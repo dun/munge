@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munge.c,v 1.1 2002/12/20 20:30:57 dun Exp $
+ *  $Id: munge.c,v 1.2 2003/02/03 23:45:04 dun Exp $
  *****************************************************************************
  *  Copyright (C) 2002-2003 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -52,7 +52,7 @@
  *  Constants  *
  ***************/
 
-#define MUNGE_DEFAULT_TTL       15
+#define MUNGE_DEFAULT_TTL       60
 #define MUNGE_PREFIX            "MUNGE"
 
 
@@ -87,6 +87,8 @@ munge_encode (char **m, const munge_ctx_t *ctx, const void *buf, int len)
     unsigned short cksum = 0;
 
     assert(m);
+
+    *m = NULL;
 
     if (len < 0) {
         len = 0;
@@ -125,11 +127,10 @@ munge_encode (char **m, const munge_ctx_t *ctx, const void *buf, int len)
 
 int
 munge_decode (const char *m, munge_ctx_t *ctx,
-              void *buf, int *plen, uid_t *puid, gid_t *pgid)
+              void **pbuf, int *plen, uid_t *puid, gid_t *pgid)
 {
     int n;
-    char *tmp;
-    int buflen;
+    char *tmpbuf;
     int tmplen;
     char *p, *q, *r;
     time_t now, then;
@@ -140,7 +141,10 @@ munge_decode (const char *m, munge_ctx_t *ctx,
 
     assert(m);
 
-    buflen = MAX(0, *plen);
+    if (pbuf && plen) {
+        *pbuf = NULL;
+        *plen = 0;
+    }
     if (time(&now) == ((time_t) -1)) {
         return(EMUNGE_SNAFU);
     }
@@ -150,52 +154,52 @@ munge_decode (const char *m, munge_ctx_t *ctx,
     m += strlen(MUNGE_PREFIX);
 
     tmplen = ((strlen(m) + 1) / 2) + 1;
-    if (!(p = tmp = malloc(tmplen))) {
+    if (!(p = tmpbuf = malloc(tmplen))) {
         return(EMUNGE_NOMEM);
     }
-    n = base32_decode(tmp, m, strlen(m));
-    tmp[n] = '\0';
+    n = base32_decode(tmpbuf, m, strlen(m));
+    tmpbuf[n] = '\0';
 
     then = (time_t) atoi(p);
     if (abs(now - then) > MUNGE_DEFAULT_TTL) {
-        free(tmp);
+        free(tmpbuf);
         return(EMUNGE_CRED_EXPIRED);
     }
 
     if ((p = strchr(p, ':') + 1) == (void *) 1) {
-        free(tmp);
+        free(tmpbuf);
         return(EMUNGE_BAD_CRED);
     }
     uid = atoi(p);
 
     if ((p = strchr(p, ':') + 1) == (void *) 1) {
-        free(tmp);
+        free(tmpbuf);
         return(EMUNGE_BAD_CRED);
     }
     gid = atoi(p);
 
     if ((p = strchr(p, ':') + 1) == (void *) 1) {
-        free(tmp);
+        free(tmpbuf);
         return(EMUNGE_BAD_CRED);
     }
     len = atoi(p);
 
     if ((p = strchr(p, ':') + 1) == (void *) 1) {
-        free(tmp);
+        free(tmpbuf);
         return(EMUNGE_BAD_CRED);
     }
 
     q = p + len;
     if (*q != ':') {
-        free(tmp);
+        free(tmpbuf);
         return(EMUNGE_BAD_CRED);
     }
     cksum0 = atoi(q+1);
-    for (r=tmp, cksum1=0; r<q; r++) {
+    for (r=tmpbuf, cksum1=0; r<q; r++) {
         cksum1 += *r;
     }
     if (cksum0 != cksum1) {
-        free(tmp);
+        free(tmpbuf);
         return(EMUNGE_BAD_CRED);
     }
 
@@ -205,13 +209,20 @@ munge_decode (const char *m, munge_ctx_t *ctx,
     if (pgid) {
         *pgid = gid;
     }
-    if (plen) {
+    if (pbuf && plen) {
         *plen = len;
-        if ((len > 0) && (buf != NULL)) {
-            memcpy(buf, p, MIN(len, buflen));
+        if (!len) {
+            *pbuf = NULL;
+        }
+        else {
+            if (!(*pbuf = malloc(len))) {
+                free(tmpbuf);
+                return(EMUNGE_NOMEM);
+            }
+            memcpy(*pbuf, p, len);
         }
     }
-    free(tmp);
+    free(tmpbuf);
     return(EMUNGE_SUCCESS);
 }
 

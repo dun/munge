@@ -1,3 +1,8 @@
+2003-02-03  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/libmunge/munge.c, src/libmunge/munge.h:
+	Tweaked API for munge_encode() and munge_decode().
+
 2002-12-20  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* : Initial commit.
