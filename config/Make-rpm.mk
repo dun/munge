@@ -3,7 +3,7 @@
 ##   by Chris Dunlap <cdunlap@llnl.gov>
 ##*
 ## ConManId: Make-rpm.mk,v 1.20 2002/08/16 00:18:29 dun Exp
-## $Id: Make-rpm.mk,v 1.5 2003/02/03 23:59:28 dun Exp $
+## $Id: Make-rpm.mk,v 1.6 2003/04/30 19:28:51 dun Exp $
 ##*
 ## REQUIREMENTS:
 ## - requires project to be under CVS version control
@@ -114,7 +114,7 @@ rpm-internal: tar-internal
 	rpmbuild --showrc | egrep "[[:space:]]_(gpg|pgp)_name[[:space:]]" \
 	  >/dev/null && sign="--sign"; \
 	if ! rpmbuild -ba --define "_tmppath $$tmp/TMP" \
-	  --define "_topdir $$tmp" $$sign --quiet $$tmp/SPECS/$$proj.spec \
+	  --define "_topdir $$tmp" $$sign $$tmp/SPECS/$$proj.spec \
 	  >$$tmp/rpm.log 2>&1; then \
 	    cat $$tmp/rpm.log; exit 1; fi; \
 	cp -p $$tmp/RPMS/*/$$proj-*.rpm $$tmp/SRPMS/$$proj-*.src.rpm . \

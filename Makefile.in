@@ -520,7 +520,7 @@ rpm-internal: tar-internal
 	rpmbuild --showrc | egrep "[[:space:]]_(gpg|pgp)_name[[:space:]]" \
 	  >/dev/null && sign="--sign"; \
 	if ! rpmbuild -ba --define "_tmppath $$tmp/TMP" \
-	  --define "_topdir $$tmp" $$sign --quiet $$tmp/SPECS/$$proj.spec \
+	  --define "_topdir $$tmp" $$sign $$tmp/SPECS/$$proj.spec \
 	  >$$tmp/rpm.log 2>&1; then \
 	    cat $$tmp/rpm.log; exit 1; fi; \
 	cp -p $$tmp/RPMS/*/$$proj-*.rpm $$tmp/SRPMS/$$proj-*.src.rpm . \
