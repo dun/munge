@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.4 2003/10/28 22:20:45 dun Exp $
+## $Id: Makefile.am,v 1.5 2003/11/26 23:07:49 dun Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
@@ -13,6 +13,9 @@ AM_CPPFLAGS = \
 
 sbin_PROGRAMS = \
 	munged
+
+munged_CFLAGS = \
+	-DWITH_PTHREADS
 
 munged_LDADD = \
 	$(top_builddir)/src/libcommon/libcommon.la \
@@ -40,6 +43,8 @@ munged_SOURCES = \
 	dec_v1.h \
 	enc_v1.c \
 	enc_v1.h \
+	hash.c \
+	hash.h \
 	lookup.c \
 	lookup.h \
 	mac.c \
@@ -50,8 +55,14 @@ munged_SOURCES = \
 	msg_server.h \
 	random.c \
 	random.h \
+	replay.c \
+	replay.h \
 	sock.c \
 	sock.h \
+	thread.c \
+	thread.h \
+	timer.c \
+	timer.h \
 	munged.c
 
 check_PROGRAMS = $(TESTS)

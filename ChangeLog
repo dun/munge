@@ -1,3 +1,12 @@
+2003-11-26  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/libcommon/munge_defs.h, src/munged/Makefile.am,
+	  src/munged/conf.c, src/munged/cred.h, src/munged/dec_v1.c,
+	  src/munged/hash.c, src/munged/hash.h, src/munged/munged.c,
+	  src/munged/replay.c, src/munged/replay.h, src/munged/thread.c,
+	  src/munged/thread.h, src/munged/timer.c, src/munged/timer.h:
+	  Added support for replay detection/prevention.
+
 2003-10-28  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* : Re-bootstrap'd with autoconf-2.57, automake-1.7.8, libtool-1.5.0a.

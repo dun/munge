@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: dec_v1.c,v 1.10 2003/10/14 17:57:47 dun Exp $
+ *  $Id: dec_v1.c,v 1.11 2003/11/26 23:07:49 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -31,6 +31,7 @@
 
 #include <assert.h>
 #include <ctype.h>
+#include <errno.h>
 #include <netinet/in.h>
 #include <string.h>
 #include "base64.h"
@@ -44,6 +45,7 @@
 #include "munge_defs.h"
 #include "munge_msg.h"
 #include "random.h"
+#include "replay.h"
 #include "str.h"
 
 
@@ -219,7 +221,7 @@ dec_v1_unarmor (munge_cred_t c)
     /*  Remove the suffix string.
      *  The suffix specifies the end of the base64-encoded data.
      *    We can't rely on the base64 pad character to detect the end,
-     *    since that only exists if the input is not a multiple of 3 bytes.
+     *    since that only exists if the input isn't a multiple of 3 bytes.
      *  However, the suffix isn't strictly necessary since whitespace
      *    is safely ignored by the base64 decoding routine.
      *  Still, it's nice to have a quick visual test to see if it's all there.
@@ -847,6 +849,7 @@ dec_v1_validate_replay (munge_cred_t c)
 /*  Validates whether this credential has been replayed.
  */
     struct munge_msg_v1 *m1;            /* munge msg (v1 format)             */
+    int rc;
 
     assert (c != NULL);
     assert (c->msg != NULL);
@@ -854,9 +857,26 @@ dec_v1_validate_replay (munge_cred_t c)
 
     m1 = c->msg->pbody;
 
-    /*  FIXME: Not implemented.
+    rc = replay_insert (c);
+
+    if (rc > 0) {
+        return (0);
+    }
+    if (rc == 0) {
+        return (_munge_msg_set_err (c->msg, EMUNGE_CRED_REPLAYED, NULL));
+    }
+    if (errno == ENOMEM) {
+        return (_munge_msg_set_err (c->msg, EMUNGE_NO_MEMORY, NULL));
+    }
+    /*  The EPERM error can only happen here if replay_insert() failed
+     *    because the replay hash is non-existent.  And that can only
+     *    happen if replay_insert() was called after replay_fini().
+     *    And that shouldn't happen.
      */
-    return (0);
+    if (errno == EPERM) {
+        return (_munge_msg_set_err (c->msg, EMUNGE_SNAFU, NULL));
+    }
+    return (-1);
 }
 
 

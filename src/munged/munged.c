@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munged.c,v 1.6 2003/05/30 01:20:12 dun Exp $
+ *  $Id: munged.c,v 1.7 2003/11/26 23:07:49 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -45,6 +45,7 @@
 #include "posignal.h"
 #include "random.h"
 #include "sock.h"
+#include "timer.h"
 
 
 /*****************************************************************************
@@ -74,8 +75,12 @@ int
 main (int argc, char *argv[])
 {
     int fd = -1;
+    int priority = LOG_NOTICE;
 
-    log_open_file (stderr, argv[0], LOG_NOTICE, LOG_OPT_PRIORITY);
+#ifndef NDEBUG
+    priority = LOG_DEBUG;
+#endif /* NDEBUG */
+    log_open_file (stderr, argv[0], priority, LOG_OPT_PRIORITY);
 
     handle_signals ();
 
@@ -87,11 +92,6 @@ main (int argc, char *argv[])
     }
     /*  FIXME: Parse config file.  */
 
-    lookup_ip_addr (conf);
-    random_init (conf->seed_name);
-    crypto_thread_init ();
-    create_subkeys (conf);
-
     if (!conf->got_foreground) {
         /*
          *  FIXME: Revamp logfile kludge.
@@ -102,6 +102,12 @@ main (int argc, char *argv[])
         daemonize_fini (fd);
     }
 
+    lookup_ip_addr (conf);
+    random_init (conf->seed_name);
+    crypto_thread_init ();
+    create_subkeys (conf);
+    timer_init ();
+
     log_msg (LOG_NOTICE, "Starting %s daemon %s (pid %d)",
         PACKAGE, VERSION, (int) getpid());
 
@@ -109,6 +115,7 @@ main (int argc, char *argv[])
     munge_sock_accept (conf);
     munge_sock_destroy (conf);
 
+    timer_fini ();
     crypto_thread_fini ();
     random_fini (conf->seed_name);
     destroy_conf (conf);
@@ -145,8 +152,10 @@ handle_signals (void)
 static void
 exit_handler (int signum)
 {
-    log_msg (LOG_NOTICE, "Exiting on signal=%d", signum);
-    done = 1;
+    if (!done) {
+        done = 1;
+        log_msg (LOG_NOTICE, "Exiting on signal=%d", signum);
+    }
     return;
 }
 

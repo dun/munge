@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: cred.h,v 1.2 2003/04/18 23:20:18 dun Exp $
+ *  $Id: cred.h,v 1.3 2003/11/26 23:07:49 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -44,8 +44,16 @@
 
 #define MAX_DEK         EVP_MAX_KEY_LENGTH
 #define MAX_IV          EVP_MAX_IV_LENGTH
-#define MAX_MAC         EVP_MAX_MD_SIZE
+#define MAX_MAC         20
 #define MAX_SALT        MUNGE_CRED_SALT_LEN
+
+/*  MAX_MAC is currently set to 20 (ie, 160 bits).  This handles the largest
+ *    message digests supported by munge_mac_t.  Note, however, <openssl/evp.h>
+ *    defines EVP_MAX_MD_SIZE which is currently set to (16+20) to handle the
+ *    SSLv3 md5+sha1 type.  But since MUNGE doesn't support that type, setting
+ *    MAX_MAC at 20 reduces the memory requirements for data structures such as
+ *    the replay hash.
+ */
 
 
 /*****************************************************************************

@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munge_defs.h,v 1.14 2003/10/14 20:58:24 dun Exp $
+ *  $Id: munge_defs.h,v 1.15 2003/11/26 23:07:49 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -34,82 +34,86 @@
 
 /*  Munge credential prefix string.
  */
-#define MUNGE_CRED_PREFIX       "MUNGE:"
+#define MUNGE_CRED_PREFIX               "MUNGE:"
 
 /*  Munge credential suffix string.
  */
-#define MUNGE_CRED_SUFFIX       ":"
+#define MUNGE_CRED_SUFFIX               ":"
 
 /*  Current version of the munge credential format.
  */
-#define MUNGE_CRED_VERSION      1
+#define MUNGE_CRED_VERSION              1
 
 /*  Amount of salt (in bytes) encoded into a credential.
  */
-#define MUNGE_CRED_SALT_LEN     8
+#define MUNGE_CRED_SALT_LEN             8
 
 /*  Default munge_cipher_t for encrypting credentials.
  */
-#define MUNGE_DEFAULT_CIPHER    MUNGE_CIPHER_CAST5
+#define MUNGE_DEFAULT_CIPHER            MUNGE_CIPHER_CAST5
 
 /*  Default munge_mac_t for validating credentials.
  *    This should NEVER be set to MUNGE_MAC_NONE.
  */
-#define MUNGE_DEFAULT_MAC       MUNGE_MAC_SHA1
+#define MUNGE_DEFAULT_MAC               MUNGE_MAC_SHA1
 
 /*  Integer for the default number of seconds before a credential expires.
  */
-#define MUNGE_DEFAULT_TTL       300
+#define MUNGE_DEFAULT_TTL               300
 
 /*  Integer for the maximum number of seconds before a credential expires.
  */
-#define MUNGE_MAXIMUM_TTL       3600
+#define MUNGE_MAXIMUM_TTL               3600
+
+/*  Integer for the number of seconds between purging the replay hash
+ *    of expired creds.
+ */
+#define MUNGE_REPLAY_PURGE_TIMER        300
 
 /*  Default munge_zip_t for compressing credentials.
  */
-#define MUNGE_DEFAULT_ZIP       MUNGE_ZIP_NONE
+#define MUNGE_DEFAULT_ZIP               MUNGE_ZIP_NONE
 
 /*  Integer (uint32_t) sentinel for valid munge message.
  */
-#define MUNGE_MSG_MAGIC         0x00606D4B
+#define MUNGE_MSG_MAGIC                 0x00606D4B
 
 /*  Current version of the munge client-server message format.
  */
-#define MUNGE_MSG_VERSION       1
+#define MUNGE_MSG_VERSION               1
 
 /*  Socket backlog for the server listening on the unix domain socket.
  */
-#define MUNGE_SOCKET_BACKLOG    128
+#define MUNGE_SOCKET_BACKLOG            128
 
 /*  String specifying the unix domain socket pathname for client-server comms.
  */
-#define MUNGE_SOCKET_NAME       "/tmp/.munge-sock"
+#define MUNGE_SOCKET_NAME               "/tmp/.munge-sock"
 
 /*  Number of attempts a client makes connecting to the server before failing.
  */
-#define MUNGE_SOCKET_RETRIES    5
+#define MUNGE_SOCKET_RETRIES            5
 
 /*  String specifying the pathname of the daemon's logfile.
  *    FIXME: Temporary kludge until configuration file support is added.
  */
-#define MUNGED_LOGFILE          "/tmp/.munge-log"
+#define MUNGED_LOGFILE                  "/tmp/.munge-log"
 
 /*  String specifying the pathname of the random seed file.
  *    FIXME: Temporary kludge until configuration file support is added.
  */
-#define MUNGED_RANDOM_SEED      "/tmp/.munge-seed"
+#define MUNGED_RANDOM_SEED              "/tmp/.munge-seed"
 
 /*  String specifying the pathname of the secret key file.
  *    FIXME: Temporary kludge until configuration file support is added.
  */
-/* #define MUNGED_SECRET_KEY       "/tmp/.munge-key"
- */
-#define MUNGED_SECRET_KEY       "/etc/ssh/ssh_host_key"
+#define MUNGED_SECRET_KEY               "/tmp/.munge-key"
+// #define MUNGED_SECRET_KEY               "/etc/ssh/ssh_host_key"
 
 /*  String specifying the pathname of the random number source device to use
  *    in case the MUNGED_RANDOM_SEED file contains insufficient entropy.
  */
-#define RANDOM_SEED_DEFAULT     "/dev/urandom"
+#define RANDOM_SEED_DEFAULT             "/dev/urandom"
 
 
 #endif /* !MUNGE_DEFS_H */

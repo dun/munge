@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: conf.c,v 1.10 2003/09/18 21:09:26 dun Exp $
+ *  $Id: conf.c,v 1.11 2003/11/26 23:07:49 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -45,6 +45,7 @@
 #include "log.h"
 #include "md.h"
 #include "munge_defs.h"
+#include "replay.h"
 
 
 /*****************************************************************************
@@ -112,6 +113,9 @@ create_conf (void)
     conf->dek_key_len = 0;
     conf->mac_key = NULL;
     conf->mac_key_len = 0;
+
+    replay_init ();
+
     return (conf);
 }
 
@@ -149,6 +153,9 @@ destroy_conf (conf_t conf)
         conf->mac_key = NULL;
     }
     free (conf);
+
+    replay_fini ();
+
     return;
 }
 
