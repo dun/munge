@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: read.c,v 1.6 2004/04/03 21:53:00 dun Exp $
+ *  $Id: read.c,v 1.7 2004/11/18 00:38:46 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -126,7 +126,7 @@ read_data_from_string (const char *s, void **buf, int *len)
         n++;
 
     if (!(p = malloc (n + 1)))          /* reserve space for terminating NUL */
-        return(-1);
+        return (-1);
     strcpy (p, s);                      /* strcpy() is safe to use here */
     p[n - 1] = '\n';
     p[n] = '\0';
