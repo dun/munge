@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: work.c,v 1.3 2004/09/17 20:23:35 dun Exp $
+ *  $Id: work.c,v 1.4 2004/11/09 02:05:47 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -244,7 +244,7 @@ work_fini (work_p wp, int do_wait)
 int
 work_queue (work_p wp, void *work)
 {
-    int rc;
+    int rc = 0;
     int do_signal = 0;
 
     if (!wp || !work) {
@@ -259,17 +259,16 @@ work_queue (work_p wp, void *work)
         errno = EPERM;
         rc = -1;
     }
-    else {
+    else if (_work_enqueue (wp, work) == NULL) {
+        errno = EINVAL;
+        rc = -1;
+    }
+    else if ((wp->n_workers - wp->n_working) > 0) {
         /*
          *  Awaken an idle worker if possible.
          *  Set a flag here so the signal can be done outside the monitor lock.
          */
-        if ((wp->n_workers - wp->n_working) > 0) {
-            do_signal = 1;
-        }
-        if (_work_enqueue (wp, work) != NULL) {
-            rc = 0;
-        }
+        do_signal = 1;
     }
     if ((errno = pthread_mutex_unlock (&wp->lock)) != 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR,

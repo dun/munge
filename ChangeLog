@@ -1,5 +1,9 @@
 2004-11-08  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/munged/work.c(work_queue):
+	  Fixed bug where rc was used uninitialized.
+	  Do not signal condition if _work_enqueue() fails.
+
 	* src/libcommon/munge_msg.c:
 	  Documented maxlen parm in munge_msg_send() and munge_msg_recv().
 
