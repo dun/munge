@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: fd.h,v 1.1 2003/04/08 18:16:16 dun Exp $
+ *  $Id: fd.h,v 1.2 2003/05/22 23:23:20 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -51,33 +51,33 @@ int fd_set_nonblocking (int fd);
 
 int fd_get_read_lock (int fd);
 /*
- *  Obtain a read lock on the file specified by [fd].
+ *  Obtains a read lock on the file specified by [fd].
  *  Returns 0 on success, or -1 if prevented from obtaining the lock.
  */
 
 int fd_get_readw_lock (int fd);
 /*
- *  Obtain a read lock on the file specified by [fd],
+ *  Obtains a read lock on the file specified by [fd],
  *    blocking until one becomes available.
  *  Returns 0 on success, or -1 on error.
  */
 
 int fd_get_write_lock (int fd);
 /*
- *  Obtain a write lock on the file specified by [fd].
+ *  Obtains a write lock on the file specified by [fd].
  *  Returns 0 on success, or -1 if prevented from obtaining the lock.
  */
 
 int fd_get_writew_lock (int fd);
 /*
- *  Obtain a write lock on the file specified by [fd],
+ *  Obtains a write lock on the file specified by [fd],
  *    blocking until one becomes available.
  *  Returns 0 on success, or -1 on error.
  */
 
 int fd_release_lock (int fd);
 /*
- *  Release a lock held on the file specified by [fd].
+ *  Releases a lock held on the file specified by [fd].
  *  Returns 0 on success, or -1 on error.
  */
 
