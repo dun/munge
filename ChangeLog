@@ -1,5 +1,7 @@
 2004-12-02  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* README: Updated notes regarding creation of secret key.
+
 	* src/etc/munge.init: Revamped for SuSE and maybe LSB.
 
 	* configure.ac, config/x_ac_check_ssl.m4:

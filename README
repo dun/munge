@@ -42,8 +42,11 @@ Getting started:
      B. You can enter the hash of a password:
         echo -n "foo" | sha1sum | cut -d' ' -f1 >secret
 
-     C. You can grab some random data (recommended):
-        dd if=/dev/random bs=1024 count=1 >secret
+     C. You can grab some pseudo random data:
+        dd if=/dev/urandom bs=1 count=1024 >secret
+
+     D. You can wait around for some random data (recommended):
+        dd if=/dev/random bs=1 count=1024 >secret
 
   4. Ensure this file is permissioned 0400 and owned by the same user that
      the 'munged' daemon will run as.  On most platforms, root privileges
