@@ -1,5 +1,7 @@
 2005-01-26  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* munge.spec: Added 'devel' and 'libs' subpackages.
+
 	* munge.spec: Added version number so "rpmbuild -ta" will work.
 
 	* munge.spec:
