@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munge_msg.c,v 1.11 2003/12/12 22:15:42 dun Exp $
+ *  $Id: munge_msg.c,v 1.12 2003/12/19 00:18:25 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -46,6 +46,9 @@
 munge_err_t
 _munge_msg_create (munge_msg_t *pm, int sd)
 {
+/*  Creates a message bound to the socket [sd], returning it via the [pm] ptr.
+ *  Returns a standard munge error code.
+ */
     munge_msg_t m;
 
     assert (pm != NULL);
@@ -70,6 +73,8 @@ _munge_msg_create (munge_msg_t *pm, int sd)
 void
 _munge_msg_destroy (munge_msg_t m)
 {
+/*  Destroys the message [m].
+ */
     assert (m != NULL);
 
     if (m->sd >= 0) {
@@ -94,9 +99,11 @@ _munge_msg_destroy (munge_msg_t m)
 munge_err_t
 _munge_msg_send (munge_msg_t m)
 {
-/*  The message sent across the socket contains a common message header
- *    and a version-specific message body.
- *  Currently, only v1 messages are used.
+/*  Sends the message [m] to the recipient at the other end of the
+ *    already-specified socket.
+ *  This message contains a common header and a version-specific body.
+ *    Currently, only v1 messages are used.
+ *  Returns a standard munge error code.
  */
     int                  n, l;
     struct munge_msg_v1 *m1;
@@ -153,6 +160,10 @@ again:
 munge_err_t
 _munge_msg_recv (munge_msg_t m)
 {
+/*  Receives a message from the sender at the other end of the already-
+ *    specified socket.  This message is stored in the already-allocated [m].
+ *  Returns a standard munge error code.
+ */
     int                  n, l;
     struct munge_msg_v1 *m1;
 
@@ -160,6 +171,8 @@ _munge_msg_recv (munge_msg_t m)
     assert (m->sd >= 0);
     assert (m->pbody == NULL);
 
+    /*  Read and validate the message header.
+     */
     n = sizeof (m->head);
     if ((l = fd_read_n (m->sd, &(m->head), n)) < 0) {
         _munge_msg_set_err (m, EMUNGE_SOCKET,
@@ -188,7 +201,11 @@ _munge_msg_recv (munge_msg_t m)
             strdupf ("Received invalid message length %d", m->head.length));
         return (EMUNGE_SOCKET);
     }
-    n = m->head.length + 1;             /* reserve space for terminating NUL */
+    /*  Read the version-specific message body.
+     *  Reserve space for a terminating NUL character.  This NUL is not
+     *    transmitted across the socket, but will be appended afterwards.
+     */
+    n = m->head.length + 1;
     if (!(m->pbody = malloc (n))) {
         _munge_msg_set_err (m, EMUNGE_NO_MEMORY,
             strdupf ("Unable to malloc %d bytes for message", n));
@@ -207,27 +224,38 @@ _munge_msg_recv (munge_msg_t m)
         return (EMUNGE_SOCKET);
     }
     m1 = m->pbody;
+    /*
+     *  Locate the realm string (if present) within the message body.
+     *    It immediately follows the munge_msg_v1 struct.
+     */
     n = sizeof (*m1);
     if (m1->realm_len > 0) {
-        m1->realm = ((char *) m1) + n;  /* m1->realm is inside m->pbody mem */
+        m1->realm = ((char *) m1) + n;
         n += m1->realm_len;
     }
     else {
         m1->realm = NULL;
     }
+    /*  Locate the message payload data (if present) within the message body.
+     *    It immediately follows the realm string.
+     */
     if (m1->data_len > 0) {
-        m1->data = ((char *) m1) + n;   /* m1->data is inside m->pbody mem */
+        m1->data = ((char *) m1) + n;
         n += m1->data_len;
     }
     else {
         m1->data = NULL;
     }
+    /*  Validate the length of the version-specific message body.
+     */
     if (n != m->head.length) {
         _munge_msg_set_err (m, EMUNGE_SOCKET,
             strdupf ("Received unexpected message length: %d of %d bytes",
                 m->head.length, n));
         return (EMUNGE_SOCKET);
     }
+    /*  Append the terminating NUL character now that the length is verified.
+     */
     ((char *) m->pbody)[m->head.length] = '\0';
     /*
      *  If an error message was returned, copy the error condition
@@ -244,6 +272,12 @@ _munge_msg_recv (munge_msg_t m)
 munge_err_t
 _munge_msg_reset (munge_msg_t m)
 {
+/*  Resets the message struct [m] for a new message.
+ *  This allows the struct used for receiving the request to be re-used
+ *    for sending the response without having to re-allocate everything.
+ *  It seemed like a good idea at the time.
+ *  Returns a standard munge error code.
+ */
     assert (m != NULL);
 
     m->head.magic = MUNGE_MSG_MAGIC;
@@ -286,7 +320,7 @@ _munge_msg_set_err (munge_msg_t m, munge_err_t e, char *s)
         assert (m->errstr == NULL);
         m->errstr = (s != NULL) ? s : strdup (munge_strerror (e));;
     }
-    /*  Screw you guys, I'm goin' home.
+    /*  "Screw you guys, I'm goin' home." -ecartman
      */
     return (-1);
 }
