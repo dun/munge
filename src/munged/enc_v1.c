@@ -1,11 +1,11 @@
 /*****************************************************************************
- *  $Id: enc_v1.c,v 1.8 2003/10/14 17:12:41 dun Exp $
+ *  $Id: enc_v1.c,v 1.9 2004/01/16 02:18:37 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
  *  UCRL-CODE-2003-???.
  *
- *  Copyright (C) 2003 The Regents of the University of California.
+ *  Copyright (C) 2003-2004 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
  *  Written by Chris Dunlap <cdunlap@llnl.gov>.
  *
@@ -43,6 +43,7 @@
 #include "lookup.h"
 #include "mac.h"
 #include "md.h"
+#include "msg_server.h"
 #include "munge_defs.h"
 #include "munge_msg.h"
 #include "random.h"
@@ -77,19 +78,11 @@ static int enc_v1_fini (munge_cred_t c);
  *  Extern Functions
  *****************************************************************************/
 
-/*  FIXME: Revisit init/fini.
- */
-/*  FIXME: Change process_msg return type to void?
- */
 int
 enc_v1_process_msg (munge_msg_t m)
 {
     munge_cred_t c = NULL;              /* aux data for processing this cred */
     int          rc = -1;               /* return code                       */
-
-    assert (m != NULL);
-    assert (m->head.version == 1);
-    assert (m->head.type = MUNGE_MSG_ENC_REQ);
 
     if (enc_v1_validate_msg (m) < 0)
         ;
@@ -115,11 +108,15 @@ enc_v1_process_msg (munge_msg_t m)
         ;
     else if (enc_v1_fini (c) < 0)
         ;
-    else if (_munge_msg_send (m) != EMUNGE_SUCCESS)
-        ;
     else /* success */
         rc = 0;
 
+    if (rc < 0) {
+        err_v1_response (m);
+    }
+    if (_munge_msg_send (m) != EMUNGE_SUCCESS) {
+        rc = -1;
+    }
     cred_destroy (c);
     return (rc);
 }
@@ -136,10 +133,13 @@ enc_v1_validate_msg (munge_msg_t m)
 
     assert (m != NULL);
     assert (m->head.version == 1);
+    assert (m->head.type == MUNGE_MSG_ENC_REQ);
 
     m1 = m->pbody;
 
     /*  Reset message type for the response.
+     *  From this point on, now that the return message type is set,
+     *    errors are returned to the client instead of being silently dropped.
      */
     m->head.type = MUNGE_MSG_ENC_RSP;
     /*

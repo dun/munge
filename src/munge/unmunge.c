@@ -1,11 +1,11 @@
 /*****************************************************************************
- *  $Id: unmunge.c,v 1.16 2003/09/18 21:09:26 dun Exp $
+ *  $Id: unmunge.c,v 1.17 2004/01/16 02:18:37 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
  *  UCRL-CODE-2003-???.
  *
- *  Copyright (C) 2003 The Regents of the University of California.
+ *  Copyright (C) 2003-2004 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
  *  Written by Chris Dunlap <cdunlap@llnl.gov>.
  *
@@ -194,11 +194,21 @@ main (int argc, char *argv[])
     conf->status = munge_decode (conf->cred, conf->ctx,
         &conf->data, &conf->dlen, &conf->uid, &conf->gid);
 
-    if (conf->status != EMUNGE_SUCCESS) {
+    /*  If the credential is expired, rewound, or replayed, the integrity
+     *    of its contents is valid even though the credential itself is not.
+     *  As such, display the metadata & payload with an appropriate status
+     *    if the integrity checks succeed; o/w, exit out here with an error.
+     */
+    if  (  (conf->status != EMUNGE_SUCCESS)
+        && (conf->status != EMUNGE_CRED_EXPIRED)
+        && (conf->status != EMUNGE_CRED_REWOUND)
+        && (conf->status != EMUNGE_CRED_REPLAYED) )
+    {
         if (!(p = munge_ctx_strerror (conf->ctx)))
             p = munge_strerror (conf->status);
         log_err (conf->status, LOG_ERR, "%s", p);
     }
+
     display_meta (conf);
     display_data (conf);
 
@@ -249,7 +259,7 @@ create_conf (void)
 void
 destroy_conf (conf_t conf)
 {
-    /*  XXX: Don't free conf's fn_in/fn_meta/fn_out
+    /*  XXX: Don't free() conf's fn_in/fn_meta/fn_out
      *       since they point inside argv[].
      */
     if (conf->ctx != NULL) {
@@ -276,11 +286,13 @@ destroy_conf (conf_t conf)
         conf->fp_out = NULL;
     }
     if (conf->cred) {
+        assert (conf->clen > 0);
         memset (conf->cred, 0, conf->clen);
         free (conf->cred);
         conf->cred = NULL;
     }
     if (conf->data) {
+        assert (conf->dlen > 0);
         memset (conf->data, 0, conf->dlen);
         free (conf->data);
         conf->data = NULL;
@@ -537,9 +549,6 @@ display_meta (conf_t conf)
         fprintf (conf->fp_meta, "%s:%*c%s (%d)\n", s, w, 0x20,
             munge_strerror (conf->status), conf->status);
     }
-    if (conf->status != EMUNGE_SUCCESS) {
-        return;
-    }
     if (conf->key[MUNGE_KEY_ORIGIN]) {
         e = munge_ctx_get (conf->ctx, MUNGE_OPT_ADDR4, &addr);
         if (e != EMUNGE_SUCCESS)
@@ -646,14 +655,18 @@ display_meta (conf_t conf)
         w = pad - strlen (s);
         fprintf (conf->fp_meta, "%s:%*c%d\n", s, w, 0x20, conf->dlen);
     }
+    /*  Since we've been ignoring the return values of fprintf(),
+     *    check for errors on fp_meta.
+     */
+    if (ferror (conf->fp_meta)) {
+        log_err (EMUNGE_SNAFU, LOG_ERR, "Write error");
+    }
     /*  Separate metadata from payload with a newline
      *    if they are both going to the same place.
      */
     if (conf->fp_meta == conf->fp_out) {
         fprintf (conf->fp_meta, "\n");
     }
-    /*  FIXME: Check fprintf() retvals?
-     */
     return;
 }
 
@@ -661,7 +674,7 @@ display_meta (conf_t conf)
 void
 display_data (conf_t conf)
 {
-    if (conf->status != EMUNGE_SUCCESS)
+    if ((conf->dlen <= 0) || (!conf->data))
         return;
     if (!conf->fp_out)
         return;

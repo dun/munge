@@ -1,11 +1,11 @@
 /*****************************************************************************
- *  $Id: msg_client.c,v 1.4 2003/05/22 18:24:21 dun Exp $
+ *  $Id: msg_client.c,v 1.5 2004/01/16 02:18:37 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
  *  UCRL-CODE-2003-???.
  *
- *  Copyright (C) 2003 The Regents of the University of California.
+ *  Copyright (C) 2003-2004 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
  *  Written by Chris Dunlap <cdunlap@llnl.gov>.
  *
@@ -94,7 +94,7 @@ _munge_msg_client_connect (munge_msg_t m, char *path)
          * If a call to connect() for a Unix domain stream socket finds that
          *   the listening socket's queue is full, ECONNREFUSED is returned
          *   immediately.  (cf, Stevens UNPv1, s14.4, p378)
-         * In case of ECONNREFUSED, try again up to MUNGE_SOCKET_RETRIES.
+         * If ECONNREFUSED, try again up to MUNGE_SOCKET_CONNECT_RETRIES.
          */
         n = connect (sd, (struct sockaddr *) &addr, sizeof (addr));
         if (n == 0)
@@ -103,7 +103,7 @@ _munge_msg_client_connect (munge_msg_t m, char *path)
             continue;
         if (errno != ECONNREFUSED)
             break;
-        if (i >= MUNGE_SOCKET_RETRIES)
+        if (i >= MUNGE_SOCKET_CONNECT_RETRIES)
             break;
         sleep (delay);
         delay++;

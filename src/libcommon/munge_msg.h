@@ -1,11 +1,11 @@
 /*****************************************************************************
- *  $Id: munge_msg.h,v 1.6 2003/05/30 01:20:12 dun Exp $
+ *  $Id: munge_msg.h,v 1.7 2004/01/16 02:18:37 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
  *  UCRL-CODE-2003-???.
  *
- *  Copyright (C) 2002-2003 The Regents of the University of California.
+ *  Copyright (C) 2002-2004 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
  *  Written by Chris Dunlap <cdunlap@llnl.gov>.
  *
@@ -45,9 +45,22 @@
  *  Data Types
  *****************************************************************************/
 
+/*  The munge_msg_v1 struct is used to handle data passed over the domain
+ *    socket between client (libmunge) and server (munged), as well as data
+ *    for the credential itself.  This seemed like a good idea at the time,
+ *    but has caused some confusion since the data representation differs
+ *    slightly in both cases.
+ *  In particular, the realm string and error string passed over the domain
+ *    socket are both NUL-terminated in addition to carrying a string length
+ *    (which includes the NUL character).
+ *  In contrast, the realm string packed inside the credential is not
+ *    NUL-terminated; instead, it is represented as a length followed by an
+ *    unterminated string.  This saved space in the credential (since the
+ *    NUL would have been redundant) and allowed for quicker unpacking.  
+ */
+
 enum munge_type {                       /* message type                      */
     MUNGE_MSG_UNKNOWN,                  /*  uninitialized message            */
-    MUNGE_MSG_ERROR,                    /*  error message                    */
     MUNGE_MSG_ENC_REQ,                  /*  encode request message           */
     MUNGE_MSG_ENC_RSP,                  /*  encode response message          */
     MUNGE_MSG_DEC_REQ,                  /*  decode request message           */
@@ -63,7 +76,6 @@ struct munge_msg_head {
 };
 
 struct munge_msg_v1 {
-    uint8_t                 errnum;     /* munge_err_t for encode/decode op  */
     uint8_t                 cipher;     /* munge_cipher_t enum               */
     uint8_t                 zip;        /* munge_zip_t enum                  */
     uint8_t                 mac;        /* munge_mac_t enum                  */
@@ -78,6 +90,9 @@ struct munge_msg_v1 {
     uint32_t                gid;        /* client process GID encoding cred  */
     uint32_t                data_len;   /* length of data                    */
     void                   *data;       /* ptr to data munged into cred      */
+    uint8_t                 error_num;  /* munge_err_t for encode/decode op  */
+    uint8_t                 error_len;  /* length of err msg str with NUL    */
+    char                   *error_str;  /* NUL-term'd descriptive errmsg str */
 };
 
 struct munge_msg {
@@ -85,8 +100,8 @@ struct munge_msg {
     struct munge_msg_head   head;       /* message header                    */
     int                     pbody_len;  /* length of msg body mem allocation */
     void                   *pbody;      /* ptr to msg body based on version  */
-    munge_err_t             status;     /* munge status code                 */
-    char                   *errstr;     /* munge error string                */
+    munge_err_t             errnum;     /* munge error status code           */
+    char                   *errstr;     /* munge NUL-term'd error string     */
 };
 
 typedef struct munge_msg * munge_msg_t;

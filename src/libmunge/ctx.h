@@ -1,11 +1,11 @@
 /*****************************************************************************
- *  $Id: ctx.h,v 1.5 2003/05/30 01:20:12 dun Exp $
+ *  $Id: ctx.h,v 1.6 2004/01/16 02:18:37 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
  *  UCRL-CODE-2003-???.
  *
- *  Copyright (C) 2002-2003 The Regents of the University of California.
+ *  Copyright (C) 2002-2004 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
  *  Written by Chris Dunlap <cdunlap@llnl.gov>.
  *
@@ -41,8 +41,8 @@
 
 struct munge_ctx {
     int                 cipher;         /* symmetric cipher type             */
-    int                 mac;            /* message authentication code type  */
     int                 zip;            /* compression type                  */
+    int                 mac;            /* message authentication code type  */
     char               *realm;          /* security realm                    */
     int                 ttl;            /* time-to-live                      */
     struct in_addr      addr;           /* IP addr where cred was encoded    */

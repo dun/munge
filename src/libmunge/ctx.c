@@ -1,11 +1,11 @@
 /*****************************************************************************
- *  $Id: ctx.c,v 1.8 2003/09/18 21:09:26 dun Exp $
+ *  $Id: ctx.c,v 1.9 2004/01/16 02:18:37 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
  *  UCRL-CODE-2003-???.
  *
- *  Copyright (C) 2002-2003 The Regents of the University of California.
+ *  Copyright (C) 2002-2004 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
  *  Written by Chris Dunlap <cdunlap@llnl.gov>.
  *
@@ -54,8 +54,8 @@ munge_ctx_create (void)
         return (NULL);
     }
     ctx->cipher = MUNGE_CIPHER_DEFAULT;
-    ctx->mac = MUNGE_MAC_DEFAULT;
     ctx->zip = MUNGE_ZIP_DEFAULT;
+    ctx->mac = MUNGE_MAC_DEFAULT;
     ctx->realm = NULL;
     ctx->ttl = MUNGE_TTL_DEFAULT;
     ctx->addr.s_addr = 0;
@@ -138,13 +138,13 @@ munge_ctx_get (munge_ctx_t ctx, munge_opt_t opt, ...)
             p2int = va_arg (vargs, int *);
             *p2int = ctx->cipher;
             break;
-        case MUNGE_OPT_MAC_TYPE:
-            p2int = va_arg (vargs, int *);
-            *p2int = ctx->mac;
-            break;
         case MUNGE_OPT_ZIP_TYPE:
             p2int = va_arg (vargs, int *);
             *p2int = ctx->zip;
+            break;
+        case MUNGE_OPT_MAC_TYPE:
+            p2int = va_arg (vargs, int *);
+            *p2int = ctx->mac;
             break;
         case MUNGE_OPT_REALM:
             p2str = va_arg (vargs, char **);
@@ -202,11 +202,11 @@ munge_ctx_set (munge_ctx_t ctx, munge_opt_t opt, ...)
         case MUNGE_OPT_CIPHER_TYPE:
             ctx->cipher = va_arg (vargs, int);
             break;
-        case MUNGE_OPT_MAC_TYPE:
-            ctx->mac = va_arg (vargs, int);
-            break;
         case MUNGE_OPT_ZIP_TYPE:
             ctx->zip = va_arg (vargs, int);
+            break;
+        case MUNGE_OPT_MAC_TYPE:
+            ctx->mac = va_arg (vargs, int);
             break;
         case MUNGE_OPT_REALM:
             str = va_arg (vargs, char *);
@@ -259,29 +259,22 @@ munge_ctx_set (munge_ctx_t ctx, munge_opt_t opt, ...)
 munge_err_t
 _munge_ctx_set_err (munge_ctx_t ctx, munge_err_t e, char *s)
 {
-/*  Sets an error code [e] and string [s] to be returned via the
- *    munge context [ctx].
+/*  If an error condition does not already exist, sets an error code [e]
+ *    and string [s] to be returned via the munge context [ctx].
  *  If [s] is not NULL, that string (and _not_ a copy) will be stored
  *    and later free()'d by the context destructor.
- *  Returns the error code [e].
+ *  Returns the [ctx] error code and consumes the string [s].
  */
     if (ctx) {
-        ctx->errnum = e;
-        if (ctx->errstr) {
-            free (ctx->errstr);
-        }
-        if (e == EMUNGE_SUCCESS) {
-            if (s) {
-                free (s);
-            }
-            ctx->errstr = NULL;
-        }
-        else {
+        if ((ctx->errnum == EMUNGE_SUCCESS) && (e != EMUNGE_SUCCESS)) {
+            ctx->errnum = e;
+            assert (ctx->errstr == NULL);
             ctx->errstr = s;
+            s = NULL;
         }
     }
-    else if (s) {
+    if (s) {
         free (s);
     }
-    return (e);
+    return (ctx->errnum);
 }

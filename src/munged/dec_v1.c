@@ -1,11 +1,11 @@
 /*****************************************************************************
- *  $Id: dec_v1.c,v 1.11 2003/11/26 23:07:49 dun Exp $
+ *  $Id: dec_v1.c,v 1.12 2004/01/16 02:18:37 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
  *  UCRL-CODE-2003-???.
  *
- *  Copyright (C) 2003 The Regents of the University of California.
+ *  Copyright (C) 2003-2004 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
  *  Written by Chris Dunlap <cdunlap@llnl.gov>.
  *
@@ -42,6 +42,7 @@
 #include "lookup.h"
 #include "mac.h"
 #include "md.h"
+#include "msg_server.h"
 #include "munge_defs.h"
 #include "munge_msg.h"
 #include "random.h"
@@ -70,24 +71,17 @@ static int dec_v1_unpack_inner (munge_cred_t c);
 static int dec_v1_validate_mac (munge_cred_t c);
 static int dec_v1_validate_time (munge_cred_t c);
 static int dec_v1_validate_replay (munge_cred_t c);
-static int dec_v1_fini (munge_cred_t c);
 
 
 /*****************************************************************************
  *  Extern Functions
  *****************************************************************************/
 
-/*  FIXME: Revisit init/fini.
- */
 int
 dec_v1_process_msg (munge_msg_t m)
 {
     munge_cred_t c = NULL;              /* aux data for processing this cred */
     int          rc = -1;               /* return code                       */
-
-    assert (m != NULL);
-    assert (m->head.version == 1);
-    assert (m->head.type = MUNGE_MSG_DEC_REQ);
 
     if (dec_v1_validate_msg (m) < 0)
         ;
@@ -111,13 +105,15 @@ dec_v1_process_msg (munge_msg_t m)
         ;
     else if (dec_v1_validate_replay (c) < 0)
         ;
-    else if (dec_v1_fini (c) < 0)
-        ;
-    else if (_munge_msg_send (m) != EMUNGE_SUCCESS)
-        ;
     else /* success */
         rc = 0;
 
+    if (rc < 0) {
+        err_v1_response (m);
+    }
+    if (_munge_msg_send (m) != EMUNGE_SUCCESS) {
+        rc = -1;
+    }
     cred_destroy (c);
     return (rc);
 }
@@ -134,13 +130,20 @@ dec_v1_validate_msg (munge_msg_t m)
 
     assert (m != NULL);
     assert (m->head.version == 1);
+    assert (m->head.type == MUNGE_MSG_DEC_REQ);
 
     m1 = m->pbody;
 
     /*  Reset message type for the response.
+     *  From this point on, now that the return message type is set,
+     *    errors are returned to the client instead of being silently dropped.
      */
     m->head.type = MUNGE_MSG_DEC_RSP;
 
+    if (!m1->data_len || !m1->data) {
+        return (_munge_msg_set_err (m, EMUNGE_SNAFU,
+            strdup ("No credential specified in decode request")));
+    }
     return (0);
 }
 
@@ -313,7 +316,7 @@ dec_v1_unpack_outer (munge_cred_t c)
             strdup ("Truncated credential version")));
     }
     c->version = *p;
-    if (c->version != 1) {
+    if ((!c->version) || (c->version > MUNGE_CRED_VERSION)) {
         return (_munge_msg_set_err (c->msg, EMUNGE_BAD_VERSION,
             strdupf ("Unsupported credential version %d", c->version)));
     }
@@ -388,21 +391,27 @@ dec_v1_unpack_outer (munge_cred_t c)
     p += n;
     len -= n;
     /*
-     *  Unpack the realm string (if present).
-     *  FIXME: Ensure this string can reside in outer mem w/o being copied.
+     *  Unpack the unterminated realm string (if present).
+     *    Note that the realm string is NUL-terminated after unpacking.
      */
     if (m1->realm_len > 0) {
         if (m1->realm_len > len) {
             return (_munge_msg_set_err (c->msg, EMUNGE_BAD_CRED,
                 strdup ("Truncated credential realm string")));
         }
-        if (p[m1->realm_len] != '\0') {
-            return (_munge_msg_set_err (c->msg, EMUNGE_BAD_CRED,
-                strdup ("Unterminated credential realm string")));
+        c->realm_mem_len = m1->realm_len + 1;
+        if (!(c->realm_mem = malloc (c->realm_mem_len))) {
+            return (_munge_msg_set_err (c->msg, EMUNGE_NO_MEMORY, NULL));
         }
-        m1->realm = p;                  /* realm string resides in outer_mem */
+        memcpy (c->realm_mem, p, m1->realm_len);
+        c->realm_mem[m1->realm_len] = '\0';
         p += m1->realm_len;
         len -= m1->realm_len;
+        /*
+         *  Update realm & realm_len to refer to the string in "cred memory".
+         */
+        m1->realm = c->realm_mem;
+        m1->realm_len = c->realm_mem_len;
     }
     /*  Unpack the cipher initialization vector (if needed).
      *    The length of the IV was derived from the cipher type.
@@ -523,9 +532,11 @@ dec_v1_decrypt (munge_cred_t c)
     }
     buf_ptr += m;
     n += m;
-    if (cipher_final (&x, buf_ptr, &m) < 0) {                         /* XXX */
+    if (cipher_final (&x, buf_ptr, &m) < 0) {
+        /*
+         *  Defer error until dec_v1_validate_mac().
+         */
         _munge_msg_set_err (c->msg, EMUNGE_CRED_INVALID, NULL);
-        /* defer error until dec_v1_validate_mac() */
     }
     buf_ptr += m;
     n += m;
@@ -535,6 +546,11 @@ dec_v1_decrypt (munge_cred_t c)
     assert (n <= buf_len);
 
     /*  Replace "inner" ciphertext with plaintext.
+     */
+    assert (c->inner_mem == NULL);
+    /*
+     *  FIXME: 20040109: I think inner_mem must always be NULL at this point.
+     *         If so, the following test for it can be removed.
      */
     if (c->inner_mem) {
         assert (c->inner_mem_len > 0);
@@ -637,7 +653,7 @@ dec_v1_validate_mac (munge_cred_t c)
     /*  Ensure an invalid cred error from before is caught
      *    (if it wasn't somehow already caught by the MAC validation).
      */
-    if (c->msg->status != EMUNGE_SUCCESS) {
+    if (c->msg->errnum != EMUNGE_SUCCESS) {
         return (-1);
     }
     return (0);
@@ -807,6 +823,9 @@ dec_v1_unpack_inner (munge_cred_t c)
 static int
 dec_v1_validate_time (munge_cred_t c)
 {
+/*  Validates whether this credential has been generated within an
+ *    acceptable time interval.
+ */
     struct munge_msg_v1 *m1;            /* munge msg (v1 format)             */
     int                  skew;          /* negative clock skew for rewind    */
     time_t               tmin;          /* min decode time_t, else rewound   */
@@ -824,7 +843,7 @@ dec_v1_validate_time (munge_cred_t c)
         m1->ttl = conf->max_ttl;
     }
     /*  Even if no clock skew is allowed, allow the cred's timestamp to be
-     *    "rewound" by up to 1 second.  Before this, we were seeing an
+     *    "rewound" by up to 1 second.  Without this, we were seeing an
      *    occasional EMUNGE_CRED_REWOUND in spite of NTP's best efforts.
      */
     skew = (conf->got_clock_skew) ? m1->ttl : 1;
@@ -868,20 +887,10 @@ dec_v1_validate_replay (munge_cred_t c)
     if (errno == ENOMEM) {
         return (_munge_msg_set_err (c->msg, EMUNGE_NO_MEMORY, NULL));
     }
-    /*  The EPERM error can only happen here if replay_insert() failed
+    /*  An EPERM error can only happen here if replay_insert() failed
      *    because the replay hash is non-existent.  And that can only
      *    happen if replay_insert() was called after replay_fini().
      *    And that shouldn't happen.
      */
-    if (errno == EPERM) {
-        return (_munge_msg_set_err (c->msg, EMUNGE_SNAFU, NULL));
-    }
-    return (-1);
-}
-
-
-static int
-dec_v1_fini (munge_cred_t c)
-{
-    return (0);
+    return (_munge_msg_set_err (c->msg, EMUNGE_SNAFU, NULL));
 }

@@ -1,3 +1,18 @@
+2004-01-15  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/libcommon/munge_defs.h, src/libcommon/munge_msg.c
+	  src/libcommon/munge_msg.h, src/libmunge/ctx.c,
+	  src/libmunge/ctx.h, src/libmunge/decode.c,
+	  src/libmunge/encode.c, src/libmunge/msg_client.c,
+	  src/libmunge/munge.h, src/munge/unmunge.c, src/munged/cred.c,
+	  src/munged/cred.h, src/munged/dec_v1.c, src/munged/enc_v1.c,
+	  src/munged/msg_server.c, src/munged/msg_server.h:
+	  Changed protocol between client (libmunge) and server (munged)
+          to allow credential data & metadata to be returned on error.
+
+	* src/munge/unmunge.c(display_meta):
+	  Added check for errors on the file stream "fp_meta".
+
 2003-12-12  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/munged/msg_server.c(munge_msg_server_thread):

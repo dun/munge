@@ -1,11 +1,11 @@
 /*****************************************************************************
- *  $Id: decode.c,v 1.7 2003/09/18 21:09:26 dun Exp $
+ *  $Id: decode.c,v 1.8 2004/01/16 02:18:37 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
  *  UCRL-CODE-2003-???.
  *
- *  Copyright (C) 2002-2003 The Regents of the University of California.
+ *  Copyright (C) 2002-2004 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
  *  Written by Chris Dunlap <cdunlap@llnl.gov>.
  *
@@ -121,8 +121,8 @@ decode_init (munge_ctx_t ctx, void **buf, int *len, uid_t *uid, gid_t *gid)
  */
     if (ctx) {
         ctx->cipher = -1;
-        ctx->mac = -1;
         ctx->zip = -1;
+        ctx->mac = -1;
         if (ctx->realm) {
             free (ctx->realm);
             ctx->realm = NULL;
@@ -193,8 +193,11 @@ decode_rsp_v1 (munge_msg_t m, munge_ctx_t ctx,
 {
 /*  Extracts a Decode Response message received from the local munge daemon.
  *  The outputs from this message are as follows:
- *    status, cipher, mac, zip, realm, ttl, addr,
- *    time0, time1, uid, gid, data_len, data.
+ *    cipher, zip, mac, realm, ttl, addr, time0, time1,
+ *    uid, gid, data_len, data, error_num, error_str.
+ *  Note that the security realm string here is NUL-terminated.
+ *  Note that error_num and error_str are set by _munge_ctx_set_err()
+ *    called from munge_decode() (ie, the parent of this stack frame).
  */
     struct munge_msg_v1 *m1;
     unsigned char       *p;
@@ -204,13 +207,6 @@ decode_rsp_v1 (munge_msg_t m, munge_ctx_t ctx,
     assert (m->head.version == 1);
 
     m1 = (struct munge_msg_v1 *) m->pbody;
-    /*
-     *  Check for error message.
-     */
-    if (m->head.type == MUNGE_MSG_ERROR) {
-        return (m->status);
-    }
-    assert (m->status == EMUNGE_SUCCESS);
     /*
      *  Perform sanity checks.
      */
@@ -223,20 +219,13 @@ decode_rsp_v1 (munge_msg_t m, munge_ctx_t ctx,
      */
     if (ctx) {
         ctx->cipher = m1->cipher;
-        ctx->mac = m1->mac;
         ctx->zip = m1->zip;
-        /*
-         *  The credential's realm is not NUL-terminated.
-         */
-        if ((ctx->realm = malloc (m1->realm_len + 1))) {
-            memcpy (ctx->realm, m1->realm, m1->realm_len);
-            ctx->realm[m1->realm_len] = '\0';
-        }
+        ctx->mac = m1->mac;
+        ctx->realm = (m1->realm ? strdup (m1->realm) : NULL);
         ctx->ttl = m1->ttl;
         ctx->addr.s_addr = m1->addr.s_addr;;
         ctx->time0 = m1->time0;
         ctx->time1 = m1->time1;
-        ctx->errnum = m1->errnum;
     }
     if (buf && len && (m1->data_len > 0)) {
         n = m1->data_len + 1;
@@ -257,5 +246,5 @@ decode_rsp_v1 (munge_msg_t m, munge_ctx_t ctx,
     if (gid) {
         *gid = m1->gid;
     }
-    return (m1->errnum);
+    return (m1->error_num);
 }

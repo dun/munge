@@ -1,11 +1,11 @@
 /*****************************************************************************
- *  $Id: munge_defs.h,v 1.16 2003/12/11 20:45:35 dun Exp $
+ *  $Id: munge_defs.h,v 1.17 2004/01/16 02:18:37 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
  *  UCRL-CODE-2003-???.
  *
- *  Copyright (C) 2002-2003 The Regents of the University of California.
+ *  Copyright (C) 2002-2004 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
  *  Written by Chris Dunlap <cdunlap@llnl.gov>.
  *
@@ -92,7 +92,7 @@
 
 /*  Number of attempts a client makes connecting to the server before failing.
  */
-#define MUNGE_SOCKET_RETRIES            5
+#define MUNGE_SOCKET_CONNECT_RETRIES    5
 
 /*  String specifying the pathname of the daemon's logfile.
  *    FIXME: Temporary kludge until configuration file support is added.

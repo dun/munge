@@ -1,11 +1,11 @@
 /*****************************************************************************
- *  $Id: cred.c,v 1.2 2003/04/18 23:20:18 dun Exp $
+ *  $Id: cred.c,v 1.3 2004/01/16 02:18:37 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
  *  UCRL-CODE-2003-???.
  *
- *  Copyright (C) 2003 The Regents of the University of California.
+ *  Copyright (C) 2003-2004 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
  *  Written by Chris Dunlap <cdunlap@llnl.gov>.
  *
@@ -71,6 +71,11 @@ cred_destroy (munge_cred_t c)
         assert (c->inner_mem_len > 0);
         memset (c->inner_mem, 0, c->inner_mem_len);
         free (c->inner_mem);
+    }
+    if (c->realm_mem) {
+        assert (c->realm_mem_len > 0);
+        memset (c->realm_mem, 0, c->realm_mem_len);
+        free (c->realm_mem);
     }
     memset (c, 0, sizeof (*c));
     free (c);

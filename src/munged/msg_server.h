@@ -1,11 +1,11 @@
 /*****************************************************************************
- *  $Id: msg_server.h,v 1.1 2003/04/08 18:16:16 dun Exp $
+ *  $Id: msg_server.h,v 1.2 2004/01/16 02:18:37 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
  *  UCRL-CODE-2003-???.
  *
- *  Copyright (C) 2003 The Regents of the University of California.
+ *  Copyright (C) 2003-2004 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
  *  Written by Chris Dunlap <cdunlap@llnl.gov>.
  *
@@ -33,6 +33,8 @@
 
 
 void munge_msg_server_thread (munge_msg_t m);
+
+void err_v1_response (munge_msg_t m);
 
 
 #endif /* !MUNGE_MSG_SERVER_H */

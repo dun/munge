@@ -1,11 +1,11 @@
 /*****************************************************************************
- *  $Id: munge_msg.c,v 1.12 2003/12/19 00:18:25 dun Exp $
+ *  $Id: munge_msg.c,v 1.13 2004/01/16 02:18:37 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
  *  UCRL-CODE-2003-???.
  *
- *  Copyright (C) 2003 The Regents of the University of California.
+ *  Copyright (C) 2003-2004 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
  *  Written by Chris Dunlap <cdunlap@llnl.gov>.
  *
@@ -63,7 +63,7 @@ _munge_msg_create (munge_msg_t *pm, int sd)
 
     _munge_msg_reset (m);
     m->sd = sd;
-    m->status = EMUNGE_SUCCESS;
+    m->errnum = EMUNGE_SUCCESS;
 
     *pm = m;
     return (EMUNGE_SUCCESS);
@@ -87,7 +87,6 @@ _munge_msg_destroy (munge_msg_t m)
         free (m->pbody);
     }
     if (m->errstr) {
-        memset (m->errstr, 0, strlen (m->errstr));
         free (m->errstr);
     }
     memset (m, 0, sizeof (*m));
@@ -105,9 +104,10 @@ _munge_msg_send (munge_msg_t m)
  *    Currently, only v1 messages are used.
  *  Returns a standard munge error code.
  */
-    int                  n, l;
     struct munge_msg_v1 *m1;
-    struct iovec         iov[4];
+    int                  i, n, nsend;
+    int                  iov_num;
+    struct iovec         iov[5];
 
     assert (m != NULL);
     assert (m->sd >= 0);
@@ -125,6 +125,7 @@ _munge_msg_send (munge_msg_t m)
     m->head.length = sizeof (*m1);
     m->head.length += m1->realm_len;
     m->head.length += m1->data_len;
+    m->head.length += m1->error_len;
 
     iov[0].iov_base = &(m->head);
     iov[0].iov_len = sizeof (m->head);
@@ -138,19 +139,27 @@ _munge_msg_send (munge_msg_t m)
     iov[3].iov_base = m1->data;
     iov[3].iov_len = m1->data_len;
 
-    n = iov[0].iov_len + iov[1].iov_len + iov[2].iov_len + iov[3].iov_len;
+    iov[4].iov_base = m1->error_str;
+    iov[4].iov_len = m1->error_len;
 
+    iov_num = sizeof (iov) / sizeof (iov[0]);
+    for (i=0, nsend=0; i < iov_num; i++) {
+        nsend += iov[i].iov_len;
+    }
 again:
-    if ((l = writev (m->sd, iov, 4)) < 0) {
+    /*  An EINTR should only occur before any data is transferred.
+     *    As such, it should be jiggy to restart the whole writev() if needed.
+     */
+    if ((n = writev (m->sd, iov, iov_num)) < 0) {
         if (errno == EINTR)
             goto again;
         _munge_msg_set_err (m, EMUNGE_SOCKET,
             strdupf ("Unable to send message: %s", strerror (errno)));
         return (EMUNGE_SOCKET);
     }
-    if (l != n) {
+    if (n != nsend) {
         _munge_msg_set_err (m, EMUNGE_SOCKET,
-            strdupf ("Sent incomplete message: %d of %d bytes", l, n));
+            strdupf ("Sent incomplete message: %d of %d bytes", n, nsend));
         return (EMUNGE_SOCKET);
     }
     return (EMUNGE_SUCCESS);
@@ -164,8 +173,8 @@ _munge_msg_recv (munge_msg_t m)
  *    specified socket.  This message is stored in the already-allocated [m].
  *  Returns a standard munge error code.
  */
-    int                  n, l;
     struct munge_msg_v1 *m1;
+    int                  n, nrecv;
 
     assert (m != NULL);
     assert (m->sd >= 0);
@@ -173,62 +182,66 @@ _munge_msg_recv (munge_msg_t m)
 
     /*  Read and validate the message header.
      */
-    n = sizeof (m->head);
-    if ((l = fd_read_n (m->sd, &(m->head), n)) < 0) {
+    nrecv = sizeof (m->head);
+    if ((n = fd_read_n (m->sd, &(m->head), nrecv)) < 0) {
         _munge_msg_set_err (m, EMUNGE_SOCKET,
             strdupf ("Unable to receive message header: %s",
                 strerror (errno)));
         return (EMUNGE_SOCKET);
     }
-    if (l != n) {
+    else if (n == 0) {
         _munge_msg_set_err (m, EMUNGE_SOCKET,
-            strdupf ("Received incomplete message header: %d of %d bytes",
-            l, n));
+            strdupf ("Received empty message"));
         return (EMUNGE_SOCKET);
     }
-    if (m->head.magic != MUNGE_MSG_MAGIC) {
+    else if (n != nrecv) {
+        _munge_msg_set_err (m, EMUNGE_SOCKET,
+            strdupf ("Received incomplete message header: %d of %d bytes",
+            n, nrecv));
+        return (EMUNGE_SOCKET);
+    }
+    else if (m->head.magic != MUNGE_MSG_MAGIC) {
         _munge_msg_set_err (m, EMUNGE_SOCKET,
             strdupf ("Received invalid message magic %d", m->head.magic));
         return (EMUNGE_SOCKET);
     }
-    if (m->head.version > MUNGE_MSG_VERSION) {
+    else if (m->head.version > MUNGE_MSG_VERSION) {
         _munge_msg_set_err (m, EMUNGE_SOCKET,
             strdupf ("Received invalid message version %d", m->head.version));
         return (EMUNGE_SOCKET);
     }
-    if (m->head.length <= 0) {
+    else if (m->head.length <= 0) {
         _munge_msg_set_err (m, EMUNGE_SOCKET,
             strdupf ("Received invalid message length %d", m->head.length));
         return (EMUNGE_SOCKET);
     }
     /*  Read the version-specific message body.
      *  Reserve space for a terminating NUL character.  This NUL is not
-     *    transmitted across the socket, but will be appended afterwards.
+     *    received across the socket, but appended afterwards.
      */
-    n = m->head.length + 1;
-    if (!(m->pbody = malloc (n))) {
+    m->pbody_len = m->head.length + 1;
+    if (!(m->pbody = malloc (m->pbody_len))) {
         _munge_msg_set_err (m, EMUNGE_NO_MEMORY,
-            strdupf ("Unable to malloc %d bytes for message", n));
+            strdupf ("Unable to malloc %d bytes for message", m->pbody_len));
         return (EMUNGE_NO_MEMORY);
     }
-    m->pbody_len = n;
-    n = m->head.length;
-    if ((l = fd_read_n (m->sd, m->pbody, n)) < 0) {
+    nrecv = m->head.length;
+    if ((n = fd_read_n (m->sd, m->pbody, nrecv)) < 0) {
         _munge_msg_set_err (m, EMUNGE_SOCKET,
             strdupf ("Unable to receive message: %s", strerror (errno)));
         return (EMUNGE_SOCKET);
     }
-    if (l != n) {
+    if (n != nrecv) {
         _munge_msg_set_err (m, EMUNGE_SOCKET,
-            strdupf ("Received incomplete message: %d of %d bytes", l, n));
+            strdupf ("Received incomplete message: %d of %d bytes", n, nrecv));
         return (EMUNGE_SOCKET);
     }
     m1 = m->pbody;
+    n = sizeof (*m1);
     /*
      *  Locate the realm string (if present) within the message body.
      *    It immediately follows the munge_msg_v1 struct.
      */
-    n = sizeof (*m1);
     if (m1->realm_len > 0) {
         m1->realm = ((char *) m1) + n;
         n += m1->realm_len;
@@ -246,6 +259,16 @@ _munge_msg_recv (munge_msg_t m)
     else {
         m1->data = NULL;
     }
+    /*  Locate the error string (if present) within the message body.
+     *    It immediately follows the data segment.
+     */
+    if (m1->error_len > 0) {
+        m1->error_str = ((char *) m1) + n;
+        n += m1->error_len;
+    }
+    else {
+        m1->error_str = NULL;
+    }
     /*  Validate the length of the version-specific message body.
      */
     if (n != m->head.length) {
@@ -258,12 +281,13 @@ _munge_msg_recv (munge_msg_t m)
      */
     ((char *) m->pbody)[m->head.length] = '\0';
     /*
-     *  If an error message was returned, copy the error condition
-     *    into the message metadata.
+     *  If an error message was returned, copy it into the message metadata.
      */
-    if (m->head.type == MUNGE_MSG_ERROR) {
-        m->status = m1->errnum;
-        m->errstr = strdup (m1->data);
+    m->errnum = m1->error_num;
+    if (m1->error_str) {
+        assert (m1->error_len > 0);
+        assert (m->errstr == NULL);
+        m->errstr = strdup (m1->error_str);
     }
     return (EMUNGE_SUCCESS);
 }
@@ -291,6 +315,14 @@ _munge_msg_reset (munge_msg_t m)
         m->pbody_len = 0;
         m->pbody = NULL;                /* Sherman, set the Wayback Machine */
     }
+    else {
+        assert (m->pbody_len == 0);
+    }
+    m->errnum = EMUNGE_SUCCESS;
+    if (m->errstr) {
+        free (m->errstr);
+        m->errstr = NULL;
+    }
     return (EMUNGE_SUCCESS);
 }
 
@@ -299,26 +331,27 @@ int
 _munge_msg_set_err (munge_msg_t m, munge_err_t e, char *s)
 {
 /*  Set an error code [e] and string [s] if an error condition
- *    does not already exist (ie, m->status == EMUNGE_SUCCESS).
+ *    does not already exist (ie, m->errnum == EMUNGE_SUCCESS).
  *    Thus, if multiple errors are set, only the first one is reported.
  *  If [s] is not NULL, that string (and _not_ a copy) will be stored
  *    and later free()'d by the message destructor; if [s] is NULL,
- *    munge_strerror() will be used.
- *  Always returns -1.
+ *    munge_strerror() will be used to obtain a descriptive string.
+ *  Always returns -1 and consumes [s].
+ *
+ *  Note that the error condition (status code and message string) is stored
+ *    within the munge_msg 'errnum' & 'errmsg' variables.  When the message
+ *    is transmitted over the socket from server to client, these are passed
+ *    via the version-specific message format as appropriate.
  */
     assert (m != NULL);
 
-    /*  Do nothing if an error does not exist or an error has already been set.
-     */
-    if ((e == EMUNGE_SUCCESS) || (m->status != EMUNGE_SUCCESS)) {
-        if (s) {
-            free (s);
-        }
-    }
-    else {
-        m->status = e;
+    if ((m->errnum == EMUNGE_SUCCESS) && (e != EMUNGE_SUCCESS)) {
+        m->errnum = e;
         assert (m->errstr == NULL);
         m->errstr = (s != NULL) ? s : strdup (munge_strerror (e));;
+    }
+    else if (s) {
+        free (s);
     }
     /*  "Screw you guys, I'm goin' home." -ecartman
      */

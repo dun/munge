@@ -1,11 +1,11 @@
 /*****************************************************************************
- *  $Id: munge.h,v 1.15 2003/09/18 21:09:26 dun Exp $
+ *  $Id: munge.h,v 1.16 2004/01/16 02:18:37 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
  *  UCRL-CODE-2003-???.
  *
- *  Copyright (C) 2002-2003 The Regents of the University of California.
+ *  Copyright (C) 2002-2004 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
  *  Written by Chris Dunlap <cdunlap@llnl.gov>.
  *
@@ -175,8 +175,10 @@ munge_err_t munge_decode (const char *cred, munge_ctx_t ctx,
  *    data munged into the credential and [len] will be set to its length.
  *    An additional NUL is appended to [buf] which is not included in [len].
  *    The caller is responsible for freeing the memory referenced by [buf].
- *    If no data was munged into the credential or an error is encountered,
- *    [buf] will be set to NULL and [len] will be set to 0.
+ *    If no data was munged into the credential, [buf] will be set to NULL
+ *    and [len] will be set to 0.  Note that in the case of some errors
+ *    (eg, EMUNGE_CRED_EXPIRED, EMUNGE_CRED_REWOUND, EMUNGE_CRED_REPLAYED),
+ *    [buf] and [len] will be updated as appropriate.
  *  If [uid] or [gid] is not NULL, they will be set to the UID/GID
  *    of the process that created the credential.
  *  Returns EMUNGE_SUCCESS if the credential is valid; o/w, returns the

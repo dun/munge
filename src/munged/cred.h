@@ -1,11 +1,11 @@
 /*****************************************************************************
- *  $Id: cred.h,v 1.3 2003/11/26 23:07:49 dun Exp $
+ *  $Id: cred.h,v 1.4 2004/01/16 02:18:37 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
  *  UCRL-CODE-2003-???.
  *
- *  Copyright (C) 2003 The Regents of the University of California.
+ *  Copyright (C) 2003-2004 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
  *  Written by Chris Dunlap <cdunlap@llnl.gov>.
  *
@@ -71,6 +71,8 @@ struct munge_cred {
     unsigned char      *inner_mem;      /* inner cred memory allocation      */
     int                 inner_len;      /* length of inner credential data   */
     unsigned char      *inner;          /* ptr to inner credential data      */
+    int                 realm_mem_len;  /* length of realm string memory     */
+    unsigned char      *realm_mem;      /* realm string memory allocation    */
     int                 salt_len;       /* length of salt data               */
     unsigned char       salt[MAX_SALT]; /* cryptographic seasoning salt      */
     int                 mac_len;        /* length of mac data                */

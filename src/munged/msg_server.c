@@ -1,11 +1,11 @@
 /*****************************************************************************
- *  $Id: msg_server.c,v 1.7 2003/12/12 18:36:31 dun Exp $
+ *  $Id: msg_server.c,v 1.8 2004/01/16 02:18:37 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
  *  UCRL-CODE-2003-???.
  *
- *  Copyright (C) 2003 The Regents of the University of California.
+ *  Copyright (C) 2003-2004 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
  *  Written by Chris Dunlap <cdunlap@llnl.gov>.
  *
@@ -40,27 +40,21 @@
 
 
 /*****************************************************************************
- *  Static Prototypes
- *****************************************************************************/
-
-static int err_v1_process_msg (munge_msg_t m);
-
-
-/*****************************************************************************
  *  Extern Functions
  *****************************************************************************/
 
 void
 munge_msg_server_thread (munge_msg_t m)
 {
-/*  This thread is responsible for destroying msg [m] via _munge_msg_destroy().
+/*  Receives and responds to the message request [m].
  */
     munge_err_t  e;
+    const char *p;
 
     assert (m != NULL);
 
     if ((e = _munge_msg_recv (m)) != EMUNGE_SUCCESS) {
-        ; /* fall out of if clause and log/return error */
+        ; /* fall out of if clause, log error, and drop request */
     }
     else if (m->head.version > MUNGE_MSG_VERSION) {
         _munge_msg_set_err (m, EMUNGE_SNAFU,
@@ -80,48 +74,31 @@ munge_msg_server_thread (munge_msg_t m)
                 break;
         }
     }
-    if (m->status != EMUNGE_SUCCESS) {
-        err_v1_process_msg (m);
+    if (m->errnum != EMUNGE_SUCCESS) {
+        p = (m->errstr != NULL) ? m->errstr : munge_strerror (m->errnum);
+        log_msg (LOG_INFO, "%s", p);
     }
     _munge_msg_destroy (m);
     return;
 }
 
 
-/*****************************************************************************
- *  Static Functions
- *****************************************************************************/
-
-static int
-err_v1_process_msg (munge_msg_t m)
+void
+err_v1_response (munge_msg_t m)
 {
-/*  Returns a error message to the client.
- *  Outputs for an error message are as follows:
- *    errnum, data_len, data
- *  The NUL-terminated error string is placed in the 'data' field.
+/*  If an error condition has been set for the message [m], copy it to the
+ *    version-specific message format for transport over the domain socket.
  */
     struct munge_msg_v1 *m1;            /* munge msg (v1 format)             */
-    const char          *p;
 
     assert (m != NULL);
-    assert (m->status != EMUNGE_SUCCESS);
 
-    m->head.magic = MUNGE_MSG_MAGIC;
-    m->head.version = MUNGE_MSG_VERSION;
-    m->head.type = MUNGE_MSG_ERROR;
-    m->head.length = 0;
-
-    p = (m->errstr != NULL) ? m->errstr : munge_strerror (m->status);
-    log_msg (LOG_INFO, "%s", p);
-
-    /*  FIXME: What if !pbody?
-     */
-    if (m->pbody) {
+    if (m->errnum != EMUNGE_SUCCESS) {
         m1 = m->pbody;
-        m1->errnum = m->status;
-        m1->data_len = strlen (p) + 1;
-        m1->data = (void *) p;
-        _munge_msg_send (m);
+        m1->error_num = m->errnum;
+        m1->error_str =
+            strdup (m->errstr ? m->errstr : munge_strerror (m->errnum));
+        m1->error_len = strlen (m1->error_str) + 1;
     }
-    return (0);
+    return;
 }
