@@ -1,13 +1,13 @@
 /*****************************************************************************
- *  $Id: auth_recv.h,v 1.1 2004/05/01 05:08:26 dun Exp $
+ *  $Id: auth_recv.h,v 1.2 2004/05/14 00:47:59 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
- *  UCRL-CODE-155910.
  *
  *  Copyright (C) 2003-2004 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
  *  Written by Chris Dunlap <cdunlap@llnl.gov>.
+ *  UCRL-CODE-155910.
  *
  *  This is free software; you can redistribute it and/or modify it
  *  under the terms of the GNU General Public License as published by
@@ -29,7 +29,6 @@
 #define MUNGE_AUTH_SERVER_H
 
 #include <sys/types.h>
-#include <munge.h>
 #include "munge_msg.h"
 
 
@@ -38,7 +37,7 @@ void auth_recv_init (void);
  *  Checks for required privileges needed to perform client authentication.
  */
 
-munge_err_t auth_recv (munge_msg_t m, uid_t *uid, gid_t *gid);
+int auth_recv (munge_msg_t m, uid_t *uid, gid_t *gid);
 /*
  *  Receives the identity of the client that sent msg [m],
  *    storing the result in the output parms [uid] and [gid].

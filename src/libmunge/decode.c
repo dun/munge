@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: decode.c,v 1.14 2004/05/06 01:41:12 dun Exp $
+ *  $Id: decode.c,v 1.15 2004/05/14 00:47:59 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -93,8 +93,9 @@ munge_decode (const char *cred, munge_ctx_t ctx,
         ;
     else if ((e = _munge_msg_send (m)) != EMUNGE_SUCCESS)
         ;
-    else if ((e = auth_send (m)) != EMUNGE_SUCCESS)
-        ;
+    else if (auth_send (m) < 0) {
+        e = EMUNGE_SOCKET;
+    }
     else if ((e = _munge_msg_reset (m)) != EMUNGE_SUCCESS)
         ;
     else if ((e = _munge_msg_recv (m)) != EMUNGE_SUCCESS)

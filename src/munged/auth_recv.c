@@ -1,13 +1,13 @@
 /*****************************************************************************
- *  $Id: auth_recv.c,v 1.1 2004/05/01 05:08:26 dun Exp $
+ *  $Id: auth_recv.c,v 1.2 2004/05/14 00:47:59 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
- *  UCRL-CODE-155910.
  *
  *  Copyright (C) 2003-2004 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
  *  Written by Chris Dunlap <cdunlap@llnl.gov>.
+ *  UCRL-CODE-155910.
  *
  *  This is free software; you can redistribute it and/or modify it
  *  under the terms of the GNU General Public License as published by
@@ -29,6 +29,8 @@
 #  include <config.h>
 #endif /* HAVE_CONFIG_H */
 
+#include <errno.h>
+#include <string.h>
 #include <unistd.h>
 #include <munge.h>
 #include "auth_policy.h"
@@ -60,19 +62,14 @@ auth_recv_init (void)
 
 #ifdef MUNGE_AUTH_GETPEEREID
 
-#include <errno.h>
-#include <string.h>
-#include "str.h"
-
-munge_err_t
+int
 auth_recv (munge_msg_t m, uid_t *uid, gid_t *gid)
 {
     if (getpeereid (m->sd, uid, gid) < 0) {
-        return (_munge_msg_set_err (m, EMUNGE_SNAFU,
-            strdupf ("Unable to determine client identity: %s",
-                strerror (errno))));
+        log_msg (LOG_ERR, "Unable to get peer identity: %s", strerror (errno));
+        return (-1);
     }
-    return (EMUNGE_SUCCESS);
+    return (0);
 }
 
 #endif /* MUNGE_AUTH_GETPEEREID */
@@ -84,29 +81,25 @@ auth_recv (munge_msg_t m, uid_t *uid, gid_t *gid)
 
 #ifdef MUNGE_AUTH_PEERCRED
 
-#include <errno.h>
-#include <string.h>
 #include <sys/socket.h>
-#include "str.h"
 
 #ifndef HAVE_SOCKLEN_T
 typedef int socklen_t;                  /* socklen_t is uint32_t in Posix.1g */
 #endif /* !HAVE_SOCKLEN_T */
                                                                                 
-munge_err_t
+int
 auth_recv (munge_msg_t m, uid_t *uid, gid_t *gid)
 {
     struct ucred cred;
     socklen_t len = sizeof (cred);
 
     if (getsockopt (m->sd, SOL_SOCKET, SO_PEERCRED, &cred, &len) < 0) {
-        return (_munge_msg_set_err (m, EMUNGE_SNAFU,
-            strdupf ("Unable to determine client identity: %s",
-                strerror (errno))));
+        log_msg (LOG_ERR, "Unable to get peer identity: %s", strerror (errno));
+        return (-1);
     }
     *uid = cred.uid;
     *gid = cred.gid;
-    return (EMUNGE_SUCCESS);
+    return (0);
 }
 
 #endif /* MUNGE_AUTH_PEERCRED */
@@ -118,27 +111,23 @@ auth_recv (munge_msg_t m, uid_t *uid, gid_t *gid)
 
 #ifdef MUNGE_AUTH_RECVFD_MKFIFO
 
-#include <errno.h>
 #include <fcntl.h>                      /* open, O_RDONLY */
-#include <string.h>                     /* strdup, strerror */
 #include <sys/ioctl.h>                  /* ioctl */
 #include <sys/stat.h>                   /* mkfifo, S_IWUSR, etc. */
 #include <stropts.h>                    /* I_RECVFD, struct strrecvfd */
-#include "str.h"                        /* strdupf */
 
 static int _name_auth_pipe (char *dst, int dstlen);
 static int _send_auth_req (int sd, const char *pipe_name);
 
-munge_err_t
+int
 auth_recv (munge_msg_t m, uid_t *uid, gid_t *gid)
 {
     char              pipe_name [AUTH_PIPE_NAME_MAX_LEN] = "";
     int               pipe_fd = -1;
-    char             *estr;
     struct strrecvfd  recvfd;
 
     if (_name_auth_pipe (pipe_name, sizeof (pipe_name)) < 0) {
-        estr = strdup ("Unable to name auth pipe");
+        log_msg (LOG_ERR, "Unable to name auth pipe");
         goto err;
     }
     unlink (pipe_name);                 /* in case it already exists */
@@ -147,12 +136,12 @@ auth_recv (munge_msg_t m, uid_t *uid, gid_t *gid)
      *    is sent to the client in order to prevent a race condition.
      */
     if (mkfifo (pipe_name, S_IWUSR | S_IRUSR | S_IRGRP | S_IROTH) < 0) {
-        estr = strdupf ("Unable to create auth pipe \"%s\": %s",
+        log_msg (LOG_ERR, "Unable to create auth pipe \"%s\": %s",
             pipe_name, strerror (errno));
         goto err;
     }
     if (_send_auth_req (m->sd, pipe_name) < 0) {
-        estr = strdup ("Unable to send auth request");
+        log_msg (LOG_ERR, "Unable to send auth request");
         goto err;
     }
     /*  This open() blocks until the client opens the fifo for writing.
@@ -160,12 +149,12 @@ auth_recv (munge_msg_t m, uid_t *uid, gid_t *gid)
      *  FIXME: The open() & ioctl() calls could block and lead to a DoS attack.
      */
     if ((pipe_fd = open (pipe_name, O_RDONLY)) < 0) {
-        estr = strdupf ("Unable to open auth pipe \"%s\": %s",
+        log_msg (LOG_ERR, "Unable to open auth pipe \"%s\": %s",
             pipe_name, strerror (errno));
         goto err;
     }
     if (ioctl (pipe_fd, I_RECVFD, &recvfd) < 0) {
-        estr = strdupf ("Unable to receive client identity: %s",
+        log_msg (LOG_ERR, "Unable to receive client identity: %s",
             strerror (errno));
         goto err;
     }
@@ -186,14 +175,14 @@ auth_recv (munge_msg_t m, uid_t *uid, gid_t *gid)
     }
     *uid = recvfd.uid;
     *gid = recvfd.gid;
-    return (EMUNGE_SUCCESS);
+    return (0);
 
 err:
     if (pipe_fd >= 0)
         close (pipe_fd);
     if (pipe_name != NULL)
         unlink (pipe_name);
-    return (_munge_msg_set_err (m, EMUNGE_SNAFU, estr));
+    return (-1);
 }
 
 #endif /* MUNGE_AUTH_RECVFD_MKFIFO */
@@ -205,9 +194,7 @@ err:
 
 #ifdef MUNGE_AUTH_RECVFD_MKNOD
 
-#include <errno.h>
 #include <fcntl.h>                      /* open, O_RDWR */
-#include <string.h>                     /* strdup, strerror */
 #include <stropts.h>                    /* I_RECVFD, struct strrecvfd */
 #include <sys/ioctl.h>                  /* I_FDINSERT */
 #include <sys/ioctl.h>                  /* ioctl */
@@ -215,7 +202,6 @@ err:
 #include <sys/stream.h>                 /* queue_t */
 #include <sys/stropts.h>                /* struct strfdinsert */
 #include <sys/uio.h>                    /* include before stream.h for aix */
-#include "str.h"                        /* strdupf, strhex */
 
 static int _create_auth_pipe (const char *name);
 static int _ns_pipe (const char *name, int fd[2]);
@@ -223,33 +209,32 @@ static int _s_pipe (int fd[2]);
 static int _name_auth_pipe (char *dst, int dstlen);
 static int _send_auth_req (int sd, const char *pipe_name);
 
-munge_err_t
+int
 auth_recv (munge_msg_t m, uid_t *uid, gid_t *gid)
 {
     char              pipe_name [AUTH_PIPE_NAME_MAX_LEN] = "";
     int               pipe_fd = -1;
-    char             *estr;
     struct strrecvfd  recvfd;
 
     if (_name_auth_pipe (pipe_name, sizeof (pipe_name)) < 0) {
-        estr = strdup ("Unable to name auth pipe");
+        log_msg (LOG_ERR, "Unable to name auth pipe");
         goto err;
     }
     /*  The auth pipe must be created in the filesystem before the auth req
      *    is sent to the client in order to prevent a race condition.
      */
     if ((pipe_fd = _create_auth_pipe (pipe_name)) < 0) {
-        estr = strdup ("Unable to create auth pipe");
+        log_msg (LOG_ERR, "Unable to create auth pipe");
         goto err;
     }
     if (_send_auth_req (m->sd, pipe_name) < 0) {
-        estr = strdup ("Unable to send auth request");
+        log_msg (LOG_ERR, "Unable to send auth request");
         goto err;
     }
     /*  FIXME: The ioctl() call could block and lead to a DoS attack.
      */
     if (ioctl (pipe_fd, I_RECVFD, &recvfd) < 0) {
-        estr = strdupf ("Unable to receive client identity: %s",
+        log_msg (LOG_ERR, "Unable to receive client identity: %s",
             strerror (errno));
         goto err;
     }
@@ -270,14 +255,14 @@ auth_recv (munge_msg_t m, uid_t *uid, gid_t *gid)
     }
     *uid = recvfd.uid;
     *gid = recvfd.gid;
-    return (EMUNGE_SUCCESS);
+    return (0);
 
 err:
     if (pipe_fd >= 0)
         close (pipe_fd);
     if (pipe_name != NULL)
         unlink (pipe_name);
-    return (_munge_msg_set_err (m, EMUNGE_SNAFU, estr));
+    return (-1);
 }
 
 static int
@@ -419,7 +404,8 @@ _name_auth_pipe (char *dst, int dstlen)
     if (p == NULL) {
         return (-1);
     }
-    n = snprintf (dst, dstlen, "/tmp/.munge-%s.pipe", nonce_str);
+    n = snprintf (dst, dstlen, "%s/.munge-%s.pipe",
+        AUTH_PIPE_NAME_PREFIX, nonce_str);
     if ((n < 0) || (n >= dstlen)) {
         return (-1);
     }

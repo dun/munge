@@ -1,3 +1,12 @@
+2004-05-13  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/libcommon/auth_policy.h, src/libmunge/auth_send.c,
+	  src/libmunge/auth_send.h, src/libmunge/decode.c,
+	  src/libmunge/encode.c, src/munged/auth_recv.c,
+	  src/munged/auth_recv.h: Added AUTH_PIPE_NAME_PREFIX.
+	  Changed return types of auth_send() and auth_recv().
+	  Changed reporting of auth_send() and auth_recv() errors.
+
 2004-05-06  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/munged/conf.c, src/munged/munged.c: Moved auth_recv_init()

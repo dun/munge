@@ -1,13 +1,13 @@
 /*****************************************************************************
- *  $Id: auth_send.c,v 1.1 2004/05/01 05:08:26 dun Exp $
+ *  $Id: auth_send.c,v 1.2 2004/05/14 00:47:59 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
- *  UCRL-CODE-155910.
  *
  *  Copyright (C) 2004 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
  *  Written by Chris Dunlap <cdunlap@llnl.gov>.
+ *  UCRL-CODE-155910.
  *
  *  This is free software; you can redistribute it and/or modify it
  *  under the terms of the GNU General Public License as published by
@@ -40,7 +40,7 @@
 
 #ifndef MUNGE_AUTH_RECVFD_COMMON
 
-munge_err_t
+int
 auth_send (munge_msg_t m)
 {
     return (EMUNGE_SUCCESS);
@@ -70,7 +70,7 @@ auth_send (munge_msg_t m)
 static int _recv_auth_req (int sd, char *dst, int dstlen);
 static int _name_auth_file (const char *src, char *dst, int dstlen);
 
-munge_err_t
+int
 auth_send (munge_msg_t m)
 {
     char  pipe_name[AUTH_PIPE_NAME_MAX_LEN];
@@ -78,7 +78,6 @@ auth_send (munge_msg_t m)
     char  file_name[AUTH_PIPE_NAME_MAX_LEN] = "";
     int   file_fd = -1;
     char *estr;
-    int   rc;
 
     if (_recv_auth_req (m->sd, pipe_name, sizeof (pipe_name)) < 0) {
         estr = strdup ("Unable to receive auth request");
@@ -121,7 +120,7 @@ auth_send (munge_msg_t m)
         goto err;
     }
 
-    return (EMUNGE_SUCCESS);
+    return (0);
 
 err:
     if (pipe_fd >= 0)
@@ -149,6 +148,14 @@ _recv_auth_req (int sd, char *dst, int dstlen)
         goto end;
     }
     if ((e = _munge_msg_recv (m)) != EMUNGE_SUCCESS) {
+        goto end;
+    }
+    /*  Note that errstr will be set if the received message is an error
+     *    message, whereas _munge_msg_recv()'s return code (e) will be set
+     *    according to how that message is received.
+     */
+    if (m->errstr != NULL) {
+        e = EMUNGE_SOCKET;
         goto end;
     }
     if (m->head.version > MUNGE_MSG_VERSION) {

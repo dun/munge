@@ -1,13 +1,13 @@
 /*****************************************************************************
- *  $Id: auth_policy.h,v 1.1 2004/05/01 05:08:26 dun Exp $
+ *  $Id: auth_policy.h,v 1.2 2004/05/14 00:47:59 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
- *  UCRL-CODE-155910.
  *
  *  Copyright (C) 2004 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
  *  Written by Chris Dunlap <cdunlap@llnl.gov>.
+ *  UCRL-CODE-155910.
  *
  *  This is free software; you can redistribute it and/or modify it
  *  under the terms of the GNU General Public License as published by
@@ -36,7 +36,7 @@
  *  - The server uses the SO_PEERCRED socket option to determine the identity
  *    of the client connected to the unix domain socket.
  *
- *  MUNGE_AUTH_RECVFD_MKFIFO (Solaris)
+ *  MUNGE_AUTH_RECVFD_MKFIFO (Irix, Solaris)
  *  - The server creates a unique FIFO special file and sends a request to
  *    the client to use it for sending a file descriptor back across.  The fd
  *    is sent by the client using the I_SENDFD ioctl(), and received by the
@@ -83,16 +83,23 @@
 #endif /* MUNGE_AUTH_RECVFD_COMMON */
 
 
-/*  The amount of entropy (in bytes) to place in the filename of the pipe
- *    used to authenticate a particular client via fd-passing.
+/*  The amount of entropy (in bytes) to place in the filename of the pipe used
+ *    to authenticate a particular client via fd-passing.
  */
 #define AUTH_PIPE_NAME_RND_BYTES        8
 
-/*  The maximum length needed for a string to contain the filename of the
- *    pipe used to authenticate a particular client via fd-passing.
- *  ("/tmp/.munge-FOO.file" + NUL, where FOO is the entropy encoded in hex)
+/*  The maximum string length for the filename of the pipe used to
+ *    authenticate a particular client via fd-passing.
+ *  The auth pipe name is of the form "PREFIX/.munge-RANDOM.pipe":
+ *    (strlen (AUTH_PIPE_NAME_PREFIX) + (AUTH_PIPE_NAME_RND_BYTES * 2) + 14).
  */
-#define AUTH_PIPE_NAME_MAX_LEN          ((AUTH_PIPE_NAME_RND_BYTES * 2) + 18)
+#define AUTH_PIPE_NAME_MAX_LEN          (4 +(AUTH_PIPE_NAME_RND_BYTES *2) +14)
+
+/*  The directory prefix for the pipe used to authenticate a particular client
+ *    via fd-passing.
+ *  Update AUTH_PIPE_NAME_MAX_LEN accordingly.
+ */
+#define AUTH_PIPE_NAME_PREFIX           "/tmp"
 
 
 #endif /* !MUNGE_AUTH_POLICY_H */
