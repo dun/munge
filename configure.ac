@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: configure.ac,v 1.25 2004/11/12 01:41:09 dun Exp $
+## $Id: configure.ac,v 1.26 2004/11/12 02:58:31 dun Exp $
 ##*****************************************************************************
 ## Process this file with autoconf to produce a configure script.
 ##*****************************************************************************
@@ -105,13 +105,21 @@ LIBS="$ac_save_LIBS"
 AC_CHECK_TYPES(CRYPTO_dynlock, [], [], [#include <openssl/crypto.h>])
 
 ##
+# Check for inet_ntop replacement.
+#   Solaris needs libnsl here in order to perform this check.
+##
+ac_save_LIBS="$LIBS"
+AC_CHECK_LIB(nsl, inet_ntop)
+AC_REPLACE_FUNCS(inet_ntop)
+LIBS="$ac_save_LIBS"
+
+##
 # Checks for library functions.
 ##
 AC_CHECK_FUNCS( \
   localtime_r \
 )
 AC_REPLACE_FUNCS( \
-  inet_ntop \
   strlcat \
   strlcpy \
 )
