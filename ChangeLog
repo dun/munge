@@ -1,5 +1,7 @@
 2004-12-21  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* : Released 0.4.1.
+
 	* HISTORY, META, NEWS, TODO: Updated for 0.4.1 release.
 
 	* munge.spec:
