@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: auth_recv.c,v 1.11 2004/11/24 01:11:08 dun Exp $
+ *  $Id: auth_recv.c,v 1.12 2004/12/08 18:48:15 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -61,6 +61,8 @@ auth_recv_init (void)
  *****************************************************************************/
 
 #ifdef MUNGE_AUTH_GETPEEREID
+
+#include <sys/types.h>
 
 int
 auth_recv (m_msg_t m, uid_t *uid, gid_t *gid)

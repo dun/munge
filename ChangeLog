@@ -1,5 +1,7 @@
 2004-12-08  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/munged/auth_recv.c: Added <sys/types.h> include for getpeereid().
+
 	* NEWS: Updated v0.4 news wrt SuSE/LSB init script support.
 
 	* JARGON: Updated URL.
