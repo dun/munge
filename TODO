@@ -1,4 +1,3 @@
--dead store removal protection
 -minimize pollution of libmunge namespace
 -thread manager
 -cross-platform (AIX, Tru64, Solaris, BSD)

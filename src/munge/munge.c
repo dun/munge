@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munge.c,v 1.18 2004/03/11 22:09:36 dun Exp $
+ *  $Id: munge.c,v 1.19 2004/03/16 23:03:22 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -197,12 +197,12 @@ destroy_conf (conf_t conf)
         conf->fp_out = NULL;
     }
     if (conf->data != NULL) {
-        memset (conf->data, 0, conf->dlen);
+        memburn (conf->data, 0, conf->dlen);
         free (conf->data);
         conf->data = NULL;
     }
     if (conf->cred != NULL) {
-        memset (conf->cred, 0, conf->clen);
+        memburn (conf->cred, 0, conf->clen);
         free (conf->cred);
         conf->cred = NULL;
     }

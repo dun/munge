@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: cred.c,v 1.4 2004/03/11 21:04:40 dun Exp $
+ *  $Id: cred.c,v 1.5 2004/03/16 23:03:22 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -34,6 +34,7 @@
 #include <string.h>
 #include "cred.h"
 #include "munge_defs.h"
+#include "str.h"
 
 
 munge_cred_t
@@ -82,7 +83,7 @@ cred_destroy (munge_cred_t c)
         memset (c->realm_mem, 0, c->realm_mem_len);
         free (c->realm_mem);
     }
-    memset (c, 0, sizeof (*c));
+    memburn (c, 0, sizeof (*c));        /* nuke the msg dek */
     free (c);
     return;
 }

@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: conf.c,v 1.13 2004/03/11 21:04:40 dun Exp $
+ *  $Id: conf.c,v 1.14 2004/03/16 23:03:22 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -46,6 +46,7 @@
 #include "md.h"
 #include "munge_defs.h"
 #include "replay.h"
+#include "str.h"
 #include "zip.h"
 
 
@@ -144,12 +145,12 @@ destroy_conf (conf_t conf)
         conf->key_name = NULL;
     }
     if (conf->dek_key) {
-        memset (conf->dek_key, 0, conf->dek_key_len);
+        memburn (conf->dek_key, 0, conf->dek_key_len);
         free (conf->dek_key);
         conf->dek_key = NULL;
     }
     if (conf->mac_key) {
-        memset (conf->mac_key, 0, conf->mac_key_len);
+        memburn (conf->mac_key, 0, conf->mac_key_len);
         free (conf->mac_key);
         conf->mac_key = NULL;
     }
