@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munge.h,v 1.3 2003/02/13 17:55:58 dun Exp $
+ *  $Id: munge.h,v 1.4 2003/02/17 02:29:41 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -31,25 +31,32 @@
 #include <sys/types.h>
 
 
-/***********
- *  Notes  *
- ***********/
+/*****************************************************************************
+ *  Got GPL?
+ *****************************************************************************/
+
+#ifndef GPL_LICENSED
+  #error By linking against libmunge, the derivative
+  #error work becomes licensed under the terms of the
+  #error GNU General Public License.  Acknowledge by
+  #error defining the GPL_LICENSED preprocessor macro.
+#endif /* !GPL_LICENSED */
 
 
-/****************
- *  Data Types  *
- ****************/
+/*****************************************************************************
+ *  Data Types
+ *****************************************************************************/
 
 typedef struct munge_ctx munge_ctx_t;
 
-/*  NOTE: Error codes must be in the range [1..255] in order to
- *        provide a meaningful return status when returned via exit().
+/*  XXX: Error codes must be in the range [1..255] in order to
+ *       provide a meaningful return status when returned via exit().
  */
 typedef enum {
     EMUNGE_SUCCESS              = 0,    /* Whoohoo! */
     EMUNGE_SNAFU                = 1,    /* Doh! */
     EMUNGE_INVAL                = 2,    /* Invalid argument */
-    EMUNGE_NOMEM                = 3,    /* Out of memory */
+    EMUNGE_NO_MEMORY            = 3,    /* Out of memory */
     EMUNGE_OVERFLOW             = 4,    /* Buffer overflow */
     EMUNGE_NO_DAEMON            = 5,    /* Munged not found */
     EMUNGE_TIMEOUT              = 6,    /* Munged timeout */
@@ -60,14 +67,14 @@ typedef enum {
     EMUNGE_BAD_ZIP              = 11,   /* Bad credential compression type */
     EMUNGE_BAD_MAC              = 12,   /* Bad credential MAC type */
     EMUNGE_CRED_EXPIRED         = 13,   /* Credential expired */
-    EMUNGE_CRED_PREMATURE       = 14,   /* Credential has future creation */
+    EMUNGE_CRED_REWOUND         = 14,   /* Credential has future creation */
     EMUNGE_CRED_REPLAYED        = 15    /* Credential replayed */
 } munge_err_t;
 
 
-/***************
- *  Functions  *
- ***************/
+/*****************************************************************************
+ *  Functions
+ *****************************************************************************/
 
 munge_err_t munge_encode (char **m, const munge_ctx_t *ctx,
                           const void *buf, int len);

@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munge.c,v 1.4 2003/02/13 17:55:58 dun Exp $
+ *  $Id: munge.c,v 1.5 2003/02/17 02:29:41 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -109,7 +109,7 @@ munge_encode (char **m, const munge_ctx_t *ctx, const void *buf, int len)
     }
     crdlen = strlen(MUNGE_PREFIX) + ((strlen(tmp) + len + 6) * 2) + 1;
     if (!(crd = malloc(crdlen))) {
-        return(EMUNGE_NOMEM);
+        return(EMUNGE_NO_MEMORY);
     }
     strcpy(crd, MUNGE_PREFIX);
     p = strchr(crd, 0);
@@ -155,7 +155,7 @@ munge_decode (const char *m, munge_ctx_t *ctx,
 
     tmplen = ((strlen(m) + 1) / 2) + 1;
     if (!(p = tmpbuf = malloc(tmplen))) {
-        return(EMUNGE_NOMEM);
+        return(EMUNGE_NO_MEMORY);
     }
     n = base32_decode(tmpbuf, m, strlen(m));
     tmpbuf[n] = '\0';
@@ -217,7 +217,7 @@ munge_decode (const char *m, munge_ctx_t *ctx,
         else {
             if (!(*pbuf = malloc(len + 1))) {
                 free(tmpbuf);
-                return(EMUNGE_NOMEM);
+                return(EMUNGE_NO_MEMORY);
             }
             memcpy(*pbuf, p, len);
             memset(*pbuf + len, 0, 1);          /* ensure buf is NUL-term'd */
@@ -239,22 +239,30 @@ munge_strerror (munge_err_t errnum)
             return("Internal error");
         case EMUNGE_INVAL:
             return("Invalid argument");
-        case EMUNGE_NOMEM:
+        case EMUNGE_NO_MEMORY:
             return("Out of memory");
         case EMUNGE_OVERFLOW:
             return("Buffer overflow");
         case EMUNGE_NO_DAEMON:
-            return("No response from daemon");
+            return("No response from munged");
+        case EMUNGE_TIMEOUT:
+            return("Timed-out with munged");
+        case EMUNGE_PROTO:
+            return("Protocol error with munged");
         case EMUNGE_BAD_CRED:
             return("Invalid credential");
         case EMUNGE_BAD_VERSION:
             return("Unrecognized version");
         case EMUNGE_BAD_CIPHER:
             return("Unsupported cipher");
+        case EMUNGE_BAD_ZIP:
+            return("Unsupported compression");
         case EMUNGE_BAD_MAC:
             return("Unsupported MAC");
         case EMUNGE_CRED_EXPIRED:
             return("Expired credential");
+        case EMUNGE_CRED_REWOUND:
+            return("Rewound credential");
         case EMUNGE_CRED_REPLAYED:
             return("Replayed credential");
         default:

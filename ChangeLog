@@ -1,3 +1,7 @@
+2003-02-16  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* : Added GPL_LICENSED preprocessor macro support.
+
 2003-02-13  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* : Added munge/unmunge cmdline progs.

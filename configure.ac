@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: configure.ac,v 1.4 2003/02/13 17:59:16 dun Exp $
+## $Id: configure.ac,v 1.5 2003/02/17 02:29:41 dun Exp $
 ##*****************************************************************************
 ## Process this file with autoconf to produce a configure script.
 ##*****************************************************************************
@@ -33,6 +33,7 @@ AC_INIT([munge], [0.0], [cdunlap@llnl.gov])
 AC_CONFIG_AUX_DIR([config])
 AC_CONFIG_SRCDIR([src/libmunge/munge.h])
 AC_CANONICAL_SYSTEM
+AC_GPL_LICENSED
 AC_HUMOR
 
 ##
