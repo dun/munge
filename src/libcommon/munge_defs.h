@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munge_defs.h,v 1.31 2004/09/24 16:50:45 dun Exp $
+ *  $Id: munge_defs.h,v 1.32 2004/09/24 18:20:14 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -68,7 +68,7 @@
 #define MUNGE_MAXIMUM_TTL               3600
 
 /*  Flag to denote that group information comes from "/etc/group".
- *  If set, group information will not be re-parsed unless the file
+ *  If set, group information will not be re-parsed unless this file
  *    modification time changes.  If not set, the file modification time
  *    will be ignored and group information will be re-parsed via getgrent()
  *    every time the MUNGE_GROUP_PARSE_TIMER expires.
@@ -81,7 +81,7 @@
 
 /*  Flag to allow previously-decoded credentials to be retried.
  *  If the client receives a socket error while communicating with the
- *    server, it will retry the transaction up to MUNGE_SOCKET_XFER_RETRIES.
+ *    server, it will retry the transaction up to MUNGE_SOCKET_XFER_ATTEMPTS.
  *    If such an error occurs after the credential has been inserted into the
  *    replay hash, a subsequent retry will appear as a replayed credential.
  *  If set, a previously-decoded credential will not be marked as being
