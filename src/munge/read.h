@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: read.h,v 1.1 2003/02/13 17:54:27 dun Exp $
+ *  $Id: read.h,v 1.2 2003/04/08 18:16:16 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -27,6 +27,8 @@
 
 #ifndef MUNGE_READ_H
 #define MUNGE_READ_H
+
+#include <stdio.h>
 
 
 int read_data_from_file (FILE *fp, void **buf, int *len);
