@@ -1,22 +1,22 @@
--minimize pollution of libmunge namespace
 -thread manager
+-minimize pollution of libmunge namespace
 -cross-platform (AIX, Tru64, Solaris, BSD)
 -save/restore replay state
 -ensure safe perms on sensitive files/dirs
--valgrindify
+-configuration file support
+-nonroot configuration support
+-auto-force daemon when appropriate
+-munged 'k' cmdling opt to kill daemon
+-decode based on uid/gid
+-statistics
 -documentation
 -create README guide
 -create FAQ
 -man pages
 -audit
--debian support
--configuration file parsing
--nonroot configuration support
--auto-force daemon when appropriate
--munged 'k' cmdling opt to kill daemon
+-debian/suse support
 -benchmark utility
 -server timeout for unresponsive clients
 -realm (multi-key) support
 -sgid support?
 -mlock support?
--security testplan script

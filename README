@@ -1,3 +1,14 @@
+-------------------------------------------------------------------------------
+
+DANGER, WILL ROBINSON! DANGER!
+
+This release should be considered alpha software.  It is being provided
+in its current state for evaluation purposes.  Some key features are
+still missing, including a configuration file and man pages.  It is
+not yet recommended for deployment within a production environment.
+
+-------------------------------------------------------------------------------
+
 MUNGE (Munge Uid 'N' Gid Emporium) is a service for creating and
 validating credentials in order to allow a process to securely
 authenticate the UID and GID of another local or remote process
@@ -21,3 +32,51 @@ embedding the destination's address to ensure the credential is valid
 on only that host.  The internal format of the credential is encoded
 in a platform-independent manner.  And the credential itself is base64
 encoded to allow it to be transmitted over virtually any transport.
+
+-------------------------------------------------------------------------------
+
+Getting started:
+
+  1. Edit src/libcommon/munge_defs.h.  The defaults for
+     MUNGED_SECRET_KEY, MUNGED_RANDOM_SEED, and MUNGED_LOGFILE
+     may not be to your liking.  Define them as you see fit.
+
+  2. ./configure; make; make install -- you know the drill.
+
+  3. Create a secret key.  The format of the key doesn't matter.
+
+     A. You can simply enter a password (not recommended):
+        echo "foo" >secret
+
+     B. You can enter the hash of a password:
+        echo -n "foo" | sha1sum | cut -d' ' -f1 >secret
+
+     C. You can grab some random data (recommended):
+        dd if=/dev/random bs=1024 count=1 >secret
+
+  4. Ensure this file is permissioned 0400 and owned by the same user
+     that the 'munged' daemon will run as.  On most platforms, root
+     privileges are not required for the daemon.
+
+  5. Securely propagate this file (eg, with ssh) to other nodes within
+     the same administrative realm.  Credentials are valid only within an
+     administrative realm (ie, on nodes that share the same secret key).
+
+  6. Start the 'munged' daemon.  On RedHat, you can use the init script
+     (which hopefully got installed in /etc/init.d/munge).  Otherwise,
+     the daemon will have been installed in /usr/local/sbin/munged.
+
+
+Testing the installation:
+
+  Try "munge -n | unmunge".  If that succeeds, all is well.
+
+
+Munging creds:
+
+  Applications written in C/C++ will want to use the interface provided
+  by <libmunge.h>.  Scripts will want to use the interface provided
+  by /usr/local/bin/munge and /usr/local/bin/unmunge -- specify "-h"
+  or "--help" for usage information.
+
+-------------------------------------------------------------------------------
