@@ -1,5 +1,8 @@
 2003-04-23  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/libmunge/decode.c, src/libmunge/encode.c, src/munged/dec_v1.c,
+	  src/munged/enc_v1.c: Removed credential's TTL field.
+
 	* : Cleanup of error propagation code.
 
 2003-04-22  Chris Dunlap  <cdunlap@llnl.gov>

@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: enc_v1.c,v 1.3 2003/04/22 20:49:36 dun Exp $
+ *  $Id: enc_v1.c,v 1.4 2003/04/23 22:04:45 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -179,11 +179,6 @@ enc_v1_validate_msg (munge_msg_t m)
     }
     assert (m1->mac != MUNGE_MAC_NONE);
 
-    /*  Validate time-to-live.
-     */
-    if (m1->ttl == MUNGE_TTL_DEFAULT) {
-        m1->ttl = conf->def_ttl;
-    }
     /*  Validate realm.
      *
      *  FIXME: Validate realm and set default string if needed.
@@ -341,7 +336,7 @@ enc_v1_pack_inner (munge_cred_t c)
 /*  Packs the "inner" credential data into MSBF (ie, big endian) format.
  *  The "inner" part of the credential may be subjected to cryptographic
  *    transformations (ie, compression and encryption).  It includes:
- *    salt, ttl, encode time, uid, gid, data length, and data (if present).
+ *    salt, encode time, uid, gid, data length, and data (if present).
  */
     struct munge_msg_v1 *m1;            /* munge msg (v1 format)             */
     unsigned char       *p;             /* ptr into packed data              */
@@ -355,7 +350,6 @@ enc_v1_pack_inner (munge_cred_t c)
     m1 = c->msg->pbody;
 
     c->inner_mem_len += c->salt_len;
-    c->inner_mem_len += sizeof (m1->ttl);
     c->inner_mem_len += sizeof (m1->time0);
     c->inner_mem_len += sizeof (m1->uid);
     c->inner_mem_len += sizeof (m1->gid);
@@ -370,11 +364,6 @@ enc_v1_pack_inner (munge_cred_t c)
     assert (c->salt_len > 0);
     memcpy (p, c->salt, c->salt_len);
     p += c->salt_len;
-
-    assert (sizeof (m1->ttl) == 4);
-    u = htonl (m1->ttl);
-    memcpy (p, &u, sizeof (m1->ttl));
-    p += sizeof (m1->ttl);
 
     assert (sizeof (m1->time0) == 4);
     u = htonl (m1->time0);

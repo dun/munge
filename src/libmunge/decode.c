@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: decode.c,v 1.2 2003/04/23 18:22:35 dun Exp $
+ *  $Id: decode.c,v 1.3 2003/04/23 22:04:45 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -123,7 +123,6 @@ decode_init (munge_ctx_t ctx, void **buf, int *len, uid_t *uid, gid_t *gid)
         ctx->cipher = -1;
         ctx->zip = -1;
         ctx->mac = -1;
-        ctx->ttl = -1;
         if (ctx->realm) {
             free (ctx->realm);
             ctx->realm = NULL;

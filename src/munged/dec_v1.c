@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: dec_v1.c,v 1.3 2003/04/23 18:22:35 dun Exp $
+ *  $Id: dec_v1.c,v 1.4 2003/04/23 22:04:45 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -135,6 +135,11 @@ dec_v1_validate_msg (munge_msg_t m)
 
     m1 = m->pbody;
 
+    /*  Validate time-to-live.
+     */
+    if (m1->ttl == MUNGE_TTL_DEFAULT) {
+        m1->ttl = conf->def_ttl;
+    }
     /*  Reset message type for the response.
      */
     m->head.type = MUNGE_MSG_DEC_RSP;
@@ -653,7 +658,7 @@ dec_v1_unpack_inner (munge_cred_t c)
 /*  Unpacks the "inner" credential data from MSBF (ie, big endian) format.
  *  The "inner" part of the credential may have been subjected to cryptographic
  *    transformations (ie, compression and encryption).  It includes:
- *    salt, ttl, encode time, uid, gid, data length, and data (if present).
+ *    salt, encode time, uid, gid, data length, and data (if present).
  *  Validation of the "inner" credential occurs here as well since unpacking
  *    may not be able to continue if an invalid field is found.
  *
@@ -691,18 +696,6 @@ dec_v1_unpack_inner (munge_cred_t c)
     }
     p += c->salt_len;
     len -= c->salt_len;
-    /*
-     *  Unpack the TTL.
-     */
-    n = sizeof (m1->ttl);
-    assert (n == 4);
-    if (n > len) {
-        return (_munge_msg_set_err (c->msg, EMUNGE_BAD_CRED,
-            strdup ("Truncated credential ttl")));
-    }
-    m1->ttl = ntohl (* (uint32_t *) p);
-    p += n;
-    len -= n;
     /*
      *  Unpack the encode time.
      */
