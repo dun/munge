@@ -1,5 +1,7 @@
 2003-04-30  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* munge.spec: Tweaked description, pre/post/preun/postun, files.
+
 	* : Added 'distclean-local' hook via Make-inc.mk.
 
 	* : Added startup script.

@@ -1,4 +1,4 @@
-# $Id: munge.spec,v 1.8 2003/04/30 17:58:59 dun Exp $
+# $Id: munge.spec,v 1.9 2003/04/30 20:13:52 dun Exp $
 
 Name:		munge
 Version:	0.0
@@ -14,25 +14,28 @@ BuildRoot:	%{_tmppath}/%{name}-%{version}
 Source0:	%{name}-%{version}.tgz
 
 %description
-Munge is a mechanism for creating/verifying credentials in order to allow
-a process to securely authenticate the UID/GID of another local or remote
-process within an administrative domain.  Processes can create and verify
-these credentials without the use of root privileges or reserved ports.
+MUNGE (Munge Uid 'N' Gid Emporium) is a mechanism for creating/validating
+credentials in order to allow a process to securely authenticate the
+UID/GID of another local or remote process within an administrative domain.
+Processes can create and validate these credentials without the use of
+root privileges or reserved ports.
 
-In actuality, a credential is created and verified by the local root
-'munged' daemon running on each node.  But a process creates or verifies
-a given credential through the use of a munge client such as the libmunge
-library or munge/unmunge executables; these clients are responsible for
-communicating with the local munged daemon.
+In actuality, a credential is created and validated by the local root
+'munged' daemon running on each node in the administrative domain.
+But a process creates or validates a given credential through the use
+of the libmunge library or munge/unmunge executables; these clients are
+responsible for communicating with the local daemon.
 
-The contents of the credential (including any application-supplied data)
-are encrypted.  The integrity of the credential is ensured by a MAC.
-The credential is valid for a limited time defined by its TTL.  The daemon
-ensures unexpired credentials are not being replayed on a particular host.
-The application-supplied data can be used for purposes such as embedding the
-destination's address to ensure the credential is valid on only that host.
-The credential itself is base64 encoded to allow it to be transmitted over
-virtually any transport.
+The contents of the credential (including any application-supplied
+data) are encrypted with a key shared by all 'munged' daemons within the
+administrative domain.  The integrity of the credential is ensured by a MAC.
+The credential is valid for a limited time defined by the daemon's TTL.
+The daemon ensures unexpired credentials are not being replayed on that
+particular host.  The application-supplied data can be used for purposes
+such as embedding the destination's address to ensure the credential is
+valid on only that host.  The internal format of the credential is encoded
+in a platform-independent manner.  And the credential itself is base64
+encoded to allow it to be transmitted over virtually any transport.
 
 %prep
 %setup
@@ -49,41 +52,35 @@ DESTDIR="$RPM_BUILD_ROOT" make install
 %clean
 rm -rf "$RPM_BUILD_ROOT"
 
-#%pre
-#if [ -x /etc/rc.d/init.d/munge ]; then
-#  if /etc/rc.d/init.d/munge status | grep running >/dev/null 2>&1; then
-#    /etc/rc.d/init.d/munge stop
-#  fi
-#fi
-#
-#%post
-#if [ -x /etc/rc.d/init.d/munge ]; then
-#  [ -x /sbin/chkconfig ] && /sbin/chkconfig --del munge
-#  [ -x /sbin/chkconfig ] && /sbin/chkconfig --add munge
-#  if ! /etc/rc.d/init.d/munge status | grep running >/dev/null 2>&1; then
-#    /etc/rc.d/init.d/munge start
-#  fi
-#fi
-#
-#%preun
-#if [ "$1" = 0 ]; then
-#  if [ -x /etc/rc.d/init.d/munge ]; then
-#    [ -x /sbin/chkconfig ] && /sbin/chkconfig --del munge
-#    if /etc/rc.d/init.d/munge status | grep running >/dev/null 2>&1; then
-#      /etc/rc.d/init.d/munge stop
-#    fi
-#  fi
-#fi
-#
+%pre
+if [ -x /etc/rc.d/init.d/munge ]; then
+  if /etc/rc.d/init.d/munge status | grep running >/dev/null 2>&1; then
+    /etc/rc.d/init.d/munge stop
+  fi
+fi
+
 %post
-if [ "$1" = 1 ]; then
-  /sbin/ldconfig %{_libdir}
+/sbin/ldconfig %{_libdir}
+if [ -x /etc/rc.d/init.d/munge ]; then
+  [ -x /sbin/chkconfig ] && /sbin/chkconfig --del munge
+  [ -x /sbin/chkconfig ] && /sbin/chkconfig --add munge
+  if ! /etc/rc.d/init.d/munge status | grep running >/dev/null 2>&1; then
+    /etc/rc.d/init.d/munge start
+  fi
+fi
+
+%preun
+if [ "$1" = 0 ]; then
+  if [ -x /etc/rc.d/init.d/munge ]; then
+    [ -x /sbin/chkconfig ] && /sbin/chkconfig --del munge
+    if /etc/rc.d/init.d/munge status | grep running >/dev/null 2>&1; then
+      /etc/rc.d/init.d/munge stop
+    fi
+  fi
 fi
 
 %postun
-if [ "$1" = 0 ]; then
-  /sbin/ldconfig %{_libdir}
-fi
+/sbin/ldconfig %{_libdir}
 
 %files
 %defattr(-,root,root,0755)
@@ -96,11 +93,11 @@ fi
 %doc NEWS
 %doc README
 %doc TODO
-#%config(noreplace) /etc/munge.conf
+#%config(noreplace) /etc/munge/munge.conf
 #%config(noreplace) /etc/logrotate.d/munge
-#/etc/rc.d/init.d/munge
+/etc/rc.d/init.d/munge
 %{_bindir}/*
 %{_includedir}/*
 %{_libdir}/*
 #%{_mandir}/*/*
-#%{_sbindir}/*
+%{_sbindir}/*
