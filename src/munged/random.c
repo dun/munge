@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: random.c,v 1.2 2003/05/06 20:15:02 dun Exp $
+ *  $Id: random.c,v 1.3 2003/05/06 21:37:22 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -56,7 +56,7 @@ random_init (const char *seed)
                 n, seed);
     }
     if (n < RANDOM_SEED_BYTES) {
-        log_msg (LOG_NOTICE, "PRNG seeding in process ...");
+        log_msg (LOG_NOTICE, "PRNG seeding in progress ...");
         if ((n = RAND_load_file (RANDOM_SEED_DEFAULT, RANDOM_SEED_BYTES)) > 0)
             log_msg (LOG_INFO, "PRNG seeded PRNG with %d bytes from \"%s\"",
                 n, RANDOM_SEED_DEFAULT);
