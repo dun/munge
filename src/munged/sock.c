@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: sock.c,v 1.6 2004/04/03 21:53:00 dun Exp $
+ *  $Id: sock.c,v 1.7 2004/06/11 20:54:32 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -137,20 +137,33 @@ munge_sock_accept (conf_t conf)
 {
     pthread_t tid;
     pthread_attr_t tattr;
+    size_t stacksize = 65536;
     munge_msg_t m;
     int sd;
 
     assert (conf != NULL);
     assert (conf->ld >= 0);
 
-    if ((errno = pthread_attr_init (&tattr))) {
-        log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to init pthread attribute");
+    if ((errno = pthread_attr_init (&tattr)) != 0) {
+        log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to init thread attribute");
     }
     if ((errno = pthread_attr_setdetachstate (
-      &tattr, PTHREAD_CREATE_DETACHED))) {
+      &tattr, PTHREAD_CREATE_DETACHED)) != 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR,
-            "Unable to set pthread detached attribute");
+            "Unable to set thread detached attribute");
     }
+#ifdef _POSIX_THREAD_ATTR_STACKSIZE
+    if ((errno = pthread_attr_setstacksize (&tattr, stacksize)) != 0) {
+        log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to set thread stacksize");
+    }
+    if ((errno = pthread_attr_getstacksize (&tattr, &stacksize)) != 0) {
+        log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to get thread stacksize");
+    }
+    log_msg (LOG_DEBUG, "Set thread stacksize to %d", (int) stacksize);
+#else  /* !_POSIX_THREAD_ATTR_STACKSIZE */
+    log_msg (LOG_DEBUG, "Setting thread stacksize not supported");
+#endif /* !_POSIX_THREAD_ATTR_STACKSIZE */
+
     while (!done) {
         if ((sd = accept (conf->ld, NULL, NULL)) < 0) {
             if (errno == EINTR)
@@ -169,15 +182,15 @@ munge_sock_accept (conf_t conf)
             log_msg (LOG_WARNING, "Unable to create message struct");
         }
         else if ((errno = pthread_create (&tid, &tattr,
-          (thrfun_t) munge_msg_server_thread, m))) {
+          (thrfun_t) munge_msg_server_thread, m)) != 0) {
             _munge_msg_destroy (m);
             log_msg (LOG_WARNING,
                 "Unable to create thread: %s", strerror (errno));
         }
     }
-    if ((errno = pthread_attr_destroy (&tattr))) {
+    if ((errno = pthread_attr_destroy (&tattr)) != 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR,
-            "Unable to destroy pthread attribute");
+            "Unable to destroy thread attribute");
     }
     return;
 }

@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: timer.c,v 1.3 2004/04/03 21:53:00 dun Exp $
+ *  $Id: timer.c,v 1.4 2004/06/11 20:54:32 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -41,6 +41,7 @@
 #include <stdlib.h>
 #include <sys/time.h>
 #include <time.h>
+#include <unistd.h>
 #include <munge.h>
 #include "log.h"
 #include "thread.h"
@@ -107,11 +108,35 @@ static _timer_t         timer_inactive = NULL;
 void
 timer_init (void)
 {
+    pthread_attr_t tattr;
+    size_t stacksize = 65536;
+
     if (timer_tid != 0) {
         return;
     }
-    if ((errno = pthread_create (&timer_tid, NULL, timer_thread, NULL)) != 0) {
-        log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to create timer thread");
+    if ((errno = pthread_attr_init (&tattr)) != 0) {
+        log_errno (EMUNGE_SNAFU, LOG_ERR,
+            "Unable to init timer thread attribute");
+    }
+#ifdef _POSIX_THREAD_ATTR_STACKSIZE
+    if ((errno = pthread_attr_setstacksize (&tattr, stacksize)) != 0) {
+        log_errno (EMUNGE_SNAFU, LOG_ERR,
+            "Unable to set timer thread stacksize");
+    }
+    if ((errno = pthread_attr_getstacksize (&tattr, &stacksize)) != 0) {
+        log_errno (EMUNGE_SNAFU, LOG_ERR,
+            "Unable to get timer thread stacksize");
+    }
+    log_msg (LOG_DEBUG, "Set timer thread stacksize to %d", (int) stacksize);
+#endif /* _POSIX_THREAD_ATTR_STACKSIZE */
+
+    if ((errno= pthread_create (&timer_tid, &tattr, timer_thread, NULL)) !=0) {
+        log_errno (EMUNGE_SNAFU, LOG_ERR,
+            "Unable to create timer thread");
+    }
+    if ((errno = pthread_attr_destroy (&tattr)) != 0) {
+        log_errno (EMUNGE_SNAFU, LOG_ERR,
+            "Unable to destroy timer thread attribute");
     }
     return;
 }

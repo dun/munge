@@ -1,3 +1,7 @@
+2004-06-11  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/munged/sock.c, src/munged/timer.c: Set pthread stacksize to 64KB.
+
 2004-06-09  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/libmunge/munge.h: Added support for C++.
