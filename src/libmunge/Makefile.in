@@ -60,7 +60,7 @@ LTLIBRARIES = $(lib_LTLIBRARIES)
 am__DEPENDENCIES_1 =
 libmunge_la_DEPENDENCIES = $(top_builddir)/src/libcommon/libcommon.la \
 	$(top_builddir)/src/libmissing/libmissing.la \
-	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
+	$(am__DEPENDENCIES_1)
 am_libmunge_la_OBJECTS = ctx.lo decode.lo encode.lo msg_client.lo \
 	strerror.lo strings.lo
 libmunge_la_OBJECTS = $(am_libmunge_la_OBJECTS)
@@ -204,7 +204,6 @@ AM_CPPFLAGS = \
 libmunge_la_LIBADD = \
 	$(top_builddir)/src/libcommon/libcommon.la \
 	$(top_builddir)/src/libmissing/libmissing.la \
-	$(LIBNSL) \
 	$(LIBSOCKET)
 
 libmunge_la_SOURCES = \

@@ -59,16 +59,15 @@ binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
 am_munge_OBJECTS = munge.$(OBJEXT) read.$(OBJEXT)
 munge_OBJECTS = $(am_munge_OBJECTS)
-munge_LDADD = $(LDADD)
 munge_DEPENDENCIES = $(top_builddir)/src/libcommon/libcommon.la \
 	$(top_builddir)/src/libmissing/libmissing.la \
 	$(top_builddir)/src/libmunge/libmunge.la
 am_unmunge_OBJECTS = unmunge.$(OBJEXT) read.$(OBJEXT)
 unmunge_OBJECTS = $(am_unmunge_OBJECTS)
-unmunge_LDADD = $(LDADD)
+am__DEPENDENCIES_1 =
 unmunge_DEPENDENCIES = $(top_builddir)/src/libcommon/libcommon.la \
 	$(top_builddir)/src/libmissing/libmissing.la \
-	$(top_builddir)/src/libmunge/libmunge.la
+	$(top_builddir)/src/libmunge/libmunge.la $(am__DEPENDENCIES_1)
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)/config
 depcomp = $(SHELL) $(top_srcdir)/config/depcomp
 am__depfiles_maybe = depfiles
@@ -198,7 +197,7 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/src/libmissing \
 	-I$(top_srcdir)/src/libmunge
 
-LDADD = \
+munge_LDADD = \
 	$(top_builddir)/src/libcommon/libcommon.la \
 	$(top_builddir)/src/libmissing/libmissing.la \
 	$(top_builddir)/src/libmunge/libmunge.la
@@ -206,6 +205,12 @@ LDADD = \
 munge_SOURCES = \
 	munge.c \
 	read.c
+
+unmunge_LDADD = \
+	$(top_builddir)/src/libcommon/libcommon.la \
+	$(top_builddir)/src/libmissing/libmissing.la \
+	$(top_builddir)/src/libmunge/libmunge.la \
+	$(LIBNSL)
 
 unmunge_SOURCES = \
 	unmunge.c \
