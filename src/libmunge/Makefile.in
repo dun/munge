@@ -143,6 +143,9 @@ LIBTOOL = @LIBTOOL@
 LIBZ = @LIBZ@
 LN_S = @LN_S@
 LTLIBOBJS = @LTLIBOBJS@
+LT_AGE = @LT_AGE@
+LT_CURRENT = @LT_CURRENT@
+LT_REVISION = @LT_REVISION@
 MAINT = @MAINT@
 MAINTAINER_MODE_FALSE = @MAINTAINER_MODE_FALSE@
 MAINTAINER_MODE_TRUE = @MAINTAINER_MODE_TRUE@
@@ -212,6 +215,9 @@ lib_LTLIBRARIES = \
 AM_CPPFLAGS = \
 	-I$(top_srcdir)/src/libcommon \
 	-I$(top_srcdir)/src/libmissing
+
+libmunge_la_LDFLAGS = \
+	-version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE)
 
 libmunge_la_LIBADD = \
 	$(top_builddir)/src/libcommon/libcommon.la \

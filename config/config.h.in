@@ -123,6 +123,15 @@
 /* Define the canonical host vendor type. */
 #undef HOST_VENDOR
 
+/* Define the libtool library 'age' version information. */
+#undef LT_AGE
+
+/* Define the libtool library 'current' version information. */
+#undef LT_CURRENT
+
+/* Define the libtool library 'revision' version information. */
+#undef LT_REVISION
+
 /* Define to 1 if you are building a production release. */
 #undef NDEBUG
 

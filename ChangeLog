@@ -1,5 +1,8 @@
 2004-11-18  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* META, config/x_ac_meta.m4, src/libmunge/Makefile.am:
+	  Added LT_Current, LT_Revision, and LT_Age for libtool -version-info.
+
 	* README, munge.spec: Updated verbage.
 	* src/libcommon/munge.7.in, src/libmunge/munge.3.in,
 	  src/libmunge/munge_ctx.3.in, src/munge/munge.1.in,

@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.12 2004/11/18 00:48:13 dun Exp $
+## $Id: Makefile.am,v 1.13 2004/11/19 00:25:43 dun Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
@@ -15,6 +15,9 @@ lib_LTLIBRARIES = \
 AM_CPPFLAGS = \
 	-I$(top_srcdir)/src/libcommon \
 	-I$(top_srcdir)/src/libmissing
+
+libmunge_la_LDFLAGS = \
+	-version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE)
 
 libmunge_la_LIBADD = \
 	$(top_builddir)/src/libcommon/libcommon.la \
