@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munge_msg.h,v 1.13 2004/05/06 01:41:12 dun Exp $
+ *  $Id: munge_msg.h,v 1.14 2004/09/23 20:56:43 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -88,6 +88,7 @@ struct munge_msg_head {
     uint32_t                magic;      /* eye of newt and toe of frog       */
     uint8_t                 version;    /* message version                   */
     uint8_t                 type;       /* enum munge_type                   */
+    uint8_t                 retry;      /* retry count for this transaction  */
     uint32_t                length;     /* length of msg body                */
 };
 
@@ -139,10 +140,7 @@ munge_err_t _munge_msg_send (munge_msg_t m);
 
 munge_err_t _munge_msg_recv (munge_msg_t m);
 
-munge_err_t _munge_msg_reset (munge_msg_t m);
-
 int _munge_msg_set_err (munge_msg_t m, munge_err_t e, char *s);
-
 
 
 #endif /* !MUNGE_MSG_H */

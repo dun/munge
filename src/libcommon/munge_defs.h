@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munge_defs.h,v 1.29 2004/09/16 20:11:37 dun Exp $
+ *  $Id: munge_defs.h,v 1.30 2004/09/23 20:56:43 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -55,7 +55,7 @@
 
 /*  Default munge_zip_t for compressing credentials.
  *    Compression incurs a substantial performance penalty.
- *    And most payloads are too small to achieve any compression.
+ *    Typical payloads are too small to achieve any compression.
  */
 #define MUNGE_DEFAULT_ZIP               MUNGE_ZIP_NONE
 
@@ -67,15 +67,28 @@
  */
 #define MUNGE_MAXIMUM_TTL               3600
 
-/*  Set to 1 if group information comes from "/etc/group".
- *  If set, group information will not be re-parsed unless
- *    the file modification time changes.
+/*  Flag to denote that group information comes from "/etc/group".
+ *  If set, group information will not be re-parsed unless the file
+ *    modification time changes.  If not set, the file modification time
+ *    will be ignored and group information will be re-parsed via getgrent()
+ *    every time the MUNGE_GROUP_PARSE_TIMER expires.
  */
 #define MUNGE_GROUP_STAT_FLAG           1
 
 /*  Integer for the number of seconds between updating group information.
  */
 #define MUNGE_GROUP_PARSE_TIMER         900
+
+/*  Flag to allow previously-decoded credentials to be retried.
+ *  If the client receives a socket error while communicating with the
+ *    server, it will retry the transaction up to MUNGE_SOCKET_XFER_RETRIES.
+ *    If such an error occurs after the credential has been inserted into the
+ *    replay hash, a subsequent retry will appear as a replayed credential.
+ *  If set, a previously-decoded credential will not be marked as being
+ *    replayed if the transaction is being retried.
+ *  So far, these types of errors have only been seen under linux smp kernels.
+ */
+#define MUNGE_REPLAY_RETRY_FLAG         1
 
 /*  Integer for the number of seconds between purging the replay hash
  *    of expired credentials.
@@ -96,7 +109,12 @@
 
 /*  Number of attempts a client makes connecting to the server before failing.
  */
-#define MUNGE_SOCKET_CONNECT_RETRIES    5
+#define MUNGE_SOCKET_CONNECT_ATTEMPTS   5
+
+/*  Number of attempts a client makes communicating with the server for a
+ *    given credential transaction before failing.
+ */
+#define MUNGE_SOCKET_XFER_ATTEMPTS      3
 
 /*  Number of microseconds (< 1e6) the daemon sleeps when encountering
  *    a transient error upon accepting a new client connection.
@@ -119,8 +137,6 @@
 
 /*  String specifying the pathname of the secret key file.
  *  FIXME: Temporary kludge until configuration file support is added.
- */
-/* #define MUNGED_SECRET_KEY               "/tmp/.munge-key"
  */
 #define MUNGED_SECRET_KEY               "/etc/ssh/ssh_host_key"
 

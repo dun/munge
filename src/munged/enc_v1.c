@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: enc_v1.c,v 1.20 2004/09/16 20:15:25 dun Exp $
+ *  $Id: enc_v1.c,v 1.21 2004/09/23 20:56:43 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -42,6 +42,7 @@
 #include "cred.h"
 #include "enc_v1.h"
 #include "job.h"
+#include "log.h"
 #include "lookup.h"
 #include "mac.h"
 #include "md.h"
@@ -59,6 +60,7 @@
 static int enc_v1_validate_msg (munge_msg_t m);
 static int enc_v1_init (munge_cred_t c);
 static int enc_v1_authenticate (munge_cred_t c);
+static int enc_v1_check_retry (munge_cred_t c);
 static int enc_v1_timestamp (munge_cred_t c);
 static int enc_v1_pack_outer (munge_cred_t c);
 static int enc_v1_pack_inner (munge_cred_t c);
@@ -87,6 +89,8 @@ enc_v1_process_msg (munge_msg_t m)
     else if (enc_v1_init (c) < 0)
         ;
     else if (enc_v1_authenticate (c) < 0)
+        ;
+    else if (enc_v1_check_retry (c) < 0)
         ;
     else if (enc_v1_timestamp (c) < 0)
         ;
@@ -259,12 +263,39 @@ enc_v1_authenticate (munge_cred_t c)
 
 
 static int
+enc_v1_check_retry (munge_cred_t c)
+{
+/*  Checks whether the transaction is being retried.
+ */
+    struct munge_msg_head  mh;          /* munge msg head struct             */
+    struct munge_msg_v1   *m1;          /* munge msg (v1 format)             */
+
+    assert (c != NULL);
+    assert (c->msg != NULL);
+
+    mh = c->msg->head;
+    m1 = c->msg->pbody;
+
+    if (mh.retry > 0) {
+        log_msg (LOG_INFO,
+            "Encode retry #%d for client uid=%d gid=%d",
+            mh.retry, m1->client_uid, m1->client_gid);
+    }
+    if (mh.retry > MUNGE_SOCKET_XFER_ATTEMPTS) {
+        return (_munge_msg_set_err (c->msg, EMUNGE_SOCKET,
+            strdupf ("Exceeded maximum transaction retry attempts")));
+    }
+    return (0);
+}
+
+
+static int
 enc_v1_timestamp (munge_cred_t c)
 {
 /*  Queries the current time.
  */
     struct munge_msg_v1 *m1;            /* munge msg (v1 format)             */
-    time_t now;
+    time_t               now;
 
     assert (c != NULL);
     assert (c->msg != NULL);

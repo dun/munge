@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: encode.c,v 1.14 2004/05/14 00:47:59 dun Exp $
+ *  $Id: encode.c,v 1.15 2004/09/23 20:56:43 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -35,7 +35,6 @@
 #include <string.h>
 #include <sys/types.h>
 #include <munge.h>
-#include "auth_send.h"
 #include "ctx.h"
 #include "msg_client.h"
 #include "munge_defs.h"
@@ -47,28 +46,27 @@
  *  Static Prototypes
  *****************************************************************************/
 
-static void encode_init (char **cred, munge_ctx_t ctx);
+static void _encode_init (char **cred, munge_ctx_t ctx);
 
-static munge_err_t encode_req_v1 (munge_msg_t m, munge_ctx_t ctx,
+static munge_err_t _encode_req_v1 (munge_msg_t m, munge_ctx_t ctx,
     const void *buf, int len);
 
-static munge_err_t encode_rsp_v1 (munge_msg_t m, char **cred);
+static munge_err_t _encode_rsp_v1 (munge_msg_t m, char **cred);
 
 
 /*****************************************************************************
- *  Extern Functions
+ *  Public Functions
  *****************************************************************************/
 
 munge_err_t
 munge_encode (char **cred, munge_ctx_t ctx, const void *buf, int len)
 {
-    char *socket;
     munge_err_t e;
     munge_msg_t m;
 
     /*  Init output parms in case of early return.
      */
-    encode_init (cred, ctx);
+    _encode_init (cred, ctx);
     /*
      *  Ensure a ptr exists for returning the credential to the caller.
      */
@@ -76,32 +74,15 @@ munge_encode (char **cred, munge_ctx_t ctx, const void *buf, int len)
         return (_munge_ctx_set_err (ctx, EMUNGE_BAD_ARG,
             strdup ("No address specified for returning the credential")));
     }
-    /*
-     *  Determine name of unix domain socket for communication with munged.
-     */
-    if (!ctx || !(socket = ctx->socket)) {
-        socket = MUNGE_SOCKET_NAME;
-    }
     /*  Ask the daemon to encode a credential.
      */
     if ((e = _munge_msg_create (&m, -1)) != EMUNGE_SUCCESS)
         ;
-    else if ((e = encode_req_v1 (m, ctx, buf, len)) != EMUNGE_SUCCESS)
+    else if ((e = _encode_req_v1 (m, ctx, buf, len)) != EMUNGE_SUCCESS)
         ;
-    else if ((e = _munge_msg_client_connect (m, socket)) != EMUNGE_SUCCESS)
+    else if ((e = munge_msg_client_xfer (&m, ctx)) != EMUNGE_SUCCESS)
         ;
-    else if ((e = _munge_msg_send (m)) != EMUNGE_SUCCESS)
-        ;
-    else if (auth_send (m) < 0) {
-        e = EMUNGE_SOCKET;
-    }
-    else if ((e = _munge_msg_reset (m)) != EMUNGE_SUCCESS)
-        ;
-    else if ((e = _munge_msg_recv (m)) != EMUNGE_SUCCESS)
-        ;
-    else if ((e = _munge_msg_client_disconnect (m)) != EMUNGE_SUCCESS)
-        ;
-    else if ((e = encode_rsp_v1 (m, cred)) != EMUNGE_SUCCESS)
+    else if ((e = _encode_rsp_v1 (m, cred)) != EMUNGE_SUCCESS)
         ;
     /*  Clean up and return.
      */
@@ -115,11 +96,11 @@ munge_encode (char **cred, munge_ctx_t ctx, const void *buf, int len)
 
 
 /*****************************************************************************
- *  Static Functions
+ *  Private Functions
  *****************************************************************************/
 
 static void
-encode_init (char **cred, munge_ctx_t ctx)
+_encode_init (char **cred, munge_ctx_t ctx)
 {
 /*  Initialize output parms in case of early return.
  */
@@ -138,7 +119,7 @@ encode_init (char **cred, munge_ctx_t ctx)
 
 
 static munge_err_t
-encode_req_v1 (munge_msg_t m, munge_ctx_t ctx, const void *buf, int len)
+_encode_req_v1 (munge_msg_t m, munge_ctx_t ctx, const void *buf, int len)
 {
 /*  Creates an Encode Request message to be sent to the local munge daemon.
  *  The inputs to this message are as follows:
@@ -199,7 +180,7 @@ encode_req_v1 (munge_msg_t m, munge_ctx_t ctx, const void *buf, int len)
 
 
 static munge_err_t
-encode_rsp_v1 (munge_msg_t m, char **cred)
+_encode_rsp_v1 (munge_msg_t m, char **cred)
 {
 /*  Extracts an Encode Response message received from the local munge daemon.
  *  The relevant outputs from this message are as follows:

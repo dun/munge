@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: msg_client.c,v 1.9 2004/04/03 21:53:00 dun Exp $
+ *  $Id: msg_client.c,v 1.10 2004/09/23 20:56:43 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -38,6 +38,8 @@
 #include <sys/un.h>
 #include <unistd.h>
 #include <munge.h>
+#include "auth_send.h"
+#include "ctx.h"
 #include "msg_client.h"
 #include "munge_defs.h"
 #include "munge_msg.h"
@@ -45,7 +47,87 @@
 #include "strlcpy.h"
 
 
+/*****************************************************************************
+ *  Prototypes
+ *****************************************************************************/
+
+static munge_err_t _munge_msg_client_connect (munge_msg_t m, char *path);
+static munge_err_t _munge_msg_client_disconnect (munge_msg_t m);
+
+
+/*****************************************************************************
+ *  Public Functions
+ *****************************************************************************/
+
 munge_err_t
+munge_msg_client_xfer (munge_msg_t *pm, munge_ctx_t ctx)
+{
+    char        *socket;
+    int          i;
+    munge_err_t  e;
+    munge_msg_t  mreq, mrsp;
+
+    if (!pm || !*pm) {
+        return (EMUNGE_SNAFU);
+    }
+    if (!ctx || !(socket = ctx->socket)) {
+        socket = MUNGE_SOCKET_NAME;
+    }
+    mreq = *pm;
+    mrsp = NULL;
+    i = 1;
+    while (1) {
+        if ((e = _munge_msg_client_connect (mreq, socket)) != EMUNGE_SUCCESS) {
+            break;
+        }
+        else if ((e = _munge_msg_send (mreq)) != EMUNGE_SUCCESS) {
+            ; /* empty */
+        }
+        else if (auth_send (mreq) < 0) {
+            e = EMUNGE_SOCKET;
+        }
+        else if ((e = _munge_msg_create (&mrsp, mreq->sd)) != EMUNGE_SUCCESS) {
+            break;
+        }
+        else if ((e = _munge_msg_recv (mrsp)) != EMUNGE_SUCCESS) {
+            ; /* empty */
+        }
+        else if ((e = _munge_msg_client_disconnect (mrsp)) != EMUNGE_SUCCESS) {
+            break;
+        }
+        else if (e == EMUNGE_SUCCESS) {
+            break;
+        }
+
+        if (i >= MUNGE_SOCKET_XFER_ATTEMPTS) {
+            break;
+        }
+        if (mrsp != NULL) {
+            mrsp->sd = -1;              /* prevent socket close by destroy() */
+            _munge_msg_destroy (mrsp);
+            mrsp = NULL;
+        }
+        if (mreq->sd >= 0) {
+            (void) close (mreq->sd);
+            mreq->sd = -1;
+        }
+        mreq->head.retry = i;
+        i++;
+    }
+    if (mrsp) {
+        *pm = mrsp;
+        mreq->sd = -1;                  /* prevent socket close by destroy() */
+        _munge_msg_destroy (mreq);
+    }
+    return (e);
+}
+
+
+/*****************************************************************************
+ *  Private Functions
+ *****************************************************************************/
+
+static munge_err_t
 _munge_msg_client_connect (munge_msg_t m, char *path)
 {
     struct stat         st;
@@ -89,22 +171,27 @@ _munge_msg_client_connect (munge_msg_t m, char *path)
     }
     i = 1;
     delay = 1;
-    for (;;) {
+    while (1) {
         /*
          * If a call to connect() for a Unix domain stream socket finds that
          *   the listening socket's queue is full, ECONNREFUSED is returned
          *   immediately.  (cf, Stevens UNPv1, s14.4, p378)
-         * If ECONNREFUSED, try again up to MUNGE_SOCKET_CONNECT_RETRIES.
+         * If ECONNREFUSED, try again up to MUNGE_SOCKET_CONNECT_ATTEMPTS.
          */
         n = connect (sd, (struct sockaddr *) &addr, sizeof (addr));
-        if (n == 0)
+
+        if (n == 0) {
             break;
-        if (errno == EINTR)
+        }
+        if (errno == EINTR) {
             continue;
-        if (errno != ECONNREFUSED)
+        }
+        if (errno != ECONNREFUSED) {
             break;
-        if (i >= MUNGE_SOCKET_CONNECT_RETRIES)
+        }
+        if (i >= MUNGE_SOCKET_CONNECT_ATTEMPTS) {
             break;
+        }
         sleep (delay);
         delay++;
         i++;
@@ -121,21 +208,21 @@ _munge_msg_client_connect (munge_msg_t m, char *path)
 }
 
 
-munge_err_t
-_munge_msg_client_disconnect (munge_msg_t m)
-{
-    munge_err_t e = EMUNGE_SUCCESS;
+static munge_err_t
+_munge_msg_client_disconnect (munge_msg_t m) {
+    munge_err_t e;
 
     assert (m != NULL);
     assert (m->sd >= 0);
 
-    if (m->sd >= 0) {
-        if (close (m->sd) < 0) {
-            _munge_msg_set_err (m, EMUNGE_SOCKET,
-                strdupf ("Unable to close socket: %s", strerror (errno)));
-            e = EMUNGE_SOCKET;
-        }
-        m->sd = -1;
+    if (close (m->sd) < 0) {
+        _munge_msg_set_err (m, EMUNGE_SOCKET,
+            strdupf ("Unable to close socket: %s", strerror (errno)));
+        e = EMUNGE_SOCKET;
     }
+    else {
+        e = EMUNGE_SUCCESS;
+    }
+    m->sd = -1;
     return (e);
 }

@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: dec_v1.c,v 1.24 2004/09/16 20:15:25 dun Exp $
+ *  $Id: dec_v1.c,v 1.25 2004/09/23 20:56:43 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -43,6 +43,7 @@
 #include "dec_v1.h"
 #include "gids.h"
 #include "job.h"
+#include "log.h"
 #include "lookup.h"
 #include "mac.h"
 #include "md.h"
@@ -61,6 +62,7 @@
 static int dec_v1_validate_msg (munge_msg_t m);
 static int dec_v1_timestamp (munge_cred_t c);
 static int dec_v1_authenticate (munge_cred_t c);
+static int dec_v1_check_retry (munge_cred_t c);
 static int dec_v1_unarmor (munge_cred_t c);
 static int dec_v1_unpack_outer (munge_cred_t c);
 static int dec_v1_decrypt (munge_cred_t c);
@@ -89,6 +91,8 @@ dec_v1_process_msg (munge_msg_t m)
     else if (dec_v1_timestamp (c) < 0)
         ;
     else if (dec_v1_authenticate (c) < 0)
+        ;
+    else if (dec_v1_check_retry (c) < 0)
         ;
     else if (dec_v1_unarmor (c) < 0)
         ;
@@ -171,7 +175,7 @@ dec_v1_timestamp (munge_cred_t c)
 /*  Queries the current time.
  */
     struct munge_msg_v1 *m1;            /* munge msg (v1 format)             */
-    time_t now;
+    time_t               now;
 
     assert (c != NULL);
     assert (c->msg != NULL);
@@ -211,6 +215,33 @@ dec_v1_authenticate (munge_cred_t c)
     if (auth_recv (c->msg, p_uid, p_gid) != EMUNGE_SUCCESS) {
         return (_munge_msg_set_err (c->msg, EMUNGE_SNAFU,
             strdup ("Unable to determine identity of client")));
+    }
+    return (0);
+}
+
+
+static int
+dec_v1_check_retry (munge_cred_t c)
+{
+/*  Checks whether the transaction is being retried.
+ */
+    struct munge_msg_head  mh;          /* munge msg head struct             */
+    struct munge_msg_v1   *m1;          /* munge msg (v1 format)             */
+
+    assert (c != NULL);
+    assert (c->msg != NULL);
+
+    mh = c->msg->head;
+    m1 = c->msg->pbody;
+
+    if (mh.retry > 0) {
+        log_msg (LOG_INFO,
+            "Decode retry #%d for client uid=%d gid=%d",
+            mh.retry, m1->client_uid, m1->client_gid);
+    }
+    if (mh.retry > MUNGE_SOCKET_XFER_ATTEMPTS) {
+        return (_munge_msg_set_err (c->msg, EMUNGE_SOCKET,
+            strdupf ("Exceeded maximum transaction retry attempts")));
     }
     return (0);
 }
@@ -273,6 +304,7 @@ dec_v1_unarmor (munge_cred_t c)
      *  XXX: This may be somewhat inefficient if the suffix isn't there.
      *       If all goes well, the suffix will match on the 3rd comparison
      *       due to the trailing "\n\0".
+     *  XXX: Would strstr() be better here instead?
      */
     if (suffix_len > 0) {
         base64_tmp = base64_ptr + base64_len - suffix_len;
@@ -496,7 +528,7 @@ dec_v1_decrypt (munge_cred_t c)
 /*  Decrypts the "inner" credential data.
  *
  *  Note that if cipher_final() fails, an error condition is set but an error
- *    status is not returned (yet).  Here's why...
+ *    status is not returned (yet).  Here's why:
  *  cipher_final() will return an error code during decryption if padding is
  *    enabled and the final block is not correctly formatted.
  *  If block cipher padding errors are not treated the same as MAC verification
@@ -996,12 +1028,14 @@ dec_v1_validate_replay (munge_cred_t c)
 {
 /*  Validates whether this credential has been replayed.
  */
-    struct munge_msg_v1 *m1;            /* munge msg (v1 format)             */
-    int rc;
+    struct munge_msg_head  mh;          /* munge msg head struct             */
+    struct munge_msg_v1   *m1;          /* munge msg (v1 format)             */
+    int                    rc;
 
     assert (c != NULL);
     assert (c->msg != NULL);
 
+    mh = c->msg->head;
     m1 = c->msg->pbody;
 
     rc = replay_insert (c);
@@ -1010,7 +1044,14 @@ dec_v1_validate_replay (munge_cred_t c)
         return (0);
     }
     if (rc > 0) {
-        return (_munge_msg_set_err (c->msg, EMUNGE_CRED_REPLAYED, NULL));
+        if ((conf->got_replay_retry)
+                && (mh.retry > 0)
+                && (mh.retry <= MUNGE_SOCKET_XFER_ATTEMPTS)) {
+            return (0);
+        }
+        else {
+            return (_munge_msg_set_err (c->msg, EMUNGE_CRED_REPLAYED, NULL));
+        }
     }
     if (errno == ENOMEM) {
         return (_munge_msg_set_err (c->msg, EMUNGE_NO_MEMORY, NULL));

@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munge_msg.c,v 1.18 2004/05/06 01:41:12 dun Exp $
+ *  $Id: munge_msg.c,v 1.19 2004/09/23 20:56:43 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -43,7 +43,7 @@
 
 
 /*****************************************************************************
- *  Extern Functions
+ *  Public Functions
  *****************************************************************************/
 
 munge_err_t
@@ -64,8 +64,11 @@ _munge_msg_create (munge_msg_t *pm, int sd)
      */
     memset (m, 0, sizeof (struct munge_msg));
 
-    _munge_msg_reset (m);
     m->sd = sd;
+    m->head.magic = MUNGE_MSG_MAGIC;
+    m->head.version = MUNGE_MSG_VERSION;
+    m->head.type = MUNGE_MSG_UNKNOWN;
+    m->head.length = 0;
     m->errnum = EMUNGE_SUCCESS;
 
     *pm = m;
@@ -90,6 +93,7 @@ _munge_msg_destroy (munge_msg_t m)
         free (m->pbody);
     }
     if (m->errstr) {
+        memset (m->errstr, 0, strlen (m->errstr));
         free (m->errstr);
     }
     memset (m, 0, sizeof (*m));
@@ -284,40 +288,6 @@ _munge_msg_recv (munge_msg_t m)
         assert (m1->error_len > 0);
         assert (m->errstr == NULL);
         m->errstr = strdup (m1->error_str);
-    }
-    return (EMUNGE_SUCCESS);
-}
-
-
-munge_err_t
-_munge_msg_reset (munge_msg_t m)
-{
-/*  Resets the message struct [m] for a new message.
- *  This allows the struct used for receiving the request to be re-used
- *    for sending the response without having to re-allocate everything.
- *  It seemed like a good idea at the time.
- *  Returns a standard munge error code.
- */
-    assert (m != NULL);
-
-    m->head.magic = MUNGE_MSG_MAGIC;
-    m->head.version = MUNGE_MSG_VERSION;
-    m->head.type = MUNGE_MSG_UNKNOWN;
-    m->head.length = 0;
-    if (m->pbody) {
-        assert (m->pbody_len > 0);
-        memset (m->pbody, 0, m->pbody_len);
-        free (m->pbody);
-        m->pbody_len = 0;
-        m->pbody = NULL;                /* Sherman, set the Wayback Machine */
-    }
-    else {
-        assert (m->pbody_len == 0);
-    }
-    m->errnum = EMUNGE_SUCCESS;
-    if (m->errstr) {
-        free (m->errstr);
-        m->errstr = NULL;
     }
     return (EMUNGE_SUCCESS);
 }

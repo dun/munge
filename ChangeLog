@@ -1,3 +1,22 @@
+2004-09-23  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/libcommon/munge_defs.h:
+	  Added MUNGE_REPLAY_RETRY_FLAG.  Added MUNGE_SOCKET_XFER_ATTEMPTS.
+	  Named MUNGE_SOCKET_CONNECT_RETRIES as MUNGE_SOCKET_CONNECT_ATTEMPTS.
+	* src/libcommon/munge_msg.c, src/libcommon/munge_msg.h:
+	  Added retry field to munge_msg_head struct.
+	  Removed _munge_msg_reset() -- merged into _munge_msg_create().
+	* src/libmunge/decode.c, src/libmunge/encode.c,
+	  src/libmunge/msg_client.c, src/libmunge/msg_client.h:
+	  Added munge_msg_client_xfer() to retry failed msg transactions.
+	  Changed _munge_msg_client_connect() and
+	  _munge_msg_client_disconnect() to static functions.
+	* src/munged/conf.c, src/munged/conf.h:
+	  Added got_replay_retry flag to conf struct.
+	* src/munged/dec_v1.c: Added dec_v1_check_retry().
+	  Added test for got_replay_retry flag to dec_v1_validate_replay().
+	* src/munged/enc_v1.c: Added enc_v1_check_retry().
+
 2004-09-21  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/munged/gids.c(_gids_hash_add):

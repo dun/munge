@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: conf.c,v 1.27 2004/09/18 23:00:01 dun Exp $
+ *  $Id: conf.c,v 1.28 2004/09/23 20:56:43 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -93,9 +93,10 @@ create_conf (void)
         log_errno (EMUNGE_NO_MEMORY, LOG_ERR, "Unable to create conf");
     conf->ld = -1;
     conf->got_clock_skew = 1;
-    conf->got_group_stat = MUNGE_GROUP_STAT_FLAG;
     conf->got_force = 0;
     conf->got_foreground = 0;
+    conf->got_group_stat = MUNGE_GROUP_STAT_FLAG;
+    conf->got_replay_retry = MUNGE_REPLAY_RETRY_FLAG;
     conf->got_root_auth = 0;
     conf->def_cipher = MUNGE_DEFAULT_CIPHER;
     conf->def_zip = zip_select_default_type (MUNGE_DEFAULT_ZIP);

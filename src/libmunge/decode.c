@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: decode.c,v 1.15 2004/05/14 00:47:59 dun Exp $
+ *  $Id: decode.c,v 1.16 2004/09/23 20:56:43 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -35,42 +35,40 @@
 #include <string.h>
 #include <sys/types.h>
 #include <munge.h>
-#include "auth_send.h"
 #include "ctx.h"
 #include "msg_client.h"
-#include "munge_defs.h"
 #include "munge_msg.h"
+#include "str.h"
 
 
 /*****************************************************************************
  *  Static Prototypes
  *****************************************************************************/
 
-static void decode_init (munge_ctx_t ctx, void **buf, int *len,
+static void _decode_init (munge_ctx_t ctx, void **buf, int *len,
     uid_t *uid, gid_t *gid);
 
-static munge_err_t decode_req_v1 (munge_msg_t m, munge_ctx_t ctx,
+static munge_err_t _decode_req_v1 (munge_msg_t m, munge_ctx_t ctx,
     const char *cred);
 
-static munge_err_t decode_rsp_v1 (munge_msg_t m, munge_ctx_t ctx,
+static munge_err_t _decode_rsp_v1 (munge_msg_t m, munge_ctx_t ctx,
     void **buf, int *len, uid_t *uid, gid_t *gid);
 
 
 /*****************************************************************************
- *  Extern Functions
+ *  Public Functions
  *****************************************************************************/
 
 munge_err_t
 munge_decode (const char *cred, munge_ctx_t ctx,
               void **buf, int *len, uid_t *uid, gid_t *gid)
 {
-    char *socket;
     munge_err_t e;
     munge_msg_t m;
 
     /*  Init output parms in case of early return.
      */
-    decode_init (ctx, buf, len, uid, gid);
+    _decode_init (ctx, buf, len, uid, gid);
     /*
      *  Ensure a credential exists for decoding.
      */
@@ -78,31 +76,15 @@ munge_decode (const char *cred, munge_ctx_t ctx,
         return (_munge_ctx_set_err (ctx, EMUNGE_BAD_ARG,
             strdup ("No credential specified")));
     }
-    /*  Determine name of unix domain socket for communication with munged.
-     */
-    if (!ctx || !(socket = ctx->socket)) {
-        socket = MUNGE_SOCKET_NAME;
-    }
     /*  Ask the daemon to decode a credential.
      */
     if ((e = _munge_msg_create (&m, -1)) != EMUNGE_SUCCESS)
         ;
-    else if ((e = decode_req_v1 (m, ctx, cred)) != EMUNGE_SUCCESS)
+    else if ((e = _decode_req_v1 (m, ctx, cred)) != EMUNGE_SUCCESS)
         ;
-    else if ((e = _munge_msg_client_connect (m, socket)) != EMUNGE_SUCCESS)
+    else if ((e = munge_msg_client_xfer (&m, ctx)) != EMUNGE_SUCCESS)
         ;
-    else if ((e = _munge_msg_send (m)) != EMUNGE_SUCCESS)
-        ;
-    else if (auth_send (m) < 0) {
-        e = EMUNGE_SOCKET;
-    }
-    else if ((e = _munge_msg_reset (m)) != EMUNGE_SUCCESS)
-        ;
-    else if ((e = _munge_msg_recv (m)) != EMUNGE_SUCCESS)
-        ;
-    else if ((e = _munge_msg_client_disconnect (m)) != EMUNGE_SUCCESS)
-        ;
-    else if ((e = decode_rsp_v1 (m, ctx, buf, len, uid, gid)) !=EMUNGE_SUCCESS)
+    else if ((e = _decode_rsp_v1 (m, ctx, buf, len, uid, gid)) !=EMUNGE_SUCCESS)
         ;
     /*  Clean up and return.
      */
@@ -116,11 +98,11 @@ munge_decode (const char *cred, munge_ctx_t ctx,
 
 
 /*****************************************************************************
- *  Static Functions
+ *  Private Functions
  *****************************************************************************/
 
 static void
-decode_init (munge_ctx_t ctx, void **buf, int *len, uid_t *uid, gid_t *gid)
+_decode_init (munge_ctx_t ctx, void **buf, int *len, uid_t *uid, gid_t *gid)
 {
 /*  Initialize output parms in case of early return.
  */
@@ -161,7 +143,7 @@ decode_init (munge_ctx_t ctx, void **buf, int *len, uid_t *uid, gid_t *gid)
 
 
 static munge_err_t
-decode_req_v1 (munge_msg_t m, munge_ctx_t ctx, const char *cred)
+_decode_req_v1 (munge_msg_t m, munge_ctx_t ctx, const char *cred)
 {
 /*  Creates a Decode Request message to be sent to the local munge daemon.
  *  The inputs to this message are as follows:
@@ -194,7 +176,7 @@ decode_req_v1 (munge_msg_t m, munge_ctx_t ctx, const char *cred)
 
 
 static munge_err_t
-decode_rsp_v1 (munge_msg_t m, munge_ctx_t ctx,
+_decode_rsp_v1 (munge_msg_t m, munge_ctx_t ctx,
                void **buf, int *len, uid_t *uid, gid_t *gid)
 {
 /*  Extracts a Decode Response message received from the local munge daemon.
