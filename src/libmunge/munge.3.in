@@ -1,4 +1,4 @@
-.\" $Id: munge.3.in,v 1.2 2004/11/18 00:48:13 dun Exp $
+.\" $Id: munge.3.in,v 1.3 2004/11/18 19:55:44 dun Exp $
 
 .TH MUNGE 3 "@DATE@" "@PACKAGE@-@VERSION@" "Munge Uid 'N' Gid Emporium"
 
@@ -35,7 +35,7 @@ The \fBmunge_decode()\fR function validates the NUL-terminated credential
 that used to encode the credential.  If \fIbuf\fR and \fIlen\fR are not NULL,
 memory will be allocated for the encapsulated payload, \fIbuf\fR will be set
 to point to this data, and \fIlen\fR will be set to its length.  An additional
-NUL character is appended to this payload data but not included in its
+NUL character will be appended to this payload data but not included in its
 length.  If no payload exists, \fIbuf\fR will be set to NULL and \fIlen\fR
 will be set to 0.  For certain errors (i.e., \fBEMUNGE_CRED_EXPIRED\fR,
 \fBEMUNGE_CRED_REWOUND\fR, \fBEMUNGE_CRED_REPLAYED\fR), payload memory will

@@ -1,4 +1,4 @@
-.\" $Id: munged.8.in,v 1.2 2004/11/18 00:48:13 dun Exp $
+.\" $Id: munged.8.in,v 1.3 2004/11/18 19:55:44 dun Exp $
 
 .TH MUNGED 8 "@DATE@" "@PACKAGE@-@VERSION@" "Munge Uid 'N' Gid Emporium"
 
@@ -10,9 +10,9 @@ munged \- MUNGE daemon
 [\fIOPTION\fR]...
 
 .SH DESCRIPTION
-The \fBmunged\fR server is responsible for authenticating local clients and
-servicing credential encode & decode requests.  All \fBmunged\fR servers
-within an administrative realm share a secret key.  This key is used to
+The \fBmunged\fR daemon is responsible for authenticating local MUNGE clients
+and servicing their credential encode & decode requests.  All \fBmunged\fR
+daemons within a security realm share a secret key.  This key is used to
 protect the contents of a credential.
 .PP
 When a credential is created, \fBmunged\fR embeds various metadata within it
@@ -72,12 +72,12 @@ support is added.
 .\" .SH FILES
 
 .SH NOTES
-All clocks within an administrative realm must be kept in sync within the
-credential time-to-live setting.
+All clocks within a security realm must be kept in sync within the credential
+time-to-live setting.
 .PP
 While \fBmunged\fR prevents a given credential from being decoded on a
 particular node more than once, nothing prevents it from being decoded on
-another node within the administrative realm before it expires.
+another node within the security realm before it expires.
 
 .SH AUTHOR
 Chris Dunlap <cdunlap@llnl.gov>

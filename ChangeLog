@@ -1,3 +1,12 @@
+2004-11-18  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* README, munge.spec: Updated verbage.
+	* src/libcommon/munge.7.in, src/libmunge/munge.3.in,
+	  src/libmunge/munge_ctx.3.in, src/munge/munge.1.in,
+	  src/munge/remunge.1.in, src/munge/unmunge.1.in,
+	  src/munged/munged.8.in: Updated verbage.
+	* src/libmunge/munge.h: Sync'd with manpages.
+
 2004-11-17  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/libmunge/munge.h:

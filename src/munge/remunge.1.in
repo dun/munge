@@ -1,4 +1,4 @@
-.\" $Id: remunge.1.in,v 1.2 2004/11/18 00:48:13 dun Exp $
+.\" $Id: remunge.1.in,v 1.3 2004/11/18 19:55:44 dun Exp $
 
 .TH REMUNGE 1 "@DATE@" "@PACKAGE@-@VERSION@" "Munge Uid 'N' Gid Emporium"
 
@@ -10,7 +10,7 @@ remunge \- MUNGE credential benchmark
 [\fIOPTION\fR]...
 
 .SH DESCRIPTION
-The \fBremunge\fR client benchmarks the performance of MUNGE.  A benchmark
+The \fBremunge\fR program benchmarks the performance of MUNGE.  A benchmark
 runs for the specified duration or until the specified number of credentials
 are processed, whichever comes first.  At its conclusion, the number of
 credentials processed per second is written to stdout.
@@ -94,7 +94,7 @@ Specify the maximum number of seconds to allow for a given munge_encode() or
 munge_decode() operation before issuing a warning.
 
 .SH "EXIT STATUS"
-The \fBremunge\fR client returns a zero exit code if the benchmark completes.
+The \fBremunge\fR program returns a zero exit code if the benchmark completes.
 On error, it prints an error message to stderr and returns a non-zero
 exit code.
 

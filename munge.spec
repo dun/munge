@@ -1,4 +1,4 @@
-# $Id: munge.spec,v 1.23 2004/11/11 00:06:36 dun Exp $
+# $Id: munge.spec,v 1.24 2004/11/18 19:55:44 dun Exp $
 
 Name:		munge
 Version:	0
@@ -15,10 +15,10 @@ Source0:	%{name}-%{version}.tar.gz
 
 %description
 MUNGE (Munge Uid 'N' Gid Emporium) is a service for creating and validating
-credentials in order to allow a process to securely authenticate the UID
-and GID of another local or remote process within an administrative realm.
-Clients can create and validate these credentials without the use of root
-privileges, reserved ports, or platform-specific methods.
+credentials in order to allow a process to securely authenticate the UID and
+GID of another local or remote process within a security realm.  Clients can
+create and validate these credentials without the use of root privileges,
+reserved ports, or platform-specific methods.
 
 %prep
 %setup

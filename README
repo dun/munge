@@ -1,26 +1,28 @@
 MUNGE (Munge Uid 'N' Gid Emporium) is a service for creating and validating
-credentials in order to allow a process to securely authenticate the UID
-and GID of another local or remote process within an administrative realm.
+credentials in order to allow a process to securely authenticate the
+UID and GID of another local or remote process within a security realm.
 Clients can create and validate these credentials without the use of root
 privileges, reserved ports, or platform-specific methods.
 
-A credential is created and validated by the local munged daemon running on
-each node within the administrative realm.  A client creates or validates
-a given credential through the use of the libmunge library or munge/unmunge
+A credential is created and validated by the local munged daemon running
+on each node within a security realm.  A security realm is defined by
+the secret key; munged daemons running on different nodes are in the
+same realm if they share the same key.  A client creates or validates a
+given credential through the use of the libmunge library or munge/unmunge
 executables; these are responsible for communicating with the local daemon
 on behalf of the client.
 
 The contents of the credential (including any optional payload data) are
-encrypted with a key shared by all munged daemons within the administrative
-realm.  The integrity of the credential is ensured by a message authentication
+encrypted with a key shared by all munged daemons within the security realm.
+The integrity of the credential is ensured by a message authentication
 code (MAC).  The credential is valid for a limited time defined by its
-time-to-live (TTL).  The daemon ensures unexpired credentials are not being
-replayed on a particular host.  Decoding of a credential can be restricted to
-a particular user and/or group ID.  The payload data can be used for purposes
-such as embedding the destination's address to ensure the credential is valid
-on only that host.  The internal format of the credential is encoded in a
-platform-independent manner.  And the credential itself is base64 encoded
-to allow it to be transmitted over virtually any transport.
+time-to-live (TTL).  The daemon ensures unexpired credentials are not
+being replayed on a particular host.  Decoding of a credential can be
+restricted to a particular user and/or group ID.  The payload data can be
+used for purposes such as embedding the destination's address to ensure the
+credential is valid on only that host.  The internal format of the credential
+is encoded in a platform-independent manner.  And the credential itself
+is base64 encoded to allow it to be transmitted over virtually any transport.
 
 -------------------------------------------------------------------------------
 
@@ -48,8 +50,8 @@ Getting started:
      are not required for the daemon.
 
   5. Securely propagate this file (eg, with ssh) to other nodes within the
-     same administrative realm.  Credentials are valid only within an
-     administrative realm (ie, on nodes that share the same secret key).
+     same security realm.  Credentials are valid only within a security
+     realm (ie, on nodes sharing the same secret key).
 
   6. Start the 'munged' daemon.  On RedHat, you can use the init script
      (which hopefully got installed in /etc/init.d/munge).

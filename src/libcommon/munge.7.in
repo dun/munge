@@ -1,4 +1,4 @@
-.\" $Id: munge.7.in,v 1.2 2004/11/18 00:48:13 dun Exp $
+.\" $Id: munge.7.in,v 1.3 2004/11/18 19:55:44 dun Exp $
 
 .TH MUNGE 7 "@DATE@" "@PACKAGE@-@VERSION@" "Munge Uid 'N' Gid Emporium"
 
@@ -7,20 +7,22 @@ munge \- Munge Uid 'N' Gid Emporium
 
 .SH DESCRIPTION
 MUNGE (Munge Uid 'N' Gid Emporium) is a service for creating and validating
-credentials in order to allow a process to securely authenticate the UID
-and GID of another local or remote process within an administrative realm.
-Clients can create and validate these credentials without the use of root
-privileges, reserved ports, or platform-specific methods.
+credentials in order to allow a process to securely authenticate the UID and
+GID of another local or remote process within a security realm.  Clients can
+create and validate these credentials without the use of root privileges,
+reserved ports, or platform-specific methods.
 .PP
 A credential is created and validated by the local \fBmunged\fR daemon
-running on each node within the administrative realm.  A client creates or
+running on each node within a security realm.  A security realm is
+defined by the secret key; \fBmunged\fR daemons running on different nodes
+are in the same realm if they share the same key.  A client creates or
 validates a given credential through the use of the \fBlibmunge\fR library or
 \fBmunge\fR/\fBunmunge\fR executables; these are responsible for communicating
 with the local daemon on behalf of the client.
 .PP
 The contents of the credential (including any optional payload data)
 are encrypted with a key shared by all \fBmunged\fR daemons within the
-administrative realm.  The integrity of the credential is ensured by a message
+security realm.  The integrity of the credential is ensured by a message
 authentication code (MAC).  The credential is valid for a limited time defined
 by its time-to-live (TTL).  The daemon ensures unexpired credentials are
 not being replayed on a particular host.  Decoding of a credential can be

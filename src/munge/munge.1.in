@@ -1,4 +1,4 @@
-.\" $Id: munge.1.in,v 1.2 2004/11/18 00:48:13 dun Exp $
+.\" $Id: munge.1.in,v 1.3 2004/11/18 19:55:44 dun Exp $
 
 .TH MUNGE 1 "@DATE@" "@PACKAGE@-@VERSION@" "Munge Uid 'N' Gid Emporium"
 
@@ -10,11 +10,12 @@ munge \- MUNGE credential encoder
 [\fIOPTION\fR]...
 
 .SH DESCRIPTION
-The \fBmunge\fR client creates an opaque credential containing the UID and
+The \fBmunge\fR program creates an MUNGE credential containing the UID and
 GID of the calling process.  Additional payload data can be encapsulated in
-as well.  The returned credential can be passed to another process which
-can validate its contents via the \fBunmunge\fR client.  This allows an
-unrelated process to ascertain the identity of the calling process.
+as well.  The returned credential can be passed to another process which can
+validate its contents (e.g., via the \fBunmunge\fR program).  This allows
+an unrelated and potentially remote process to ascertain the identity of
+the calling process.
 .PP
 By default, payload input is read from stdin and the credential is written
 to stdout.
@@ -79,7 +80,7 @@ A value of -1 selects the maximum allowed ttl.
 Specify the local domain socket for connecting with \fBmunged\fR.
 
 .SH "EXIT STATUS"
-The \fBmunge\fR client returns a zero exit code when the credential is
+The \fBmunge\fR program returns a zero exit code when the credential is
 successfully created and returned.  On error, it prints an error message to
 stderr and returns a non-zero exit code.
 

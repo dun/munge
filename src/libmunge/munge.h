@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munge.h,v 1.26 2004/11/18 01:55:31 dun Exp $
+ *  $Id: munge.h,v 1.27 2004/11/18 19:55:44 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -140,8 +140,8 @@ typedef enum munge_enum {
 
 /*  Munge error codes
  *
- *  XXX: Error codes must be in the range [1..255] in order to
- *       provide a meaningful return status when returned via exit().
+ *  Error codes are in the range [1..255] in order to provide
+ *    a meaningful return status when returned via exit().
  */
 typedef enum munge_err {
     EMUNGE_SUCCESS              =  0,   /* Whoohoo!                          */
@@ -176,11 +176,12 @@ BEGIN_C_DECLS
 munge_err_t munge_encode (char **cred, munge_ctx_t ctx,
                           const void *buf, int len);
 /*
- *  Creates a munged credential contained in a NUL-terminated base64 string.
- *    An optional buffer [buf] of length [len] can be munged in as well.
+ *  Creates a credential contained in a NUL-terminated base64 string.
+ *    A payload specified by a buffer [buf] of length [len] can be
+ *    encapsulated in as well.
  *  If the munge context [ctx] is NULL, the default context will be used.
- *  The munged credential is passed back by reference via the [cred] parameter;
- *    the caller is responsible for freeing this string.
+ *  A pointer to the resulting credential is returned via [cred]; the caller
+ *    is responsible for freeing this memory.
  *  Returns EMUNGE_SUCCESS if the credential is successfully created;
  *    o/w, sets [cred] to NULL and returns the munge error number.
  *    If a [ctx] was specified, it may contain a more detailed error
@@ -190,19 +191,19 @@ munge_err_t munge_encode (char **cred, munge_ctx_t ctx,
 munge_err_t munge_decode (const char *cred, munge_ctx_t ctx,
                           void **buf, int *len, uid_t *uid, gid_t *gid);
 /*
- *  Validates the NUL-terminated munged credential [cred].
- *  If [ctx] is not NULL, it will be set to the munge context used to
- *    encode the credential.
- *  If [buf] and [len] are not NULL, [buf] will be set to the optional
- *    data munged into the credential and [len] will be set to its length.
- *    An additional NUL is appended to [buf] which is not included in [len].
- *    The caller is responsible for freeing the memory referenced by [buf].
- *    If no data was munged into the credential, [buf] will be set to NULL
- *    and [len] will be set to 0.  Note that in the case of some errors
- *    (ie, EMUNGE_CRED_EXPIRED, EMUNGE_CRED_REWOUND, EMUNGE_CRED_REPLAYED),
- *    [buf] and [len] will be updated as appropriate.
- *  If [uid] or [gid] is not NULL, they will be set to the UID/GID
- *    of the process that created the credential.
+ *  Validates the NUL-terminated credential [cred].
+ *  If the munge context [ctx] is not NULL, it will be set to that used
+ *    to encode the credential.
+ *  If [buf] and [len] are not NULL, memory will be allocated for the
+ *    encapsulated payload, [buf] will be set to point to this data, and [len]
+ *    will be set to its length.  An additional NUL character will be appended
+ *    to this payload data but not included in its length.  If no payload
+ *    exists, [buf] will be set to NULL and [len] will be set to 0.
+ *    For certain errors (ie, EMUNGE_CRED_EXPIRED, EMUNGE_CRED_REWOUND,
+ *    EMUNGE_CRED_REPLAYED), payload memory will still be allocated if
+ *    necessary.  The caller is responsible for freeing this memory.
+ *  If [uid] or [gid] is not NULL, they will be set to the UID/GID of the
+ *    process that created the credential.
  *  Returns EMUNGE_SUCCESS if the credential is valid; o/w, returns the
  *    munge error number.  If a [ctx] was specified, it may contain a
  *    more detailed error message accessible via munge_ctx_strerror().
@@ -211,6 +212,7 @@ munge_err_t munge_decode (const char *cred, munge_ctx_t ctx,
 const char * munge_strerror (munge_err_t e);
 /*
  *  Returns a descriptive string describing the munge errno [e].
+ *    This string should not be freed or modified by the caller.
  */
 
 END_C_DECLS
@@ -235,7 +237,7 @@ BEGIN_C_DECLS
 
 munge_ctx_t munge_ctx_create (void);
 /*
- *  Creates and returns a new munge context, or NULL on error (out-of-memory).
+ *  Creates and returns a new munge context or NULL on error.
  *  Abandoning a context without calling munge_ctx_destroy() will result
  *    in a memory leak.
  */
@@ -254,28 +256,27 @@ void munge_ctx_destroy (munge_ctx_t ctx);
 
 const char * munge_ctx_strerror (munge_ctx_t ctx);
 /*
- *  Returns the error message associated with the last munge operation in
- *    which the context [ctx] was passed, or NULL if no error condition exists.
+ *  Returns a descriptive text string describing the munge error number
+ *    according to the context [ctx], or NULL if no error condition exists.
  *  This message may be more detailed than that returned by munge_strerror().
- *  If a context is supplied to munge_encode(), munge_decode(),
- *    munge_ctx_get(), or munge_ctx_set(), the error status and
- *    error message will be updated as appropriate.
+ *  This string should not be freed or modified by the caller.
  */
 
 munge_err_t munge_ctx_get (munge_ctx_t ctx, munge_opt_t opt, ...);
 /*
- *  Gets the option [opt] from the context [ctx] and stores the result
- *    in the following ptr argument(s).  Refer to the munge_opt_t enum
- *    comments for argument types.  In the case of a string, it sets the
- *    (char **) to the actual internal string, not a copy -- remember,
- *    it's not your string, you're just borrowing it.
+ *  Gets the value for the option [opt] associated with the munge context
+ *    [ctx], storing the result in the subsequent pointer argument.
+ *    Refer to the munge_opt_t enum comments for argument types.
+ *    If the result is a string, that string should not be freed or modified
+ *    by the caller.
  *  Returns EMUNGE_SUCCESS on success; o/w, returns the munge error number.
  */
 
 munge_err_t munge_ctx_set (munge_ctx_t ctx, munge_opt_t opt, ...);
 /*
- *  Sets the option [opt] for the context [ctx] from the following argument(s).
- *    Refer to the munge_opt_t enum comments for argument types.
+ *  Sets the value for the option [opt] associated with the munge context
+ *    [ctx], using the value of the subsequent argument.  Refer to the
+ *    munge_opt_t enum comments for argument types.
  *  Returns EMUNGE_SUCCESS on success; o/w, returns the munge error number.
  */
 
@@ -290,23 +291,25 @@ BEGIN_C_DECLS
 
 int munge_enum_is_valid (munge_enum_t type, int val);
 /*
- *  Returns non-zero if the given value [val] is a valid enumeration of the
- *    specified [type] in the software configuration as currently compiled;
- *    o/w, returns 0.
+ *  Returns non-zero if the given value [val] is a valid enumeration of
+ *    the specified type [type] in the software configuration as currently
+ *    compiled; o/w, returns 0.
+ *  Some enumerations corresond to options that can only be enabled at
+ *    compile-time.
  */
 
 const char * munge_enum_int_to_str (munge_enum_t type, int val);
 /*
- *  Converts the munge enumeration [val] of the specified [type] into a
- *    text string.
+ *  Converts the munge enumeration [val] of the specified type [type]
+ *    into a text string.
  *  Returns a NUL-terminated constant text string, or NULL on error;
  *    this string should not be freed or modified by the caller.
  */
 
 int munge_enum_str_to_int (munge_enum_t type, const char *str);
 /*
- *  Converts the NUL-terminated case-insensitive string [str] into
- *    the corresponding munge enumeration of the specified [type].
+ *  Converts the NUL-terminated case-insensitive string [str] into the
+ *    corresponding munge enumeration of the specified type [type].
  *  Returns a munge enumeration on success (>=0), or -1 on error.
  */
 

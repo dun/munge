@@ -1,4 +1,4 @@
-.\" $Id: unmunge.1.in,v 1.2 2004/11/18 00:48:13 dun Exp $
+.\" $Id: unmunge.1.in,v 1.3 2004/11/18 19:55:44 dun Exp $
 
 .TH UNMUNGE 1 "@DATE@" "@PACKAGE@-@VERSION@" "Munge Uid 'N' Gid Emporium"
 
@@ -10,8 +10,8 @@ unmunge \- MUNGE credential decoder
 [\fIOPTION\fR]...
 
 .SH DESCRIPTION
-The \fBunmunge\fR client validates a credential created by the \fBmunge\fR
-client.
+The \fBunmunge\fR program validates a MUNGE credential (e.g., one created by
+the \fBmunge\fR program).
 .PP
 By default, the credential is read from stdin and the metadata & payload
 are written to stdout.  When the metadata and payload are written to the
@@ -43,7 +43,7 @@ Output the payload to the specified file.
 .BI "-k, --keys " string
 Specify a subset of metadata keys to output.  The keys are case-insensitive
 and delimited by whitespace, commas, semicolons, or periods -- as long as the
-string is treated as a single argument by the shell (eg, enclosed by quotes).
+string is treated as a single argument by the shell (e.g., enclosed by quotes).
 .TP
 .BI "-K, --list-keys"
 Display a list of metadata keys.
@@ -52,7 +52,7 @@ Display a list of metadata keys.
 Specify the local domain socket for connecting with \fBmunged\fR.
 
 .SH "EXIT STATUS"
-The \fBunmunge\fR client returns an exit code corresponding to the return
+The \fBunmunge\fR program returns an exit code corresponding to the return
 code of \fBmunge_decode\fR(3).  On success, it returns a zero exit code which
 signifies the credential is valid.  On error, it prints an error message to
 stderr and returns a non-zero exit code.

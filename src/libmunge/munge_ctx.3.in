@@ -1,4 +1,4 @@
-.\" $Id: munge_ctx.3.in,v 1.2 2004/11/18 00:48:13 dun Exp $
+.\" $Id: munge_ctx.3.in,v 1.3 2004/11/18 19:55:44 dun Exp $
 
 .TH MUNGE_CTX 3 "@DATE@" "@PACKAGE@-@VERSION@" "Munge Uid 'N' Gid Emporium"
 
@@ -26,22 +26,23 @@ munge_ctx_create, munge_ctx_copy, munge_ctx_destroy, munge_ctx_strerror, munge_c
 .fi
 
 .SH DESCRIPTION
-The \fBmunge_ctx_create()\fR function creates and returns a new munge context,
+The \fBmunge_ctx_create()\fR function creates and returns a new munge context
 or NULL or error.
 .PP
 The \fBmunge_ctx_copy()\fR function copies the context \fIctx\fR, returning
-a new munge context, or NULL on error.
+a new munge context or NULL on error.
 .PP
 The \fBmunge_ctx_destroy()\fR function destroys the context \fIctx\fR.
 .PP
 The \fBmunge_ctx_strerror()\fR function returns a descriptive text string
-describing the munge error number according to the context \fIctx\fR.
-This may provide a more detailed error message than that returned by
-\fBmunge_strerror()\fR.
+describing the munge error number according to the context \fIctx\fR, or
+NULL if no error condition exists.  This may provide a more detailed error
+message than that returned by \fBmunge_strerror()\fR.
 .PP
 The \fBmunge_ctx_get()\fR function gets the value for the option \fIopt\fR
 associated with the munge context \fIctx\fR, storing the result in the
-subsequent pointer argument.
+subsequent pointer argument.  If the result is a string, that string should
+not be freed or modified by the caller.
 .PP
 The \fBmunge_ctx_set()\fR function sets the value for the option \fIopt\fR
 associated with the munge context \fIctx\fR, using the value of the subsequent
@@ -112,10 +113,10 @@ the process requesting the credential decode, as well as each supplementary
 group of which the effective user ID of that process is a memeber.
 
 .SH "CIPHER TYPES"
-Credentials can be encrypted using the secret key that is shared by all
-\fBmunged\fR daemons within an administrative domain.  Anyone having access
-to this key can use it to decrypt a credential bypassing any restrictions
-being imposed by \fBmunged\fR.
+Credentials can be encrypted using the secret key shared by all \fBmunged\fR
+daemons within a security realm.  Anyone having access to this key can use
+it to decrypt a credential, thereby bypassing any restrictions being imposed
+by \fBmunged\fR.
 .TP
 .B MUNGE_CIPHER_NONE
 Specify encryption is to be disabled.
