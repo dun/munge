@@ -1,0 +1,56 @@
+MUNGE supports two different types of client authentication under AIX.
+The getpeereid() method is supported by AIX 5.2 ML4 and later.  The configure
+script tests for this when "checking for getpeereid".  The recvfd-mknod
+file-descriptor-passing method is supported by earlier AIX versions.
+The configure script tests for this when "checking for /dev/spx" and
+"checking for struct strrecvfd".
+
+The getpeereid() method is substantially faster; if your system supports that,
+you can stop reading now.  On the other hand, the file-descriptor-passing
+method on AIX is excruciatingly slow unless special steps are taken.
+This is due to the fact that a unique STREAMS-based pipe must be created in
+the filesystem for each client authentication attempt, and the journaling
+of the jfs filesystem makes this quite slow.  To increase performance,
+the authentication pipe needs to be created in a ramdisk.
+
+The following steps create a 5MB ramdisk and mount it as "/tmp/munge".
+A small ramdisk will do just fine.  The recommended permissions for this
+directory are 1333 -- write & execute permissions for all, read permissions
+for none, and the sticky bit set so files can only be renamed or deleted
+by the owner (or root, of course).  Note that execute permissions for all
+need to be set on all of the parent directories as well.
+
+  # mkramdisk 10000
+  /dev/rramdisk0
+
+  # mkfs -V jfs /dev/ramdisk0
+  mkfs: destroy /dev/ramdisk0 (y)? y
+  Device /dev/ramdisk0:
+    Standard empty file system
+    Size:           10000 512-byte (UBSIZE) blocks
+    Initial Inodes: 1792
+
+  # mkdir /tmp/munge
+
+  # mount -V jfs -o nointegrity /dev/ramdisk0 /tmp/munge
+
+  # chmod 1333 /tmp/munge
+
+  # mount
+    node       mounted        mounted over    vfs       date        options
+  -------- ---------------  ---------------  ------ ------------ ---------------
+           /dev/ramdisk0    /tmp/munge       jfs    Oct 01 10:01 rw,nointegrity
+
+
+The MUNGE_AUTH_PIPE_DIR define in src/libcommon/munge_defs.h also needs to
+be modified to specify the location of this ramdisk, and the source then
+needs to be recompiled.
+
+  #define MUNGE_AUTH_PIPE_DIR             "/tmp/munge"
+
+Alternatively, you can override this setting with the "--auth-pipe-dir"
+munged command-line option.
+
+  munged --auth-pipe-dir /tmp/munge
+
+This option will be moved into the configuration file once one exists.

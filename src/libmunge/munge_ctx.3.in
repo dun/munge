@@ -1,0 +1,301 @@
+.\" $Id: munge_ctx.3.in,v 1.1 2004/11/11 00:06:37 dun Exp $
+
+.TH MUNGE_CTX 3 "@DATE@" "@PACKAGE@-@VERSION@" "Munge Uid 'N' Gid Emporium"
+
+.SH NAME
+munge_ctx_create, munge_ctx_copy, munge_ctx_destroy, munge_ctx_strerror, munge_ctx_get, munge_ctx_set \- MUNGE context functions
+
+.SH SYNOPSIS
+.nf
+.B #define GPL_LICENSED 1
+.B #include <munge.h>
+.PP
+.BI "munge_ctx_t munge_ctx_create (void);"
+.PP
+.BI "munge_ctx_t munge_ctx_copy (munge_ctx_t " ctx );
+.PP
+.BI "void munge_ctx_destroy (munge_ctx_t " ctx );
+.PP
+.BI "const char * munge_ctx_strerror (munge_ctx_t " ctx );
+.PP
+.BI "munge_err_t munge_ctx_get (munge_ctx_t " ctx ", munge_opt_t " opt ", ...);"
+.PP
+.BI "munge_err_t munge_ctx_set (munge_ctx_t " ctx ", munge_opt_t " opt ", ...);"
+.PP
+.B cc ... -lmunge
+.fi
+
+.SH DESCRIPTION
+The \fBmunge_ctx_create()\fR function creates and returns a new munge context,
+or NULL or error.
+.PP
+The \fBmunge_ctx_copy()\fR function copies the context \fIctx\fR, returning
+a new munge context, or NULL on error.
+.PP
+The \fBmunge_ctx_destroy()\fR function destroys the context \fIctx\fR.
+.PP
+The \fBmunge_ctx_strerror()\fR function returns a descriptive text string
+describing the munge error number according to the context \fIctx\fR.
+This may provide a more detailed error message than that returned by
+\fBmunge_strerror()\fR.
+.PP
+The \fBmunge_ctx_get()\fR function gets the value for the option \fIopt\fR
+associated with the munge context \fIctx\fR, storing the result in the
+subsequent pointer argument.
+.PP
+The \fBmunge_ctx_set()\fR function sets the value for the option \fIopt\fR
+associated with the munge context \fIctx\fR, using the value of the subsequent
+argument.
+
+.SH RETURN VALUE
+The \fBmunge_ctx_create()\fR and \fBmunge_ctx_copy()\fR functions return a
+newly allocated munge context, or NULL on error.
+.PP
+The \fBmunge_cxt_strerror()\fR function returns a pointer to a NUL-terminated
+constant text string; this string should not be freed by the caller.
+.PP
+The \fBmunge_ctx_get()\fR and \fBmunge_ctx_set()\fR functions return
+\fBEMUNGE_SUCCESS\fR on success; otherwise, a munge error number is returned.
+
+.SH "CONTEXT OPTIONS"
+The following context options can be queried via \fBmunge_ctx_get()\fR or
+specified via \fBmunge_ctx_set()\fR.  The type following each enumeration is
+the variable type used for the subsequent argument in \fBmunge_ctx_set()\fR,
+or the variable type of a pointer used for the subsequent argument in
+\fBmunge_ctx_get()\fR.
+.TP
+\fBMUNGE_OPT_CIPHER_TYPE\fR , \fIint\fR
+Gets or sets the cipher type (cf, \fBCIPHER TYPES\fR).
+.TP
+\fBMUNGE_OPT_MAC_TYPE\fR , \fIint\fR
+Gets or sets the MAC type (cf, \fBMAC TYPES\fR).
+.TP
+\fBMUNGE_OPT_ZIP_TYPE\fR , \fIint\fR
+Gets or sets the compression type (cf, \fBZIP TYPES\fR).
+.TP
+\fBMUNGE_OPT_REALM\fR , \fIchar *\fR
+Gets or sets the security realm, where the \fIchar *\fR type is a
+NUL-terminated character string.  The string returned by \fBmunge_ctx_get()\fR
+should not be freed by the caller.  \fBNOT YET SUPPORTED\fR.
+.TP
+\fBMUNGE_OPT_TTL\fR , \fIint\fR
+Gets or sets the time-to-live (in seconds) (cf, \fBTTL TYPES\fR).
+.TP
+\fBMUNGE_OPT_ADDR4\fR , \fIstruct in_addr\fR
+Gets the IPv4 address of the host where the credential was encoded.
+This option cannot be explicitly set.
+.TP
+\fBMUNGE_OPT_ENCODE_TIME\fR , \fItime_t\fR
+Gets the time (in seconds since the epoch) at which the credential was encoded.
+This option cannot be explicitly set.
+.TP
+\fBMUNGE_OPT_DECODE_TIME\fR , \fItime_t\fR
+Gets the time (in seconds since the epoch) at which the credential was decoded.
+This option cannot be explicitly set.
+.TP
+\fBMUNGE_OPT_SOCKET\fR , \fIchar *\fR
+Gets or sets the local domain socket for connecting with \fBmunged\fR, where
+the \fIchar *\fR type is a NUL-terminated character string.  The string
+returned by \fBmunge_ctx_get()\fR should not be freed by the caller.
+.TP
+\fBMUNGE_OPT_UID_RESTRICTION\fR , \fIuid_t\fR
+Gets or sets the UID allowed to decode the credential (cf, \fBUID & GID
+TYPES\fR).  This value will be matched against the effective user ID of the
+process requesting the credential decode.
+.TP
+\fBMUNGE_OPT_GID_RESTRICTION\fR , \fIgid_t\fR
+Gets or sets the GID allowed to decode the credential (cf, \fBUID & GID
+TYPES\fR).  This value will be matched against the effective group ID of
+the process requesting the credential decode, as well as each supplementary
+group of which the effective user ID of that process is a memeber.
+
+.SH "CIPHER TYPES"
+Credentials can be encrypted using the secret key that is shared by all
+\fBmunged\fR daemons within an administrative domain.  Anyone having access
+to this key can use it to decrypt a credential bypassing any restrictions
+being imposed by \fBmunged\fR.
+.TP
+.B MUNGE_CIPHER_NONE
+Specify encryption is to be disabled.
+.TP
+.B MUNGE_CIPHER_DEFAULT
+Specify the default according to the \fBmunged\fR configuration.
+.TP
+.B MUNGE_CIPHER_BLOWFISH
+Specify the Blowfish cipher designed by Bruce Schneier.  This cipher has a
+64-bit block-size and a variable key length.  MUNGE uses it with a 128-bit
+key in CBC mode.  It is a fast block cipher but suffers from a slow key
+setup time.  Consequently, it underperforms when generating small credentials.
+.TP
+.B MUNGE_CIPHER_CAST5
+Specify the CAST5 cipher designed by Carlisle Adams and Stafford Tavares.
+This cipher has a 64-bit block-size and a variable key length.  MUNGE uses
+it with a 128-bit key in CBC mode.
+.TP
+.B MUNGE_CIPHER_AES_128
+Specify the AES (Advanced Encryption Standard) cipher, also known as Rijndael.
+It was designed by Joan Daemen and Vincent Rijmen.  This cipher has a variable
+block and key length.  MUNGE uses it with a 128-bit block-size and 128-bit
+key in CBC mode.  It is available in OpenSSL versions 0.9.7 or later.
+
+.SH "MAC TYPES"
+The message authentication code (MAC), also known as a message integrity code
+(MIC), is a required component of the credental; consequently, it cannot
+be disabled.  MUNGE uses the HMAC implementation provided by OpenSSL.
+.TP
+.B MUNGE_MAC_DEFAULT
+Specify the default according to the \fBmunged\fR configuration.
+.TP
+.B MUNGE_MAC_MD5
+Specify the MD5 algorithm designed by Ron Rivest and published in 1991.
+This algorithm has a 128-bit message digest.  In 2004, a successful collision
+attack was demonstrated against MD5.  But since a pre-image attack has
+not yet been demonstrated, MD5 should still be safe to use within MUNGE.
+However, use of SHA-1 or RIPEMD-160 is recommended in order to provide a
+better security margin.
+.TP
+.B MUNGE_MAC_SHA1
+Specify the SHA-1 algorithm designed by the National Security Agency
+and published in 1995; this is the successor to the original Secure Hash
+Algorithm (now called SHA-0) published in 1993.  This algorithm has a 160-bit
+message digest.  SHA-1 has been closely examined by the public cryptographic
+community and no attacks have yet been found.  However, NIST has announced
+plans to phase out the use of SHA-1 by 2010 in favor of the SHA-2 variant.
+.TP
+.B MUNGE_MAC_RIPEMD160
+Specify the RIPEMD-160 (RACE Integrity Primitives Evaluation Message Digest)
+algorithm designed in Europe by Hans Dobbertin, Antoon Bosselaers, and Bart
+Preneel, and published in 1996.  This algorithm has a 160-bit message digest.
+It is somewhat less popular than SHA-1 and correspondingly less well studied.
+While slower than SHA-1, it is believed to have a slightly better security
+margin.
+
+.SH "COMPRESSION TYPES"
+If a compression type is specified, a payload-bearing credential will be
+compressed accordingly.  However, if the resulting compressed data is larger
+than the original uncompressed data, the uncompressed data will be restored
+and compression will be disabled.
+.TP
+.B MUNGE_ZIP_NONE
+Specify compression is to be disabled.  This is the recommended setting
+unless there is a payload of sufficient size to compress.
+.TP
+.B MUNGE_ZIP_DEFAULT
+Specify the default according to the \fBmunged\fR configuration.
+.TP
+.B MUNGE_ZIP_BZLIB
+Specify the bzip2 algorithm developed by Julian Seward.  This algorithm
+is slower and uses more memory, but generally gets the best compression on
+larger payloads.
+.TP
+.B MUNGE_ZIP_ZLIB
+Specify the zlib "deflate" algorithm developed by Jean-loup Gailly and
+Mark Adler.  This algorithm is faster and uses less memory, but gets pretty
+good compression nonetheless.
+
+.SH "TTL TYPES"
+The time-to-live value specifies the number of seconds the credential is
+considered valid from the time it was encoded according to the clock on the
+host on which it was encoded.  In addition to specifying a integer value,
+the following types are available.
+.TP
+.B MUNGE_TTL_MAXIMUM
+Specify the maximum allowed by the \fBmunged\fR configuration.
+.TP
+.B MUNGE_TTL_DEFAULT
+Specify the default according to the \fBmunged\fR configuration.
+
+.SH "UID & GID TYPES"
+The UID and GID restrictions can be used to restrict the credential
+decode based on the effective user and group ID of the requesting process.
+In addition to specifying an integer value, the following types are available.
+.TP
+.B MUNGE_UID_ANY
+Specify that no UID restriction is to take effect; this is the default
+behavior.
+.TP
+.B MUNGE_GID_ANY
+Specify that no GID restriction is to take effect; this is the default
+behavior.
+
+.SH ERRORS
+Refer to \fBmunge\fR(3) for a complete list of errors.
+
+.SH EXAMPLE
+The following example program illustrates the use of the munge context to
+query the location of the \fBmunged\fR domain socket.
+.PP
+.nf
+#define GPL_LICENSED 1
+
+#include <stdio.h>                      /* for printf() */
+#include <stdlib.h>                     /* for exit() */
+#include <munge.h>
+
+int
+main (int argc, char *argv[])
+{
+    munge_ctx_t  ctx;
+    munge_err_t  err;
+    char        *str;
+
+    if (!(ctx = munge_ctx_create ())) {
+        fprintf (stderr, "ERROR: Unable to create munge context\\n");
+        exit (1);
+    }
+    err = munge_ctx_get (ctx, MUNGE_OPT_SOCKET, &str);
+
+    if (err != EMUNGE_SUCCESS) {
+        fprintf (stderr, "ERROR: %s\\n", munge_ctx_strerror (ctx));
+        exit (1);
+    }
+    printf ("socket=%s\\n", str);
+    /*
+     *  Note that 'str' is not to be free()d since
+     *    it points to a string within the 'ctx'.
+     */
+    munge_ctx_destroy (ctx);
+    exit (0);
+}
+.fi
+
+.SH NOTES
+Abandoning a new or copied munge context without destroying it will result
+in a memory leak.
+.PP
+The context passed to \fBmunge_encode()\fR is treated read-only except
+for the error message that is set when an error is returned.  The context
+passed to \fBmunge_decode()\fR is set according to the context used to encode
+the credential; however, on error, its settings may be in a state which is
+invalid for encoding.  Consequently, separate contexts should be used for
+encoding and decoding.
+.PP
+A context should not be shared between threads unless it is protected by a
+mutex; however, a better alternative is to use a separate context (or two)
+for each thread, either by creating a new one via \fBmunge_ctx_create()\fR
+or copying an existing one via \fBmunge_ctx_copy()\fR.
+
+.SH AUTHOR
+Chris Dunlap <cdunlap@llnl.gov>
+
+.SH COPYRIGHT
+Copyright (C) 2003-2004 The Regents of the University of California.
+Produced at Lawrence Livermore National Laboratory.  UCRL-CODE-155910.
+
+MUNGE is free software; you can redistribute it and/or modify it under the
+terms of the GNU General Public License as published by the Free Software
+Foundation.
+
+.SH "SEE ALSO"
+.BR munge (1),
+.BR remunge (1),
+.BR unmunge (1),
+.BR munge (3),
+.BR munge (7),
+.BR munged (8).
+.PP
+The MUNGE Web page:
+  \fB<http://www.llnl.gov/linux/munge/>\fR
+.PP
+The MUNGE FTP site:
+  \fB<ftp://ftp.llnl.gov/pub/linux/munge/>\fR

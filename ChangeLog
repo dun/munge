@@ -1,5 +1,17 @@
 2004-11-10  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* README: Updated.
+	* README.AIX: Added.
+	* configure.ac: Changed to older AC_INIT & AM_INIT_AUTOMAKE constructs.
+	* munge.spec: Updated description.  Added manpages.
+	* config/x_ac_meta.m4: Added metatags for AUTHOR and DATE.
+	* src/libcommon/Makefile.am, src/libmunge/Makefile.am,
+	  src/munge/Makefile.am, src/munged/Makefile.am: Added manpages.
+	* src/libcommon/munge.7.in, src/libmunge/munge.3.in,
+	  src/libmunge/munge_ctx.3.in, src/munge/munge.1.in,
+	  src/munge/remunge.1.in, src/munge/unmunge.1.in,
+	  src/munged/munged.8.in: Added.
+
 	* src/libcommon/munge_defs.h, src/munged/conf.c:
 	  Added MUNGE_AUTH_ROOT_ALLOW_FLAG.
 

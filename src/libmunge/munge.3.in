@@ -1,0 +1,198 @@
+.\" $Id: munge.3.in,v 1.1 2004/11/11 00:06:37 dun Exp $
+
+.TH MUNGE 3 "@DATE@" "@PACKAGE@-@VERSION@" "Munge Uid 'N' Gid Emporium"
+
+.SH NAME
+munge_encode, munge_decode, munge_strerror \- MUNGE primary functions
+
+.SH SYNOPSIS
+.nf
+.B #define GPL_LICENSED 1
+.B #include <munge.h>
+.PP
+.BI "munge_err_t munge_encode (char **" cred ", munge_ctx_t " ctx ,
+.BI "                          const void *" buf ", int " len );
+.PP
+.BI "munge_err_t munge_decode (const char *" cred ", munge_ctx_t " ctx ,
+.BI "                          void **" buf ", int *" len ,
+.BI "                          uid_t *" uid ", gid_t *" gid );
+.PP
+.BI "const char * munge_strerror (munge_err_t " e );
+.PP
+.BI "extern const char *" munge_cipher_strings [];
+.BI "extern const char *" munge_mac_strings [];
+.BI "extern const char *" munge_zip_strings [];
+.PP
+.B cc ... -lmunge
+.fi
+
+.SH DESCRIPTION
+The \fBmunge_encode()\fR function creates a credential contained in a
+NUL-terminated base64 string.  A payload specified by a buffer \fIbuf\fR
+of length \fIlen\fR can be encapsulated in as well.  If the munge context
+\fIctx\fR is NULL, the default context will be used.  A pointer to the
+resulting credential is returned via \fIcred\fR; on error, it is set to NULL.
+The caller is responsible for freeing the memory referenced by \fIcred\fR.
+.PP
+The \fBmunge_decode()\fR function validates the NUL-terminated credential
+\fIcred\fR.  If the munge context \fIctx\fR is not NULL, it will be set to
+that used to encode the credential.  If \fIbuf\fR and \fIlen\fR are not NULL,
+memory will be allocated for the encapsulated payload, \fIbuf\fR will be set
+to point to this data, and \fIlen\fR will be set to its length.  An additional
+NUL character is appended to this payload data but not included in its
+length.  If no payload exists, \fIbuf\fR will be set to NULL and \fIlen\fR
+will be set to 0.  For certain errors (i.e., \fBEMUNGE_CRED_EXPIRED\fR,
+\fBEMUNGE_CRED_REWOUND\fR, \fBEMUNGE_CRED_REPLAYED\fR), payload memory will
+still be allocated if necessary.  The caller is responsible for freeing
+the memory referenced by \fIbuf\fR.  If \fIuid\fR or \fIgid\fR is not NULL,
+they will be set to the UID/GID of the process that created the credential.
+.PP
+The \fBmunge_strerror()\fR function returns a descriptive text string
+describing the munge error number \fIe\fR.
+.PP
+The \fImunge_cipher_strings\fR, \fImunge_mac_strings\fR, and
+\fImunge_zip_strings\fR variables are NULL-terminated arrays of NUL-terminated
+character strings containing descriptive strings for the corresponding types.
+If a given string is set to the empty string (ie, "\\0"), that setting is
+not defined in the configuration as currently compiled.
+
+.SH RETURN VALUE
+The \fBmunge_encode()\fR and \fBmunge_decode()\fR functions return
+\fBEMUNGE_SUCCESS\fR on success; otherwise, a munge error number is returned.
+If a munge context was used, it may contain a more detailed error message
+accessible via \fBmunge_ctx_strerror\fR.
+.PP
+The \fBmunge_strerror()\fR function returns a pointer to a NUL-terminated
+constant text string; this string should not be freed by the caller.
+
+.SH ERRORS
+.TP
+.B EMUNGE_SUCCESS
+Success.
+.TP
+.B EMUNGE_SNAFU
+Internal error.
+.TP
+.B EMUNGE_BAD_ARG
+Invalid argument.
+.TP
+.B EMUNGE_BAD_LENGTH
+Exceeded the maximum message length as specified by the \fBmunged\fR
+configuration.
+.TP
+.B EMUNGE_OVERFLOW
+Exceeded the maximum length of a buffer.
+.TP
+.B EMUNGE_NO_MEMORY
+Unable to allocate the requisite memory.
+.TP
+.B EMUNGE_NO_DAEMON
+Unable to contact the daemon on the domain socket.
+.TP
+.B EMUNGE_SOCKET
+Unable to communicate with the daemon on the domain socket.
+.\" .TP
+.\" .B EMUNGE_TIMEOUT
+.\" NOT YET USED
+.TP
+.B EMUNGE_BAD_CRED
+The credential does not match the specified format.
+.TP
+.B EMUNGE_BAD_VERSION
+The credential contains an unsupported version number.
+.TP
+.B EMUNGE_BAD_CIPHER
+The credential contains an unsupported cipher type.
+.TP
+.B EMUNGE_BAD_MAC
+The credential contains an unsupported MAC type.
+.TP
+.B EMUNGE_BAD_ZIP
+The credential contains an unsupported compression type.
+.TP
+.B EMUNGE_BAD_REALM
+The credential contains an unrecognized security realm.
+.TP
+.B EMUNGE_CRED_INVALID
+The credential is invalid.
+.TP
+.B EMUNGE_CRED_EXPIRED
+The credential has expired.
+.TP
+.B EMUNGE_CRED_REWOUND
+The credential appears to have been encoded at some point in the future.
+.TP
+.B EMUNGE_CRED_REPLAYED
+The credential has been previously decoded on this node.
+.TP
+.B EMUNGE_CRED_UNAUTHORIZED
+The client is not authorized to decode the credential based upon the effective
+user and/or group ID of the process.
+
+.SH EXAMPLE
+The following example program illustrates the use of a munge credential to
+ascertain the effective user and group ID of the encoding process.
+.PP
+.nf
+#define GPL_LICENSED 1
+
+#include <stdio.h>                      /* for printf() */
+#include <stdlib.h>                     /* for exit() & free() */
+#include <unistd.h>                     /* for uid_t & gid_t */
+#include <munge.h>
+
+int
+main (int argc, char *argv[])
+{
+    char        *cred;
+    munge_err_t  err;
+    uid_t        uid;
+    gid_t        gid;
+
+    err = munge_encode (&cred, NULL, NULL, 0);
+
+    if (err != EMUNGE_SUCCESS) {
+        fprintf (stderr, "ERROR: %s\\n", munge_strerror (err));
+        exit (1);
+    }
+    err = munge_decode (cred, NULL, NULL, NULL, &uid, &gid);
+
+    if (err != EMUNGE_SUCCESS) {
+        fprintf (stderr, "ERROR: %s\\n", munge_strerror (err));
+        exit (1);
+    }
+    printf ("uid=%d gid=%d\\n", uid, gid);
+    free (cred);
+    exit (0);
+}
+.fi
+
+.SH NOTES
+Both \fBmunge_encode()\fR and \fBmunge_decode()\fR may allocate memory that
+the caller is responsible for freeing.  Failure to do so will result in a
+memory leak.
+
+.SH AUTHOR
+Chris Dunlap <cdunlap@llnl.gov>
+
+.SH COPYRIGHT
+Copyright (C) 2003-2004 The Regents of the University of California.
+Produced at Lawrence Livermore National Laboratory.  UCRL-CODE-155910.
+
+MUNGE is free software; you can redistribute it and/or modify it under the
+terms of the GNU General Public License as published by the Free Software
+Foundation.
+
+.SH "SEE ALSO"
+.BR munge (1),
+.BR remunge (1),
+.BR unmunge (1),
+.BR munge_ctx (3),
+.BR munge (7),
+.BR munged (8).
+.PP
+The MUNGE Web page:
+  \fB<http://www.llnl.gov/linux/munge/>\fR
+.PP
+The MUNGE FTP site:
+  \fB<ftp://ftp.llnl.gov/pub/linux/munge/>\fR

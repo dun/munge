@@ -1,0 +1,105 @@
+.\" $Id: munged.8.in,v 1.1 2004/11/11 00:06:37 dun Exp $
+
+.TH MUNGED 8 "@DATE@" "@PACKAGE@-@VERSION@" "Munge Uid 'N' Gid Emporium"
+
+.SH NAME
+munged \- MUNGE daemon
+
+.SH SYNOPSIS
+.B munged
+[\fIOPTION\fR]...
+
+.SH DESCRIPTION
+The \fBmunged\fR server is responsible for authenticating local clients and
+servicing credential encode & decode requests.  All \fBmunged\fR servers
+within an administrative realm share a secret key.  This key is used to
+protect the contents of a credential.
+.PP
+When a credential is created, \fBmunged\fR embeds various metadata within it
+including the effective UID and GID of the requesting client (as determined by
+\fBmunged\fR) and the current time (as determined by the local clock).  Next,
+it computes a message authentication code over this data.  Then, it compresses,
+encrypts, and base64-encodes the result before returning it to the client.
+.PP
+When a credential is validated, \fBmunged\fR first checks the message
+authentication code to ensure the credential has not been subquently altered.
+Next, it checks the embedded UID/GID restrictions to determine whether the
+requesting client is allowed to decode it.  Then, it checks the embedded
+encode time against the current time; if this difference exceeds the embedded
+time-to-live, the credential has expired.  Finally, it checks whether this
+credential has been previously decoded on this host; if so, the credential
+has been replayed.  The resulting metadata and payload are then returned to
+the client.
+
+.SH OPTIONS
+.TP
+.BI "-h, --help"
+Display a summary of the command-line options.
+.TP
+.BI "-L, --license"
+Display license information.
+.TP
+.BI "-V, --version"
+Display version information.
+.TP
+.BI "-f, --force"
+Force the process to run if at all possible.
+.TP
+.BI "-F, --foreground"
+Run the process in the foreground.
+.TP
+.BI "-S, --socket " string
+Specify the local domain socket for communicating with clients.
+.TP
+.BI "--auth-pipe-dir " directory
+Specify an alternate directory in which to create the pipe used to authenticate
+clients on certain platforms.
+This option is \fBdeprecated\fR and will be removed once configuration file
+support is added.
+.TP
+.BI "--key-file " file
+Specify an alternate secret key file.
+This option is \fBdeprecated\fR and will be removed once configuration file
+support is added.
+.TP
+.BI "--num-threads " integer
+Specify the number of threads to spawn for processing credential requests.
+This option is \fBdeprecated\fR and will be removed once configuration file
+support is added.
+
+.\" .SH SIGNALS
+
+.\" .SH FILES
+
+.SH NOTES
+All clocks within an administrative realm must be kept in sync within the
+credential time-to-live setting.
+.PP
+While \fBmunged\fR prevents a given credential from being decoded on a
+particular node more than once, nothing prevents it from being decoded on
+another node within the administrative realm before it expires.
+
+.SH AUTHOR
+Chris Dunlap <cdunlap@llnl.gov>
+
+.SH COPYRIGHT
+Copyright (C) 2003-2004 The Regents of the University of California.
+Produced at Lawrence Livermore National Laboratory.  UCRL-CODE-155910.
+
+MUNGE is free software; you can redistribute it and/or modify it under the
+terms of the GNU General Public License as published by the Free Software
+Foundation.
+
+.SH "SEE ALSO"
+.BR munge (1),
+.BR remunge (1),
+.BR unmunge (1),
+.BR munge (3),
+.BR munge_ctx (3),
+.BR munge (7).
+.PP
+The MUNGE Web page:
+  \fB<http://www.llnl.gov/linux/munge/>\fR
+.PP
+The MUNGE FTP site:
+  \fB<ftp://ftp.llnl.gov/pub/linux/munge/>\fR

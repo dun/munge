@@ -1,0 +1,124 @@
+.\" $Id: remunge.1.in,v 1.1 2004/11/11 00:06:37 dun Exp $
+
+.TH REMUNGE 1 "@DATE@" "@PACKAGE@-@VERSION@" "Munge Uid 'N' Gid Emporium"
+
+.SH NAME
+remunge \- MUNGE credential benchmark
+
+.SH SYNOPSIS
+.B remunge
+[\fIOPTION\fR]...
+
+.SH DESCRIPTION
+The \fBremunge\fR client benchmarks the performance of MUNGE.  A benchmark
+runs for the specified duration or until the specified number of credentials
+are processed, whichever comes first.  At its conclusion, the number of
+credentials processed per second is written to stdout.
+.PP
+By default, credentials are encoded for one second using a single thread.
+
+.SH OPTIONS
+.TP
+.BI "-h, --help"
+Display a summary of the command-line options.
+.TP
+.BI "-L, --license"
+Display license information.
+.TP
+.BI "-V, --version"
+Display version information.
+.TP
+.BI "-c, --cipher " string
+Specify the cipher type, either by name or number.
+.TP
+.BI "-C, --list-ciphers"
+Display a list of supported cipher types.
+.TP
+.BI "-m, --mac " string
+Specify the MAC type, either by name or number.
+.TP
+.BI "-M, --list-macs"
+Display a list of supported MAC types.
+.TP
+.BI "-z, --zip " string
+Specify the compression type, either by name or number.
+.TP
+.BI "-Z, --list-zips"
+Display a list of supported compression types.
+.TP
+.BI "-e, --encode"
+Encode (but do not decode) each credential.  By bypassing the decode operation,
+the credential is not stored in the replay cache.
+.TP
+.BI "-d, --decode"
+Encode and decode each credential.
+.TP
+.BI "-l, --length " integer
+Specify an arbitrary payload length (in bytes).  The integer may be followed
+by a single-character modifier: k=kilobytes, m=megabytes, g=gigabytes;
+K=kibibytes, M=mebibytes, G=gibibytes.
+.TP
+.BI "-u, --restrict-uid " uid
+Specify the user name or UID allowed to decode the credential.  This will
+be matched against the effective user ID of the process requesting the
+credential decode.
+.TP
+.BI "-g, --restrict-gid " gid
+Specify the group name or GID allowed to decode the credential.  This will
+be matched against the effective group ID of the process requesting the
+credential decode, as well as each supplementary group of which the effective
+user ID of that process is a member.
+.TP
+.BI "-t, --ttl " integer
+Specify the time-to-live (in seconds).  A value of 0 selects the default ttl.
+A value of -1 selects the maximum allowed ttl.
+.TP
+.BI "-S, --socket " string
+Specify the local domain socket for connecting with \fBmunged\fR.
+.TP
+.BI "-D, --duration " integer
+Specify the test duration (in seconds).  The default duration is one second.
+A value of -1 selects the maximum duration.  The integer may be followed by
+a single-character modifier: s=seconds, m=minutes, h=hours, d=days.
+.TP
+.BI "-N, --num-creds " integer
+Specify the number of credentials to generate.  The integer may be followed
+by a single-character modifier: k=kilobytes, m=megabytes, g=gigabytes;
+K=kibibytes, M=mebibytes, G=gibibytes.
+.TP
+.BI "-T, --num-threads " integer
+Specify the number of threads to spawn for processing credentials.
+.TP
+.BI "-W, --warn-time " integer
+Specify the maximum number of seconds to allow for a given munge_encode() or
+munge_decode() operation before issuing a warning.
+
+.SH "EXIT STATUS"
+The \fBremunge\fR client returns a zero exit code if the benchmark completes.
+On error, it prints an error message to stderr and returns a non-zero
+exit code.
+
+.SH AUTHOR
+Chris Dunlap <cdunlap@llnl.gov>
+
+.SH COPYRIGHT
+Copyright (C) 2003-2004 The Regents of the University of California.
+Produced at Lawrence Livermore National Laboratory.  UCRL-CODE-155910.
+
+MUNGE is free software; you can redistribute it and/or modify it under the
+terms of the GNU General Public License as published by the Free Software
+Foundation.
+
+.SH "SEE ALSO"
+.BR munge (1),
+.BR unmunge (1),
+.BR munge (3),
+.BR munge_ctx (3),
+.BR munge (7),
+.BR munged (8).
+.PP
+The MUNGE Web page:
+  \fB<http://www.llnl.gov/linux/munge/>\fR
+.PP
+The MUNGE FTP site:
+  \fB<ftp://ftp.llnl.gov/pub/linux/munge/>\fR

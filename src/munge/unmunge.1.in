@@ -1,0 +1,83 @@
+.\" $Id: unmunge.1.in,v 1.1 2004/11/11 00:06:37 dun Exp $
+
+.TH UNMUNGE 1 "@DATE@" "@PACKAGE@-@VERSION@" "Munge Uid 'N' Gid Emporium"
+
+.SH NAME
+unmunge \- MUNGE credential decoder
+
+.SH SYNOPSIS
+.B unmunge
+[\fIOPTION\fR]...
+
+.SH DESCRIPTION
+The \fBunmunge\fR client validates a credential created by the \fBmunge\fR
+client.
+.PP
+By default, the credential is read from stdin and the metadata & payload
+are written to stdout.  When the metadata and payload are written to the
+same stream, they are separated by a blank line.
+
+.SH OPTIONS
+.TP
+.BI "-h, --help"
+Display a summary of the command-line options.
+.TP
+.BI "-L, --license"
+Display license information.
+.TP
+.BI "-V, --version"
+Display version information.
+.TP
+.BI "-i, --input " file
+Input the credential from the specified file.
+.TP
+.BI "-n, --no-output"
+Discard all output.
+.TP
+.BI "-m, --metadata " file
+Output metadata to the specified file.
+.TP
+.BI "-o, --output " file
+Output the payload to the specified file.
+.TP
+.BI "-k, --keys " string
+Specify a subset of metadata keys to output.  The keys are case-insensitive
+and delimited by whitespace, commas, semicolons, or periods -- as long as the
+string is treated as a single argument by the shell (eg, enclosed by quotes).
+.TP
+.BI "-K, --list-keys"
+Display a list of metadata keys.
+.TP
+.BI "-S, --socket " string
+Specify the local domain socket for connecting with \fBmunged\fR.
+
+.SH "EXIT STATUS"
+The \fBunmunge\fR client returns an exit code corresponding to the return
+code of \fBmunge_decode\fR(3).  On success, it returns a zero exit code which
+signifies the credential is valid.  On error, it prints an error message to
+stderr and returns a non-zero exit code.
+
+.SH AUTHOR
+Chris Dunlap <cdunlap@llnl.gov>
+
+.SH COPYRIGHT
+Copyright (C) 2003-2004 The Regents of the University of California.
+Produced at Lawrence Livermore National Laboratory.  UCRL-CODE-155910.
+
+MUNGE is free software; you can redistribute it and/or modify it under the
+terms of the GNU General Public License as published by the Free Software
+Foundation.
+
+.SH "SEE ALSO"
+.BR munge (1),
+.BR remunge (1),
+.BR munge (3),
+.BR munge_ctx (3),
+.BR munge (7),
+.BR munged (8).
+.PP
+The MUNGE Web page:
+  \fB<http://www.llnl.gov/linux/munge/>\fR
+.PP
+The MUNGE FTP site:
+  \fB<ftp://ftp.llnl.gov/pub/linux/munge/>\fR

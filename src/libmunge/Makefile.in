@@ -40,7 +40,8 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 DIST_COMMON = $(include_HEADERS) $(srcdir)/Makefile.am \
-	$(srcdir)/Makefile.in $(top_srcdir)/config/Make-inc.mk
+	$(srcdir)/Makefile.in $(srcdir)/munge.3.in \
+	$(srcdir)/munge_ctx.3.in $(top_srcdir)/config/Make-inc.mk
 subdir = src/libmunge
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/config/x_ac_canonical.m4 \
@@ -56,14 +57,15 @@ am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(SHELL) $(top_srcdir)/config/mkinstalldirs
 CONFIG_HEADER = $(top_builddir)/config/config.h
-CONFIG_CLEAN_FILES =
+CONFIG_CLEAN_FILES = munge.3 munge_ctx.3
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
 am__vpath_adj = case $$p in \
     $(srcdir)/*) f=`echo "$$p" | sed "s|^$$srcdirstrip/||"`;; \
     *) f=$$p;; \
   esac;
 am__strip_dir = `echo $$p | sed -e 's|^.*/||'`;
-am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(includedir)"
+am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(man3dir)" \
+	"$(DESTDIR)$(includedir)"
 libLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(lib_LTLIBRARIES)
 am__DEPENDENCIES_1 =
@@ -86,6 +88,9 @@ LINK = $(LIBTOOL) --tag=CC --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(AM_LDFLAGS) $(LDFLAGS) -o $@
 SOURCES = $(libmunge_la_SOURCES)
 DIST_SOURCES = $(libmunge_la_SOURCES)
+man3dir = $(mandir)/man3
+NROFF = nroff
+MANS = $(man_MANS)
 includeHEADERS_INSTALL = $(INSTALL_HEADER)
 HEADERS = $(include_HEADERS)
 ETAGS = etags
@@ -96,6 +101,7 @@ AMDEP_FALSE = @AMDEP_FALSE@
 AMDEP_TRUE = @AMDEP_TRUE@
 AMTAR = @AMTAR@
 AR = @AR@
+AUTHOR = @AUTHOR@
 AUTOCONF = @AUTOCONF@
 AUTOHEADER = @AUTOHEADER@
 AUTOMAKE = @AUTOMAKE@
@@ -110,6 +116,7 @@ CXXCPP = @CXXCPP@
 CXXDEPMODE = @CXXDEPMODE@
 CXXFLAGS = @CXXFLAGS@
 CYGPATH_W = @CYGPATH_W@
+DATE = @DATE@
 DEFS = @DEFS@
 DEPDIR = @DEPDIR@
 ECHO = @ECHO@
@@ -223,6 +230,10 @@ libmunge_la_SOURCES = \
 	strings.c \
 	munge.h
 
+man_MANS = \
+	munge.3 \
+	munge_ctx.3
+
 all: all-am
 
 .SUFFIXES:
@@ -256,6 +267,10 @@ $(top_srcdir)/configure: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
 $(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
+munge.3: $(top_builddir)/config.status $(srcdir)/munge.3.in
+	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
+munge_ctx.3: $(top_builddir)/config.status $(srcdir)/munge_ctx.3.in
+	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
 install-libLTLIBRARIES: $(lib_LTLIBRARIES)
 	@$(NORMAL_INSTALL)
 	test -z "$(libdir)" || $(mkdir_p) "$(DESTDIR)$(libdir)"
@@ -330,6 +345,51 @@ clean-libtool:
 distclean-libtool:
 	-rm -f libtool
 uninstall-info-am:
+install-man3: $(man3_MANS) $(man_MANS)
+	@$(NORMAL_INSTALL)
+	test -z "$(man3dir)" || $(mkdir_p) "$(DESTDIR)$(man3dir)"
+	@list='$(man3_MANS) $(dist_man3_MANS) $(nodist_man3_MANS)'; \
+	l2='$(man_MANS) $(dist_man_MANS) $(nodist_man_MANS)'; \
+	for i in $$l2; do \
+	  case "$$i" in \
+	    *.3*) list="$$list $$i" ;; \
+	  esac; \
+	done; \
+	for i in $$list; do \
+	  if test -f $(srcdir)/$$i; then file=$(srcdir)/$$i; \
+	  else file=$$i; fi; \
+	  ext=`echo $$i | sed -e 's/^.*\\.//'`; \
+	  case "$$ext" in \
+	    3*) ;; \
+	    *) ext='3' ;; \
+	  esac; \
+	  inst=`echo $$i | sed -e 's/\\.[0-9a-z]*$$//'`; \
+	  inst=`echo $$inst | sed -e 's/^.*\///'`; \
+	  inst=`echo $$inst | sed '$(transform)'`.$$ext; \
+	  echo " $(INSTALL_DATA) '$$file' '$(DESTDIR)$(man3dir)/$$inst'"; \
+	  $(INSTALL_DATA) "$$file" "$(DESTDIR)$(man3dir)/$$inst"; \
+	done
+uninstall-man3:
+	@$(NORMAL_UNINSTALL)
+	@list='$(man3_MANS) $(dist_man3_MANS) $(nodist_man3_MANS)'; \
+	l2='$(man_MANS) $(dist_man_MANS) $(nodist_man_MANS)'; \
+	for i in $$l2; do \
+	  case "$$i" in \
+	    *.3*) list="$$list $$i" ;; \
+	  esac; \
+	done; \
+	for i in $$list; do \
+	  ext=`echo $$i | sed -e 's/^.*\\.//'`; \
+	  case "$$ext" in \
+	    3*) ;; \
+	    *) ext='3' ;; \
+	  esac; \
+	  inst=`echo $$i | sed -e 's/\\.[0-9a-z]*$$//'`; \
+	  inst=`echo $$inst | sed -e 's/^.*\///'`; \
+	  inst=`echo $$inst | sed '$(transform)'`.$$ext; \
+	  echo " rm -f '$(DESTDIR)$(man3dir)/$$inst'"; \
+	  rm -f "$(DESTDIR)$(man3dir)/$$inst"; \
+	done
 install-includeHEADERS: $(include_HEADERS)
 	@$(NORMAL_INSTALL)
 	test -z "$(includedir)" || $(mkdir_p) "$(DESTDIR)$(includedir)"
@@ -426,9 +486,9 @@ distdir: $(DISTFILES)
 	done
 check-am: all-am
 check: check-am
-all-am: Makefile $(LTLIBRARIES) $(HEADERS)
+all-am: Makefile $(LTLIBRARIES) $(MANS) $(HEADERS)
 installdirs:
-	for dir in "$(DESTDIR)$(libdir)" "$(DESTDIR)$(includedir)"; do \
+	for dir in "$(DESTDIR)$(libdir)" "$(DESTDIR)$(man3dir)" "$(DESTDIR)$(includedir)"; do \
 	  test -z "$$dir" || $(mkdir_p) "$$dir"; \
 	done
 install: install-am
@@ -476,13 +536,13 @@ info: info-am
 
 info-am:
 
-install-data-am: install-includeHEADERS
+install-data-am: install-data-local install-includeHEADERS install-man
 
 install-exec-am: install-libLTLIBRARIES
 
 install-info: install-info-am
 
-install-man:
+install-man: install-man3
 
 installcheck-am:
 
@@ -505,21 +565,24 @@ ps: ps-am
 ps-am:
 
 uninstall-am: uninstall-includeHEADERS uninstall-info-am \
-	uninstall-libLTLIBRARIES
+	uninstall-libLTLIBRARIES uninstall-man
+
+uninstall-man: uninstall-man3
 
 .PHONY: CTAGS GTAGS all all-am check check-am clean clean-generic \
 	clean-libLTLIBRARIES clean-libtool ctags distclean \
 	distclean-compile distclean-generic distclean-libtool \
 	distclean-local distclean-tags distdir dvi dvi-am html html-am \
 	info info-am install install-am install-data install-data-am \
-	install-exec install-exec-am install-includeHEADERS \
-	install-info install-info-am install-libLTLIBRARIES \
-	install-man install-strip installcheck installcheck-am \
-	installdirs maintainer-clean maintainer-clean-generic \
-	mostlyclean mostlyclean-compile mostlyclean-generic \
-	mostlyclean-libtool pdf pdf-am ps ps-am tags uninstall \
-	uninstall-am uninstall-includeHEADERS uninstall-info-am \
-	uninstall-libLTLIBRARIES
+	install-data-local install-exec install-exec-am \
+	install-includeHEADERS install-info install-info-am \
+	install-libLTLIBRARIES install-man install-man3 install-strip \
+	installcheck installcheck-am installdirs maintainer-clean \
+	maintainer-clean-generic mostlyclean mostlyclean-compile \
+	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
+	tags uninstall uninstall-am uninstall-includeHEADERS \
+	uninstall-info-am uninstall-libLTLIBRARIES uninstall-man \
+	uninstall-man3
 
 
 # Dependencies to ensure libraries get rebuilt.
@@ -539,6 +602,15 @@ force-dependency-check:
 #
 distclean-local::
 	-rm -f *~ \#* .\#* cscope*.out core core.* tags TAGS
+
+install-data-local:
+	$(INSTALL) -d $(DESTDIR)$(mandir)/man3/
+	for man in encode decode strerror; do \
+	  ln -f -s munge.3 $(DESTDIR)$(mandir)/man3/munge_$$man.3; \
+	done
+	for man in create copy destroy strerror get set; do \
+	  ln -f -s munge_ctx.3 $(DESTDIR)$(mandir)/man3/munge_ctx_$$man.3; \
+	done
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

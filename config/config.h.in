@@ -1,5 +1,11 @@
 /* config/config.h.in.  Generated from configure.ac by autoheader.  */
 
+/* Define the package author. */
+#undef AUTHOR
+
+/* Define the package release date. */
+#undef DATE
+
 /* Define to 1 if licensed under terms of the GNU General Public License. */
 #undef GPL_LICENSED
 

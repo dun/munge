@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: configure.ac,v 1.22 2004/05/01 05:26:46 dun Exp $
+## $Id: configure.ac,v 1.23 2004/11/11 00:06:36 dun Exp $
 ##*****************************************************************************
 ## Process this file with autoconf to produce a configure script.
 ##*****************************************************************************
@@ -29,7 +29,7 @@
 ##
 # Prologue.
 ##
-AC_INIT([munge], [0])
+AC_INIT([munge])
 X_AC_META
 AC_CONFIG_AUX_DIR([config])
 AC_CONFIG_SRCDIR([src/libmunge/munge.h])
@@ -40,7 +40,7 @@ X_AC_HUMOR
 ##
 # Automake support.
 ##
-AM_INIT_AUTOMAKE([check-news dist-bzip2 gnu no-define])
+AM_INIT_AUTOMAKE([$PACKAGE], [$VERSION], [check-news dist-bzip2 gnu no-define])
 AC_CONFIG_HEADERS([config/config.h])
 AM_MAINTAINER_MODE
 
@@ -123,9 +123,16 @@ AC_CONFIG_FILES( \
   src/Makefile \
   src/etc/Makefile \
   src/libcommon/Makefile \
+  src/libcommon/munge.7 \
   src/libmissing/Makefile \
   src/libmunge/Makefile \
+  src/libmunge/munge.3 \
+  src/libmunge/munge_ctx.3 \
   src/munge/Makefile \
+  src/munge/munge.1 \
+  src/munge/remunge.1 \
+  src/munge/unmunge.1 \
   src/munged/Makefile \
+  src/munged/munged.8 \
 )
 AC_OUTPUT

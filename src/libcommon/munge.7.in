@@ -1,0 +1,56 @@
+.\" $Id: munge.7.in,v 1.1 2004/11/11 00:06:36 dun Exp $
+
+.TH MUNGE 7 "@DATE@" "@PACKAGE@-@VERSION@" "Munge Uid 'N' Gid Emporium"
+
+.SH NAME
+munge \- Munge Uid 'N' Gid Emporium
+
+.SH DESCRIPTION
+MUNGE (Munge Uid 'N' Gid Emporium) is a service for creating and validating
+credentials in order to allow a process to securely authenticate the UID
+and GID of another local or remote process within an administrative realm.
+Clients can create and validate these credentials without the use of root
+privileges, reserved ports, or platform-specific methods.
+.PP
+A credential is created and validated by the local \fBmunged\fR daemon
+running on each node within the administrative realm.  A client creates or
+validates a given credential through the use of the \fBlibmunge\fR library or
+\fBmunge\fR/\fBunmunge\fR executables; these are responsible for communicating
+with the local daemon on behalf of the client.
+.PP
+The contents of the credential (including any optional payload data)
+are encrypted with a key shared by all \fBmunged\fR daemons within the
+administrative realm.  The integrity of the credential is ensured by a message
+authentication code (MAC).  The credential is valid for a limited time defined
+by its time-to-live (TTL).  The daemon ensures unexpired credentials are
+not being replayed on a particular host.  Decoding of a credential can be
+restricted to a particular user and/or group ID.  The payload data can be
+used for purposes such as embedding the destination's address to ensure the
+credential is valid on only that host.  The internal format of the credential
+is encoded in a platform-independent manner.  And the credential itself is
+base64 encoded to allow it to be transmitted over virtually any transport.
+
+.SH AUTHOR
+Chris Dunlap <cdunlap@llnl.gov>
+
+.SH COPYRIGHT
+Copyright (C) 2003-2004 The Regents of the University of California.
+Produced at Lawrence Livermore National Laboratory.  UCRL-CODE-155910.
+
+MUNGE is free software; you can redistribute it and/or modify it under the
+terms of the GNU General Public License as published by the Free Software
+Foundation.
+
+.SH "SEE ALSO"
+.BR munge (1),
+.BR remunge (1),
+.BR unmunge (1),
+.BR munge (3),
+.BR munge_ctx (3),
+.BR munged (8).
+.PP
+The MUNGE Web page:
+  \fB<http://www.llnl.gov/linux/munge/>\fR
+.PP
+The MUNGE FTP site:
+  \fB<ftp://ftp.llnl.gov/pub/linux/munge/>\fR

@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.10 2004/05/01 05:08:26 dun Exp $
+## $Id: Makefile.am,v 1.11 2004/11/11 00:06:37 dun Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
@@ -33,3 +33,16 @@ libmunge_la_SOURCES = \
 	strerror.c \
 	strings.c \
 	munge.h
+
+man_MANS = \
+	munge.3 \
+	munge_ctx.3
+
+install-data-local:
+	$(INSTALL) -d $(DESTDIR)$(mandir)/man3/
+	for man in encode decode strerror; do \
+	  ln -f -s munge.3 $(DESTDIR)$(mandir)/man3/munge_$$man.3; \
+	done
+	for man in create copy destroy strerror get set; do \
+	  ln -f -s munge_ctx.3 $(DESTDIR)$(mandir)/man3/munge_ctx_$$man.3; \
+	done

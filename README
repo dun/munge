@@ -1,42 +1,40 @@
-MUNGE (Munge Uid 'N' Gid Emporium) is a service for creating and
-validating credentials in order to allow a process to securely
-authenticate the UID and GID of another local or remote process
-within an administrative domain.  Clients can create and validate
-these credentials without the use of root privileges, reserved ports,
-or platform-specific methods.
+MUNGE (Munge Uid 'N' Gid Emporium) is a service for creating and validating
+credentials in order to allow a process to securely authenticate the UID
+and GID of another local or remote process within an administrative realm.
+Clients can create and validate these credentials without the use of root
+privileges, reserved ports, or platform-specific methods.
 
-A credential is created and validated by the local munged daemon
-running on each node within the administrative domain.  A client
-creates or validates a given credential through the use of the
-libmunge library or munge/unmunge executables; these are responsible
-for communicating with the local daemon on behalf of the client.
+A credential is created and validated by the local munged daemon running on
+each node within the administrative realm.  A client creates or validates
+a given credential through the use of the libmunge library or munge/unmunge
+executables; these are responsible for communicating with the local daemon
+on behalf of the client.
 
-The contents of the credential (including any application-supplied
-data) are encrypted with a key shared by all munged daemons within the
-administrative domain.  The integrity of the credential is ensured by
-a message authentication code (MAC).  The credential is valid for a
-limited time defined by its time-to-live (TTL).  The daemon ensures
-unexpired credentials are not being replayed on that particular host.
-The application-supplied data can be used for purposes such as
-embedding the destination's address to ensure the credential is valid
-on only that host.  The internal format of the credential is encoded
-in a platform-independent manner.  And the credential itself is base64
-encoded to allow it to be transmitted over virtually any transport.
+The contents of the credential (including any optional payload data) are
+encrypted with a key shared by all munged daemons within the administrative
+realm.  The integrity of the credential is ensured by a message authentication
+code (MAC).  The credential is valid for a limited time defined by its
+time-to-live (TTL).  The daemon ensures unexpired credentials are not being
+replayed on a particular host.  Decoding of a credential can be restricted to
+a particular user and/or group ID.  The payload data can be used for purposes
+such as embedding the destination's address to ensure the credential is valid
+on only that host.  The internal format of the credential is encoded in a
+platform-independent manner.  And the credential itself is base64 encoded
+to allow it to be transmitted over virtually any transport.
 
 -------------------------------------------------------------------------------
 
 Getting started:
 
-  1. Edit src/libcommon/munge_defs.h.  The defaults for
-     MUNGED_SECRET_KEY, MUNGED_RANDOM_SEED, and MUNGED_LOGFILE
-     may not be to your liking.  Define them as you see fit.
-     Configuration file support is forthcoming.
+  1. Edit src/libcommon/munge_defs.h.  The defaults for MUNGED_SECRET_KEY,
+     MUNGED_RANDOM_SEED, and MUNGED_LOGFILE may not be to your liking.
+     Define them as you see fit.  Configuration file support is forthcoming.
 
   2. ./configure; make; make install -- you know the drill.
 
   3. Create a secret key.  The format of the key doesn't matter.
 
-     A. You can simply enter a password (not recommended):
+     A. You can enter a password (not recommended):
         echo "foo" >secret
 
      B. You can enter the hash of a password:
@@ -45,17 +43,16 @@ Getting started:
      C. You can grab some random data (recommended):
         dd if=/dev/random bs=1024 count=1 >secret
 
-  4. Ensure this file is permissioned 0400 and owned by the same user
-     that the 'munged' daemon will run as.  On most platforms, root
-     privileges are not required for the daemon.
+  4. Ensure this file is permissioned 0400 and owned by the same user that
+     the 'munged' daemon will run as.  On most platforms, root privileges
+     are not required for the daemon.
 
-  5. Securely propagate this file (eg, with ssh) to other nodes within
-     the same administrative realm.  Credentials are valid only within an
+  5. Securely propagate this file (eg, with ssh) to other nodes within the
+     same administrative realm.  Credentials are valid only within an
      administrative realm (ie, on nodes that share the same secret key).
 
   6. Start the 'munged' daemon.  On RedHat, you can use the init script
-     (which hopefully got installed in /etc/init.d/munge).  Otherwise,
-     the daemon will have been installed in /usr/local/sbin/munged.
+     (which hopefully got installed in /etc/init.d/munge).
 
 
 Testing the installation:
@@ -65,7 +62,6 @@ Testing the installation:
 
 Munging credentials:
 
-  Applications written in C/C++ will want to use the interface provided
-  by <libmunge.h>.  Scripts will want to use the interface provided
-  by the "munge" and "unmunge" executables -- specify "-h" or "--help"
-  for usage information.
+  Applications written in C/C++ can use the interface provided by
+  <libmunge.h>.  Scripts can use the interface provided by the "munge" and
+  "unmunge" executables -- specify "-h" or "--help" for usage information.
