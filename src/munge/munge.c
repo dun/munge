@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munge.c,v 1.26 2004/05/01 06:17:14 dun Exp $
+ *  $Id: munge.c,v 1.27 2004/08/19 19:22:13 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -317,7 +317,7 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                 break;
             case 't':
                 i = strtol (optarg, &p, 10);
-                if (optarg == p)
+                if (*p != '\0')
                     log_errno (EMUNGE_SNAFU, LOG_ERR,
                         "Invalid time-to-live '%s'", optarg);
                 if (i < 0)
@@ -482,7 +482,11 @@ str_to_int (const char *s, const char **strings)
     int i;
     int n;
 
+    if ((!s) || (*s == '\0')) {
+        return (-1);
+    }
     /*  Check to see if the given string matches a valid string.
+     *  Also determine the number of s trings in the array.
      */
     for (pp=strings, i=0; *pp; pp++, i++) {
         if (!strcasecmp (s, *pp))
@@ -490,12 +494,17 @@ str_to_int (const char *s, const char **strings)
     }
     /*  Check to see if the given string matches a valid enum.
      */
-    if (isdigit ((int) s[0])) {
-        n = strtol (s, &p, 10);
-        if ((s != p) && (n >= 0) && (n < i) && (strings[n][0] != '\0'))
-            return (n);
+    n = strtol (s, &p, 10);
+    if ((s == p) || (*p != '\0')) {
+        return (-1);
     }
-    return (-1);
+    if ((n < 0) || (n >= i)) {
+        return (-1);
+    }
+    if (strings[n][0] == '\0') {
+        return (-1);
+    }
+    return (n);
 }
 
 

@@ -1,3 +1,8 @@
+2004-08-19  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/munge/munge.c: Tweaked use of strtol().
+	* src/munge/munge.c(str_to_int): Revamped.
+
 2004-08-18  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/libcommon/munge_defs.h:
