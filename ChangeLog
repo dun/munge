@@ -1,3 +1,8 @@
+2005-02-24  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/libmissing/strlcpy.c, src/libmissing/strlcat.c:
+	  Latest from <ftp://ftp.openbsd.org/pub/OpenBSD/src/lib/libc/string/>.
+
 2005-01-26  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* munge.spec: Added 'devel' and 'libs' subpackages.
