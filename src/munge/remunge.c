@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: remunge.c,v 1.5 2004/09/04 04:43:26 dun Exp $
+ *  $Id: remunge.c,v 1.6 2004/09/04 04:58:32 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -193,6 +193,12 @@ main (int argc, char *argv[])
      */
     if (close (STDIN_FILENO) < 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to close stdin");
+    }
+    /*  Set stdout to be line buffered.
+     */
+    if (setvbuf (stdout, NULL, _IOLBF, 0) < 0) {
+        log_err (EMUNGE_SNAFU, LOG_ERR,
+            "Unable to line-buffer standard output");
     }
     log_open_file (stderr, argv[0], LOG_INFO, LOG_OPT_PRIORITY);
     conf = create_conf ();
