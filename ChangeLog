@@ -1,5 +1,7 @@
 2005-01-26  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* munge.spec: Added version number so "rpmbuild -ta" will work.
+
 	* munge.spec:
 	  Removed %post rm of chkconfig droppings from the "-1 priority" bug.
 
