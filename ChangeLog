@@ -1,5 +1,7 @@
 2004-04-08  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/munge/munge.c, src/munge/unmunge.c: Tweaks for Solaris 2.8.
+
 	* src/libmunge/Makefile.am, src/munge/Makefile.am,
 	  src/munged/Makefile.am: Moved libnsl from libmunge to munged/unmunge.
 
@@ -48,7 +50,7 @@
 2004-03-19  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/libcommon/munge_msg.c, src/munge/unmunge.c, src/munged/conf.c:
-	  Minor tweaks for FreeBSD.
+	  Minor tweaks for FreeBSD 4.8.
 
 2004-03-18  Chris Dunlap  <cdunlap@llnl.gov>
 

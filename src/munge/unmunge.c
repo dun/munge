@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: unmunge.c,v 1.25 2004/04/08 22:09:45 dun Exp $
+ *  $Id: unmunge.c,v 1.26 2004/04/09 04:55:51 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -641,14 +641,14 @@ display_meta (conf_t conf)
         s = key_val_to_str (MUNGE_KEY_UID);
         w = pad - strlen (s);
         fprintf (conf->fp_meta, "%s:%*c%s (%d)\n", s, w, 0x20,
-            (pw_ptr ? pw_ptr->pw_name : "???"), conf->uid);
+            (pw_ptr ? pw_ptr->pw_name : "???"), (int) conf->uid);
     }
     if (conf->key[MUNGE_KEY_GID]) {
         gr_ptr = getgrgid (conf->gid);
         s = key_val_to_str (MUNGE_KEY_GID);
         w = pad - strlen (s);
         fprintf (conf->fp_meta, "%s:%*c%s (%d)\n", s, w, 0x20,
-            (gr_ptr ? gr_ptr->gr_name : "???"), conf->gid);
+            (gr_ptr ? gr_ptr->gr_name : "???"), (int) conf->gid);
     }
     if (conf->key[MUNGE_KEY_LENGTH]) {
         s = key_val_to_str (MUNGE_KEY_LENGTH);
