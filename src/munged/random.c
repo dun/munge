@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: random.c,v 1.7 2004/09/17 21:30:44 dun Exp $
+ *  $Id: random.c,v 1.8 2004/09/17 21:49:07 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -53,7 +53,7 @@ random_init (const char *seed)
 {
     int n = 0;
 
-    if ((seed != NULL) && (*seed != '\0')) {
+    if (seed != NULL) {
         /*
          *  FIXME: Ignore seed file if it does not have sane permissions.
          */
@@ -65,13 +65,15 @@ random_init (const char *seed)
     if (n < RANDOM_SEED_BYTES) {
         log_msg (LOG_NOTICE, "PRNG seeding in progress ...");
         if ((n = RAND_load_file (RANDOM_SEED_DEFAULT, RANDOM_SEED_BYTES)) >0) {
-            log_msg (LOG_INFO, "PRNG seeded PRNG with %d bytes from \"%s\"",
+            log_msg (LOG_INFO, "PRNG seeded with %d bytes from \"%s\"",
                 n, RANDOM_SEED_DEFAULT);
         }
     }
     if (n < RANDOM_SEED_BYTES) {
-        log_err (EMUNGE_SNAFU, LOG_ERR,
-            "Unable to seed PRNG with adequte entropy.");
+        log_msg (LOG_WARNING, "Unable to seed PRNG with adequte entropy.");
+        if (!conf->got_force) {
+            exit (EMUNGE_SNAFU);
+        }
     }
     return;
 }
@@ -82,7 +84,7 @@ random_fini (const char *seed)
 {
     int n;
 
-    if ((seed != NULL) && (*seed != '\0')) {
+    if (seed != NULL) {
         n = RAND_write_file (seed);
         if (n < 0) {
             log_msg (LOG_WARNING,
