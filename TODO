@@ -1,4 +1,3 @@
--debug vs production code compilation
 -munged 'k' cmdling opt to kill daemon
 -revisit data returned on credential error
 -benchmark utility

@@ -72,6 +72,9 @@
 /* Define to 1 if you have the <unistd.h> header file. */
 #undef HAVE_UNISTD_H
 
+/* Define to 1 if you are building a production release. */
+#undef NDEBUG
+
 /* Define the package name. */
 #undef PACKAGE
 

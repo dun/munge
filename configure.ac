@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: configure.ac,v 1.10 2003/05/02 22:31:26 dun Exp $
+## $Id: configure.ac,v 1.11 2003/05/07 00:46:22 dun Exp $
 ##*****************************************************************************
 ## Process this file with autoconf to produce a configure script.
 ##*****************************************************************************
@@ -45,18 +45,12 @@ AM_CONFIG_HEADER([config/config.h])
 AM_MAINTAINER_MODE
 
 ##
-# Read META information.
-##
-#NAME="`perl -ne 'print,exit if s/^\s*NAME:\s*(\S*).*/\1/i' $srcdir/META`"
-#AC_DEFINE_UNQUOTED([NAME], ["$NAME"], [Define the project's name.])
-#AC_SUBST([NAME])
-
-##
 # Checks for programs.
 ##
 AC_PROG_CC
 AC_PROG_LIBTOOL
 AC_PROG_MAKE_SET
+AC_DEBUG
 
 ##
 # Checks for libraries.
@@ -80,6 +74,7 @@ AC_CHECK_TYPES(CRYPTO_dynlock, [], [], [#include <openssl/crypto.h>])
 
 ##
 # Checks for OpenSSL library functions.
+#   Prevent libcrypto from being linked into all binaries.
 ##
 ac_save_LIBS="$LIBS"
 AC_CHECK_LIB(crypto, RAND_bytes)
@@ -93,7 +88,8 @@ AC_CHECK_FUNCS( \
 LIBS="$ac_save_LIBS"
 
 ##
-# Checks for Pthreads
+# Checks for Pthreads.
+#   Prevent libpthread from being linked into all binaries.
 ##
 ac_save_LIBS="$LIBS"
 AC_CHECK_LIB(pthread, pthread_create)
@@ -102,7 +98,6 @@ LIBS="$ac_save_LIBS"
 ##
 # Checks for library functions.
 ##
-#AC_FUNC_MALLOC
 AC_CHECK_FUNCS( \
   getopt_long \
   localtime_r \

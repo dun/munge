@@ -1,5 +1,7 @@
 2003-05-06  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* : Added support for the "--enable-debug" configure script option.
+
 	* src/etc/munge.init, src/libcommon/munge_defs.h, src/munged/conf.c,
 	  src/munged/munged.c: Added munged F cmdline opt and daemon support.
 
