@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: ac_ltlibobjs.m4,v 1.2 2003/05/07 17:02:44 dun Exp $
+## $Id: ac_ltlibobjs.m4,v 1.3 2003/05/07 18:58:12 dun Exp $
 ##*****************************************************************************
 #  AUTHOR:
 #    Chris Dunlap <cdunlap@llnl.gov>
@@ -9,7 +9,7 @@
 #
 #  DESCRIPTION:
 #    Adjust LIBOBJS for automake and/or libtool.
-#    Refer to autoconf dox, section 15.6.4, AC_LIBOBJ vs. LIBOBJS).
+#    Refer to autoconf dox, section 15.6.4 (AC_LIBOBJ vs. LIBOBJS).
 #
 #  WARNINGS:
 #    This macro must be placed after AC_REPLACE_FUNCS.

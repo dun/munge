@@ -4619,7 +4619,7 @@ AC_DEFUN([AC_DEBUG],
 #
 #  DESCRIPTION:
 #    Adjust LIBOBJS for automake and/or libtool.
-#    Refer to autoconf dox, section 15.6.4, AC_LIBOBJ vs. LIBOBJS).
+#    Refer to autoconf dox, section 15.6.4 (AC_LIBOBJ vs. LIBOBJS).
 #
 #  WARNINGS:
 #    This macro must be placed after AC_REPLACE_FUNCS.
