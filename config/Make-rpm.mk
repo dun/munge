@@ -1,52 +1,52 @@
-##
-# Makefile Include for RPM Construction
-#   by Chris Dunlap <cdunlap@llnl.gov>
-##
-# ConManId: Make-rpm.mk,v 1.20 2002/08/16 00:18:29 dun Exp
-# $Id: Make-rpm.mk,v 1.3 2002/12/20 21:04:16 dun Exp $
-##
-# REQUIREMENTS:
-# - requires project to be under CVS version control
-# - requires "PACKAGE" macro definition set to the CVS project name
-# - requires "META" file to reside in the top-level directory of the project
-# - requires RPM spec file named "$(PACKAGE).spec.in" or "$(PACKAGE).spec"
-#     to reside in the top-level directory of the project
-##
-# META FILE FORMAT:
-# - whitespace is ignored
-# - comments are ignored (ie, lines beginning with the pound character)
-# - lines are of the form "TAG:VALUE"
-# - TAGs and VALUEs cannot contain whitespace
-# - supported tags: NAME, VERSION, RELEASE
-# - NAME tag must be set the same as the PACKAGE macro definition
-##
-# CVS TAG FORMAT:
-# - if RELEASE is not defined, tags are of the form "NAME-VERSION";
-#     o/w, they are of the form "NAME-VERSION-RELEASE"
-# - periods are converted to hyphens
-# - examples: foo v1.2.3 (foo-1-2-3), foo v1.2.3 r4 (foo-1-2-3-4)
-##
-# NOTES:
-# - RPM will be built directly from the CVS repository based on the CVS tag
-# - CVS tag will be based on the contents of the META file by default;
-#     this allows the version information to be stored and tagged within CVS
-# - CVS tag can be specified on the make cmdline to override the default
-#     (eg, make rpm tag=foo-1-2-3)
-# - CVS "HEAD" tag can be used to build the most recent version in CVS
-#     w/o requiring it to be tagged within CVS (eg, make rpm tag=HEAD);
-#     this is intended for pre-release testing purposes only
-# - if RELEASE is not specified in the META file when using a "HEAD" tag,
-#     a "rev" can be specified on the cmdline (eg, make rpm tag=HEAD rev=2);
-#     o/w, the RPM release is set to 1
-# - CVS "HEAD" releases have a release number of the form "YYMMDDHHMM".
-# - CVS "BASE" tag is not supported
-# - RPM will be signed with a PGP/GPG key if one is specified in ~/.rpmmacros
-##
-# USAGE:
-# - update and cvs commit the META file (cf, META FILE FORMAT)
-# - cvs tag/rtag the project (cf, CVS TAG FORMAT)
-# - make rpm
-##
+##*
+## Makefile Include for RPM Construction
+##   by Chris Dunlap <cdunlap@llnl.gov>
+##*
+## ConManId: Make-rpm.mk,v 1.20 2002/08/16 00:18:29 dun Exp
+## $Id: Make-rpm.mk,v 1.4 2002/12/20 21:07:28 dun Exp $
+##*
+## REQUIREMENTS:
+## - requires project to be under CVS version control
+## - requires "PACKAGE" macro definition set to the CVS project name
+## - requires "META" file to reside in the top-level directory of the project
+## - requires RPM spec file named "$(PACKAGE).spec.in" or "$(PACKAGE).spec"
+##     to reside in the top-level directory of the project
+##*
+## META FILE FORMAT:
+## - whitespace is ignored
+## - comments are ignored (ie, lines beginning with the pound character)
+## - lines are of the form "TAG:VALUE"
+## - TAGs and VALUEs cannot contain whitespace
+## - supported tags: NAME, VERSION, RELEASE
+## - NAME tag must be set the same as the PACKAGE macro definition
+##*
+## CVS TAG FORMAT:
+## - if RELEASE is not defined, tags are of the form "NAME-VERSION";
+##     o/w, they are of the form "NAME-VERSION-RELEASE"
+## - periods are converted to hyphens
+## - examples: foo v1.2.3 (foo-1-2-3), foo v1.2.3 r4 (foo-1-2-3-4)
+##*
+## NOTES:
+## - RPM will be built directly from the CVS repository based on the CVS tag
+## - CVS tag will be based on the contents of the META file by default;
+##     this allows the version information to be stored and tagged within CVS
+## - CVS tag can be specified on the make cmdline to override the default
+##     (eg, make rpm tag=foo-1-2-3)
+## - CVS "HEAD" tag can be used to build the most recent version in CVS
+##     w/o requiring it to be tagged within CVS (eg, make rpm tag=HEAD);
+##     this is intended for pre-release testing purposes only
+## - if RELEASE is not specified in the META file when using a "HEAD" tag,
+##     a "rev" can be specified on the cmdline (eg, make rpm tag=HEAD rev=2);
+##     o/w, the RPM release is set to 1
+## - CVS "HEAD" releases have a release number of the form "YYMMDDHHMM".
+## - CVS "BASE" tag is not supported
+## - RPM will be signed with a PGP/GPG key if one is specified in ~/.rpmmacros
+##*
+## USAGE:
+## - update and cvs commit the META file (cf, META FILE FORMAT)
+## - cvs tag/rtag the project (cf, CVS TAG FORMAT)
+## - make rpm
+##*
 
 tar rpm:
 	@proj=$(PACKAGE); if test -z "$$proj"; then \
