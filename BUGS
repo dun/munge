@@ -1,3 +1,4 @@
+- libcrypto (openssl) license is incompatible with gpl
 - munged does not terminate on sigint or sigterm on many platforms
 - munged needs support for a configuration file; configuration is currently
   set by src/libcommon/munge_defs.h at compile-time
