@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: gids.c,v 1.9 2004/09/17 21:27:05 dun Exp $
+ *  $Id: gids.c,v 1.10 2004/09/21 20:08:27 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -344,8 +344,6 @@ _gids_hash_add (hash_t hash, uid_t uid, gid_t gid)
         ; /* empty */
     }
     if (*gp && ((*gp)->gid == gid)) {
-        log_msg (LOG_WARNING,
-            "Detected duplicate user uid=%d for group gid=%d", uid, gid);
         return (0);
     }
     if (!(g = _gids_node_alloc (gid))) {

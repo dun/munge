@@ -1,3 +1,8 @@
+2004-09-21  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/munged/gids.c(_gids_hash_add):
+	  Removed warning for having detected duplicate uid for given gid.
+
 2004-09-18  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/munged/conf.c, src/munged/conf.h, src/munged/munged.c:
