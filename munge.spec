@@ -1,4 +1,4 @@
-# $Id: munge.spec,v 1.11 2003/05/03 21:41:36 dun Exp $
+# $Id: munge.spec,v 1.12 2003/05/30 23:59:55 dun Exp $
 
 Name:		munge
 Version:	0.1
@@ -94,6 +94,7 @@ fi
 %doc NEWS
 %doc README
 %doc TODO
+%doc doc/*
 #%config(noreplace) /etc/munge/munge.conf
 #%config(noreplace) /etc/logrotate.d/munge
 /etc/rc.d/init.d/munge
