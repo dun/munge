@@ -1,5 +1,7 @@
 2004-11-11  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/libmissing/inet_ntop.h: Added sys/socket.h include for socklen_t.
+
 	* src/libmissing/inet_ntop.h: Changed #ifndef x to #if !x.
 	* src/libmissing/strlcat.h, src/libmissing/strlcpy.h:
 	  Changed #if #else x to #if !x.
