@@ -1,6 +1,24 @@
 2003-04-18  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/libcommon/munge_defs.h, src/munged/conf.c:
+	Temporarily added MUNGED_RANDOM_SEED and MUNGED_SECRET_KEY defs.
+
+	* src/libmunge/ctx.c, src/libmunge/munge.h, src/munge/munge.c:
+	Renamed munge_ctx_err() to munge_ctx_strerror().
+
 	* : Committed munge_decode() support.
+
+	* src/munged/md.c: Changed md_size() to return 0 on NULL ptr.
+	* src/munged/mac.c: Changed mac_size() to return 0 on NULL ptr.
+	* src/munged/cipher.c: Changed cipher_block_size(), cipher_iv_size(),
+	and cipher_key_size() to return 0 on NULL ptr.
+
+	* src/munged/cipher.h: Added CIPHER_DECRYPT & CIPHER_ENCRYPT enums.
+
+	* src/libcommon/str.c, src/libcommon/str.h: Added strdump().
+
+	* src/libcommon/munge_defs.h:
+	Changed MUNGE_CRED_PREFIX & MUNGE_CRED_SUFFIX.
 
 2003-04-08  Chris Dunlap  <cdunlap@llnl.gov>
 
