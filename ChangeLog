@@ -1,6 +1,9 @@
 2004-08-20  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/munge/munge.c(parse_cmdline):
+	  Check for overflow of time-to-live "-t" cmdline option.
+
+	* src/munge/munge.c(parse_cmdline):
 	  Changed strtol() err msg from log_errno() to log_err().
 
 2004-08-19  Chris Dunlap  <cdunlap@llnl.gov>

@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munge.c,v 1.32 2004/08/21 05:11:43 dun Exp $
+ *  $Id: munge.c,v 1.33 2004/08/21 05:50:49 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -366,6 +366,11 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                 if ((optarg == p) || (*p != '\0')) {
                     log_err (EMUNGE_SNAFU, LOG_ERR,
                         "Invalid time-to-live '%s'", optarg);
+                }
+                if ((i == LONG_MAX) && (errno == ERANGE)) {
+                    log_err (EMUNGE_SNAFU, LOG_ERR,
+                        "Exceeded maximum time-to-live of %d seconds",
+                        LONG_MAX);
                 }
                 if (i < 0) {
                     i = MUNGE_TTL_MAXIMUM;
