@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: conf.c,v 1.34 2004/11/10 20:49:50 dun Exp $
+ *  $Id: conf.c,v 1.35 2004/11/10 20:53:07 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -235,7 +235,7 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                     free (conf->key_name);
                 if (!(conf->key_name = strdup (optarg)))
                     log_errno (EMUNGE_NO_MEMORY, LOG_ERR,
-                        "Cannot dup keyfile name string");
+                        "Cannot dup key-file name string");
                 break;
             case '1':
                 if ((c = atoi (optarg)) > 0)
@@ -340,18 +340,18 @@ create_subkeys (conf_t conf)
         log_err (EMUNGE_SNAFU, LOG_ERR,
             "Unable to compute subkeys: Cannot init md ctx");
     }
-    /*  Open keyfile.
+    /*  Open key-file.
      */
     if ((conf->key_name == NULL) || (*conf->key_name == '\0')) {
-        log_err (EMUNGE_SNAFU, LOG_ERR, "No keyfile was specified");
+        log_err (EMUNGE_SNAFU, LOG_ERR, "No key-file was specified");
     }
-    /*  FIXME: Ignore keyfile if it does not have sane permissions.
+    /*  FIXME: Ignore key-file if it does not have sane permissions.
      */
     if ((fd = open (conf->key_name, O_RDONLY)) < 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR,
-            "Unable to open keyfile \"%s\"", conf->key_name);
+            "Unable to open key-file \"%s\"", conf->key_name);
     }
-    /*  Compute keyfile's message digest.
+    /*  Compute key-file's message digest.
      */
     for (;;) {
         n = read (fd, buf, sizeof (buf));
@@ -361,19 +361,19 @@ create_subkeys (conf_t conf)
             continue;
         if (n < 0)
             log_errno (EMUNGE_SNAFU, LOG_ERR,
-                "Unable to read keyfile \"%s\"", conf->key_name);
+                "Unable to read key-file \"%s\"", conf->key_name);
         if (md_update (&dek_ctx, buf, n) < 0)
             log_err (EMUNGE_SNAFU, LOG_ERR, "Unable to compute subkeys");
     }
     if (close (fd) < 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR,
-            "Unable to close keyfile \"%s\"", conf->key_name);
+            "Unable to close key-file \"%s\"", conf->key_name);
     }
     if (md_copy (&mac_ctx, &dek_ctx) < 0) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
             "Unable to compute subkeys: Cannot copy md ctx");
     }
-    /*  Append "1" to keyfile in order to compute cipher subkey.
+    /*  Append "1" to key-file in order to compute cipher subkey.
      */
     if ( (md_update (&dek_ctx, "1", 1) < 0)
       || (md_final (&dek_ctx, conf->dek_key, &n) < 0)
@@ -382,7 +382,7 @@ create_subkeys (conf_t conf)
     }
     assert (n == conf->dek_key_len);
 
-    /*  Append "2" to keyfile in order to compute mac subkey.
+    /*  Append "2" to key-file in order to compute mac subkey.
      */
     if ( (md_update (&mac_ctx, "2", 1) < 0)
       || (md_final (&mac_ctx, conf->mac_key, &n) < 0)
