@@ -1,3 +1,7 @@
+2004-01-28  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* : Re-bootstrap'd with autoconf-2.59, automake-1.8.2, libtool-1.5.2.
+
 2004-01-27  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/libcommon/str.c, src/libcommon/str.h: Added memburn().

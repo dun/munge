@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: configure.ac,v 1.11 2003/05/07 00:46:22 dun Exp $
+## $Id: configure.ac,v 1.12 2004/01/28 21:16:10 dun Exp $
 ##*****************************************************************************
 ## Process this file with autoconf to produce a configure script.
 ##*****************************************************************************
@@ -33,7 +33,7 @@ AC_INIT([munge], [0])
 AC_META
 AC_CONFIG_AUX_DIR([config])
 AC_CONFIG_SRCDIR([src/libmunge/munge.h])
-AC_CANONICAL_SYSTEM
+AC_CANONICAL_TARGET
 AC_GPL_LICENSED
 AC_HUMOR
 
@@ -41,7 +41,7 @@ AC_HUMOR
 # Automake support.
 ##
 AM_INIT_AUTOMAKE([check-news dist-bzip2 gnu no-define])
-AM_CONFIG_HEADER([config/config.h])
+AC_CONFIG_HEADERS([config/config.h])
 AM_MAINTAINER_MODE
 
 ##
