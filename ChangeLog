@@ -1,5 +1,9 @@
 2004-08-26  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/libcommon/munge_defs.h, src/munged/job.c(job_accept):
+	  Fix bug causing the daemon to crash if accept() exceeded the
+	  open file descriptor limit for the process.
+
 	* src/libmunge/ctx.c, src/libmunge/munge.h:
 	  Added munge_ctx_copy().  Added docs wrt context function usage.
 
