@@ -1,3 +1,8 @@
+2005-01-26  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* munge.spec:
+	  Removed %post rm of chkconfig droppings from the "-1 priority" bug.
+
 2005-01-18  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/munged/hash.c(hash_destroy): Fixed memory leak.
