@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: x_ac_meta.m4,v 1.1 2004/03/05 20:04:18 dun Exp $
+## $Id: x_ac_meta.m4,v 1.2 2004/03/11 20:56:54 dun Exp $
 ##*****************************************************************************
 #  AUTHOR:
 #    Chris Dunlap <cdunlap@llnl.gov>
@@ -12,16 +12,20 @@
 ##*****************************************************************************
 
 AC_DEFUN([X_AC_META],
-[
-  AC_MSG_CHECKING([metadata])
+  [AC_MSG_CHECKING([metadata])
 
-  PACKAGE="`perl -ne 'print,exit if s/^\s*NAME:\s*(\S*).*/\1/i' $srcdir/META`"
-  AC_DEFINE_UNQUOTED([PACKAGE], ["$PACKAGE"], [Define the package name.])
-  AC_SUBST([PACKAGE])
+  _x_ac_meta_got_file=no
+  if test -f "$srcdir/META"; then
+    _x_ac_meta_got_file=yes
 
-  VERSION="`perl -ne 'print,exit if s/^\s*VERSION:\s*(\S*).*/\1/i' $srcdir/META`"
-  AC_DEFINE_UNQUOTED([VERSION], ["$VERSION"], [Define the package version.])
-  AC_SUBST([VERSION])
+    PACKAGE="`perl -ne 'print,exit if s/^\s*NAME:\s*(\S*).*/\1/i' $srcdir/META`"
+    AC_DEFINE_UNQUOTED([PACKAGE], ["$PACKAGE"], [Define the package name.])
+    AC_SUBST([PACKAGE])
 
-  AC_MSG_RESULT([yes])
+    VERSION="`perl -ne 'print,exit if s/^\s*VERSION:\s*(\S*).*/\1/i' $srcdir/META`"
+    AC_DEFINE_UNQUOTED([VERSION], ["$VERSION"], [Define the package version.])
+    AC_SUBST([VERSION])
+  fi
+
+  AC_MSG_RESULT([$_x_ac_meta_got_file])
 ])
