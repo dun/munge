@@ -1,3 +1,8 @@
+2004-09-10  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/munged/cred.c(cred_create):
+	  Fixed bug where error condition was not set on failure.
+
 2004-09-09  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/munge/munge.c, src/munge/remunge.c:

@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: cred.c,v 1.7 2004/04/03 21:53:00 dun Exp $
+ *  $Id: cred.c,v 1.8 2004/09/10 17:45:52 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -45,6 +45,7 @@ cred_create (munge_msg_t m)
     assert (m != NULL);
 
     if (!(c = malloc (sizeof (struct munge_cred)))) {
+        _munge_msg_set_err (m, EMUNGE_NO_MEMORY, NULL);
         return (NULL);
     }
     /*  Init ints to 0, chars to \0, ptrs to NULL.
