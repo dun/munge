@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: conf.c,v 1.33 2004/11/10 17:48:58 dun Exp $
+ *  $Id: conf.c,v 1.34 2004/11/10 20:49:50 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -63,7 +63,7 @@ struct option opt_table[] = {
     { "foreground", 0, NULL, 'F' },
     { "socket",     1, NULL, 'S' },
     { "advice",     0, NULL, 'A' },
-    { "keyfile",       1, NULL, '0' },  /* deprecated cmdline opt */
+    { "key-file",      1, NULL, '0' },  /* deprecated cmdline opt */
     { "num-threads",   1, NULL, '1' },  /* deprecated cmdline opt */
     { "auth-pipe-dir", 1, NULL, '2' },  /* deprecated cmdline opt */
     {  NULL,        0, NULL,  0  }
