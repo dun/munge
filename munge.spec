@@ -1,4 +1,4 @@
-# $Id: munge.spec,v 1.16 2004/04/02 21:11:30 dun Exp $
+# $Id: munge.spec,v 1.17 2004/04/02 21:13:04 dun Exp $
 
 Name:		munge
 Version:	0.1
@@ -61,14 +61,14 @@ fi
 
 %preun
 if [ $1 = 0 ]; then
-  /sbin/service munge stop || :
+  /sbin/service munge stop >/dev/null 2>&1 || :
   /sbin/chkconfig --del munge
 fi
 
 %postun
 /sbin/ldconfig %{_libdir}
 if [ $1 -ge 1 ]; then
-  /sbin/service munge condrestart || :
+  /sbin/service munge condrestart >/dev/null 2>&1 || :
 fi
 
 %files
