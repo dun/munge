@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: msg_client.h,v 1.5 2004/09/23 20:56:43 dun Exp $
+ *  $Id: msg_client.h,v 1.6 2004/11/24 00:21:58 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -30,10 +30,10 @@
 
 
 #include <munge.h>
-#include "munge_msg.h"
+#include "msg.h"
 
 
-munge_err_t munge_msg_client_xfer (munge_msg_t *pm, munge_ctx_t ctx);
+munge_err_t msg_client_xfer (msg_t *pm, munge_ctx_t ctx);
 
 
 #endif /* !MUNGE_MSG_CLIENT_H */

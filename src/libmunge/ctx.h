@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: ctx.h,v 1.9 2004/04/16 22:15:06 dun Exp $
+ *  $Id: ctx.h,v 1.10 2004/11/24 00:21:58 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -33,7 +33,6 @@
 #include <sys/types.h>                  /* for uid_t, gid_t                  */
 #include <time.h>                       /* for time_t                        */
 #include <munge.h>                      /* for munge_ctx_t, munge_err_t      */
-#include "munge_msg.h"                  /* for munge_msg_t                   */
 
 
 /*****************************************************************************

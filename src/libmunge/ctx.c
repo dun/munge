@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: ctx.c,v 1.14 2004/08/26 17:45:58 dun Exp $
+ *  $Id: ctx.c,v 1.15 2004/11/24 00:21:57 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -38,7 +38,6 @@
 #include <munge.h>
 #include "ctx.h"
 #include "munge_defs.h"
-#include "munge_msg.h"
 
 
 /*****************************************************************************

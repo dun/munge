@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: job.c,v 1.9 2004/10/13 22:51:11 dun Exp $
+ *  $Id: job.c,v 1.10 2004/11/24 00:21:58 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -39,8 +39,8 @@
 #include "dec_v1.h"
 #include "enc_v1.h"
 #include "log.h"
+#include "msg.h"
 #include "munge_defs.h"
-#include "munge_msg.h"
 #include "str.h"
 #include "work.h"
 
@@ -56,7 +56,7 @@ extern int done;                        /* defined in munged.c               */
  *  Private Prototypes
  *****************************************************************************/
 
-static void _job_exec (munge_msg_t m);
+static void _job_exec (msg_t m);
 
 
 /*****************************************************************************
@@ -67,7 +67,7 @@ void
 job_accept (conf_t conf)
 {
     work_p w;
-    munge_msg_t m;
+    msg_t m;
     int sd;
 
     assert (conf != NULL);
@@ -101,12 +101,12 @@ job_accept (conf_t conf)
                     break;
             }
         }
-        if (munge_msg_create (&m, sd) != EMUNGE_SUCCESS) {
+        if (msg_create (&m, sd) != EMUNGE_SUCCESS) {
             close (sd);
             log_msg (LOG_WARNING, "Unable to create client request");
         }
         else if (work_queue (w, m) < 0) {
-            munge_msg_destroy (m);
+            msg_destroy (m);
             log_msg (LOG_WARNING, "Unable to queue client request");
         }
     }
@@ -116,12 +116,12 @@ job_accept (conf_t conf)
 
 
 void
-job_error (munge_msg_t m)
+job_error (msg_t m)
 {
 /*  If an error condition has been set for the message [m], copy it to the
  *    version-specific message format for transport over the domain socket.
  */
-    struct munge_msg_v1 *m1;            /* munge msg (v1 format)             */
+    struct msg_v1 *m1;
 
     assert (m != NULL);
 
@@ -141,7 +141,7 @@ job_error (munge_msg_t m)
  *****************************************************************************/
 
 static void
-_job_exec (munge_msg_t m)
+_job_exec (msg_t m)
 {
 /*  Receives and responds to the message request [m].
  */
@@ -150,11 +150,11 @@ _job_exec (munge_msg_t m)
 
     assert (m != NULL);
 
-    if ((e = munge_msg_recv (m, MUNGE_MAXIMUM_REQ_LEN)) != EMUNGE_SUCCESS) {
+    if ((e = msg_recv (m, MUNGE_MAXIMUM_REQ_LEN)) != EMUNGE_SUCCESS) {
         ; /* fall out of if clause, log error, and drop request */
     }
     else if (m->head.version != MUNGE_MSG_VERSION) {
-        munge_msg_set_err (m, EMUNGE_SNAFU,
+        msg_set_err (m, EMUNGE_SNAFU,
             strdupf ("Invalid message version %d", m->head.version));
     }
     else {
@@ -166,7 +166,7 @@ _job_exec (munge_msg_t m)
                 dec_v1_process_msg (m);
                 break;
             default:
-                munge_msg_set_err (m, EMUNGE_SNAFU,
+                msg_set_err (m, EMUNGE_SNAFU,
                     strdupf ("Invalid message type %d", m->head.type));
                 break;
         }
@@ -175,6 +175,6 @@ _job_exec (munge_msg_t m)
         p = (m->errstr != NULL) ? m->errstr : munge_strerror (m->errnum);
         log_msg (LOG_INFO, "%s", p);
     }
-    munge_msg_destroy (m);
+    msg_destroy (m);
     return;
 }

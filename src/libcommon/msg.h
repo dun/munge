@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munge_msg.h,v 1.18 2004/11/18 01:53:59 dun Exp $
+ *  $Id: msg.h,v 1.1 2004/11/24 00:21:57 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -46,7 +46,7 @@
  *
  *  This must be incremented whenever the client/server msg format changes;
  *    otherwise, the message may be parsed incorrectly when decoded.
- *  In retrospect, the struct munge_msg_v1 type name was poorly chosen.
+ *  In retrospect, the struct msg_v1 type name was poorly chosen.
  */
 #define MUNGE_MSG_VERSION               3
 
@@ -55,11 +55,11 @@
  *  Data Types
  *****************************************************************************/
 
-/*  The munge_msg_v1 struct is used to handle data passed over the domain
- *    socket between client (libmunge) and server (munged), as well as data
- *    for the credential itself.  This seemed like a good idea at the time,
- *    but has caused some confusion since the data representation differs
- *    slightly in both cases.
+/*  The msg_v1 struct is used to handle data passed over the domain socket
+ *    between client (libmunge) and server (munged), as well as data for the
+ *    credential itself.  This seemed like a good idea at the time, but has
+ *    caused some confusion since the data representation differs slightly
+ *    in both cases.
  *  In particular, the realm string and error string passed over the domain
  *    socket are both NUL-terminated in addition to carrying a string length
  *    (which includes the NUL character).
@@ -74,7 +74,7 @@
  *  FIXME: The msg layer between client & server should be revamped.
  */
 
-enum munge_type {                       /* message type                      */
+enum msg_type {                         /* message type                      */
     MUNGE_MSG_UNKNOWN,                  /*  uninitialized message            */
     MUNGE_MSG_ENC_REQ,                  /*  encode request message           */
     MUNGE_MSG_ENC_RSP,                  /*  encode response message          */
@@ -83,63 +83,63 @@ enum munge_type {                       /* message type                      */
     MUNGE_MSG_AUTH_FD_REQ               /*  auth via fd request message      */
 };
 
-struct munge_msg_head {
-    uint32_t                magic;      /* eye of newt and toe of frog       */
-    uint8_t                 version;    /* message version                   */
-    uint8_t                 type;       /* enum munge_type                   */
-    uint8_t                 retry;      /* retry count for this transaction  */
-    uint32_t                length;     /* length of msg body                */
+struct msg_head {
+    uint32_t         magic;             /* eye of newt and toe of frog       */
+    uint8_t          version;           /* message version                   */
+    uint8_t          type;              /* enum msg_type                     */
+    uint8_t          retry;             /* retry count for this transaction  */
+    uint32_t         length;            /* length of msg body                */
 };
 
-struct munge_msg_v1 {
-    uint8_t                 cipher;     /* munge_cipher_t enum               */
-    uint8_t                 zip;        /* munge_zip_t enum                  */
-    uint8_t                 mac;        /* munge_mac_t enum                  */
-    uint8_t                 realm_len;  /* length of realm string            */
-    char                   *realm;      /* security realm string             */
-    uint32_t                ttl;        /* time-to-live                      */
-    uint8_t                 addr_len;   /* length of IP address              */
-    struct in_addr          addr;       /* IP addr where cred was encoded    */
-    uint32_t                time0;      /* time at which cred was encoded    */
-    uint32_t                time1;      /* time at which cred was decoded    */
-    uint32_t                client_uid; /* UID of connecting client process  */
-    uint32_t                client_gid; /* GID of connecting client process  */
-    uint32_t                cred_uid;   /* UID of client that requested cred */
-    uint32_t                cred_gid;   /* GID of client that requested cred */
-    uint32_t                auth_uid;   /* UID of client allowed to decode   */
-    uint32_t                auth_gid;   /* GID of client allowed to decode   */
-    uint32_t                data_len;   /* length of data                    */
-    void                   *data;       /* ptr to data munged into cred      */
-    uint8_t                 error_num;  /* munge_err_t for encode/decode op  */
-    uint8_t                 error_len;  /* length of err msg str with NUL    */
-    char                   *error_str;  /* NUL-term'd descriptive errmsg str */
+struct msg_v1 {
+    uint8_t          cipher;            /* munge_cipher_t enum               */
+    uint8_t          zip;               /* munge_zip_t enum                  */
+    uint8_t          mac;               /* munge_mac_t enum                  */
+    uint8_t          realm_len;         /* length of realm string            */
+    char            *realm;             /* security realm string             */
+    uint32_t         ttl;               /* time-to-live                      */
+    uint8_t          addr_len;          /* length of IP address              */
+    struct in_addr   addr;              /* IP addr where cred was encoded    */
+    uint32_t         time0;             /* time at which cred was encoded    */
+    uint32_t         time1;             /* time at which cred was decoded    */
+    uint32_t         client_uid;        /* UID of connecting client process  */
+    uint32_t         client_gid;        /* GID of connecting client process  */
+    uint32_t         cred_uid;          /* UID of client that requested cred */
+    uint32_t         cred_gid;          /* GID of client that requested cred */
+    uint32_t         auth_uid;          /* UID of client allowed to decode   */
+    uint32_t         auth_gid;          /* GID of client allowed to decode   */
+    uint32_t         data_len;          /* length of data                    */
+    void            *data;              /* ptr to data munged into cred      */
+    uint8_t          error_num;         /* munge_err_t for encode/decode op  */
+    uint8_t          error_len;         /* length of err msg str with NUL    */
+    char            *error_str;         /* NUL-term'd descriptive errmsg str */
 };
 
-struct munge_msg {
-    int                     sd;         /* munge socket descriptor           */
-    struct munge_msg_head   head;       /* message header                    */
-    int                     pbody_len;  /* length of msg body mem allocation */
-    void                   *pbody;      /* ptr to msg body based on version  */
-    munge_err_t             errnum;     /* munge error status code           */
-    char                   *errstr;     /* munge NUL-term'd error string     */
+struct msg {
+    int              sd;                /* munge socket descriptor           */
+    struct msg_head  head;              /* message header                    */
+    int              pbody_len;         /* length of msg body mem allocation */
+    void            *pbody;             /* ptr to msg body based on version  */
+    munge_err_t      errnum;            /* munge error status code           */
+    char            *errstr;            /* munge NUL-term'd error string     */
 };
 
-typedef struct munge_msg * munge_msg_t;
+typedef struct msg * msg_t;
 
 
 /*****************************************************************************
  *  Prototypes
  *****************************************************************************/
 
-munge_err_t munge_msg_create (munge_msg_t *pm, int sd);
+munge_err_t msg_create (msg_t *pm, int sd);
 
-void munge_msg_destroy (munge_msg_t m);
+void msg_destroy (msg_t m);
 
-munge_err_t munge_msg_send (munge_msg_t m, int maxlen);
+munge_err_t msg_send (msg_t m, int maxlen);
 
-munge_err_t munge_msg_recv (munge_msg_t m, int maxlen);
+munge_err_t msg_recv (msg_t m, int maxlen);
 
-int munge_msg_set_err (munge_msg_t m, munge_err_t e, char *s);
+int msg_set_err (msg_t m, munge_err_t e, char *s);
 
 
 #endif /* !MUNGE_MSG_H */

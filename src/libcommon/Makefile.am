@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.6 2004/11/11 00:06:36 dun Exp $
+## $Id: Makefile.am,v 1.7 2004/11/24 00:21:57 dun Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
@@ -21,9 +21,9 @@ libcommon_la_SOURCES = \
 	license.h \
 	log.c \
 	log.h \
+	msg.c \
+	msg.h \
 	munge_defs.h \
-	munge_msg.c \
-	munge_msg.h \
 	posignal.c \
 	posignal.h \
 	str.c \

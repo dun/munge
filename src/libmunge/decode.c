@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: decode.c,v 1.17 2004/09/23 21:10:11 dun Exp $
+ *  $Id: decode.c,v 1.18 2004/11/24 00:21:58 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -36,8 +36,8 @@
 #include <sys/types.h>
 #include <munge.h>
 #include "ctx.h"
+#include "msg.h"
 #include "msg_client.h"
-#include "munge_msg.h"
 #include "str.h"
 
 
@@ -48,10 +48,10 @@
 static void _decode_init (munge_ctx_t ctx, void **buf, int *len,
     uid_t *uid, gid_t *gid);
 
-static munge_err_t _decode_req_v1 (munge_msg_t m, munge_ctx_t ctx,
+static munge_err_t _decode_req_v1 (msg_t m, munge_ctx_t ctx,
     const char *cred);
 
-static munge_err_t _decode_rsp_v1 (munge_msg_t m, munge_ctx_t ctx,
+static munge_err_t _decode_rsp_v1 (msg_t m, munge_ctx_t ctx,
     void **buf, int *len, uid_t *uid, gid_t *gid);
 
 
@@ -64,7 +64,7 @@ munge_decode (const char *cred, munge_ctx_t ctx,
               void **buf, int *len, uid_t *uid, gid_t *gid)
 {
     munge_err_t e;
-    munge_msg_t m;
+    msg_t       m;
 
     /*  Init output parms in case of early return.
      */
@@ -78,13 +78,14 @@ munge_decode (const char *cred, munge_ctx_t ctx,
     }
     /*  Ask the daemon to decode a credential.
      */
-    if ((e = munge_msg_create (&m, -1)) != EMUNGE_SUCCESS)
+    if ((e = msg_create (&m, -1)) != EMUNGE_SUCCESS)
         ;
     else if ((e = _decode_req_v1 (m, ctx, cred)) != EMUNGE_SUCCESS)
         ;
-    else if ((e = munge_msg_client_xfer (&m, ctx)) != EMUNGE_SUCCESS)
+    else if ((e = msg_client_xfer (&m, ctx)) != EMUNGE_SUCCESS)
         ;
-    else if ((e = _decode_rsp_v1 (m, ctx, buf, len, uid, gid)) !=EMUNGE_SUCCESS)
+    else if ((e = _decode_rsp_v1 (m, ctx, buf, len, uid, gid))
+            != EMUNGE_SUCCESS)
         ;
     /*  Clean up and return.
      */
@@ -92,7 +93,7 @@ munge_decode (const char *cred, munge_ctx_t ctx,
         _munge_ctx_set_err (ctx, e, m->errstr);
         m->errstr = NULL;
     }
-    munge_msg_destroy (m);
+    msg_destroy (m);
     return (e);
 }
 
@@ -143,13 +144,13 @@ _decode_init (munge_ctx_t ctx, void **buf, int *len, uid_t *uid, gid_t *gid)
 
 
 static munge_err_t
-_decode_req_v1 (munge_msg_t m, munge_ctx_t ctx, const char *cred)
+_decode_req_v1 (msg_t m, munge_ctx_t ctx, const char *cred)
 {
 /*  Creates a Decode Request message to be sent to the local munge daemon.
  *  The inputs to this message are as follows:
  *    data_len, data.
  */
-    struct munge_msg_v1 *m1;
+    struct msg_v1 *m1;
 
     assert (m != NULL);
     assert (m->pbody == NULL);
@@ -158,7 +159,7 @@ _decode_req_v1 (munge_msg_t m, munge_ctx_t ctx, const char *cred)
 
     m->head.type = MUNGE_MSG_DEC_REQ;
 
-    m->pbody_len = sizeof (struct munge_msg_v1);
+    m->pbody_len = sizeof (struct msg_v1);
     if (!(m->pbody = malloc (m->pbody_len))) {
         return (EMUNGE_NO_MEMORY);
     }
@@ -176,7 +177,7 @@ _decode_req_v1 (munge_msg_t m, munge_ctx_t ctx, const char *cred)
 
 
 static munge_err_t
-_decode_rsp_v1 (munge_msg_t m, munge_ctx_t ctx,
+_decode_rsp_v1 (msg_t m, munge_ctx_t ctx,
                void **buf, int *len, uid_t *uid, gid_t *gid)
 {
 /*  Extracts a Decode Response message received from the local munge daemon.
@@ -187,18 +188,18 @@ _decode_rsp_v1 (munge_msg_t m, munge_ctx_t ctx,
  *  Note that error_num and error_str are set by _munge_ctx_set_err()
  *    called from munge_decode() (ie, the parent of this stack frame).
  */
-    struct munge_msg_v1 *m1;
-    unsigned char       *p;
-    int                  n;
+    struct msg_v1 *m1;
+    unsigned char *p;
+    int            n;
 
     assert (m != NULL);
 
-    m1 = (struct munge_msg_v1 *) m->pbody;
+    m1 = (struct msg_v1 *) m->pbody;
     /*
      *  Perform sanity checks.
      */
     if (m->head.type != MUNGE_MSG_DEC_RSP) {
-        munge_msg_set_err (m, EMUNGE_SNAFU,
+        msg_set_err (m, EMUNGE_SNAFU,
             strdupf ("Client received invalid message type %d", m->head.type));
         return (EMUNGE_SNAFU);
     }
@@ -219,7 +220,7 @@ _decode_rsp_v1 (munge_msg_t m, munge_ctx_t ctx,
     if (buf && len && (m1->data_len > 0)) {
         n = m1->data_len + 1;
         if (!(p = malloc (n))) {
-            munge_msg_set_err (m, EMUNGE_NO_MEMORY,
+            msg_set_err (m, EMUNGE_NO_MEMORY,
                 strdupf ("Client unable to allocate %d bytes for data", n));
         }
         memcpy (p, m1->data, m1->data_len);
