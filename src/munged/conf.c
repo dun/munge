@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: conf.c,v 1.22 2004/06/15 18:35:01 dun Exp $
+ *  $Id: conf.c,v 1.23 2004/08/05 21:10:50 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -115,6 +115,7 @@ create_conf (void)
     conf->dek_key_len = 0;
     conf->mac_key = NULL;
     conf->mac_key_len = 0;
+    conf->nthreads = MUNGE_THREADS;
 
     return (conf);
 }

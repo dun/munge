@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munge_defs.h,v 1.23 2004/05/06 01:41:12 dun Exp $
+ *  $Id: munge_defs.h,v 1.24 2004/08/05 21:10:50 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -86,18 +86,23 @@
  */
 #define MUNGE_SOCKET_CONNECT_RETRIES    5
 
+/*  Number of threads to create for processing credential requests.
+ *  FIXME: Default should be 2.
+ */
+#define MUNGE_THREADS                   4
+
 /*  String specifying the pathname of the daemon's logfile.
- *    FIXME: Temporary kludge until configuration file support is added.
+ *  FIXME: Temporary kludge until configuration file support is added.
  */
 #define MUNGED_LOGFILE                  "/tmp/.munge-log"
 
 /*  String specifying the pathname of the random seed file.
- *    FIXME: Temporary kludge until configuration file support is added.
+ *  FIXME: Temporary kludge until configuration file support is added.
  */
 #define MUNGED_RANDOM_SEED              "/tmp/.munge-seed"
 
 /*  String specifying the pathname of the secret key file.
- *    FIXME: Temporary kludge until configuration file support is added.
+ *  FIXME: Temporary kludge until configuration file support is added.
  */
 /* #define MUNGED_SECRET_KEY               "/tmp/.munge-key"
  */
@@ -105,6 +110,7 @@
 
 /*  String specifying the pathname of the random number source device to use
  *    in case the MUNGED_RANDOM_SEED file contains insufficient entropy.
+ *  FIXME: Default should be for "/dev/random".
  */
 #define RANDOM_SEED_DEFAULT             "/dev/urandom"
 

@@ -1,3 +1,17 @@
+2004-08-05  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/libcommon/munge_defs.h, src/munged/conf.c, src/munged/conf.h,
+	  src/munged/job.c, src/munged/job.h, src/munged/work.c,
+	  src/munged/work.h:
+	  Added support for thread work crew to process credential requests.
+	* src/munged/munged.c, src/munged/sock.c, src/munged/sock.h:
+	  Moved munge_sock_create() & munge_sock_destroy() to munged.c.
+	  Moved munge_sock_accept() to job.c:job_accept().
+	* src/munged/msg_server.c, src/munged/msg_server.h,
+	  src/munged/dec_v1.c, src/munged/enc_v1.c:
+	  Moved munge_msg_server_thread() to job.c:_job_exec().
+	  Moved err_v1_response() to job.c:job_error().
+
 2004-07-23  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/munged/auth_recv.c: Fixed bug in MUNGE_AUTH_RECVFD_MKNOD codepath
@@ -56,7 +70,7 @@
 	  src/libmunge/encode.c, src/munged/cred.h, src/munged/dec_v1.c,
 	  src/munged/enc_v1.c, src/munged/msg_server.c:
 	  Incremented MUNGE_MSG_VERSION.  Fixed segfault occurring when
-          received message was smaller than its expected length {gnats:432}.
+	  received message was smaller than its expected length {gnats:432}.
 
 2004-04-30  Chris Dunlap  <cdunlap@llnl.gov>
 

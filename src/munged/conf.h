@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: conf.h,v 1.8 2004/04/16 22:15:06 dun Exp $
+ *  $Id: conf.h,v 1.9 2004/08/05 21:10:50 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -59,6 +59,7 @@ struct conf {
     int             mac_key_len;        /* length of mac subkey              */
     struct in_addr  addr;               /* IPv4 addr in n/w byte order       */
     gids_t          gids;               /* supplementary group information   */
+    int             nthreads;           /* num threads for processing creds  */
 };
 
 typedef struct conf * conf_t;
