@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munge.c,v 1.17 2004/03/02 00:28:48 dun Exp $
+ *  $Id: munge.c,v 1.18 2004/03/11 22:09:36 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -405,6 +405,8 @@ display_help (char *prog)
 
     printf ("  %*s %s\n", w, (got_long ? "-Z, --list-zips" : "-Z"),
             "Print a list of supported compressions");
+
+    printf ("\n");
 
     printf ("  %*s %s\n", w, (got_long ? "-S, --socket=STRING" : "-S STRING"),
             "Specify local domain socket");
