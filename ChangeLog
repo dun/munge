@@ -1,3 +1,7 @@
+2003-10-24  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* : Released 0.2.
+
 2003-10-14  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/libcommon/munge_defs.h, src/munged/random.c:

@@ -1,3 +1,7 @@
+Version 0.2 (2003-10-24):
+  - Support for ia64.
+  - Added ttl and origin IP addr to credential header.
+
 Version 0.1 (2003-04-30):
   - Full client/server support (via munged).
   - Full cryptographic support.
