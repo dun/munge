@@ -1,3 +1,8 @@
+2003-12-11  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/libcommon/munge_defs.h:
+	  Increased MUNGE_SOCKET_BACKLOG from 128 to 256.
+
 2003-11-26  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* : Re-bootstrap'd with autoconf-2.57, automake-1.7.9, libtool-1.5.0a.

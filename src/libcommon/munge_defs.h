@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munge_defs.h,v 1.15 2003/11/26 23:07:49 dun Exp $
+ *  $Id: munge_defs.h,v 1.16 2003/12/11 20:45:35 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -84,7 +84,7 @@
 
 /*  Socket backlog for the server listening on the unix domain socket.
  */
-#define MUNGE_SOCKET_BACKLOG            128
+#define MUNGE_SOCKET_BACKLOG            256
 
 /*  String specifying the unix domain socket pathname for client-server comms.
  */
