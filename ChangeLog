@@ -1,5 +1,7 @@
 2004-10-15  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/etc/munge.init: Added support for /etc/sysconfig/munge.
+
 	* : Re-bootstrap'd with automake-1.9.2.
 
 	* munge.spec, src/etc/Makefile.am, src/etc/munge.init:

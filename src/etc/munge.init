@@ -1,16 +1,18 @@
 #know !/bin/sh
 ###############################################################################
-# $Id: munge.init,v 1.9 2004/10/15 16:50:50 dun Exp $
+# $Id: munge.init,v 1.10 2004/10/15 17:26:42 dun Exp $
 ###############################################################################
 # chkconfig:	345 40 60
 # description:	The MUNGE daemon is a user authentication service.
 # processname:	munged
-# config:	not-yet-supported
+# config:	/etc/sysconfig/munge
 ###############################################################################
 
 DAEMON="munged"
 
-source /etc/init.d/functions || source /etc/rc.d/init.d/functions
+source /etc/init.d/functions
+[ -f /etc/sysconfig/munge ] && source /etc/sysconfig/munge
+
 SUBSYS="/var/lock/subsys/`echo $0 | perl -pe 's,(.*/)?([SK][0-9]{2})?(.*),$3,'`"
 
 # Disable suppression of stderr msgs.
@@ -24,7 +26,7 @@ which "$DAEMON" 1>/dev/null 2>&1 || exit 5
 case "$1" in
   start)
  	echo -n "Starting $DAEMON: "
-	daemon $DAEMON -f
+	daemon $DAEMON -f $OPTIONS
 	RETVAL=$?
 	echo
 	[ $RETVAL -eq 0 ] && touch $SUBSYS
