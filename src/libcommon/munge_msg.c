@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munge_msg.c,v 1.20 2004/09/23 21:10:11 dun Exp $
+ *  $Id: munge_msg.c,v 1.21 2004/09/23 22:53:37 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -68,7 +68,6 @@ munge_msg_create (munge_msg_t *pm, int sd)
     m->head.magic = MUNGE_MSG_MAGIC;
     m->head.version = MUNGE_MSG_VERSION;
     m->head.type = MUNGE_MSG_UNKNOWN;
-    m->head.length = 0;
     m->errnum = EMUNGE_SUCCESS;
 
     *pm = m;
