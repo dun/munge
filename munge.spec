@@ -1,4 +1,4 @@
-# $Id: munge.spec,v 1.1 2002/12/20 20:30:57 dun Exp $
+# $Id: munge.spec,v 1.2 2002/12/20 21:13:35 dun Exp $
 
 Name:		munge
 Version:	0.0
@@ -57,6 +57,15 @@ rm -rf "$RPM_BUILD_ROOT"
 #    fi
 #  fi
 #fi
+%post
+if [ "$1" = 1 ]; then
+  /sbin/ldconfig %{_libdir}
+fi
+
+%postun
+if [ "$1" = 0 ]; then
+  /sbin/ldconfig %{_libdir}
+fi
 
 %files
 %defattr(-,root,root,0755)
