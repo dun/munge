@@ -1,3 +1,7 @@
+2005-04-05  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* : Re-bootstrap'd with automake-1.9.5 on Debian Sarge.
+
 2005-02-24  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/libmissing/strlcpy.c, src/libmissing/strlcat.c:
