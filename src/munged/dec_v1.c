@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: dec_v1.c,v 1.26 2004/09/23 21:10:11 dun Exp $
+ *  $Id: dec_v1.c,v 1.27 2004/09/24 17:00:25 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -1047,6 +1047,9 @@ dec_v1_validate_replay (munge_cred_t c)
         if ((conf->got_replay_retry)
                 && (mh.retry > 0)
                 && (mh.retry <= MUNGE_SOCKET_XFER_ATTEMPTS)) {
+            log_msg (LOG_NOTICE,
+                "Allowed credential replay for client uid=%d gid=%d",
+                m1->client_uid, m1->client_gid);
             return (0);
         }
         else {

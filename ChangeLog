@@ -1,5 +1,8 @@
 2004-09-24  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/munged/dec_v1.c(dec_v1_validate_replay):
+	  Added log msg when allowing credential replay due to retry.
+
 	* src/libcommon/munge_defs.h:
 	  Added MUNGE_SOCKET_XFER_USLEEP.  Removed MUNGE_SOCKET_ACCEPT_USLEEP.
 	  Changed MUNGE_SOCKET_XFER_ATTEMPTS from 3 to 5.
