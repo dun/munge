@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: lookup.h,v 1.3 2004/04/03 21:53:00 dun Exp $
+ *  $Id: lookup.h,v 1.4 2004/11/23 23:49:32 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -33,14 +33,8 @@
 
 
 const EVP_CIPHER * lookup_cipher (munge_cipher_t cipher);
-/*
- *  FIXME: Doc me!
- */
 
 const EVP_MD * lookup_mac (munge_mac_t mac);
-/*
- *  FIXME: Doc me!
- */
 
 
 #endif /* !LOOKUP_H */
