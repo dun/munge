@@ -1,19 +1,9 @@
--minimize pollution of libmunge namespace (cf, drepper)
--fix aix port so it doesn't require explicit LDFLAGS="-Wl,-brtl"
--save/restore replay state
+-fix signal handlers
+-add configuration file support
 -ensure safe perms on sensitive files/dirs
--configuration file support
--nonroot configuration support
--auto-force daemon when appropriate
--munged 'k' cmdling opt to kill daemon
--timer to periodically reparse group info
--statistics
--documentation
--create README guide
--create FAQ
--man pages
--audit
--debian/suse support
--benchmark utility
--server timeout for unresponsive clients
--realm (multi-key) support
+-restrict decode to host/ip/range
+-add realm (multi-key) support
+-save/restore replay state at munged shutdown/startup
+-add munged 'k' cmdline opt to kill daemon
+-add debian support
+-add server timeout for unresponsive clients
