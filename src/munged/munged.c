@@ -1,11 +1,11 @@
 /*****************************************************************************
- *  $Id: munged.c,v 1.8 2004/01/30 23:16:33 dun Exp $
+ *  $Id: munged.c,v 1.9 2004/03/25 23:19:37 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
  *  UCRL-CODE-2003-???.
  *
- *  Copyright (C) 2003 The Regents of the University of California.
+ *  Copyright (C) 2003-2004 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
  *  Written by Chris Dunlap <cdunlap@llnl.gov>.
  *
@@ -98,7 +98,7 @@ main (int argc, char *argv[])
          *  FIXME: Revamp logfile kludge.
          */
         FILE *fp = fopen (MUNGED_LOGFILE, "a");
-        log_open_file (fp, NULL, LOG_DEBUG,
+        log_open_file (fp, NULL, priority,
             LOG_OPT_JUSTIFY | LOG_OPT_PRIORITY | LOG_OPT_TIMESTAMP);
         daemonize_fini (fd);
     }
