@@ -1,5 +1,7 @@
 2004-01-15  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/libcommon/license.c: Updated copyright date range.
+
 	* src/libcommon/munge_defs.h, src/libcommon/munge_msg.c
 	  src/libcommon/munge_msg.h, src/libmunge/ctx.c,
 	  src/libmunge/ctx.h, src/libmunge/decode.c,
