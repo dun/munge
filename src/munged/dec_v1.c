@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: dec_v1.c,v 1.5 2003/04/23 22:15:03 dun Exp $
+ *  $Id: dec_v1.c,v 1.6 2003/05/08 00:32:08 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -765,19 +765,35 @@ static int
 dec_v1_validate_time (munge_cred_t c)
 {
     struct munge_msg_v1 *m1;            /* munge msg (v1 format)             */
-    uint32_t             delta;         /* seconds 'tween encode/decode time */
+    int                  skew;          /* negative clock skew for rewind    */
+    time_t               tmin;          /* min decode time_t, else rewound   */
+    time_t               tmax;          /* max decode time_t, else expired   */
 
     assert (c != NULL);
     assert (c->msg != NULL);
     assert (c->msg->head.version == 1);
 
     m1 = c->msg->pbody;
-
-    if ((!conf->got_clock_skew) && (m1->time1 < m1->time0)) {
+    /*
+     *  A TTL of FOREVER disables time validation.
+     */
+    if (m1->ttl == MUNGE_TTL_FOREVER) {
+        return (0);
+    }
+    /*  Even if no clock skew is allowed, allow the cred's timestamp to be
+     *    "rewound" by up to 1 second.  Before this, we were seeing an
+     *    occasional EMUNGE_CRED_REWOUND in spite of NTP's best efforts.
+     */
+    skew = (conf->got_clock_skew) ? m1->ttl : 1;
+    tmin = m1->time0 - skew;
+    tmax = m1->time0 + m1->ttl;
+    /*
+     *  Check the decode time against the allowable min & max.
+     */
+    if (m1->time1 < tmin) {
         return (_munge_msg_set_err (c->msg, EMUNGE_CRED_REWOUND, NULL));
     }
-    delta = abs (m1->time1 - m1->time0);
-    if ((m1->ttl != MUNGE_TTL_FOREVER) && (delta > m1->ttl)) {
+    if (m1->time1 > tmax) {
         return (_munge_msg_set_err (c->msg, EMUNGE_CRED_EXPIRED, NULL));
     }
     return (0);

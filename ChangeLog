@@ -1,3 +1,9 @@
+2003-05-07  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/munged/dec_v1.c(dec_v1_validate_time):
+	  Added a minimum negative clock skew of 1 second, since we were
+	  encountering EMUNGE_CRED_REWOUND in spite of NTP's best efforts.
+
 2003-05-06  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* : Added support for the "--enable-debug" configure script option.
