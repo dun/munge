@@ -1,5 +1,7 @@
 2003-05-29  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* libcommon/munge_defs.h: Increased credential's salt from 56b to 64b.
+
 	* src/libcommon/munge_msg.h, src/libmunge/ctx.c, src/libmunge/ctx.h,
 	  src/libmunge/decode.c, src/libmunge/encode.c, src/libmunge/munge.h,
 	  src/munge/unmunge.c, src/munged/conf.c, src/munged/conf.h,
