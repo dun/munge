@@ -1,5 +1,8 @@
 2003-05-06  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/etc/munge.init, src/libcommon/munge_defs.h, src/munged/conf.c,
+	  src/munged/munged.c: Added munged F cmdline opt and daemon support.
+
 	* src/munged/random.c(random_init): Added "seeding in process" msg.
 
 2003-05-03  Chris Dunlap  <cdunlap@llnl.gov>

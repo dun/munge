@@ -1,15 +1,15 @@
+-debug vs production code compilation
+-munged 'k' cmdling opt to kill daemon
 -revisit data returned on credential error
--foreground vs daemon mode support
+-benchmark utility
 -nonroot configuration support
 -create README guide
 -create FAQ
--benchmark utility
 -replay detection
 -max data length ctx opt
 -compression support
 -configuration file parsing
 -ensure safe perms on sensitive files/dirs
--debug vs production code compilation
 -man pages
 -documentation
 -security testplan script

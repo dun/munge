@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munge_defs.h,v 1.8 2003/04/30 21:21:31 dun Exp $
+ *  $Id: munge_defs.h,v 1.9 2003/05/06 20:20:29 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -87,6 +87,11 @@
 /*  Number of attempts a client makes connecting to the server before failing.
  */
 #define MUNGE_SOCKET_RETRIES    5
+
+/*  String specifying the pathname of the daemon's logfile.
+ *    FIXME: Temporary kludge until configuration file support is added.
+ */
+#define MUNGED_LOGFILE          "/tmp/.munge-log"
 
 /*  String specifying the pathname of the random seed file.
  *    FIXME: Temporary kludge until configuration file support is added.

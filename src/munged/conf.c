@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: conf.c,v 1.5 2003/05/02 19:52:01 dun Exp $
+ *  $Id: conf.c,v 1.6 2003/05/06 20:20:29 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -88,7 +88,7 @@ create_conf (void)
      *  FIXME: Add support for default realm.
      */
     /*
-     *  FIXME: Get file lock on configuration filename.
+     *  FIXME: Get file lock on configuration filename?
      */
     conf->config_name = NULL;
     if (!(conf->socket_name = strdup (MUNGE_SOCKET_NAME)))
@@ -184,9 +184,9 @@ parse_cmdline (conf_t conf, int argc, char **argv)
             case 'f':
                 conf->got_force = 1;
                 break;
-//          case 'F':
-//              conf->foreground = 1;
-//              break;
+            case 'F':
+                conf->got_foreground = 1;
+                break;
             case 'S':
                 if  (conf->socket_name)
                     free (conf->socket_name);
@@ -274,32 +274,32 @@ create_subkeys (conf_t conf)
     /*  Allocate memory for subkeys.
      */
     conf->dek_key_len = md_size (md);
-    if (!(conf->dek_key = malloc (conf->dek_key_len)))
+    if (!(conf->dek_key = malloc (conf->dek_key_len))) {
         log_err (EMUNGE_NO_MEMORY, LOG_ERR,
             "Unable to allocate %d bytes for cipher subkey",
             conf->dek_key_len);
-
-    conf->mac_key_len = md_size (md);
+    }
+    conf->mac_key_len = md_size (md); {
     if (!(conf->mac_key = malloc (conf->mac_key_len)))
         log_err (EMUNGE_NO_MEMORY, LOG_ERR,
             "Unable to allocate %d bytes for mac subkey",
             conf->mac_key_len);
-
-    if (md_init (&dek_ctx, md) < 0)
+    }
+    if (md_init (&dek_ctx, md) < 0) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
             "Unable to compute subkeys: Cannot init md ctx");
-
+    }
     /*  Open keyfile.
      */
-    if ((conf->key_name == NULL) || (*conf->key_name == '\0'))
+    if ((conf->key_name == NULL) || (*conf->key_name == '\0')) {
         log_err (EMUNGE_SNAFU, LOG_ERR, "No keyfile was specified");
-    /*
-     *  FIXME: Ignore keyfile if it does not have sane permissions.
+    }
+    /*  FIXME: Ignore keyfile if it does not have sane permissions.
      */
-    if ((fd = open (conf->key_name, O_RDONLY)) < 0)
+    if ((fd = open (conf->key_name, O_RDONLY)) < 0) {
         log_err (EMUNGE_SNAFU, LOG_ERR, "Unable to open keyfile \"%s\": %s",
             conf->key_name, strerror (errno));
-
+    }
     /*  Compute keyfile's message digest.
      */
     for (;;) {
@@ -315,14 +315,14 @@ create_subkeys (conf_t conf)
         if (md_update (&dek_ctx, buf, n) < 0)
             log_err (EMUNGE_SNAFU, LOG_ERR, "Unable to compute subkeys");
     }
-    if (close (fd) < 0)
+    if (close (fd) < 0) {
         log_err (EMUNGE_SNAFU, LOG_ERR, "Unable to close keyfile \"%s\": %s",
             conf->key_name, strerror (errno));
-
-    if (md_copy (&mac_ctx, &dek_ctx) < 0)
+    }
+    if (md_copy (&mac_ctx, &dek_ctx) < 0) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
             "Unable to compute subkeys: Cannot copy md ctx");
-
+    }
     /*  Append "1" to keyfile in order to compute cipher subkey.
      */
     if ( (md_update (&dek_ctx, "1", 1) < 0)
