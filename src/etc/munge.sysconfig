@@ -1,0 +1,10 @@
+###############################################################################
+# $Id: munge.sysconfig,v 1.1 2004/12/02 03:43:23 dun Exp $
+###############################################################################
+
+##
+# Specify additional command-line options to be passed to munged
+#   when it is invoked by its init script.
+##
+# OPTIONS="--key-file /etc/munge/munged.key --num-threads 1"
+##

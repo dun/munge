@@ -1,4 +1,4 @@
-# $Id: munge.spec,v 1.24 2004/11/18 19:55:44 dun Exp $
+# $Id: munge.spec,v 1.25 2004/12/02 03:43:23 dun Exp $
 
 Name:		munge
 Version:	0
@@ -69,6 +69,7 @@ fi
 %doc TODO
 %doc doc/*
 %config(noreplace) %{_sysconfdir}/init.d/*
+%config(noreplace) %{_sysconfdir}/sysconfig/*
 %{_bindir}/*
 %{_includedir}/*
 %{_libdir}/*

@@ -1,5 +1,9 @@
 2004-12-01  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* README: Updated info regarding /etc/sysconfig/munge.
+	* munge.spec, src/etc/Makefile.am, src/etc/munge.sysconfig:
+	  Added /etc/sysconfig/munge.
+
 	* src/libmunge/enum.c(_munge_enum_lookup): Changed return type from
 	const munge_enum_table_t to munge_enum_table_t.
 

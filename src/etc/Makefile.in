@@ -349,15 +349,16 @@ distclean-local::
 	-rm -f *~ \#* .\#* cscope*.out core core.* tags TAGS
 
 install-data-local:
-	@for d in $(sysconfdir)/init.d $(sysconfdir)/rc.d/init.d; do \
-	  if test -d "$$d"; then \
-	    echo $(INSTALL) -m 755 -d $(DESTDIR)$$d; \
-	    $(INSTALL) -m 755 -d $(DESTDIR)$$d; \
-	    echo $(INSTALL) -m 755 munge.init $(DESTDIR)$$d/munge; \
-	    $(INSTALL) -m 755 munge.init $(DESTDIR)$$d/munge; \
-	    break; \
-	  fi; \
-	done
+	if test -d "$(sysconfdir)/init.d"; then \
+	  $(INSTALL) -m 755 -d "$(DESTDIR)$(sysconfdir)/init.d"; \
+	  $(INSTALL) -m 755 $(srcdir)/munge.init \
+	    "$(DESTDIR)$(sysconfdir)/init.d/munge"; \
+	fi
+	if test -d "$(sysconfdir)/sysconfig"; then \
+	  $(INSTALL) -m 755 -d "$(DESTDIR)$(sysconfdir)/sysconfig"; \
+	  $(INSTALL) -m 755 $(srcdir)/munge.sysconfig \
+	    "$(DESTDIR)$(sysconfdir)/sysconfig/munge"; \
+	fi
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

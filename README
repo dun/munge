@@ -54,10 +54,10 @@ Getting started:
      realm (ie, on nodes sharing the same secret key).  All 'munged'
      daemons exchanging credentials need to share the same secret key.
 
-  6. Start the 'munged' daemon.  On RedHat, you can use the init script
-     (which hopefully got installed in /etc/init.d/munge).  The init script
-     sources /etc/sysconfig/munge to set the ${OPTIONS} var in order to
-     pass cmdline opts to the daemon.
+  6. Start the 'munged' daemon.  You can use the init script
+     (which probably got installed in /etc/init.d/munge).  The init script
+     sources /etc/sysconfig/munge (if present) to set the ${OPTIONS} var
+     in order to pass additional cmdline opts to the daemon.
 
 
 Testing the installation:
