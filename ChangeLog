@@ -1,5 +1,9 @@
 2004-09-17  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/munged/work.c:
+	  Moved pthread_cond_signal() outside of critical region.
+	  Replaced public function parm asserts with if-guards.
+
 	* src/munged/timer.c:
 	  Moved pthread_cond_signal() outside of critical region.
 

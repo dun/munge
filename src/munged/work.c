@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: work.c,v 1.2 2004/08/11 22:11:11 dun Exp $
+ *  $Id: work.c,v 1.3 2004/09/17 20:23:35 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -166,8 +166,10 @@ work_fini (work_p wp, int do_wait)
 {
     int i;
 
-    assert (wp != NULL);
-
+    if (!wp) {
+        errno = EINVAL;
+        return;
+    }
     if ((errno = pthread_mutex_lock (&wp->lock)) != 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR,
             "Unable to lock work thread mutex");
@@ -243,10 +245,9 @@ int
 work_queue (work_p wp, void *work)
 {
     int rc;
+    int do_signal = 0;
 
-    assert (wp != NULL);
-
-    if (work == NULL) {
+    if (!wp || !work) {
         errno = EINVAL;
         return (-1);
     }
@@ -261,12 +262,10 @@ work_queue (work_p wp, void *work)
     else {
         /*
          *  Awaken an idle worker if possible.
+         *  Set a flag here so the signal can be done outside the monitor lock.
          */
         if ((wp->n_workers - wp->n_working) > 0) {
-            if ((errno = pthread_cond_signal (&wp->received_work)) != 0) {
-                log_errno (EMUNGE_SNAFU, LOG_ERR,
-                    "Unable to signal work thread for received work");
-            }
+            do_signal = 1;
         }
         if (_work_enqueue (wp, work) != NULL) {
             rc = 0;
@@ -276,6 +275,12 @@ work_queue (work_p wp, void *work)
         log_errno (EMUNGE_SNAFU, LOG_ERR,
             "Unable to unlock work thread mutex");
     }
+    if (do_signal) {
+        if ((errno = pthread_cond_signal (&wp->received_work)) != 0) {
+            log_errno (EMUNGE_SNAFU, LOG_ERR,
+                "Unable to signal work thread for received work");
+        }
+    }
     return (rc);
 }
 
@@ -283,8 +288,10 @@ work_queue (work_p wp, void *work)
 void
 work_wait (work_p wp)
 {
-    assert (wp != NULL);
-
+    if (!wp) {
+        errno = EINVAL;
+        return;
+    }
     if ((errno = pthread_mutex_lock (&wp->lock)) != 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR,
             "Unable to lock work thread mutex");
