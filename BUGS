@@ -1,5 +1,10 @@
-- munged run in the foreground does not terminate on sigint
-- munged can occasionally drop a client request when it gets inundated
+- munged does not terminate on sigint or sigterm on many platforms
+- munged needs support for a configuration file; configuration is currently
+  set by src/libcommon/munge_defs.h at compile-time
+- munged does not ensure sensitive files & dirs are permissioned properly
 - munged replay state is not saved across sessions, thereby allowing
   unexpired creds to be replayed after the daemon has been restarted
-- munged configuration is hard-coded in libcommon/munge_defs.h & munged/conf.c
+- credentials cannot be restricted based on where they can be decoded
+  (eg, hostname/hostrange/regex or ip-addr/netmask)
+- munged hangs if client does not respond to auth req (auth via fd passing)
+- client hangs if auth-pipe-dir is permissioned wrong (auth via fd passing)
