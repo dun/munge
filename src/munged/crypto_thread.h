@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: common.h,v 1.2 2003/04/08 18:16:16 dun Exp $
+ *  $Id: crypto_thread.h,v 1.1 2003/04/08 18:16:16 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -25,29 +25,27 @@
  *****************************************************************************/
 
 
-#ifndef MUNGE_COMMON_H
-#define MUNGE_COMMON_H
+#ifndef CRYPTO_THREAD_H
+#define CRYPTO_THREAD_H
 
 
-/*  These contain prototypes and whatnot for libcommon.
- */
-#include "dprintf.h"
-#include "fd.h"
-#include "license.h"
-#include "log.h"
-#include "munge_defs.h"
-#include "munge_msg.h"
-#include "posignal.h"
-#include "str.h"
+#if HAVE_CONFIG_H
+#  include <config.h>
+#endif /* HAVE_CONFIG_H */
+
+#if HAVE_LIBPTHREAD
+
+#define _CRYPTO_THREAD_FUNCTIONS 1
+int crypto_thread_init (void);
+int crypto_thread_fini (void);
+
+#else  /* !HAVE_LIBPTHREAD */
+
+#define _CRYPTO_THREAD_FUNCTIONS 0
+#define crypto_thread_init()
+#define crypto_thread_fini()
+
+#endif /* !HAVE_LIBPTHREAD */
 
 
-#ifndef MAX
-#  define MAX(a,b) ((a >= b) ? (a) : (b))
-#endif /* !MAX */
-
-#ifndef MIN
-#  define MIN(a,b) ((a <= b) ? (a) : (b))
-#endif /* !MIN */
-
-
-#endif /* !MUNGE_COMMON_H */
+#endif /* !CRYPTO_THREAD_H */

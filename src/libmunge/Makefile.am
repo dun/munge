@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.3 2003/02/13 17:59:16 dun Exp $
+## $Id: Makefile.am,v 1.4 2003/04/08 18:16:16 dun Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
@@ -12,5 +12,18 @@ include_HEADERS = \
 lib_LTLIBRARIES = \
 	libmunge.la
 
+CPPFLAGS = \
+	-I$(top_srcdir)/src/libcommon \
+	-I$(top_srcdir)/src/libmissing
+
+libmunge_la_LIBADD = \
+	$(top_builddir)/src/libcommon/libcommon.la \
+	$(top_builddir)/src/libmissing/libmissing.la
+
 libmunge_la_SOURCES = \
-	munge.c
+	code.c \
+	ctx.c \
+	ctx.h \
+	msg_client.c \
+	msg_client.h \
+	munge.h

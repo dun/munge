@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munge.c,v 1.5 2003/02/18 19:46:20 dun Exp $
+ *  $Id: munge.c,v 1.6 2003/04/08 18:16:16 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -36,30 +36,31 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-
 #include "common.h"
 #include "read.h"
 
 
 /***************************************************************************** 
- *  Options
+ *  Command-Line Options
  *****************************************************************************/
 
 #if HAVE_GETOPT_H
 #  include <getopt.h>
 struct option opt_table[] = {
-    { "help",     0, NULL, 'h' },
-    { "license",  0, NULL, 'L' },
-    { "version",  0, NULL, 'V' },
-    { "input",    1, NULL, 'i' },
-    { "no-input", 0, NULL, 'n' },
-    { "output",   1, NULL, 'o' },
-    { "string",   1, NULL, 's' },
-    {  NULL,      0, NULL,  0  }
+    { "help",       0, NULL, 'h' },
+    { "license",    0, NULL, 'L' },
+    { "version",    0, NULL, 'V' },
+    { "verbose",    0, NULL, 'v' },
+    { "input",      1, NULL, 'i' },
+    { "no-input",   0, NULL, 'n' },
+    { "output",     1, NULL, 'o' },
+    { "string",     1, NULL, 's' },
+    { "socket",     1, NULL, 'S' },
+    {  NULL,        0, NULL,  0  }
 };
 #endif /* HAVE_GETOPT_H */
 
-const char * const opt_string = "hLVi:no:s:";
+const char * const opt_string = "hLVvi:no:s:S:";
 
 
 /***************************************************************************** 
@@ -67,15 +68,16 @@ const char * const opt_string = "hLVi:no:s:";
  *****************************************************************************/
 
 struct conf {
-    char *string;                       /* input from string instead of file */
-    char *fn_in;                        /* input filename, '-' for stdin     */
-    char *fn_out;                       /* output filename, '-' for stdout   */
-    FILE *fp_in;                        /* input file pointer                */
-    FILE *fp_out;                       /* output file pointer               */
-    int   dlen;                         /* payload data length               */
-    void *data;                         /* payload data                      */
-    int   clen;                         /* munged credential length          */
-    char *cred;                         /* munged credential nul-terminated  */
+    munge_ctx_t  ctx;                   /* munge context                     */
+    char        *string;                /* input from string instead of file */
+    char        *fn_in;                 /* input filename, '-' for stdin     */
+    char        *fn_out;                /* output filename, '-' for stdout   */
+    FILE        *fp_in;                 /* input file pointer                */
+    FILE        *fp_out;                /* output file pointer               */
+    int          dlen;                  /* payload data length               */
+    void        *data;                  /* payload data                      */
+    int          clen;                  /* munged credential length          */
+    char        *cred;                  /* munged credential nul-terminated  */
 };
 
 typedef struct conf * conf_t;
@@ -100,9 +102,13 @@ void display_cred (conf_t conf);
 int
 main (int argc, char *argv[])
 {
-    conf_t      conf;
-    int         rc = 0;
-    munge_err_t e;
+    conf_t       conf;
+    int          rc = 0;
+    munge_err_t  e;
+    char        *p;
+
+    if (posignal (SIGPIPE, SIG_IGN) == SIG_ERR)
+        log_err (EMUNGE_SNAFU, LOG_ERR, "Unable to ignore signal=%d", SIGPIPE);
 
     log_open_file (stderr, argv[0], LOG_INFO, LOG_OPT_PRIORITY);
     conf = create_conf ();
@@ -113,13 +119,19 @@ main (int argc, char *argv[])
         rc = read_data_from_string (conf->string, &conf->data, &conf->dlen);
     else if (conf->fn_in)
         rc = read_data_from_file (conf->fp_in, &conf->data, &conf->dlen);
-    if (rc < 0)
-        log_err (EMUNGE_SNAFU, "%s",
-            (errno == ENOMEM) ? strerror (errno) : "Read error");
-
-    e = munge_encode (&conf->cred, NULL, conf->data, conf->dlen);
-    if (e != EMUNGE_SUCCESS)
-        log_err (e, "%s", munge_strerror (e));
+    if (rc < 0) {
+        if (errno == ENOMEM)
+            log_err (EMUNGE_NO_MEMORY, LOG_ERR, "%s", strerror (errno));
+        else
+            log_err (EMUNGE_SNAFU, LOG_ERR, "Read error");
+    }
+    e = munge_encode (&conf->cred, conf->ctx, conf->data, conf->dlen);
+    if (e != EMUNGE_SUCCESS) {
+        if ((p = munge_ctx_err (conf->ctx)))
+            log_err (e, LOG_ERR, "%s", p);
+        else
+            log_err (e, LOG_ERR, "%s", munge_strerror (e));
+    }
     conf->clen = strlen (conf->cred);
 
     display_cred (conf);
@@ -134,9 +146,12 @@ create_conf (void)
 {
     conf_t conf;
 
-    if (!(conf = malloc (sizeof (*conf))))
-        log_err (EMUNGE_SNAFU, "%s", strerror (errno));
-
+    if (!(conf = malloc (sizeof (struct conf)))) {
+        log_err (EMUNGE_NO_MEMORY, LOG_ERR, "%s", strerror (errno));
+    }
+    if (!(conf->ctx = munge_ctx_create())) {
+        log_err (EMUNGE_NO_MEMORY, LOG_ERR, "%s", strerror (errno));
+    }
     conf->string = NULL;
     conf->fn_in = "-";
     conf->fn_out = "-";
@@ -146,7 +161,6 @@ create_conf (void)
     conf->data = NULL;
     conf->clen = 0;
     conf->cred = NULL;
-
     return (conf);
 }
 
@@ -157,16 +171,19 @@ destroy_conf (conf_t conf)
     /*  XXX: Don't free conf's string/fn_in/fn_out
      *       since they point inside argv[].
      */
+    if (conf->ctx != NULL) {
+        munge_ctx_destroy (conf->ctx);
+    }
     if (conf->fp_in != NULL) {
         if (fclose (conf->fp_in) < 0)
-            log_err (EMUNGE_SNAFU, "Unable to close infile: %s",
-                strerror (errno));
+            log_err (EMUNGE_SNAFU, LOG_ERR,
+                "Unable to close infile: %s", strerror (errno));
         conf->fp_in = NULL;
     }
     if (conf->fp_out != NULL) {
         if (fclose (conf->fp_out) < 0)
-            log_err (EMUNGE_SNAFU, "Unable to close outfile: %s",
-                strerror (errno));
+            log_err (EMUNGE_SNAFU, LOG_ERR,
+                "Unable to close outfile: %s", strerror (errno));
         conf->fp_out = NULL;
     }
     if (conf->data != NULL) {
@@ -187,8 +204,9 @@ destroy_conf (conf_t conf)
 void
 parse_cmdline (conf_t conf, int argc, char **argv)
 {
-    char *prog;
-    char  c;
+    char       *prog;
+    char        c;
+    munge_err_t e;
 
     opterr = 0;                         /* suppress default getopt err msgs */
 
@@ -216,6 +234,8 @@ parse_cmdline (conf_t conf, int argc, char **argv)
 //          case 'V':
 //              exit (EMUNGE_SUCCESS);
 //              break;
+            case 'v':
+                break;
             case 'i':
                 conf->fn_in = optarg;
                 conf->string = NULL;
@@ -231,18 +251,29 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                 conf->fn_in = NULL;
                 conf->string = optarg;
                 break;
+            case 'S':
+                e = munge_ctx_set (conf->ctx, MUNGE_OPT_SOCKET, optarg);
+                if (e != EMUNGE_SUCCESS)
+                    log_err (EMUNGE_SNAFU, LOG_ERR,
+                        "Unable to set munge socket name");
+                break;
             case '?':
-                log_err (EMUNGE_SNAFU, "Invalid option \"%s\"",
-                    argv[optind - 1]);
+                if (optopt > 0)
+                    log_err (EMUNGE_SNAFU, LOG_ERR,
+                        "Invalid option \"-%c\"", optopt);
+                else
+                    log_err (EMUNGE_SNAFU, LOG_ERR,
+                        "Invalid option \"%s\"", argv[optind - 1]);
                 break;
             default:
-                log_err (EMUNGE_SNAFU, "Unimplemented option \"%s\"",
-                    argv[optind - 1]);
+                log_err (EMUNGE_SNAFU, LOG_ERR,
+                    "Unimplemented option \"%s\"", argv[optind - 1]);
                 break;
         }
     }
     if (argv[optind]) {
-        log_err (EMUNGE_SNAFU, "Unrecognized parameter \"%s\"", argv[optind]);
+        log_err (EMUNGE_SNAFU, LOG_ERR,
+            "Unrecognized parameter \"%s\"", argv[optind]);
     }
     return;
 }
@@ -274,6 +305,9 @@ display_help (char *prog)
     printf ("  %*s %s\n", w, (got_long ? "-V, --version" : "-V"),
             "Display version information");
 
+    printf ("  %*s %s\n", w, (got_long ? "-v, --verbose" : "-v"),
+            "Be verbose");
+
     printf ("  %*s %s\n", w, (got_long ? "-i, --input=FILE" : "-i FILE"),
             "Input payload data from FILE");
 
@@ -285,6 +319,9 @@ display_help (char *prog)
 
     printf ("  %*s %s\n", w, (got_long ? "-s, --string=STRING" : "-s STRING"),
             "Input payload data from STRING");
+
+    printf ("  %*s %s\n", w, (got_long ? "-S, --socket=STRING" : "-S STRING"),
+            "Specify local domain socket");
 
     printf ("\n");
     printf ("By default, data is read from stdin and written to stdout.\n\n");
@@ -300,14 +337,14 @@ open_files (conf_t conf)
         if (!strcmp (conf->fn_in, "-"))
             conf->fp_in = stdin;
         else if (!(conf->fp_in = fopen (conf->fn_in, "r")))
-            log_err (EMUNGE_SNAFU, "Unable to read from \"%s\": %s",
+            log_err (EMUNGE_SNAFU, LOG_ERR, "Unable to read from \"%s\": %s",
                 conf->fn_in, strerror (errno));
     }
     if (conf->fn_out) {
         if (!strcmp (conf->fn_out, "-"))
             conf->fp_out = stdout;
         else if (!(conf->fp_out = fopen (conf->fn_out, "w")))
-            log_err (EMUNGE_SNAFU, "Unable to write to \"%s\": %s",
+            log_err (EMUNGE_SNAFU, LOG_ERR, "Unable to write to \"%s\": %s",
                 conf->fn_out, strerror (errno));
     }
     return;
@@ -320,6 +357,6 @@ display_cred (conf_t conf)
     if (!conf->fp_out)
         return;
     if (fprintf (conf->fp_out, "%s\n", conf->cred) < 0)
-        log_err (EMUNGE_SNAFU, "Write error: %s", strerror (errno));
+        log_err (EMUNGE_SNAFU, LOG_ERR, "Write error: %s", strerror (errno));
     return;
 }

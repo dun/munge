@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: configure.ac,v 1.5 2003/02/17 02:29:41 dun Exp $
+## $Id: configure.ac,v 1.6 2003/04/08 18:16:10 dun Exp $
 ##*****************************************************************************
 ## Process this file with autoconf to produce a configure script.
 ##*****************************************************************************
@@ -75,11 +75,33 @@ AC_CHECK_HEADERS( \
 AC_C_BIGENDIAN
 AC_C_CONST
 AC_TYPE_UID_T
+AC_CHECK_TYPES(CRYPTO_dynlock, [], [], [#include <openssl/crypto.h>])
+
+##
+# Checks for OpenSSL library functions.
+##
+ac_save_LIBS="$LIBS"
+AC_CHECK_LIB(crypto, RAND_bytes)
+AC_CHECK_FUNCS( \
+  ERR_error_string_n \
+  EVP_CipherInit_ex \
+  EVP_DigestInit_ex \
+  EVP_aes_128_cbc \
+  HMAC_Init_ex \
+)
+LIBS="$ac_save_LIBS"
+
+##
+# Checks for Pthreads
+##
+ac_save_LIBS="$LIBS"
+AC_CHECK_LIB(pthread, pthread_create)
+LIBS="$ac_save_LIBS"
 
 ##
 # Checks for library functions.
 ##
-AC_FUNC_MALLOC
+#AC_FUNC_MALLOC
 AC_CHECK_FUNCS( \
   getopt_long \
   localtime_r \

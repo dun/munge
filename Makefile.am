@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.4 2003/02/13 17:59:16 dun Exp $
+## $Id: Makefile.am,v 1.5 2003/04/08 18:16:10 dun Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
@@ -7,8 +7,8 @@
 include $(top_srcdir)/config/Make-rpm.mk
 
 ACLOCAL_AMFLAGS =       -I config
-EXTRA_DIST =            AUTHORS COPYING DISCLAIMER INSTALL NEWS README
-EXTRA_DIST +=           ChangeLog munge.spec
+EXTRA_DIST =            AUTHORS COPYING ChangeLog DISCLAIMER INSTALL JARGON \
+			NEWS README munge.spec
 SUBDIRS =               src
 
 distclean-local:

@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: common.h,v 1.2 2003/04/08 18:16:16 dun Exp $
+ *  $Id: crypto_log.c,v 1.1 2003/04/08 18:16:16 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -25,29 +25,41 @@
  *****************************************************************************/
 
 
-#ifndef MUNGE_COMMON_H
-#define MUNGE_COMMON_H
+#if HAVE_CONFIG_H
+#  include <config.h>
+#endif /* HAVE_CONFIG_H */
 
-
-/*  These contain prototypes and whatnot for libcommon.
- */
-#include "dprintf.h"
-#include "fd.h"
-#include "license.h"
+#include <assert.h>
+#include <openssl/err.h>
+#include "crypto_log.h"
 #include "log.h"
-#include "munge_defs.h"
-#include "munge_msg.h"
-#include "posignal.h"
 #include "str.h"
 
 
-#ifndef MAX
-#  define MAX(a,b) ((a >= b) ? (a) : (b))
-#endif /* !MAX */
-
-#ifndef MIN
-#  define MIN(a,b) ((a <= b) ? (a) : (b))
-#endif /* !MIN */
+#define CRYPTO_LOG_MAX_ERR_LEN     1024
 
 
-#endif /* !MUNGE_COMMON_H */
+void
+crypto_log_msg (int priority)
+{
+    int         e;
+    const char *data;
+    int         flags;
+    char        buf[CRYPTO_LOG_MAX_ERR_LEN];
+
+    ERR_load_crypto_strings ();
+    while ((e = ERR_get_error_line_data (NULL, NULL, &data, &flags)) != 0) {
+#if HAVE_ERR_ERROR_STRING_N
+        ERR_error_string_n (e, buf, sizeof (buf));
+#else  /* !HAVE_ERR_ERROR_STRING_N */
+        assert (sizeof (buf) >= 256);
+        ERR_error_string (e, buf);
+#endif /* !HAVE_ERR_ERROR_STRING_N */
+        if (data && (flags & ERR_TXT_STRING)) {
+            strcatf (buf, sizeof (buf), ":%s", data);
+        }
+        log_msg (priority, "%s", buf);
+    }
+    ERR_free_strings ();
+    return;
+}

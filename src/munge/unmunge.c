@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: unmunge.c,v 1.4 2003/02/18 19:46:20 dun Exp $
+ *  $Id: unmunge.c,v 1.5 2003/04/08 18:16:16 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -38,37 +38,43 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <unistd.h>
-
 #include "common.h"
 #include "read.h"
 
 
 /*****************************************************************************
- *  Options
+ *  Command-Line Options
  *****************************************************************************/
 
 #if HAVE_GETOPT_H
 #  include <getopt.h>
 struct option opt_table[] = {
-    { "help",      0, NULL, 'h' },
-    { "license",   0, NULL, 'L' },
-    { "version",   0, NULL, 'V' },
-    { "input",     1, NULL, 'i' },
-    { "metadata",  1, NULL, 'm' },
-    { "no-output", 0, NULL, 'n' },
-    { "output",    1, NULL, 'o' },
-    { "tags",      1, NULL, 't' },
-    { "list-tags", 0, NULL, 'T' },
-    {  NULL,       0, NULL,  0  }
+    { "help",       0, NULL, 'h' },
+    { "license",    0, NULL, 'L' },
+    { "version",    0, NULL, 'V' },
+    { "verbose",    0, NULL, 'v' },
+    { "input",      1, NULL, 'i' },
+    { "metadata",   1, NULL, 'm' },
+    { "no-output",  0, NULL, 'n' },
+    { "output",     1, NULL, 'o' },
+    { "socket",     1, NULL, 'S' },
+    { "tags",       1, NULL, 't' },
+    { "list-tags",  0, NULL, 'T' },
+    {  NULL,        0, NULL,  0  }
 };
 #endif /* HAVE_GETOPT_H */
 
-const char * const opt_string = "hLVi:m:no:t:T";
+const char * const opt_string = "hLVvi:m:no:S:t:T";
 
 
 /*****************************************************************************
- *  Tags
+ *  Metadata Tags
  *****************************************************************************/
+
+typedef struct {
+    int   val;
+    char *str;
+} tag_t;
 
 typedef enum {
     MUNGE_TAG_STATUS_CODE,
@@ -78,11 +84,6 @@ typedef enum {
     MUNGE_TAG_LENGTH,
     MUNGE_TAG_LAST
 } munge_tag_t;
-
-typedef struct {
-    int   val;
-    char *str;
-} tag_t;
 
 tag_t munge_tags[] = {
     { MUNGE_TAG_STATUS_CODE, "STATUS-CODE" },
@@ -99,6 +100,7 @@ tag_t munge_tags[] = {
  *****************************************************************************/
 
 struct conf {
+    munge_ctx_t  ctx;                   /* munge context                     */
     munge_err_t  status;                /* status unmunging the cred         */
     char        *fn_in;                 /* input filename, '-' for stdin     */
     char        *fn_meta;               /* metadata filename, '-' for stdout */
@@ -146,6 +148,9 @@ main (int argc, char *argv[])
     conf_t conf;
     int    rc;
 
+    if (posignal (SIGPIPE, SIG_IGN) == SIG_ERR)
+        log_err (EMUNGE_SNAFU, LOG_ERR, "Unable to ignore signal=%d", SIGPIPE);
+
     log_open_file (stderr, argv[0], LOG_INFO, LOG_OPT_PRIORITY);
     conf = create_conf ();
     parse_cmdline (conf, argc, argv);
@@ -153,11 +158,13 @@ main (int argc, char *argv[])
 
     rc = read_data_from_file (conf->fp_in,
         (void **) &conf->cred, &conf->clen);
-    if (rc < 0)
-        log_err (EMUNGE_SNAFU, "%s",
-            (errno == ENOMEM) ? strerror (errno) : "Read error");
-
-    conf->status = munge_decode (conf->cred, NULL,
+    if (rc < 0) {
+        if (errno == ENOMEM)
+            log_err (EMUNGE_NO_MEMORY, LOG_ERR, "%s", strerror (errno));
+        else
+            log_err (EMUNGE_SNAFU, LOG_ERR, "Read error");
+    }
+    conf->status = munge_decode (conf->cred, conf->ctx,
         &conf->data, &conf->dlen, &conf->uid, &conf->gid);
 
     display_meta (conf);
@@ -176,9 +183,12 @@ create_conf (void)
     int    len;
     int    maxlen;
 
-    if (!(conf = malloc (sizeof (*conf))))
-        log_err (EMUNGE_SNAFU, "%s", strerror(errno));
-
+    if (!(conf = malloc (sizeof (struct conf)))) {
+        log_err (EMUNGE_NO_MEMORY, LOG_ERR, "%s", strerror(errno));
+    }
+    if (!(conf->ctx = munge_ctx_create())) {
+        log_err (EMUNGE_NO_MEMORY, LOG_ERR, "%s", strerror (errno));
+    }
     conf->status = -1;
     conf->fn_in = "-";
     conf->fn_meta = "-";
@@ -209,24 +219,27 @@ destroy_conf (conf_t conf)
     /*  XXX: Don't free conf's fn_in/fn_meta/fn_out
      *       since they point inside argv[].
      */
+    if (conf->ctx != NULL) {
+        munge_ctx_destroy (conf->ctx);
+    }
     if (conf->fp_in != NULL) {
         if (fclose (conf->fp_in) < 0)
-            log_err (EMUNGE_SNAFU, "Unable to close infile: %s",
-                strerror (errno));
+            log_err (EMUNGE_SNAFU, LOG_ERR,
+                "Unable to close infile: %s", strerror (errno));
         conf->fp_in = NULL;
     }
     if (conf->fp_meta != NULL) {
         if (fclose (conf->fp_meta) < 0)
-            log_err (EMUNGE_SNAFU, "Unable to close metadata outfile: %s",
-                strerror (errno));
+            log_err (EMUNGE_SNAFU, LOG_ERR,
+                "Unable to close metadata outfile: %s", strerror (errno));
         conf->fp_meta = NULL;
     }
     if (conf->fp_out != NULL) {
         if (conf->fn_out && conf->fn_meta
           && strcmp (conf->fn_out, conf->fn_meta))
             if (fclose (conf->fp_out) < 0)
-                log_err (EMUNGE_SNAFU, "Unable to close payload outfile: %s",
-                    strerror (errno));
+                log_err (EMUNGE_SNAFU, LOG_ERR,
+                    "Unable to close payload outfile: %s", strerror (errno));
         conf->fp_out = NULL;
     }
     if (conf->cred) {
@@ -247,10 +260,11 @@ destroy_conf (conf_t conf)
 void
 parse_cmdline (conf_t conf, int argc, char **argv)
 {
-    char *prog;
-    int   got_tags = 0;
-    char  c;
-    int   i;
+    int         got_tags = 0;
+    char       *prog;
+    char        c;
+    munge_err_t e;
+    int         i;
 
     opterr = 0;                         /* suppress default getopt err msgs */
 
@@ -278,6 +292,8 @@ parse_cmdline (conf_t conf, int argc, char **argv)
 //          case 'V':
 //              exit (EMUNGE_SUCCESS);
 //              break;
+            case 'v':
+                break;
             case 'i':
                 conf->fn_in = optarg;
                 break;
@@ -291,6 +307,12 @@ parse_cmdline (conf_t conf, int argc, char **argv)
             case 'o':
                 conf->fn_out = optarg;
                 break;
+            case 'S':
+                e = munge_ctx_set (conf->ctx, MUNGE_OPT_SOCKET, optarg);
+                if (e != EMUNGE_SUCCESS)
+                    log_err (EMUNGE_SNAFU, LOG_ERR,
+                        "Unable to set munge socket name");
+                break;
             case 't':
                 got_tags = 1;
                 parse_tags (conf, optarg);
@@ -300,17 +322,22 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                 exit (EMUNGE_SUCCESS);
                 break;
             case '?':
-                log_err (EMUNGE_SNAFU, "Invalid option \"%s\"",
-                    argv[optind - 1]);
+                if (optopt > 0)
+                    log_err (EMUNGE_SNAFU, LOG_ERR,
+                        "Invalid option \"-%c\"", optopt);
+                else
+                    log_err (EMUNGE_SNAFU, LOG_ERR,
+                        "Invalid option \"%s\"", argv[optind - 1]);
                 break;
             default:
-                log_err (EMUNGE_SNAFU, "Unimplemented option \"%s\"",
-                    argv[optind - 1]);
+                log_err (EMUNGE_SNAFU, LOG_ERR,
+                    "Unimplemented option \"%s\"", argv[optind - 1]);
                 break;
         }
     }
     if (argv[optind]) {
-        log_err (EMUNGE_SNAFU, "Unrecognized parameter \"%s\"", argv[optind]);
+        log_err (EMUNGE_SNAFU, LOG_ERR,
+            "Unrecognized parameter \"%s\"", argv[optind]);
     }
     /*  Enable all metadata tags if a subset was not specified.
      */
@@ -346,6 +373,9 @@ display_help (char *prog)
     printf ("  %*s %s\n", w, (got_long ? "-V, --version" : "-V"),
             "Display version information");
 
+    printf ("  %*s %s\n", w, (got_long ? "-v, --verbose" : "-v"),
+            "Be verbose");
+
     printf ("  %*s %s\n", w, (got_long ? "-i, --input=FILE" : "-i FILE"),
             "Input credential from FILE");
 
@@ -357,6 +387,9 @@ display_help (char *prog)
 
     printf ("  %*s %s\n", w, (got_long ? "-o, --output=FILE" : "-o FILE"),
             "Output payload to FILE");
+
+    printf ("  %*s %s\n", w, (got_long ? "-S, --socket=STRING" : "-S STRING"),
+            "Specify local domain socket");
 
     printf ("  %*s %s\n", w, (got_long ? "-t, --tags=STRING" : "-t STRING"),
             "Specify subset of metadata tags to output");
@@ -409,31 +442,31 @@ open_files (conf_t conf)
         if (!strcmp (conf->fn_in, "-"))
             conf->fp_in = stdin;
         else if (!(conf->fp_in = fopen (conf->fn_in, "r")))
-            log_err (EMUNGE_SNAFU, "Unable to read from \"%s\": %s",
+            log_err (EMUNGE_SNAFU, LOG_ERR, "Unable to read from \"%s\": %s",
                 conf->fn_in, strerror (errno));
     }
     if (conf->fn_meta) {
         if (!strcmp (conf->fn_meta, "-"))
             conf->fp_meta = stdout;
         else if (conf->fn_in && !strcmp (conf->fn_meta, conf->fn_in))
-            log_err (EMUNGE_SNAFU,
+            log_err (EMUNGE_SNAFU, LOG_ERR,
                 "Cannot read and write to the same file \"%s\"",
                 conf->fn_meta);
         else if (!(conf->fp_meta = fopen (conf->fn_meta, "w")))
-            log_err (EMUNGE_SNAFU, "Unable to write to \"%s\": %s",
+            log_err (EMUNGE_SNAFU, LOG_ERR, "Unable to write to \"%s\": %s",
                 conf->fn_meta, strerror (errno));
     }
     if (conf->fn_out) {
         if (!strcmp (conf->fn_out, "-"))
             conf->fp_out = stdout;
         else if (conf->fn_in && !strcmp (conf->fn_out, conf->fn_in))
-            log_err (EMUNGE_SNAFU,
+            log_err (EMUNGE_SNAFU, LOG_ERR,
                 "Cannot read and write to the same file \"%s\"",
                 conf->fn_out);
         else if (conf->fn_meta && !strcmp (conf->fn_out, conf->fn_meta))
             conf->fp_out = conf->fp_meta;
         else if (!(conf->fp_out = fopen (conf->fn_out, "w")))
-            log_err (EMUNGE_SNAFU, "Unable to write to \"%s\": %s",
+            log_err (EMUNGE_SNAFU, LOG_ERR, "Unable to write to \"%s\": %s",
                 conf->fn_out, strerror (errno));
     }
     return;
@@ -487,7 +520,7 @@ display_meta (conf_t conf)
     if (conf->fp_meta == conf->fp_out) {
         fprintf (conf->fp_meta, "\n");
     }
-    /*  XXX: Check fprintf() retvals?
+    /*  FIXME: Check fprintf() retvals?
      */
     return;
 }
@@ -501,7 +534,7 @@ display_data (conf_t conf)
     if (!conf->fp_out)
         return;
     if (fwrite (conf->data, 1, conf->dlen, conf->fp_out) != conf->dlen)
-        log_err (EMUNGE_SNAFU, "Write error");
+        log_err (EMUNGE_SNAFU, LOG_ERR, "Write error");
     return;
 }
 

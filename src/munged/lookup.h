@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: common.h,v 1.2 2003/04/08 18:16:16 dun Exp $
+ *  $Id: lookup.h,v 1.1 2003/04/08 18:16:16 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -25,29 +25,22 @@
  *****************************************************************************/
 
 
-#ifndef MUNGE_COMMON_H
-#define MUNGE_COMMON_H
+#ifndef LOOKUP_H
+#define LOOKUP_H
+
+#include <munge.h>
+#include <openssl/evp.h>
 
 
-/*  These contain prototypes and whatnot for libcommon.
+const EVP_CIPHER * lookup_cipher (munge_cipher_t cipher);
+/*
+ *  FIXME: Doc me!
  */
-#include "dprintf.h"
-#include "fd.h"
-#include "license.h"
-#include "log.h"
-#include "munge_defs.h"
-#include "munge_msg.h"
-#include "posignal.h"
-#include "str.h"
+
+const EVP_MD * lookup_mac (munge_mac_t mac);
+/*
+ *  FIXME: Doc me!
+ */
 
 
-#ifndef MAX
-#  define MAX(a,b) ((a >= b) ? (a) : (b))
-#endif /* !MAX */
-
-#ifndef MIN
-#  define MIN(a,b) ((a <= b) ? (a) : (b))
-#endif /* !MIN */
-
-
-#endif /* !MUNGE_COMMON_H */
+#endif /* !LOOKUP_H */

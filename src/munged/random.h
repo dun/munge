@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: common.h,v 1.2 2003/04/08 18:16:16 dun Exp $
+ *  $Id: random.h,v 1.1 2003/04/08 18:16:16 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -25,29 +25,38 @@
  *****************************************************************************/
 
 
-#ifndef MUNGE_COMMON_H
-#define MUNGE_COMMON_H
+#ifndef RANDOM_H
+#define RANDOM_H
 
 
-/*  These contain prototypes and whatnot for libcommon.
+void random_init (const char *seed);
+/*
+ *  Initializes the PRNG from the [seed] file.
+ *  If [seed] does not exist or provide adequate entropy,
+ *    the PRNG will be seeded from a secure source (/dev/random).
  */
-#include "dprintf.h"
-#include "fd.h"
-#include "license.h"
-#include "log.h"
-#include "munge_defs.h"
-#include "munge_msg.h"
-#include "posignal.h"
-#include "str.h"
+
+void random_fini (const char *seed);
+/*
+ *  Cleans-up the PRNG, writing the current state out to the [seed] file
+ *    if one is specified.
+ */
+
+void random_add (const void *buf, int n);
+/*
+ *  Adds [n] bytes of entropy from [buf] to the PRNG state.
+ */
+
+void random_bytes (unsigned char *buf, int n);
+/*
+ *  Places [n] bytes of cryptographically strong pseudo-random data into [buf].
+ */
+
+void random_pseudo_bytes (unsigned char *buf, int n);
+/*
+ *  Places [n] bytes of pseudo-random data into [buf].
+ *  This should not be used for purposes such as key generation.
+ */
 
 
-#ifndef MAX
-#  define MAX(a,b) ((a >= b) ? (a) : (b))
-#endif /* !MAX */
-
-#ifndef MIN
-#  define MIN(a,b) ((a <= b) ? (a) : (b))
-#endif /* !MIN */
-
-
-#endif /* !MUNGE_COMMON_H */
+#endif /* !RANDOM_H */

@@ -98,8 +98,23 @@ lib_LTLIBRARIES = \
 	libmunge.la
 
 
+CPPFLAGS = \
+	-I$(top_srcdir)/src/libcommon \
+	-I$(top_srcdir)/src/libmissing
+
+
+libmunge_la_LIBADD = \
+	$(top_builddir)/src/libcommon/libcommon.la \
+	$(top_builddir)/src/libmissing/libmissing.la
+
+
 libmunge_la_SOURCES = \
-	munge.c
+	code.c \
+	ctx.c \
+	ctx.h \
+	msg_client.c \
+	msg_client.h \
+	munge.h
 
 subdir = src/libmunge
 mkinstalldirs = $(SHELL) $(top_srcdir)/config/mkinstalldirs
@@ -108,18 +123,19 @@ CONFIG_CLEAN_FILES =
 LTLIBRARIES = $(lib_LTLIBRARIES)
 
 libmunge_la_LDFLAGS =
-libmunge_la_LIBADD =
-am_libmunge_la_OBJECTS = munge.lo
+libmunge_la_DEPENDENCIES = $(top_builddir)/src/libcommon/libcommon.la \
+	$(top_builddir)/src/libmissing/libmissing.la
+am_libmunge_la_OBJECTS = code.lo ctx.lo msg_client.lo
 libmunge_la_OBJECTS = $(am_libmunge_la_OBJECTS)
 
 DEFS = @DEFS@
 DEFAULT_INCLUDES =  -I. -I$(srcdir) -I$(top_builddir)/config
-CPPFLAGS = @CPPFLAGS@
 LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
 depcomp = $(SHELL) $(top_srcdir)/config/depcomp
 am__depfiles_maybe = depfiles
-@AMDEP_TRUE@DEP_FILES = ./$(DEPDIR)/munge.Plo
+@AMDEP_TRUE@DEP_FILES = ./$(DEPDIR)/code.Plo ./$(DEPDIR)/ctx.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/msg_client.Plo
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) \
@@ -180,7 +196,9 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/munge.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/code.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ctx.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/msg_client.Plo@am__quote@
 
 distclean-depend:
 	-rm -rf ./$(DEPDIR)

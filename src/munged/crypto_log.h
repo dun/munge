@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: common.h,v 1.2 2003/04/08 18:16:16 dun Exp $
+ *  $Id: crypto_log.h,v 1.1 2003/04/08 18:16:16 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -25,29 +25,18 @@
  *****************************************************************************/
 
 
-#ifndef MUNGE_COMMON_H
-#define MUNGE_COMMON_H
+#ifndef CRYPTO_LOG_H
+#define CRYPTO_LOG_H
 
 
-/*  These contain prototypes and whatnot for libcommon.
- */
-#include "dprintf.h"
-#include "fd.h"
-#include "license.h"
 #include "log.h"
-#include "munge_defs.h"
-#include "munge_msg.h"
-#include "posignal.h"
-#include "str.h"
 
 
-#ifndef MAX
-#  define MAX(a,b) ((a >= b) ? (a) : (b))
-#endif /* !MAX */
-
-#ifndef MIN
-#  define MIN(a,b) ((a <= b) ? (a) : (b))
-#endif /* !MIN */
+void crypto_log_msg (int priority);
+/*
+ *  Logs all crypto/ssl errors in this thread's error queue (should any exist)
+ *    at the specified [priority] level.
+ */
 
 
-#endif /* !MUNGE_COMMON_H */
+#endif /* !CRYPTO_LOG_H */

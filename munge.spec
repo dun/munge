@@ -1,4 +1,4 @@
-# $Id: munge.spec,v 1.6 2003/02/13 19:27:02 dun Exp $
+# $Id: munge.spec,v 1.7 2003/04/08 18:16:10 dun Exp $
 
 Name:		munge
 Version:	0.0
@@ -74,6 +74,7 @@ rm -rf "$RPM_BUILD_ROOT"
 #    fi
 #  fi
 #fi
+#
 %post
 if [ "$1" = 1 ]; then
   /sbin/ldconfig %{_libdir}
@@ -96,7 +97,7 @@ fi
 %doc README
 #%config(noreplace) /etc/munge.conf
 #%config(noreplace) /etc/logrotate.d/munge
-#%config(noreplace) /etc/rc.d/init.d/munge
+/etc/rc.d/init.d/munge
 %{_bindir}/*
 %{_includedir}/*
 %{_libdir}/*

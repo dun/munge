@@ -90,13 +90,31 @@ am__include = @am__include@
 am__quote = @am__quote@
 install_sh = @install_sh@
 
+CPPFLAGS = \
+	-I$(top_srcdir)/src/libmunge
+
+
 noinst_LTLIBRARIES = \
 	libcommon.la
 
 
 libcommon_la_SOURCES = \
+	common.h \
+	dprintf.c \
+	dprintf.h \
+	fd.c \
+	fd.h \
 	license.c \
-	log.c
+	license.h \
+	log.c \
+	log.h \
+	munge_defs.h \
+	munge_msg.c \
+	munge_msg.h \
+	posignal.c \
+	posignal.h \
+	str.c \
+	str.h
 
 subdir = src/libcommon
 mkinstalldirs = $(SHELL) $(top_srcdir)/config/mkinstalldirs
@@ -106,17 +124,20 @@ LTLIBRARIES = $(noinst_LTLIBRARIES)
 
 libcommon_la_LDFLAGS =
 libcommon_la_LIBADD =
-am_libcommon_la_OBJECTS = license.lo log.lo
+am_libcommon_la_OBJECTS = dprintf.lo fd.lo license.lo log.lo \
+	munge_msg.lo posignal.lo str.lo
 libcommon_la_OBJECTS = $(am_libcommon_la_OBJECTS)
 
 DEFS = @DEFS@
 DEFAULT_INCLUDES =  -I. -I$(srcdir) -I$(top_builddir)/config
-CPPFLAGS = @CPPFLAGS@
 LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
 depcomp = $(SHELL) $(top_srcdir)/config/depcomp
 am__depfiles_maybe = depfiles
-@AMDEP_TRUE@DEP_FILES = ./$(DEPDIR)/license.Plo ./$(DEPDIR)/log.Plo
+@AMDEP_TRUE@DEP_FILES = ./$(DEPDIR)/dprintf.Plo ./$(DEPDIR)/fd.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/license.Plo ./$(DEPDIR)/log.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/munge_msg.Plo ./$(DEPDIR)/posignal.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/str.Plo
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) \
@@ -156,8 +177,13 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dprintf.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fd.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/license.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/log.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/munge_msg.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/posignal.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/str.Plo@am__quote@
 
 distclean-depend:
 	-rm -rf ./$(DEPDIR)

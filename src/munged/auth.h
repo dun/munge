@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: common.h,v 1.2 2003/04/08 18:16:16 dun Exp $
+ *  $Id: auth.h,v 1.1 2003/04/08 18:16:16 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -25,29 +25,13 @@
  *****************************************************************************/
 
 
-#ifndef MUNGE_COMMON_H
-#define MUNGE_COMMON_H
+#ifndef MUNGE_AUTH_H
+#define MUNGE_AUTH_H
+
+#include <sys/types.h>
 
 
-/*  These contain prototypes and whatnot for libcommon.
- */
-#include "dprintf.h"
-#include "fd.h"
-#include "license.h"
-#include "log.h"
-#include "munge_defs.h"
-#include "munge_msg.h"
-#include "posignal.h"
-#include "str.h"
+int auth_peer_get (int sd, uid_t *p2uid, gid_t *p2gid);
 
 
-#ifndef MAX
-#  define MAX(a,b) ((a >= b) ? (a) : (b))
-#endif /* !MAX */
-
-#ifndef MIN
-#  define MIN(a,b) ((a <= b) ? (a) : (b))
-#endif /* !MIN */
-
-
-#endif /* !MUNGE_COMMON_H */
+#endif /* !MUNGE_AUTH_H */

@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: common.h,v 1.2 2003/04/08 18:16:16 dun Exp $
+ *  $Id: auth.c,v 1.1 2003/04/08 18:16:16 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -25,29 +25,26 @@
  *****************************************************************************/
 
 
-#ifndef MUNGE_COMMON_H
-#define MUNGE_COMMON_H
+#if HAVE_CONFIG_H
+#  include <config.h>
+#endif /* HAVE_CONFIG_H */
+
+#include <sys/socket.h>
+#include <sys/types.h>
 
 
-/*  These contain prototypes and whatnot for libcommon.
+/*  FIXME: Add autoconf support for SO_PEERCRED sockopt().
+ *  FIXME: Add autoconf support for socklen_t.
  */
-#include "dprintf.h"
-#include "fd.h"
-#include "license.h"
-#include "log.h"
-#include "munge_defs.h"
-#include "munge_msg.h"
-#include "posignal.h"
-#include "str.h"
+int
+auth_peer_get (int sd, uid_t *p2uid, gid_t *p2gid)
+{
+    struct ucred cred;
+    socklen_t len = sizeof (cred);
 
-
-#ifndef MAX
-#  define MAX(a,b) ((a >= b) ? (a) : (b))
-#endif /* !MAX */
-
-#ifndef MIN
-#  define MIN(a,b) ((a <= b) ? (a) : (b))
-#endif /* !MIN */
-
-
-#endif /* !MUNGE_COMMON_H */
+    if (getsockopt (sd, SOL_SOCKET, SO_PEERCRED, &cred, &len) < 0)
+        return (-1);
+    *p2uid = cred.uid;
+    *p2gid = cred.gid;
+    return (0);
+}

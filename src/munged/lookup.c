@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: common.h,v 1.2 2003/04/08 18:16:16 dun Exp $
+ *  $Id: lookup.c,v 1.1 2003/04/08 18:16:16 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -25,29 +25,52 @@
  *****************************************************************************/
 
 
-#ifndef MUNGE_COMMON_H
-#define MUNGE_COMMON_H
+#if HAVE_CONFIG_H
+#  include <config.h>
+#endif /* HAVE_CONFIG_H */
+
+#include <munge.h>
+#include <openssl/evp.h>
+#include "lookup.h"
 
 
-/*  These contain prototypes and whatnot for libcommon.
- */
-#include "dprintf.h"
-#include "fd.h"
-#include "license.h"
-#include "log.h"
-#include "munge_defs.h"
-#include "munge_msg.h"
-#include "posignal.h"
-#include "str.h"
+const EVP_CIPHER *
+lookup_cipher (munge_cipher_t cipher)
+{
+    switch (cipher) {
+        case MUNGE_CIPHER_BLOWFISH:
+            return (EVP_bf_cbc ());
+        case MUNGE_CIPHER_CAST5:
+            return (EVP_cast5_cbc ());
+#if HAVE_EVP_AES_128_CBC
+        case MUNGE_CIPHER_AES_128:
+            return (EVP_aes_128_cbc ());
+#endif /* HAVE_EVP_AES_128_CBC */
+        default:
+            break;
+    }
+    return (NULL);
+}
 
 
-#ifndef MAX
-#  define MAX(a,b) ((a >= b) ? (a) : (b))
-#endif /* !MAX */
-
-#ifndef MIN
-#  define MIN(a,b) ((a <= b) ? (a) : (b))
-#endif /* !MIN */
-
-
-#endif /* !MUNGE_COMMON_H */
+const EVP_MD *
+lookup_mac (munge_mac_t mac)
+{
+    switch (mac) {
+        case MUNGE_MAC_MD5:
+            /* fall-thru */
+        case MUNGE_MAC_MD5_HALF:
+            return (EVP_md5 ());
+        case MUNGE_MAC_SHA1:
+            /* fall-thru */
+        case MUNGE_MAC_SHA1_HALF:
+            return (EVP_sha1 ());
+        case MUNGE_MAC_RIPEMD160:
+            /* fall-thru */
+        case MUNGE_MAC_RIPEMD160_HALF:
+            return (EVP_ripemd160 ());
+        default:
+            break;
+    }
+    return (NULL);
+}

@@ -1,6 +1,10 @@
+2003-04-08  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* : Support for munge_encode().
+
 2003-02-18  Chris Dunlap  <cdunlap@llnl.gov>
 
-	* : Changed #ifdef/#ifndef to #if/#else where appropriate.
+	* : Changed #ifdef/#ifndef to #if where appropriate.
 
 2003-02-16  Chris Dunlap  <cdunlap@llnl.gov>
 

@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: common.h,v 1.2 2003/04/08 18:16:16 dun Exp $
+ *  $Id: cred.c,v 1.1 2003/04/08 18:16:16 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -25,29 +25,59 @@
  *****************************************************************************/
 
 
-#ifndef MUNGE_COMMON_H
-#define MUNGE_COMMON_H
+#if HAVE_CONFIG_H
+#  include <config.h>
+#endif /* HAVE_CONFIG_H */
 
-
-/*  These contain prototypes and whatnot for libcommon.
- */
-#include "dprintf.h"
-#include "fd.h"
-#include "license.h"
-#include "log.h"
+#include <assert.h>
+#include <stdlib.h>
+#include <string.h>
+#include "cred.h"
 #include "munge_defs.h"
-#include "munge_msg.h"
-#include "posignal.h"
-#include "str.h"
 
 
-#ifndef MAX
-#  define MAX(a,b) ((a >= b) ? (a) : (b))
-#endif /* !MAX */
+munge_cred_t
+cred_create (munge_msg_t m)
+{
+    munge_cred_t c;
 
-#ifndef MIN
-#  define MIN(a,b) ((a <= b) ? (a) : (b))
-#endif /* !MIN */
+    assert (m != NULL);
+
+    if (!(c = malloc (sizeof (struct munge_cred)))) {
+        return (NULL);
+    }
+    /*  Init ints to 0, chars to \0, ptrs to NULL.
+     */
+    memset (c, 0, sizeof (*c));
+
+    c->version = MUNGE_CRED_VERSION;
+    c->msg = m;
+    return (c);
+}
 
 
-#endif /* !MUNGE_COMMON_H */
+void
+cred_destroy (munge_cred_t c)
+{
+    if (!c) {
+        return;
+    }
+    if (c->cred) {
+        assert (c->cred_len > 0);
+        memset (c->cred, 0, c->cred_len);
+        free (c->cred);
+    }
+    if (c->outer) {
+        assert (c->outer_len > 0);
+        memset (c->outer, 0, c->outer_len);
+        free (c->outer);
+    }
+    if (c->inner) {
+        assert (c->inner_len > 0);
+        memset (c->inner, 0, c->inner_len);
+        free (c->inner);
+    }
+    memset (c, 0, sizeof (*c));
+    free (c);
+    return;
+}
