@@ -1,0 +1,2 @@
+Version 0.0 (2002-12-20):
+  - Initial support for munge_encode, munge_decode, munge_strerror.
