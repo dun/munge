@@ -1,3 +1,8 @@
+2004-03-25  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* munge.spec, config/Make-rpm.mk:
+	  Changed tarball suffix from ".tgz" to ".tar.gz".
+
 2004-03-24  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* configure.ac, config/x_ac_check_pthreads.m4,

@@ -3,7 +3,7 @@
 ##   by Chris Dunlap <cdunlap@llnl.gov>
 ##*
 ## ConManId: Make-rpm.mk,v 1.20 2002/08/16 00:18:29 dun Exp
-## $Id: Make-rpm.mk,v 1.6 2003/04/30 19:28:51 dun Exp $
+## $Id: Make-rpm.mk,v 1.7 2004/03/25 21:48:20 dun Exp $
 ##*
 ## REQUIREMENTS:
 ## - requires project to be under CVS version control
@@ -87,10 +87,10 @@ tar rpm:
 	    && rm -rf $$tmp
 
 tar-internal:
-	@echo "Creating $$pkg.tgz ..."; \
-	rm -f $$pkg.tgz || exit 1; \
-	(cd $$tmp; tar -cf - $$proj-$$ver) | gzip -c9 >$$tmp/$$pkg.tgz; \
-	cp -p $$tmp/$$pkg.tgz $$pkg.tgz || exit 1
+	@echo "Creating $$pkg.tar.gz ..."; \
+	rm -f $$pkg.tar.gz || exit 1; \
+	(cd $$tmp; tar -cf - $$proj-$$ver) | gzip -c9 >$$tmp/$$pkg.tar.gz; \
+	cp -p $$tmp/$$pkg.tar.gz $$pkg.tar.gz || exit 1
 
 rpm-internal: tar-internal
 	@echo "Creating $$pkg*rpm ..."; \
@@ -98,7 +98,7 @@ rpm-internal: tar-internal
 	  if ! $$mkdir $$tmp/$$d >/dev/null; then \
 	    echo "ERROR: Cannot create \"$$tmp/$$d\" dir." 1>&2; exit 1; fi; \
 	      done; \
-	mv $$tmp/$$pkg.tgz $$tmp/SOURCES/ || exit 1; \
+	mv $$tmp/$$pkg.tar.gz $$tmp/SOURCES/ || exit 1; \
 	test -f $$tmp/$$proj-$$ver/$$proj.spec.in \
 	  && spec=$$tmp/$$proj-$$ver/$$proj.spec.in \
 	  || spec=$$tmp/$$proj-$$ver/$$proj.spec; \
@@ -107,7 +107,7 @@ rpm-internal: tar-internal
 	sed -e "s/^\([ 	]*Name:\).*/\1 $$proj/i" \
 	    -e "s/^\([ 	]*Version:\).*/\1 $$ver/i" \
 	    -e "s/^\([ 	]*Release:\).*/\1 $$rel/i" \
-	    -e "s/^\([ 	]*Source0\?:\).*/\1 $$pkg.tgz/i" \
+	    -e "s/^\([ 	]*Source0\?:\).*/\1 $$pkg.tar.gz/i" \
 	    <$$spec >$$tmp/SPECS/$$proj.spec; \
 	if ! test -s $$tmp/SPECS/$$proj.spec; then \
 	  echo "ERROR: Cannot create $$proj.spec." 1>&2; exit 1; fi; \

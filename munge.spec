@@ -1,4 +1,4 @@
-# $Id: munge.spec,v 1.13 2004/03/04 22:44:10 dun Exp $
+# $Id: munge.spec,v 1.14 2004/03/25 21:48:20 dun Exp $
 
 Name:		munge
 Version:	0.1
@@ -11,7 +11,7 @@ URL:		http://www.llnl.gov/linux/munge/
 
 BuildRoot:	%{_tmppath}/%{name}-%{version}
 
-Source0:	%{name}-%{version}.tgz
+Source0:	%{name}-%{version}.tar.gz
 
 %description
 MUNGE (Munge Uid 'N' Gid Emporium) is a service for creating and
