@@ -91,6 +91,7 @@ am__quote = @am__quote@
 install_sh = @install_sh@
 
 SUBDIRS = \
+	etc \
 	libcommon \
 	libmissing \
 	libmunge \

@@ -1,3 +1,7 @@
+2003-04-30  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* : Added startup script.
+
 2003-04-29  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* : Fixed compiler warnings under RH62 w/o -Wall.

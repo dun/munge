@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: configure.ac,v 1.6 2003/04/08 18:16:10 dun Exp $
+## $Id: configure.ac,v 1.7 2003/04/30 17:58:59 dun Exp $
 ##*****************************************************************************
 ## Process this file with autoconf to produce a configure script.
 ##*****************************************************************************
@@ -118,6 +118,7 @@ AC_LTLIBOBJS
 AC_CONFIG_FILES( \
   Makefile \
   src/Makefile \
+  src/etc/Makefile \
   src/libcommon/Makefile \
   src/libmissing/Makefile \
   src/libmunge/Makefile \
