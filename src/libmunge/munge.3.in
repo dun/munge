@@ -1,4 +1,4 @@
-.\" $Id: munge.3.in,v 1.3 2004/11/18 19:55:44 dun Exp $
+.\" $Id: munge.3.in,v 1.4 2004/12/07 19:24:40 dun Exp $
 
 .TH MUNGE 3 "@DATE@" "@PACKAGE@-@VERSION@" "Munge Uid 'N' Gid Emporium"
 
@@ -114,7 +114,7 @@ The credential has expired.
 The credential appears to have been encoded at some point in the future.
 .TP
 .B EMUNGE_CRED_REPLAYED
-The credential has been previously decoded on this node.
+The credential has been previously decoded on this host.
 .TP
 .B EMUNGE_CRED_UNAUTHORIZED
 The client is not authorized to decode the credential based upon the effective

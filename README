@@ -5,8 +5,8 @@ Clients can create and validate these credentials without the use of root
 privileges, reserved ports, or platform-specific methods.
 
 A credential is created and validated by the local munged daemon running
-on each node within a security realm.  A security realm is defined by
-the secret key; munged daemons running on different nodes are in the
+on each host within a security realm.  A security realm is defined by
+the secret key; munged daemons running on different hosts are in the
 same realm if they share the same key.  A client creates or validates a
 given credential through the use of the libmunge library or munge/unmunge
 executables; these are responsible for communicating with the local daemon
@@ -52,9 +52,9 @@ Getting started:
      the 'munged' daemon will run as.  On most platforms, root privileges
      are not required for the daemon.
 
-  5. Securely propagate this file (eg, with ssh) to other nodes within the
+  5. Securely propagate this file (eg, with ssh) to other hosts within the
      same security realm.  Credentials are valid only within a security
-     realm (ie, on nodes sharing the same secret key).  All 'munged'
+     realm (ie, on hosts sharing the same secret key).  All 'munged'
      daemons exchanging credentials need to share the same secret key.
 
   6. Start the 'munged' daemon.  You can use the init script
