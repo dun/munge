@@ -1,5 +1,7 @@
 2004-03-11  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/munged/replay.c(replay_insert): Changed return codes.
+
 	* config/x_ac_meta.m4: Added test for META file existence.
 
 2004-03-05  Chris Dunlap  <cdunlap@llnl.gov>

@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: replay.c,v 1.1 2003/11/26 23:07:49 dun Exp $
+ *  $Id: replay.c,v 1.2 2004/03/11 21:00:41 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -140,8 +140,8 @@ replay_fini (void)
 int
 replay_insert (munge_cred_t c)
 {
-/*  Returns 1 if the credential is successfully inserted.
- *    Returns 0 if the credential is already present (ie, replay).
+/*  Returns 0 if the credential is successfully inserted.
+ *    Returns 1 if the credential is already present (ie, replay).
  *    Returns -1 on error with errno set.
  */
     int                     e;
@@ -164,7 +164,7 @@ replay_insert (munge_cred_t c)
     memcpy (r->mac, c->mac, c->mac_len);
 
     if (hash_insert (replay_hash, r, r) != NULL) {
-        return (1);
+        return (0);
     }
     e = errno;
 
@@ -173,7 +173,7 @@ replay_insert (munge_cred_t c)
     replay_free (r);
 
     if (e == EEXIST) {
-        return (0);
+        return (1);
     }
     if (e == EINVAL) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
