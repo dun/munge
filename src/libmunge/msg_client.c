@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: msg_client.c,v 1.13 2004/10/13 21:52:56 dun Exp $
+ *  $Id: msg_client.c,v 1.14 2004/11/12 02:09:59 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -40,11 +40,11 @@
 #include <munge.h>
 #include "auth_send.h"
 #include "ctx.h"
+#include "missing.h"
 #include "msg_client.h"
 #include "munge_defs.h"
 #include "munge_msg.h"
 #include "str.h"
-#include "strlcpy.h"
 
 
 /*****************************************************************************

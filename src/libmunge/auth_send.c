@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: auth_send.c,v 1.5 2004/11/09 18:12:04 dun Exp $
+ *  $Id: auth_send.c,v 1.6 2004/11/12 02:09:59 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -64,9 +64,9 @@ auth_send (munge_msg_t m)
 #include <sys/ioctl.h>                  /* ioctl */
 #include <sys/stat.h>                   /* I_IRUSR */
 #include <unistd.h>                     /* unlink, close */
+#include "missing.h"
 #include "munge_defs.h"
 #include "str.h"
-#include "strlcat.h"
 
 static int _recv_auth_req (int sd, char **dst_p);
 static int _name_auth_file (const char *src, char **dst_p);

@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munged.c,v 1.17 2004/09/18 23:00:01 dun Exp $
+ *  $Id: munged.c,v 1.18 2004/11/12 02:09:59 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -49,11 +49,11 @@
 #include "gids.h"
 #include "job.h"
 #include "log.h"
+#include "missing.h"
 #include "munge_defs.h"
 #include "posignal.h"
 #include "random.h"
 #include "replay.h"
-#include "strlcpy.h"
 #include "timer.h"
 
 
