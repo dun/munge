@@ -1,3 +1,12 @@
+2004-11-24  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/munge/unmunge.c:
+	  Changed MUNGE_KEY_ORIGIN to MUNGE_KEY_ENCODE_HOST.
+	  Tweaked munge_keys[] strings.
+
+	* configure.ac, config/x_ac_aix.m4:
+	  Added X_AC_AIX to enable run-time linking under AIX.
+
 2004-11-23  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/libcommon/Makefile.am, src/libcommon/m_msg.c,

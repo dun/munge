@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: unmunge.c,v 1.34 2004/11/18 00:48:13 dun Exp $
+ *  $Id: unmunge.c,v 1.35 2004/11/24 20:55:20 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -92,7 +92,7 @@ typedef struct {
 
 typedef enum {
     MUNGE_KEY_STATUS,
-    MUNGE_KEY_ORIGIN,
+    MUNGE_KEY_ENCODE_HOST,
     MUNGE_KEY_ENCODE_TIME,
     MUNGE_KEY_DECODE_TIME,
     MUNGE_KEY_TTL,
@@ -108,20 +108,20 @@ typedef enum {
 } munge_key_t;
 
 strval_t munge_keys[] = {
-    { MUNGE_KEY_STATUS,          "STATUS"  },
-    { MUNGE_KEY_ORIGIN,          "ORIGIN"  },
-    { MUNGE_KEY_ENCODE_TIME,     "ENCODED" },
-    { MUNGE_KEY_DECODE_TIME,     "DECODED" },
-    { MUNGE_KEY_TTL,             "TTL"     },
-    { MUNGE_KEY_CIPHER_TYPE,     "CIPHER"  },
-    { MUNGE_KEY_MAC_TYPE,        "MAC"     },
-    { MUNGE_KEY_ZIP_TYPE,        "ZIP"     },
-    { MUNGE_KEY_UID,             "UID"     },
-    { MUNGE_KEY_GID,             "GID"     },
-    { MUNGE_KEY_UID_RESTRICTION, "RUID"    },
-    { MUNGE_KEY_GID_RESTRICTION, "RGID"    },
-    { MUNGE_KEY_LENGTH,          "LENGTH"  },
-    { MUNGE_KEY_LAST,             NULL     }
+    { MUNGE_KEY_STATUS,          "STATUS"          },
+    { MUNGE_KEY_ENCODE_HOST,     "ENCODE_HOST"     },
+    { MUNGE_KEY_ENCODE_TIME,     "ENCODE_TIME"     },
+    { MUNGE_KEY_DECODE_TIME,     "DECODE_TIME"     },
+    { MUNGE_KEY_TTL,             "TTL"             },
+    { MUNGE_KEY_CIPHER_TYPE,     "CIPHER"          },
+    { MUNGE_KEY_MAC_TYPE,        "MAC"             },
+    { MUNGE_KEY_ZIP_TYPE,        "ZIP"             },
+    { MUNGE_KEY_UID,             "UID"             },
+    { MUNGE_KEY_GID,             "GID"             },
+    { MUNGE_KEY_UID_RESTRICTION, "UID_RESTRICTION" },
+    { MUNGE_KEY_GID_RESTRICTION, "GID_RESTRICTION" },
+    { MUNGE_KEY_LENGTH,          "LENGTH"          },
+    { MUNGE_KEY_LAST,             NULL             }
 };
 
 
@@ -566,7 +566,7 @@ display_meta (conf_t conf)
         fprintf (conf->fp_meta, "%s:%*c%s (%d)\n", s, w, 0x20,
             munge_strerror (conf->status), conf->status);
     }
-    if (conf->key[MUNGE_KEY_ORIGIN]) {
+    if (conf->key[MUNGE_KEY_ENCODE_HOST]) {
         e = munge_ctx_get (conf->ctx, MUNGE_OPT_ADDR4, &addr);
         if (e != EMUNGE_SUCCESS) {
             log_err (EMUNGE_SNAFU, LOG_ERR,
@@ -578,7 +578,7 @@ display_meta (conf_t conf)
             log_err (EMUNGE_SNAFU, LOG_ERR,
                 "Unable to convert ip address string");
         }
-        s = key_val_to_str (MUNGE_KEY_ORIGIN);
+        s = key_val_to_str (MUNGE_KEY_ENCODE_HOST);
         w = pad - strlen (s);
         fprintf (conf->fp_meta, "%s:%*c%s (%s)\n", s, w, 0x20,
             (hptr ? hptr->h_name : "???"), ip_buf);
