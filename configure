@@ -19320,9 +19320,9 @@ _ACEOF
 
 
 
-  echo "$as_me:$LINENO: checking for inet_ntoa in default libs" >&5
-echo $ECHO_N "checking for inet_ntoa in default libs... $ECHO_C" >&6
-if test "${x_ac_cv_lib_none_inet_ntoa+set}" = set; then
+  echo "$as_me:$LINENO: checking for gethostbyname in default libs" >&5
+echo $ECHO_N "checking for gethostbyname in default libs... $ECHO_C" >&6
+if test "${x_ac_cv_lib_none_gethostbyname+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
 
@@ -19339,11 +19339,11 @@ extern "C"
 #endif
 /* We use char because int might match the return type of a gcc2
    builtin and then its argument prototype would still apply.  */
-char inet_ntoa ();
+char gethostbyname ();
 int
 main ()
 {
-inet_ntoa ();
+gethostbyname ();
   ;
   return 0;
 }
@@ -19369,24 +19369,24 @@ if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); }; }; then
-  x_ac_cv_lib_none_inet_ntoa=yes
+  x_ac_cv_lib_none_gethostbyname=yes
 else
   echo "$as_me: failed program was:" >&5
 sed 's/^/| /' conftest.$ac_ext >&5
 
-x_ac_cv_lib_none_inet_ntoa=no
+x_ac_cv_lib_none_gethostbyname=no
 
 fi
 rm -f conftest.err conftest.$ac_objext \
       conftest$ac_exeext conftest.$ac_ext
 
 fi
-echo "$as_me:$LINENO: result: $x_ac_cv_lib_none_inet_ntoa" >&5
-echo "${ECHO_T}$x_ac_cv_lib_none_inet_ntoa" >&6
-  if test $x_ac_cv_lib_none_inet_ntoa = no; then
-  echo "$as_me:$LINENO: checking for inet_ntoa in -lnsl" >&5
-echo $ECHO_N "checking for inet_ntoa in -lnsl... $ECHO_C" >&6
-if test "${ac_cv_lib_nsl_inet_ntoa+set}" = set; then
+echo "$as_me:$LINENO: result: $x_ac_cv_lib_none_gethostbyname" >&5
+echo "${ECHO_T}$x_ac_cv_lib_none_gethostbyname" >&6
+  if test $x_ac_cv_lib_none_gethostbyname = no; then
+  echo "$as_me:$LINENO: checking for gethostbyname in -lnsl" >&5
+echo $ECHO_N "checking for gethostbyname in -lnsl... $ECHO_C" >&6
+if test "${ac_cv_lib_nsl_gethostbyname+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   ac_check_lib_save_LIBS=$LIBS
@@ -19404,11 +19404,11 @@ extern "C"
 #endif
 /* We use char because int might match the return type of a gcc2
    builtin and then its argument prototype would still apply.  */
-char inet_ntoa ();
+char gethostbyname ();
 int
 main ()
 {
-inet_ntoa ();
+gethostbyname ();
   ;
   return 0;
 }
@@ -19434,20 +19434,20 @@ if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); }; }; then
-  ac_cv_lib_nsl_inet_ntoa=yes
+  ac_cv_lib_nsl_gethostbyname=yes
 else
   echo "$as_me: failed program was:" >&5
 sed 's/^/| /' conftest.$ac_ext >&5
 
-ac_cv_lib_nsl_inet_ntoa=no
+ac_cv_lib_nsl_gethostbyname=no
 fi
 rm -f conftest.err conftest.$ac_objext \
       conftest$ac_exeext conftest.$ac_ext
 LIBS=$ac_check_lib_save_LIBS
 fi
-echo "$as_me:$LINENO: result: $ac_cv_lib_nsl_inet_ntoa" >&5
-echo "${ECHO_T}$ac_cv_lib_nsl_inet_ntoa" >&6
-if test $ac_cv_lib_nsl_inet_ntoa = yes; then
+echo "$as_me:$LINENO: result: $ac_cv_lib_nsl_gethostbyname" >&5
+echo "${ECHO_T}$ac_cv_lib_nsl_gethostbyname" >&6
+if test $ac_cv_lib_nsl_gethostbyname = yes; then
 
 
 
