@@ -39,7 +39,8 @@ DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 	$(top_srcdir)/config/Make-inc.mk
 subdir = src
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/config/x_ac_canonical.m4 \
+am__aclocal_m4_deps = $(top_srcdir)/config/x_ac_aix.m4 \
+	$(top_srcdir)/config/x_ac_canonical.m4 \
 	$(top_srcdir)/config/x_ac_check_cond_lib.m4 \
 	$(top_srcdir)/config/x_ac_check_fifo_recvfd.m4 \
 	$(top_srcdir)/config/x_ac_check_peercred.m4 \

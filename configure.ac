@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: configure.ac,v 1.27 2004/11/18 00:48:13 dun Exp $
+## $Id: configure.ac,v 1.28 2004/11/24 19:05:15 dun Exp $
 ##*****************************************************************************
 ## Process this file with autoconf to produce a configure script.
 ##*****************************************************************************
@@ -123,6 +123,11 @@ AC_REPLACE_FUNCS( \
   strlcat \
   strlcpy \
 )
+
+##
+# Check for platform-specific issues.
+##
+X_AC_AIX
 
 ##
 # Epilogue.
