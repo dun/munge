@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: job.c,v 1.7 2004/09/24 17:16:44 dun Exp $
+ *  $Id: job.c,v 1.8 2004/10/13 21:52:56 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -38,6 +38,7 @@
 #include "dec_v1.h"
 #include "enc_v1.h"
 #include "log.h"
+#include "munge_defs.h"
 #include "munge_msg.h"
 #include "str.h"
 #include "work.h"
@@ -148,7 +149,7 @@ _job_exec (munge_msg_t m)
 
     assert (m != NULL);
 
-    if ((e = munge_msg_recv (m)) != EMUNGE_SUCCESS) {
+    if ((e = munge_msg_recv (m, MUNGE_MAXIMUM_REQ_LEN)) != EMUNGE_SUCCESS) {
         ; /* fall out of if clause, log error, and drop request */
     }
     else if (m->head.version != MUNGE_MSG_VERSION) {

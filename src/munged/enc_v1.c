@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: enc_v1.c,v 1.22 2004/09/23 21:10:11 dun Exp $
+ *  $Id: enc_v1.c,v 1.23 2004/10/13 21:52:56 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -116,7 +116,7 @@ enc_v1_process_msg (munge_msg_t m)
     if (rc < 0) {
         job_error (m);
     }
-    if (munge_msg_send (m) != EMUNGE_SUCCESS) {
+    if (munge_msg_send (m, 0) != EMUNGE_SUCCESS) {
         rc = -1;
     }
     cred_destroy (c);

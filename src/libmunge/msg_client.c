@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: msg_client.c,v 1.12 2004/09/24 16:50:45 dun Exp $
+ *  $Id: msg_client.c,v 1.13 2004/10/13 21:52:56 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -82,7 +82,8 @@ munge_msg_client_xfer (munge_msg_t *pm, munge_ctx_t ctx)
         if ((e = _munge_msg_client_connect (mreq, socket)) != EMUNGE_SUCCESS) {
             break;
         }
-        else if ((e = munge_msg_send (mreq)) != EMUNGE_SUCCESS) {
+        else if ((e = munge_msg_send (mreq, MUNGE_MAXIMUM_REQ_LEN))
+                != EMUNGE_SUCCESS) {
             ; /* empty */
         }
         else if (auth_send (mreq) < 0) {
@@ -91,7 +92,7 @@ munge_msg_client_xfer (munge_msg_t *pm, munge_ctx_t ctx)
         else if ((e = munge_msg_create (&mrsp, mreq->sd)) != EMUNGE_SUCCESS) {
             break;
         }
-        else if ((e = munge_msg_recv (mrsp)) != EMUNGE_SUCCESS) {
+        else if ((e = munge_msg_recv (mrsp, 0)) != EMUNGE_SUCCESS) {
             ; /* empty */
         }
         else if ((e = _munge_msg_client_disconnect (mrsp)) != EMUNGE_SUCCESS) {
@@ -102,6 +103,9 @@ munge_msg_client_xfer (munge_msg_t *pm, munge_ctx_t ctx)
         }
 
         if (i >= MUNGE_SOCKET_XFER_ATTEMPTS) {
+            break;
+        }
+        if (e == EMUNGE_BAD_LENGTH) {
             break;
         }
         if (mrsp != NULL) {

@@ -1,5 +1,15 @@
 2004-10-13  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/libcommon/munge_defs.h: Added MUNGE_MAXIMUM_REQ_LEN.
+	* src/libcommon/munge_msg.c, src/libcommon/munge_msg.h:
+	  Added maxlen parm to munge_msg_send() and munge_msg_recv().
+	  All callers changed.
+	* src/libmunge/msg_client.c(munge_msg_client_xfer):
+	  Abort retry attempts on EMUNGE_BAD_LENGTH.
+	* src/libmunge/munge.h, src/libmunge/strerror.c:
+	  Added EMUNGE_BAD_LENGTH.  Renumbered munge_err enum.
+	* src/munged/job.c(_job_exec): Limit msg len to MUNGE_MAXIMUM_REQ_LEN.
+
 	* src/libcommon/munge_msg.h: Incremented MUNGE_MSG_VERSION to 3
 	  since retry field was added to munge_msg_head struct.
 

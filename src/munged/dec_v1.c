@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: dec_v1.c,v 1.27 2004/09/24 17:00:25 dun Exp $
+ *  $Id: dec_v1.c,v 1.28 2004/10/13 21:52:56 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -128,7 +128,7 @@ dec_v1_process_msg (munge_msg_t m)
      *       will then be marked as "unplayed", and the replayed reponse
      *       to the "second" client will now be in error.
      */
-    if (munge_msg_send (m) != EMUNGE_SUCCESS) {
+    if (munge_msg_send (m, 0) != EMUNGE_SUCCESS) {
         if (rc == 0) {
             replay_remove (c);
         }

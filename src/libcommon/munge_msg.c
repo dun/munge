@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munge_msg.c,v 1.21 2004/09/23 22:53:37 dun Exp $
+ *  $Id: munge_msg.c,v 1.22 2004/10/13 21:52:56 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -102,7 +102,7 @@ munge_msg_destroy (munge_msg_t m)
 
 
 munge_err_t
-munge_msg_send (munge_msg_t m)
+munge_msg_send (munge_msg_t m, int maxlen)
 {
 /*  Sends the message [m] to the recipient at the other end of the
  *    already-specified socket.
@@ -145,16 +145,29 @@ munge_msg_send (munge_msg_t m)
     for (i=0, nsend=0; i < iov_num; i++) {
         nsend += iov[i].iov_len;
     }
-again:
     /*  An EINTR should only occur before any data is transferred.
      *    As such, it should be jiggy to restart the whole writev() if needed.
      */
+again:
     if ((n = writev (m->sd, iov, iov_num)) < 0) {
         if (errno == EINTR)
             goto again;
         munge_msg_set_err (m, EMUNGE_SOCKET,
             strdupf ("Unable to send message: %s", strerror (errno)));
         return (EMUNGE_SOCKET);
+    }
+    /*  Normally, the test here for exceeding the message length would be
+     *    placed before the write to prevent an error that will surely happen.
+     *    But the reason it is placed here after the writev() is to allow the
+     *    daemon to log the attempt to exceed the maximum message length.
+     *    The daemon will abort its read after having read only the
+     *    munge_msg_head struct.
+     */
+    if ((maxlen > 0) && (m->head.length > maxlen)) {
+        munge_msg_set_err (m, EMUNGE_SOCKET,
+            strdupf ("Unable to send message: length %d exceeds max of %d",
+                m->head.length, maxlen));
+        return (EMUNGE_BAD_LENGTH);
     }
     if (n != nsend) {
         munge_msg_set_err (m, EMUNGE_SOCKET,
@@ -166,7 +179,7 @@ again:
 
 
 munge_err_t
-munge_msg_recv (munge_msg_t m)
+munge_msg_recv (munge_msg_t m, int maxlen)
 {
 /*  Receives a message from the sender at the other end of the already-
  *    specified socket.  This message is stored in the already-allocated [m].
@@ -213,6 +226,12 @@ munge_msg_recv (munge_msg_t m)
         munge_msg_set_err (m, EMUNGE_SOCKET,
             strdupf ("Received invalid message length %d", m->head.length));
         return (EMUNGE_SOCKET);
+    }
+    else if ((maxlen > 0) && (m->head.length > maxlen)) {
+        munge_msg_set_err (m, EMUNGE_SOCKET,
+            strdupf ("Received message length %d exceeding max of %d",
+                m->head.length, maxlen));
+        return (EMUNGE_BAD_LENGTH);
     }
     /*  Read the version-specific message body.
      *  Reserve space for a terminating NUL character.  This NUL is not

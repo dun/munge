@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: strerror.c,v 1.4 2004/04/16 22:15:06 dun Exp $
+ *  $Id: strerror.c,v 1.5 2004/10/13 21:52:56 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -42,6 +42,8 @@ munge_strerror (munge_err_t errnum)
             return ("Internal error");
         case EMUNGE_BAD_ARG:
             return ("Invalid argument");
+        case EMUNGE_BAD_LENGTH:
+            return ("Exceeded maximum message length");
         case EMUNGE_OVERFLOW:
             return ("Buffer overflow");
         case EMUNGE_NO_MEMORY:

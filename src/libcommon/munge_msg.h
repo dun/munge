@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munge_msg.h,v 1.16 2004/10/13 20:07:37 dun Exp $
+ *  $Id: munge_msg.h,v 1.17 2004/10/13 21:52:56 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -136,9 +136,9 @@ munge_err_t munge_msg_create (munge_msg_t *pm, int sd);
 
 void munge_msg_destroy (munge_msg_t m);
 
-munge_err_t munge_msg_send (munge_msg_t m);
+munge_err_t munge_msg_send (munge_msg_t m, int maxlen);
 
-munge_err_t munge_msg_recv (munge_msg_t m);
+munge_err_t munge_msg_recv (munge_msg_t m, int maxlen);
 
 int munge_msg_set_err (munge_msg_t m, munge_err_t e, char *s);
 

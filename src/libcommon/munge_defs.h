@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munge_defs.h,v 1.32 2004/09/24 18:20:14 dun Exp $
+ *  $Id: munge_defs.h,v 1.33 2004/10/13 21:52:56 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -66,6 +66,10 @@
 /*  Integer for the maximum number of seconds before a credential expires.
  */
 #define MUNGE_MAXIMUM_TTL               3600
+
+/* Integer for the maximum size (in bytes) of a munge request message.
+ */
+#define MUNGE_MAXIMUM_REQ_LEN           1048576
 
 /*  Flag to denote that group information comes from "/etc/group".
  *  If set, group information will not be re-parsed unless this file
