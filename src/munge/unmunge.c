@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: unmunge.c,v 1.1 2003/02/13 17:54:27 dun Exp $
+ *  $Id: unmunge.c,v 1.2 2003/02/13 20:17:20 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -330,7 +330,7 @@ display_help (char *prog)
 #else  /* !HAVE_GETOPT_LONG */
     const int got_long = 0;
 #endif /* !HAVE_GETOPT_LONG */
-    const int w = -24;                  /* pad for width of option string */
+    const int w = -21;                  /* pad for width of option string */
 
     assert (prog != NULL);
 
