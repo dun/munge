@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munge.c,v 1.11 2003/04/30 00:11:00 dun Exp $
+ *  $Id: munge.c,v 1.12 2003/05/02 19:52:02 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -243,9 +243,10 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                 display_license ();
                 exit (EMUNGE_SUCCESS);
                 break;
-//          case 'V':
-//              exit (EMUNGE_SUCCESS);
-//              break;
+            case 'V':
+                printf ("%s-%s\n", PACKAGE, VERSION);
+                exit (EMUNGE_SUCCESS);
+                break;
             case 'c':
                 if ((i = str_to_int (optarg, munge_cipher_strings)) < 0)
                     log_err (EMUNGE_SNAFU, LOG_ERR,

@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: conf.c,v 1.4 2003/04/30 21:45:15 dun Exp $
+ *  $Id: conf.c,v 1.5 2003/05/02 19:52:01 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -53,7 +53,6 @@ struct option opt_table[] = {
     { "help",       0, NULL, 'h' },
     { "license",    0, NULL, 'L' },
     { "version",    0, NULL, 'V' },
-    { "verbose",    0, NULL, 'v' },
     { "force",      0, NULL, 'f' },
     { "foreground", 0, NULL, 'F' },
     { "socket",     1, NULL, 'S' },
@@ -61,7 +60,7 @@ struct option opt_table[] = {
 };
 #endif /* HAVE_GETOPT_H */
                                                                                 
-const char * const opt_string = "hLVvfFS:";
+const char * const opt_string = "hLVfFS:";
 
 
 /*****************************************************************************
@@ -178,10 +177,9 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                 display_license ();
                 exit (EMUNGE_SUCCESS);
                 break;
-//          case 'V':
-//              exit (EMUNGE_SUCCESS);
-//              break;
-            case 'v':
+            case 'V':
+                printf ("%s-%s\n", PACKAGE, VERSION);
+                exit (EMUNGE_SUCCESS);
                 break;
             case 'f':
                 conf->got_force = 1;
@@ -243,9 +241,6 @@ display_help (char *prog)
 
     printf ("  %*s %s\n", w, (got_long ? "-V, --version" : "-V"),
             "Display version information");
-
-    printf ("  %*s %s\n", w, (got_long ? "-v, --verbose" : "-v"),
-            "Be verbose");
 
     printf ("  %*s %s\n", w, (got_long ? "-f, --force" : "-f"),
             "Force process to run if possible");

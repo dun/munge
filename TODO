@@ -1,5 +1,4 @@
 -revisit data returned on credential error
--'V' cmdline option support
 -foreground vs daemon mode support
 -nonroot configuration support
 -create README guide
