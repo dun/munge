@@ -24,12 +24,6 @@
 /* Define to 1 if you have the `EVP_DigestInit_ex' function. */
 #undef HAVE_EVP_DIGESTINIT_EX
 
-/* Define to 1 if you have the <getopt.h> header file. */
-#undef HAVE_GETOPT_H
-
-/* Define to 1 if you have the `getopt_long' function. */
-#undef HAVE_GETOPT_LONG
-
 /* Define to 1 if you have the `getpeereid' function. */
 #undef HAVE_GETPEEREID
 

@@ -55,12 +55,13 @@ CONFIG_HEADER = $(top_builddir)/config/config.h
 CONFIG_CLEAN_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 libmissing_la_DEPENDENCIES = @LTLIBOBJS@
-am_libmissing_la_OBJECTS =
+am_libmissing_la_OBJECTS = getopt.lo getopt1.lo
 libmissing_la_OBJECTS = $(am_libmissing_la_OBJECTS)
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)/config
 depcomp = $(SHELL) $(top_srcdir)/config/depcomp
 am__depfiles_maybe = depfiles
-@AMDEP_TRUE@DEP_FILES = $(DEPDIR)/strlcat.Plo $(DEPDIR)/strlcpy.Plo
+@AMDEP_TRUE@DEP_FILES = $(DEPDIR)/strlcat.Plo $(DEPDIR)/strlcpy.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/getopt.Plo ./$(DEPDIR)/getopt1.Plo
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) \
@@ -185,6 +186,9 @@ libmissing_la_LIBADD = \
 	@LTLIBOBJS@
 
 libmissing_la_SOURCES = \
+	getopt.h \
+	getopt.c \
+	getopt1.c \
 	missing.h
 
 all: all-am
@@ -240,6 +244,8 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/strlcat.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/strlcpy.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/getopt.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/getopt1.Plo@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	if $(COMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \
@@ -383,7 +389,7 @@ clean-am: clean-generic clean-libtool clean-noinstLTLIBRARIES \
 	mostlyclean-am
 
 distclean: distclean-am
-	-rm -rf $(DEPDIR)
+	-rm -rf $(DEPDIR) ./$(DEPDIR)
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-libtool distclean-local distclean-tags
@@ -409,7 +415,7 @@ install-man:
 installcheck-am:
 
 maintainer-clean: maintainer-clean-am
-	-rm -rf $(DEPDIR)
+	-rm -rf $(DEPDIR) ./$(DEPDIR)
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 

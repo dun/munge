@@ -1,3 +1,10 @@
+2004-04-08  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* configure.ac, src/libmissing/Makefile.am, src/libmissing/getopt.c,
+	  src/libmissing/getopt.h, src/libmissing/getopt1.c, src/munge/munge.c,
+	  src/munge/unmunge.c, src/munged/conf.c:
+	  Added GNU getopt from glibc-2.3.2 to libmissing.
+
 2004-04-06  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/etc/munge.init: Tweaked in an attempt to make path independent.

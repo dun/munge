@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: configure.ac,v 1.19 2004/04/03 21:52:59 dun Exp $
+## $Id: configure.ac,v 1.20 2004/04/08 22:09:45 dun Exp $
 ##*****************************************************************************
 ## Process this file with autoconf to produce a configure script.
 ##*****************************************************************************
@@ -65,7 +65,6 @@ X_AC_CHECK_COND_LIB(z, compress)
 AC_HEADER_STDC
 AC_CHECK_HEADERS( \
   bzlib.h \
-  getopt.h \
   zlib.h \
 )
 
@@ -103,7 +102,6 @@ AC_CHECK_TYPES(CRYPTO_dynlock, [], [], [#include <openssl/crypto.h>])
 # Checks for library functions.
 ##
 AC_CHECK_FUNCS( \
-  getopt_long \
   localtime_r \
 )
 AC_REPLACE_FUNCS( \

@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: conf.c,v 1.17 2004/04/03 21:53:00 dun Exp $
+ *  $Id: conf.c,v 1.18 2004/04/08 22:09:45 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -55,7 +55,6 @@
  *  Command-Line Options
  *****************************************************************************/
 
-#if HAVE_GETOPT_H
 #  include <getopt.h>
 struct option opt_table[] = {
     { "help",       0, NULL, 'h' },
@@ -66,8 +65,7 @@ struct option opt_table[] = {
     { "socket",     1, NULL, 'S' },
     {  NULL,        0, NULL,  0  }
 };
-#endif /* HAVE_GETOPT_H */
-                                                                                
+
 const char * const opt_string = "hLVfFS:";
 
 
@@ -174,11 +172,8 @@ parse_cmdline (conf_t conf, int argc, char **argv)
     prog = (prog = strrchr (argv[0], '/')) ? prog + 1 : argv[0];
 
     for (;;) {
-#if HAVE_GETOPT_LONG
+
         c = getopt_long (argc, argv, opt_string, opt_table, NULL);
-#else  /* !HAVE_GETOPT_LONG */
-        c = getopt (argc, argv, opt_string);
-#endif /* !HAVE_GETOPT_LONG */
 
         if (c == -1) {                  /* reached end of option list */
             break;
@@ -236,11 +231,6 @@ display_help (char *prog)
 {
 /*  Displays a help message describing the command-line options.
  */
-#if HAVE_GETOPT_LONG
-    const int got_long = 1;
-#else  /* !HAVE_GETOPT_LONG */
-    const int got_long = 0;
-#endif /* !HAVE_GETOPT_LONG */
     const int w = -21;                  /* pad for width of option string */
 
     assert (prog != NULL);
@@ -248,26 +238,25 @@ display_help (char *prog)
     printf ("Usage: %s [OPTIONS]\n", prog);
     printf ("\n");
 
-    printf ("  %*s %s\n", w, (got_long ? "-h, --help" : "-h"),
+    printf ("  %*s %s\n", w, "-h, --help",
             "Display this help");
 
-    printf ("  %*s %s\n", w, (got_long ? "-L, --license" : "-L"),
+    printf ("  %*s %s\n", w, "-L, --license",
             "Display license information");
 
-    printf ("  %*s %s\n", w, (got_long ? "-V, --version" : "-V"),
+    printf ("  %*s %s\n", w, "-V, --version",
             "Display version information");
 
-    printf ("  %*s %s\n", w, (got_long ? "-f, --force" : "-f"),
+    printf ("  %*s %s\n", w, "-f, --force",
             "Force process to run if possible");
 
-    printf ("  %*s %s\n", w, (got_long ? "-F, --foreground" : "-F"),
+    printf ("  %*s %s\n", w, "-F, --foreground",
             "Run process in the foreground (do not fork)");
 
-    printf ("  %*s %s\n", w, (got_long ? "-S, --socket=STRING" : "-S STRING"),
+    printf ("  %*s %s\n", w, "-S, --socket=STRING",
             "Specify local domain socket");
 
     printf ("\n");
-
     return;
 }
 

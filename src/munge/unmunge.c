@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: unmunge.c,v 1.24 2004/04/03 21:53:00 dun Exp $
+ *  $Id: unmunge.c,v 1.25 2004/04/08 22:09:45 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -62,8 +62,7 @@
  *  Command-Line Options
  *****************************************************************************/
 
-#if HAVE_GETOPT_H
-#  include <getopt.h>
+#include <getopt.h>
 struct option opt_table[] = {
     { "help",         0, NULL, 'h' },
     { "license",      0, NULL, 'L' },
@@ -77,7 +76,6 @@ struct option opt_table[] = {
     { "socket",       1, NULL, 'S' },
     {  NULL,          0, NULL,  0  }
 };
-#endif /* HAVE_GETOPT_H */
 
 const char * const opt_string = "hLVi:k:Km:no:S:";
 
@@ -317,11 +315,8 @@ parse_cmdline (conf_t conf, int argc, char **argv)
     prog = (prog = strrchr (argv[0], '/')) ? prog + 1 : argv[0];
 
     for (;;) {
-#if HAVE_GETOPT_LONG
+
         c = getopt_long (argc, argv, opt_string, opt_table, NULL);
-#else  /* !HAVE_GETOPT_LONG */
-        c = getopt (argc, argv, opt_string);
-#endif /* !HAVE_GETOPT_LONG */
 
         if (c == -1) {                  /* reached end of option list */
             break;
@@ -398,11 +393,6 @@ parse_cmdline (conf_t conf, int argc, char **argv)
 void
 display_help (char *prog)
 {
-#if HAVE_GETOPT_LONG
-    const int got_long = 1;
-#else  /* !HAVE_GETOPT_LONG */
-    const int got_long = 0;
-#endif /* !HAVE_GETOPT_LONG */
     const int w = -21;                  /* pad for width of option string */
 
     assert (prog != NULL);
@@ -410,43 +400,42 @@ display_help (char *prog)
     printf ("Usage: %s [OPTIONS]\n", prog);
     printf ("\n");
 
-    printf ("  %*s %s\n", w, (got_long ? "-h, --help" : "-h"),
+    printf ("  %*s %s\n", w, "-h, --help",
             "Display this help");
 
-    printf ("  %*s %s\n", w, (got_long ? "-L, --license" : "-L"),
+    printf ("  %*s %s\n", w, "-L, --license",
             "Display license information");
 
-    printf ("  %*s %s\n", w, (got_long ? "-V, --version" : "-V"),
+    printf ("  %*s %s\n", w, "-V, --version",
             "Display version information");
 
     printf ("\n");
 
-    printf ("  %*s %s\n", w, (got_long ? "-i, --input=FILE" : "-i FILE"),
+    printf ("  %*s %s\n", w, "-i, --input=FILE",
             "Input credential from FILE");
 
-    printf ("  %*s %s\n", w, (got_long ? "-m, --metadata=FILE" : "-m FILE"),
+    printf ("  %*s %s\n", w, "-m, --metadata=FILE",
             "Output metadata to FILE");
 
-    printf ("  %*s %s\n", w, (got_long ? "-o, --output=FILE" : "-o FILE"),
+    printf ("  %*s %s\n", w, "-o, --output=FILE",
             "Output payload to FILE");
 
-    printf ("  %*s %s\n", w, (got_long ? "-n, --no-output" : "-n"),
+    printf ("  %*s %s\n", w, "-n, --no-output",
             "Redirect all output to /dev/null");
 
     printf ("\n");
 
-    printf ("  %*s %s\n", w, (got_long ? "-k, --keys=STRING" : "-k STRING"),
+    printf ("  %*s %s\n", w, "-k, --keys=STRING",
             "Specify subset of metadata keys to output");
 
-    printf ("  %*s %s\n", w, (got_long ? "-K, --list-keys" : "-K"),
+    printf ("  %*s %s\n", w, "-K, --list-keys",
             "Print a list of metadata keys");
 
-    printf ("  %*s %s\n", w, (got_long ? "-S, --socket=STRING" : "-S STRING"),
+    printf ("  %*s %s\n", w, "-S, --socket=STRING",
             "Specify local domain socket");
 
     printf ("\n");
     printf ("By default, data is read from stdin and written to stdout.\n\n");
-
     return;
 }
 
