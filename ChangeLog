@@ -1,5 +1,8 @@
 2003-04-25  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/munge/unmunge.c: Added "t" cmdline opt for setting TTL.
+	  Added ENCODED, DECODED, CIPHER, MAC, ZIP metadata keys.
+
 	* src/libmunge/munge.h, src/libmunge/ctx.c: Tweaked MUNGE_OPT_* enums.
 
 	* src/libmunge/Makefile.am, src/libmunge/Makefile.in,

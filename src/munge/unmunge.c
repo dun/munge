@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: unmunge.c,v 1.7 2003/04/24 19:58:38 dun Exp $
+ *  $Id: unmunge.c,v 1.8 2003/04/25 21:25:45 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -32,14 +32,26 @@
 #include <assert.h>
 #include <errno.h>
 #include <fcntl.h>
-#include <munge.h>
+#include <grp.h>
+#include <limits.h>
+#include <pwd.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
+#include <sys/types.h>
+#include <time.h>
 #include <unistd.h>
+#include <munge.h>
 #include "common.h"
 #include "read.h"
+
+
+/*****************************************************************************
+ *  Constants
+ *****************************************************************************/
+
+#define MAX_TIME_STR 33                 /* YYYY-MM-DD HH:MM:SS (4294967296)  */
 
 
 /*****************************************************************************
@@ -49,26 +61,26 @@
 #if HAVE_GETOPT_H
 #  include <getopt.h>
 struct option opt_table[] = {
-    { "help",       0, NULL, 'h' },
-    { "license",    0, NULL, 'L' },
-    { "version",    0, NULL, 'V' },
-    { "verbose",    0, NULL, 'v' },
-    { "input",      1, NULL, 'i' },
-    { "keys",       1, NULL, 'k' },
-    { "list-keys",  0, NULL, 'K' },
-    { "metadata",   1, NULL, 'm' },
-    { "no-output",  0, NULL, 'n' },
-    { "output",     1, NULL, 'o' },
-    { "socket",     1, NULL, 'S' },
-    {  NULL,        0, NULL,  0  }
+    { "help",         0, NULL, 'h' },
+    { "license",      0, NULL, 'L' },
+    { "version",      0, NULL, 'V' },
+    { "input",        1, NULL, 'i' },
+    { "keys",         1, NULL, 'k' },
+    { "list-keys",    0, NULL, 'K' },
+    { "metadata",     1, NULL, 'm' },
+    { "no-output",    0, NULL, 'n' },
+    { "output",       1, NULL, 'o' },
+    { "socket",       1, NULL, 'S' },
+    { "ttl",          1, NULL, 't' },
+    {  NULL,          0, NULL,  0  }
 };
 #endif /* HAVE_GETOPT_H */
 
-const char * const opt_string = "hLVvi:k:Km:no:S:";
+const char * const opt_string = "hLVi:k:Km:no:S:t:";
 
 
 /*****************************************************************************
- *  Metadata Tags
+ *  Metadata Keys
  *****************************************************************************/
 
 typedef struct {
@@ -77,8 +89,12 @@ typedef struct {
 } strval_t;
 
 typedef enum {
-    MUNGE_KEY_STATUS_CODE,
-    MUNGE_KEY_STATUS_TEXT,
+    MUNGE_KEY_STATUS,
+    MUNGE_KEY_ENCODE_TIME,
+    MUNGE_KEY_DECODE_TIME,
+    MUNGE_KEY_CIPHER_TYPE,
+    MUNGE_KEY_MAC_TYPE,   
+    MUNGE_KEY_ZIP_TYPE,   
     MUNGE_KEY_UID,
     MUNGE_KEY_GID,
     MUNGE_KEY_LENGTH,
@@ -86,12 +102,16 @@ typedef enum {
 } munge_key_t;
 
 strval_t munge_keys[] = {
-    { MUNGE_KEY_STATUS_CODE, "STATUS-CODE" },
-    { MUNGE_KEY_STATUS_TEXT, "STATUS-TEXT" },
-    { MUNGE_KEY_UID,         "UID"         },
-    { MUNGE_KEY_GID,         "GID"         },
-    { MUNGE_KEY_LENGTH,      "LENGTH"      },
-    { MUNGE_KEY_LAST,         NULL         }
+    { MUNGE_KEY_STATUS,      "STATUS"  },
+    { MUNGE_KEY_ENCODE_TIME, "ENCODED" },
+    { MUNGE_KEY_DECODE_TIME, "DECODED" },
+    { MUNGE_KEY_CIPHER_TYPE, "CIPHER"  },
+    { MUNGE_KEY_MAC_TYPE,    "MAC"     },
+    { MUNGE_KEY_ZIP_TYPE,    "ZIP"     },
+    { MUNGE_KEY_UID,         "UID"     },
+    { MUNGE_KEY_GID,         "GID"     },
+    { MUNGE_KEY_LENGTH,      "LENGTH"  },
+    { MUNGE_KEY_LAST,         NULL     }
 };
 
 
@@ -298,8 +318,6 @@ parse_cmdline (conf_t conf, int argc, char **argv)
 //          case 'V':
 //              exit (EMUNGE_SUCCESS);
 //              break;
-            case 'v':
-                break;
             case 'i':
                 conf->fn_in = optarg;
                 break;
@@ -325,7 +343,21 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                 e = munge_ctx_set (conf->ctx, MUNGE_OPT_SOCKET, optarg);
                 if (e != EMUNGE_SUCCESS)
                     log_err (EMUNGE_SNAFU, LOG_ERR,
-                        "Unable to set munge socket name");
+                        "Unable to set munge socket name: %s",
+                        munge_ctx_strerror (conf->ctx));
+                break;
+            case 't':
+                i = strtol (optarg, NULL, 10);
+                if ((i == LONG_MIN) || (i == LONG_MAX))
+                    log_err (EMUNGE_SNAFU, LOG_ERR,
+                        "Invalid time-to-live '%d': %s", i, strerror (errno));
+                if (i < 0)
+                    i = MUNGE_TTL_FOREVER;
+                e = munge_ctx_set (conf->ctx, MUNGE_OPT_TTL, i);
+                if (e != EMUNGE_SUCCESS)
+                    log_err (EMUNGE_SNAFU, LOG_ERR,
+                        "Unable to set time-to-live: %s",
+                        munge_ctx_strerror (conf->ctx));
                 break;
             case '?':
                 if (optopt > 0)
@@ -379,9 +411,6 @@ display_help (char *prog)
     printf ("  %*s %s\n", w, (got_long ? "-V, --version" : "-V"),
             "Display version information");
 
-    printf ("  %*s %s\n", w, (got_long ? "-v, --verbose" : "-v"),
-            "Be verbose");
-
     printf ("\n");
 
     printf ("  %*s %s\n", w, (got_long ? "-i, --input=FILE" : "-i FILE"),
@@ -406,6 +435,9 @@ display_help (char *prog)
 
     printf ("  %*s %s\n", w, (got_long ? "-S, --socket=STRING" : "-S STRING"),
             "Specify local domain socket");
+
+    printf ("  %*s %s\n", w, (got_long ? "-t, --ttl=INTEGER" : "-t INTEGER"),
+            "Specify time-to-live (in seconds, -1=forever)");
 
     printf ("\n");
     printf ("By default, data is read from stdin and written to stdout.\n\n");
@@ -486,38 +518,110 @@ open_files (conf_t conf)
 void
 display_meta (conf_t conf)
 {
-    int   pad;
-    char *s;
-    int   w;
+    int            pad;                 /* num chars reserved for key field  */
+    char          *s;                   /* key field string                  */
+    int            w;                   /* width of space chars to fill pad  */
+    munge_err_t    e;                   /* munge error condition             */
+    time_t         t;                   /* time (seconds since epoch)        */
+    struct tm     *tm_ptr;              /* ptr to broken-down time entry     */
+    int            tlen;                /* length of time string             */
+    char           tbuf[MAX_TIME_STR];  /* time string buffer                */
+    int            i;                   /* all-purpose int                   */
+    struct passwd *pw_ptr;              /* ptr to broken-down password entry */
+    struct group  *gr_ptr;              /* ptr to broken-down group entry    */
 
-    if (!conf->fp_meta)
+    if (!conf->fp_meta) {
         return;
-
+    }
     pad = conf->key_max_str_len + 2;
 
-    if (conf->key[MUNGE_KEY_STATUS_CODE]) {
-        s = key_val_to_str (MUNGE_KEY_STATUS_CODE);
+    if (conf->key[MUNGE_KEY_STATUS]) {
+        s = key_val_to_str (MUNGE_KEY_STATUS);
         w = pad - strlen (s);
-        fprintf (conf->fp_meta, "%s:%*c%d\n", s, w, 0x20, conf->status);
+        fprintf (conf->fp_meta, "%s:%*c%s (%d)\n", s, w, 0x20,
+            munge_strerror (conf->status), conf->status);
     }
-    if (conf->key[MUNGE_KEY_STATUS_TEXT]) {
-        s = key_val_to_str (MUNGE_KEY_STATUS_TEXT);
-        w = pad - strlen (s);
-        fprintf (conf->fp_meta, "%s:%*c%s\n", s, w, 0x20,
-            munge_strerror (conf->status));
-    }
-    if (conf->status != EMUNGE_SUCCESS)
+    if (conf->status != EMUNGE_SUCCESS) {
         return;
-
+    }
+    if (conf->key[MUNGE_KEY_ENCODE_TIME]) {
+        e = munge_ctx_get (conf->ctx, MUNGE_OPT_ENCODE_TIME, &t);
+        if (e != EMUNGE_SUCCESS)
+            log_err (EMUNGE_SNAFU, LOG_ERR,
+                "Unable to retrieve encode time: %s",
+                munge_ctx_strerror (conf->ctx));
+        tm_ptr = localtime (&t);
+        tlen = strftime (tbuf, sizeof (tbuf),
+            "%Y-%m-%d %H:%M:%S (%s)", tm_ptr);
+        if ((tlen == 0) || (tlen >= sizeof (tbuf)))
+            log_err (EMUNGE_OVERFLOW, LOG_ERR,
+                "Overran buffer for encode time");
+        s = key_val_to_str (MUNGE_KEY_ENCODE_TIME);
+        w = pad - strlen (s);
+        fprintf (conf->fp_meta, "%s:%*c%s\n", s, w, 0x20, tbuf);
+    }
+    if (conf->key[MUNGE_KEY_DECODE_TIME]) {
+        e = munge_ctx_get (conf->ctx, MUNGE_OPT_DECODE_TIME, &t);
+        if (e != EMUNGE_SUCCESS)
+            log_err (EMUNGE_SNAFU, LOG_ERR,
+                "Unable to retrieve decode time: %s",
+                munge_ctx_strerror (conf->ctx));
+        tm_ptr = localtime (&t);
+        tlen = strftime (tbuf, sizeof (tbuf),
+            "%Y-%m-%d %H:%M:%S (%s)", tm_ptr);
+        if ((tlen == 0) || (tlen >= sizeof (tbuf)))
+            log_err (EMUNGE_OVERFLOW, LOG_ERR,
+                "Overran buffer for decode time");
+        s = key_val_to_str (MUNGE_KEY_DECODE_TIME);
+        w = pad - strlen (s);
+        fprintf (conf->fp_meta, "%s:%*c%s\n", s, w, 0x20, tbuf);
+    }
+    if (conf->key[MUNGE_KEY_CIPHER_TYPE]) {
+        e = munge_ctx_get (conf->ctx, MUNGE_OPT_CIPHER_TYPE, &i);
+        if (e != EMUNGE_SUCCESS)
+            log_err (EMUNGE_SNAFU, LOG_ERR,
+                "Unable to retrieve cipher type: %s",
+                munge_ctx_strerror (conf->ctx));
+        s = key_val_to_str (MUNGE_KEY_CIPHER_TYPE);
+        w = pad - strlen (s);
+        fprintf (conf->fp_meta, "%s:%*c%s (%d)\n", s, w, 0x20,
+            munge_cipher_strings[i], i);
+    }
+    if (conf->key[MUNGE_KEY_MAC_TYPE]) {
+        e = munge_ctx_get (conf->ctx, MUNGE_OPT_MAC_TYPE, &i);
+        if (e != EMUNGE_SUCCESS)
+            log_err (EMUNGE_SNAFU, LOG_ERR,
+                "Unable to retrieve mesg auth code type: %s",
+                munge_ctx_strerror (conf->ctx));
+        s = key_val_to_str (MUNGE_KEY_MAC_TYPE);
+        w = pad - strlen (s);
+        fprintf (conf->fp_meta, "%s:%*c%s (%d)\n", s, w, 0x20,
+            munge_mac_strings[i], i);
+    }
+    if (conf->key[MUNGE_KEY_ZIP_TYPE]) {
+        e = munge_ctx_get (conf->ctx, MUNGE_OPT_ZIP_TYPE, &i);
+        if (e != EMUNGE_SUCCESS)
+            log_err (EMUNGE_SNAFU, LOG_ERR,
+                "Unable to retrieve compression type: %s",
+                munge_ctx_strerror (conf->ctx));
+        s = key_val_to_str (MUNGE_KEY_ZIP_TYPE);
+        w = pad - strlen (s);
+        fprintf (conf->fp_meta, "%s:%*c%s (%d)\n", s, w, 0x20,
+            munge_zip_strings[i], i);
+    }
     if (conf->key[MUNGE_KEY_UID]) {
+        pw_ptr = getpwuid (conf->uid);
         s = key_val_to_str (MUNGE_KEY_UID);
         w = pad - strlen (s);
-        fprintf (conf->fp_meta, "%s:%*c%d\n", s, w, 0x20, conf->uid);
+        fprintf (conf->fp_meta, "%s:%*c%s (%d)\n", s, w, 0x20,
+            (pw_ptr ? pw_ptr->pw_name : "???"), conf->uid);
     }
     if (conf->key[MUNGE_KEY_GID]) {
+        gr_ptr = getgrgid (conf->gid);
         s = key_val_to_str (MUNGE_KEY_GID);
         w = pad - strlen (s);
-        fprintf (conf->fp_meta, "%s:%*c%d\n", s, w, 0x20, conf->gid);
+        fprintf (conf->fp_meta, "%s:%*c%s (%d)\n", s, w, 0x20,
+            (gr_ptr ? gr_ptr->gr_name : "???"), conf->gid);
     }
     if (conf->key[MUNGE_KEY_LENGTH]) {
         s = key_val_to_str (MUNGE_KEY_LENGTH);
