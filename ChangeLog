@@ -1,3 +1,7 @@
+2003-02-13  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* : Added munge/unmunge cmdline progs.
+
 2003-02-03  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/libmunge/munge.c, src/libmunge/munge.h:
