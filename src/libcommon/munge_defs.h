@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munge_defs.h,v 1.2 2003/04/17 02:14:47 dun Exp $
+ *  $Id: munge_defs.h,v 1.3 2003/04/18 23:11:02 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -34,11 +34,11 @@
 
 /*  Munge credential prefix string.
  */
-#define MUNGE_CRED_PREFIX       "MUNGE_"
+#define MUNGE_CRED_PREFIX       "MUNGE:"
 
 /*  Munge credential suffix string.
  */
-#define MUNGE_CRED_SUFFIX       "_EGNUM"
+#define MUNGE_CRED_SUFFIX       ":"
 
 /*  Current version of the munge credential format.
  */
