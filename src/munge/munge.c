@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munge.c,v 1.3 2003/02/13 20:17:20 dun Exp $
+ *  $Id: munge.c,v 1.4 2003/02/13 20:22:35 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -236,7 +236,7 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                     argv[optind - 1]);
                 break;
             default:
-                log_err (EMUNGE_SNAFU, "Option \"%s\" not implemented",
+                log_err (EMUNGE_SNAFU, "Unimplemented option \"%s\"",
                     argv[optind - 1]);
                 break;
         }
