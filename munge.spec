@@ -1,4 +1,4 @@
-# $Id: munge.spec,v 1.26 2004/12/22 01:05:04 dun Exp $
+# $Id: munge.spec,v 1.27 2004/12/22 01:25:37 dun Exp $
 
 Name:		munge
 Version:	0
@@ -36,7 +36,14 @@ DESTDIR="$RPM_BUILD_ROOT" make install
 rm -rf "$RPM_BUILD_ROOT"
 
 %pre
-find /etc/rc.d/rc?.d/ -type l -name "[SK]-1munge" -exec rm -f {} \;
+#
+# Remove chkconfig droppings from the "-1 priority" bug.
+#
+if [ -L /etc/rc.d/rc0.d/K-1munge ]; then
+  find /etc/rc.d/rc?.d/ -type l -name "[SK]-1munge" -exec rm -f {} \;
+  /sbin/chkconfig --del munge
+  /sbin/chkconfig --add munge
+fi
 
 %post
 /sbin/ldconfig %{_libdir}
