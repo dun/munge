@@ -1,11 +1,11 @@
 /*****************************************************************************
- *  $Id: str.h,v 1.3 2004/01/28 01:04:59 dun Exp $
+ *  $Id: str.h,v 1.4 2004/02/13 18:07:03 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
  *  UCRL-CODE-2003-???.
  *
- *  Copyright (C) 2001-2003 The Regents of the University of California.
+ *  Copyright (C) 2001-2004 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
  *  Written by Chris Dunlap <cdunlap@llnl.gov>.
  *
@@ -53,10 +53,12 @@ size_t strcatf (char *dst, size_t size, const char *fmt, ...);
  *    guaranteed to be NUL-terminated.
  */
 
-void strdump (const char *prefix, void *x, int n);
+char * strhex (void *dst, size_t dstlen, const void *src, size_t srclen);
 /*
- *  Debugging aid for dumping the byte array [x] of length [n] to stdout,
- *    prefixing the output with the [prefix] string.
+ *  Converts the buf [src] of length [srclen] to hexadecimal notation, storing
+ *    the resulting NUL-terminated string in buf [dst] of length [dstlen].
+ *  Returns a ptr to [dst], or NULL if the [dst] buffer is too small
+ *    (ie, less than ((srclen * 2) + 1) bytes).
  */
 
 void * memburn (void *v, int c, size_t n);

@@ -1,11 +1,11 @@
 /*****************************************************************************
- *  $Id: str.c,v 1.3 2004/01/28 01:04:59 dun Exp $
+ *  $Id: str.c,v 1.4 2004/02/13 18:07:03 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
  *  UCRL-CODE-2003-???.
  *
- *  Copyright (C) 2001-2003 The Regents of the University of California.
+ *  Copyright (C) 2001-2004 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
  *  Written by Chris Dunlap <cdunlap@llnl.gov>.
  *
@@ -31,6 +31,7 @@
 #  include "config.h"
 #endif /* HAVE_CONFIG_H */
 
+#include <errno.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
@@ -112,17 +113,24 @@ strcatf (char *dst, size_t size, const char *fmt, ...)
 }
 
 
-void
-strdump (const char *prefix, void *x, int n)
+char *
+strhex (void *dst, size_t dstlen, const void *src, size_t srclen)
 {
-    unsigned char *p = x;
-    int i;
+    const unsigned char  bin2hex[] = "0123456789ABCDEF";
+    unsigned char       *pdst = dst;
+    const unsigned char *psrc = src;
+    int                  i;
 
-    printf ("%s:%d:", prefix, n);
-    for (i=0; i<n; i++)
-        printf ("%02x", p[i]);
-    printf ("\n");
-    return;
+    if (dstlen < ((srclen * 2) + 1)) {
+        errno = EINVAL;
+        return (NULL);
+    }
+    for (i=0; i<srclen; i++) {
+        *pdst++ = bin2hex[(psrc[i] >> 4) & 0x0f];
+        *pdst++ = bin2hex[(psrc[i]     ) & 0x0f];
+    }
+    *pdst = '\0';
+    return (dst);
 }
 
 
