@@ -1,19 +1,38 @@
+Version 0.4 (2004-12-07):
+  - Added persistent pool of threads.
+  - Added retry for failed requests.
+  - Added libtool version-info.
+  - Added key-file, num-threads, and auth-pipe-dir munged cmdline opts.
+  - Added munge_ctx opt to limit maximum request length.
+  - Added timer to periodically re-parse group info.
+  - Added remunge benchmark/stress-test utility.
+  - Added munge enums (munge_enum).
+  - Added manpages.
+  - Added support for configure to locate OpenSSL installation.
+  - Added support for fd-passing over ramdisks.
+  - Added support for C++.
+  - Improved support for AIX.
+  - Optimized memory usage.
+  - Optimized performance.
+  - Changed libmunge.so to only export public symbols.
+  - Changed protocol between client & server.
+
 Version 0.3 (2004-04-30):
-  - Support for AIX, FreeBSD, Solaris.
-  - Support for compression (bzlib & zlib).
-  - Support for replay detection/prevention.
-  - Support for restricting decode based on uid/gid.
+  - Added support for AIX, FreeBSD, Solaris.
+  - Added compression (bzlib & zlib).
+  - Added replay detection/prevention.
+  - Added ability to restrict decoding based on uid/gid.
   - Changed credential format to v2.
   - Changed protocol between client & server.
 
 Version 0.2 (2003-10-24):
-  - Support for ia64.
+  - Added support for ia64.
   - Added ttl and origin IP addr to credential header.
 
 Version 0.1 (2003-04-30):
-  - Full client/server support (via munged).
-  - Full cryptographic support.
-  - Munge context (munge_ctx) support.
+  - Added full client/server support (via munged).
+  - Added full cryptographic support.
+  - Support for munge contexts (munge_ctx).
 
 Version 0.0 (2002-12-20):
   - Initial support for munge_encode, munge_decode, munge_strerror.

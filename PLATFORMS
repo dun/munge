@@ -1,6 +1,6 @@
-MUNGE has been successfully compiled on the following platforms:
+MUNGE has been tested on the following platforms:
 
-  AIX 5.1, 5.2
-  FreeBSD 4.8-RELEASE-p17
-  Linux 2.4, 2.6 (i386, ia64, x86-64) [RedHat 7.3/9.0/EL3.0]
+  AIX 5.1, 5.2 ML4, AIX 5.3
+  FreeBSD 4.10-RELEASE-p3
+  Linux 2.4, 2.6 (RedHat, SuSE)
   Solaris 2.8

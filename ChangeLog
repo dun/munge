@@ -1,5 +1,7 @@
 2004-12-07  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* HISTORY, META, NEWS, PLATFORMS: Updated for 0.4 release.
+
 	* src/libmunge/munge.3.in, src/libmunge/munge.h,
 	  src/libmunge/strerror.c: Cleaned up error codes.
 

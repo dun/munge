@@ -1,7 +1,7 @@
-Package:        munge
-Version:        0.3
-Date:           2004-04-30
-Author:         cdunlap@llnl.gov
-LT_Current:     0
-LT_Revision:    0
-LT_Age:         0
+ Package:       munge
+ Version:       0.4
+ Date:          2004-12-07
+ Author:        cdunlap@llnl.gov
+ LT_Current:    1
+ LT_Revision:   0
+ LT_Age:        0
