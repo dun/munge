@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: dec_v1.c,v 1.22 2004/05/27 00:03:05 dun Exp $
+ *  $Id: dec_v1.c,v 1.23 2004/08/05 21:07:53 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -42,10 +42,10 @@
 #include "cred.h"
 #include "dec_v1.h"
 #include "gids.h"
+#include "job.h"
 #include "lookup.h"
 #include "mac.h"
 #include "md.h"
-#include "msg_server.h"
 #include "munge_defs.h"
 #include "munge_msg.h"
 #include "random.h"
@@ -119,7 +119,7 @@ dec_v1_process_msg (munge_msg_t m)
         rc = 0;
 
     if (rc < 0) {
-        err_v1_response (m);
+        job_error (m);
     }
     /*  If the successfully decoded credential isn't successfully returned
      *    to the client, remove it from the replay hash.

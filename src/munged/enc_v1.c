@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: enc_v1.c,v 1.18 2004/05/06 01:41:12 dun Exp $
+ *  $Id: enc_v1.c,v 1.19 2004/08/05 21:07:53 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -41,10 +41,10 @@
 #include "conf.h"
 #include "cred.h"
 #include "enc_v1.h"
+#include "job.h"
 #include "lookup.h"
 #include "mac.h"
 #include "md.h"
-#include "msg_server.h"
 #include "munge_defs.h"
 #include "munge_msg.h"
 #include "random.h"
@@ -117,7 +117,7 @@ enc_v1_process_msg (munge_msg_t m)
         rc = 0;
 
     if (rc < 0) {
-        err_v1_response (m);
+        job_error (m);
     }
     if (_munge_msg_send (m) != EMUNGE_SUCCESS) {
         rc = -1;
