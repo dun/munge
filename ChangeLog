@@ -1,5 +1,8 @@
 2004-09-03  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/munged/munged.c(main):
+	  Changed default log priority level from LOG_NOTICE to LOG_INFO.
+
 	* src/munged/conf.c(display_help): Added newline.
 
 	* src/munge/munge.c(display_strings,str_to_int): Tweaked formatting.

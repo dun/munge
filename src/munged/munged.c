@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munged.c,v 1.15 2004/08/05 21:09:24 dun Exp $
+ *  $Id: munged.c,v 1.16 2004/09/03 18:54:33 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -86,7 +86,7 @@ int
 main (int argc, char *argv[])
 {
     int fd = -1;
-    int priority = LOG_NOTICE;
+    int priority = LOG_INFO;
 
 #ifndef NDEBUG
     priority = LOG_DEBUG;
