@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: str.h,v 1.1 2003/04/08 18:16:16 dun Exp $
+ *  $Id: str.h,v 1.2 2003/04/18 23:14:39 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -51,6 +51,12 @@ size_t strcatf (char *dst, size_t size, const char *fmt, ...);
  *  Returns the new length of the NUL-terminated string [dst],
  *    or -1 if truncation occurred.  The string in [dst] is
  *    guaranteed to be NUL-terminated.
+ */
+
+void strdump (const char *prefix, void *x, int n);
+/*
+ *  Debugging aid for dumping the byte array [x] of length [n] to stdout,
+ *    prefixing the output with the [prefix] string.
  */
 
 

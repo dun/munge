@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: str.c,v 1.1 2003/04/08 18:16:16 dun Exp $
+ *  $Id: str.c,v 1.2 2003/04/18 23:14:39 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -109,4 +109,18 @@ strcatf (char *dst, size_t size, const char *fmt, ...)
         return(-1);
     }
     return(len + n);
+}
+
+
+void
+strdump (const char *prefix, void *x, int n)
+{
+    unsigned char *p = x;
+    int i;
+
+    printf ("%s:%d:", prefix, n);
+    for (i=0; i<n; i++)
+        printf ("%02x", p[i]);
+    printf ("\n");
+    return;
 }
