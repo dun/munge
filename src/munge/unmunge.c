@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: unmunge.c,v 1.27 2004/04/16 22:15:06 dun Exp $
+ *  $Id: unmunge.c,v 1.28 2004/08/19 20:23:13 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -622,7 +622,7 @@ display_meta (conf_t conf)
         e = munge_ctx_get (conf->ctx, MUNGE_OPT_MAC_TYPE, &i);
         if (e != EMUNGE_SUCCESS)
             log_err (EMUNGE_SNAFU, LOG_ERR,
-                "Unable to retrieve mesg auth code type: %s",
+                "Unable to retrieve message auth code type: %s",
                 munge_ctx_strerror (conf->ctx));
         s = key_val_to_str (MUNGE_KEY_MAC_TYPE);
         w = pad - strlen (s);

@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munge.c,v 1.28 2004/08/19 20:20:32 dun Exp $
+ *  $Id: munge.c,v 1.29 2004/08/19 20:23:13 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -286,11 +286,11 @@ parse_cmdline (conf_t conf, int argc, char **argv)
             case 'm':
                 if ((i = str_to_int (optarg, munge_mac_strings)) < 0)
                     log_err (EMUNGE_SNAFU, LOG_ERR,
-                        "Invalid mesg auth code type \"%s\"", optarg);
+                        "Invalid message auth code type \"%s\"", optarg);
                 e = munge_ctx_set (conf->ctx, MUNGE_OPT_MAC_TYPE, i);
                 if (e != EMUNGE_SUCCESS)
                     log_err (EMUNGE_SNAFU, LOG_ERR,
-                        "Unable to set mesg auth code type: %s",
+                        "Unable to set message auth code type: %s",
                         munge_ctx_strerror (conf->ctx));
                 break;
             case 'M':
