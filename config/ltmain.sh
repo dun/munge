@@ -56,7 +56,7 @@ modename="$progname"
 PROGRAM=ltmain.sh
 PACKAGE=libtool
 VERSION=1.5.2
-TIMESTAMP=" (1.1220.2.60 2004/01/25 12:25:08) Debian$Rev: 192 $"
+TIMESTAMP=" (1.1220.2.60 2004/01/25 12:25:08) Debian$Rev: 199 $"
 
 default_mode=
 help="Try \`$progname --help' for more information."
@@ -1828,7 +1828,10 @@ EOF
 	case $pass in
 	dlopen) libs="$dlfiles" ;;
 	dlpreopen) libs="$dlprefiles" ;;
-	link) libs="$deplibs %DEPLIBS% $dependency_libs" ;;
+	link)
+	  libs="$deplibs %DEPLIBS%"
+	  test "X$link_all_deplibs" != Xno && libs="$libs $dependency_libs"
+	  ;;
 	esac
       fi
       if test "$pass" = dlopen; then
@@ -1936,11 +1939,11 @@ EOF
 	    fi
 	    if test "$pass" = scan; then
 	      deplibs="$deplib $deplibs"
-	      newlib_search_path="$newlib_search_path "`$echo "X$deplib" | $Xsed -e 's/^-L//'`
 	    else
 	      compile_deplibs="$deplib $compile_deplibs"
 	      finalize_deplibs="$deplib $finalize_deplibs"
 	    fi
+	    newlib_search_path="$newlib_search_path "`$echo "X$deplib" | $Xsed -e 's/^-L//'`
 	    ;;
 	  *)
 	    $echo "$modename: warning: \`-L' is ignored for archives/objects" 1>&2
@@ -3097,9 +3100,11 @@ EOF
 	    *.$objext)
 	       ;;
 	    $output_objdir/$outputname | $output_objdir/$libname.* | $output_objdir/${libname}${release}.*)
-	       if echo $p | $EGREP -e "$precious_files_regex" >/dev/null 2>&1
-	       then
-		 continue
+	       if test "X$precious_files_regex" != "X"; then
+	         if echo $p | $EGREP -e "$precious_files_regex" >/dev/null 2>&1
+	         then
+		   continue
+		 fi
 	       fi
 	       removelist="$removelist $p"
 	       ;;
@@ -5673,8 +5678,12 @@ relink_command=\"$relink_command\""
 	      tmpdir="/tmp"
 	      test -n "$TMPDIR" && tmpdir="$TMPDIR"
 	      tmpdir="$tmpdir/libtool-$$"
-	      if $mkdir "$tmpdir" && chmod 700 "$tmpdir"; then :
+	      save_umask=`umask`
+	      umask 0077
+	      if $mkdir "$tmpdir"; then
+	        umask $save_umask
 	      else
+	        umask $save_umask
 		$echo "$modename: error: cannot create temporary directory \`$tmpdir'" 1>&2
 		continue
 	      fi
