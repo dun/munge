@@ -1,18 +1,31 @@
--munged 'k' cmdling opt to kill daemon
--revisit data returned on credential error
--benchmark utility
--nonroot configuration support
+-dead store removal protection
+-compression support
+-thread manager
+-save/restore replay state
+-cross-platform (AIX, Tru64, Solaris, BSD)
+-ensure safe perms on sensitive files/dirs
+-/* FALLTHROUGH */
+-valgrindify
+-documentation
 -create README guide
 -create FAQ
--replay detection
--max data length ctx opt
--compression support
--configuration file parsing
--ensure safe perms on sensitive files/dirs
 -man pages
--documentation
--security testplan script
+
+-audit
+-debian support
+-configuration file parsing
+-nonroot configuration support
+-auto-force daemon when appropriate
+-munged 'k' cmdling opt to kill daemon
+-benchmark utility
 -server timeout for unresponsive clients
--cross-platform (AIX, Tru64, Solaris, BSD?)
 -realm (multi-key) support
+-sgid support?
 -mlock support?
+-security testplan script
+
+01. Upon interrupting:
+      while true; do munge/munge -n | munge/unmunge -n; done
+    munged: INFO: Unable to send message: Broken pipe
+    munged: INFO: Received incomplete message body (65268/1603677)
+    munged: INFO: Sent incomplete message (718080/1202701)
