@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: missing.h,v 1.4 2004/11/12 00:29:18 dun Exp $
+ *  $Id: missing.h,v 1.5 2004/11/12 02:08:23 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -28,12 +28,10 @@
 #ifndef MUNGE_MISSING_H
 #define MUNGE_MISSING_H
 
-
 /*  These contain prototypes and whatnot for libmissing.
  */
 #include "inet_ntop.h"
 #include "strlcat.h"
 #include "strlcpy.h"
-
 
 #endif /* !MUNGE_MISSING_H */
