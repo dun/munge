@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munge_defs.h,v 1.4 2003/04/18 23:41:45 dun Exp $
+ *  $Id: munge_defs.h,v 1.5 2003/04/23 22:05:07 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -45,15 +45,18 @@
 #define MUNGE_CRED_VERSION      1
 
 /*  Amount of salt (in bytes) encoded into a credential.
+ *    This is set such that the "dataless" credential's inner block
+ *    ciphertext will not spill over into a new cipher block during
+ *    encryption (assuming a 64-bit cipher block size).
  */
-#define MUNGE_CRED_SALT_LEN     8
+#define MUNGE_CRED_SALT_LEN     7
 
 /*  Default munge_cipher_t for encrypting credentials.
  */
 #define MUNGE_DEFAULT_CIPHER    MUNGE_CIPHER_CAST5
 
 /*  Default munge_mac_t for validating credentials.
- *  This should NEVER be set to MUNGE_MAC_NONE.
+ *    This should NEVER be set to MUNGE_MAC_NONE.
  */
 #define MUNGE_DEFAULT_MAC       MUNGE_MAC_SHA1
 

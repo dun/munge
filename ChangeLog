@@ -1,5 +1,7 @@
 2003-04-23  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* libcommon/munge_defs.h: Reduced credential's salt from 64b to 56b.
+
 	* src/libmunge/decode.c, src/libmunge/encode.c, src/munged/dec_v1.c,
 	  src/munged/enc_v1.c: Removed credential's TTL field.
 
