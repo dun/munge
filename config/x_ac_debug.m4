@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: x_ac_debug.m4,v 1.4 2004/05/01 05:22:27 dun Exp $
+## $Id: x_ac_debug.m4,v 1.5 2004/11/30 00:00:55 dun Exp $
 ##*****************************************************************************
 #  AUTHOR:
 #    Chris Dunlap <cdunlap@llnl.gov>
@@ -8,9 +8,9 @@
 #    X_AC_DEBUG
 #
 #  DESCRIPTION:
-#    Adds support for the "--enable-debug" configure script option.
-#    If CFLAGS are not passed to configure, they will be set based
-#    on whether debugging has been enabled.  Also, the NDEBUG macro
+#    Add support for the "--enable-debug" configure script option.
+#    If CFLAGS is not passed to configure, it will be set based on
+#    whether debugging has been enabled.  Also, the NDEBUG macro
 #    (used by assert) will be set accordingly.
 #
 #  WARNINGS:

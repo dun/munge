@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: x_ac_check_cond_lib.m4,v 1.4 2004/05/01 05:22:27 dun Exp $
+## $Id: x_ac_check_cond_lib.m4,v 1.5 2004/11/30 00:00:55 dun Exp $
 ##*****************************************************************************
 #  AUTHOR:
 #    Chris Dunlap <cdunlap@llnl.gov>
@@ -8,7 +8,7 @@
 #    X_AC_CHECK_COND_LIB(library, function)
 #
 #  DESCRIPTION:
-#    Checks whether a program can be linked with <library> to get <function>.
+#    Check whether a program can be linked with <library> to get <function>.
 #    Like AC_CHECK_LIB(), except that if the check succeeds, HAVE_LIB<library>
 #    will be defined and a shell variable LIB<library> containing "-l<library>"
 #    will be substituted via AC_SUBST().

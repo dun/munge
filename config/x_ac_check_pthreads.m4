@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: x_ac_check_pthreads.m4,v 1.2 2004/05/01 05:22:27 dun Exp $
+## $Id: x_ac_check_pthreads.m4,v 1.3 2004/11/30 00:00:55 dun Exp $
 ##*****************************************************************************
 #  AUTHOR:
 #    Chris Dunlap <cdunlap@llnl.gov>
@@ -8,8 +8,9 @@
 #    X_AC_CHECK_PTHREADS
 #
 #  DESCRIPTION:
-#    Checks to see how to link a process against Pthreads.
-#    Also defines both _REENTRANT and _THREAD_SAFE which may be needed when
+#    Check to see how to link a process against Pthreads.
+#
+#    Also define both _REENTRANT and _THREAD_SAFE which may be needed when
 #    linking against multithreaded code.  By defining them here, the define
 #    goes into "config.h" which is the first include (in my code, at least).
 #    For more information wrt _REENTRANT, refer to the LinuxThreads FAQ:

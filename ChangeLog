@@ -1,5 +1,9 @@
 2004-11-29  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* config/x_ac_check_cond_lib.m4, config/x_ac_check_fifo_recvfd.m4,
+	  config/x_ac_check_peercred.m4, config/x_ac_check_pthreads.m4,
+	  config/x_ac_debug.m4: Tweaked docs to be consistent with others.
+
 	* configure.ac, config/x_ac_check_ssl.m4: Added X_AC_CHECK_SSL.
 
 2004-11-24  Chris Dunlap  <cdunlap@llnl.gov>

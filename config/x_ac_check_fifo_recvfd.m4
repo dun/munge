@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: x_ac_check_fifo_recvfd.m4,v 1.2 2004/05/01 06:10:45 dun Exp $
+## $Id: x_ac_check_fifo_recvfd.m4,v 1.3 2004/11/30 00:00:55 dun Exp $
 ##*****************************************************************************
 #  AUTHOR:
 #    Chris Dunlap <cdunlap@llnl.gov>
@@ -8,7 +8,7 @@
 #    X_AC_CHECK_FIFO_RECVFD
 #
 #  DESCRIPTION:
-#    Checks to see if a fifo (constructed via mkfifo) can be used to pass
+#    Check to see if a fifo (constructed via mkfifo) can be used to pass
 #    file descriptors using a struct strrecvfd and the I_RECVFD ioctl.
 ##*****************************************************************************
 

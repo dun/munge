@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: x_ac_check_peercred.m4,v 1.3 2004/05/01 05:22:27 dun Exp $
+## $Id: x_ac_check_peercred.m4,v 1.4 2004/11/30 00:00:55 dun Exp $
 ##*****************************************************************************
 #  AUTHOR:
 #    Chris Dunlap <cdunlap@llnl.gov>
@@ -8,7 +8,7 @@
 #    X_AC_CHECK_PEERCRED
 #
 #  DESCRIPTION:
-#    Checks to see if the SO_PEERCRED socket option is supported.
+#    Check to see if the SO_PEERCRED socket option is supported.
 ##*****************************************************************************
 
 AC_DEFUN([X_AC_CHECK_PEERCRED], [
