@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: lookup.c,v 1.1 2003/04/08 18:16:16 dun Exp $
+ *  $Id: lookup.c,v 1.2 2003/04/25 23:23:11 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -58,16 +58,10 @@ lookup_mac (munge_mac_t mac)
 {
     switch (mac) {
         case MUNGE_MAC_MD5:
-            /* fall-thru */
-        case MUNGE_MAC_MD5_HALF:
             return (EVP_md5 ());
         case MUNGE_MAC_SHA1:
-            /* fall-thru */
-        case MUNGE_MAC_SHA1_HALF:
             return (EVP_sha1 ());
         case MUNGE_MAC_RIPEMD160:
-            /* fall-thru */
-        case MUNGE_MAC_RIPEMD160_HALF:
             return (EVP_ripemd160 ());
         default:
             break;

@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munge.h,v 1.10 2003/04/25 21:20:50 dun Exp $
+ *  $Id: munge.h,v 1.11 2003/04/25 23:23:11 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -55,8 +55,8 @@ typedef struct munge_ctx * munge_ctx_t;
  */
 typedef enum munge_opt {
     MUNGE_OPT_CIPHER_TYPE       =  0,   /* symmetric cipher type (int)       */
-    MUNGE_OPT_ZIP_TYPE          =  1,   /* compression type (int)            */
-    MUNGE_OPT_MAC_TYPE          =  2,   /* message auth code type (int)      */
+    MUNGE_OPT_MAC_TYPE          =  1,   /* message auth code type (int)      */
+    MUNGE_OPT_ZIP_TYPE          =  2,   /* compression type (int)            */
     MUNGE_OPT_REALM             =  3,   /* security realm (str)              */
     MUNGE_OPT_TTL               =  4,   /* time-to-live (int)                */
     MUNGE_OPT_ENCODE_TIME       =  5,   /* time when cred encoded (time_t)   */
@@ -82,11 +82,8 @@ typedef enum munge_mac {
     MUNGE_MAC_NONE              =  0,   /* mac disabled -- invalid, btw      */
     MUNGE_MAC_DEFAULT           =  1,   /* default mac specified by daemon   */
     MUNGE_MAC_MD5               =  2,   /* MD5 w/ 128b-digest                */
-    MUNGE_MAC_MD5_HALF          =  3,   /* MD5 w/ 64b-digest                 */
-    MUNGE_MAC_SHA1              =  4,   /* SHA-1 w/ 160b-digest              */
-    MUNGE_MAC_SHA1_HALF         =  5,   /* SHA-1 w/ 80b-digest               */
-    MUNGE_MAC_RIPEMD160         =  6,   /* RIPEMD-160 w/ 160b-digest         */
-    MUNGE_MAC_RIPEMD160_HALF    =  7,   /* RIPEMD-160 w/ 80b-digest          */
+    MUNGE_MAC_SHA1              =  3,   /* SHA-1 w/ 160b-digest              */
+    MUNGE_MAC_RIPEMD160         =  4,   /* RIPEMD-160 w/ 160b-digest         */
     MUNGE_MAC_LAST_ENTRY
 } munge_mac_t;
 

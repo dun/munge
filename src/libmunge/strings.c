@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: strings.c,v 1.1 2003/04/25 21:17:29 dun Exp $
+ *  $Id: strings.c,v 1.2 2003/04/25 23:23:11 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -45,7 +45,7 @@ const char * munge_cipher_strings[] = {
     "Blowfish",
     "CAST5",
 #if HAVE_EVP_AES_128_CBC
-    "AES-128",
+    "AES128",
 #else  /* !HAVE_EVP_AES_128_CBC */
     "",
 #endif /* !HAVE_EVP_AES_128_CBC */
@@ -58,11 +58,8 @@ const char * munge_mac_strings[] = {
     "",
     "Default",
     "MD5",
-    "MD5-Half",
     "SHA1",
-    "SHA1-Half",
-    "RIPEMD-160",
-    "RIPEMD-160-Half",
+    "RIPEMD160",
      NULL
 };
 

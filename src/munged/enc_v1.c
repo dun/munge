@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: enc_v1.c,v 1.4 2003/04/23 22:04:45 dun Exp $
+ *  $Id: enc_v1.c,v 1.5 2003/04/25 23:23:11 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -594,8 +594,6 @@ enc_v1_armor (munge_cred_t c)
     base64_ctx           x;             /* base64 context                    */
     int                  n, m;          /* all-purpose ints                  */
 
-    /*  FIXME: Add support for *_HALF MACs.
-     */
     assert (c != NULL);
     assert (c->msg != NULL);
     assert (c->msg->head.version == 1);

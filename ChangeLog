@@ -1,5 +1,8 @@
 2003-04-25  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/libmunge/munge.h, src/libmunge/strings.c, src/munged/enc_v1.c,
+	  src/munged/lookup.c: Removed "half-mac" work-in-progress.
+
 	* src/munge/munge.c, src/munge/unmunge.c: Tweaked "list" output.
 
 	* src/munge/munge.c: Added c/C/m/M/z/Z cmdline opts.
