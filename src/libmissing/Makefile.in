@@ -98,7 +98,9 @@ libmissing_la_LIBADD = \
 	@LTLIBOBJS@
 
 
-libmissing_la_SOURCES = 
+libmissing_la_SOURCES = \
+	missing.h
+
 subdir = src/libmissing
 mkinstalldirs = $(SHELL) $(top_srcdir)/config/mkinstalldirs
 CONFIG_HEADER = $(top_builddir)/config/config.h

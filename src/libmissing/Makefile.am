@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.1 2003/02/13 17:54:27 dun Exp $
+## $Id: Makefile.am,v 1.2 2003/04/08 18:16:16 dun Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
@@ -12,4 +12,5 @@ noinst_LTLIBRARIES = \
 libmissing_la_LIBADD = \
 	@LTLIBOBJS@
 
-libmissing_la_SOURCES =
+libmissing_la_SOURCES = \
+	missing.h
