@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: msg_client.c,v 1.11 2004/09/23 21:10:11 dun Exp $
+ *  $Id: msg_client.c,v 1.12 2004/09/24 16:50:45 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -67,6 +67,8 @@ munge_msg_client_xfer (munge_msg_t *pm, munge_ctx_t ctx)
     munge_err_t  e;
     munge_msg_t  mreq, mrsp;
 
+    assert (MUNGE_SOCKET_XFER_ATTEMPTS * MUNGE_SOCKET_XFER_USLEEP < 1000000);
+
     if (!pm || !*pm) {
         return (EMUNGE_SNAFU);
     }
@@ -112,6 +114,7 @@ munge_msg_client_xfer (munge_msg_t *pm, munge_ctx_t ctx)
             mreq->sd = -1;
         }
         mreq->head.retry = i;
+        usleep (i * MUNGE_SOCKET_XFER_USLEEP);
         i++;
     }
     if (mrsp) {

@@ -1,6 +1,16 @@
+2004-09-24  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/libcommon/munge_defs.h:
+	  Added MUNGE_SOCKET_XFER_USLEEP.  Removed MUNGE_SOCKET_ACCEPT_USLEEP.
+	  Changed MUNGE_SOCKET_XFER_ATTEMPTS from 3 to 5.
+	* src/libmunge/msg_client.c(munge_msg_client_xfer):
+	  Added linear back-off to retry of failed credential transactions.
+	* src/munged/job.c(job_accept):
+	  Changed usleep() to work_wait() when accept() exceeds open fd limit.
+
 2004-09-23  Chris Dunlap  <cdunlap@llnl.gov>
 
-	* libcommon/munge_msg.c, libcommon/munge_msg.h:
+	* src/libcommon/munge_msg.c, src/libcommon/munge_msg.h:
 	  Removed leading underscore from public functions.
 	  All callers changed.
 

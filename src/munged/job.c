@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: job.c,v 1.5 2004/09/23 21:10:11 dun Exp $
+ *  $Id: job.c,v 1.6 2004/09/24 16:50:46 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -38,7 +38,6 @@
 #include "dec_v1.h"
 #include "enc_v1.h"
 #include "log.h"
-#include "munge_defs.h"
 #include "munge_msg.h"
 #include "str.h"
 #include "work.h"
@@ -91,10 +90,8 @@ job_accept (conf_t conf)
                 case ENOBUFS:
                 case ENOMEM:
                     log_msg (LOG_INFO,
-                        "Unable to accept connection: %s: Sleeping %dms",
-                        strerror (errno), (MUNGE_SOCKET_ACCEPT_USLEEP / 1000));
-                    assert (MUNGE_SOCKET_ACCEPT_USLEEP < 1000000);
-                    usleep (MUNGE_SOCKET_ACCEPT_USLEEP);
+                        "Suspended connections until work queue emptied");
+                    work_wait (w);
                     continue;
                 default:
                     log_errno (EMUNGE_SNAFU, LOG_ERR,

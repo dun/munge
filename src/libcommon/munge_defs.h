@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munge_defs.h,v 1.30 2004/09/23 20:56:43 dun Exp $
+ *  $Id: munge_defs.h,v 1.31 2004/09/24 16:50:45 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -114,12 +114,13 @@
 /*  Number of attempts a client makes communicating with the server for a
  *    given credential transaction before failing.
  */
-#define MUNGE_SOCKET_XFER_ATTEMPTS      3
+#define MUNGE_SOCKET_XFER_ATTEMPTS      5
 
-/*  Number of microseconds (< 1e6) the daemon sleeps when encountering
- *    a transient error upon accepting a new client connection.
+/*  Number of microseconds for the start of the linear back-off where the
+ *    client sleeps between attempts at retrying a credential transaction.
+ *  Ensure (MUNGE_SOCKET_XFER_ATTEMPTS * MUNGE_SOCKET_XFER_USLEEP) < 1e6.
  */
-#define MUNGE_SOCKET_ACCEPT_USLEEP      500000
+#define MUNGE_SOCKET_XFER_USLEEP        10000
 
 /*  Number of threads to create for processing credential requests.
  */
