@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: gids.c,v 1.8 2004/09/17 20:20:04 dun Exp $
+ *  $Id: gids.c,v 1.9 2004/09/17 21:27:05 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -68,8 +68,13 @@
  *  Constants
  *****************************************************************************/
 
-#define GIDS_DEBUG      0
-#define GIDS_GROUP_FILE "/etc/group"
+#ifndef GIDS_DEBUG
+#  define GIDS_DEBUG            0
+#endif /* !GIDS_DEBUG */
+
+#ifndef GIDS_GROUP_FILE
+#  define GIDS_GROUP_FILE       "/etc/group"
+#endif /* !GIDS_GROUP_FILE */
 
 
 /*****************************************************************************

@@ -1,5 +1,8 @@
 2004-09-17  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/munged/gids.c:
+	  Added #ifndef's around GIDS_DEBUG and GIDS_GROUP_FILE.
+
 	* src/munged/work.c:
 	  Moved pthread_cond_signal() outside of critical region.
 	  Replaced public function parm asserts with if-guards.
@@ -25,7 +28,7 @@
 	* src/munged/gids.c, src/munged/gids.h:
 	  Added timer to periodically re-parse group info.
 	* src/munged/conf.c, src/munged/conf.h:
-	  Made extern declaration of conf.
+	  Added extern declaration of conf.
 	  Added got_group_stat flag to struct conf.
 	* src/libcommon/munge_defs.h:
 	  Added MUNGE_GROUP_STAT_FLAG and MUNGE_GROUP_PARSE_TIMER.
