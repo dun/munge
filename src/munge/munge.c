@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munge.c,v 1.37 2004/09/16 22:12:13 dun Exp $
+ *  $Id: munge.c,v 1.38 2004/11/09 20:15:23 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -437,13 +437,13 @@ display_help (char *prog)
     printf ("\n");
 
     printf ("  %*s %s\n", w, "-n, --no-input",
-            "Redirect input from /dev/null");
+            "Discard all input for payload");
 
     printf ("  %*s %s\n", w, "-s, --string=STRING",
-            "Input payload data from STRING");
+            "Input payload from STRING");
 
     printf ("  %*s %s\n", w, "-i, --input=FILE",
-            "Input payload data from FILE");
+            "Input payload from FILE");
 
     printf ("  %*s %s\n", w, "-o, --output=FILE",
             "Output credential to FILE");
@@ -454,36 +454,37 @@ display_help (char *prog)
             "Specify cipher type");
 
     printf ("  %*s %s\n", w, "-C, --list-ciphers",
-            "Print a list of supported ciphers");
+            "Display a list of supported ciphers");
 
     printf ("  %*s %s\n", w, "-m, --mac=STRING",
-            "Specify message authentication code type");
+            "Specify MAC type");
 
     printf ("  %*s %s\n", w, "-M, --list-macs",
-            "Print a list of supported MACs");
+            "Display a list of supported MACs");
 
     printf ("  %*s %s\n", w, "-z, --zip=STRING",
             "Specify compression type");
 
     printf ("  %*s %s\n", w, "-Z, --list-zips",
-            "Print a list of supported compressions");
+            "Display a list of supported compressions");
 
     printf ("\n");
 
     printf ("  %*s %s\n", w, "-u, --restrict-uid=UID",
-            "Restrict credential decoding to only this UID");
+            "Restrict credential decoding by UID");
 
     printf ("  %*s %s\n", w, "-g, --restrict-gid=GID",
-            "Restrict credential decoding to only this GID");
+            "Restrict credential decoding by GID");
 
     printf ("  %*s %s\n", w, "-t, --ttl=INTEGER",
-            "Specify time-to-live (in seconds; 0=default -1=max)");
+            "Specify time-to-live (in seconds; 0=dfl -1=max)");
 
     printf ("  %*s %s\n", w, "-S, --socket=STRING",
-            "Specify local domain socket");
+            "Specify local domain socket for daemon");
 
     printf ("\n");
-    printf ("By default, data is read from stdin and written to stdout.\n\n");
+    printf ("By default, payload read from stdin, "
+            "credential written to stdout.\n\n");
     return;
 }
 

@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: remunge.c,v 1.9 2004/09/16 22:10:40 dun Exp $
+ *  $Id: remunge.c,v 1.10 2004/11/09 20:15:23 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -665,19 +665,19 @@ display_help (char *prog)
             "Specify cipher type");
 
     printf ("  %*s %s\n", w, "-C, --list-ciphers",
-            "Print a list of supported ciphers");
+            "Display a list of supported ciphers");
 
     printf ("  %*s %s\n", w, "-m, --mac=STRING",
-            "Specify message authentication code type");
+            "Specify MAC type");
 
     printf ("  %*s %s\n", w, "-M, --list-macs",
-            "Print a list of supported MACs");
+            "Display a list of supported MACs");
 
     printf ("  %*s %s\n", w, "-z, --zip=STRING",
             "Specify compression type");
 
     printf ("  %*s %s\n", w, "-Z, --list-zips",
-            "Print a list of supported compressions");
+            "Display a list of supported compressions");
 
     printf ("\n");
 
@@ -691,16 +691,16 @@ display_help (char *prog)
             "Specify payload length (in bytes)");
 
     printf ("  %*s %s\n", w, "-u, --restrict-uid=UID",
-            "Restrict credential decoding to only this UID");
+            "Restrict credential decoding by UID");
 
     printf ("  %*s %s\n", w, "-g, --restrict-gid=GID",
-            "Restrict credential decoding to only this GID");
+            "Restrict credential decoding by GID");
 
     printf ("  %*s %s\n", w, "-t, --ttl=INTEGER",
-            "Specify time-to-live (in seconds; 0=default -1=max)");
+            "Specify time-to-live (in seconds; 0=dfl -1=max)");
 
     printf ("  %*s %s\n", w, "-S, --socket=STRING",
-            "Specify local domain socket");
+            "Specify local domain socket for daemon");
 
     printf ("\n");
 
@@ -791,26 +791,26 @@ get_si_multiple (char c)
     int multiple;
 
     switch (c) {
-        case '\0':
+        case '\0':                      /* bytes */
             multiple = 1;
             break;
-        case 'k':
-            multiple = 1 << 10;
-            break;
-        case 'K':
+        case 'k':                       /* kilobytes */
             multiple = 1e3;
             break;
-        case 'm':
-            multiple = 1 << 20;
+        case 'K':                       /* kibibytes */
+            multiple = 1 << 10;
             break;
-        case 'M':
+        case 'm':                       /* megabytes */
             multiple = 1e6;
             break;
-        case 'g':
-            multiple = 1 << 30;
+        case 'M':                       /* mebibytes */
+            multiple = 1 << 20;
             break;
-        case 'G':
+        case 'g':                       /* gigabytes */
             multiple = 1e9;
+            break;
+        case 'G':                       /* gibibytes */
+            multiple = 1 << 30;
             break;
         default:
             multiple = 0;
@@ -877,7 +877,7 @@ start_threads (conf_t conf)
 #endif /* _POSIX_THREAD_ATTR_STACKSIZE */
     /*
      *  Lock mutex to prevent threads from starting until all are created.
-     *    After the timer has been started, it will be unlocked via
+     *    After the timer has been started, the mutex will be unlocked via
      *    pthread_cond_timedwait().
      */
     if ((errno = pthread_mutex_lock (&conf->mutex)) != 0) {

@@ -1,5 +1,8 @@
 2004-11-09  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/munge/munge.c, src/munge/remunge.c, src/munge/unmunge.c:
+	  Tweaked display_help() information.
+
 	* src/libcommon/auth_policy.h, src/libcommon/munge_defs.h,
 	  src/munged/conf.c: Moved defines from auth_policy.h to munge_defs.h.
 	  Renamed AUTH_PIPE_NAME_PREFIX to MUNGE_AUTH_PIPE_NAME_PREFIX.

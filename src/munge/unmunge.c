@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: unmunge.c,v 1.30 2004/08/24 19:58:08 dun Exp $
+ *  $Id: unmunge.c,v 1.31 2004/11/09 20:15:24 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -427,7 +427,7 @@ display_help (char *prog)
             "Input credential from FILE");
 
     printf ("  %*s %s\n", w, "-n, --no-output",
-            "Redirect all output to /dev/null");
+            "Discard all output");
 
     printf ("  %*s %s\n", w, "-m, --metadata=FILE",
             "Output metadata to FILE");
@@ -441,13 +441,14 @@ display_help (char *prog)
             "Specify subset of metadata keys to output");
 
     printf ("  %*s %s\n", w, "-K, --list-keys",
-            "Print a list of metadata keys");
+            "Display list of metadata keys");
 
     printf ("  %*s %s\n", w, "-S, --socket=STRING",
-            "Specify local domain socket");
+            "Specify local domain socket for daemon");
 
     printf ("\n");
-    printf ("By default, data is read from stdin and written to stdout.\n\n");
+    printf ("By default, credential read from stdin, "
+            "metadata & payload written to stdout.\n\n");
     return;
 }
 
