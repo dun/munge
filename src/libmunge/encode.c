@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: encode.c,v 1.3 2003/04/23 22:04:45 dun Exp $
+ *  $Id: encode.c,v 1.4 2003/04/30 00:11:00 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -160,7 +160,7 @@ encode_req_v1 (munge_msg_t m, munge_ctx_t ctx, const void *buf, int len)
     /*  Pass optional data to be encoded into the credential.
      */
     m1->data_len = len;
-    m1->data = buf;
+    m1->data = (void *) buf;
     return (EMUNGE_SUCCESS);
 }
 

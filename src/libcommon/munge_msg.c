@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munge_msg.c,v 1.3 2003/04/23 18:22:35 dun Exp $
+ *  $Id: munge_msg.c,v 1.4 2003/04/30 00:11:00 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -242,7 +242,7 @@ _munge_msg_reset (munge_msg_t m)
 
 
 int
-_munge_msg_set_err (munge_msg_t m, munge_err_t e, const char *s)
+_munge_msg_set_err (munge_msg_t m, munge_err_t e, char *s)
 {
 /*  Set an error code [e] and string [s] if an error condition
  *    does not already exist (ie, m->status == EMUNGE_SUCCESS).

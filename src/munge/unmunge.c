@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: unmunge.c,v 1.9 2003/04/25 22:36:03 dun Exp $
+ *  $Id: unmunge.c,v 1.10 2003/04/30 00:11:00 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -167,7 +167,7 @@ main (int argc, char *argv[])
 {
     conf_t       conf;
     int          rc;
-    char        *p;
+    const char  *p;
 
     if (posignal (SIGPIPE, SIG_IGN) == SIG_ERR)
         log_err (EMUNGE_SNAFU, LOG_ERR, "Unable to ignore signal=%d", SIGPIPE);

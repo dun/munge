@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: msg_server.c,v 1.3 2003/04/23 18:22:35 dun Exp $
+ *  $Id: msg_server.c,v 1.4 2003/04/30 00:11:00 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -103,7 +103,7 @@ err_v1_process_msg (munge_msg_t m)
  *  The NUL-terminated error string is placed in the 'data' field.
  */
     struct munge_msg_v1 *m1;            /* munge msg (v1 format)             */
-    char                *p;
+    const char          *p;
 
     assert (m != NULL);
     assert (m->status != EMUNGE_SUCCESS);
@@ -118,7 +118,7 @@ err_v1_process_msg (munge_msg_t m)
     p = (m->errstr != NULL) ? m->errstr : munge_strerror (m->status);
     m1->errnum = m->status;
     m1->data_len = strlen (p) + 1;
-    m1->data = p;
+    m1->data = (void *) p;
 
     log_msg (LOG_INFO, "%s", p);
     _munge_msg_send (m);

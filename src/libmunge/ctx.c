@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: ctx.c,v 1.5 2003/04/25 21:20:50 dun Exp $
+ *  $Id: ctx.c,v 1.6 2003/04/30 00:11:00 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -247,7 +247,7 @@ munge_ctx_set (munge_ctx_t ctx, munge_opt_t opt, ...)
  *****************************************************************************/
 
 munge_err_t
-_munge_ctx_set_err (munge_ctx_t ctx, munge_err_t e, const char *s)
+_munge_ctx_set_err (munge_ctx_t ctx, munge_err_t e, char *s)
 {
 /*  Sets an error code [e] and string [s] to be returned via the
  *    munge context [ctx].
