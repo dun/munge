@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: gids.c,v 1.4 2004/05/06 23:32:34 dun Exp $
+ *  $Id: gids.c,v 1.5 2004/09/03 23:29:04 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -115,7 +115,7 @@ gids_create (void)
         log_errno (EMUNGE_NO_MEMORY, LOG_ERR,
             "Unable to allocate gids struct");
     }
-    if (!(gids->hash = hash_create (0, keyf, cmpf, delf))) {
+    if (!(gids->hash = hash_create (GIDS_HASH_SIZE, keyf, cmpf, delf))) {
         log_errno (EMUNGE_NO_MEMORY, LOG_ERR,
             "Unable to allocate gids hash");
     }

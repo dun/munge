@@ -1,5 +1,7 @@
 2004-09-03  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/munged/gids.c, src/munged/gids.h: Added GIDS_HASH_SIZE.
+
 	* src/munge/remunge.c: Removed error count from number processed.
 
 	* src/munged/munged.c(main):
