@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munge.c,v 1.25 2004/05/01 05:00:24 dun Exp $
+ *  $Id: munge.c,v 1.26 2004/05/01 06:17:14 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -29,6 +29,7 @@
 #  include "config.h"
 #endif /* HAVE_CONFIG_H */
 
+#include <sys/types.h>                  /* include before grp.h for bsd */
 #include <assert.h>
 #include <ctype.h>
 #include <errno.h>
@@ -38,7 +39,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/types.h>
 #include <unistd.h>
 #include <munge.h>
 #include "common.h"

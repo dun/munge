@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: gids.c,v 1.2 2004/04/21 23:01:59 dun Exp $
+ *  $Id: gids.c,v 1.3 2004/05/01 06:17:14 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -31,12 +31,12 @@
 #  include "config.h"
 #endif /* HAVE_CONFIG_H */
 
+#include <sys/types.h>                  /* include before grp.h for bsd */
 #include <assert.h>
 #include <errno.h>
 #include <grp.h>
 #include <pwd.h>
 #include <stdlib.h>
-#include <sys/types.h>
 #include <munge.h>
 #include "gids.h"
 #include "hash.h"
