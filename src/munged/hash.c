@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: hash.c,v 1.5 2004/09/04 00:15:50 dun Exp $
+ *  $Id: hash.c,v 1.6 2004/09/16 20:16:14 dun Exp $
  *  LSD-Id: hash.c,v 1.8 2003/11/19 23:33:48 dun Exp
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
@@ -159,7 +159,10 @@ hash_destroy (hash_t h)
     int i;
     struct hash_node *p, *q;
 
-    assert (h != NULL);
+    if (!h) {
+        errno = EINVAL;
+        return;
+    }
     lsd_mutex_lock (&h->mutex);
     assert (h->magic == HASH_MAGIC);
     for (i = 0; i < h->size; i++) {
@@ -183,7 +186,10 @@ hash_is_empty (hash_t h)
 {
     int n;
 
-    assert (h != NULL);
+    if (!h) {
+        errno = EINVAL;
+        return (0);
+    }
     lsd_mutex_lock (&h->mutex);
     assert (h->magic == HASH_MAGIC);
     n = h->count;
@@ -197,7 +203,10 @@ hash_count (hash_t h)
 {
     int n;
 
-    assert (h != NULL);
+    if (!h) {
+        errno = EINVAL;
+        return (0);
+    }
     lsd_mutex_lock (&h->mutex);
     assert (h->magic == HASH_MAGIC);
     n = h->count;
@@ -213,8 +222,7 @@ hash_find (hash_t h, const void *key)
     struct hash_node *p;
     void *data = NULL;
 
-    assert (h != NULL);
-    if (!key) {
+    if (!h || !key) {
         errno = EINVAL;
         return (NULL);
     }
@@ -239,8 +247,7 @@ hash_insert (hash_t h, const void *key, void *data)
     struct hash_node *p;
     unsigned int slot;
 
-    assert (h != NULL);
-    if (!key || !data) {
+    if (!h || !key || !data) {
         errno = EINVAL;
         return (NULL);
     }
@@ -278,8 +285,7 @@ hash_remove (hash_t h, const void *key)
     unsigned int slot;
     void *data = NULL;
 
-    assert (h != NULL);
-    if (!key) {
+    if (!h || !key) {
         errno = EINVAL;
         return (NULL);
     }
@@ -309,8 +315,7 @@ hash_delete_if (hash_t h, hash_arg_f arg_f, void *arg)
     struct hash_node *p;
     int n = 0;
 
-    assert (h != NULL);
-    if (!arg_f) {
+    if (!h || !arg_f) {
         errno = EINVAL;
         return (-1);
     }
@@ -344,8 +349,7 @@ hash_for_each (hash_t h, hash_arg_f arg_f, void *arg)
     struct hash_node *p;
     int n = 0;
 
-    assert (h != NULL);
-    if (!arg_f) {
+    if (!h || !arg_f) {
         errno = EINVAL;
         return (-1);
     }

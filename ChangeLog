@@ -1,5 +1,7 @@
 2004-09-16  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/munged/hash.c: Replaced parm asserts with if-guards.
+
 	* src/munged/dec_v1.c, src/munged/enc_v1.c:
 	  Removed extern declaration of conf -- now in conf.h.
 
