@@ -1,5 +1,7 @@
 2004-09-03  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/munge/remunge.c: Removed error count from number processed.
+
 	* src/munged/munged.c(main):
 	  Changed default log priority level from LOG_NOTICE to LOG_INFO.
 

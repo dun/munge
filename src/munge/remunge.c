@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: remunge.c,v 1.1 2004/09/03 18:32:51 dun Exp $
+ *  $Id: remunge.c,v 1.2 2004/09/03 21:13:08 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -519,7 +519,8 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                         || (i > conf->max_threads)) {
                     log_err (EMUNGE_SNAFU, LOG_ERR,
                         "Exceeded maximum number of %d thread%s",
-                        conf->max_threads, (conf->max_threads > 1) ? "s" : "");
+                        conf->max_threads,
+                        (conf->max_threads == 1) ? "" : "s");
                 }
                 conf->num_threads = i;
                 break;
@@ -561,7 +562,7 @@ parse_cmdline (conf_t conf, int argc, char **argv)
         if (!(conf->payload = malloc (conf->num_payload + 1))) {
             log_err (EMUNGE_NO_MEMORY, LOG_ERR,
                 "Unable to allocate credential payload of %d byte%s",
-                conf->num_payload, (conf->num_payload > 1 ? "s" : ""));
+                conf->num_payload, (conf->num_payload == 1 ? "" : "s"));
         }
         for (i = 0, c = 'A'; i < conf->num_payload; i++) {
             if ((conf->payload[i] = c++) == 'Z') {
@@ -827,7 +828,7 @@ start_threads (conf_t conf)
     conf->num_running = conf->num_threads;
 
     output_msg ("Spawning %d thread%s for %s",
-        conf->num_threads, ((conf->num_threads > 1) ? "s" : ""),
+        conf->num_threads, ((conf->num_threads == 1) ? "" : "s"),
         (conf->do_decode ? "encoding/decoding" : "encoding"));
 
     for (i = 0; i < conf->num_threads; i++) {
@@ -899,16 +900,16 @@ process_creds (conf_t conf)
      */
     if (n_creds && !n_secs) {
         output_msg ("Processing %lu credential%s",
-            conf->num_creds,   ((conf->num_creds   > 1) ? "s" : ""));
+            conf->num_creds,   ((conf->num_creds   == 1) ? "" : "s"));
     }
     else if (n_secs && !n_creds) {
         output_msg ("Processing credentials for %d second%s",
-            conf->num_seconds, ((conf->num_seconds > 1) ? "s" : ""));
+            conf->num_seconds, ((conf->num_seconds == 1) ? "" : "s"));
     }
     else {
         output_msg ("Processing %lu credential%s for up to %d second%s",
-            conf->num_creds,   ((conf->num_creds   > 1) ? "s" : ""),
-            conf->num_seconds, ((conf->num_seconds > 1) ? "s" : ""));
+            conf->num_creds,   ((conf->num_creds   == 1) ? "" : "s"),
+            conf->num_seconds, ((conf->num_seconds == 1) ? "" : "s"));
     }
     /*  Start processing credentials.
      */
@@ -935,8 +936,9 @@ stop_threads (conf_t conf)
 {
 /*  Stop the threads from processing further credentials.  Output the results.
  */
-    int    i;
-    double delta;
+    int           i;
+    unsigned long n;
+    double        delta;
 
     /*  The mutex must be unlocked here in order to let the threads clean up
      *    (via remunge_cleanup()) once they are canceled/finished.
@@ -965,22 +967,31 @@ stop_threads (conf_t conf)
     /*
      *  Output processing stop message and results.
      */
-    output_msg ("Processed %lu credential%s in %0.3fs (%0.0f creds/sec)",
-        conf->shared.num_creds_done,
-        ((conf->shared.num_creds_done > 1) ? "s" : ""),
-        delta, (conf->shared.num_creds_done / delta));
-
-    if (conf->shared.num_encode_errs > 0) {
-        output_msg ("Encountered %lu encoding error%s",
+    if (conf->shared.num_encode_errs && conf->shared.num_decode_errs) {
+        output_msg ("Generated %lu encoding error%s and %lu decoding error%s",
             conf->shared.num_encode_errs,
-            ((conf->shared.num_encode_errs > 1) ? "s" : ""));
-    }
-    if (conf->shared.num_decode_errs > 0) {
-        output_msg ("Encountered %lu decoding error%s",
+            ((conf->shared.num_encode_errs == 1) ? "" : "s"),
             conf->shared.num_decode_errs,
-            ((conf->shared.num_decode_errs > 1) ? "s" : ""));
+            ((conf->shared.num_decode_errs == 1) ? "" : "s"));
     }
-    /*  Check for minimum duration time interval.
+    else if (conf->shared.num_encode_errs) {
+        output_msg ("Generated %lu encoding error%s",
+            conf->shared.num_encode_errs,
+            ((conf->shared.num_encode_errs == 1) ? "" : "s"));
+    }
+    else if (conf->shared.num_decode_errs) {
+        output_msg ("Generated %lu decoding error%s",
+            conf->shared.num_decode_errs,
+            ((conf->shared.num_decode_errs == 1) ? "" : "s"));
+    }
+    /*  Subtract the errors from the number of credentials processed.
+     */
+    n = conf->shared.num_creds_done
+        - conf->shared.num_encode_errs - conf->shared.num_decode_errs;
+    output_msg ("Processed %lu credential%s in %0.3fs (%0.0f creds/sec)",
+        n, ((n == 1) ? "" : "s"), delta, (n / delta));
+    /*
+     *  Check for minimum duration time interval.
      */
     if (delta < MIN_DURATION) {
         printf ("\nWARNING: Results based on such a short time interval "
