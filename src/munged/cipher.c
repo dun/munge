@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: cipher.c,v 1.1 2003/04/08 18:16:16 dun Exp $
+ *  $Id: cipher.c,v 1.2 2003/04/18 23:18:42 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -150,25 +150,19 @@ cipher_cleanup (cipher_ctx *x)
 int
 cipher_block_size (const EVP_CIPHER *ci)
 {
-    assert (ci != NULL);
-
-    return (EVP_CIPHER_block_size (ci));
+    return ((ci == NULL) ? 0 : EVP_CIPHER_block_size (ci));
 }
 
 
 int
 cipher_iv_size (const EVP_CIPHER *ci)
 {
-    assert (ci != NULL);
-
-    return (EVP_CIPHER_iv_length (ci));
+    return ((ci == NULL) ? 0 : EVP_CIPHER_iv_length (ci));
 }
 
 
 int
 cipher_key_size (const EVP_CIPHER *ci)
 {
-    assert (ci != NULL);
-
-    return (EVP_CIPHER_key_length (ci));
+    return ((ci == NULL) ? 0 : EVP_CIPHER_key_length (ci));
 }
