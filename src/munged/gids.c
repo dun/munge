@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: gids.c,v 1.7 2004/09/16 20:41:12 dun Exp $
+ *  $Id: gids.c,v 1.8 2004/09/17 20:20:04 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -141,18 +141,22 @@ gids_create (void)
 void
 gids_destroy (gids_t gids)
 {
+    hash_t h;
+
     if (!gids) {
         return;
     }
     if ((errno = pthread_mutex_lock (&gids->lock)) != 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to lock gids mutex");
     }
-    hash_destroy (gids->hash);
+    h = gids->hash;
     gids->hash = NULL;
 
     if ((errno = pthread_mutex_unlock (&gids->lock)) != 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to unlock gids mutex");
     }
+    hash_destroy (h);
+
     if ((errno = pthread_mutex_destroy (&gids->lock)) != 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to destroy gids mutex");
     }

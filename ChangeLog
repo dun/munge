@@ -1,3 +1,8 @@
+2004-09-17  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/munged/gids.c(gids_destroy):
+	  Moved hash_destroy() outside of critical region.
+
 2004-09-16  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/munge/munge.c: Revamped "-u" and "-g" cmdline opts.
