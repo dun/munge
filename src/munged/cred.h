@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: cred.h,v 1.10 2004/11/24 00:21:58 dun Exp $
+ *  $Id: cred.h,v 1.11 2004/11/24 01:11:08 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -32,7 +32,7 @@
 #include <inttypes.h>
 #include <openssl/evp.h>
 #include "munge_defs.h"
-#include "msg.h"
+#include "m_msg.h"
 
 
 /*****************************************************************************
@@ -62,7 +62,7 @@
 
 struct munge_cred {
     uint8_t             version;        /* version of the munge cred format  */
-    msg_t               msg;            /* ptr to corresponding munge msg    */
+    m_msg_t             msg;            /* ptr to corresponding munge msg    */
     int                 outer_mem_len;  /* length of outer credential memory */
     unsigned char      *outer_mem;      /* outer cred memory allocation      */
     int                 outer_len;      /* length of outer credential data   */
@@ -95,7 +95,7 @@ typedef struct munge_cred * munge_cred_t;
  *  Extern Functions
  *****************************************************************************/
 
-munge_cred_t cred_create (msg_t m);
+munge_cred_t cred_create (m_msg_t m);
 
 void cred_destroy (munge_cred_t c);
 

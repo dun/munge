@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: auth_recv.c,v 1.10 2004/11/24 00:21:58 dun Exp $
+ *  $Id: auth_recv.c,v 1.11 2004/11/24 01:11:08 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -35,7 +35,7 @@
 #include <munge.h>
 #include "auth_policy.h"
 #include "log.h"
-#include "msg.h"
+#include "m_msg.h"
 
 
 /*****************************************************************************
@@ -63,7 +63,7 @@ auth_recv_init (void)
 #ifdef MUNGE_AUTH_GETPEEREID
 
 int
-auth_recv (msg_t m, uid_t *uid, gid_t *gid)
+auth_recv (m_msg_t m, uid_t *uid, gid_t *gid)
 {
     if (getpeereid (m->sd, uid, gid) < 0) {
         log_msg (LOG_ERR, "Unable to get peer identity: %s", strerror (errno));
@@ -88,7 +88,7 @@ typedef int socklen_t;                  /* socklen_t is uint32_t in Posix.1g */
 #endif /* !HAVE_SOCKLEN_T */
                                                                                 
 int
-auth_recv (msg_t m, uid_t *uid, gid_t *gid)
+auth_recv (m_msg_t m, uid_t *uid, gid_t *gid)
 {
     struct ucred cred;
     socklen_t len = sizeof (cred);
@@ -122,7 +122,7 @@ static int _name_auth_pipe (char **dst);
 static int _send_auth_req (int sd, const char *pipe_name);
 
 int
-auth_recv (msg_t m, uid_t *uid, gid_t *gid)
+auth_recv (m_msg_t m, uid_t *uid, gid_t *gid)
 {
     char             *pipe_name = NULL;
     int               pipe_fd = -1;
@@ -216,7 +216,7 @@ static int _name_auth_pipe (char **dst);
 static int _send_auth_req (int sd, const char *pipe_name);
 
 int
-auth_recv (msg_t m, uid_t *uid, gid_t *gid)
+auth_recv (m_msg_t m, uid_t *uid, gid_t *gid)
 {
     char             *pipe_name = NULL;
     int               pipe_fds[2] = {-1, -1};
@@ -465,19 +465,19 @@ _send_auth_req (int sd, const char *pipe_name)
  *  The authentication request message needs to contain the name of the
  *    authentication pipe for the client to use for sending an fd across.
  *
- *  FIXME: Use of the msg_v1 struct is overkill here, but all of the
+ *  FIXME: Use of the m_msg_v1 struct is overkill here, but all of the
  *         existing msg routines currently expect to work with that struct.
  */
-    msg_t          m;
-    munge_err_t    e;
-    struct msg_v1 *m1;
+    m_msg_t          m;
+    munge_err_t      e;
+    struct m_msg_v1 *m1;
 
-    if ((e = msg_create (&m, sd)) != EMUNGE_SUCCESS) {
+    if ((e = m_msg_create (&m, sd)) != EMUNGE_SUCCESS) {
         goto end;
     }
     m->head.type = MUNGE_MSG_AUTH_FD_REQ;
 
-    m->pbody_len = sizeof (struct msg_v1);
+    m->pbody_len = sizeof (struct m_msg_v1);
     if (!(m->pbody = malloc (m->pbody_len))) {
         e = EMUNGE_NO_MEMORY;
         goto end;
@@ -486,21 +486,21 @@ _send_auth_req (int sd, const char *pipe_name)
     m1 = m->pbody;
     /*
      *  Note that the actual string reference (not a copy) is used here
-     *    since msg_destroy() does not free any m1 fields.
+     *    since m_msg_destroy() does not free any m1 fields.
      */
     m1->data_len = strlen ((char *) pipe_name) + 1;
     m1->data = (char *) pipe_name;
 
-    if ((e = msg_send (m, 0)) != EMUNGE_SUCCESS) {
+    if ((e = m_msg_send (m, 0)) != EMUNGE_SUCCESS) {
         goto end;
     }
 
 end:
-    /*  Clear the msg sd to prevent closing the socket by msg_destroy().
+    /*  Clear the msg sd to prevent closing the socket by m_msg_destroy().
      */
     if (m) {
         m->sd = -1;
-        msg_destroy (m);
+        m_msg_destroy (m);
     }
     return (e == EMUNGE_SUCCESS ? 0 : -1);
 }

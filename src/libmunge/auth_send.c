@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: auth_send.c,v 1.7 2004/11/24 00:21:57 dun Exp $
+ *  $Id: auth_send.c,v 1.8 2004/11/24 01:11:08 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -31,7 +31,7 @@
 
 #include <munge.h>
 #include "auth_policy.h"
-#include "msg.h"
+#include "m_msg.h"
 
 
 /*****************************************************************************
@@ -41,7 +41,7 @@
 #ifndef MUNGE_AUTH_RECVFD_COMMON
 
 int
-auth_send (msg_t m)
+auth_send (m_msg_t m)
 {
     return (EMUNGE_SUCCESS);
 }
@@ -72,7 +72,7 @@ static int _recv_auth_req (int sd, char **dst_p);
 static int _name_auth_file (const char *src, char **dst_p);
 
 int
-auth_send (msg_t m)
+auth_send (m_msg_t m)
 {
     char *pipe_name = NULL;
     int   pipe_fd = -1;
@@ -140,7 +140,7 @@ err:
         unlink (file_name);
         free (file_name);
     }
-    return (msg_set_err (m, EMUNGE_SNAFU, estr));
+    return (m_msg_set_err (m, EMUNGE_SNAFU, estr));
 }
 
 static int
@@ -152,20 +152,20 @@ _recv_auth_req (int sd, char **dst_p)
  *  The caller is responsible for freeing the string returned by [dst_p].
  *  Returns 0 on success, -1 on error.
  */
-    msg_t          m;
-    munge_err_t    e;
-    struct msg_v1 *m1;
+    m_msg_t          m;
+    munge_err_t      e;
+    struct m_msg_v1 *m1;
 
     *dst_p = NULL;
 
-    if ((e = msg_create (&m, sd)) != EMUNGE_SUCCESS) {
+    if ((e = m_msg_create (&m, sd)) != EMUNGE_SUCCESS) {
         goto end;
     }
-    if ((e = msg_recv (m, 0)) != EMUNGE_SUCCESS) {
+    if ((e = m_msg_recv (m, 0)) != EMUNGE_SUCCESS) {
         goto end;
     }
     /*  Note that errstr will be set if the received message is an error
-     *    message, whereas msg_recv()'s return code (e) will be set
+     *    message, whereas m_msg_recv()'s return code (e) will be set
      *    according to how that message is received.
      */
     if (m->errstr != NULL) {
@@ -182,7 +182,7 @@ _recv_auth_req (int sd, char **dst_p)
     }
     m1 = m->pbody;
     /*
-     *  The string must be copied since msg_destroy() will free the
+     *  The string must be copied since m_msg_destroy() will free the
      *    msg body, and the msg data here resides within that memory.
      */
     if (!(*dst_p = strdup (m1->data))) {
@@ -191,11 +191,11 @@ _recv_auth_req (int sd, char **dst_p)
     }
 
 end:
-    /*  Clear the msg sd to prevent closing the socket by msg_destroy().
+    /*  Clear the msg sd to prevent closing the socket by m_msg_destroy().
      */
     if (m) {
         m->sd = -1;
-        msg_destroy (m);
+        m_msg_destroy (m);
     }
     return (e == EMUNGE_SUCCESS ? 0 : -1);
 }

@@ -74,7 +74,7 @@ libmunge_la_DEPENDENCIES = $(top_builddir)/src/libcommon/libcommon.la \
 	$(top_builddir)/src/libmissing/libmissing.la \
 	$(am__DEPENDENCIES_1)
 am_libmunge_la_OBJECTS = auth_send.lo ctx.lo decode.lo encode.lo \
-	enum.lo msg_client.lo strerror.lo
+	enum.lo m_msg_client.lo strerror.lo
 libmunge_la_OBJECTS = $(am_libmunge_la_OBJECTS)
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)/config
 depcomp = $(SHELL) $(top_srcdir)/config/depcomp
@@ -233,8 +233,8 @@ libmunge_la_SOURCES = \
 	decode.c \
 	encode.c \
 	enum.c \
-	msg_client.c \
-	msg_client.h \
+	m_msg_client.c \
+	m_msg_client.h \
 	strerror.c \
 	munge.h
 
@@ -323,7 +323,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/decode.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/encode.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/enum.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/msg_client.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/m_msg_client.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/strerror.Plo@am__quote@
 
 .c.o:

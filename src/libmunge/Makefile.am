@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.14 2004/11/24 00:25:12 dun Exp $
+## $Id: Makefile.am,v 1.15 2004/11/24 01:11:08 dun Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
@@ -33,8 +33,8 @@ libmunge_la_SOURCES = \
 	decode.c \
 	encode.c \
 	enum.c \
-	msg_client.c \
-	msg_client.h \
+	m_msg_client.c \
+	m_msg_client.h \
 	strerror.c \
 	munge.h
 

@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: common.h,v 1.8 2004/11/24 00:21:57 dun Exp $
+ *  $Id: common.h,v 1.9 2004/11/24 01:11:08 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -37,7 +37,7 @@
 #include "fd.h"
 #include "license.h"
 #include "log.h"
-#include "msg.h"
+#include "m_msg.h"
 #include "munge_defs.h"
 #include "posignal.h"
 #include "str.h"

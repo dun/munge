@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: auth_recv.h,v 1.3 2004/11/24 00:21:58 dun Exp $
+ *  $Id: auth_recv.h,v 1.4 2004/11/24 01:11:08 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -29,7 +29,7 @@
 #define MUNGE_AUTH_SERVER_H
 
 #include <sys/types.h>
-#include "msg.h"
+#include "m_msg.h"
 
 
 void auth_recv_init (void);
@@ -37,7 +37,7 @@ void auth_recv_init (void);
  *  Checks for required privileges needed to perform client authentication.
  */
 
-int auth_recv (msg_t m, uid_t *uid, gid_t *gid);
+int auth_recv (m_msg_t m, uid_t *uid, gid_t *gid);
 /*
  *  Receives the identity of the client that sent msg [m],
  *    storing the result in the output parms [uid] and [gid].

@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: msg_client.c,v 1.15 2004/11/24 00:21:58 dun Exp $
+ *  $Id: m_msg_client.c,v 1.1 2004/11/24 01:11:08 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -41,8 +41,8 @@
 #include "auth_send.h"
 #include "ctx.h"
 #include "missing.h"
-#include "msg.h"
-#include "msg_client.h"
+#include "m_msg.h"
+#include "m_msg_client.h"
 #include "munge_defs.h"
 #include "str.h"
 
@@ -51,8 +51,8 @@
  *  Prototypes
  *****************************************************************************/
 
-static munge_err_t _msg_client_connect (msg_t m, char *path);
-static munge_err_t _msg_client_disconnect (msg_t m);
+static munge_err_t _m_msg_client_connect (m_msg_t m, char *path);
+static munge_err_t _m_msg_client_disconnect (m_msg_t m);
 
 
 /*****************************************************************************
@@ -60,12 +60,12 @@ static munge_err_t _msg_client_disconnect (msg_t m);
  *****************************************************************************/
 
 munge_err_t
-msg_client_xfer (msg_t *pm, munge_ctx_t ctx)
+m_msg_client_xfer (m_msg_t *pm, munge_ctx_t ctx)
 {
-    char        *socket;
-    int          i;
-    munge_err_t  e;
-    msg_t        mreq, mrsp;
+    char          *socket;
+    int            i;
+    munge_err_t    e;
+    m_msg_t        mreq, mrsp;
 
     assert (MUNGE_SOCKET_XFER_ATTEMPTS * MUNGE_SOCKET_XFER_USLEEP < 1000000);
 
@@ -79,23 +79,23 @@ msg_client_xfer (msg_t *pm, munge_ctx_t ctx)
     mrsp = NULL;
     i = 1;
     while (1) {
-        if ((e = _msg_client_connect (mreq, socket)) != EMUNGE_SUCCESS) {
+        if ((e = _m_msg_client_connect (mreq, socket)) != EMUNGE_SUCCESS) {
             break;
         }
-        else if ((e = msg_send (mreq, MUNGE_MAXIMUM_REQ_LEN))
+        else if ((e = m_msg_send (mreq, MUNGE_MAXIMUM_REQ_LEN))
                 != EMUNGE_SUCCESS) {
             ; /* empty */
         }
         else if (auth_send (mreq) < 0) {
             e = EMUNGE_SOCKET;
         }
-        else if ((e = msg_create (&mrsp, mreq->sd)) != EMUNGE_SUCCESS) {
+        else if ((e = m_msg_create (&mrsp, mreq->sd)) != EMUNGE_SUCCESS) {
             break;
         }
-        else if ((e = msg_recv (mrsp, 0)) != EMUNGE_SUCCESS) {
+        else if ((e = m_msg_recv (mrsp, 0)) != EMUNGE_SUCCESS) {
             ; /* empty */
         }
-        else if ((e = _msg_client_disconnect (mrsp)) != EMUNGE_SUCCESS) {
+        else if ((e = _m_msg_client_disconnect (mrsp)) != EMUNGE_SUCCESS) {
             break;
         }
         else if (e == EMUNGE_SUCCESS) {
@@ -110,7 +110,7 @@ msg_client_xfer (msg_t *pm, munge_ctx_t ctx)
         }
         if (mrsp != NULL) {
             mrsp->sd = -1;              /* prevent socket close by destroy() */
-            msg_destroy (mrsp);
+            m_msg_destroy (mrsp);
             mrsp = NULL;
         }
         if (mreq->sd >= 0) {
@@ -124,7 +124,7 @@ msg_client_xfer (msg_t *pm, munge_ctx_t ctx)
     if (mrsp) {
         *pm = mrsp;
         mreq->sd = -1;                  /* prevent socket close by destroy() */
-        msg_destroy (mreq);
+        m_msg_destroy (mreq);
     }
     return (e);
 }
@@ -135,7 +135,7 @@ msg_client_xfer (msg_t *pm, munge_ctx_t ctx)
  *****************************************************************************/
 
 static munge_err_t
-_msg_client_connect (msg_t m, char *path)
+_m_msg_client_connect (m_msg_t m, char *path)
 {
     struct stat         st;
     struct sockaddr_un  addr;
@@ -148,22 +148,22 @@ _msg_client_connect (msg_t m, char *path)
     assert (m->sd < 0);
 
     if ((path == NULL) || (*path == '\0')) {
-        msg_set_err (m, EMUNGE_SOCKET,
+        m_msg_set_err (m, EMUNGE_SOCKET,
             strdup ("Munge socket has no name"));
         return (EMUNGE_SOCKET);
     }
     if (stat (path, &st) < 0) {
-        msg_set_err (m, EMUNGE_SOCKET,
+        m_msg_set_err (m, EMUNGE_SOCKET,
             strdupf ("Unable to access \"%s\": %s", path, strerror (errno)));
         return (EMUNGE_SOCKET);
     }
     if (!S_ISSOCK (st.st_mode)) {
-        msg_set_err (m, EMUNGE_SOCKET,
+        m_msg_set_err (m, EMUNGE_SOCKET,
             strdupf ("Invalid file type for socket \"%s\"", path));
         return (EMUNGE_SOCKET);
     }
     if ((sd = socket (PF_UNIX, SOCK_STREAM, 0)) < 0) {
-        msg_set_err (m, EMUNGE_SOCKET,
+        m_msg_set_err (m, EMUNGE_SOCKET,
             strdupf ("Unable to create socket: %s", strerror (errno)));
         return (EMUNGE_SOCKET);
     }
@@ -172,7 +172,7 @@ _msg_client_connect (msg_t m, char *path)
     n = strlcpy (addr.sun_path, path, sizeof (addr.sun_path));
     if (n >= sizeof (addr.sun_path)) {
         close (sd);
-        msg_set_err (m, EMUNGE_OVERFLOW,
+        m_msg_set_err (m, EMUNGE_OVERFLOW,
             strdup ("Exceeded maximum length of socket pathname"));
         return (EMUNGE_OVERFLOW);
     }
@@ -205,7 +205,7 @@ _msg_client_connect (msg_t m, char *path)
     }
     if (n < 0) {
         close (sd);
-        msg_set_err (m, EMUNGE_SOCKET,
+        m_msg_set_err (m, EMUNGE_SOCKET,
             strdupf ("Unable to connect to \"%s\": %s", path,
             strerror (errno)));
         return (EMUNGE_SOCKET);
@@ -216,14 +216,14 @@ _msg_client_connect (msg_t m, char *path)
 
 
 static munge_err_t
-_msg_client_disconnect (msg_t m) {
+_m_msg_client_disconnect (m_msg_t m) {
     munge_err_t e;
 
     assert (m != NULL);
     assert (m->sd >= 0);
 
     if (close (m->sd) < 0) {
-        msg_set_err (m, EMUNGE_SOCKET,
+        m_msg_set_err (m, EMUNGE_SOCKET,
             strdupf ("Unable to close socket: %s", strerror (errno)));
         e = EMUNGE_SOCKET;
     }

@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: job.h,v 1.2 2004/11/24 00:21:58 dun Exp $
+ *  $Id: job.h,v 1.3 2004/11/24 01:11:08 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -29,12 +29,12 @@
 #define JOB_H
 
 
-#include "msg.h"
+#include "m_msg.h"
 
 
 void job_accept (conf_t conf);
 
-void job_error (msg_t m);
+void job_error (m_msg_t m);
 
 
 #endif /* !JOB_H */

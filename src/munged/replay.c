@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: replay.c,v 1.11 2004/11/24 00:21:58 dun Exp $
+ *  $Id: replay.c,v 1.12 2004/11/24 01:11:08 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -37,7 +37,7 @@
 #include "cred.h"
 #include "hash.h"
 #include "log.h"
-#include "msg.h"
+#include "m_msg.h"
 #include "munge_defs.h"
 #include "replay.h"
 #include "thread.h"
@@ -148,9 +148,9 @@ replay_insert (munge_cred_t c)
  *    Returns 1 if the credential is already present (ie, replay).
  *    Returns -1 on error with errno set.
  */
-    int            e;
-    replay_t       r;
-    struct msg_v1 *m1;
+    int              e;
+    replay_t         r;
+    struct m_msg_v1 *m1;
 
     assert (c != NULL);
 
@@ -196,10 +196,10 @@ replay_remove (munge_cred_t c)
 {
 /*  Removes the credential [c] from the replay hash.
  */
-    union replay_key  rkey_st;
-    replay_t          rkey = &rkey_st;
-    replay_t          r;
-    struct msg_v1    *m1;
+    union replay_key    rkey_st;
+    replay_t            rkey = &rkey_st;
+    replay_t            r;
+    struct m_msg_v1    *m1;
 
     assert (c != NULL);
 

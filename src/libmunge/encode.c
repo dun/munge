@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: encode.c,v 1.17 2004/11/24 00:21:58 dun Exp $
+ *  $Id: encode.c,v 1.18 2004/11/24 01:11:08 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -36,8 +36,8 @@
 #include <sys/types.h>
 #include <munge.h>
 #include "ctx.h"
-#include "msg.h"
-#include "msg_client.h"
+#include "m_msg.h"
+#include "m_msg_client.h"
 #include "munge_defs.h"
 #include "str.h"
 
@@ -48,10 +48,10 @@
 
 static void _encode_init (char **cred, munge_ctx_t ctx);
 
-static munge_err_t _encode_req_v1 (msg_t m, munge_ctx_t ctx,
+static munge_err_t _encode_req_v1 (m_msg_t m, munge_ctx_t ctx,
     const void *buf, int len);
 
-static munge_err_t _encode_rsp_v1 (msg_t m, char **cred);
+static munge_err_t _encode_rsp_v1 (m_msg_t m, char **cred);
 
 
 /*****************************************************************************
@@ -61,8 +61,8 @@ static munge_err_t _encode_rsp_v1 (msg_t m, char **cred);
 munge_err_t
 munge_encode (char **cred, munge_ctx_t ctx, const void *buf, int len)
 {
-    munge_err_t e;
-    msg_t       m;
+    munge_err_t   e;
+    m_msg_t       m;
 
     /*  Init output parms in case of early return.
      */
@@ -76,11 +76,11 @@ munge_encode (char **cred, munge_ctx_t ctx, const void *buf, int len)
     }
     /*  Ask the daemon to encode a credential.
      */
-    if ((e = msg_create (&m, -1)) != EMUNGE_SUCCESS)
+    if ((e = m_msg_create (&m, -1)) != EMUNGE_SUCCESS)
         ;
     else if ((e = _encode_req_v1 (m, ctx, buf, len)) != EMUNGE_SUCCESS)
         ;
-    else if ((e = msg_client_xfer (&m, ctx)) != EMUNGE_SUCCESS)
+    else if ((e = m_msg_client_xfer (&m, ctx)) != EMUNGE_SUCCESS)
         ;
     else if ((e = _encode_rsp_v1 (m, cred)) != EMUNGE_SUCCESS)
         ;
@@ -90,7 +90,7 @@ munge_encode (char **cred, munge_ctx_t ctx, const void *buf, int len)
         _munge_ctx_set_err (ctx, e, m->errstr);
         m->errstr = NULL;
     }
-    msg_destroy (m);
+    m_msg_destroy (m);
     return (e);
 }
 
@@ -119,7 +119,7 @@ _encode_init (char **cred, munge_ctx_t ctx)
 
 
 static munge_err_t
-_encode_req_v1 (msg_t m, munge_ctx_t ctx, const void *buf, int len)
+_encode_req_v1 (m_msg_t m, munge_ctx_t ctx, const void *buf, int len)
 {
 /*  Creates an Encode Request message to be sent to the local munge daemon.
  *  The inputs to this message are as follows:
@@ -127,14 +127,14 @@ _encode_req_v1 (msg_t m, munge_ctx_t ctx, const void *buf, int len)
  *    data_len, data.
  *  Note that the security realm string here is NUL-terminated.
  */
-    struct msg_v1 *m1;
+    struct m_msg_v1 *m1;
 
     assert (m != NULL);
     assert (m->pbody == NULL);
 
     m->head.type = MUNGE_MSG_ENC_REQ;
 
-    m->pbody_len = sizeof (struct msg_v1);
+    m->pbody_len = sizeof (struct m_msg_v1);
     if (!(m->pbody = malloc (m->pbody_len))) {
         return (EMUNGE_NO_MEMORY);
     }
@@ -180,7 +180,7 @@ _encode_req_v1 (msg_t m, munge_ctx_t ctx, const void *buf, int len)
 
 
 static munge_err_t
-_encode_rsp_v1 (msg_t m, char **cred)
+_encode_rsp_v1 (m_msg_t m, char **cred)
 {
 /*  Extracts an Encode Response message received from the local munge daemon.
  *  The relevant outputs from this message are as follows:
@@ -196,24 +196,24 @@ _encode_rsp_v1 (msg_t m, char **cred)
  *    with the same options.
  *  Note that the [cred] is NUL-terminated.
  */
-    struct msg_v1 *m1;
-    unsigned char *p;
-    int            n;
+    struct m_msg_v1 *m1;
+    unsigned char   *p;
+    int              n;
 
     assert (m != NULL);
     assert (cred != NULL);
 
-    m1 = (struct msg_v1 *) m->pbody;
+    m1 = (struct m_msg_v1 *) m->pbody;
     /*
      *  Perform sanity checks.
      */
     if (m->head.type != MUNGE_MSG_ENC_RSP) {
-        msg_set_err (m, EMUNGE_SNAFU,
+        m_msg_set_err (m, EMUNGE_SNAFU,
             strdupf ("Client received invalid message type %d", m->head.type));
         return (EMUNGE_SNAFU);
     }
     if (m1->data_len <= 0) {
-        msg_set_err (m, EMUNGE_SNAFU,
+        m_msg_set_err (m, EMUNGE_SNAFU,
             strdupf ("Client received invalid data length %d", m1->data_len));
         return (EMUNGE_SNAFU);
     }
@@ -224,7 +224,7 @@ _encode_rsp_v1 (msg_t m, char **cred)
      */
     n = m1->data_len + 1;
     if (!(p = malloc (n))) {
-        msg_set_err (m, EMUNGE_NO_MEMORY,
+        m_msg_set_err (m, EMUNGE_NO_MEMORY,
             strdupf ("Client unable to allocate %d bytes for data", n));
         return (EMUNGE_NO_MEMORY);
     }

@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: auth_send.h,v 1.3 2004/11/24 00:21:57 dun Exp $
+ *  $Id: auth_send.h,v 1.4 2004/11/24 01:11:08 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -28,10 +28,10 @@
 #ifndef MUNGE_AUTH_CLIENT_H
 #define MUNGE_AUTH_CLIENT_H
 
-#include "msg.h"
+#include "m_msg.h"
 
 
-int auth_send (msg_t m);
+int auth_send (m_msg_t m);
 /*
  *  Sends data needed to prove the identity of the client to the server
  *    that sent the auth req msg [m].

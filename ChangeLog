@@ -1,20 +1,23 @@
 2004-11-23  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/libcommon/Makefile.am, src/libcommon/m_msg.c,
+	  src/libcommon/m_msg.h, src/libcommon/msg.c, src/libcommon/msg.h,
+	  src/libmunge/Makefile.am, src/libmunge/m_msg_client.c,
+	  src/libmunge/m_msg_client.h, src/libmunge/msg_client.c,
+	  src/libmunge/msg_client.h:
+	  Renamed src/libcommon/msg.[ch] to m_msg.[ch].
+	  Renamed src/libmunge/msg_client.[ch] to m_msg_client.[ch].
+	  Changed "msg_" prefix to "m_msg_".  All callers changed.
+	  Fixed "previous declaration of `msg_t'" error under AIX.
+
 	* src/libmunge/Makefile.am:
 	  Added -export-symbols-regex to libmunge.
 
-	* src/libcommon/Makefile.am, src/libcommon/common.h,
-	  src/libcommon/msg.c, src/libcommon/msg.h,
-	  src/libcommon/munge_msg.c, src/libcommon/munge_msg.h,
-	  src/libmunge/auth_send.c, src/libmunge/auth_send.h,
-	  src/libmunge/decode.c, src/libmunge/encode.c,
-	  src/libmunge/msg_client.c, src/libmunge/msg_client.h,
-	  src/munged/auth_recv.c, src/munged/auth_recv.h, src/munged/cred.c,
-	  src/munged/cred.h, src/munged/dec_v1.c, src/munged/dec_v1.h,
-	  src/munged/enc_v1.c, src/munged/enc_v1.h, src/munged/job.c,
-	  src/munged/job.h, src/munged/replay.c:
-	  Renamed src/libmunge/munge_msg.[ch] to msg.[ch].
+	* src/libcommon/Makefile.am, src/libcommon/msg.c, src/libcommon/msg.h,
+	  src/libcommon/munge_msg.c, src/libcommon/munge_msg.h:
+	  Renamed src/libcommon/munge_msg.[ch] to msg.[ch].
 	  Removed "munge_" prefix on all "munge_msg_*" functions.
+	  All callers changed.
 	* src/libmunge/ctx.c, src/libmunge/ctx.h:
 	  Removed unnecessary include for munge_msg.h.
 
