@@ -1,4 +1,4 @@
-# generated automatically by aclocal 1.8.3 -*- Autoconf -*-
+# generated automatically by aclocal 1.8.4 -*- Autoconf -*-
 
 # Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004
 # Free Software Foundation, Inc.
@@ -5944,7 +5944,7 @@ AC_DEFUN([AM_AUTOMAKE_VERSION], [am__api_version="1.8"])
 # Call AM_AUTOMAKE_VERSION so it can be traced.
 # This function is AC_REQUIREd by AC_INIT_AUTOMAKE.
 AC_DEFUN([AM_SET_CURRENT_AUTOMAKE_VERSION],
-	 [AM_AUTOMAKE_VERSION([1.8.3])])
+	 [AM_AUTOMAKE_VERSION([1.8.4])])
 
 # AM_AUX_DIR_EXPAND
 
@@ -6170,9 +6170,14 @@ AC_CACHE_CHECK([dependency style of $depcc],
        grep sub/conftest.${OBJEXT-o} sub/conftest.Po > /dev/null 2>&1 &&
        ${MAKE-make} -s -f confmf > /dev/null 2>&1; then
       # icc doesn't choke on unknown options, it will just issue warnings
-      # (even with -Werror).  So we grep stderr for any message
-      # that says an option was ignored.
-      if grep 'ignoring option' conftest.err >/dev/null 2>&1; then :; else
+      # or remarks (even with -Werror).  So we grep stderr for any message
+      # that says an option was ignored or not supported.
+      # When given -MP, icc 7.0 and 7.1 complain thusly:
+      #   icc: Command line warning: ignoring option '-M'; no argument required
+      # The diagnosis changed in icc 8.0:
+      #   icc: Command line remark: option '-MP' not supported
+      if (grep 'ignoring option' conftest.err ||
+          grep 'not supported' conftest.err) >/dev/null 2>&1; then :; else
         am_cv_$1_dependencies_compiler_type=$depmode
         break
       fi
@@ -6845,7 +6850,9 @@ fi
 INSTALL_STRIP_PROGRAM="\${SHELL} \$(install_sh) -c -s"
 AC_SUBST([INSTALL_STRIP_PROGRAM])])
 
+m4_include([config/x_ac_canonical.m4])
 m4_include([config/x_ac_check_cond_lib.m4])
+m4_include([config/x_ac_check_fifo_recvfd.m4])
 m4_include([config/x_ac_check_peercred.m4])
 m4_include([config/x_ac_check_pthreads.m4])
 m4_include([config/x_ac_debug.m4])
