@@ -1,2 +1,7 @@
+Version 0.1 (2003-04-30):
+  - Full client/server support (via munged).
+  - Full cryptographic support.
+  - Munge context (munge_ctx) support.
+
 Version 0.0 (2002-12-20):
   - Initial support for munge_encode, munge_decode, munge_strerror.

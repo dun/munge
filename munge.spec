@@ -1,7 +1,7 @@
-# $Id: munge.spec,v 1.9 2003/04/30 20:13:52 dun Exp $
+# $Id: munge.spec,v 1.10 2003/04/30 21:23:23 dun Exp $
 
 Name:		munge
-Version:	0.0
+Version:	0.1
 Release:	1
 
 Summary:	Munge Uid 'N' Gid Emporium
