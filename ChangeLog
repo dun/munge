@@ -1,3 +1,9 @@
+2004-05-26  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/munged/dec_v1.c, src/munged/replay.c, src/munged/replay.h:
+	  Fixed bug where decoded cred was marked as "played" even if the
+	  rsp msg was not successfully delivered to the client {gnats:437}.
+
 2004-05-13  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* : Re-bootstrap'd with automake-1.8.5.

@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: replay.c,v 1.5 2004/04/16 22:14:12 dun Exp $
+ *  $Id: replay.c,v 1.6 2004/05/27 00:03:05 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -140,7 +140,8 @@ replay_fini (void)
 int
 replay_insert (munge_cred_t c)
 {
-/*  Returns 0 if the credential is successfully inserted.
+/*  Inserts the credential [c] into the replay hash.
+ *  Returns 0 if the credential is successfully inserted.
  *    Returns 1 if the credential is already present (ie, replay).
  *    Returns -1 on error with errno set.
  */
@@ -148,28 +149,31 @@ replay_insert (munge_cred_t c)
     replay_t                r;
     struct munge_msg_v1    *m1;
 
+    assert (c != NULL);
+
     if (!replay_hash) {
         errno = EPERM;
         return (-1);
     }
     m1 = c->msg->pbody;
 
-    /*  Attempt to insert a replay obj for this cred into the hash.
-     */
     if (!(r = replay_alloc ())) {
         return (-1);
     }
     r->t_expired = (time_t) (m1->time0 + m1->ttl);
     r->mac_len = c->mac_len;
-    memcpy (r->mac, c->mac, c->mac_len);
-
+    memcpy (r->mac, c->mac, r->mac_len);
+    /*
+     *  The credential's "hash key" is defined by its MAC.  But since the MAC
+     *    is a variable-length byte array, the "hash key" must contain both
+     *    a pointer and a length.  The t_expired was just thrown in for
+     *    good measure since it was available.
+     *  As such, the replay hash key is the replay struct itself.
+     */
     if (hash_insert (replay_hash, r, r) != NULL) {
         return (0);
     }
     e = errno;
-
-    /*  De-allocate the replay obj if it couldn't be inserted.
-     */
     replay_free (r);
 
     if (e == EEXIST) {
@@ -180,6 +184,37 @@ replay_insert (munge_cred_t c)
             "Attempt to insert cred into hash using invalid args");
     }
     return (-1);
+}
+
+
+int
+replay_remove (munge_cred_t c)
+{
+/*  Removes the credential [c] from the replay hash.
+ */
+    struct replay_key       rkey_st;
+    replay_t                rkey = &rkey_st;
+    replay_t                r;
+    struct munge_msg_v1    *m1;
+
+    assert (c != NULL);
+
+    if (!replay_hash) {
+        errno = EPERM;
+        return (-1);
+    }
+    m1 = c->msg->pbody;
+    /*
+     *  Recompute the cred's "hash key".
+     */
+    rkey->t_expired = (time_t) (m1->time0 + m1->ttl);
+    rkey->mac_len = c->mac_len;
+    memcpy (rkey->mac, c->mac, rkey->mac_len);
+
+    if ((r = hash_remove (replay_hash, rkey))) {
+        replay_free (r);
+    }
+    return (r ? 0 : -1);
 }
 
 
@@ -279,10 +314,13 @@ replay_alloc (void)
             replay_free_list[i].next = NULL;
         }
     }
-    if ((r = replay_free_list))
+    if ((r = replay_free_list)) {
         replay_free_list = r->next;
-    else
+        r->next = NULL;
+    }
+    else {
         errno = ENOMEM;
+    }
     lsd_mutex_unlock (&replay_free_lock);
     return (r);
 }

@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: replay.h,v 1.3 2004/04/03 21:53:00 dun Exp $
+ *  $Id: replay.h,v 1.4 2004/05/27 00:03:05 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -48,6 +48,8 @@ void replay_init (void);
 void replay_fini (void);
 
 int replay_insert (munge_cred_t c);
+
+int replay_remove (munge_cred_t c);
 
 void replay_purge (void);
 

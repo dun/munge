@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: dec_v1.c,v 1.21 2004/05/06 01:41:12 dun Exp $
+ *  $Id: dec_v1.c,v 1.22 2004/05/27 00:03:05 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -121,7 +121,20 @@ dec_v1_process_msg (munge_msg_t m)
     if (rc < 0) {
         err_v1_response (m);
     }
+    /*  If the successfully decoded credential isn't successfully returned
+     *    to the client, remove it from the replay hash.
+     *
+     *  XXX: If two instances of the same credential are being decoded at
+     *       the same time, dec_v1_validate_replay() will mark the "first"
+     *       as successful, and the "second" as replayed.  But if the
+     *       successful response to the "first" client fails, that credential
+     *       will then be marked as "unplayed", and the replayed reponse
+     *       to the "second" client will now be in error.
+     */
     if (_munge_msg_send (m) != EMUNGE_SUCCESS) {
+        if (rc == 0) {
+            replay_remove (c);
+        }
         rc = -1;
     }
     cred_destroy (c);
