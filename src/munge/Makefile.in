@@ -14,7 +14,7 @@
 
 @SET_MAKE@
 
-SOURCES = $(munge_SOURCES) $(unmunge_SOURCES)
+SOURCES = $(munge_SOURCES) $(remunge_SOURCES) $(unmunge_SOURCES)
 
 srcdir = @srcdir@
 top_srcdir = @top_srcdir@
@@ -40,7 +40,7 @@ build_triplet = @build@
 host_triplet = @host@
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 	$(top_srcdir)/config/Make-inc.mk
-bin_PROGRAMS = munge$(EXEEXT) unmunge$(EXEEXT)
+bin_PROGRAMS = munge$(EXEEXT) unmunge$(EXEEXT) remunge$(EXEEXT)
 subdir = src/munge
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/config/x_ac_canonical.m4 \
@@ -65,9 +65,14 @@ munge_OBJECTS = $(am_munge_OBJECTS)
 munge_DEPENDENCIES = $(top_builddir)/src/libcommon/libcommon.la \
 	$(top_builddir)/src/libmissing/libmissing.la \
 	$(top_builddir)/src/libmunge/libmunge.la
+am_remunge_OBJECTS = remunge.$(OBJEXT)
+remunge_OBJECTS = $(am_remunge_OBJECTS)
+am__DEPENDENCIES_1 =
+remunge_DEPENDENCIES = $(top_builddir)/src/libcommon/libcommon.la \
+	$(top_builddir)/src/libmissing/libmissing.la \
+	$(top_builddir)/src/libmunge/libmunge.la $(am__DEPENDENCIES_1)
 am_unmunge_OBJECTS = unmunge.$(OBJEXT) read.$(OBJEXT)
 unmunge_OBJECTS = $(am_unmunge_OBJECTS)
-am__DEPENDENCIES_1 =
 unmunge_DEPENDENCIES = $(top_builddir)/src/libcommon/libcommon.la \
 	$(top_builddir)/src/libmissing/libmissing.la \
 	$(top_builddir)/src/libmunge/libmunge.la $(am__DEPENDENCIES_1)
@@ -82,8 +87,8 @@ LTCOMPILE = $(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) \
 CCLD = $(CC)
 LINK = $(LIBTOOL) --mode=link --tag=CC $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(AM_LDFLAGS) $(LDFLAGS) -o $@
-SOURCES = $(munge_SOURCES) $(unmunge_SOURCES)
-DIST_SOURCES = $(munge_SOURCES) $(unmunge_SOURCES)
+SOURCES = $(munge_SOURCES) $(remunge_SOURCES) $(unmunge_SOURCES)
+DIST_SOURCES = $(munge_SOURCES) $(remunge_SOURCES) $(unmunge_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -215,6 +220,15 @@ unmunge_SOURCES = \
 	unmunge.c \
 	read.c
 
+remunge_LDADD = \
+	$(top_builddir)/src/libcommon/libcommon.la \
+	$(top_builddir)/src/libmissing/libmissing.la \
+	$(top_builddir)/src/libmunge/libmunge.la \
+	$(LIBPTHREAD)
+
+remunge_SOURCES = \
+	remunge.c
+
 all: all-am
 
 .SUFFIXES:
@@ -279,6 +293,9 @@ clean-binPROGRAMS:
 munge$(EXEEXT): $(munge_OBJECTS) $(munge_DEPENDENCIES) 
 	@rm -f munge$(EXEEXT)
 	$(LINK) $(munge_LDFLAGS) $(munge_OBJECTS) $(munge_LDADD) $(LIBS)
+remunge$(EXEEXT): $(remunge_OBJECTS) $(remunge_DEPENDENCIES) 
+	@rm -f remunge$(EXEEXT)
+	$(LINK) $(remunge_LDFLAGS) $(remunge_OBJECTS) $(remunge_LDADD) $(LIBS)
 unmunge$(EXEEXT): $(unmunge_OBJECTS) $(unmunge_DEPENDENCIES) 
 	@rm -f unmunge$(EXEEXT)
 	$(LINK) $(unmunge_LDFLAGS) $(unmunge_OBJECTS) $(unmunge_LDADD) $(LIBS)
@@ -291,6 +308,7 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/munge.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/read.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/remunge.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/unmunge.Po@am__quote@
 
 .c.o:

@@ -1,3 +1,7 @@
+2004-09-03  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/munge/Makefile.am, src/munge/remunge.c: Added.
+
 2004-08-26  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/libcommon/munge_defs.h, src/munged/job.c(job_accept):

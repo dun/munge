@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.3 2004/04/09 04:52:13 dun Exp $
+## $Id: Makefile.am,v 1.4 2004/09/03 18:32:51 dun Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
@@ -13,7 +13,8 @@ AM_CPPFLAGS = \
 
 bin_PROGRAMS = \
 	munge \
-	unmunge
+	unmunge \
+	remunge
 
 munge_LDADD = \
 	$(top_builddir)/src/libcommon/libcommon.la \
@@ -33,3 +34,12 @@ unmunge_LDADD = \
 unmunge_SOURCES = \
 	unmunge.c \
 	read.c
+
+remunge_LDADD = \
+	$(top_builddir)/src/libcommon/libcommon.la \
+	$(top_builddir)/src/libmissing/libmissing.la \
+	$(top_builddir)/src/libmunge/libmunge.la \
+	$(LIBPTHREAD)
+
+remunge_SOURCES = \
+	remunge.c
