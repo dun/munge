@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: remunge.c,v 1.3 2004/09/04 00:27:34 dun Exp $
+ *  $Id: remunge.c,v 1.4 2004/09/04 04:35:47 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -183,6 +183,9 @@ main (int argc, char *argv[])
 
     /*  FIXME: Revamp signal handlers.
      */
+    if (posignal (SIGHUP, SIG_IGN) == SIG_ERR) {
+        log_err (EMUNGE_SNAFU, LOG_ERR, "Unable to ignore signal=%d", SIGHUP);
+    }
     if (posignal (SIGPIPE, SIG_IGN) == SIG_ERR) {
         log_err (EMUNGE_SNAFU, LOG_ERR, "Unable to ignore signal=%d", SIGPIPE);
     }
