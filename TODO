@@ -1,0 +1,20 @@
+-revisit data returned on credential error
+-'V' cmdline option support
+-foreground vs daemon mode support
+-nonroot configuration support
+-create README guide
+-create FAQ
+-benchmark utility
+-replay detection
+-max data length ctx opt
+-compression support
+-configuration file parsing
+-ensure safe perms on sensitive files/dirs
+-debug vs production code compilation
+-man pages
+-documentation
+-security testplan script
+-server timeout for unresponsive clients
+-cross-platform (AIX, Tru64, Solaris, BSD?)
+-realm (multi-key) support
+-mlock support?
