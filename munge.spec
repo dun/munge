@@ -1,4 +1,4 @@
-# $Id: munge.spec,v 1.20 2004/10/15 16:50:50 dun Exp $
+# $Id: munge.spec,v 1.21 2004/10/29 17:27:29 dun Exp $
 
 Name:		munge
 Version:	0
@@ -89,9 +89,9 @@ fi
 %doc doc/*
 #%config(noreplace) /etc/munge/munge.conf
 #%config(noreplace) /etc/logrotate.d/munge
-%{_sysconfdir}/init.d/*
+%config(noreplace) %{_sysconfdir}/init.d/*
 %{_bindir}/*
 %{_includedir}/*
 %{_libdir}/*
-#%{_mandir}/*/*
+%{_mandir}/*/*
 %{_sbindir}/*
