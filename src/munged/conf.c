@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: conf.c,v 1.32 2004/11/09 21:54:28 dun Exp $
+ *  $Id: conf.c,v 1.33 2004/11/10 17:48:58 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -63,8 +63,9 @@ struct option opt_table[] = {
     { "foreground", 0, NULL, 'F' },
     { "socket",     1, NULL, 'S' },
     { "advice",     0, NULL, 'A' },
-    { "keyfile",    1, NULL, '0' },	/* xyzzy: tmp secret cmdline opt */
-    { "num-threads",1, NULL, '1' },	/* xyzzy: tmp secret cmdline opt */
+    { "keyfile",       1, NULL, '0' },  /* deprecated cmdline opt */
+    { "num-threads",   1, NULL, '1' },  /* deprecated cmdline opt */
+    { "auth-pipe-dir", 1, NULL, '2' },  /* deprecated cmdline opt */
     {  NULL,        0, NULL,  0  }
 };
 
@@ -228,17 +229,26 @@ parse_cmdline (conf_t conf, int argc, char **argv)
             case 'A':
                 printf ("Don't Panic!\n");
                 exit (42);
-            case '0':                   /* xyzzy */
+            /* Begin deprecated cmdline opts */
+            case '0':
                 if (conf->key_name)
                     free (conf->key_name);
                 if (!(conf->key_name = strdup (optarg)))
                     log_errno (EMUNGE_NO_MEMORY, LOG_ERR,
                         "Cannot dup keyfile name string");
-                break;                  /* xyzzy */
-            case '1':                   /* xyzzy */
+                break;
+            case '1':
                 if ((c = atoi (optarg)) > 0)
                     conf->nthreads = c;
-                break;                  /* xyzzy */
+                break;
+            case '2':
+                if (conf->auth_pipe_dir)
+                    free (conf->auth_pipe_dir);
+                if (!(conf->auth_pipe_dir = strdup (optarg)))
+                    log_errno (EMUNGE_NO_MEMORY, LOG_ERR,
+                        "Cannot dup auth-pipe-dir name string");
+                break;
+            /* End deprecated cmdline opts */
             case '?':
                 if (optopt > 0)
                     log_err (EMUNGE_SNAFU, LOG_ERR,
