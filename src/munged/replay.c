@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: replay.c,v 1.6 2004/05/27 00:03:05 dun Exp $
+ *  $Id: replay.c,v 1.7 2004/06/15 18:33:23 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -126,7 +126,7 @@ replay_fini (void)
  *  XXX: Race conditions may result if the replay hash is removed while
  *    replay_purge() timers are active.  Consequently, the timer thread
  *    is canceled via timer_fini() as soon as munged's event loop is exited.
- *    And shortly _thereafter_, this routine is invoked from destroy_conf().
+ *    And shortly _thereafter_, this routine is invoked.
  */
     if (!replay_hash) {
         return;

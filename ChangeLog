@@ -1,3 +1,9 @@
+2004-06-15  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/munged/conf.c, src/munged/munged.c:
+	  Moved auth_recv_init(), replay_init(), replay_fini(),
+	  gids_create(), and gids_destroy() from create_conf() to main().
+
 2004-06-11  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/munged/sock.c, src/munged/timer.c: Set pthread stacksize to 64KB.

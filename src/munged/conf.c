@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: conf.c,v 1.20 2004/05/07 00:36:58 dun Exp $
+ *  $Id: conf.c,v 1.21 2004/06/15 18:33:23 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -41,14 +41,11 @@
 #include <string.h>
 #include <sys/param.h>                  /* for MAXHOSTNAMELEN */
 #include <unistd.h>
-#include "auth_recv.h"
 #include "conf.h"
-#include "gids.h"
 #include "license.h"
 #include "log.h"
 #include "md.h"
 #include "munge_defs.h"
-#include "replay.h"
 #include "str.h"
 #include "zip.h"
 
@@ -118,13 +115,6 @@ create_conf (void)
     conf->mac_key = NULL;
     conf->mac_key_len = 0;
 
-    auth_recv_init ();
-    replay_init ();
-    /*
-     *  Parsing the group file could take a few seconds on some platforms.
-     */
-    conf->gids = gids_create ();
-
     return (conf);
 }
 
@@ -161,10 +151,7 @@ destroy_conf (conf_t conf)
         free (conf->mac_key);
         conf->mac_key = NULL;
     }
-    gids_destroy (conf->gids);
     free (conf);
-
-    replay_fini ();
 
     return;
 }

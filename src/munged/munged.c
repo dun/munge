@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munged.c,v 1.13 2004/05/07 00:36:58 dun Exp $
+ *  $Id: munged.c,v 1.14 2004/06/15 18:33:23 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -39,12 +39,15 @@
 #include <sys/resource.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include "auth_recv.h"
 #include "common.h"
 #include "conf.h"
 #include "crypto_thread.h"
+#include "gids.h"
 #include "munge_defs.h"
 #include "posignal.h"
 #include "random.h"
+#include "replay.h"
 #include "sock.h"
 #include "timer.h"
 
@@ -85,6 +88,7 @@ main (int argc, char *argv[])
 
     handle_signals ();
 
+    auth_recv_init ();
     conf = create_conf ();
     parse_cmdline (conf, argc, argv);
 
@@ -107,6 +111,8 @@ main (int argc, char *argv[])
     random_init (conf->seed_name);
     crypto_thread_init ();
     create_subkeys (conf);
+    conf->gids = gids_create();
+    replay_init ();
     timer_init ();
 
     log_msg (LOG_NOTICE, "Starting %s daemon %s (pid %d)",
@@ -117,6 +123,8 @@ main (int argc, char *argv[])
     munge_sock_destroy (conf);
 
     timer_fini ();
+    replay_fini ();
+    gids_destroy (conf->gids);
     crypto_thread_fini ();
     random_fini (conf->seed_name);
     destroy_conf (conf);
