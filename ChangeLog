@@ -1,3 +1,7 @@
+2004-03-04  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* README, munge.spec: Updated description.
+
 2004-03-01  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/munge/munge.c, src/munge/unmunge.c:
