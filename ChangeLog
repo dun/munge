@@ -1,5 +1,7 @@
 2004-08-17  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* : Re-bootstrap'd with automake-1.9.1.
+
 	* src/munged/conf.c:
 	  Added temporary cmdline opts for 'keyfile' and 'nthreads'.
 
