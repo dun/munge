@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: decode.c,v 1.1 2003/04/18 23:20:18 dun Exp $
+ *  $Id: decode.c,v 1.2 2003/04/23 18:22:35 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -73,7 +73,8 @@ munge_decode (const char *cred, munge_ctx_t ctx,
      *  Ensure a credential exists for decoding.
      */
     if ((cred == NULL) || (*cred == '\0')) {
-        return (EMUNGE_BAD_ARG);
+        return (_munge_ctx_set_err (ctx, EMUNGE_BAD_ARG,
+            strdup ("No credential specified")));
     }
     /*  Determine name of unix domain socket for communication with munged.
      */
@@ -96,8 +97,14 @@ munge_decode (const char *cred, munge_ctx_t ctx,
         ;
     else if ((e = _munge_msg_client_disconnect (m)) != EMUNGE_SUCCESS)
         ;
-    else if ((e = decode_rsp_v1(m, ctx, buf, len, uid, gid)) != EMUNGE_SUCCESS)
+    else if ((e = decode_rsp_v1 (m, ctx, buf, len, uid, gid)) !=EMUNGE_SUCCESS)
         ;
+    /*  Clean up and return.
+     */
+    if (ctx) {
+        _munge_ctx_set_err (ctx, e, m->errstr);
+        m->errstr = NULL;
+    }
     _munge_msg_destroy (m);
     return (e);
 }
@@ -195,7 +202,6 @@ decode_rsp_v1 (munge_msg_t m, munge_ctx_t ctx,
  *  The outputs from this message are as follows:
  *    status, cipher, zip, mac, realm, ttl,
  *    time0, time1, uid, gid, data_len, data.
- *  Note that the realm string is *not* NUL-terminated.
  */
     struct munge_msg_v1 *m1;
     unsigned char       *p;
@@ -227,6 +233,9 @@ decode_rsp_v1 (munge_msg_t m, munge_ctx_t ctx,
         ctx->zip = m1->zip;
         ctx->mac = m1->mac;
         ctx->ttl = m1->ttl;
+        /*
+         *  The credential's realm is not NUL-terminated.
+         */
         if ((ctx->realm = malloc (m1->realm_len + 1))) {
             memcpy (ctx->realm, m1->realm, m1->realm_len);
             ctx->realm[m1->realm_len] = '\0';

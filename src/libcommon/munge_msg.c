@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munge_msg.c,v 1.2 2003/04/18 23:20:18 dun Exp $
+ *  $Id: munge_msg.c,v 1.3 2003/04/23 18:22:35 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -241,24 +241,15 @@ _munge_msg_reset (munge_msg_t m)
 }
 
 
-char *
-_munge_msg_get_err (munge_msg_t m)
-{
-    assert (m != NULL);
-
-    return (m->errstr);
-}
-
-
 int
-_munge_msg_set_err (munge_msg_t m, munge_err_t e, const char *str)
+_munge_msg_set_err (munge_msg_t m, munge_err_t e, const char *s)
 {
-/*  Set an error code [e] and string [str] if an error condition
+/*  Set an error code [e] and string [s] if an error condition
  *    does not already exist (ie, m->status == EMUNGE_SUCCESS).
- *  If [str] is not NULL, that string (and _not_ a copy) will be stored
- *    and later free()'d by the message destructor; if [str] is NULL,
- *    munge_strerror() will be used.  Thus, if multiple errors are set,
- *    only the first one is reported.
+ *    Thus, if multiple errors are set, only the first one is reported.
+ *  If [s] is not NULL, that string (and _not_ a copy) will be stored
+ *    and later free()'d by the message destructor; if [s] is NULL,
+ *    munge_strerror() will be used.
  *  Always returns -1.
  */
     assert (m != NULL);
@@ -266,14 +257,14 @@ _munge_msg_set_err (munge_msg_t m, munge_err_t e, const char *str)
     /*  Do nothing if an error does not exist or an error has already been set.
      */
     if ((e == EMUNGE_SUCCESS) || (m->status != EMUNGE_SUCCESS)) {
-        if (str) {
-            free (str);
+        if (s) {
+            free (s);
         }
     }
     else {
         m->status = e;
         assert (m->errstr == NULL);
-        m->errstr = (str != NULL) ? str : strdup (munge_strerror (e));;
+        m->errstr = (s != NULL) ? s : strdup (munge_strerror (e));;
     }
     /*  Screw you guys, I'm goin' home.
      */

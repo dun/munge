@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: unmunge.c,v 1.5 2003/04/08 18:16:16 dun Exp $
+ *  $Id: unmunge.c,v 1.6 2003/04/23 18:22:35 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -101,7 +101,7 @@ tag_t munge_tags[] = {
 
 struct conf {
     munge_ctx_t  ctx;                   /* munge context                     */
-    munge_err_t  status;                /* status unmunging the cred         */
+    munge_err_t  status;                /* error status unmunging the cred   */
     char        *fn_in;                 /* input filename, '-' for stdin     */
     char        *fn_meta;               /* metadata filename, '-' for stdout */
     char        *fn_out;                /* output filename, '-' for stdout   */
@@ -145,8 +145,9 @@ char * tag_val_to_str (int val);
 int
 main (int argc, char *argv[])
 {
-    conf_t conf;
-    int    rc;
+    conf_t       conf;
+    int          rc;
+    char        *p;
 
     if (posignal (SIGPIPE, SIG_IGN) == SIG_ERR)
         log_err (EMUNGE_SNAFU, LOG_ERR, "Unable to ignore signal=%d", SIGPIPE);
@@ -167,6 +168,11 @@ main (int argc, char *argv[])
     conf->status = munge_decode (conf->cred, conf->ctx,
         &conf->data, &conf->dlen, &conf->uid, &conf->gid);
 
+    if (conf->status != EMUNGE_SUCCESS) {
+        if (!(p = munge_ctx_strerror (conf->ctx)))
+            p = munge_strerror (conf->status);
+        log_err (conf->status, LOG_ERR, "%s", p);
+    }
     display_meta (conf);
     display_data (conf);
 

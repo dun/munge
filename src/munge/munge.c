@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munge.c,v 1.7 2003/04/18 23:28:06 dun Exp $
+ *  $Id: munge.c,v 1.8 2003/04/23 18:22:35 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -69,6 +69,7 @@ const char * const opt_string = "hLVvi:no:s:S:";
 
 struct conf {
     munge_ctx_t  ctx;                   /* munge context                     */
+    munge_err_t  status;                /* error status munging the cred     */
     char        *string;                /* input from string instead of file */
     char        *fn_in;                 /* input filename, '-' for stdin     */
     char        *fn_out;                /* output filename, '-' for stdout   */
@@ -104,7 +105,6 @@ main (int argc, char *argv[])
 {
     conf_t       conf;
     int          rc = 0;
-    munge_err_t  e;
     char        *p;
 
     if (posignal (SIGPIPE, SIG_IGN) == SIG_ERR)
@@ -125,12 +125,13 @@ main (int argc, char *argv[])
         else
             log_err (EMUNGE_SNAFU, LOG_ERR, "Read error");
     }
-    e = munge_encode (&conf->cred, conf->ctx, conf->data, conf->dlen);
-    if (e != EMUNGE_SUCCESS) {
-        if ((p = munge_ctx_strerror (conf->ctx)))
-            log_err (e, LOG_ERR, "%s", p);
-        else
-            log_err (e, LOG_ERR, "%s", munge_strerror (e));
+    conf->status = munge_encode (&conf->cred, conf->ctx,
+        conf->data, conf->dlen);
+
+    if (conf->status != EMUNGE_SUCCESS) {
+        if (!(p = munge_ctx_strerror (conf->ctx)))
+            p = munge_strerror (conf->status);
+        log_err (conf->status, LOG_ERR, "%s", p);
     }
     conf->clen = strlen (conf->cred);
 
@@ -152,6 +153,7 @@ create_conf (void)
     if (!(conf->ctx = munge_ctx_create())) {
         log_err (EMUNGE_NO_MEMORY, LOG_ERR, "%s", strerror (errno));
     }
+    conf->status = -1;
     conf->string = NULL;
     conf->fn_in = "-";
     conf->fn_out = "-";

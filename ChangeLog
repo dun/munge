@@ -1,3 +1,7 @@
+2003-04-23  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* : Cleanup of error propagation code.
+
 2003-04-22  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/libcommon/munge_msg.h, src/munged/dec_v1.c, src/munged/enc_v1.c:

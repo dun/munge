@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: encode.c,v 1.1 2003/04/18 23:20:18 dun Exp $
+ *  $Id: encode.c,v 1.2 2003/04/23 18:22:35 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -65,7 +65,8 @@ munge_encode (char **cred, munge_ctx_t ctx, const void *buf, int len)
     /*  Ensure a ptr exists for returning the credential to the caller.
      */
     if (!cred) {
-        return (EMUNGE_BAD_ARG);
+        return (_munge_ctx_set_err (ctx, EMUNGE_BAD_ARG,
+            strdup ("No address specified for returning the credential")));
     }
     /*  Init output parm in case of early return.
      */
@@ -97,7 +98,8 @@ munge_encode (char **cred, munge_ctx_t ctx, const void *buf, int len)
     /*  Clean up and return.
      */
     if (ctx) {
-        _munge_ctx_set_err (ctx, m, e);
+        _munge_ctx_set_err (ctx, e, m->errstr);
+        m->errstr = NULL;
     }
     _munge_msg_destroy (m);
     return (e);

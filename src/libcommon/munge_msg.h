@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munge_msg.h,v 1.3 2003/04/22 20:49:35 dun Exp $
+ *  $Id: munge_msg.h,v 1.4 2003/04/23 18:22:35 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -103,9 +103,7 @@ munge_err_t _munge_msg_recv (munge_msg_t m);
 
 munge_err_t _munge_msg_reset (munge_msg_t m);
 
-char * _munge_msg_get_err (munge_msg_t m);
-
-int _munge_msg_set_err (munge_msg_t m, munge_err_t e, const char *str);
+int _munge_msg_set_err (munge_msg_t m, munge_err_t e, const char *s);
 
 
 

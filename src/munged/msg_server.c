@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: msg_server.c,v 1.2 2003/04/18 23:20:18 dun Exp $
+ *  $Id: msg_server.c,v 1.3 2003/04/23 18:22:35 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -57,13 +57,12 @@ munge_msg_server_thread (munge_msg_t m)
 /*  This thread is responsible for destroying msg [m] via _munge_msg_destroy().
  */
     munge_err_t  e;
-    char        *estr;
 
     assert (m != NULL);
 
     if ((e = _munge_msg_recv (m)) != EMUNGE_SUCCESS) {
-        if ((estr = _munge_msg_get_err (m)) != NULL)
-            log_msg (LOG_NOTICE, "%s", estr);
+        if (m->errstr != NULL)
+            log_msg (LOG_NOTICE, "%s", m->errstr);
     }
     else if (m->head.version > MUNGE_MSG_VERSION) {
         _munge_msg_set_err (m, EMUNGE_SNAFU,

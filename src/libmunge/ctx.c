@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: ctx.c,v 1.3 2003/04/18 23:28:06 dun Exp $
+ *  $Id: ctx.c,v 1.4 2003/04/23 18:22:35 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -98,10 +98,15 @@ munge_ctx_strerror (munge_ctx_t ctx)
 {
     assert (ctx != NULL);
 
-    if (ctx->errnum == EMUNGE_SUCCESS)
+    if (!ctx) {
         return (NULL);
-    if (ctx->errstr)
+    }
+    if (ctx->errnum == EMUNGE_SUCCESS) {
+        return (NULL);
+    }
+    if (ctx->errstr != NULL) {
         return (ctx->errstr);
+    }
     return (munge_strerror (ctx->errnum));
 }
 
@@ -241,24 +246,32 @@ munge_ctx_set (munge_ctx_t ctx, munge_opt_t opt, ...)
  *  Internal (but still "Extern") Functions
  *****************************************************************************/
 
-void
-_munge_ctx_set_err (munge_ctx_t ctx, munge_msg_t msg, munge_err_t e)
+munge_err_t
+_munge_ctx_set_err (munge_ctx_t ctx, munge_err_t e, const char *s)
 {
-/*  Sets the error condition returned via the munge context [ctx].
+/*  Sets an error code [e] and string [s] to be returned via the
+ *    munge context [ctx].
+ *  If [s] is not NULL, that string (and _not_ a copy) will be stored
+ *    and later free()'d by the context destructor.
+ *  Returns the error code [e].
  */
-    if (!ctx || !msg) {
-        return;
+    if (ctx) {
+        ctx->errnum = e;
+        if (ctx->errstr) {
+            free (ctx->errstr);
+        }
+        if (e == EMUNGE_SUCCESS) {
+            if (s) {
+                free (s);
+            }
+            ctx->errstr = NULL;
+        }
+        else {
+            ctx->errstr = s;
+        }
     }
-    ctx->errnum = e;
-    if (ctx->errstr) {
-        free (ctx->errstr);
+    else if (s) {
+        free (s);
     }
-    if (e == EMUNGE_SUCCESS) {
-        ctx->errstr = NULL;
-    }
-    else {
-        ctx->errstr = msg->errstr;
-        msg->errstr = NULL;
-    }
-    return;
+    return (e);
 }

@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: dec_v1.c,v 1.2 2003/04/22 20:49:36 dun Exp $
+ *  $Id: dec_v1.c,v 1.3 2003/04/23 18:22:35 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -30,6 +30,7 @@
 #endif /* HAVE_CONFIG_H */
 
 #include <assert.h>
+#include <ctype.h>
 #include <netinet/in.h>
 #include <string.h>
 #include "base64.h"
@@ -193,17 +194,34 @@ dec_v1_unarmor (munge_cred_t c)
     base64_ptr = m1->data;
     base64_len = m1->data_len;
 
+    /*  Consume leading whitespace.
+     */
+    while ((base64_len > 0) && isspace (*base64_ptr)) {
+        base64_ptr++;
+        base64_len--;
+    }
+    if ((base64_len == 0) || (*base64_ptr == '\0')) {
+        return (_munge_msg_set_err (c->msg, EMUNGE_BAD_ARG,
+            strdup ("No credential specified")));
+    }
     /*  Remove the prefix string.
+     *  The prefix specifies the start of the base64-encoded data.
      */
     if (prefix_len > 0) {
         if (strncmp (base64_ptr, MUNGE_CRED_PREFIX, prefix_len) != 0) {
-            return (_munge_msg_set_err (c->msg, EMUNGE_SNAFU,
+            return (_munge_msg_set_err (c->msg, EMUNGE_BAD_CRED,
                 strdup ("Unable to match armor prefix")));
         }
         base64_ptr += prefix_len;
         base64_len -= prefix_len;
     }
     /*  Remove the suffix string.
+     *  The suffix specifies the end of the base64-encoded data.
+     *    We can't rely on the base64 pad character to detect the end,
+     *    since that only exists if the input is not a multiple of 3 bytes.
+     *  However, the suffix isn't strictly necessary since whitespace
+     *    is safely ignored by the base64 decoding routine.
+     *  Still, it's nice to have a quick visual test to see if it's all there.
      *
      *  XXX: This may be somewhat inefficient if the suffix isn't there.
      *       If all goes well, the suffix will match on the 3rd comparison
@@ -217,7 +235,7 @@ dec_v1_unarmor (munge_cred_t c)
             base64_tmp--;
         }
         if (base64_tmp < base64_ptr) {
-            return (_munge_msg_set_err (c->msg, EMUNGE_SNAFU,
+            return (_munge_msg_set_err (c->msg, EMUNGE_BAD_CRED,
                 strdup ("Unable to match armor suffix")));
         }
         base64_len = base64_tmp - base64_ptr;
@@ -231,7 +249,7 @@ dec_v1_unarmor (munge_cred_t c)
     /*  Base64-decode the chewy-internals of the credential.
      */
     if (base64_decode_block (c->outer_mem, &n, base64_ptr, base64_len) < 0) {
-        return (_munge_msg_set_err (c->msg, EMUNGE_SNAFU,
+        return (_munge_msg_set_err (c->msg, EMUNGE_BAD_CRED,
             strdup ("Unable to base64-decode credential")));
     }
     assert (n < c->outer_mem_len);

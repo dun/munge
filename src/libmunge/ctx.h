@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: ctx.h,v 1.2 2003/04/18 23:20:18 dun Exp $
+ *  $Id: ctx.h,v 1.3 2003/04/23 18:22:35 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -56,7 +56,7 @@ struct munge_ctx {
  *  Internal (but still "Extern") Prototypes
  *****************************************************************************/
 
-void _munge_ctx_set_err (munge_ctx_t ctx, munge_msg_t msg, munge_err_t e);
+munge_err_t _munge_ctx_set_err (munge_ctx_t ctx, munge_err_t e, const char *s);
 
 
 #endif /* !MUNGE_CTX_H */
