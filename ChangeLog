@@ -1,5 +1,8 @@
 2004-05-06  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/munged/conf.c, src/munged/munged.c: Moved auth_recv_init()
+	  before gids_create() to allow for quicker exit when !root on aix.
+
 	* src/munged/gids.c(gids_create): Allow errno == ENOENT to denote
 	  success after last entry is returned by getgrent() for glibc-2.2.5.
 
