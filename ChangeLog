@@ -1,5 +1,9 @@
 2005-04-05  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* : Re-bootstrap'd with updated autotools-dev.
+
+2005-04-05  Chris Dunlap  <cdunlap@llnl.gov>
+
 	* : Re-bootstrap'd with automake-1.9.5 on Debian Sarge.
 
 2005-02-24  Chris Dunlap  <cdunlap@llnl.gov>
