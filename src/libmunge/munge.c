@@ -1,27 +1,27 @@
 /*****************************************************************************
- *  $Id: munge.c,v 1.3 2003/02/04 23:55:33 dun Exp $
+ *  $Id: munge.c,v 1.4 2003/02/13 17:55:58 dun Exp $
  *****************************************************************************
+ *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
+ *  For details, see <http://www.llnl.gov/linux/munge/>.
+ *  UCRL-CODE-2003-???.
+ *
  *  Copyright (C) 2002-2003 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
  *  Written by Chris Dunlap <cdunlap@llnl.gov>.
- *  UCRL-CODE-2003-???.
  *
- *  This file is part of Munge, an authentication library.
- *  For details, see <http://www.llnl.gov/linux/munge/>.
+ *  This is free software; you can redistribute it and/or modify it
+ *  under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
  *
- *  Munge is free software; you can redistribute it and/or modify it under
- *  the terms of the GNU General Public License as published by the Free
- *  Software Foundation; either version 2 of the License, or (at your option)
- *  any later version.
+ *  This is distributed in the hope that it will be useful, but WITHOUT
+ *  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ *  FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+ *  for more details.
  *
- *  Munge is distributed in the hope that it will be useful, but WITHOUT ANY
- *  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- *  FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
- *  details.
- *
- *  You should have received a copy of the GNU General Public License along
- *  with Munge; if not, write to the Free Software Foundation, Inc.,
- *  59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.
+ *  You should have received a copy of the GNU General Public License;
+ *  if not, write to the Free Software Foundation, Inc., 59 Temple Place,
+ *  Suite 330, Boston, MA  02111-1307  USA.
  *****************************************************************************/
 
 
@@ -75,7 +75,7 @@ static int base32_encode (char *dst, const char *src, int srclen);
 static int base32_decode (char *dst, const char *src, int srclen);
 
 
-int
+munge_err_t
 munge_encode (char **m, const munge_ctx_t *ctx, const void *buf, int len)
 {
     int i, n;
@@ -125,7 +125,7 @@ munge_encode (char **m, const munge_ctx_t *ctx, const void *buf, int len)
 }
 
 
-int
+munge_err_t
 munge_decode (const char *m, munge_ctx_t *ctx,
               void **pbuf, int *plen, uid_t *puid, gid_t *pgid)
 {
@@ -220,7 +220,7 @@ munge_decode (const char *m, munge_ctx_t *ctx,
                 return(EMUNGE_NOMEM);
             }
             memcpy(*pbuf, p, len);
-            memset(*pbuf + len, 0, 1);		/* ensure buf is NUL-term'd */
+            memset(*pbuf + len, 0, 1);          /* ensure buf is NUL-term'd */
 
         }
     }

@@ -1,27 +1,27 @@
 /*****************************************************************************
- *  $Id: munge.h,v 1.2 2003/02/03 23:45:04 dun Exp $
+ *  $Id: munge.h,v 1.3 2003/02/13 17:55:58 dun Exp $
  *****************************************************************************
+ *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
+ *  For details, see <http://www.llnl.gov/linux/munge/>.
+ *  UCRL-CODE-2003-???.
+ *
  *  Copyright (C) 2002-2003 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
  *  Written by Chris Dunlap <cdunlap@llnl.gov>.
- *  UCRL-CODE-2003-???.
  *
- *  This file is part of Munge, an authentication library.
- *  For details, see <http://www.llnl.gov/linux/munge/>.
+ *  This is free software; you can redistribute it and/or modify it
+ *  under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
  *
- *  Munge is free software; you can redistribute it and/or modify it under
- *  the terms of the GNU General Public License as published by the Free
- *  Software Foundation; either version 2 of the License, or (at your option)
- *  any later version.
+ *  This is distributed in the hope that it will be useful, but WITHOUT
+ *  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ *  FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+ *  for more details.
  *
- *  Munge is distributed in the hope that it will be useful, but WITHOUT ANY
- *  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- *  FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
- *  details.
- *
- *  You should have received a copy of the GNU General Public License along
- *  with Munge; if not, write to the Free Software Foundation, Inc.,
- *  59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.
+ *  You should have received a copy of the GNU General Public License;
+ *  if not, write to the Free Software Foundation, Inc., 59 Temple Place,
+ *  Suite 330, Boston, MA  02111-1307  USA.
  *****************************************************************************/
 
 
@@ -42,6 +42,9 @@
 
 typedef struct munge_ctx munge_ctx_t;
 
+/*  NOTE: Error codes must be in the range [1..255] in order to
+ *        provide a meaningful return status when returned via exit().
+ */
 typedef enum {
     EMUNGE_SUCCESS              = 0,    /* Whoohoo! */
     EMUNGE_SNAFU                = 1,    /* Doh! */
@@ -66,7 +69,8 @@ typedef enum {
  *  Functions  *
  ***************/
 
-int munge_encode (char **m, const munge_ctx_t *ctx, const void *buf, int len);
+munge_err_t munge_encode (char **m, const munge_ctx_t *ctx,
+                          const void *buf, int len);
 /*
  *  Creates a munged credential contained in a NUL-terminated base64 string.
  *    An optional buffer [buf] of length [len] can be munged in as well.
@@ -77,8 +81,8 @@ int munge_encode (char **m, const munge_ctx_t *ctx, const void *buf, int len);
  *    o/w, sets [m] to NULL and returns the munge error number.
  */
 
-int munge_decode (const char *m, munge_ctx_t *ctx,
-                  void **buf, int *len, uid_t *uid, gid_t *gid);
+munge_err_t munge_decode (const char *m, munge_ctx_t *ctx,
+                          void **buf, int *len, uid_t *uid, gid_t *gid);
 /*
  *  Validates the NUL-terminated munged credential [m].
  *  If [ctx] is not NULL, it will be set to the munge context used to
@@ -96,8 +100,7 @@ int munge_decode (const char *m, munge_ctx_t *ctx,
 
 const char * munge_strerror (munge_err_t e);
 /*
- *  Returns a descriptive string for the munge errno [e],
- *    or an unknown error message if the error code is unknown.
+ *  Returns a descriptive string for the munge errno [e].
  */
 
 
