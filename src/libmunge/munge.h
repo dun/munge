@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munge.h,v 1.4 2003/02/17 02:29:41 dun Exp $
+ *  $Id: munge.h,v 1.5 2003/02/18 19:46:20 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -35,7 +35,8 @@
  *  Got GPL?
  *****************************************************************************/
 
-#ifndef GPL_LICENSED
+#if GPL_LICENSED
+#else  /* !GPL_LICENSED */
   #error By linking against libmunge, the derivative
   #error work becomes licensed under the terms of the
   #error GNU General Public License.  Acknowledge by

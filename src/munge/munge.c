@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munge.c,v 1.4 2003/02/13 20:22:35 dun Exp $
+ *  $Id: munge.c,v 1.5 2003/02/18 19:46:20 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -25,7 +25,7 @@
  *****************************************************************************/
 
 
-#ifdef HAVE_CONFIG_H
+#if HAVE_CONFIG_H
 #  include "config.h"
 #endif /* HAVE_CONFIG_H */
 
@@ -45,7 +45,7 @@
  *  Options
  *****************************************************************************/
 
-#ifdef HAVE_GETOPT_H
+#if HAVE_GETOPT_H
 #  include <getopt.h>
 struct option opt_table[] = {
     { "help",     0, NULL, 'h' },
@@ -195,7 +195,7 @@ parse_cmdline (conf_t conf, int argc, char **argv)
     prog = (prog = strrchr (argv[0], '/')) ? prog + 1 : argv[0];
 
     for (;;) {
-#ifdef HAVE_GETOPT_LONG
+#if HAVE_GETOPT_LONG
         c = getopt_long (argc, argv, opt_string, opt_table, NULL);
 #else  /* !HAVE_GETOPT_LONG */
         c = getopt (argc, argv, opt_string);
@@ -253,7 +253,7 @@ display_help (char *prog)
 {
 /*  Displays a help message describing the command-line options.
  */
-#ifdef HAVE_GETOPT_LONG
+#if HAVE_GETOPT_LONG
     const int got_long = 1;
 #else  /* !HAVE_GETOPT_LONG */
     const int got_long = 0;

@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: log.c,v 1.1 2003/02/13 17:54:27 dun Exp $
+ *  $Id: log.c,v 1.2 2003/02/18 19:46:19 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -27,7 +27,7 @@
  *****************************************************************************/
 
 
-#ifdef HAVE_CONFIG_H
+#if HAVE_CONFIG_H
 #  include "config.h"
 #endif /* HAVE_CONFIG_H */
 
@@ -215,7 +215,7 @@ log_aux (int priority, const char *format, va_list vargs)
         time_t t;
         struct tm *tm_ptr;
         if (time (&t) != ((time_t) -1)) {
-#ifdef HAVE_LOCALTIME_R
+#if HAVE_LOCALTIME_R
             struct tm tm;
             tm_ptr = localtime_r (&t, &tm);
 #else  /* !HAVE_LOCALTIME_R */

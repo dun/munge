@@ -1,13 +1,14 @@
 /*****************************************************************************
- *  $Id: strlcat.h,v 1.1 2003/02/13 17:54:27 dun Exp $
+ *  $Id: strlcat.h,v 1.2 2003/02/18 19:46:20 dun Exp $
  *****************************************************************************/
 
-#ifdef HAVE_CONFIG_H
+#if HAVE_CONFIG_H
 #  include "config.h"
 #endif /* HAVE_CONFIG_H */
 
-#ifndef HAVE_STRLCAT
-#define HAVE_STRLCAT
+#if HAVE_STRLCAT
+#else /* !HAVE_STRLCAT */
+#define HAVE_STRLCAT 1
 
 size_t strlcat(char *dst, const char *src, size_t siz);
 /*

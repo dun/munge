@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: read.c,v 1.1 2003/02/13 17:54:27 dun Exp $
+ *  $Id: read.c,v 1.2 2003/02/18 19:46:20 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -25,7 +25,7 @@
  *****************************************************************************/
 
 
-#ifdef HAVE_CONFIG_H
+#if HAVE_CONFIG_H
 #  include "config.h"
 #endif /* HAVE_CONFIG_H */
 

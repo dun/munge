@@ -1,3 +1,7 @@
+2003-02-18  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* : Changed #ifdef/#ifndef to #if/#else where appropriate.
+
 2003-02-16  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* : Added GPL_LICENSED preprocessor macro support.
