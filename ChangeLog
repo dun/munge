@@ -1,5 +1,8 @@
 2003-10-14  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/libcommon/munge_defs.h, src/munged/random.c:
+	  Changed RANDOM_SEED_DEFAULT from "/dev/random" to "/dev/urandom".
+
 	* src/munged/dec_v1.c(dec_v1_unpack_inner):
 	  Fixed unaligned access on ia64 {gnats:303}.
 
@@ -13,7 +16,7 @@
 	  src/libmunge/ctx.c, src/libmunge/decode.c, src/libmunge/encode.c,
 	  src/libmunge/munge.h, src/munge/munge.c, src/munge/unmunge.c,
 	  src/munged/conf.c, src/munged/conf.h, src/munged/dec_v1.c,
-	  src/munged/enc_v1.c: Added ttl back into credential (for replay).
+	  src/munged/enc_v1.c: Added TTL back into credential (for replay).
 
 	* src/libcommon/fd.c: Tweaked formatting.
 

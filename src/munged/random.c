@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: random.c,v 1.3 2003/05/06 21:37:22 dun Exp $
+ *  $Id: random.c,v 1.4 2003/10/14 20:58:24 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -35,11 +35,17 @@
 #include <string.h>
 #include "crypto_log.h"
 #include "log.h"
+#include "munge_defs.h"
 #include "random.h"
 
 
-#define RANDOM_SEED_BYTES       1024
-#define RANDOM_SEED_DEFAULT     "/dev/random"
+#ifndef RANDOM_SEED_BYTES
+#  define RANDOM_SEED_BYTES       1024
+#endif /* !RANDOM_SEED_BYTES */
+
+#ifndef RANDOM_SEED_DEFAULT
+#  define RANDOM_SEED_DEFAULT     "/dev/random"
+#endif /* !RANDOM_SEED_DEFAULT */
 
 
 void

@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munge_defs.h,v 1.13 2003/09/18 21:09:26 dun Exp $
+ *  $Id: munge_defs.h,v 1.14 2003/10/14 20:58:24 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -105,5 +105,11 @@
 /* #define MUNGED_SECRET_KEY       "/tmp/.munge-key"
  */
 #define MUNGED_SECRET_KEY       "/etc/ssh/ssh_host_key"
+
+/*  String specifying the pathname of the random number source device to use
+ *    in case the MUNGED_RANDOM_SEED file contains insufficient entropy.
+ */
+#define RANDOM_SEED_DEFAULT     "/dev/urandom"
+
 
 #endif /* !MUNGE_DEFS_H */
