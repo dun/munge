@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: configure.ac,v 1.2 2002/12/20 20:44:07 dun Exp $
+## $Id: configure.ac,v 1.3 2002/12/20 23:21:58 dun Exp $
 ##*****************************************************************************
 ## Process this file with autoconf to produce a configure script.
 ##*****************************************************************************
@@ -93,5 +93,6 @@ AC_CONFIG_FILES( \
   Makefile \
   src/Makefile \
   src/libmunge/Makefile \
+  src/munged/Makefile \
 )
 AC_OUTPUT
