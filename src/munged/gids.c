@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: gids.c,v 1.5 2004/09/03 23:29:04 dun Exp $
+ *  $Id: gids.c,v 1.6 2004/09/16 20:14:25 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -35,12 +35,18 @@
 #include <assert.h>
 #include <errno.h>
 #include <grp.h>
+#include <pthread.h>
 #include <pwd.h>
 #include <stdlib.h>
+#include <string.h>
+#include <sys/stat.h>
 #include <munge.h>
+#include "conf.h"
 #include "gids.h"
 #include "hash.h"
 #include "log.h"
+#include "munge_defs.h"
+#include "timer.h"
 
 
 /*****************************************************************************
@@ -52,33 +58,32 @@
  *    increasing order without duplicates.  The first gids_node in the list
  *    is special -- it contains the associated UID (cast into a gid_t).
  *
- *  The non-reentrant passwd/group functions are not an issue, since this
- *    routine is the only place where they are used within the daemon.
- *
- *  FIXME: The group information is only parsed during initialization.
- *    A timer needs to be added to re-parse this on a configurable basis
- *    (defaulting to hourly).  This, of course, requires locking in order to
- *    prevent the hash from being moved while a search operation is being
- *    performed during decode.  And read-write locks will need to be used to
- *    prevent the supplementary group search from serializing all decodes.
- *
- *  FIXME: Should all errors here be fatal?  Maybe throw a fatal error during
- *    initialization, but simply log the error and keep the old mapping if
- *    errors occur during subsequent re-parsing of the group information.
+ *  The non-reentrant passwd/group functions are not an issue since this
+ *    routine is the only place where they are used within the daemon.  There
+ *    will never be multiple instances of gids_create() running concurrently.
  */
  
+
+/*****************************************************************************
+ *  Constants
+ *****************************************************************************/
+
+#define GIDS_DEBUG      0
+#define GIDS_GROUP_FILE "/etc/group"
+
 
 /*****************************************************************************
  *  Data Types
  *****************************************************************************/
 
 struct gids {
-    hash_t             hash;
+    pthread_mutex_t     lock;           /* mutex for accessing struct        */
+    hash_t              hash;           /* hash of GIDs mappings             */
 };
 
 struct gids_node {
-    struct gids_node  *next;
-    gid_t              gid;
+    struct gids_node   *next;
+    gid_t               gid;
 };
 
 typedef struct gids_node * gids_node_t;
@@ -88,11 +93,18 @@ typedef struct gids_node * gids_node_t;
  *  Prototypes
  *****************************************************************************/
 
-static int _gids_add (gids_t gids, uid_t uid, gid_t gid);
-static gids_node_t _gids_node_alloc (gid_t gid);
-static void _gids_node_free (gids_node_t g);
-static int _gids_node_cmp (uid_t *uid1_p, uid_t *uid2_p);
+static void         _gids_update (gids_t gids);
+static hash_t       _gids_hash_create (void);
+static int          _gids_hash_add (hash_t hash, uid_t uid, gid_t gid);
+static gids_node_t  _gids_node_alloc (gid_t gid);
+static void         _gids_node_free (gids_node_t g);
+static int          _gids_node_cmp (uid_t *uid1_p, uid_t *uid2_p);
 static unsigned int _gids_node_key (uid_t *uid_p);
+
+#if GIDS_DEBUG
+static void         _gids_hash_dump (hash_t hash);
+static void         _gids_dump_node (gids_node_t g, uid_t *uid_p, void *null);
+#endif /* GIDS_DEBUG */
 
 
 /*****************************************************************************
@@ -103,45 +115,25 @@ gids_t
 gids_create (void)
 {
     gids_t gids;
-    hash_key_f keyf = (hash_key_f) _gids_node_key;
-    hash_cmp_f cmpf = (hash_cmp_f) _gids_node_cmp;
-    hash_del_f delf = (hash_del_f) _gids_node_free;
-    struct group *gr_ptr;
-    struct passwd *pw_ptr;
-    char **pp;
-    int n;
 
     if (!(gids = malloc (sizeof (*gids)))) {
         log_errno (EMUNGE_NO_MEMORY, LOG_ERR,
             "Unable to allocate gids struct");
     }
-    if (!(gids->hash = hash_create (GIDS_HASH_SIZE, keyf, cmpf, delf))) {
-        log_errno (EMUNGE_NO_MEMORY, LOG_ERR,
-            "Unable to allocate gids hash");
+    if ((errno = pthread_mutex_init (&gids->lock, NULL)) != 0) {
+        log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to init gids mutex");
     }
-    for (;;) {
-        errno = 0;
-        if (!(gr_ptr = getgrent ())) {
-            /*
-             *  glibc-2.2.5 returns ENOENT.
-             */
-            if ((errno == 0) || (errno == ENOENT))
-                break;
-            if (errno == EINTR)
-                continue;
-            log_errno (EMUNGE_SNAFU, LOG_ERR,
-                "Unable to parse group information");
-        }
-        for (pp = gr_ptr->gr_mem; *pp; pp++) {
-            if ((pw_ptr = getpwnam (*pp))) {
-                _gids_add (gids, pw_ptr->pw_uid, gr_ptr->gr_gid);
-            }
-        }
+    gids->hash = NULL;
+    /*
+     *  Compute the GIDs mapping in the background by setting an expired timer.
+     *  Normally, I'd like this mapping to exist before the daemon starts
+     *    accepting requests, but I've observed this processing to take a
+     *    while on certain platforms.  The daemon can still function without
+     *    a mapping -- gids_is_member() simply returns false until it exists.
+     */
+    if (timer_set_relative ((callback_f) _gids_update, gids, 0) < 0) {
+        log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to set gids timer");
     }
-    endgrent ();
-    n = hash_count (gids->hash);
-    log_msg (LOG_INFO, "Found %d user%s with supplementary groups",
-        n, ((n == 1) ? "" : "s"));
     return (gids);
 }
 
@@ -149,10 +141,22 @@ gids_create (void)
 void
 gids_destroy (gids_t gids)
 {
-    if (gids) {
-        hash_destroy (gids->hash);
-        free (gids);
+    if (!gids) {
+        return;
     }
+    if ((errno = pthread_mutex_lock (&gids->lock)) != 0) {
+        log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to lock gids mutex");
+    }
+    hash_destroy (gids->hash);
+    gids->hash = NULL;
+
+    if ((errno = pthread_mutex_unlock (&gids->lock)) != 0) {
+        log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to unlock gids mutex");
+    }
+    if ((errno = pthread_mutex_destroy (&gids->lock)) != 0) {
+        log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to destroy gids mutex");
+    }
+    free (gids);
     return;
 }
 
@@ -161,18 +165,28 @@ int
 gids_is_member (gids_t gids, uid_t uid, gid_t gid)
 {
     gids_node_t g;
+    int         is_member = 0;
 
-    assert (gids != NULL);
-
+    if (!gids) {
+        errno = EINVAL;
+        return (0);
+    }
+    if ((errno = pthread_mutex_lock (&gids->lock)) != 0) {
+        log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to lock gids mutex");
+    }
     if ((g = hash_find (gids->hash, &uid)) != NULL) {
         assert (g->gid == (gid_t) uid);
         for (g = g->next; g && g->gid <= gid; g = g->next) {
-            if (g->gid == gid)
-                return (1);
+            if (g->gid == gid) {
+                is_member = 1;
+                break;
+            }
         }
     }
-    errno = EEXIST;
-    return (0);
+    if ((errno = pthread_mutex_unlock (&gids->lock)) != 0) {
+        log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to unlock gids mutex");
+    }
+    return (is_member);
 }
 
 
@@ -180,17 +194,140 @@ gids_is_member (gids_t gids, uid_t uid, gid_t gid)
  *  Private Functions
  *****************************************************************************/
 
-static int
-_gids_add (gids_t gids, uid_t uid, gid_t gid)
+static void
+_gids_update (gids_t gids)
 {
+/*  Updates the GIDs mapping [gids] if needed.
+ *
+ *  The use of a static mtime here is groovy since there will never be
+ *    multiple instances of this routine running concurrently.  Placing
+ *    mtime within the gids struct would potentially require locking the
+ *    struct twice per function invocation: once for the stat and once for
+ *    the update.
+ */
+    static time_t   t_last_update = 0;
+    time_t          t_now;
+    struct stat     st;
+    int             do_update = 1;
+    hash_t          hash, hash_bak;
+    int             n;
+
+    assert (gids != NULL);
+
+    if (time (&t_now) == (time_t) -1) {
+        log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to query current time");
+    }
+    if (conf->got_group_stat) {
+        if (stat (GIDS_GROUP_FILE, &st) < 0) {
+            log_msg (LOG_ERR, "Unable to stat \"%s\": %s",
+                GIDS_GROUP_FILE, strerror (errno));
+        }
+        else if (st.st_mtime <= t_last_update) {
+            do_update = 0;
+        }
+        else {
+            t_now = st.st_mtime;
+        }
+    }
+    if (do_update && (hash = _gids_hash_create ())) {
+
+        n = hash_count (hash);
+        log_msg (LOG_INFO, "Found %d user%s with supplementary groups",
+            n, ((n == 1) ? "" : "s"));
+
+#if GIDS_DEBUG
+        _gids_hash_dump (hash);
+#endif /* GIDS_DEBUG */
+
+        if ((errno = pthread_mutex_lock (&gids->lock)) != 0) {
+            log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to lock gids mutex");
+        }
+        hash_bak = gids->hash;
+        gids->hash = hash;
+
+        if ((errno = pthread_mutex_unlock (&gids->lock)) != 0) {
+            log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to unlock gids mutex");
+        }
+        hash_destroy (hash_bak);
+        t_last_update = t_now;
+    }
+    if (timer_set_relative (
+      (callback_f) _gids_update, gids, MUNGE_GROUP_PARSE_TIMER * 1000) < 0) {
+        log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to set gids timer");
+    }
+    return;
+}
+
+
+static hash_t
+_gids_hash_create (void)
+{
+/*  Returns a new hash containing the new GIDs mapping, or NULL on error.
+ */
+    hash_t          hash = NULL;
+    hash_key_f      keyf = (hash_key_f) _gids_node_key;
+    hash_cmp_f      cmpf = (hash_cmp_f) _gids_node_cmp;
+    hash_del_f      delf = (hash_del_f) _gids_node_free;
+    struct group   *gr_ptr;
+    struct passwd  *pw_ptr;
+    char          **pp;
+
+    if (!(hash = hash_create (GIDS_HASH_SIZE, keyf, cmpf, delf))) {
+        log_msg (LOG_ERR, "Unable to allocate gids hash -- out of memory");
+        goto err;
+    }
+    setgrent ();
+    for (;;) {
+        errno = 0;
+        if (!(gr_ptr = getgrent ())) {
+            /*
+             *  In addition to returning NULL when there are no more entries,
+             *    glibc-2.2.5 sets errno to ENOENT.  Deal with it.
+             */
+            if ((errno == 0) || (errno == ENOENT))
+                break;
+            if (errno == EINTR)
+                continue;
+            log_msg (LOG_ERR, "Unable to parse group information");
+            endgrent ();
+            goto err;
+        }
+        for (pp = gr_ptr->gr_mem; *pp; pp++) {
+            if ((pw_ptr = getpwnam (*pp))) {
+                if (_gids_hash_add (hash, pw_ptr->pw_uid, gr_ptr->gr_gid) <0) {
+                    goto err;
+                }
+            }
+        }
+    }
+    endgrent ();
+    return (hash);
+
+err:
+    hash_destroy (hash);
+    return (NULL);
+}
+
+
+static int
+_gids_hash_add (hash_t hash, uid_t uid, gid_t gid)
+{
+/*  Adds supplementary group [gid] for user [uid] to the GIDs mapping [gids].
+ *  Returns 1 if the entry was added, 0 if the entry already exists,
+ *    or -1 on error.
+ */
     gids_node_t  g;
     gids_node_t *gp;
 
-    if (!(g = hash_find (gids->hash, &uid))) {
-        g = _gids_node_alloc ((gid_t) uid);
-        if (!hash_insert (gids->hash, &g->gid, g)) {
-            log_errno (EMUNGE_NO_MEMORY, LOG_ERR,
-                "Unable to insert gids node into hash");
+    if (!(g = hash_find (hash, &uid))) {
+        if (!(g = _gids_node_alloc ((gid_t) uid))) {
+            log_msg (LOG_ERR, "Unable to allocate gids node -- out of memory");
+            return (-1);
+        }
+        if (!hash_insert (hash, &g->gid, g)) {
+            log_msg (LOG_ERR, "Unable to insert gids node into hash");
+            _gids_node_free (g);
+            return (-1);
         }
     }
     assert ((uid_t) g->gid == uid);
@@ -198,9 +335,14 @@ _gids_add (gids_t gids, uid_t uid, gid_t gid)
         ; /* empty */
     }
     if (*gp && ((*gp)->gid == gid)) {
+        log_msg (LOG_WARNING,
+            "Detected duplicate user uid=%d for group gid=%d", uid, gid);
         return (0);
     }
-    g = _gids_node_alloc (gid);
+    if (!(g = _gids_node_alloc (gid))) {
+        log_msg (LOG_ERR, "Unable to allocate gids node -- out of memory");
+        return (-1);
+    }
     g->next = *gp;
     *gp = g;
     return (1);
@@ -210,11 +352,12 @@ _gids_add (gids_t gids, uid_t uid, gid_t gid)
 static gids_node_t
 _gids_node_alloc (gid_t gid)
 {
+/*  Returns an allocated GIDs node set to [gid], or NULL on error.
+ */
     gids_node_t g;
 
     if (!(g = malloc (sizeof (*g)))) {
-        log_errno (EMUNGE_NO_MEMORY, LOG_ERR,
-            "Unable to allocate gids node");
+        return (NULL);
     }
     g->next = NULL;
     g->gid = gid;
@@ -225,6 +368,8 @@ _gids_node_alloc (gid_t gid)
 static void
 _gids_node_free (gids_node_t g)
 {
+/*  De-allocates the GIDs node chain starting at [g].
+ */
     gids_node_t gtmp;
 
     while (g) {
@@ -239,6 +384,8 @@ _gids_node_free (gids_node_t g)
 static int
 _gids_node_cmp (uid_t *uid1_p, uid_t *uid2_p)
 {
+/*  Used by the hash routines to compare hash keys [uid1_p] and [uid2_p].
+ */
     return (!(*uid1_p == *uid2_p));
 }
 
@@ -246,17 +393,23 @@ _gids_node_cmp (uid_t *uid1_p, uid_t *uid2_p)
 static unsigned int
 _gids_node_key (uid_t *uid_p)
 {
+/*  Used by the hash routines to convert [uid_p] into a hash key.
+ */
     return (*uid_p);
 }
 
 
-#if 0
+/*****************************************************************************
+ *  Debug Functions
+ *****************************************************************************/
+
+#if GIDS_DEBUG
 
 static void
-_gids_dump (gids_t gids)
+_gids_hash_dump (hash_t hash)
 {
-    printf ("* GIDs Dump (%d UIDs):\n", hash_count (gids->hash));
-    hash_for_each (gids->hash, (hash_arg_f) _gids_dump_node, NULL);
+    printf ("* GIDs Dump (%d UIDs):\n", hash_count (hash));
+    hash_for_each (hash, (hash_arg_f) _gids_dump_node, NULL);
     return;
 }
 
@@ -266,14 +419,12 @@ _gids_dump_node (gids_node_t g, uid_t *uid_p, void *null)
 {
     assert (g->gid == *uid_p);
 
-    g = g->next;
     printf (" %5d:", *uid_p);
-    while (g) {
+    for (g = g->next; g; g = g->next) {
         printf (" %d", g->gid);
-        g = g->next;
     }
     printf ("\n");
     return;
 }
 
-#endif
+#endif /* GIDS_DEBUG */

@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: gids.h,v 1.3 2004/09/07 16:26:22 dun Exp $
+ *  $Id: gids.h,v 1.4 2004/09/16 20:14:25 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -53,8 +53,9 @@ typedef struct gids * gids_t;
 gids_t gids_create (void);
 /*
  *  Creates a list of supplementary GIDs for each UID based on information
- *    in /etc/group.
- *  Returns this GIDs mapping, or throws a fatal error.
+ *    in /etc/group.  This information will be updated according to the
+ *    time interval specified by MUNGE_GROUP_PARSE_TIMER.
+ *  Returns this GIDs mapping or dies trying.
  */
 
 void gids_destroy (gids_t gids);

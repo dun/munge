@@ -1,5 +1,7 @@
 2004-09-16  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/munged/gids.c, src/munged/gids.h:
+	  Added timer to periodically re-parse group info.
 	* src/munged/conf.c, src/munged/conf.h:
 	  Made extern declaration of conf.
 	  Added got_group_stat flag to struct conf.
