@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: enum.c,v 1.1 2004/11/18 00:48:13 dun Exp $
+ *  $Id: enum.c,v 1.2 2004/11/19 01:03:21 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -117,8 +117,8 @@ static const munge_enum_table_t _munge_enum_lookup (munge_enum_t type);
 int
 munge_enum_is_valid (munge_enum_t type, int val)
 {
-    const munge_enum_table_t  tp;
-    int                       i;
+    munge_enum_table_t  tp;
+    int                 i;
 
     if (!(tp = _munge_enum_lookup (type))) {
         return (0);
@@ -135,8 +135,8 @@ munge_enum_is_valid (munge_enum_t type, int val)
 const char *
 munge_enum_int_to_str (munge_enum_t type, int val)
 {
-    const munge_enum_table_t  tp;
-    int                       i;
+    munge_enum_table_t  tp;
+    int                 i;
 
     if (!(tp = _munge_enum_lookup (type))) {
         return (NULL);
@@ -153,10 +153,10 @@ munge_enum_int_to_str (munge_enum_t type, int val)
 int
 munge_enum_str_to_int (munge_enum_t type, const char *str)
 {
-    const munge_enum_table_t  tp;
-    int                       i;
-    int                       n;
-    char                     *p;
+    munge_enum_table_t  tp;
+    int                 i;
+    int                 n;
+    char               *p;
 
     if (!str || !*str) {
         return (-1);

@@ -1,5 +1,8 @@
 2004-11-18  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/libmunge/enum.c:
+	  Fixed compiler warning regarding assignment of read-only variable.
+
 	* META, config/x_ac_meta.m4, src/libmunge/Makefile.am:
 	  Added LT_Current, LT_Revision, and LT_Age for libtool -version-info.
 
