@@ -427,14 +427,14 @@ distdir: $(DISTFILES)
 	  ! -type d ! -perm -444 -exec $(SHELL) $(install_sh) -c -m a+r {} {} \; \
 	|| chmod -R a+r $(distdir)
 dist-gzip: distdir
-	$(AMTAR) chof - $(distdir) | GZIP=$(GZIP_ENV) gzip -c >$(distdir).tar.gz
+	$(AMTAR) chf - $(distdir) --format=posix | GZIP=$(GZIP_ENV) gzip -c >$(distdir).tar.gz
 	$(am__remove_distdir)
 dist-bzip2: distdir
-	$(AMTAR) chof - $(distdir) | bzip2 -9 -c >$(distdir).tar.bz2
+	$(AMTAR) chf - $(distdir) --format=posix | bzip2 -9 -c >$(distdir).tar.bz2
 	$(am__remove_distdir)
 
 dist-tarZ: distdir
-	$(AMTAR) chof - $(distdir) | compress -c >$(distdir).tar.Z
+	$(AMTAR) chf - $(distdir) --format=posix | compress -c >$(distdir).tar.Z
 	$(am__remove_distdir)
 
 dist-shar: distdir
@@ -447,8 +447,8 @@ dist-zip: distdir
 	$(am__remove_distdir)
 
 dist dist-all: distdir
-	$(AMTAR) chof - $(distdir) | GZIP=$(GZIP_ENV) gzip -c >$(distdir).tar.gz
-	$(AMTAR) chof - $(distdir) | bzip2 -9 -c >$(distdir).tar.bz2
+	$(AMTAR) chf - $(distdir) --format=posix | GZIP=$(GZIP_ENV) gzip -c >$(distdir).tar.gz
+	$(AMTAR) chf - $(distdir) --format=posix | bzip2 -9 -c >$(distdir).tar.bz2
 	$(am__remove_distdir)
 
 # This target untars the dist file and tries a VPATH configuration.  Then

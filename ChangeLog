@@ -1,3 +1,7 @@
+2004-04-14  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* : Re-bootstrap'd with autoconf-2.59, automake-1.8.3, libtool-1.5.6.
+
 2004-04-08  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/munge/munge.c, src/munge/unmunge.c: Tweaks for Solaris 2.8.
