@@ -1,6 +1,6 @@
 #!/bin/sh
 ##
-# $Id: munge.init,v 1.5 2003/05/06 20:20:29 dun Exp $
+# $Id: munge.init,v 1.6 2003/05/08 00:34:58 dun Exp $
 ##
 # chkconfig:	345 40 60
 # description:	The MUNGE daemon is used for user authentication.
@@ -24,7 +24,7 @@ INITLOG_ARGS=""
 case "$1" in
   start)
  	echo -n "Starting $DAEMON: "
-	daemon $DAEMON
+	daemon $DAEMON -f
 	RETVAL=$?
 	echo
 	[ $RETVAL -eq 0 ] && touch /var/lock/subsys/$SUBSYS
