@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: work.h,v 1.1 2004/08/05 21:10:50 dun Exp $
+ *  $Id: work.h,v 1.2 2004/08/17 21:14:49 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -66,8 +66,7 @@ void work_fini (work_p wp, int do_wait);
 int work_queue (work_p wp, void *work);
 /*
  *  Queues the [work] element for processing by the work crew [wp].
- *    The [work] element will be passed to the work function
- *      specified during work_init().
+ *    The [work] will be passed to the function specified during work_init().
  *  Returns 0 on success, or -1 on error (with errno set).
  */
 
