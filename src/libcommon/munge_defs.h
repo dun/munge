@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munge_defs.h,v 1.18 2004/03/11 21:04:39 dun Exp $
+ *  $Id: munge_defs.h,v 1.19 2004/03/12 23:34:53 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -57,6 +57,10 @@
  */
 #define MUNGE_DEFAULT_MAC               MUNGE_MAC_SHA1
 
+/*  Default munge_zip_t for compressing credentials.
+ */
+#define MUNGE_DEFAULT_ZIP               MUNGE_ZIP_ZLIB
+
 /*  Integer for the default number of seconds before a credential expires.
  */
 #define MUNGE_DEFAULT_TTL               300
@@ -69,10 +73,6 @@
  *    of expired creds.
  */
 #define MUNGE_REPLAY_PURGE_TIMER        300
-
-/*  Default munge_zip_t for compressing credentials.
- */
-#define MUNGE_DEFAULT_ZIP               MUNGE_ZIP_ZLIB
 
 /*  Integer (uint32_t) sentinel for valid munge message.
  */
@@ -107,8 +107,9 @@
 /*  String specifying the pathname of the secret key file.
  *    FIXME: Temporary kludge until configuration file support is added.
  */
-#define MUNGED_SECRET_KEY               "/tmp/.munge-key"
-// #define MUNGED_SECRET_KEY               "/etc/ssh/ssh_host_key"
+/* #define MUNGED_SECRET_KEY               "/tmp/.munge-key"
+ */
+#define MUNGED_SECRET_KEY               "/etc/ssh/ssh_host_key"
 
 /*  String specifying the pathname of the random number source device to use
  *    in case the MUNGED_RANDOM_SEED file contains insufficient entropy.
