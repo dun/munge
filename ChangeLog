@@ -1,3 +1,8 @@
+2003-05-03  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/munged/msg_server.c(err_v1_process_msg):
+	  Fixed sending err msg with no body, but need to revisit this routine.
+
 2003-05-02  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* : Removed dprintf() due to an interpositioning bug with a

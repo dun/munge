@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: msg_server.c,v 1.5 2003/05/03 00:41:00 dun Exp $
+ *  $Id: msg_server.c,v 1.6 2003/05/03 21:35:41 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -107,19 +107,22 @@ err_v1_process_msg (munge_msg_t m)
     assert (m != NULL);
     assert (m->status != EMUNGE_SUCCESS);
 
-    m1 = m->pbody;
-
     m->head.magic = MUNGE_MSG_MAGIC;
     m->head.version = MUNGE_MSG_VERSION;
     m->head.type = MUNGE_MSG_ERROR;
     m->head.length = 0;
 
     p = (m->errstr != NULL) ? m->errstr : munge_strerror (m->status);
-    m1->errnum = m->status;
-    m1->data_len = strlen (p) + 1;
-    m1->data = (void *) p;
-
     log_msg (LOG_INFO, "%s", p);
-    _munge_msg_send (m);
+
+    /*  FIXME: What if !pbody?
+     */
+    if (m->pbody) {
+        m1 = m->pbody;
+        m1->errnum = m->status;
+        m1->data_len = strlen (p) + 1;
+        m1->data = (void *) p;
+        _munge_msg_send (m);
+    }
     return (0);
 }
