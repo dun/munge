@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munge_defs.h,v 1.6 2003/04/30 17:59:20 dun Exp $
+ *  $Id: munge_defs.h,v 1.7 2003/04/30 20:26:09 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -91,12 +91,12 @@
 /*  String specifying the pathname of the random seed file.
  *    FIXME: Temporary kludge until configuration file support is added.
  */
-#define MUNGED_RANDOM_SEED      "/etc/munge/rnd"
+#define MUNGED_RANDOM_SEED      "/tmp/.munge.rnd"
 
 /*  String specifying the pathname of the secret key file.
  *    FIXME: Temporary kludge until configuration file support is added.
  */
-#define MUNGED_SECRET_KEY       "/etc/munge/key"
+#define MUNGED_SECRET_KEY       "/etc/ssh/ssh_host_key"
 
 
 #endif /* !MUNGE_DEFS_H */
