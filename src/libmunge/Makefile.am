@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.4 2003/04/08 18:16:16 dun Exp $
+## $Id: Makefile.am,v 1.5 2003/04/18 23:20:18 dun Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
@@ -21,9 +21,11 @@ libmunge_la_LIBADD = \
 	$(top_builddir)/src/libmissing/libmissing.la
 
 libmunge_la_SOURCES = \
-	code.c \
 	ctx.c \
 	ctx.h \
+	decode.c \
+	encode.c \
 	msg_client.c \
 	msg_client.h \
+	strerror.c \
 	munge.h

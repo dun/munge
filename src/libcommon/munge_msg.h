@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munge_msg.h,v 1.1 2003/04/08 18:16:16 dun Exp $
+ *  $Id: munge_msg.h,v 1.2 2003/04/18 23:20:18 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -45,14 +45,12 @@
  *****************************************************************************/
 
 enum munge_type {                       /* message type                      */
-    MUNGE_MSG_UNKNOWN,
-    MUNGE_MSG_ENC_REQ,
-    MUNGE_MSG_ENC_RSP,
-    MUNGE_MSG_DEC_REQ,
-    MUNGE_MSG_DEC_RSP,
-    MUNGE_MSG_DEF_REQ,
-    MUNGE_MSG_DEF_RSP,
-    MUNGE_MSG_ERROR,
+    MUNGE_MSG_UNKNOWN,                  /*  uninitialized message            */
+    MUNGE_MSG_ERROR,                    /*  error message                    */
+    MUNGE_MSG_ENC_REQ,                  /*  encode request message           */
+    MUNGE_MSG_ENC_RSP,                  /*  encode response message          */
+    MUNGE_MSG_DEC_REQ,                  /*  decode request message           */
+    MUNGE_MSG_DEC_RSP,                  /*  decode response message          */
     MUNGE_MSG_LAST_ENTRY
 };
 
@@ -64,7 +62,7 @@ struct munge_msg_head {
 };
 
 struct munge_msg_v1 {
-    uint8_t                 status;     /* status of encode/decode op        */
+    uint8_t                 errnum;     /* munge_err_t for encode/decode op  */
     uint8_t                 cipher;     /* munge_cipher_t enum               */
     uint8_t                 zip;        /* munge_zip_t enum                  */
     uint8_t                 mac;        /* munge_mac_t enum                  */
@@ -84,8 +82,8 @@ struct munge_msg {
     struct munge_msg_head   head;       /* message header                    */
     int                     pbody_len;  /* length of msg body mem allocation */
     void                   *pbody;      /* ptr to msg body based on version  */
-    munge_err_t             status;     /* munge error status                */
-    char                   *error;      /* munge error string                */
+    munge_err_t             status;     /* munge status code                 */
+    char                   *errstr;     /* munge error string                */
 };
 
 typedef struct munge_msg * munge_msg_t;
@@ -95,7 +93,7 @@ typedef struct munge_msg * munge_msg_t;
  *  Prototypes
  *****************************************************************************/
 
-munge_err_t _munge_msg_create (munge_msg_t *pm, int sd, enum munge_type type);
+munge_err_t _munge_msg_create (munge_msg_t *pm, int sd);
 
 void _munge_msg_destroy (munge_msg_t m);
 
@@ -103,9 +101,11 @@ munge_err_t _munge_msg_send (munge_msg_t m);
 
 munge_err_t _munge_msg_recv (munge_msg_t m);
 
+munge_err_t _munge_msg_reset (munge_msg_t m);
+
 char * _munge_msg_get_err (munge_msg_t m);
 
-void _munge_msg_set_err (munge_msg_t m, munge_err_t e, const char *str);
+int _munge_msg_set_err (munge_msg_t m, munge_err_t e, const char *str);
 
 
 

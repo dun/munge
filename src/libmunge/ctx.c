@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: ctx.c,v 1.1 2003/04/08 18:16:16 dun Exp $
+ *  $Id: ctx.c,v 1.2 2003/04/18 23:20:18 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -37,7 +37,12 @@
 #include <munge.h>
 #include "ctx.h"
 #include "munge_defs.h"
+#include "munge_msg.h"
 
+
+/*****************************************************************************
+ *  Extern Functions
+ *****************************************************************************/
 
 munge_ctx_t
 munge_ctx_create (void)
@@ -55,8 +60,8 @@ munge_ctx_create (void)
     ctx->time0 = 0;
     ctx->time1 = 0;
     ctx->socket = strdup (MUNGE_SOCKET_NAME);
-    ctx->status = EMUNGE_SUCCESS;
-    ctx->error = NULL;
+    ctx->errnum = EMUNGE_SUCCESS;
+    ctx->errstr = NULL;
 
     if (!(ctx->socket)) {
         munge_ctx_destroy (ctx);
@@ -75,18 +80,14 @@ munge_ctx_destroy (munge_ctx_t ctx)
         return;
     }
     if (ctx->realm) {
-        memset (ctx->realm, 0, strlen (ctx->realm));
         free (ctx->realm);
     }
     if (ctx->socket) {
-        memset (ctx->socket, 0, strlen (ctx->socket));
         free (ctx->socket);
     }
-    if (ctx->error) {
-        memset (ctx->error, 0, strlen (ctx->error));
-        free (ctx->error);
+    if (ctx->errstr) {
+        free (ctx->errstr);
     }
-    memset (ctx, 0, sizeof (*ctx));
     free (ctx);
     return;
 }
@@ -97,11 +98,11 @@ munge_ctx_err (munge_ctx_t ctx)
 {
     assert (ctx != NULL);
 
-    if (ctx->status == EMUNGE_SUCCESS)
+    if (ctx->errnum == EMUNGE_SUCCESS)
         return (NULL);
-    if (ctx->error)
-        return (ctx->error);
-    return (munge_strerror (ctx->status));
+    if (ctx->errstr)
+        return (ctx->errstr);
+    return (munge_strerror (ctx->errnum));
 }
 
 
@@ -118,10 +119,10 @@ munge_ctx_get (munge_ctx_t ctx, munge_opt_t opt, ...)
     if (!ctx) {
         return (EMUNGE_BAD_ARG);
     }
-    ctx->status = EMUNGE_SUCCESS;
-    if (ctx->error) {
-        free (ctx->error);
-        ctx->error = NULL;
+    ctx->errnum = EMUNGE_SUCCESS;
+    if (ctx->errstr) {
+        free (ctx->errstr);
+        ctx->errstr = NULL;
     }
     va_start (vargs, opt);
     switch (opt) {
@@ -158,11 +159,11 @@ munge_ctx_get (munge_ctx_t ctx, munge_opt_t opt, ...)
             *p2str = ctx->socket;
             break;
         default:
-            ctx->status = EMUNGE_BAD_ARG;
+            ctx->errnum = EMUNGE_BAD_ARG;
             break;
     }
     va_end (vargs);
-    return (ctx->status);
+    return (ctx->errnum);
 }
 
 
@@ -178,10 +179,10 @@ munge_ctx_set (munge_ctx_t ctx, munge_opt_t opt, ...)
     if (!ctx) {
         return (EMUNGE_BAD_ARG);
     }
-    ctx->status = EMUNGE_SUCCESS;
-    if (ctx->error) {
-        free (ctx->error);
-        ctx->error = NULL;
+    ctx->errnum = EMUNGE_SUCCESS;
+    if (ctx->errstr) {
+        free (ctx->errstr);
+        ctx->errstr = NULL;
     }
     va_start (vargs, opt);
     switch (opt) {
@@ -202,7 +203,7 @@ munge_ctx_set (munge_ctx_t ctx, munge_opt_t opt, ...)
             if (!str)
                 p = NULL;
             else if (!(p = strdup (str))) {
-                ctx->status = EMUNGE_NO_MEMORY;
+                ctx->errnum = EMUNGE_NO_MEMORY;
                 break;
             }
             if (ctx->realm)
@@ -220,7 +221,7 @@ munge_ctx_set (munge_ctx_t ctx, munge_opt_t opt, ...)
             if (!str)
                 p = NULL;
             else if (!(p = strdup (str))) {
-                ctx->status = EMUNGE_NO_MEMORY;
+                ctx->errnum = EMUNGE_NO_MEMORY;
                 break;
             }
             if (ctx->socket)
@@ -228,9 +229,36 @@ munge_ctx_set (munge_ctx_t ctx, munge_opt_t opt, ...)
             ctx->socket = p;
             break;
         default:
-            ctx->status = EMUNGE_BAD_ARG;
+            ctx->errnum = EMUNGE_BAD_ARG;
             break;
     }
     va_end (vargs);
-    return (ctx->status);
+    return (ctx->errnum);
+}
+
+
+/*****************************************************************************
+ *  Internal (but still "Extern") Functions
+ *****************************************************************************/
+
+void
+_munge_ctx_set_err (munge_ctx_t ctx, munge_msg_t msg, munge_err_t e)
+{
+/*  Sets the error condition returned via the munge context [ctx].
+ */
+    if (!ctx || !msg) {
+        return;
+    }
+    ctx->errnum = e;
+    if (ctx->errstr) {
+        free (ctx->errstr);
+    }
+    if (e == EMUNGE_SUCCESS) {
+        ctx->errstr = NULL;
+    }
+    else {
+        ctx->errstr = msg->errstr;
+        msg->errstr = NULL;
+    }
+    return;
 }

@@ -1,6 +1,10 @@
+2003-04-18  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* : Committed munge_decode() support.
+
 2003-04-08  Chris Dunlap  <cdunlap@llnl.gov>
 
-	* : Support for munge_encode().
+	* : Committed munge_encode() support.
 
 2003-02-18  Chris Dunlap  <cdunlap@llnl.gov>
 

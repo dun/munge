@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: cred.c,v 1.1 2003/04/08 18:16:16 dun Exp $
+ *  $Id: cred.c,v 1.2 2003/04/18 23:20:18 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -62,20 +62,15 @@ cred_destroy (munge_cred_t c)
     if (!c) {
         return;
     }
-    if (c->cred) {
-        assert (c->cred_len > 0);
-        memset (c->cred, 0, c->cred_len);
-        free (c->cred);
+    if (c->outer_mem) {
+        assert (c->outer_mem_len > 0);
+        memset (c->outer_mem, 0, c->outer_mem_len);
+        free (c->outer_mem);
     }
-    if (c->outer) {
-        assert (c->outer_len > 0);
-        memset (c->outer, 0, c->outer_len);
-        free (c->outer);
-    }
-    if (c->inner) {
-        assert (c->inner_len > 0);
-        memset (c->inner, 0, c->inner_len);
-        free (c->inner);
+    if (c->inner_mem) {
+        assert (c->inner_mem_len > 0);
+        memset (c->inner_mem, 0, c->inner_mem_len);
+        free (c->inner_mem);
     }
     memset (c, 0, sizeof (*c));
     free (c);

@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: sock.c,v 1.1 2003/04/08 18:16:16 dun Exp $
+ *  $Id: sock.c,v 1.2 2003/04/18 23:20:18 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -90,7 +90,7 @@ munge_sock_create (conf_t conf)
     }
     mask = umask (0);                   /* ensure sock access perms of 0777 */
 
-    if (conf->force) {
+    if (conf->got_force) {
         unlink (conf->socket_name);     /* ignoring errors */
     }
     if (bind (sd, (struct sockaddr *) &addr, sizeof (addr)) < 0) {
@@ -166,7 +166,7 @@ munge_sock_accept (conf_t conf)
         /*  XXX: The munge_msg_server_thread() is responsible for
          *       destroying this msg via _munge_msg_destroy().
          */
-        if (_munge_msg_create (&m, sd, MUNGE_MSG_UNKNOWN) != EMUNGE_SUCCESS) {
+        if (_munge_msg_create (&m, sd) != EMUNGE_SUCCESS) {
             close (sd);
             log_msg (LOG_WARNING, "Unable to create message struct");
         }

@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.2 2003/04/08 18:16:16 dun Exp $
+## $Id: Makefile.am,v 1.3 2003/04/18 23:20:18 dun Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
@@ -17,6 +17,7 @@ sbin_PROGRAMS = \
 munged_LDADD = \
 	$(top_builddir)/src/libcommon/libcommon.la \
 	$(top_builddir)/src/libmissing/libmissing.la \
+	$(top_builddir)/src/libmunge/libmunge.la \
 	-lpthread \
 	-lcrypto
 
@@ -35,6 +36,8 @@ munged_SOURCES = \
 	crypto_log.h \
 	crypto_thread.c \
 	crypto_thread.h \
+	dec_v1.c \
+	dec_v1.h \
 	enc_v1.c \
 	enc_v1.h \
 	lookup.c \

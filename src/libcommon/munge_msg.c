@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munge_msg.c,v 1.1 2003/04/08 18:16:16 dun Exp $
+ *  $Id: munge_msg.c,v 1.2 2003/04/18 23:20:18 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -43,26 +43,24 @@
  *****************************************************************************/
 
 munge_err_t
-_munge_msg_create (munge_msg_t *pm, int sd, enum munge_type type)
+_munge_msg_create (munge_msg_t *pm, int sd)
 {
     munge_msg_t m;
 
     assert (pm != NULL);
-    assert ((type >= 0) && (type < MUNGE_MSG_LAST_ENTRY));
 
     if (!(m = malloc (sizeof (struct munge_msg)))) {
         *pm = NULL;
         return (EMUNGE_NO_MEMORY);
     }
+    /*  Initialize ints to 0, ptrs to NULL.
+     */
+    memset (m, 0, sizeof (struct munge_msg));
+
+    _munge_msg_reset (m);
     m->sd = sd;
-    m->head.magic = MUNGE_MSG_MAGIC;
-    m->head.version = MUNGE_MSG_VERSION;
-    m->head.type = type;
-    m->head.length = 0;
-    m->pbody_len = 0;
-    m->pbody = NULL;                    /* Sherman, set the Wayback Machine */
     m->status = EMUNGE_SUCCESS;
-    m->error = NULL;
+
     *pm = m;
     return (EMUNGE_SUCCESS);
 }
@@ -82,9 +80,9 @@ _munge_msg_destroy (munge_msg_t m)
         memset (m->pbody, 0, m->pbody_len);
         free (m->pbody);
     }
-    if (m->error) {
-        memset (m->error, 0, strlen (m->error));
-        free (m->error);
+    if (m->errstr) {
+        memset (m->errstr, 0, strlen (m->errstr));
+        free (m->errstr);
     }
     memset (m, 0, sizeof (*m));
     free (m);
@@ -95,6 +93,10 @@ _munge_msg_destroy (munge_msg_t m)
 munge_err_t
 _munge_msg_send (munge_msg_t m)
 {
+/*  The message sent across the socket contains a common message header
+ *    and a version-specific message body.
+ *  Currently, only v1 messages are used.
+ */
     int n;
     struct munge_msg_v1 *m1;
 
@@ -114,8 +116,8 @@ _munge_msg_send (munge_msg_t m)
     m->head.length = sizeof (*m1);
     m->head.length += m1->realm_len;
     m->head.length += m1->data_len;
-
-    /*  FIXME: Replace multiple write()s with a single writev()?
+    /*
+     *  FIXME: Replace multiple write()s with a single writev()?
      */
     n = sizeof (m->head);
     if (fd_write_n (m->sd, &(m->head), n) < n) {
@@ -148,24 +150,13 @@ _munge_msg_send (munge_msg_t m)
 munge_err_t
 _munge_msg_recv (munge_msg_t m)
 {
-    int n;
+    int                  n;
     struct munge_msg_v1 *m1;
 
     assert (m != NULL);
     assert (m->sd >= 0);
+    assert (m->pbody == NULL);
 
-    if (m->pbody) {
-        assert (m->pbody_len > 0);
-        memset (m->pbody, 0, m->pbody_len);
-        free (m->pbody);
-        m->pbody = NULL;
-        m->pbody_len = 0;
-    }
-    /*  FIXME: I don't like how I'm reusing the same msg implicitly.
-     *         Maybe I should add a reset() method or somesuch
-     *         for the client to call 'tween send() & recv().
-     *         Then I could assert (m->pbody == NULL) here.
-     */
     n = sizeof (m->head);
     if (fd_read_n (m->sd, &(m->head), n) < n) {
         _munge_msg_set_err (m, EMUNGE_SOCKET,
@@ -218,6 +209,34 @@ _munge_msg_recv (munge_msg_t m)
     }
     assert (n == m->head.length);
     ((char *) m->pbody)[m->head.length] = '\0';
+    /*
+     *  If an error message was returned, copy the error condition
+     *    into the message metadata.
+     */
+    if (m->head.type == MUNGE_MSG_ERROR) {
+        m->status = m1->errnum;
+        m->errstr = strdup (m1->data);
+    }
+    return (EMUNGE_SUCCESS);
+}
+
+
+munge_err_t
+_munge_msg_reset (munge_msg_t m)
+{
+    assert (m != NULL);
+
+    m->head.magic = MUNGE_MSG_MAGIC;
+    m->head.version = MUNGE_MSG_VERSION;
+    m->head.type = MUNGE_MSG_UNKNOWN;
+    m->head.length = 0;
+    if (m->pbody) {
+        assert (m->pbody_len > 0);
+        memset (m->pbody, 0, m->pbody_len);
+        free (m->pbody);
+        m->pbody_len = 0;
+        m->pbody = NULL;                /* Sherman, set the Wayback Machine */
+    }
     return (EMUNGE_SUCCESS);
 }
 
@@ -227,19 +246,36 @@ _munge_msg_get_err (munge_msg_t m)
 {
     assert (m != NULL);
 
-    return (m->error);
+    return (m->errstr);
 }
 
 
-void
+int
 _munge_msg_set_err (munge_msg_t m, munge_err_t e, const char *str)
 {
+/*  Set an error code [e] and string [str] if an error condition
+ *    does not already exist (ie, m->status == EMUNGE_SUCCESS).
+ *  If [str] is not NULL, that string (and _not_ a copy) will be stored
+ *    and later free()'d by the message destructor; if [str] is NULL,
+ *    munge_strerror() will be used.  Thus, if multiple errors are set,
+ *    only the first one is reported.
+ *  Always returns -1.
+ */
     assert (m != NULL);
 
-    if (m->error) {
-        free (m->error);
+    /*  Do nothing if an error does not exist or an error has already been set.
+     */
+    if ((e == EMUNGE_SUCCESS) || (m->status != EMUNGE_SUCCESS)) {
+        if (str) {
+            free (str);
+        }
     }
-    m->status = e;
-    m->error = str;
-    return;
+    else {
+        m->status = e;
+        assert (m->errstr == NULL);
+        m->errstr = (str != NULL) ? str : strdup (munge_strerror (e));;
+    }
+    /*  Screw you guys, I'm goin' home.
+     */
+    return (-1);
 }

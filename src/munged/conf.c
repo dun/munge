@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: conf.c,v 1.1 2003/04/08 18:16:16 dun Exp $
+ *  $Id: conf.c,v 1.2 2003/04/18 23:20:18 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -78,8 +78,9 @@ create_conf (void)
     if (!(conf = malloc (sizeof (struct conf))))
         log_err (EMUNGE_NO_MEMORY, LOG_ERR, "%s", strerror (errno));
     conf->ld = -1;
-    conf->force = 0;
-    conf->foreground = 0;
+    conf->got_clock_skew = 0;
+    conf->got_force = 0;
+    conf->got_foreground = 0;
     conf->def_cipher = MUNGE_DEFAULT_CIPHER;
     conf->def_zip = MUNGE_DEFAULT_ZIP;
     conf->def_mac = MUNGE_DEFAULT_MAC;
@@ -183,7 +184,7 @@ parse_cmdline (conf_t conf, int argc, char **argv)
             case 'v':
                 break;
             case 'f':
-                conf->force = 1;
+                conf->got_force = 1;
                 break;
 //          case 'F':
 //              conf->foreground = 1;

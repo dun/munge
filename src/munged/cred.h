@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: cred.h,v 1.1 2003/04/08 18:16:16 dun Exp $
+ *  $Id: cred.h,v 1.2 2003/04/18 23:20:18 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -55,12 +55,14 @@
 struct munge_cred {
     uint8_t             version;        /* version of the munge cred format  */
     munge_msg_t         msg;            /* ptr to corresponding munge msg    */
-    int                 cred_len;       /* length of munged credential       */
-    unsigned char      *cred;           /* munged credential                 */
+    int                 outer_mem_len;  /* length of outer credential memory */
+    unsigned char      *outer_mem;      /* outer cred memory allocation      */
     int                 outer_len;      /* length of outer credential data   */
-    unsigned char      *outer;          /* outer cred data w/o crypto xforms */
+    unsigned char      *outer;          /* ptr to outer credential data      */
+    int                 inner_mem_len;  /* length of inner credential memory */
+    unsigned char      *inner_mem;      /* inner cred memory allocation      */
     int                 inner_len;      /* length of inner credential data   */
-    unsigned char      *inner;          /* inner cred data w/ crypto xforms  */
+    unsigned char      *inner;          /* ptr to inner credential data      */
     int                 salt_len;       /* length of salt data               */
     unsigned char       salt[MAX_SALT]; /* cryptographic seasoning salt      */
     int                 mac_len;        /* length of mac data                */

@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: conf.h,v 1.1 2003/04/08 18:16:16 dun Exp $
+ *  $Id: conf.h,v 1.2 2003/04/18 23:20:18 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -40,21 +40,22 @@
  *****************************************************************************/
 
 struct conf {
-    int                 ld;             /* listening socket descriptor       */
-    unsigned            force:1;        /* flag for FORCE option             */
-    unsigned            foreground:1;   /* flag for FOREGROUND option        */
-    munge_cipher_t      def_cipher;     /* default cipher type               */
-    munge_zip_t         def_zip;        /* default compression type          */
-    munge_mac_t         def_mac;        /* default message auth code type    */
-    munge_ttl_t         def_ttl;        /* default time-to-live              */
-    char               *config_name;    /* configuration filename            */
-    char               *socket_name;    /* unix domain socket filename       */
-    char               *seed_name;      /* random seed filename              */
-    char               *key_name;       /* symmetric key filename            */
-    unsigned char      *dek_key;        /* subkey for cipher ops             */
-    int                 dek_key_len;    /* length of cipher subkey           */
-    unsigned char      *mac_key;        /* subkey for mac ops                */
-    int                 mac_key_len;    /* length of mac subkey              */
+    int             ld;                 /* listening socket descriptor       */
+    unsigned        got_clock_skew:1;   /* flag for allowing clock skew      */
+    unsigned        got_force:1;        /* flag for FORCE option             */
+    unsigned        got_foreground:1;   /* flag for FOREGROUND option        */
+    munge_cipher_t  def_cipher;         /* default cipher type               */
+    munge_zip_t     def_zip;            /* default compression type          */
+    munge_mac_t     def_mac;            /* default message auth code type    */
+    munge_ttl_t     def_ttl;            /* default time-to-live              */
+    char           *config_name;        /* configuration filename            */
+    char           *socket_name;        /* unix domain socket filename       */
+    char           *seed_name;          /* random seed filename              */
+    char           *key_name;           /* symmetric key filename            */
+    unsigned char  *dek_key;            /* subkey for cipher ops             */
+    int             dek_key_len;        /* length of cipher subkey           */
+    unsigned char  *mac_key;            /* subkey for mac ops                */
+    int             mac_key_len;        /* length of mac subkey              */
 };
 
 typedef struct conf * conf_t;

@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: enc_v1.h,v 1.2 2003/04/18 23:20:18 dun Exp $
+ *  $Id: dec_v1.h,v 1.1 2003/04/18 23:20:18 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -25,14 +25,14 @@
  *****************************************************************************/
 
 
-#ifndef MUNGE_ENC_V1_H
-#define MUNGE_ENC_V1_H
+#ifndef MUNGE_DEC_V1_H
+#define MUNGE_DEC_V1_H
 
 
 #include "munge_msg.h"
 
 
-int enc_v1_process_msg (munge_msg_t m);
+int dec_v1_process_msg (munge_msg_t m);
 
 
-#endif /* !MUNGE_ENC_V1_H */
+#endif /* !MUNGE_DEC_V1_H */

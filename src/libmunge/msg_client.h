@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: msg_client.h,v 1.1 2003/04/08 18:16:16 dun Exp $
+ *  $Id: msg_client.h,v 1.2 2003/04/18 23:20:18 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -35,11 +35,6 @@
 munge_err_t _munge_msg_client_connect (munge_msg_t m, char *path);
 
 munge_err_t _munge_msg_client_disconnect (munge_msg_t m);
-
-munge_err_t _munge_msg_client_enc_req_v1 (munge_msg_t m, munge_ctx_t ctx,
-    const void *buf, int len);
-
-munge_err_t _munge_msg_client_enc_rsp_v1 (munge_msg_t m, char **cred);
 
 
 #endif /* !MUNGE_MSG_CLIENT_H */

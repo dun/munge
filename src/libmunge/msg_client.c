@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: msg_client.c,v 1.1 2003/04/08 18:16:16 dun Exp $
+ *  $Id: msg_client.c,v 1.2 2003/04/18 23:20:18 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -31,7 +31,6 @@
 
 #include <assert.h>
 #include <errno.h>
-#include <stdlib.h>
 #include <string.h>
 #include <sys/socket.h>
 #include <sys/stat.h>
@@ -39,9 +38,11 @@
 #include <sys/un.h>
 #include <unistd.h>
 #include <munge.h>
-#include "ctx.h"
 #include "dprintf.h"
 #include "msg_client.h"
+#include "munge_defs.h"
+#include "munge_msg.h"
+#include "str.h"
 #include "strlcpy.h"
 
 
@@ -139,87 +140,4 @@ _munge_msg_client_disconnect (munge_msg_t m)
         m->sd = -1;
     }
     return (e);
-}
-
-
-munge_err_t
-_munge_msg_client_enc_req_v1 (munge_msg_t m, munge_ctx_t ctx,
-                              const void *buf, int len)
-{
-    struct munge_msg_v1 *m1;
-
-    assert (m != NULL);
-    assert (m->head.version == 1);
-    assert (m->pbody == NULL);
-
-    if (!(m->pbody = malloc (sizeof (struct munge_msg_v1))))
-        return (EMUNGE_NO_MEMORY);
-    memset (m->pbody, 0, sizeof (struct munge_msg_v1));
-    m->pbody_len = sizeof (struct munge_msg_v1);
-    m1 = m->pbody;
-
-    if (ctx) {
-        m1->cipher = ctx->cipher;
-        m1->zip = ctx->zip;
-        m1->mac = ctx->mac;
-        if (ctx->realm) {
-            m1->realm_len = strlen (ctx->realm) + 1;
-            m1->realm = ctx->realm;
-        }
-        else {
-            m1->realm_len = 0;
-            m1->realm = NULL;
-        }
-        m1->ttl = ctx->ttl;
-    }
-    else {
-        m1->cipher = MUNGE_CIPHER_DEFAULT;
-        m1->zip = MUNGE_ZIP_DEFAULT;
-        m1->mac = MUNGE_MAC_DEFAULT;
-        m1->realm_len = 0;
-        m1->realm = NULL;
-        m1->ttl = 0;
-    }
-    m1->data_len = len;
-    m1->data = buf;
-    return (EMUNGE_SUCCESS);
-}
-
-
-munge_err_t
-_munge_msg_client_enc_rsp_v1 (munge_msg_t m, char **cred)
-{
-    struct munge_msg_v1 *m1;
-    char *p;
-
-    assert (m != NULL);
-    assert (m->head.version == 1);
-    assert (cred != NULL);
-
-    m1 = (struct munge_msg_v1 *) m->pbody;
-
-    if (m1->data_len <= 0) {
-        return (EMUNGE_SNAFU);
-    }
-    if (!(p = malloc (m1->data_len + 1))) { /* reserved for terminating NUL */
-        return (EMUNGE_NO_MEMORY);
-    }
-    memcpy (p, m1->data, m1->data_len);
-    p[m1->data_len] = '\0';
-    *cred = p;
-    return (EMUNGE_SUCCESS);
-}
-
-
-munge_err_t
-_munge_msg_client_dec_req_v1 (munge_msg_t m)
-{
-    return (EMUNGE_SNAFU);
-}
-
-
-munge_err_t
-_munge_msg_client_dec_rsp_v1 (munge_msg_t m)
-{
-    return (EMUNGE_SNAFU);
 }

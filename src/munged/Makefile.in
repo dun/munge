@@ -103,6 +103,7 @@ sbin_PROGRAMS = \
 munged_LDADD = \
 	$(top_builddir)/src/libcommon/libcommon.la \
 	$(top_builddir)/src/libmissing/libmissing.la \
+	$(top_builddir)/src/libmunge/libmunge.la \
 	-lpthread \
 	-lcrypto
 
@@ -122,6 +123,8 @@ munged_SOURCES = \
 	crypto_log.h \
 	crypto_thread.c \
 	crypto_thread.h \
+	dec_v1.c \
+	dec_v1.h \
 	enc_v1.c \
 	enc_v1.h \
 	lookup.c \
@@ -165,12 +168,14 @@ base64_test_DEPENDENCIES =
 base64_test_LDFLAGS =
 am_munged_OBJECTS = auth.$(OBJEXT) base64.$(OBJEXT) cipher.$(OBJEXT) \
 	conf.$(OBJEXT) cred.$(OBJEXT) crypto_log.$(OBJEXT) \
-	crypto_thread.$(OBJEXT) enc_v1.$(OBJEXT) lookup.$(OBJEXT) \
-	mac.$(OBJEXT) md.$(OBJEXT) msg_server.$(OBJEXT) \
-	random.$(OBJEXT) sock.$(OBJEXT) munged.$(OBJEXT)
+	crypto_thread.$(OBJEXT) dec_v1.$(OBJEXT) enc_v1.$(OBJEXT) \
+	lookup.$(OBJEXT) mac.$(OBJEXT) md.$(OBJEXT) \
+	msg_server.$(OBJEXT) random.$(OBJEXT) sock.$(OBJEXT) \
+	munged.$(OBJEXT)
 munged_OBJECTS = $(am_munged_OBJECTS)
 munged_DEPENDENCIES = $(top_builddir)/src/libcommon/libcommon.la \
-	$(top_builddir)/src/libmissing/libmissing.la
+	$(top_builddir)/src/libmissing/libmissing.la \
+	$(top_builddir)/src/libmunge/libmunge.la
 munged_LDFLAGS =
 
 DEFS = @DEFS@
@@ -183,11 +188,11 @@ am__depfiles_maybe = depfiles
 @AMDEP_TRUE@	./$(DEPDIR)/base64_test.Po ./$(DEPDIR)/cipher.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/conf.Po ./$(DEPDIR)/cred.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/crypto_log.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/crypto_thread.Po ./$(DEPDIR)/enc_v1.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/lookup.Po ./$(DEPDIR)/mac.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/md.Po ./$(DEPDIR)/msg_server.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/munged.Po ./$(DEPDIR)/random.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/sock.Po
+@AMDEP_TRUE@	./$(DEPDIR)/crypto_thread.Po ./$(DEPDIR)/dec_v1.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/enc_v1.Po ./$(DEPDIR)/lookup.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/mac.Po ./$(DEPDIR)/md.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/msg_server.Po ./$(DEPDIR)/munged.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/random.Po ./$(DEPDIR)/sock.Po
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) \
@@ -266,6 +271,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cred.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/crypto_log.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/crypto_thread.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dec_v1.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/enc_v1.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lookup.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mac.Po@am__quote@

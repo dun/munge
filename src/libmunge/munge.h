@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munge.h,v 1.7 2003/04/08 18:16:16 dun Exp $
+ *  $Id: munge.h,v 1.8 2003/04/18 23:20:18 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -120,15 +120,16 @@ typedef enum munge_err {
     EMUNGE_NO_DAEMON            =  5,   /* Munged not found                  */
     EMUNGE_SOCKET               =  6,   /* Munged communication error        */
     EMUNGE_TIMEOUT              =  7,   /* Munged timeout                    */
-    EMUNGE_BAD_CRED             =  8,   /* Bad credential (generic)          */
+    EMUNGE_BAD_CRED             =  8,   /* Bad credential format             */
     EMUNGE_BAD_VERSION          =  9,   /* Bad credential version            */
     EMUNGE_BAD_CIPHER           = 10,   /* Bad credential cipher type        */
     EMUNGE_BAD_ZIP              = 11,   /* Bad credential compression type   */
     EMUNGE_BAD_MAC              = 12,   /* Bad credential msg auth code type */
     EMUNGE_BAD_REALM            = 13,   /* Bad credential security realm     */
-    EMUNGE_CRED_EXPIRED         = 14,   /* Credential expired                */
-    EMUNGE_CRED_REWOUND         = 15,   /* Credential created in the future  */
-    EMUNGE_CRED_REPLAYED        = 16,   /* Credential replayed               */
+    EMUNGE_CRED_INVALID         = 14,   /* Credential invalid                */
+    EMUNGE_CRED_EXPIRED         = 15,   /* Credential expired                */
+    EMUNGE_CRED_REWOUND         = 16,   /* Credential created in the future  */
+    EMUNGE_CRED_REPLAYED        = 17,   /* Credential replayed               */
     EMUNGE_LAST_ENTRY
 } munge_err_t;
 
