@@ -1,5 +1,8 @@
 2003-12-12  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/munged/msg_server.c(munge_msg_server_thread):
+	  Fixed _munge_msg_recv() error from getting logged twice.
+
 	* src/libcommon/munge_msg.c(_munge_msg_send, _munge_msg_recv):
 	  Fixed error conditions that were not errno conditions.
 
