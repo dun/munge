@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munge_defs.h,v 1.1 2003/04/08 18:16:16 dun Exp $
+ *  $Id: munge_defs.h,v 1.2 2003/04/17 02:14:47 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -59,7 +59,7 @@
 
 /*  Default integer for the number of seconds before a credential expires.
  */
-#define MUNGE_DEFAULT_TTL       60
+#define MUNGE_DEFAULT_TTL       300
 
 /*  Default munge_zip_t for compressing credentials.
  */
