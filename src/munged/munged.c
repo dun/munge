@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munged.c,v 1.4 2003/05/16 23:44:17 dun Exp $
+ *  $Id: munged.c,v 1.5 2003/05/22 17:59:32 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -29,6 +29,7 @@
 #  include "config.h"
 #endif /* HAVE_CONFIG_H */
 
+#include <assert.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <munge.h>
@@ -52,6 +53,7 @@
 
 static void handle_signals (void);
 static void exit_handler (int signum);
+static void segv_handler (int signum);
 static int  daemonize_init (void);
 static void daemonize_fini (int fd);
 
@@ -129,6 +131,9 @@ handle_signals (void)
     if (posignal (SIGTERM, exit_handler) == SIG_ERR) {
         log_err (EMUNGE_SNAFU, LOG_ERR, "Unable to handle signal=%d", SIGTERM);
     }
+    if (posignal (SIGSEGV, segv_handler) == SIG_ERR) {
+        log_err (EMUNGE_SNAFU, LOG_ERR, "Unable to handle signal=%d", SIGSEGV);
+    }
     if (posignal (SIGPIPE, SIG_IGN) == SIG_ERR) {
         log_err (EMUNGE_SNAFU, LOG_ERR, "Unable to ignore signal=%d", SIGPIPE);
     }
@@ -142,6 +147,15 @@ exit_handler (int signum)
     log_msg (LOG_NOTICE, "Exiting on signal=%d", signum);
     done = 1;
     return;
+}
+
+
+static void
+segv_handler (int signum)
+{
+    log_err (EMUNGE_SNAFU, LOG_CRIT,
+        "Exiting on signal=%d (segmentation violation)", signum);
+    assert (1);                         /* not reached */
 }
 
 
