@@ -1,5 +1,8 @@
 2004-09-10  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/munged/replay.c: Changed struct replay_key to union replay_key
+	  to reduce storage requirements for replay data.
+
 	* src/munged/cred.c(cred_create):
 	  Fixed bug where error condition was not set on failure.
 

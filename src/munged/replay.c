@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: replay.c,v 1.8 2004/09/04 00:15:02 dun Exp $
+ *  $Id: replay.c,v 1.9 2004/09/10 19:29:12 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -55,14 +55,18 @@
  *  Private Data Types
  *****************************************************************************/
 
-struct replay_key {
-    struct replay_key  *next;           /* ptr for chaining by allocator     */
-    time_t              t_expired;      /* time after which cred expires     */
-    int                 mac_len;        /* length of mac data                */
-    unsigned char       mac[MAX_MAC];   /* message authentication code       */
+union replay_key {
+    struct {
+      union replay_key  *next;          /* ptr for chaining by allocator     */
+    }                    alloc;
+    struct {
+      time_t             t_expired;     /* time after which cred expires     */
+      int                mac_len;       /* length of mac data                */
+      unsigned char      mac[MAX_MAC];  /* message authentication code       */
+    }                    data;
 };
 
-typedef struct replay_key * replay_t;
+typedef union replay_key * replay_t;
 
 
 /*****************************************************************************
@@ -145,9 +149,9 @@ replay_insert (munge_cred_t c)
  *    Returns 1 if the credential is already present (ie, replay).
  *    Returns -1 on error with errno set.
  */
-    int                     e;
-    replay_t                r;
-    struct munge_msg_v1    *m1;
+    int                   e;
+    replay_t              r;
+    struct munge_msg_v1  *m1;
 
     assert (c != NULL);
 
@@ -160,9 +164,9 @@ replay_insert (munge_cred_t c)
     if (!(r = replay_alloc ())) {
         return (-1);
     }
-    r->t_expired = (time_t) (m1->time0 + m1->ttl);
-    r->mac_len = c->mac_len;
-    memcpy (r->mac, c->mac, r->mac_len);
+    r->data.t_expired = (time_t) (m1->time0 + m1->ttl);
+    r->data.mac_len = c->mac_len;
+    memcpy (r->data.mac, c->mac, r->data.mac_len);
     /*
      *  The credential's "hash key" is defined by its MAC.  But since the MAC
      *    is a variable-length byte array, the "hash key" must contain both
@@ -192,10 +196,10 @@ replay_remove (munge_cred_t c)
 {
 /*  Removes the credential [c] from the replay hash.
  */
-    struct replay_key       rkey_st;
-    replay_t                rkey = &rkey_st;
-    replay_t                r;
-    struct munge_msg_v1    *m1;
+    union replay_key      rkey_st;
+    replay_t              rkey = &rkey_st;
+    replay_t              r;
+    struct munge_msg_v1  *m1;
 
     assert (c != NULL);
 
@@ -207,9 +211,9 @@ replay_remove (munge_cred_t c)
     /*
      *  Recompute the cred's "hash key".
      */
-    rkey->t_expired = (time_t) (m1->time0 + m1->ttl);
-    rkey->mac_len = c->mac_len;
-    memcpy (rkey->mac, c->mac, rkey->mac_len);
+    rkey->data.t_expired = (time_t) (m1->time0 + m1->ttl);
+    rkey->data.mac_len = c->mac_len;
+    memcpy (rkey->data.mac, c->mac, rkey->data.mac_len);
 
     if ((r = hash_remove (replay_hash, rkey))) {
         replay_free (r);
@@ -258,7 +262,7 @@ replay_key_f (const replay_t r)
  *  While the results of this conversion are dependent on byte sex,
  *    we can ignore it since this data is local to the node.
  */
-    return (* (unsigned int *) r->mac);
+    return (* (unsigned int *) r->data.mac);
 }
 
 
@@ -269,13 +273,13 @@ replay_cmp_f (const replay_t r1, const replay_t r2)
  *    This return code may seem counter-intuitive, but it mirrors
  *    the various *cmp() functions that return zero on equality.
  */
-    if (r1->t_expired != r2->t_expired) {
+    if (r1->data.t_expired != r2->data.t_expired) {
         return (-1);
     }
-    if (r1->mac_len != r2->mac_len) {
+    if (r1->data.mac_len != r2->data.mac_len) {
         return (-1);
     }
-    if (memcmp (r1->mac, r2->mac, r2->mac_len)) {
+    if (memcmp (r1->data.mac, r2->data.mac, r2->data.mac_len)) {
         return (-1);
     }
     return (0);
@@ -287,7 +291,7 @@ replay_is_expired (replay_t r, void *key, time_t *pnow)
 {
 /*  Returns true if the replay struct [r] has expired based on the time [pnow].
  */
-    if (r->t_expired < *pnow) {
+    if (r->data.t_expired < *pnow) {
         return (1);
     }
     return (0);
@@ -307,16 +311,16 @@ replay_alloc (void)
 
     lsd_mutex_lock (&replay_free_lock);
     if (!replay_free_list) {
-        n = sizeof (struct replay_key);
+        n = sizeof (*r);
         if ((replay_free_list = calloc (REPLAY_ALLOC, n))) {
             for (i = 0; i < REPLAY_ALLOC - 1; i++)
-                replay_free_list[i].next = &replay_free_list[i+1];
-            replay_free_list[i].next = NULL;
+                replay_free_list[i].alloc.next = &replay_free_list[i+1];
+            replay_free_list[i].alloc.next = NULL;
         }
     }
     if ((r = replay_free_list)) {
-        replay_free_list = r->next;
-        r->next = NULL;
+        replay_free_list = r->alloc.next;
+        r->alloc.next = NULL;
     }
     else {
         errno = ENOMEM;
@@ -334,7 +338,7 @@ replay_free (replay_t r)
     assert (r != NULL);
 
     lsd_mutex_lock (&replay_free_lock);
-    r->next = replay_free_list;
+    r->alloc.next = replay_free_list;
     replay_free_list = r;
     lsd_mutex_unlock (&replay_free_lock);
     return;
