@@ -1,5 +1,7 @@
 2003-05-02  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/munge/unmunge.c(main): Fixed invalid read of free'd memory.
+
 	* src/libmunge/decode.c(decode_rsp_v1):
 	  Fixed dataless cred decode to match header (ie, no data is malloc'd).
 	  Fixed overwrite of returned data buffer.

@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: unmunge.c,v 1.10 2003/04/30 00:11:00 dun Exp $
+ *  $Id: unmunge.c,v 1.11 2003/05/02 18:01:39 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -196,8 +196,9 @@ main (int argc, char *argv[])
     display_meta (conf);
     display_data (conf);
 
+    rc = conf->status;
     destroy_conf (conf);
-    exit (conf->status);
+    exit (rc);
 }
 
 
