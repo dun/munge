@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munge.h,v 1.11 2003/04/25 23:23:11 dun Exp $
+ *  $Id: munge.h,v 1.12 2003/05/02 16:44:06 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -194,7 +194,7 @@ const char * munge_strerror (munge_err_t e);
 munge_ctx_t munge_ctx_create (void);
 /*
  *  Creates and returns a new munge context, or NULL on error (out-of-memory).
- *  Abandoning a context without calling munge_ctx_destroy() will results
+ *  Abandoning a context without calling munge_ctx_destroy() will result
  *    in a memory leak.
  */
 
