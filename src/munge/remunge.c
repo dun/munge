@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: remunge.c,v 1.2 2004/09/03 21:13:08 dun Exp $
+ *  $Id: remunge.c,v 1.3 2004/09/04 00:27:34 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -50,7 +50,7 @@
  *  Constants
  *****************************************************************************/
 
-#define DEF_DO_DECODE           1
+#define DEF_DO_DECODE           0
 #define DEF_NUM_THREADS         1
 #define DEF_PAYLOAD_LENGTH      0
 #define DEF_WARNING_TIME        5

@@ -1,5 +1,7 @@
 2004-09-03  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/munge/remunge.c: Changed DEF_DO_DECODE from 1 to 0.
+
 	* src/munged/hash.c: Changed HASH_ALLOC from 256 to 1024.
 	* src/munged/replay.c: Changed REPLAY_ALLOC from 256 to 1024.
 	* src/munged/replay.h: Changed REPLAY_HASH_SIZE from 4013 to 65537.
