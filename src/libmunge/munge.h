@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munge.h,v 1.20 2004/04/16 22:15:06 dun Exp $
+ *  $Id: munge.h,v 1.21 2004/06/09 21:43:28 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -41,6 +41,21 @@
   #error GNU General Public License.  Acknowledge by
   #error defining the GPL_LICENSED preprocessor macro.
 #endif /* !GPL_LICENSED */
+
+
+/*****************************************************************************
+ *  Got C++?
+ *****************************************************************************/
+
+#undef BEGIN_C_DECLS
+#undef END_C_DECLS
+#ifdef __cplusplus
+  #define BEGIN_C_DECLS         extern "C" {
+  #define END_C_DECLS           }
+#else  /* !__cplusplus */
+  #define BEGIN_C_DECLS         /* empty */
+  #define END_C_DECLS           /* empty */
+#endif /* !__cplusplus */
 
 
 /*****************************************************************************
@@ -168,6 +183,8 @@ extern const char * munge_zip_strings[];
  *  Primary Functions
  *****************************************************************************/
 
+BEGIN_C_DECLS
+
 munge_err_t munge_encode (char **cred, munge_ctx_t ctx,
                           const void *buf, int len);
 /*
@@ -205,10 +222,14 @@ const char * munge_strerror (munge_err_t e);
  *  Returns a descriptive string describing the munge errno [e].
  */
 
+END_C_DECLS
+
 
 /*****************************************************************************
  *  Context Functions
  *****************************************************************************/
+
+BEGIN_C_DECLS
 
 munge_ctx_t munge_ctx_create (void);
 /*
@@ -248,6 +269,8 @@ munge_err_t munge_ctx_set (munge_ctx_t ctx, munge_opt_t opt, ...);
  *    Refer to the munge_opt_t enum comments for argument types.
  *  Returns EMUNGE_SUCCESS on success; o/w, returns the munge error number.
  */
+
+END_C_DECLS
 
 
 #endif /* !MUNGE_H */
