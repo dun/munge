@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munge.c,v 1.1 2003/02/13 17:54:27 dun Exp $
+ *  $Id: munge.c,v 1.2 2003/02/13 18:19:34 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -101,7 +101,7 @@ int
 main (int argc, char *argv[])
 {
     conf_t      conf;
-    int         rc;
+    int         rc = 0;
     munge_err_t e;
 
     log_open_file (stderr, argv[0], LOG_INFO, LOG_OPT_PRIORITY);
