@@ -1,5 +1,7 @@
 2004-11-29  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/munged/conf.c: Added <sys/socket.h> for AF_INET.
+
 	* config/x_ac_check_cond_lib.m4, config/x_ac_check_fifo_recvfd.m4,
 	  config/x_ac_check_peercred.m4, config/x_ac_check_pthreads.m4,
 	  config/x_ac_debug.m4: Tweaked docs to be consistent with others.

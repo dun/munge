@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: conf.c,v 1.37 2004/11/12 00:29:18 dun Exp $
+ *  $Id: conf.c,v 1.38 2004/11/30 01:39:36 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -40,6 +40,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/param.h>                  /* for MAXHOSTNAMELEN */
+#include <sys/socket.h>                 /* for AF_INET */
 #include <unistd.h>
 #include "conf.h"
 #include "license.h"
