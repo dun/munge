@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: replay.c,v 1.4 2004/04/03 21:53:00 dun Exp $
+ *  $Id: replay.c,v 1.5 2004/04/16 22:14:12 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -73,7 +73,7 @@ static unsigned int replay_key_f (const replay_t r);
 
 static int replay_cmp_f (const replay_t r1, const replay_t r2);
 
-static int replay_is_expired (replay_t r, time_t *pnow);
+static int replay_is_expired (replay_t r, void *key, time_t *pnow);
 
 static replay_t replay_alloc (void);
 
@@ -248,7 +248,7 @@ replay_cmp_f (const replay_t r1, const replay_t r2)
 
 
 static int
-replay_is_expired (replay_t r, time_t *pnow)
+replay_is_expired (replay_t r, void *key, time_t *pnow)
 {
 /*  Returns true if the replay struct [r] has expired based on the time [pnow].
  */

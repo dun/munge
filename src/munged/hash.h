@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: hash.h,v 1.3 2004/04/03 21:53:00 dun Exp $
+ *  $Id: hash.h,v 1.4 2004/04/16 22:14:12 dun Exp $
  *  LSD-Id: hash.h,v 1.3 2003/10/28 17:49:02 dun Exp
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
@@ -82,11 +82,11 @@ typedef void (*hash_del_f) (void *data);
  *    the [data] item, including any subordinate items.
  */
 
-typedef int (*hash_arg_f) (void *data, void *arg);
+typedef int (*hash_arg_f) (void *data, void *key, void *arg);
 /*
  *  Function prototype for operating on each element in the hash table.
  *  The function will be invoked once for each [data] item in the hash,
- *    with [arg] being passed in as an argument.
+ *    with the item's [key] and the specified [arg] being passed in as args.
  */
 
 

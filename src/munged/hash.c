@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: hash.c,v 1.3 2004/04/03 21:53:00 dun Exp $
+ *  $Id: hash.c,v 1.4 2004/04/16 22:14:12 dun Exp $
  *  LSD-Id: hash.c,v 1.8 2003/11/19 23:33:48 dun Exp
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
@@ -319,7 +319,7 @@ hash_delete_if (hash_t h, hash_arg_f arg_f, void *arg)
     for (i = 0; i < h->size; i++) {
         pp = &(h->table[i]);
         while ((p = *pp) != NULL) {
-            if (arg_f (p->data, arg) > 0) {
+            if (arg_f (p->data, p->hkey, arg) > 0) {
                 if (h->del_f)
                     h->del_f (p->data);
                 *pp = p->next;
@@ -353,7 +353,7 @@ hash_for_each (hash_t h, hash_arg_f arg_f, void *arg)
     assert (h->magic == HASH_MAGIC);
     for (i = 0; i < h->size; i++) {
         for (p = h->table[i]; p != NULL; p = p->next) {
-            if (arg_f (p->data, arg) > 0) {
+            if (arg_f (p->data, p->hkey, arg) > 0) {
                 n++;
             }
         }
