@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: configure.ac,v 1.29 2004/11/29 23:03:35 dun Exp $
+## $Id: configure.ac,v 1.30 2004/12/02 18:45:44 dun Exp $
 ##*****************************************************************************
 ## Process this file with autoconf to produce a configure script.
 ##*****************************************************************************
@@ -48,6 +48,7 @@ AM_MAINTAINER_MODE
 # Checks for programs.
 ##
 AC_PROG_CC
+X_AC_CHECK_SSL
 AC_PROG_LIBTOOL
 AC_PROG_MAKE_SET
 X_AC_DEBUG
@@ -56,7 +57,6 @@ X_AC_DEBUG
 # Checks for libraries.
 ##
 X_AC_CHECK_PTHREADS
-X_AC_CHECK_SSL
 X_AC_CHECK_COND_LIB(nsl, gethostbyname)
 X_AC_CHECK_COND_LIB(socket, socket)
 X_AC_CHECK_COND_LIB(bz2, BZ2_bzBuffToBuffCompress)

@@ -1,3 +1,9 @@
+2004-12-02  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* configure.ac, config/x_ac_check_ssl.m4:
+	  Moved X_AC_CHECK_SSL before AC_PROG_LIBTOOL to allow the
+	  linker's libpath to be computed correctly under AIX.
+
 2004-12-01  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* README: Updated info regarding /etc/sysconfig/munge.
@@ -431,7 +437,7 @@
 2004-07-23  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/munged/auth_recv.c: Fixed bug in MUNGE_AUTH_RECVFD_MKNOD codepath
-	  causing an auth pipe fd leak resulting in poor performance on aix.
+	  causing an auth pipe fd leak resulting in poor performance on AIX.
 
 2004-07-21  Chris Dunlap  <cdunlap@llnl.gov>
 
@@ -474,7 +480,7 @@
 2004-05-06  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/munged/conf.c, src/munged/munged.c: Moved auth_recv_init()
-	  before gids_create() to allow for quicker exit when !root on aix.
+	  before gids_create() to allow for quicker exit when !root on AIX.
 
 	* src/munged/gids.c(gids_create): Allow errno == ENOENT to denote
 	  success after last entry is returned by getgrent() for glibc-2.2.5.

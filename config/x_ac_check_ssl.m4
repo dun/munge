@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: x_ac_check_ssl.m4,v 1.1 2004/11/29 23:03:35 dun Exp $
+## $Id: x_ac_check_ssl.m4,v 1.2 2004/12/02 18:45:44 dun Exp $
 ##*****************************************************************************
 #  AUTHOR:
 #    Chris Dunlap <cdunlap@llnl.gov>
@@ -10,6 +10,9 @@
 #  DESCRIPTION:
 #    Check the usual suspects for an OpenSSL installation,
 #    updating CPPFLAGS and LDFLAGS as necessary.
+#
+#  WARNINGS:
+#    This macro must be placed after AC_PROG_CC and before AC_PROG_LIBTOOL.
 ##*****************************************************************************
 
 AC_DEFUN([X_AC_CHECK_SSL], [
