@@ -293,12 +293,8 @@
 	  src/munged/enc_v1.c, src/munged/munged.c:
 	  Tweaked includes for FreeBSD 4.8.
 
-	* Makefile.in, aclocal.m4, configure, configure.ac,
-	  config/ac_check_peercred.m4, config/config.h.in, src/Makefile.in,
-	  src/etc/Makefile.in, src/libcommon/Makefile.in,
-	  src/libmissing/Makefile.in, src/libmunge/Makefile.in,
-	  src/munge/Makefile.in, src/munged/Makefile.in: Added checks
-	  for HAVE_GETPEEREID, HAVE_SO_PEERCRED, and HAVE_STRUCT_STRRECVFD.
+	* configure.ac, config/ac_check_peercred.m4: Added checks for
+	  HAVE_GETPEEREID, HAVE_SO_PEERCRED, and HAVE_STRUCT_STRRECVFD.
 
 	* config/ac_debug.m4:
 	  Replaced obsolete AC_HELP_STRING with AS_HELP_STRING.
