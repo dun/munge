@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munged.c,v 1.14 2004/06/15 18:33:23 dun Exp $
+ *  $Id: munged.c,v 1.15 2004/08/05 21:09:24 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -37,18 +37,23 @@
 #include <string.h>
 #include <sys/time.h>                   /* include before resource.h for bsd */
 #include <sys/resource.h>
+#include <sys/socket.h>
 #include <sys/stat.h>
+#include <sys/types.h>
+#include <sys/un.h>
 #include <unistd.h>
 #include "auth_recv.h"
 #include "common.h"
 #include "conf.h"
 #include "crypto_thread.h"
 #include "gids.h"
+#include "job.h"
+#include "log.h"
 #include "munge_defs.h"
 #include "posignal.h"
 #include "random.h"
 #include "replay.h"
-#include "sock.h"
+#include "strlcpy.h"
 #include "timer.h"
 
 
@@ -61,6 +66,8 @@ static void exit_handler (int signum);
 static void segv_handler (int signum);
 static int  daemonize_init (void);
 static void daemonize_fini (int fd);
+static void sock_create (conf_t conf);
+static void sock_destroy (conf_t conf);
 
 
 /*****************************************************************************
@@ -118,9 +125,9 @@ main (int argc, char *argv[])
     log_msg (LOG_NOTICE, "Starting %s daemon %s (pid %d)",
         PACKAGE, VERSION, (int) getpid());
 
-    munge_sock_create (conf);
-    munge_sock_accept (conf);
-    munge_sock_destroy (conf);
+    sock_create (conf);
+    job_accept (conf);
+    sock_destroy (conf);
 
     timer_fini ();
     replay_fini ();
@@ -299,6 +306,74 @@ daemonize_fini (int fd)
     if ((fd >= 0) && (close (fd) < 0)) {
         log_errno (EMUNGE_SNAFU, LOG_ERR,
             "Unable to close write-pipe in grandchild");
+    }
+    return;
+}
+
+
+static void
+sock_create (conf_t conf)
+{
+    struct sockaddr_un  addr;
+    int                 sd;
+    int                 n;
+    mode_t              mask;
+
+    assert (conf != NULL);
+
+    if ((conf->socket_name == NULL) || (*conf->socket_name == '\0')) {
+        log_err (EMUNGE_SNAFU, LOG_ERR, "Munge socket has no name");
+    }
+    if ((sd = socket (PF_UNIX, SOCK_STREAM, 0)) < 0) {
+        log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to create socket");
+    }
+    memset (&addr, 0, sizeof (addr));
+    addr.sun_family = AF_UNIX;
+    n = strlcpy (addr.sun_path, conf->socket_name, sizeof (addr.sun_path));
+    if (n >= sizeof (addr.sun_path)) {
+        log_err (EMUNGE_SNAFU, LOG_ERR,
+            "Exceeded maximum length of socket pathname");
+    }
+    mask = umask (0);                   /* ensure sock access perms of 0777 */
+
+    if (conf->got_force) {
+        unlink (conf->socket_name);     /* ignoring errors */
+    }
+    if (bind (sd, (struct sockaddr *) &addr, sizeof (addr)) < 0) {
+        log_errno (EMUNGE_SNAFU, LOG_ERR,
+            "Unable to bind to \"%s\"", conf->socket_name);
+    }
+
+    umask (mask);                       /* restore umask */
+
+    if (listen (sd, MUNGE_SOCKET_BACKLOG) < 0) {
+        log_errno (EMUNGE_SNAFU, LOG_ERR,
+            "Unable to listen to \"%s\"", conf->socket_name);
+    }
+    conf->ld = sd;
+    return;
+}
+
+
+static void
+sock_destroy (conf_t conf)
+{
+    assert (conf != NULL);
+    assert (conf->ld >= 0);
+    assert (conf->socket_name != NULL);
+
+    if (conf->socket_name) {
+        if (unlink (conf->socket_name) < 0) {
+            log_msg (LOG_WARNING, "Unable to unlink \"%s\": %s",
+                conf->socket_name, strerror (errno));
+        }
+    }
+    if (conf->ld >= 0) {
+        if (close (conf->ld) < 0) {
+            log_msg (LOG_WARNING, "Unable to close \"%s\": %s",
+                conf->ld, strerror (errno));
+        }
+        conf->ld = -1;
     }
     return;
 }
