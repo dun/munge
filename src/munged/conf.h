@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: conf.h,v 1.14 2004/11/09 21:54:28 dun Exp $
+ *  $Id$
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.

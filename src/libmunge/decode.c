@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: decode.c,v 1.19 2004/11/24 01:11:08 dun Exp $
+ *  $Id$
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.

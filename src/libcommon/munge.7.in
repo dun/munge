@@ -1,4 +1,4 @@
-.\" $Id: munge.7.in,v 1.4 2004/12/07 19:24:40 dun Exp $
+.\" $Id$
 
 .TH MUNGE 7 "@DATE@" "@PACKAGE@-@VERSION@" "Munge Uid 'N' Gid Emporium"
 

@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: missing.h,v 1.5 2004/11/12 02:08:23 dun Exp $
+ *  $Id$
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.

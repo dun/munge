@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: inet_ntop.h,v 1.3 2004/11/12 02:28:55 dun Exp $
+ *  $Id$
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.

@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: auth_recv.c,v 1.12 2004/12/08 18:48:15 dun Exp $
+ *  $Id$
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.

@@ -1,4 +1,4 @@
-# $Id: munge.spec,v 1.31 2005/01/26 23:44:40 dun Exp $
+# $Id$
 
 Name:		munge
 Version:	0.4.1

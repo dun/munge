@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: read.c,v 1.7 2004/11/18 00:38:46 dun Exp $
+ *  $Id$
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.

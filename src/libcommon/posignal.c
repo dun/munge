@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: posignal.c,v 1.5 2004/05/04 23:41:41 dun Exp $
+ *  $Id$
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
