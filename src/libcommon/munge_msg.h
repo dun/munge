@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munge_msg.h,v 1.17 2004/10/13 21:52:56 dun Exp $
+ *  $Id: munge_msg.h,v 1.18 2004/11/18 01:53:59 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -80,8 +80,7 @@ enum munge_type {                       /* message type                      */
     MUNGE_MSG_ENC_RSP,                  /*  encode response message          */
     MUNGE_MSG_DEC_REQ,                  /*  decode request message           */
     MUNGE_MSG_DEC_RSP,                  /*  decode response message          */
-    MUNGE_MSG_AUTH_FD_REQ,              /*  auth via fd request message      */
-    MUNGE_MSG_LAST_ENTRY
+    MUNGE_MSG_AUTH_FD_REQ               /*  auth via fd request message      */
 };
 
 struct munge_msg_head {

@@ -1,5 +1,7 @@
 2004-11-17  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/libcommon/munge_msg.h: Removed MUNGE_MSG_LAST_ENTRY.
+
 	* configure.ac, src/libcommon/munge.7.in, src/libmunge/munge.3.in,
 	  src/libmunge/munge_ctx.3.in, src/libmunge/munge_enum.3.in,
 	  src/munge/munge.1.in, src/munge/remunge.1.in, src/munge/unmunge.1.in,
