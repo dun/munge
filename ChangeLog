@@ -1,5 +1,11 @@
 2004-03-05  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* config/ac_check_peercred.m4, config/ac_debug.m4,
+	  config/ac_gpl_licensed.m4, config/ac_humor.m4,
+	  config/ac_ltlibobjs.m4, config/ac_meta.m4:
+	  Renamed to config/x_ac_*.m4 to prevent future potential
+	  conflicts in the autoconf variable namespace.
+
 	* config/ac_check_peercred.m4, config/ac_humor.m4:
 	  Added autoconf caching support.
 

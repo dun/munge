@@ -1,11 +1,11 @@
 ##*****************************************************************************
-## $Id: ac_debug.m4,v 1.3 2004/01/30 23:10:04 dun Exp $
+## $Id: x_ac_debug.m4,v 1.1 2004/03/05 20:04:18 dun Exp $
 ##*****************************************************************************
 #  AUTHOR:
 #    Chris Dunlap <cdunlap@llnl.gov>
 #
 #  SYNOPSIS:
-#    AC_DEBUG
+#    X_AC_DEBUG
 #
 #  DESCRIPTION:
 #    Adds support for the "--enable-debug" configure script option.
@@ -17,23 +17,21 @@
 #    This macro must be placed after AC_PROG_CC or equivalent.
 ##*****************************************************************************
 
-AC_DEFUN([AC_DEBUG],
+AC_DEFUN([X_AC_DEBUG],
 [
   AC_MSG_CHECKING([whether debugging is enabled])
   AC_ARG_ENABLE([debug],
     AS_HELP_STRING([--enable-debug], [enable debugging code for development]),
-    [ case "$enableval" in
-        yes) ac_debug=yes ;;
-        no)  ac_debug=no ;;
-        *)   AC_MSG_RESULT([doh!])
-             AC_MSG_ERROR([bad value "$enableval" for --enable-debug]) ;;
-      esac
-    ]
-  )
-  if test "$ac_debug" = yes; then
+      [ case "$enableval" in
+          yes) x_ac_debug=yes ;;
+          no)  x_ac_debug=no ;;
+          *)   AC_MSG_RESULT([doh!])
+               AC_MSG_ERROR([bad value "$enableval" for --enable-debug]) ;;
+        esac ])
+  if test "$x_ac_debug" = yes; then
     if test -z "$ac_save_CFLAGS"; then
-      test "$ac_cv_prog_cc_g" = yes && CFLAGS="-g"
-      test "$GCC" = yes && CFLAGS="$CFLAGS -Wall -Werror"
+      test "$ac_cv_prog_cc_g" = yes && _x_ac_debug_g="-g"
+      test "$GCC" = yes && CFLAGS="-Wall -Werror $_x_ac_debug_g"
     fi
   else
     if test -z "$ac_save_CFLAGS"; then
@@ -42,5 +40,5 @@ AC_DEFUN([AC_DEBUG],
     AC_DEFINE([NDEBUG], [1],
       [Define to 1 if you are building a production release.])
   fi
-  AC_MSG_RESULT([${ac_debug=no}])
+  AC_MSG_RESULT([${x_ac_debug=no}])
 ])

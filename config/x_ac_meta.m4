@@ -1,17 +1,17 @@
 ##*****************************************************************************
-## $Id: ac_meta.m4,v 1.2 2003/05/07 17:02:44 dun Exp $
+## $Id: x_ac_meta.m4,v 1.1 2004/03/05 20:04:18 dun Exp $
 ##*****************************************************************************
 #  AUTHOR:
 #    Chris Dunlap <cdunlap@llnl.gov>
 #
 #  SYNOPSIS:
-#    AC_META
+#    X_AC_META
 #
 #  DESCRIPTION:
 #    Set PACKAGE and VERSION from the META file.
 ##*****************************************************************************
 
-AC_DEFUN([AC_META],
+AC_DEFUN([X_AC_META],
 [
   AC_MSG_CHECKING([metadata])
 

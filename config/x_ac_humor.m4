@@ -1,19 +1,17 @@
 ##*****************************************************************************
-## $Id: ac_gpl_licensed.m4,v 1.2 2003/05/07 17:02:44 dun Exp $
+## $Id: x_ac_humor.m4,v 1.1 2004/03/05 20:04:18 dun Exp $
 ##*****************************************************************************
 #  AUTHOR:
 #    Chris Dunlap <cdunlap@llnl.gov>
 #
 #  SYNOPSIS:
-#    AC_GPL_LICENSED
+#    X_AC_HUMOR
 #
 #  DESCRIPTION:
-#    Acknowledge being licensed under terms of the GNU General Public License.
+#    Check for random silliness.
 ##*****************************************************************************
 
-AC_DEFUN([AC_GPL_LICENSED],
+AC_DEFUN([X_AC_HUMOR],
 [
-  AC_DEFINE([GPL_LICENSED], [1],
-    [Define to 1 if licensed under terms of the GNU General Public License.]
-  )
+  AC_CACHE_CHECK([for a sense of humor], [x_ac_cv_humor], [x_ac_cv_humor=yes])
 ])
