@@ -41,7 +41,6 @@ need to be set on all of the parent directories as well.
   -------- ---------------  ---------------  ------ ------------ ---------------
            /dev/ramdisk0    /tmp/munge       jfs    Oct 01 10:01 rw,nointegrity
 
-
 The MUNGE_AUTH_PIPE_DIR define in src/libcommon/munge_defs.h also needs to
 be modified to specify the location of this ramdisk, and the source then
 needs to be recompiled.
