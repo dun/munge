@@ -1,5 +1,6 @@
 2004-09-16  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/munge/munge.c: Revamped "-u" and "-g" cmdline opts.
 	* src/munge/remunge.c: Added "-u" and "-g" cmdline opts.
 
 	* src/munged/timer.h: Tweaked timer_init() docs.

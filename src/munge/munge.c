@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munge.c,v 1.36 2004/09/10 00:54:16 dun Exp $
+ *  $Id: munge.c,v 1.37 2004/09/16 22:12:13 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -319,18 +319,18 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                 exit (EMUNGE_SUCCESS);
                 break;
             case 'u':
-                if (strlen (optarg) == 0) {
-                    i = getuid ();
-                }
-                else if (strlen (optarg) == strspn (optarg, "0123456789")) {
-                    i = strtol (optarg, NULL, 10);
-                }
-                else if ((pw_ptr = getpwnam (optarg)) != NULL) {
+                if ((pw_ptr = getpwnam (optarg)) != NULL) {
                     i = pw_ptr->pw_uid;
                 }
                 else {
-                    log_err (EMUNGE_SNAFU, LOG_ERR,
-                        "Unrecognized user \"%s\"", optarg);
+                    l = strtol (optarg, &p, 10);
+                    if ((optarg == p) || (*p != '\0')
+                            || (l < 0) || (l > INT_MAX)
+                            || ((l == LONG_MAX) && (errno == ERANGE))) {
+                        log_err (EMUNGE_SNAFU, LOG_ERR,
+                            "Unrecognized user \"%s\"", optarg);
+                    }
+                    i = (int) l;
                 }
                 e = munge_ctx_set (conf->ctx, MUNGE_OPT_UID_RESTRICTION, i);
                 if (e != EMUNGE_SUCCESS) {
@@ -340,18 +340,18 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                 }
                 break;
             case 'g':
-                if (strlen (optarg) == 0) {
-                    i = getgid ();
-                }
-                else if (strlen (optarg) == strspn (optarg, "0123456789")) {
-                    i = strtol (optarg, NULL, 10);
-                }
-                else if ((gr_ptr = getgrnam (optarg)) != NULL) {
+                if ((gr_ptr = getgrnam (optarg)) != NULL) {
                     i = gr_ptr->gr_gid;
                 }
                 else {
-                    log_err (EMUNGE_SNAFU, LOG_ERR,
-                        "Unrecognized group \"%s\"", optarg);
+                    l = strtol (optarg, &p, 10);
+                    if ((optarg == p) || (*p != '\0')
+                            || (l < 0) || (l > INT_MAX)
+                            || ((l == LONG_MAX) && (errno == ERANGE))) {
+                        log_err (EMUNGE_SNAFU, LOG_ERR,
+                            "Unrecognized group \"%s\"", optarg);
+                    }
+                    i = (int) l;
                 }
                 e = munge_ctx_set (conf->ctx, MUNGE_OPT_GID_RESTRICTION, i);
                 if (e != EMUNGE_SUCCESS) {
