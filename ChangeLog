@@ -1,3 +1,7 @@
+2003-09-18  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/libcommon/fd.c: Tweaked formatting.
+
 2003-07-18  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/libcommon/munge_msg.c: Augmented err msgs once again.

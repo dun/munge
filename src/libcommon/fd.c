@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: fd.c,v 1.1 2003/04/08 18:16:16 dun Exp $
+ *  $Id: fd.c,v 1.2 2003/09/18 16:20:08 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -40,120 +40,17 @@
 #include "fd.h"
 
 
+/*****************************************************************************
+ *  Static Prototypes
+ *****************************************************************************/
+
 static int _fd_get_lock (int fd, int cmd, int type);
 static pid_t _fd_test_lock (int fd, int type);
 
 
-int
-fd_set_close_on_exec (int fd)
-{
-    assert (fd >= 0);
-
-    if (fcntl (fd, F_SETFD, FD_CLOEXEC) < 0)
-        return (-1);
-    return (0);
-}
-
-
-int
-fd_set_nonblocking (int fd)
-{
-    int fval;
-
-    assert (fd >= 0);
-
-    if ((fval = fcntl (fd, F_GETFL, 0)) < 0)
-        return (-1);
-    if (fcntl (fd, F_SETFL, fval | O_NONBLOCK) < 0)
-        return (-1);
-    return (0);
-}
-
-
-int
-fd_get_read_lock (int fd)
-{
-    return (_fd_get_lock (fd, F_SETLK, F_RDLCK));
-}
-
-
-int
-fd_get_readw_lock (int fd)
-{
-    return (_fd_get_lock (fd, F_SETLKW, F_RDLCK));
-}
-
-
-int
-fd_get_write_lock (int fd)
-{
-    return (_fd_get_lock (fd, F_SETLK, F_WRLCK));
-}
-
-
-int
-fd_get_writew_lock (int fd)
-{
-    return (_fd_get_lock (fd, F_SETLKW, F_WRLCK));
-}
-
-
-int
-fd_release_lock (int fd)
-{
-    return (_fd_get_lock (fd, F_SETLK, F_UNLCK));
-}
-
-
-pid_t
-fd_is_read_lock_blocked (int fd)
-{
-    return (_fd_test_lock (fd, F_RDLCK));
-}
-
-
-pid_t
-fd_is_write_lock_blocked (int fd)
-{
-    return (_fd_test_lock (fd, F_WRLCK));
-}
-
-
-static int
-_fd_get_lock (int fd, int cmd, int type)
-{
-    struct flock lock;
-
-    assert (fd >= 0);
-
-    lock.l_type = type;
-    lock.l_start = 0;
-    lock.l_whence = SEEK_SET;
-    lock.l_len = 0;
-
-    return (fcntl (fd, cmd, &lock));
-}
-
-
-static pid_t
-_fd_test_lock (int fd, int type)
-{
-    struct flock lock;
-
-    assert (fd >= 0);
-
-    lock.l_type = type;
-    lock.l_start = 0;
-    lock.l_whence = SEEK_SET;
-    lock.l_len = 0;
-
-    if (fcntl (fd, F_GETLK, &lock) < 0)
-        return (-1);
-    if (lock.l_type == F_UNLCK)
-        return (0);
-    return (lock.l_pid);
-}
-
+/*****************************************************************************
+ *  Extern I/O Functions
+ *****************************************************************************/
 
 ssize_t
 fd_read_n (int fd, void *buf, size_t n)
@@ -235,4 +132,127 @@ fd_read_line (int fd, void *buf, size_t maxlen)
 
     *p = '\0';                          /* NUL-terminate, like fgets() */
     return (n);
+}
+
+
+/*****************************************************************************
+ *  Extern Locking Functions
+ *****************************************************************************/
+
+int
+fd_get_read_lock (int fd)
+{
+    return (_fd_get_lock (fd, F_SETLK, F_RDLCK));
+}
+
+
+int
+fd_get_readw_lock (int fd)
+{
+    return (_fd_get_lock (fd, F_SETLKW, F_RDLCK));
+}
+
+
+int
+fd_get_write_lock (int fd)
+{
+    return (_fd_get_lock (fd, F_SETLK, F_WRLCK));
+}
+
+
+int
+fd_get_writew_lock (int fd)
+{
+    return (_fd_get_lock (fd, F_SETLKW, F_WRLCK));
+}
+
+
+int
+fd_release_lock (int fd)
+{
+    return (_fd_get_lock (fd, F_SETLK, F_UNLCK));
+}
+
+
+pid_t
+fd_is_read_lock_blocked (int fd)
+{
+    return (_fd_test_lock (fd, F_RDLCK));
+}
+
+
+pid_t
+fd_is_write_lock_blocked (int fd)
+{
+    return (_fd_test_lock (fd, F_WRLCK));
+}
+
+
+/*****************************************************************************
+ *  Extern Attribute Functions
+ *****************************************************************************/
+
+int
+fd_set_close_on_exec (int fd)
+{
+    assert (fd >= 0);
+
+    if (fcntl (fd, F_SETFD, FD_CLOEXEC) < 0)
+        return (-1);
+    return (0);
+}
+
+
+int
+fd_set_nonblocking (int fd)
+{
+    int fval;
+
+    assert (fd >= 0);
+
+    if ((fval = fcntl (fd, F_GETFL, 0)) < 0)
+        return (-1);
+    if (fcntl (fd, F_SETFL, fval | O_NONBLOCK) < 0)
+        return (-1);
+    return (0);
+}
+
+
+/*****************************************************************************
+ *  Static Functions
+ *****************************************************************************/
+
+static int
+_fd_get_lock (int fd, int cmd, int type)
+{
+    struct flock lock;
+
+    assert (fd >= 0);
+
+    lock.l_type = type;
+    lock.l_start = 0;
+    lock.l_whence = SEEK_SET;
+    lock.l_len = 0;
+
+    return (fcntl (fd, cmd, &lock));
+}
+
+
+static pid_t
+_fd_test_lock (int fd, int type)
+{
+    struct flock lock;
+
+    assert (fd >= 0);
+
+    lock.l_type = type;
+    lock.l_start = 0;
+    lock.l_whence = SEEK_SET;
+    lock.l_len = 0;
+
+    if (fcntl (fd, F_GETLK, &lock) < 0)
+        return (-1);
+    if (lock.l_type == F_UNLCK)
+        return (0);
+    return (lock.l_pid);
 }
