@@ -1,17 +1,20 @@
+2004-09-07  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/munged/gids.h: Changed GIDS_HASH_SIZE from 1213 to 2053.
+
 2004-09-03  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/munge/remunge.c: Set stdout to be line buffered.
 	* src/munge/remunge.c: Close stdin.
 	* src/munge/remunge.c: Ignore SIGHUP.
 	* src/munge/remunge.c: Changed DEF_DO_DECODE from 1 to 0.
+	* src/munge/remunge.c: Subtract error count from number processed.
 
 	* src/munged/hash.c: Changed HASH_ALLOC from 256 to 1024.
 	* src/munged/replay.c: Changed REPLAY_ALLOC from 256 to 1024.
 	* src/munged/replay.h: Changed REPLAY_HASH_SIZE from 4013 to 65537.
 
 	* src/munged/gids.c, src/munged/gids.h: Added GIDS_HASH_SIZE.
-
-	* src/munge/remunge.c: Removed error count from number processed.
 
 	* src/munged/munged.c(main):
 	  Changed default log priority level from LOG_NOTICE to LOG_INFO.
