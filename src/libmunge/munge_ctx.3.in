@@ -1,4 +1,4 @@
-.\" $Id: munge_ctx.3.in,v 1.3 2004/11/18 19:55:44 dun Exp $
+.\" $Id: munge_ctx.3.in,v 1.4 2004/11/24 20:56:36 dun Exp $
 
 .TH MUNGE_CTX 3 "@DATE@" "@PACKAGE@-@VERSION@" "Munge Uid 'N' Gid Emporium"
 
@@ -82,6 +82,7 @@ should not be freed or modified by the caller.  \fBNOT YET SUPPORTED\fR.
 .TP
 \fBMUNGE_OPT_TTL\fR , \fIint\fR
 Get or set the time-to-live (in seconds) (cf, \fBTTL TYPES\fR).
+This value controls how long the credential is valid once it has been encoded.
 .TP
 \fBMUNGE_OPT_ADDR4\fR , \fIstruct in_addr\fR
 Get the IPv4 address of the host where the credential was encoded.

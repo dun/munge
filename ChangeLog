@@ -1,5 +1,8 @@
 2004-11-24  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/libmunge/munge_ctx.3.in, src/munge/munge.1.in,
+	  src/munge/unmunge.1.in: Updated verbage.
+
 	* src/munge/unmunge.c:
 	  Changed MUNGE_KEY_ORIGIN to MUNGE_KEY_ENCODE_HOST.
 	  Tweaked munge_keys[] strings.

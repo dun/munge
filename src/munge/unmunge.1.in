@@ -1,4 +1,4 @@
-.\" $Id: unmunge.1.in,v 1.3 2004/11/18 19:55:44 dun Exp $
+.\" $Id: unmunge.1.in,v 1.4 2004/11/24 20:56:36 dun Exp $
 
 .TH UNMUNGE 1 "@DATE@" "@PACKAGE@-@VERSION@" "Munge Uid 'N' Gid Emporium"
 
@@ -44,12 +44,56 @@ Output the payload to the specified file.
 Specify a subset of metadata keys to output.  The keys are case-insensitive
 and delimited by whitespace, commas, semicolons, or periods -- as long as the
 string is treated as a single argument by the shell (e.g., enclosed by quotes).
+If a subset is not specified, all available keys are selected by default.
 .TP
 .BI "-K, --list-keys"
 Display a list of metadata keys.
 .TP
 .BI "-S, --socket " string
 Specify the local domain socket for connecting with \fBmunged\fR.
+
+.SH "METADATA KEYS"
+The following metadata keys are supported.
+.TP
+.B STATUS
+The status of the credential decode operation.
+.TP
+.B ENCODE_HOST
+The address of the host on which the credential was encoded.
+.TP
+.B ENCODE_TIME
+The time at which the credential was encoded (according to the clock of the
+host that encoded it).
+.TP
+.B DECODE_TIME
+The time at which the credential was decoded (according to the local clock).
+.TP
+.B TTL
+The time-to-live value (in seconds) placed within the credential.
+.TP
+.B CIPHER
+The cipher type used to encode the credential.
+.TP
+.B MAC
+The MAC type used to encode the credential.
+.TP
+.B ZIP
+The compression type used to encode the credential.
+.TP
+.B UID
+The user ID of the process that encoded the credential.
+.TP
+.B GID
+The group ID of the process that encoded the credential.
+.TP
+.B UID_RESTRICTION
+The user ID restriction placed within the credential.
+.TP
+.B GID_RESTRICTION
+The group ID restriction placed within the credential.
+.TP
+.B LENGTH
+The length (in bytes) of the payload.
 
 .SH "EXIT STATUS"
 The \fBunmunge\fR program returns an exit code corresponding to the return
