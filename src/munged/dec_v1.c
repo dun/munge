@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: dec_v1.c,v 1.12 2004/01/16 02:18:37 dun Exp $
+ *  $Id: dec_v1.c,v 1.13 2004/01/30 23:16:33 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -32,6 +32,7 @@
 #include <assert.h>
 #include <ctype.h>
 #include <errno.h>
+#include <sys/types.h>                  /* include before in.h for bsd */
 #include <netinet/in.h>
 #include <string.h>
 #include "base64.h"

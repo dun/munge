@@ -1,5 +1,9 @@
 2004-01-30  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/libmunge/ctx.c, src/libmunge/msg_client.c, src/munged/dec_v1.c,
+	  src/munged/enc_v1.c, src/munged/munged.c:
+	  Tweaked includes for FreeBSD.
+
 	* Makefile.in, aclocal.m4, configure, configure.ac,
 	  config/ac_check_peercred.m4, config/config.h.in, src/Makefile.in,
 	  src/etc/Makefile.in, src/libcommon/Makefile.in,

@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munged.c,v 1.7 2003/11/26 23:07:49 dun Exp $
+ *  $Id: munged.c,v 1.8 2004/01/30 23:16:33 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -35,6 +35,7 @@
 #include <munge.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/time.h>                   /* include before resource.h for bsd */
 #include <sys/resource.h>
 #include <sys/stat.h>
 #include <unistd.h>

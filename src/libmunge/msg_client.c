@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: msg_client.c,v 1.6 2004/01/29 00:15:49 dun Exp $
+ *  $Id: msg_client.c,v 1.7 2004/01/30 23:16:33 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -32,9 +32,9 @@
 #include <assert.h>
 #include <errno.h>
 #include <string.h>
+#include <sys/types.h>                  /* include before socket.h for bsd */
 #include <sys/socket.h>
 #include <sys/stat.h>
-#include <sys/types.h>
 #include <sys/un.h>
 #include <unistd.h>
 #include <munge.h>
