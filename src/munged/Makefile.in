@@ -66,13 +66,13 @@ am_munged_OBJECTS = munged-auth.$(OBJEXT) munged-base64.$(OBJEXT) \
 	munged-cipher.$(OBJEXT) munged-conf.$(OBJEXT) \
 	munged-cred.$(OBJEXT) munged-crypto_log.$(OBJEXT) \
 	munged-crypto_thread.$(OBJEXT) munged-dec_v1.$(OBJEXT) \
-	munged-enc_v1.$(OBJEXT) munged-hash.$(OBJEXT) \
-	munged-lookup.$(OBJEXT) munged-mac.$(OBJEXT) \
-	munged-md.$(OBJEXT) munged-msg_server.$(OBJEXT) \
-	munged-random.$(OBJEXT) munged-replay.$(OBJEXT) \
-	munged-sock.$(OBJEXT) munged-thread.$(OBJEXT) \
-	munged-timer.$(OBJEXT) munged-zip.$(OBJEXT) \
-	munged-munged.$(OBJEXT)
+	munged-enc_v1.$(OBJEXT) munged-gids.$(OBJEXT) \
+	munged-hash.$(OBJEXT) munged-lookup.$(OBJEXT) \
+	munged-mac.$(OBJEXT) munged-md.$(OBJEXT) \
+	munged-msg_server.$(OBJEXT) munged-random.$(OBJEXT) \
+	munged-replay.$(OBJEXT) munged-sock.$(OBJEXT) \
+	munged-thread.$(OBJEXT) munged-timer.$(OBJEXT) \
+	munged-zip.$(OBJEXT) munged-munged.$(OBJEXT)
 munged_OBJECTS = $(am_munged_OBJECTS)
 am__DEPENDENCIES_1 =
 munged_DEPENDENCIES = $(top_builddir)/src/libcommon/libcommon.la \
@@ -94,6 +94,7 @@ am__depfiles_maybe = depfiles
 @AMDEP_TRUE@	./$(DEPDIR)/munged-crypto_thread.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/munged-dec_v1.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/munged-enc_v1.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/munged-gids.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/munged-hash.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/munged-lookup.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/munged-mac.Po ./$(DEPDIR)/munged-md.Po \
@@ -261,6 +262,8 @@ munged_SOURCES = \
 	dec_v1.h \
 	enc_v1.c \
 	enc_v1.h \
+	gids.c \
+	gids.h \
 	hash.c \
 	hash.h \
 	lookup.c \
@@ -385,6 +388,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/munged-crypto_thread.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/munged-dec_v1.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/munged-enc_v1.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/munged-gids.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/munged-hash.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/munged-lookup.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/munged-mac.Po@am__quote@
@@ -637,6 +641,30 @@ munged-enc_v1.lo: enc_v1.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/munged-enc_v1.Plo' tmpdepfile='$(DEPDIR)/munged-enc_v1.TPlo' @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -c -o munged-enc_v1.lo `test -f 'enc_v1.c' || echo '$(srcdir)/'`enc_v1.c
+
+munged-gids.o: gids.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -MT munged-gids.o -MD -MP -MF "$(DEPDIR)/munged-gids.Tpo" -c -o munged-gids.o `test -f 'gids.c' || echo '$(srcdir)/'`gids.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/munged-gids.Tpo" "$(DEPDIR)/munged-gids.Po"; else rm -f "$(DEPDIR)/munged-gids.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='gids.c' object='munged-gids.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/munged-gids.Po' tmpdepfile='$(DEPDIR)/munged-gids.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -c -o munged-gids.o `test -f 'gids.c' || echo '$(srcdir)/'`gids.c
+
+munged-gids.obj: gids.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -MT munged-gids.obj -MD -MP -MF "$(DEPDIR)/munged-gids.Tpo" -c -o munged-gids.obj `if test -f 'gids.c'; then $(CYGPATH_W) 'gids.c'; else $(CYGPATH_W) '$(srcdir)/gids.c'; fi`; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/munged-gids.Tpo" "$(DEPDIR)/munged-gids.Po"; else rm -f "$(DEPDIR)/munged-gids.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='gids.c' object='munged-gids.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/munged-gids.Po' tmpdepfile='$(DEPDIR)/munged-gids.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -c -o munged-gids.obj `if test -f 'gids.c'; then $(CYGPATH_W) 'gids.c'; else $(CYGPATH_W) '$(srcdir)/gids.c'; fi`
+
+munged-gids.lo: gids.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -MT munged-gids.lo -MD -MP -MF "$(DEPDIR)/munged-gids.Tpo" -c -o munged-gids.lo `test -f 'gids.c' || echo '$(srcdir)/'`gids.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/munged-gids.Tpo" "$(DEPDIR)/munged-gids.Plo"; else rm -f "$(DEPDIR)/munged-gids.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='gids.c' object='munged-gids.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/munged-gids.Plo' tmpdepfile='$(DEPDIR)/munged-gids.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -c -o munged-gids.lo `test -f 'gids.c' || echo '$(srcdir)/'`gids.c
 
 munged-hash.o: hash.c
 @am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -MT munged-hash.o -MD -MP -MF "$(DEPDIR)/munged-hash.Tpo" -c -o munged-hash.o `test -f 'hash.c' || echo '$(srcdir)/'`hash.c; \

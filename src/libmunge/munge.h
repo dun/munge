@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munge.h,v 1.19 2004/04/03 21:53:00 dun Exp $
+ *  $Id: munge.h,v 1.20 2004/04/16 22:15:06 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -63,6 +63,8 @@ typedef enum munge_opt {
     MUNGE_OPT_ENCODE_TIME       =  6,   /* time when cred encoded (time_t)   */
     MUNGE_OPT_DECODE_TIME       =  7,   /* time when cred decoded (time_t)   */
     MUNGE_OPT_SOCKET            =  8,   /* socket for comm w/ daemon (str)   */
+    MUNGE_OPT_UID_RESTRICTION   =  9,   /* UID able to decode cred (uid_t)   */
+    MUNGE_OPT_GID_RESTRICTION   = 10,   /* GID able to decode cred (gid_t)   */
     MUNGE_OPT_LAST_ENTRY
 } munge_opt_t;
 
@@ -102,9 +104,20 @@ typedef enum munge_zip {
  */
 typedef enum munge_ttl {
     MUNGE_TTL_MAXIMUM           = -1,   /* maximum ttl allowed by daemon     */
-    MUNGE_TTL_DEFAULT           =  0,   /* default ttl specified by daemon   */
-    MUNGE_TTL_LAST_ENTRY
+    MUNGE_TTL_DEFAULT           =  0    /* default ttl specified by daemon   */
 } munge_ttl_t;
+
+/*  Munge UID restrictions for credential decoding
+ */
+typedef enum munge_uid {
+    MUNGE_UID_ANY               = -1    /* do not restrict decode via uid    */
+} munge_uid_t;
+
+/*  Munge GID restrictions for credential decoding
+ */
+typedef enum munge_gid {
+    MUNGE_GID_ANY               = -1    /* do not restrict decode via gid    */
+} munge_gid_t;
 
 /*  Munge error codes
  *
@@ -130,6 +143,7 @@ typedef enum munge_err {
     EMUNGE_CRED_EXPIRED         = 15,   /* Credential expired                */
     EMUNGE_CRED_REWOUND         = 16,   /* Credential created in the future  */
     EMUNGE_CRED_REPLAYED        = 17,   /* Credential replayed               */
+    EMUNGE_CRED_UNAUTHORIZED    = 18,   /* Credential decode unauthorized    */
     EMUNGE_LAST_ENTRY
 } munge_err_t;
 

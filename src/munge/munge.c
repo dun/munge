@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munge.c,v 1.23 2004/04/09 04:55:51 dun Exp $
+ *  $Id: munge.c,v 1.24 2004/04/16 22:15:06 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -32,10 +32,13 @@
 #include <assert.h>
 #include <ctype.h>
 #include <errno.h>
+#include <grp.h>
 #include <limits.h>
+#include <pwd.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/types.h>
 #include <unistd.h>
 #include <munge.h>
 #include "common.h"
@@ -53,6 +56,7 @@ struct option opt_table[] = {
     { "version",      0, NULL, 'V' },
     { "cipher",       1, NULL, 'c' },
     { "list-ciphers", 0, NULL, 'C' },
+    { "restrict-gid", 1, NULL, 'g' },
     { "input",        1, NULL, 'i' },
     { "mac",          1, NULL, 'm' },
     { "list-macs",    0, NULL, 'M' },
@@ -61,12 +65,13 @@ struct option opt_table[] = {
     { "string",       1, NULL, 's' },
     { "socket",       1, NULL, 'S' },
     { "ttl",          1, NULL, 't' },
+    { "restrict-uid", 1, NULL, 'u' },
     { "zip",          1, NULL, 'z' },
     { "list-zips",    0, NULL, 'Z' },
     {  NULL,          0, NULL,  0  }
 };
 
-const char * const opt_string = "hLVc:Ci:m:Mno:s:S:t:z:Z";
+const char * const opt_string = "hLVc:Cg:i:m:Mno:s:S:t:u:z:Z";
 
 
 /***************************************************************************** 
@@ -212,11 +217,13 @@ destroy_conf (conf_t conf)
 void
 parse_cmdline (conf_t conf, int argc, char **argv)
 {
-    char        *prog;
-    int          c;
-    char        *p;
-    munge_err_t  e;
-    int          i;
+    char           *prog;
+    int             c;
+    char           *p;
+    munge_err_t     e;
+    int             i;
+    struct passwd  *pw_ptr;
+    struct group   *gr_ptr;
 
     opterr = 0;                         /* suppress default getopt err msgs */
 
@@ -255,6 +262,22 @@ parse_cmdline (conf_t conf, int argc, char **argv)
             case 'C':
                 display_strings ("Cipher types", munge_cipher_strings);
                 exit (EMUNGE_SUCCESS);
+                break;
+            case 'g':
+                if (strlen (optarg) == 0)
+                    i = getgid ();
+                else if (strlen (optarg) == strspn (optarg, "0123456789"))
+                    i = strtol (optarg, NULL, 10);
+                else if ((gr_ptr = getgrnam (optarg)) != NULL)
+                    i = gr_ptr->gr_gid;
+                else
+                    log_err (EMUNGE_SNAFU, LOG_ERR,
+                        "Unrecognized group \"%s\"", optarg);
+                e = munge_ctx_set (conf->ctx, MUNGE_OPT_GID_RESTRICTION, i);
+                if (e != EMUNGE_SUCCESS)
+                    log_err (EMUNGE_SNAFU, LOG_ERR,
+                        "Unable to set gid restriction: %s",
+                        munge_ctx_strerror (conf->ctx));
                 break;
             case 'i':
                 conf->fn_in = optarg;
@@ -305,6 +328,22 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                         "Unable to set time-to-live: %s",
                         munge_ctx_strerror (conf->ctx));
                 break;
+            case 'u':
+                if (strlen (optarg) == 0)
+                    i = getuid ();
+                else if (strlen (optarg) == strspn (optarg, "0123456789"))
+                    i = strtol (optarg, NULL, 10);
+                else if ((pw_ptr = getpwnam (optarg)) != NULL)
+                    i = pw_ptr->pw_uid;
+                else
+                    log_err (EMUNGE_SNAFU, LOG_ERR,
+                        "Unrecognized user \"%s\"", optarg);
+                e = munge_ctx_set (conf->ctx, MUNGE_OPT_UID_RESTRICTION, i);
+                if (e != EMUNGE_SUCCESS)
+                    log_err (EMUNGE_SNAFU, LOG_ERR,
+                        "Unable to set uid restriction: %s",
+                        munge_ctx_strerror (conf->ctx));
+                break;
             case 'z':
                 if ((i = str_to_int (optarg, munge_zip_strings)) < 0)
                     log_err (EMUNGE_SNAFU, LOG_ERR,
@@ -346,7 +385,7 @@ display_help (char *prog)
 {
 /*  Displays a help message describing the command-line options.
  */
-    const int w = -21;                  /* pad for width of option string */
+    const int w = -24;                  /* pad for width of option string */
 
     assert (prog != NULL);
 
@@ -364,17 +403,17 @@ display_help (char *prog)
 
     printf ("\n");
 
-    printf ("  %*s %s\n", w, "-i, --input=FILE",
-            "Input payload data from FILE");
-
     printf ("  %*s %s\n", w, "-n, --no-input",
             "Redirect input from /dev/null");
 
-    printf ("  %*s %s\n", w, "-o, --output=FILE",
-            "Output credential to FILE");
-
     printf ("  %*s %s\n", w, "-s, --string=STRING",
             "Input payload data from STRING");
+
+    printf ("  %*s %s\n", w, "-i, --input=FILE",
+            "Input payload data from FILE");
+
+    printf ("  %*s %s\n", w, "-o, --output=FILE",
+            "Output credential to FILE");
 
     printf ("\n");
 
@@ -398,11 +437,17 @@ display_help (char *prog)
 
     printf ("\n");
 
-    printf ("  %*s %s\n", w, "-S, --socket=STRING",
-            "Specify local domain socket");
-
     printf ("  %*s %s\n", w, "-t, --ttl=INTEGER",
             "Specify time-to-live (in seconds; 0=default, -1=max)");
+
+    printf ("  %*s %s\n", w, "-u, --restrict-uid=UID",
+            "Restrict credential decoding to only this UID");
+
+    printf ("  %*s %s\n", w, "-g, --restrict-gid=GID",
+            "Restrict credential decoding to only this GID");
+
+    printf ("  %*s %s\n", w, "-S, --socket=STRING",
+            "Specify local domain socket");
 
     printf ("\n");
     printf ("By default, data is read from stdin and written to stdout.\n\n");

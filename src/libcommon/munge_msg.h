@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munge_msg.h,v 1.10 2004/04/03 21:53:00 dun Exp $
+ *  $Id: munge_msg.h,v 1.11 2004/04/16 22:15:06 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -83,8 +83,12 @@ struct munge_msg_v1 {
     struct in_addr          addr;       /* IP addr where cred was encoded    */
     uint32_t                time0;      /* time at which cred was encoded    */
     uint32_t                time1;      /* time at which cred was decoded    */
-    uint32_t                uid;        /* client process UID encoding cred  */
-    uint32_t                gid;        /* client process GID encoding cred  */
+    uint32_t                client_uid; /* UID of connecting client process  */
+    uint32_t                client_gid; /* GID of connecting client process  */
+    uint32_t                cred_uid;   /* UID of client that requested cred */
+    uint32_t                cred_gid;   /* GID of client that requested cred */
+    uint32_t                auth_uid;   /* UID of client allowed to decode   */
+    uint32_t                auth_gid;   /* GID of client allowed to decode   */
     uint32_t                data_len;   /* length of data                    */
     void                   *data;       /* ptr to data munged into cred      */
     uint8_t                 error_num;  /* munge_err_t for encode/decode op  */

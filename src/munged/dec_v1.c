@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: dec_v1.c,v 1.18 2004/04/03 21:53:00 dun Exp $
+ *  $Id: dec_v1.c,v 1.19 2004/04/16 22:15:06 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -35,11 +35,13 @@
 #include <sys/types.h>                  /* include before in.h for bsd */
 #include <netinet/in.h>
 #include <string.h>
+#include "auth.h"
 #include "base64.h"
 #include "cipher.h"
 #include "conf.h"
 #include "cred.h"
 #include "dec_v1.h"
+#include "gids.h"
 #include "lookup.h"
 #include "mac.h"
 #include "md.h"
@@ -65,6 +67,7 @@ extern conf_t conf;                     /* defined in munged.c               */
 
 static int dec_v1_validate_msg (munge_msg_t m);
 static int dec_v1_timestamp (munge_cred_t c);
+static int dec_v1_authenticate (munge_cred_t c);
 static int dec_v1_unarmor (munge_cred_t c);
 static int dec_v1_unpack_outer (munge_cred_t c);
 static int dec_v1_decrypt (munge_cred_t c);
@@ -72,6 +75,7 @@ static int dec_v1_decompress (munge_cred_t c);
 static int dec_v1_unpack_inner (munge_cred_t c);
 static int dec_v1_validate_mac (munge_cred_t c);
 static int dec_v1_validate_time (munge_cred_t c);
+static int dec_v1_validate_auth (munge_cred_t c);
 static int dec_v1_validate_replay (munge_cred_t c);
 
 
@@ -91,6 +95,8 @@ dec_v1_process_msg (munge_msg_t m)
         ;
     else if (dec_v1_timestamp (c) < 0)
         ;
+    else if (dec_v1_authenticate (c) < 0)
+        ;
     else if (dec_v1_unarmor (c) < 0)
         ;
     else if (dec_v1_unpack_outer (c) < 0)
@@ -102,6 +108,8 @@ dec_v1_process_msg (munge_msg_t m)
     else if (dec_v1_validate_mac (c) < 0)
         ;
     else if (dec_v1_unpack_inner (c) < 0)
+        ;
+    else if (dec_v1_validate_auth (c) < 0)
         ;
     else if (dec_v1_validate_time (c) < 0)
         ;
@@ -174,6 +182,29 @@ dec_v1_timestamp (munge_cred_t c)
     }
     m1->time0 = 0;
     m1->time1 = now;                    /* potential 64b value for 32b var */
+    return (0);
+}
+
+
+static int
+dec_v1_authenticate (munge_cred_t c)
+{
+/*  Ascertains the UID/GID of the client process.
+ */
+    struct munge_msg_v1 *m1;            /* munge msg (v1 format)             */
+
+    assert (c != NULL);
+    assert (c->msg);
+    assert (c->msg->head.version == 1);
+
+    m1 = c->msg->pbody;
+
+    /*  Determine identity of client process.
+     */
+    if (auth_peer_get (c->msg->sd, &(m1->client_uid), &(m1->client_gid)) < 0) {
+        return (_munge_msg_set_err (c->msg, EMUNGE_SNAFU,
+            strdup ("Unable to determine identity of client")));
+    }
     return (0);
 }
 
@@ -308,9 +339,10 @@ dec_v1_unpack_outer (munge_cred_t c)
     len = c->outer_len;
     /*
      *  Unpack the credential version.
-     *  Note that only version 1 of the credential format is supported.
-     *    Support for multiple versions will require a switch on the
-     *    version number to invoke the appropriate unpack routine.
+     *  Note that only one version (ie, the latest) of the credential format
+     *    is currently supported.  Support for multiple versions would
+     *    require a switch on the version number to invoke the appropriate
+     *    unpack routine, but it doesn't really seem worth the effort.
      */
     n = sizeof (c->version);
     assert (n == 1);
@@ -319,7 +351,7 @@ dec_v1_unpack_outer (munge_cred_t c)
             strdup ("Truncated credential version")));
     }
     c->version = *p;
-    if ((!c->version) || (c->version > MUNGE_CRED_VERSION)) {
+    if ((!c->version) || (c->version != MUNGE_CRED_VERSION)) {
         return (_munge_msg_set_err (c->msg, EMUNGE_BAD_VERSION,
             strdupf ("Unsupported credential version %d", c->version)));
     }
@@ -806,27 +838,53 @@ dec_v1_unpack_inner (munge_cred_t c)
     /*
      *  Unpack the UID.
      */
-    n = sizeof (m1->uid);
+    n = sizeof (m1->cred_uid);
     assert (n == 4);
     if (n > len) {
         return (_munge_msg_set_err (c->msg, EMUNGE_BAD_CRED,
             strdup ("Truncated credential uid")));
     }
     memcpy (&u, p, n);                  /* ensure proper byte-alignment */
-    m1->uid = ntohl (u);
+    m1->cred_uid = ntohl (u);
     p += n;
     len -= n;
     /*
      *  Unpack the GID.
      */
-    n = sizeof (m1->gid);
+    n = sizeof (m1->cred_gid);
     assert (n == 4);
     if (n > len) {
         return (_munge_msg_set_err (c->msg, EMUNGE_BAD_CRED,
             strdup ("Truncated credential gid")));
     }
     memcpy (&u, p, n);                  /* ensure proper byte-alignment */
-    m1->gid = ntohl (u);
+    m1->cred_gid = ntohl (u);
+    p += n;
+    len -= n;
+    /*
+     *  Unpack the UID restriction for authorization.
+     */
+    n = sizeof (m1->auth_uid);
+    assert (n == 4);
+    if (n > len) {
+        return (_munge_msg_set_err (c->msg, EMUNGE_BAD_CRED,
+            strdup ("Truncated uid restriction")));
+    }
+    memcpy (&u, p, n);                  /* ensure proper byte-alignment */
+    m1->auth_uid = ntohl (u);
+    p += n;
+    len -= n;
+    /*
+     *  Unpack the GID restriction for authorization.
+     */
+    n = sizeof (m1->auth_gid);
+    assert (n == 4);
+    if (n > len) {
+        return (_munge_msg_set_err (c->msg, EMUNGE_BAD_CRED,
+            strdup ("Truncated gid restriction")));
+    }
+    memcpy (&u, p, n);                  /* ensure proper byte-alignment */
+    m1->auth_gid = ntohl (u);
     p += n;
     len -= n;
     /*
@@ -856,6 +914,39 @@ dec_v1_unpack_inner (munge_cred_t c)
     }
     assert (len == 0);
     return (0);
+}
+
+
+static int
+dec_v1_validate_auth (munge_cred_t c)
+{
+/*  Validates whether the client is authorized to view this credential.
+ *  But allow root to decode any credential if so configured.
+ */
+    struct munge_msg_v1 *m1;            /* munge msg (v1 format)             */
+
+    assert (c != NULL);
+    assert (c->msg != NULL);
+    assert (c->msg->head.version == 1);
+
+    m1 = c->msg->pbody;
+
+    if ( (m1->auth_uid != MUNGE_UID_ANY)
+      && (m1->auth_uid != m1->client_uid)
+      && (! (conf->got_root_auth && (m1->client_uid == 0)))) {
+        goto unauthorized;
+    }
+    if (m1->auth_gid == MUNGE_GID_ANY)
+        return (0);
+    else if (m1->auth_gid == m1->client_gid)
+        return (0);
+    else if (gids_is_member (conf->gids, m1->client_uid, m1->auth_gid))
+        return (0);
+
+unauthorized:
+    return (_munge_msg_set_err (c->msg, EMUNGE_CRED_UNAUTHORIZED,
+        strdupf ("Unauthorized credential for client uid=%d gid=%d",
+            m1->client_uid, m1->client_gid)));
 }
 
 

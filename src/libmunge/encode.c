@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: encode.c,v 1.10 2004/04/03 21:53:00 dun Exp $
+ *  $Id: encode.c,v 1.11 2004/04/16 22:15:06 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -137,7 +137,8 @@ encode_req_v1 (munge_msg_t m, munge_ctx_t ctx, const void *buf, int len)
 {
 /*  Creates an Encode Request message to be sent to the local munge daemon.
  *  The inputs to this message are as follows:
- *    cipher, zip, mac, realm_len, realm, ttl, data_len, data.
+ *    cipher, zip, mac, realm_len, realm, ttl, auth_uid, auth_gid,
+ *    data_len, data.
  *  Note that the security realm string here is NUL-terminated.
  */
     struct munge_msg_v1 *m1;
@@ -172,6 +173,8 @@ encode_req_v1 (munge_msg_t m, munge_ctx_t ctx, const void *buf, int len)
             m1->realm = NULL;
         }
         m1->ttl = ctx->ttl;
+        m1->auth_uid = ctx->auth_uid;
+        m1->auth_gid = ctx->auth_gid;
     }
     else {
         m1->cipher = MUNGE_CIPHER_DEFAULT;
@@ -180,6 +183,8 @@ encode_req_v1 (munge_msg_t m, munge_ctx_t ctx, const void *buf, int len)
         m1->realm_len = 0;
         m1->realm = NULL;
         m1->ttl = MUNGE_TTL_DEFAULT;
+        m1->auth_uid = MUNGE_UID_ANY;
+        m1->auth_gid = MUNGE_GID_ANY;
     }
     /*  Pass optional data to be encoded into the credential.
      */
@@ -198,7 +203,8 @@ encode_rsp_v1 (munge_msg_t m, char **cred)
  *  Note that error_num and error_str are set by _munge_ctx_set_err()
  *    called from munge_encode() (ie, the parent of this stack frame).
  *  The ignored outputs from this message are as follows:
- *    cipher, zip, mac, realm_len, realm, time0, ttl, uid, gid.
+ *    cipher, zip, mac, realm_len, realm, time0, ttl, uid, gid,
+ *    auth_uid, auth_gid.
  *  These are ignored because the encode() ctx is considered read-only
  *    (with the exception of using it to pass detailed error messages).
  *    This allows the same ctx to be used to encode multiple credentials

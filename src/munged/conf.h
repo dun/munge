@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: conf.h,v 1.7 2004/04/03 21:53:00 dun Exp $
+ *  $Id: conf.h,v 1.8 2004/04/16 22:15:06 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -31,6 +31,7 @@
 #include <inttypes.h>
 #include <munge.h>
 #include <netinet/in.h>
+#include "gids.h"
 
 
 /*****************************************************************************
@@ -42,6 +43,7 @@ struct conf {
     unsigned        got_clock_skew:1;   /* flag for allowing clock skew      */
     unsigned        got_force:1;        /* flag for FORCE option             */
     unsigned        got_foreground:1;   /* flag for FOREGROUND option        */
+    unsigned        got_root_auth:1;    /* flag if root can decode any cred  */
     munge_cipher_t  def_cipher;         /* default cipher type               */
     munge_zip_t     def_zip;            /* default compression type          */
     munge_mac_t     def_mac;            /* default message auth code type    */
@@ -56,6 +58,7 @@ struct conf {
     unsigned char  *mac_key;            /* subkey for mac ops                */
     int             mac_key_len;        /* length of mac subkey              */
     struct in_addr  addr;               /* IPv4 addr in n/w byte order       */
+    gids_t          gids;               /* supplementary group information   */
 };
 
 typedef struct conf * conf_t;

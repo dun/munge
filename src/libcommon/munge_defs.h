@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munge_defs.h,v 1.21 2004/04/03 21:53:00 dun Exp $
+ *  $Id: munge_defs.h,v 1.22 2004/04/16 22:15:06 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -42,7 +42,7 @@
 
 /*  Current version of the munge credential format.
  */
-#define MUNGE_CRED_VERSION              1
+#define MUNGE_CRED_VERSION              2
 
 /*  Amount of salt (in bytes) encoded into a credential.
  */

@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: ctx.c,v 1.12 2004/04/03 21:53:00 dun Exp $
+ *  $Id: ctx.c,v 1.13 2004/04/16 22:15:06 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -61,6 +61,8 @@ munge_ctx_create (void)
     ctx->addr.s_addr = 0;
     ctx->time0 = 0;
     ctx->time1 = 0;
+    ctx->auth_uid = MUNGE_UID_ANY;
+    ctx->auth_gid = MUNGE_GID_ANY;
     ctx->socket = strdup (MUNGE_SOCKET_NAME);
     ctx->errnum = EMUNGE_SUCCESS;
     ctx->errstr = NULL;
@@ -120,6 +122,8 @@ munge_ctx_get (munge_ctx_t ctx, munge_opt_t opt, ...)
     char           **p2str;
     struct in_addr  *p2addr;
     time_t          *p2time;
+    uid_t           *p2uid;
+    gid_t           *p2gid;
     va_list          vargs;
 
     assert (ctx != NULL);
@@ -169,6 +173,14 @@ munge_ctx_get (munge_ctx_t ctx, munge_opt_t opt, ...)
         case MUNGE_OPT_SOCKET:
             p2str = va_arg (vargs, char **);
             *p2str = ctx->socket;
+            break;
+        case MUNGE_OPT_UID_RESTRICTION:
+            p2uid = va_arg (vargs, uid_t *);
+            *p2uid = ctx->auth_uid;
+            break;
+        case MUNGE_OPT_GID_RESTRICTION:
+            p2gid = va_arg (vargs, gid_t *);
+            *p2gid = ctx->auth_gid;
             break;
         default:
             ctx->errnum = EMUNGE_BAD_ARG;
@@ -236,6 +248,12 @@ munge_ctx_set (munge_ctx_t ctx, munge_opt_t opt, ...)
             if (ctx->socket)
                 free (ctx->socket);
             ctx->socket = p;
+            break;
+        case MUNGE_OPT_UID_RESTRICTION:
+            ctx->auth_uid = va_arg (vargs, uid_t);
+            break;
+        case MUNGE_OPT_GID_RESTRICTION:
+            ctx->auth_gid = va_arg (vargs, gid_t);
             break;
         case MUNGE_OPT_ADDR4:
             /* this option cannot be set; fall through to error case */

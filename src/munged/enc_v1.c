@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: enc_v1.c,v 1.15 2004/04/03 21:53:00 dun Exp $
+ *  $Id: enc_v1.c,v 1.16 2004/04/16 22:15:06 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -255,7 +255,7 @@ enc_v1_authenticate (munge_cred_t c)
 
     /*  Determine identity of client process.
      */
-    if (auth_peer_get (c->msg->sd, &(m1->uid), &(m1->gid)) < 0) {
+    if (auth_peer_get (c->msg->sd, &(m1->client_uid), &(m1->client_gid)) < 0) {
         return (_munge_msg_set_err (c->msg, EMUNGE_SNAFU,
             strdup ("Unable to determine identity of client")));
     }
@@ -382,8 +382,10 @@ enc_v1_pack_inner (munge_cred_t c)
     c->inner_mem_len += sizeof (m1->addr);
     c->inner_mem_len += sizeof (m1->time0);
     c->inner_mem_len += sizeof (m1->ttl);
-    c->inner_mem_len += sizeof (m1->uid);
-    c->inner_mem_len += sizeof (m1->gid);
+    c->inner_mem_len += sizeof (m1->client_uid);
+    c->inner_mem_len += sizeof (m1->client_gid);
+    c->inner_mem_len += sizeof (m1->auth_uid);
+    c->inner_mem_len += sizeof (m1->auth_gid);
     c->inner_mem_len += sizeof (m1->data_len);
     c->inner_mem_len += m1->data_len;
     if (!(c->inner_mem = malloc (c->inner_mem_len))) {
@@ -415,15 +417,25 @@ enc_v1_pack_inner (munge_cred_t c)
     memcpy (p, &u32, sizeof (m1->ttl));
     p += sizeof (m1->ttl);
 
-    assert (sizeof (m1->uid) == 4);
-    u32 = htonl (m1->uid);
-    memcpy (p, &u32, sizeof (m1->uid));
-    p += sizeof (m1->uid);
+    assert (sizeof (m1->client_uid) == 4);
+    u32 = htonl (m1->client_uid);
+    memcpy (p, &u32, sizeof (m1->client_uid));
+    p += sizeof (m1->client_uid);
 
-    assert (sizeof (m1->gid) == 4);
-    u32 = htonl (m1->gid);
-    memcpy (p, &u32, sizeof (m1->gid));
-    p += sizeof (m1->gid);
+    assert (sizeof (m1->client_gid) == 4);
+    u32 = htonl (m1->client_gid);
+    memcpy (p, &u32, sizeof (m1->client_gid));
+    p += sizeof (m1->client_gid);
+
+    assert (sizeof (m1->auth_uid) == 4);
+    u32 = htonl (m1->auth_uid);
+    memcpy (p, &u32, sizeof (m1->auth_uid));
+    p += sizeof (m1->auth_uid);
+
+    assert (sizeof (m1->auth_gid) == 4);
+    u32 = htonl (m1->auth_gid);
+    memcpy (p, &u32, sizeof (m1->auth_gid));
+    p += sizeof (m1->auth_gid);
 
     assert (sizeof (m1->data_len) == 4);
     u32 = htonl (m1->data_len);

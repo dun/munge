@@ -7,7 +7,7 @@
 -nonroot configuration support
 -auto-force daemon when appropriate
 -munged 'k' cmdling opt to kill daemon
--decode based on uid/gid
+-timer to periodically reparse group info
 -statistics
 -documentation
 -create README guide

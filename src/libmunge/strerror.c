@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: strerror.c,v 1.3 2004/04/03 21:53:00 dun Exp $
+ *  $Id: strerror.c,v 1.4 2004/04/16 22:15:06 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -72,6 +72,8 @@ munge_strerror (munge_err_t errnum)
             return ("Rewound credential");
         case EMUNGE_CRED_REPLAYED:
             return ("Replayed credential");
+        case EMUNGE_CRED_UNAUTHORIZED:
+            return ("Unauthorized credential");
         default:
             break;
     }

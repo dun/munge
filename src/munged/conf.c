@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: conf.c,v 1.18 2004/04/08 22:09:45 dun Exp $
+ *  $Id: conf.c,v 1.19 2004/04/16 22:15:06 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -42,6 +42,7 @@
 #include <sys/param.h>                  /* for MAXHOSTNAMELEN */
 #include <unistd.h>
 #include "conf.h"
+#include "gids.h"
 #include "license.h"
 #include "log.h"
 #include "md.h"
@@ -86,6 +87,7 @@ create_conf (void)
     conf->got_clock_skew = 1;
     conf->got_force = 0;
     conf->got_foreground = 0;
+    conf->got_root_auth = 0;
     conf->def_cipher = MUNGE_DEFAULT_CIPHER;
     conf->def_zip = zip_select_default_type (MUNGE_DEFAULT_ZIP);
     conf->def_mac = MUNGE_DEFAULT_MAC;
@@ -114,6 +116,7 @@ create_conf (void)
     conf->dek_key_len = 0;
     conf->mac_key = NULL;
     conf->mac_key_len = 0;
+    conf->gids = gids_create ();
 
     replay_init ();
 
@@ -153,6 +156,7 @@ destroy_conf (conf_t conf)
         free (conf->mac_key);
         conf->mac_key = NULL;
     }
+    gids_destroy (conf->gids);
     free (conf);
 
     replay_fini ();
@@ -231,7 +235,7 @@ display_help (char *prog)
 {
 /*  Displays a help message describing the command-line options.
  */
-    const int w = -21;                  /* pad for width of option string */
+    const int w = -24;                  /* pad for width of option string */
 
     assert (prog != NULL);
 

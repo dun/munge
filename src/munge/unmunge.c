@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: unmunge.c,v 1.26 2004/04/09 04:55:51 dun Exp $
+ *  $Id: unmunge.c,v 1.27 2004/04/16 22:15:06 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -100,23 +100,27 @@ typedef enum {
     MUNGE_KEY_ZIP_TYPE,   
     MUNGE_KEY_UID,
     MUNGE_KEY_GID,
+    MUNGE_KEY_UID_RESTRICTION,
+    MUNGE_KEY_GID_RESTRICTION,
     MUNGE_KEY_LENGTH,
     MUNGE_KEY_LAST
 } munge_key_t;
 
 strval_t munge_keys[] = {
-    { MUNGE_KEY_STATUS,      "STATUS"  },
-    { MUNGE_KEY_ORIGIN,      "ORIGIN"  },
-    { MUNGE_KEY_ENCODE_TIME, "ENCODED" },
-    { MUNGE_KEY_DECODE_TIME, "DECODED" },
-    { MUNGE_KEY_TTL,         "TTL"     },
-    { MUNGE_KEY_CIPHER_TYPE, "CIPHER"  },
-    { MUNGE_KEY_MAC_TYPE,    "MAC"     },
-    { MUNGE_KEY_ZIP_TYPE,    "ZIP"     },
-    { MUNGE_KEY_UID,         "UID"     },
-    { MUNGE_KEY_GID,         "GID"     },
-    { MUNGE_KEY_LENGTH,      "LENGTH"  },
-    { MUNGE_KEY_LAST,         NULL     }
+    { MUNGE_KEY_STATUS,          "STATUS"  },
+    { MUNGE_KEY_ORIGIN,          "ORIGIN"  },
+    { MUNGE_KEY_ENCODE_TIME,     "ENCODED" },
+    { MUNGE_KEY_DECODE_TIME,     "DECODED" },
+    { MUNGE_KEY_TTL,             "TTL"     },
+    { MUNGE_KEY_CIPHER_TYPE,     "CIPHER"  },
+    { MUNGE_KEY_MAC_TYPE,        "MAC"     },
+    { MUNGE_KEY_ZIP_TYPE,        "ZIP"     },
+    { MUNGE_KEY_UID,             "UID"     },
+    { MUNGE_KEY_GID,             "GID"     },
+    { MUNGE_KEY_UID_RESTRICTION, "RUID"    },
+    { MUNGE_KEY_GID_RESTRICTION, "RGID"    },
+    { MUNGE_KEY_LENGTH,          "LENGTH"  },
+    { MUNGE_KEY_LAST,             NULL     }
 };
 
 
@@ -393,7 +397,7 @@ parse_cmdline (conf_t conf, int argc, char **argv)
 void
 display_help (char *prog)
 {
-    const int w = -21;                  /* pad for width of option string */
+    const int w = -24;                  /* pad for width of option string */
 
     assert (prog != NULL);
 
@@ -414,14 +418,14 @@ display_help (char *prog)
     printf ("  %*s %s\n", w, "-i, --input=FILE",
             "Input credential from FILE");
 
+    printf ("  %*s %s\n", w, "-n, --no-output",
+            "Redirect all output to /dev/null");
+
     printf ("  %*s %s\n", w, "-m, --metadata=FILE",
             "Output metadata to FILE");
 
     printf ("  %*s %s\n", w, "-o, --output=FILE",
             "Output payload to FILE");
-
-    printf ("  %*s %s\n", w, "-n, --no-output",
-            "Redirect all output to /dev/null");
 
     printf ("\n");
 
@@ -649,6 +653,34 @@ display_meta (conf_t conf)
         w = pad - strlen (s);
         fprintf (conf->fp_meta, "%s:%*c%s (%d)\n", s, w, 0x20,
             (gr_ptr ? gr_ptr->gr_name : "???"), (int) conf->gid);
+    }
+    if (conf->key[MUNGE_KEY_UID_RESTRICTION]) {
+        e = munge_ctx_get (conf->ctx, MUNGE_OPT_UID_RESTRICTION, &i);
+        if (e != EMUNGE_SUCCESS)
+            log_err (EMUNGE_SNAFU, LOG_ERR,
+                "Unable to retrieve uid restriction: %s",
+                munge_ctx_strerror (conf->ctx));
+        if (i != MUNGE_UID_ANY) {
+            pw_ptr = getpwuid (i);
+            s = key_val_to_str (MUNGE_KEY_UID_RESTRICTION);
+            w = pad - strlen (s);
+            fprintf (conf->fp_meta, "%s:%*c%s (%d)\n", s, w, 0x20,
+                (pw_ptr ? pw_ptr->pw_name : "???"), i);
+        }
+    }
+    if (conf->key[MUNGE_KEY_GID_RESTRICTION]) {
+        e = munge_ctx_get (conf->ctx, MUNGE_OPT_GID_RESTRICTION, &i);
+        if (e != EMUNGE_SUCCESS)
+            log_err (EMUNGE_SNAFU, LOG_ERR,
+                "Unable to retrieve gid restriction: %s",
+                munge_ctx_strerror (conf->ctx));
+        if (i != MUNGE_GID_ANY) {
+            gr_ptr = getgrgid (i);
+            s = key_val_to_str (MUNGE_KEY_GID_RESTRICTION);
+            w = pad - strlen (s);
+            fprintf (conf->fp_meta, "%s:%*c%s (%d)\n", s, w, 0x20,
+                (gr_ptr ? gr_ptr->gr_name : "???"), i);
+        }
     }
     if (conf->key[MUNGE_KEY_LENGTH]) {
         s = key_val_to_str (MUNGE_KEY_LENGTH);

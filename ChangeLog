@@ -1,3 +1,14 @@
+2004-04-16  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* doc/credential_v2_format.txt, src/libcommon/munge_defs.h,
+	  src/libcommon/munge_msg.h, src/libmunge/ctx.c, src/libmunge/ctx.h,
+	  src/libmunge/decode.c, src/libmunge/encode.c, src/libmunge/munge.h,
+	  src/libmunge/strerror.c, src/munge/munge.c, src/munge/unmunge.c,
+	  src/munged/Makefile.am, src/munged/conf.c, src/munged/conf.h,
+	  src/munged/dec_v1.c, src/munged/enc_v1.c, src/munged/gids.c,
+	  src/munged/gids.h, src/munged/hash.c, src/munged/hash.h,
+	  src/munged/replay.c: Added support for UID & GID decode restrictions.
+
 2004-04-14  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* : Re-bootstrap'd with autoconf-2.59, automake-1.8.3, libtool-1.5.6.
@@ -7,7 +18,8 @@
 	* src/munge/munge.c, src/munge/unmunge.c: Tweaks for Solaris 2.8.
 
 	* src/libmunge/Makefile.am, src/munge/Makefile.am,
-	  src/munged/Makefile.am: Moved libnsl from libmunge to munged/unmunge.
+	  src/munged/Makefile.am:
+	  Moved linking of libnsl from libmunge to munged/unmunge.
 
 	* configure.ac, config/x_ac_check_cond_lib.m4,
 	  src/libmunge/Makefile.am: Added checks for libnsl & libsocket.
@@ -189,7 +201,7 @@
 	  src/munged/cred.h, src/munged/dec_v1.c, src/munged/enc_v1.c,
 	  src/munged/msg_server.c, src/munged/msg_server.h:
 	  Changed protocol between client (libmunge) and server (munged)
-          to allow credential data & metadata to be returned on error.
+	  to allow credential data & metadata to be returned on error.
 
 	* src/munge/unmunge.c(display_meta):
 	  Added check for errors on the file stream "fp_meta".

@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: decode.c,v 1.11 2004/04/03 21:53:00 dun Exp $
+ *  $Id: decode.c,v 1.12 2004/04/16 22:15:06 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -132,6 +132,8 @@ decode_init (munge_ctx_t ctx, void **buf, int *len, uid_t *uid, gid_t *gid)
         ctx->addr.s_addr = 0;
         ctx->time0 = -1;
         ctx->time1 = -1;
+        ctx->auth_uid = -1;
+        ctx->auth_gid = -1;
         ctx->errnum = EMUNGE_SUCCESS;
         if (ctx->errstr) {
             free (ctx->errstr);
@@ -195,7 +197,7 @@ decode_rsp_v1 (munge_msg_t m, munge_ctx_t ctx,
 /*  Extracts a Decode Response message received from the local munge daemon.
  *  The outputs from this message are as follows:
  *    cipher, zip, mac, realm, ttl, addr, time0, time1,
- *    uid, gid, data_len, data, error_num, error_str.
+ *    uid, gid, auth_uid, auth_gid, data_len, data, error_num, error_str.
  *  Note that the security realm string here is NUL-terminated.
  *  Note that error_num and error_str are set by _munge_ctx_set_err()
  *    called from munge_decode() (ie, the parent of this stack frame).
@@ -227,6 +229,8 @@ decode_rsp_v1 (munge_msg_t m, munge_ctx_t ctx,
         ctx->addr.s_addr = m1->addr.s_addr;;
         ctx->time0 = m1->time0;
         ctx->time1 = m1->time1;
+        ctx->auth_uid = m1->auth_uid;
+        ctx->auth_gid = m1->auth_gid;
     }
     if (buf && len && (m1->data_len > 0)) {
         n = m1->data_len + 1;
@@ -242,10 +246,10 @@ decode_rsp_v1 (munge_msg_t m, munge_ctx_t ctx,
         *len = m1->data_len;
     }
     if (uid) {
-        *uid = m1->uid;
+        *uid = m1->cred_uid;
     }
     if (gid) {
-        *gid = m1->gid;
+        *gid = m1->cred_gid;
     }
     return (m1->error_num);
 }

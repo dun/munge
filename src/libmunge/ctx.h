@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: ctx.h,v 1.8 2004/04/03 21:53:00 dun Exp $
+ *  $Id: ctx.h,v 1.9 2004/04/16 22:15:06 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -29,9 +29,10 @@
 #define MUNGE_CTX_H
 
 
+#include <netinet/in.h>                 /* for struct in_addr                */
+#include <sys/types.h>                  /* for uid_t, gid_t                  */
 #include <time.h>                       /* for time_t                        */
 #include <munge.h>                      /* for munge_ctx_t, munge_err_t      */
-#include <netinet/in.h>                 /* for struct in_addr                */
 #include "munge_msg.h"                  /* for munge_msg_t                   */
 
 
@@ -48,6 +49,8 @@ struct munge_ctx {
     struct in_addr      addr;           /* IP addr where cred was encoded    */
     time_t              time0;          /* time at which cred was encoded    */
     time_t              time1;          /* time at which cred was decoded    */
+    uid_t               auth_uid;       /* UID of client allowed to decode   */
+    gid_t               auth_gid;       /* GID of client allowed to decode   */
     char               *socket;         /* munge unix domain socket filename */
     munge_err_t         errnum;         /* munge error status                */
     char               *errstr;         /* munge error string                */
