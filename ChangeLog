@@ -1,5 +1,8 @@
 2004-11-08  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/libcommon/munge_msg.c:
+	  Documented maxlen parm in munge_msg_send() and munge_msg_recv().
+
 	* src/libmunge/auth_send.c:
 	  Added missing maxlen parm to invocation of munge_msg_recv().
 	* src/munged/auth_recv.c:

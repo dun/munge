@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munge_msg.c,v 1.22 2004/10/13 21:52:56 dun Exp $
+ *  $Id: munge_msg.c,v 1.23 2004/11/09 01:40:10 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -106,6 +106,8 @@ munge_msg_send (munge_msg_t m, int maxlen)
 {
 /*  Sends the message [m] to the recipient at the other end of the
  *    already-specified socket.
+ *  If [maxlen] > 0, messages larger than this value will be discarded and
+ *    a munge error will be returned to the caller.
  *  This message contains a common header and a version-specific body.
  *  Returns a standard munge error code.
  */
@@ -183,6 +185,8 @@ munge_msg_recv (munge_msg_t m, int maxlen)
 {
 /*  Receives a message from the sender at the other end of the already-
  *    specified socket.  This message is stored in the already-allocated [m].
+ *  If [maxlen] > 0, messages larger than this value will be discarded and
+ *    a munge error will be returned to the caller.
  *  Returns a standard munge error code.
  */
     struct munge_msg_v1 *m1;
