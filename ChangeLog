@@ -1,5 +1,7 @@
 2003-11-26  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* : Re-bootstrap'd with autoconf-2.57, automake-1.7.9, libtool-1.5.0a.
+
 	* src/libcommon/munge_defs.h, src/munged/Makefile.am,
 	  src/munged/conf.c, src/munged/cred.h, src/munged/dec_v1.c,
 	  src/munged/hash.c, src/munged/hash.h, src/munged/munged.c,
