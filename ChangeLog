@@ -1,3 +1,8 @@
+2004-07-21  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/munged/sock.c, src/munged/timer.c:
+	  Set pthread stacksize to 256KB (to appease ia64).
+
 2004-06-15  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/munged/conf.c, src/munged/munged.c:

@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: sock.c,v 1.7 2004/06/11 20:54:32 dun Exp $
+ *  $Id: sock.c,v 1.8 2004/07/21 17:57:07 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -137,7 +137,7 @@ munge_sock_accept (conf_t conf)
 {
     pthread_t tid;
     pthread_attr_t tattr;
-    size_t stacksize = 65536;
+    size_t stacksize = 256 * 1024;
     munge_msg_t m;
     int sd;
 

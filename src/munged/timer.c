@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: timer.c,v 1.4 2004/06/11 20:54:32 dun Exp $
+ *  $Id: timer.c,v 1.5 2004/07/21 17:57:07 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -109,7 +109,7 @@ void
 timer_init (void)
 {
     pthread_attr_t tattr;
-    size_t stacksize = 65536;
+    size_t stacksize = 256 * 1024;
 
     if (timer_tid != 0) {
         return;
