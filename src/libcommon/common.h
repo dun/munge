@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: common.h,v 1.2 2003/04/08 18:16:16 dun Exp $
+ *  $Id: common.h,v 1.3 2003/05/03 00:41:00 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -31,7 +31,6 @@
 
 /*  These contain prototypes and whatnot for libcommon.
  */
-#include "dprintf.h"
 #include "fd.h"
 #include "license.h"
 #include "log.h"

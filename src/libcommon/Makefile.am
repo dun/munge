@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.2 2003/04/08 18:16:16 dun Exp $
+## $Id: Makefile.am,v 1.3 2003/05/03 00:41:00 dun Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
@@ -14,8 +14,6 @@ noinst_LTLIBRARIES = \
 
 libcommon_la_SOURCES = \
 	common.h \
-	dprintf.c \
-	dprintf.h \
 	fd.c \
 	fd.h \
 	license.c \

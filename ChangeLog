@@ -1,5 +1,8 @@
 2003-05-02  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* : Removed dprintf() due to an interpositioning bug with a
+	  GNU extension function named dprintf() -- who knew?!?
+
 	* : Read PACKAGE/VERSION info from META file.
 
 	* src/munge/munge.c, src/munge/unmunge.c, src/munged/conf.c:

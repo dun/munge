@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: msg_server.c,v 1.4 2003/04/30 00:11:00 dun Exp $
+ *  $Id: msg_server.c,v 1.5 2003/05/03 00:41:00 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -31,7 +31,6 @@
 
 #include <assert.h>
 #include <string.h>
-#include "dprintf.h"
 #include "dec_v1.h"
 #include "enc_v1.h"
 #include "log.h"

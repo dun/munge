@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: msg_client.c,v 1.2 2003/04/18 23:20:18 dun Exp $
+ *  $Id: msg_client.c,v 1.3 2003/05/03 00:41:00 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -38,7 +38,6 @@
 #include <sys/un.h>
 #include <unistd.h>
 #include <munge.h>
-#include "dprintf.h"
 #include "msg_client.h"
 #include "munge_defs.h"
 #include "munge_msg.h"
@@ -97,7 +96,6 @@ _munge_msg_client_connect (munge_msg_t m, char *path)
          *   immediately.  (cf, Stevens UNPv1, s14.4, p378)
          * In case of ECONNREFUSED, try again up to MUNGE_SOCKET_RETRIES.
          */
-        DPRINTF ((10, "Connecting to \"%s\" (#%d) ...\n", path, i));
         n = connect (sd, (struct sockaddr *) &addr, sizeof (addr));
         if (n == 0)
             break;

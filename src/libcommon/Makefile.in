@@ -100,8 +100,6 @@ noinst_LTLIBRARIES = \
 
 libcommon_la_SOURCES = \
 	common.h \
-	dprintf.c \
-	dprintf.h \
 	fd.c \
 	fd.h \
 	license.c \
@@ -124,8 +122,8 @@ LTLIBRARIES = $(noinst_LTLIBRARIES)
 
 libcommon_la_LDFLAGS =
 libcommon_la_LIBADD =
-am_libcommon_la_OBJECTS = dprintf.lo fd.lo license.lo log.lo \
-	munge_msg.lo posignal.lo str.lo
+am_libcommon_la_OBJECTS = fd.lo license.lo log.lo munge_msg.lo \
+	posignal.lo str.lo
 libcommon_la_OBJECTS = $(am_libcommon_la_OBJECTS)
 
 DEFS = @DEFS@
@@ -134,10 +132,9 @@ LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
 depcomp = $(SHELL) $(top_srcdir)/config/depcomp
 am__depfiles_maybe = depfiles
-@AMDEP_TRUE@DEP_FILES = ./$(DEPDIR)/dprintf.Plo ./$(DEPDIR)/fd.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/license.Plo ./$(DEPDIR)/log.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/munge_msg.Plo ./$(DEPDIR)/posignal.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/str.Plo
+@AMDEP_TRUE@DEP_FILES = ./$(DEPDIR)/fd.Plo ./$(DEPDIR)/license.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/log.Plo ./$(DEPDIR)/munge_msg.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/posignal.Plo ./$(DEPDIR)/str.Plo
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) \
@@ -177,7 +174,6 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dprintf.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fd.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/license.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/log.Plo@am__quote@
