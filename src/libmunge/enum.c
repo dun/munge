@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: enum.c,v 1.2 2004/11/19 01:03:21 dun Exp $
+ *  $Id: enum.c,v 1.3 2004/12/02 03:40:15 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -107,7 +107,7 @@ static struct munge_enum_table _munge_zip_table[] = {
  *  Prototypes
  *****************************************************************************/
 
-static const munge_enum_table_t _munge_enum_lookup (munge_enum_t type);
+static munge_enum_table_t _munge_enum_lookup (munge_enum_t type);
 
 
 /*****************************************************************************
@@ -189,7 +189,7 @@ munge_enum_str_to_int (munge_enum_t type, const char *str)
  *  Private Functions
  *****************************************************************************/
 
-static const munge_enum_table_t
+static munge_enum_table_t
 _munge_enum_lookup (munge_enum_t type)
 {
     switch (type) {

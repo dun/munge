@@ -1,6 +1,11 @@
+2004-12-01  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/libmunge/enum.c(_munge_enum_lookup): Changed return type from
+	const munge_enum_table_t to munge_enum_table_t.
+
 2004-11-30  Chris Dunlap  <cdunlap@llnl.gov>
 
-	* config/Make-rpm.mk: Updated to reflect changes to META.
+	* config/Make-rpm.mk: Updated to reflect prior changes to META.
 
 	* src/munged/munged.8.in: Updated info for '--force' cmdline opt.
 
