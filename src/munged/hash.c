@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: hash.c,v 1.4 2004/04/16 22:14:12 dun Exp $
+ *  $Id: hash.c,v 1.5 2004/09/04 00:15:50 dun Exp $
  *  LSD-Id: hash.c,v 1.8 2003/11/19 23:33:48 dun Exp
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
@@ -45,7 +45,7 @@
  *  Constants
  *****************************************************************************/
 
-#define HASH_ALLOC      256
+#define HASH_ALLOC      1024
 #define HASH_DEF_SIZE   1213
 #define HASH_MAGIC      0xDEADBEEF
 
