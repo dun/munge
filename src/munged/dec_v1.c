@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: dec_v1.c,v 1.4 2003/04/23 22:04:45 dun Exp $
+ *  $Id: dec_v1.c,v 1.5 2003/04/23 22:15:03 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -765,6 +765,7 @@ static int
 dec_v1_validate_time (munge_cred_t c)
 {
     struct munge_msg_v1 *m1;            /* munge msg (v1 format)             */
+    uint32_t             delta;         /* seconds 'tween encode/decode time */
 
     assert (c != NULL);
     assert (c->msg != NULL);
@@ -775,7 +776,8 @@ dec_v1_validate_time (munge_cred_t c)
     if ((!conf->got_clock_skew) && (m1->time1 < m1->time0)) {
         return (_munge_msg_set_err (c->msg, EMUNGE_CRED_REWOUND, NULL));
     }
-    if (abs (m1->time1 - m1->time0) > m1->ttl) {
+    delta = abs (m1->time1 - m1->time0);
+    if ((m1->ttl != MUNGE_TTL_FOREVER) && (delta > m1->ttl)) {
         return (_munge_msg_set_err (c->msg, EMUNGE_CRED_EXPIRED, NULL));
     }
     return (0);
