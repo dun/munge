@@ -4,7 +4,7 @@
 
 	* src/libmunge/ctx.c, src/libmunge/msg_client.c, src/munged/dec_v1.c,
 	  src/munged/enc_v1.c, src/munged/munged.c:
-	  Tweaked includes for FreeBSD.
+	  Tweaked includes for FreeBSD 4.8.
 
 	* Makefile.in, aclocal.m4, configure, configure.ac,
 	  config/ac_check_peercred.m4, config/config.h.in, src/Makefile.in,
@@ -17,6 +17,10 @@
 	  Replaced obsolete AC_HELP_STRING with AS_HELP_STRING.
 
 2004-01-29  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/libmunge/msg_client.c, src/munge/munge.c, src/munge/unmunge.c,
+	  src/munged/conf.c, src/munged/sock.c:
+	  Tweaked for compiler warnings under AIX 5.1.
 
 	* src/libcommon/munge_msg.h, src/munged/conf.h, src/munged/cred.h:
 	  Replaced <stdint.h> with <inttypes.h> based on info from the
