@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: timer.c,v 1.7 2004/07/29 19:11:15 dun Exp $
+ *  $Id: timer.c,v 1.8 2004/07/29 20:20:06 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -379,7 +379,8 @@ timer_thread (void *arg)
             t->next = timer_inactive;
             timer_inactive = t;
         }
-        /*  Since enabling cancellation is not a cancellation point,
+        /*  Enable the thread's cancellation state.
+         *    Since enabling cancellation is not a cancellation point,
          *    a pending cancel request must be tested for.  But a
          *    pthread_testcancel() is not needed here.  If active timers
          *    are present, the pthread_cond_timedwait() at the bottom of
