@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munge.h,v 1.23 2004/10/13 21:52:56 dun Exp $
+ *  $Id: munge.h,v 1.24 2004/11/09 17:20:43 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -36,10 +36,10 @@
  *****************************************************************************/
 
 #if ! GPL_LICENSED
-  #error By linking against libmunge, the derivative
-  #error work becomes licensed under the terms of the
-  #error GNU General Public License.  Acknowledge by
-  #error defining the GPL_LICENSED preprocessor macro.
+#  error By linking against libmunge, the derivative
+#  error work becomes licensed under the terms of the
+#  error GNU General Public License.  Acknowledge by
+#  error defining the GPL_LICENSED preprocessor macro.
 #endif /* !GPL_LICENSED */
 
 
@@ -50,11 +50,11 @@
 #undef BEGIN_C_DECLS
 #undef END_C_DECLS
 #ifdef __cplusplus
-  #define BEGIN_C_DECLS         extern "C" {
-  #define END_C_DECLS           }
+#  define BEGIN_C_DECLS         extern "C" {
+#  define END_C_DECLS           }
 #else  /* !__cplusplus */
-  #define BEGIN_C_DECLS         /* empty */
-  #define END_C_DECLS           /* empty */
+#  define BEGIN_C_DECLS         /* empty */
+#  define END_C_DECLS           /* empty */
 #endif /* !__cplusplus */
 
 

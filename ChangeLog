@@ -1,3 +1,8 @@
+2004-11-09  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/libmunge/munge.h:
+	  Changed indenting of preprocessor cmds so line begins with '#'.
+
 2004-11-08  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/munged/work.c(work_queue):
