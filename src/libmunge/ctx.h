@@ -1,9 +1,9 @@
 /*****************************************************************************
- *  $Id: ctx.h,v 1.6 2004/01/16 02:18:37 dun Exp $
+ *  $Id: ctx.h,v 1.7 2004/04/03 01:12:06 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
- *  UCRL-CODE-2003-???.
+ *  UCRL-CODE-155910.
  *
  *  Copyright (C) 2002-2004 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).

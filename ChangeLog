@@ -1,5 +1,7 @@
 2004-04-02  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* : Added official UCRL number.
+
 	* munge.spec, src/etc/munge.init:
 	  Changed daemon rpm (re)start behavior at install or upgrade.
 

@@ -1,11 +1,11 @@
 ##*****************************************************************************
-## $Id: configure.ac,v 1.17 2004/03/25 00:14:57 dun Exp $
+## $Id: configure.ac,v 1.18 2004/04/03 01:12:06 dun Exp $
 ##*****************************************************************************
 ## Process this file with autoconf to produce a configure script.
 ##*****************************************************************************
 ## This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
 ## For details, see <http://www.llnl.gov/linux/munge/>.
-## UCRL-CODE-2003-???.
+## UCRL-CODE-155910.
 ##
 ## Copyright (C) 2002-2004 The Regents of the University of California.
 ## Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
