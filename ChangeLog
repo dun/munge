@@ -1,3 +1,8 @@
+2004-03-05  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* config/ac_check_peercred.m4, config/ac_humor.m4:
+	  Added autoconf caching support.
+
 2004-03-04  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* README, munge.spec: Updated description.

@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: ac_humor.m4,v 1.2 2003/02/13 17:59:16 dun Exp $
+## $Id: ac_humor.m4,v 1.3 2004/03/05 19:13:33 dun Exp $
 ##*****************************************************************************
 #  AUTHOR:
 #    Chris Dunlap <cdunlap@llnl.gov>
@@ -13,7 +13,5 @@
 
 AC_DEFUN([AC_HUMOR],
 [
-  AC_MSG_CHECKING([for a sense of humor])
-  ac_humor=1
-  AC_MSG_RESULT([yes])
+  AC_CACHE_CHECK([for a sense of humor], [ac_cv_humor], [ac_cv_humor=yes])
 ])
