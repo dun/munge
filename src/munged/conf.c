@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: conf.c,v 1.29 2004/11/09 18:12:04 dun Exp $
+ *  $Id: conf.c,v 1.30 2004/11/09 20:06:14 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -41,7 +41,6 @@
 #include <string.h>
 #include <sys/param.h>                  /* for MAXHOSTNAMELEN */
 #include <unistd.h>
-#include "auth_policy.h"
 #include "conf.h"
 #include "license.h"
 #include "log.h"
@@ -131,11 +130,11 @@ create_conf (void)
     conf->mac_key_len = 0;
     conf->nthreads = MUNGE_THREADS;
 
-    if (!(conf->auth_pipe_prefix = strdup (AUTH_PIPE_NAME_PREFIX))) {
+    if (!(conf->auth_pipe_prefix = strdup (MUNGE_AUTH_PIPE_NAME_PREFIX))) {
         log_errno (EMUNGE_NO_MEMORY, LOG_ERR,
             "Cannot dup auth pipe name prefix string");
     }
-    conf->auth_pipe_rnd_bytes = AUTH_PIPE_NAME_RND_BYTES;
+    conf->auth_pipe_rnd_bytes = MUNGE_AUTH_PIPE_NAME_RND_BYTES;
 
     return (conf);
 }

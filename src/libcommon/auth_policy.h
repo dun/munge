@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: auth_policy.h,v 1.3 2004/11/09 18:12:04 dun Exp $
+ *  $Id: auth_policy.h,v 1.4 2004/11/09 20:06:14 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -85,21 +85,6 @@
 #if defined (MUNGE_AUTH_RECVFD_MKFIFO) || defined (MUNGE_AUTH_RECVFD_MKNOD)
 #  define MUNGE_AUTH_RECVFD_COMMON
 #endif /* MUNGE_AUTH_RECVFD_COMMON */
-
-
-/*****************************************************************************
- *  Constants
- *****************************************************************************/
-
-/*  The directory prefix for the pipe used to authenticate a particular
- *    client via fd-passing.
- */
-#define AUTH_PIPE_NAME_PREFIX           "/tmp"
-
-/*  The amount of entropy (in bytes) to place in the filename of the pipe used
- *    to authenticate a particular client via fd-passing.
- */
-#define AUTH_PIPE_NAME_RND_BYTES        16
 
 
 #endif /* !MUNGE_AUTH_POLICY_H */

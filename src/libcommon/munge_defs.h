@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munge_defs.h,v 1.33 2004/10/13 21:52:56 dun Exp $
+ *  $Id: munge_defs.h,v 1.34 2004/11/09 20:06:14 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -129,6 +129,16 @@
 /*  Number of threads to create for processing credential requests.
  */
 #define MUNGE_THREADS                   2
+
+/*  The directory prefix for the pipe used to authenticate a particular
+ *    client via fd-passing.
+ */
+#define MUNGE_AUTH_PIPE_NAME_PREFIX     "/tmp"
+
+/*  The amount of entropy (in bytes) to place in the filename of the pipe used
+ *    to authenticate a particular client via fd-passing.
+ */
+#define MUNGE_AUTH_PIPE_NAME_RND_BYTES  16
 
 /*  String specifying the pathname of the daemon's logfile.
  *  FIXME: Temporary kludge until configuration file support is added.
