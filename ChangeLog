@@ -36,8 +36,8 @@
 	* src/libmunge/auth_send.c, src/libmunge/msg_client.c,
 	  src/munged/munged.c: Replaced strlcat/strlcpy includes w/ missing.h.
 
-	* configure.ac:
-	  Replaced inet_ntoa() with gethostbyname() in X_AC_CHECK_COND_LIB.
+	* configure.ac: Changed X_AC_CHECK_COND_LIB libnsl test
+	  from inet_ntoa() to gethostbyname().
 
 	* configure.ac, src/libmissing/inet_ntop.c, src/libmissing/inet_ntop.h,
 	  src/libmissing/missing.h, src/munge/unmunge.c, src/munged/conf.c:
