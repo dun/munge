@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: auth_recv.c,v 1.2 2004/05/14 00:47:59 dun Exp $
+ *  $Id: auth_recv.c,v 1.3 2004/06/08 23:43:12 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -195,12 +195,10 @@ err:
 #ifdef MUNGE_AUTH_RECVFD_MKNOD
 
 #include <fcntl.h>                      /* open, O_RDWR */
-#include <stropts.h>                    /* I_RECVFD, struct strrecvfd */
-#include <sys/ioctl.h>                  /* I_FDINSERT */
+#include <stropts.h>                    /* struct strrecvfd, I_RECVFD */
 #include <sys/ioctl.h>                  /* ioctl */
 #include <sys/stat.h>                   /* struct stat, mknod, S_IFCHR */
 #include <sys/stream.h>                 /* queue_t */
-#include <sys/stropts.h>                /* struct strfdinsert */
 #include <sys/uio.h>                    /* include before stream.h for aix */
 
 static int _create_auth_pipe (const char *name);
