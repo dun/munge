@@ -1,5 +1,8 @@
 2004-08-17  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/munged/conf.c:
+	  Added temporary cmdline opts for 'keyfile' and 'nthreads'.
+
 	* src/munged/job.c(job_accept): Tweaked log messages.
 
 	* src/libcommon/munge_defs.h: Changed MUNGE_THREADS from 4 to 2.

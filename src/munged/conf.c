@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: conf.c,v 1.23 2004/08/05 21:10:50 dun Exp $
+ *  $Id: conf.c,v 1.24 2004/08/17 21:37:32 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -63,6 +63,8 @@ struct option opt_table[] = {
     { "foreground", 0, NULL, 'F' },
     { "socket",     1, NULL, 'S' },
     { "advice",     0, NULL, 'A' },
+    { "keyfile",    1, NULL, '0' },	/* xyzzy: tmp secret cmdline opt */
+    { "nthreads",   1, NULL, '1' },	/* xyzzy: tmp secret cmdline opt */
     {  NULL,        0, NULL,  0  }
 };
 
@@ -196,7 +198,7 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                 conf->got_foreground = 1;
                 break;
             case 'S':
-                if  (conf->socket_name)
+                if (conf->socket_name)
                     free (conf->socket_name);
                 if (!(conf->socket_name = strdup (optarg)))
                     log_errno (EMUNGE_NO_MEMORY, LOG_ERR,
@@ -205,6 +207,17 @@ parse_cmdline (conf_t conf, int argc, char **argv)
             case 'A':
                 printf ("Don't Panic!\n");
                 exit (42);
+            case '0':                   /* xyzzy */
+                if (conf->key_name)
+                    free (conf->key_name);
+                if (!(conf->key_name = strdup (optarg)))
+                    log_errno (EMUNGE_NO_MEMORY, LOG_ERR,
+                        "Cannot dup keyfile name string");
+                break;                  /* xyzzy */
+            case '1':                   /* xyzzy */
+                if ((c = atoi (optarg)) > 0)
+                    conf->nthreads = c;
+                break;                  /* xyzzy */
             case '?':
                 if (optopt > 0)
                     log_err (EMUNGE_SNAFU, LOG_ERR,
