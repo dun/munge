@@ -1,6 +1,8 @@
 2003-04-25  Chris Dunlap  <cdunlap@llnl.gov>
 
-	* src/munge/unmunge.c: Added "t" cmdline opt for setting TTL.
+	* src/munge/munge.c: Added c/C/m/M/z/Z cmdline opts.
+
+	* src/munge/unmunge.c: Added t cmdline opt for setting TTL.
 	  Added ENCODED, DECODED, CIPHER, MAC, ZIP metadata keys.
 
 	* src/libmunge/munge.h, src/libmunge/ctx.c: Tweaked MUNGE_OPT_* enums.
@@ -10,7 +12,7 @@
 
 2003-04-24  Chris Dunlap  <cdunlap@llnl.gov>
 
-	* src/munge/unmunge.c: Changed "t" & "T" cmdline opts to "k" & "K".
+	* src/munge/unmunge.c: Changed t/T cmdline opts to k/K.
 
 2003-04-23  Chris Dunlap  <cdunlap@llnl.gov>
 

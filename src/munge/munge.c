@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munge.c,v 1.8 2003/04/23 18:22:35 dun Exp $
+ *  $Id: munge.c,v 1.9 2003/04/25 21:27:36 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -30,12 +30,14 @@
 #endif /* HAVE_CONFIG_H */
 
 #include <assert.h>
+#include <ctype.h>
 #include <errno.h>
-#include <munge.h>
+#include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <munge.h>
 #include "common.h"
 #include "read.h"
 
@@ -47,20 +49,25 @@
 #if HAVE_GETOPT_H
 #  include <getopt.h>
 struct option opt_table[] = {
-    { "help",       0, NULL, 'h' },
-    { "license",    0, NULL, 'L' },
-    { "version",    0, NULL, 'V' },
-    { "verbose",    0, NULL, 'v' },
-    { "input",      1, NULL, 'i' },
-    { "no-input",   0, NULL, 'n' },
-    { "output",     1, NULL, 'o' },
-    { "string",     1, NULL, 's' },
-    { "socket",     1, NULL, 'S' },
-    {  NULL,        0, NULL,  0  }
+    { "help",         0, NULL, 'h' },
+    { "license",      0, NULL, 'L' },
+    { "version",      0, NULL, 'V' },
+    { "cipher",       1, NULL, 'c' },
+    { "list-ciphers", 0, NULL, 'C' },
+    { "input",        1, NULL, 'i' },
+    { "mac",          1, NULL, 'm' },
+    { "list-macs",    0, NULL, 'M' },
+    { "no-input",     0, NULL, 'n' },
+    { "output",       1, NULL, 'o' },
+    { "string",       1, NULL, 's' },
+    { "socket",       1, NULL, 'S' },
+    { "zip",          1, NULL, 'z' },
+    { "list-zips",    0, NULL, 'Z' },
+    {  NULL,          0, NULL,  0  }
 };
 #endif /* HAVE_GETOPT_H */
 
-const char * const opt_string = "hLVvi:no:s:S:";
+const char * const opt_string = "hLVc:Ci:m:Mno:s:S:z:Z";
 
 
 /***************************************************************************** 
@@ -92,6 +99,8 @@ conf_t create_conf (void);
 void destroy_conf (conf_t conf);
 void parse_cmdline (conf_t conf, int argc, char **argv);
 void display_help (char *prog);
+void display_strings (const char **strings);
+int str_to_int (const char *s, const char **strings);
 void open_files (conf_t conf);
 void display_cred (conf_t conf);
 
@@ -209,6 +218,7 @@ parse_cmdline (conf_t conf, int argc, char **argv)
     char       *prog;
     char        c;
     munge_err_t e;
+    int         i;
 
     opterr = 0;                         /* suppress default getopt err msgs */
 
@@ -236,11 +246,37 @@ parse_cmdline (conf_t conf, int argc, char **argv)
 //          case 'V':
 //              exit (EMUNGE_SUCCESS);
 //              break;
-            case 'v':
+            case 'c':
+                if ((i = str_to_int (optarg, munge_cipher_strings)) < 0)
+                    log_err (EMUNGE_SNAFU, LOG_ERR,
+                        "Invalid cipher type \"%s\"", optarg);
+                e = munge_ctx_set (conf->ctx, MUNGE_OPT_CIPHER_TYPE, i);
+                if (e != EMUNGE_SUCCESS)
+                    log_err (EMUNGE_SNAFU, LOG_ERR,
+                        "Unable to set cipher type: %s",
+                        munge_ctx_strerror (conf->ctx));
+                break;
+            case 'C':
+                display_strings (munge_cipher_strings);
+                exit (EMUNGE_SUCCESS);
                 break;
             case 'i':
                 conf->fn_in = optarg;
                 conf->string = NULL;
+                break;
+            case 'm':
+                if ((i = str_to_int (optarg, munge_mac_strings)) < 0)
+                    log_err (EMUNGE_SNAFU, LOG_ERR,
+                        "Invalid mesg auth code type \"%s\"", optarg);
+                e = munge_ctx_set (conf->ctx, MUNGE_OPT_MAC_TYPE, i);
+                if (e != EMUNGE_SUCCESS)
+                    log_err (EMUNGE_SNAFU, LOG_ERR,
+                        "Unable to set mesg auth code type: %s",
+                        munge_ctx_strerror (conf->ctx));
+                break;
+            case 'M':
+                display_strings (munge_mac_strings);
+                exit (EMUNGE_SUCCESS);
                 break;
             case 'n':
                 conf->fn_in = NULL;
@@ -257,7 +293,22 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                 e = munge_ctx_set (conf->ctx, MUNGE_OPT_SOCKET, optarg);
                 if (e != EMUNGE_SUCCESS)
                     log_err (EMUNGE_SNAFU, LOG_ERR,
-                        "Unable to set munge socket name");
+                        "Unable to set munge socket name: %s",
+                        munge_ctx_strerror (conf->ctx));
+                break;
+            case 'z':
+                if ((i = str_to_int (optarg, munge_zip_strings)) < 0)
+                    log_err (EMUNGE_SNAFU, LOG_ERR,
+                        "Invalid compression type \"%s\"", optarg);
+                e = munge_ctx_set (conf->ctx, MUNGE_OPT_ZIP_TYPE, i);
+                if (e != EMUNGE_SUCCESS)
+                    log_err (EMUNGE_SNAFU, LOG_ERR,
+                        "Unable to set compression type: %s",
+                        munge_ctx_strerror (conf->ctx));
+                break;
+            case 'Z':
+                display_strings (munge_zip_strings);
+                exit (EMUNGE_SUCCESS);
                 break;
             case '?':
                 if (optopt > 0)
@@ -307,8 +358,7 @@ display_help (char *prog)
     printf ("  %*s %s\n", w, (got_long ? "-V, --version" : "-V"),
             "Display version information");
 
-    printf ("  %*s %s\n", w, (got_long ? "-v, --verbose" : "-v"),
-            "Be verbose");
+    printf ("\n");
 
     printf ("  %*s %s\n", w, (got_long ? "-i, --input=FILE" : "-i FILE"),
             "Input payload data from FILE");
@@ -322,6 +372,26 @@ display_help (char *prog)
     printf ("  %*s %s\n", w, (got_long ? "-s, --string=STRING" : "-s STRING"),
             "Input payload data from STRING");
 
+    printf ("\n");
+
+    printf ("  %*s %s\n", w, (got_long ? "-c, --cipher=STRING" : "-c STRING"),
+            "Specify cipher type");
+
+    printf ("  %*s %s\n", w, (got_long ? "-C, --list-ciphers" : "-C"),
+            "Print a list of supported ciphers");
+
+    printf ("  %*s %s\n", w, (got_long ? "-m, --mac=STRING" : "-m STRING"),
+            "Specify message authentication code type");
+
+    printf ("  %*s %s\n", w, (got_long ? "-M, --list-macs" : "-M"),
+            "Print a list of supported MACs");
+
+    printf ("  %*s %s\n", w, (got_long ? "-z, --zip=STRING" : "-z STRING"),
+            "Specify compression type");
+
+    printf ("  %*s %s\n", w, (got_long ? "-Z, --list-zips" : "-Z"),
+            "Print a list of supported compressions");
+
     printf ("  %*s %s\n", w, (got_long ? "-S, --socket=STRING" : "-S STRING"),
             "Specify local domain socket");
 
@@ -329,6 +399,49 @@ display_help (char *prog)
     printf ("By default, data is read from stdin and written to stdout.\n\n");
 
     return;
+}
+
+
+void
+display_strings (const char **strings)
+{
+    const char **pp;
+    int i;
+
+    /*  Display each non-empty string in the NULL-terminated list.
+     *    Empty strings (ie, "") are invalid.
+     */
+    for (pp=strings, i=0; *pp; pp++, i++) {
+        if (*pp[0] != '\0')
+            printf ("%s (%d)\n", *pp, i);
+    }
+    return;
+}
+
+
+int
+str_to_int (const char *s, const char **strings)
+{
+    const char **pp;
+    int i;
+    int n;
+
+    /*  Check to see if the given string matches a valid string.
+     */
+    for (pp=strings, i=0; *pp; pp++, i++) {
+        if (!strcasecmp (s, *pp))
+            return (i);
+    }
+    /*  Check to see if the given string matches a valid enum.
+     */
+    if (isdigit (s[0])) {
+        n = strtol (s, NULL, 10);
+        if ((n == LONG_MIN) || (n == LONG_MAX))
+            return (-1);
+        if ((n >= 0) && (n < i) && (strings[n][0] != '\0'))
+            return (n);
+    }
+    return (-1);
 }
 
 
