@@ -1,5 +1,7 @@
 2004-08-11  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* : Re-bootstrap'd with automake-1.9.
+
 	* src/munged/work.c(work_fini):
 	  Fixed bug preventing the worker thread(s) from being canceled.
 
