@@ -1,3 +1,9 @@
+2004-03-31  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* config/x_ac_debug.m4, src/munge/unmunge.c, src/munged/dec_v1.c,
+	  src/munged/enc_v1.c, src/munged/zip.c:
+	  Added -pedantic to --enable-debug CFLAGS.
+
 2004-03-25  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/munged/munged.c(main):

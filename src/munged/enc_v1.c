@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: enc_v1.c,v 1.12 2004/03/12 22:45:02 dun Exp $
+ *  $Id: enc_v1.c,v 1.13 2004/04/01 01:03:24 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -745,7 +745,7 @@ enc_v1_armor (munge_cred_t c)
     /*  Add the prefix string.
      */
     if (prefix_len > 0) {
-        strcpy (buf_ptr, MUNGE_CRED_PREFIX);    /* strcpy() is safe here */
+        strcpy ((char *) buf_ptr, MUNGE_CRED_PREFIX); /* strcpy() safe here */
         buf_ptr += prefix_len;
     }
     /*  Base64-encode the chewy-internals of the credential.
@@ -783,7 +783,7 @@ enc_v1_armor (munge_cred_t c)
     /*  Add the suffix string.
      */
     if (suffix_len > 0) {
-        strcpy (buf_ptr, MUNGE_CRED_SUFFIX);    /* strcpy() is safe here */
+        strcpy ((char *) buf_ptr, MUNGE_CRED_SUFFIX); /* strcpy() safe here */
         buf_ptr += suffix_len;
     }
     assert ((buf_ptr - buf) < buf_len);

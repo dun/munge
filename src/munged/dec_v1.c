@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: dec_v1.c,v 1.15 2004/03/12 22:45:02 dun Exp $
+ *  $Id: dec_v1.c,v 1.16 2004/04/01 01:03:24 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -218,7 +218,7 @@ dec_v1_unarmor (munge_cred_t c)
      *  The prefix specifies the start of the base64-encoded data.
      */
     if (prefix_len > 0) {
-        if (strncmp (base64_ptr, MUNGE_CRED_PREFIX, prefix_len) != 0) {
+        if (strncmp ((char *) base64_ptr, MUNGE_CRED_PREFIX, prefix_len)) {
             return (_munge_msg_set_err (c->msg, EMUNGE_BAD_CRED,
                 strdup ("Unable to match armor prefix")));
         }
@@ -240,7 +240,7 @@ dec_v1_unarmor (munge_cred_t c)
     if (suffix_len > 0) {
         base64_tmp = base64_ptr + base64_len - suffix_len;
         while (base64_tmp >= base64_ptr) {
-            if (strncmp (base64_tmp, MUNGE_CRED_SUFFIX, suffix_len) == 0)
+            if (!strncmp ((char *) base64_tmp, MUNGE_CRED_SUFFIX, suffix_len))
                 break;
             base64_tmp--;
         }
@@ -413,7 +413,7 @@ dec_v1_unpack_outer (munge_cred_t c)
         /*
          *  Update realm & realm_len to refer to the string in "cred memory".
          */
-        m1->realm = c->realm_mem;
+        m1->realm = (char *) c->realm_mem;
         m1->realm_len = c->realm_mem_len;
     }
     /*  Unpack the cipher initialization vector (if needed).

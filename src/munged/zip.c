@@ -112,15 +112,15 @@ zip_compress_block (munge_zip_t type,
     if (*dstlen < sizeof (meta)) {
         return (-1);
     }
-    xdst = dst + sizeof (meta);
+    xdst = (unsigned char *) dst + sizeof (meta);
     xdstlen = *dstlen - sizeof (meta);
     xsrc = (unsigned char *) src;
     xsrclen = srclen;
 
 #if HAVE_PKG_BZLIB
     if (type == MUNGE_ZIP_BZLIB) {
-        if (BZ2_bzBuffToBuffCompress (xdst, &xdstlen,
-                xsrc, xsrclen, 9, 0, 0) != BZ_OK)
+        if (BZ2_bzBuffToBuffCompress ((char *) xdst, &xdstlen,
+                (char *) xsrc, xsrclen, 9, 0, 0) != BZ_OK)
             return (-1);
     }
 #endif /* HAVE_PKG_BZLIB */
@@ -178,8 +178,8 @@ zip_decompress_block (munge_zip_t type,
 
 #if HAVE_PKG_BZLIB
     if (type == MUNGE_ZIP_BZLIB) {
-        if (BZ2_bzBuffToBuffDecompress (xdst, &xdstlen,
-                xsrc, xsrclen, 0, 0) != BZ_OK)
+        if (BZ2_bzBuffToBuffDecompress ((char *) xdst, &xdstlen,
+                (char *) xsrc, xsrclen, 0, 0) != BZ_OK)
             return (-1);
     }
 #endif /* HAVE_PKG_BZLIB */

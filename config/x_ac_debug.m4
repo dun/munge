@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: x_ac_debug.m4,v 1.2 2004/03/12 00:33:48 dun Exp $
+## $Id: x_ac_debug.m4,v 1.3 2004/04/01 01:03:24 dun Exp $
 ##*****************************************************************************
 #  AUTHOR:
 #    Chris Dunlap <cdunlap@llnl.gov>
@@ -32,7 +32,7 @@ AC_DEFUN([X_AC_DEBUG],
   if test "$x_ac_debug" = yes; then
     if test -z "$ac_save_CFLAGS"; then
       test "$ac_cv_prog_cc_g" = yes && _x_ac_debug_g="-g" || _x_ac_debug_g=""
-      test "$GCC" = yes && CFLAGS="-Wall -Werror $_x_ac_debug_g"
+      test "$GCC" = yes && CFLAGS="-Wall -Werror -pedantic $_x_ac_debug_g"
     fi
   else
     if test -z "$ac_save_CFLAGS"; then

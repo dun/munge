@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: unmunge.c,v 1.21 2004/03/19 23:39:01 dun Exp $
+ *  $Id: unmunge.c,v 1.22 2004/04/01 01:03:24 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -569,9 +569,14 @@ display_meta (conf_t conf)
                 "Unable to retrieve encode time: %s",
                 munge_ctx_strerror (conf->ctx));
         tm_ptr = localtime (&t);
-        tlen = strftime (tbuf, sizeof (tbuf),
-            "%Y-%m-%d %H:%M:%S (%s)", tm_ptr);
+        tlen = strftime (tbuf, sizeof (tbuf), "%Y-%m-%d %H:%M:%S", tm_ptr);
         if ((tlen == 0) || (tlen >= sizeof (tbuf)))
+            log_err (EMUNGE_OVERFLOW, LOG_ERR,
+                "Overran buffer for encode time");
+        /*
+         *  Since ISO C does not support the '%s' strftime format option ...
+         */
+        if (strcatf (tbuf, sizeof (tbuf), " (%ld)", (long) t) < 0)
             log_err (EMUNGE_OVERFLOW, LOG_ERR,
                 "Overran buffer for encode time");
         s = key_val_to_str (MUNGE_KEY_ENCODE_TIME);
@@ -585,9 +590,14 @@ display_meta (conf_t conf)
                 "Unable to retrieve decode time: %s",
                 munge_ctx_strerror (conf->ctx));
         tm_ptr = localtime (&t);
-        tlen = strftime (tbuf, sizeof (tbuf),
-            "%Y-%m-%d %H:%M:%S (%s)", tm_ptr);
+        tlen = strftime (tbuf, sizeof (tbuf), "%Y-%m-%d %H:%M:%S", tm_ptr);
         if ((tlen == 0) || (tlen >= sizeof (tbuf)))
+            log_err (EMUNGE_OVERFLOW, LOG_ERR,
+                "Overran buffer for decode time");
+        /*
+         *  Since ISO C does not support the '%s' strftime format option ...
+         */
+        if (strcatf (tbuf, sizeof (tbuf), " (%ld)", (long) t) < 0)
             log_err (EMUNGE_OVERFLOW, LOG_ERR,
                 "Overran buffer for decode time");
         s = key_val_to_str (MUNGE_KEY_DECODE_TIME);

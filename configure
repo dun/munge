@@ -19126,7 +19126,7 @@ fi;
   if test "$x_ac_debug" = yes; then
     if test -z "$ac_save_CFLAGS"; then
       test "$ac_cv_prog_cc_g" = yes && _x_ac_debug_g="-g" || _x_ac_debug_g=""
-      test "$GCC" = yes && CFLAGS="-Wall -Werror $_x_ac_debug_g"
+      test "$GCC" = yes && CFLAGS="-Wall -Werror -pedantic $_x_ac_debug_g"
     fi
   else
     if test -z "$ac_save_CFLAGS"; then
