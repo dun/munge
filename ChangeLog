@@ -1,5 +1,7 @@
 2004-11-30  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* config/Make-rpm.mk: Updated to reflect changes to META.
+
 	* src/munged/munged.8.in: Updated info for '--force' cmdline opt.
 
 2004-11-29  Chris Dunlap  <cdunlap@llnl.gov>

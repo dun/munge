@@ -3,7 +3,7 @@
 ##   by Chris Dunlap <cdunlap@llnl.gov>
 ##*
 ## ConManId: Make-rpm.mk,v 1.20 2002/08/16 00:18:29 dun Exp
-## $Id: Make-rpm.mk,v 1.7 2004/03/25 21:48:20 dun Exp $
+## $Id: Make-rpm.mk,v 1.8 2004/11/30 20:33:02 dun Exp $
 ##*
 ## REQUIREMENTS:
 ## - requires project to be under CVS version control
@@ -55,7 +55,8 @@ tar rpm:
 	  if ! test -f META; then \
 	    echo "ERROR: Cannot find $$proj metadata in \"`pwd`/META\"." 1>&2;\
 	      exit 1; fi; \
-	  name=`perl -ne 'print,exit if s/^\s*NAME:\s*(\S*).*/\1/i' META`; \
+	  name=`perl -ne 'print,exit if s/^\s*(NAME|PACKAGE):\s*(\S*).*/\1/i' \
+	    META`; \
 	  ver=`perl -ne 'print,exit if s/^\s*VERSION:\s*(\S*).*/\1/i' META`; \
 	  rel=`perl -ne 'print,exit if s/^\s*RELEASE:\s*(\S*).*/\1/i' META`; \
 	  test -z "$$rel" && pkg=$$name-$$ver || pkg=$$name-$$ver-$$rel; \
@@ -72,7 +73,8 @@ tar rpm:
 	meta=$$tmp/$$proj/META; \
 	if test ! -f "$$meta"; then \
 	  echo "ERROR: Cannot find $$proj metadata in CVS." 1>&2; exit 1; fi; \
-	name=`perl -ne 'print,exit if s/^\s*NAME:\s*(\S*).*/\1/i' $$meta`; \
+	name=`perl -ne 'print,exit if s/^\s*(NAME|PACKAGE):\s*(\S*).*/\1/i' \
+	  $$meta`; \
 	if test "$$proj" != "$$name"; then \
 	  echo "ERROR: PACKAGE does not match metadata." 1>&2; exit 1; fi; \
 	ver=`perl -ne 'print,exit if s/^\s*VERSION:\s*(\S*).*/\1/i' $$meta`; \
