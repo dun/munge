@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munge_defs.h,v 1.25 2004/08/17 21:13:51 dun Exp $
+ *  $Id: munge_defs.h,v 1.26 2004/08/18 23:35:55 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -68,7 +68,7 @@
 /*  Integer for the number of seconds between purging the replay hash
  *    of expired creds.
  */
-#define MUNGE_REPLAY_PURGE_TIMER        300
+#define MUNGE_REPLAY_PURGE_TIMER        60
 
 /*  Integer (uint32_t) sentinel for valid munge message.
  */

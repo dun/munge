@@ -1,3 +1,8 @@
+2004-08-18  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/libcommon/munge_defs.h:
+	  Changed MUNGE_REPLAY_PURGE_TIMER from 300 to 60.
+
 2004-08-17  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* : Re-bootstrap'd with automake-1.9.1.
