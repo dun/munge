@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: job.c,v 1.3 2004/08/26 22:06:18 dun Exp $
+ *  $Id: job.c,v 1.4 2004/08/26 23:06:45 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -104,12 +104,11 @@ job_accept (conf_t conf)
         }
         if (_munge_msg_create (&m, sd) != EMUNGE_SUCCESS) {
             close (sd);
-            log_msg (LOG_WARNING, "Unable to create message struct");
+            log_msg (LOG_WARNING, "Unable to create client request");
         }
         else if (work_queue (w, m) < 0) {
             _munge_msg_destroy (m);
-            log_msg (LOG_WARNING,
-                "Unable to create thread: %s", strerror (errno));
+            log_msg (LOG_WARNING, "Unable to queue client request");
         }
     }
     work_fini (w, 1);
