@@ -1,11 +1,11 @@
 /*****************************************************************************
- *  $Id: crypto_thread.h,v 1.1 2003/04/08 18:16:16 dun Exp $
+ *  $Id: crypto_thread.h,v 1.2 2004/03/25 00:14:37 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
  *  UCRL-CODE-2003-???.
  *
- *  Copyright (C) 2003 The Regents of the University of California.
+ *  Copyright (C) 2003-2004 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
  *  Written by Chris Dunlap <cdunlap@llnl.gov>.
  *
@@ -33,19 +33,23 @@
 #  include <config.h>
 #endif /* HAVE_CONFIG_H */
 
-#if HAVE_LIBPTHREAD
-
+#if 1
+/*
+ *  This ifdef used to test for HAVE_LIBPTHREAD, but this define has been
+ *    removed now that configure checks to see if it can link against pthreads,
+ *    and fails if it cannot.
+ */
 #define _CRYPTO_THREAD_FUNCTIONS 1
 int crypto_thread_init (void);
 int crypto_thread_fini (void);
 
-#else  /* !HAVE_LIBPTHREAD */
+#else  /* 0 */
 
 #define _CRYPTO_THREAD_FUNCTIONS 0
 #define crypto_thread_init()
 #define crypto_thread_fini()
 
-#endif /* !HAVE_LIBPTHREAD */
+#endif /* 0 */
 
 
 #endif /* !CRYPTO_THREAD_H */

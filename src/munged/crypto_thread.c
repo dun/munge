@@ -1,11 +1,11 @@
 /*****************************************************************************
- *  $Id: crypto_thread.c,v 1.1 2003/04/08 18:16:16 dun Exp $
+ *  $Id: crypto_thread.c,v 1.2 2004/03/25 00:14:37 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
  *  UCRL-CODE-2003-???.
  *
- *  Copyright (C) 2003 The Regents of the University of California.
+ *  Copyright (C) 2003-2004 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
  *  Written by Chris Dunlap <cdunlap@llnl.gov>.
  *
@@ -29,11 +29,8 @@
 #  include <config.h>
 #endif /* HAVE_CONFIG_H */
 
-#if HAVE_LIBPTHREAD
-#  include <pthread.h>
-#endif  /* HAVE_LIBPTHREAD */
-
 #include <openssl/crypto.h>
+#include <pthread.h>
 #include <stdlib.h>
 #include "crypto_thread.h"
 
