@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: sock.c,v 1.2 2003/04/18 23:20:18 dun Exp $
+ *  $Id: sock.c,v 1.3 2003/05/16 23:44:17 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -78,8 +78,7 @@ munge_sock_create (conf_t conf)
         log_err (EMUNGE_SNAFU, LOG_ERR, "Munge socket has no name");
     }
     if ((sd = socket (PF_LOCAL, SOCK_STREAM, 0)) < 0) {
-        log_err (EMUNGE_SNAFU, LOG_ERR, "Unable to create socket: %s",
-            strerror (errno));
+        log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to create socket");
     }
     memset (&addr, 0, sizeof (addr));
     addr.sun_family = AF_LOCAL;
@@ -94,15 +93,15 @@ munge_sock_create (conf_t conf)
         unlink (conf->socket_name);     /* ignoring errors */
     }
     if (bind (sd, (struct sockaddr *) &addr, sizeof (addr)) < 0) {
-        log_err (EMUNGE_SNAFU, LOG_ERR, "Unable to bind to \"%s\": %s",
-            conf->socket_name, strerror (errno));
+        log_errno (EMUNGE_SNAFU, LOG_ERR,
+            "Unable to bind to \"%s\"", conf->socket_name);
     }
 
     umask (mask);                       /* restore umask */
 
     if (listen (sd, MUNGE_SOCKET_BACKLOG) < 0) {
-        log_err (EMUNGE_SNAFU, LOG_ERR, "Unable to listen to \"%s\": %s",
-            conf->socket_name, strerror (errno));
+        log_errno (EMUNGE_SNAFU, LOG_ERR,
+            "Unable to listen to \"%s\"", conf->socket_name);
     }
     conf->ld = sd;
     return;
@@ -136,7 +135,6 @@ munge_sock_destroy (conf_t conf)
 void
 munge_sock_accept (conf_t conf)
 {
-    int e;
     pthread_t tid;
     pthread_attr_t tattr;
     munge_msg_t m;
@@ -145,13 +143,13 @@ munge_sock_accept (conf_t conf)
     assert (conf != NULL);
     assert (conf->ld >= 0);
 
-    if ((e = pthread_attr_init (&tattr))) {
-        log_err (EMUNGE_SNAFU, LOG_ERR,
-            "Unable to init pthread attribute: %s", strerror (e));
+    if ((errno = pthread_attr_init (&tattr))) {
+        log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to init pthread attribute");
     }
-    if ((e = pthread_attr_setdetachstate (&tattr, PTHREAD_CREATE_DETACHED))) {
-        log_err (EMUNGE_SNAFU, LOG_ERR,
-            "Unable to set pthread detached attribute: %s", strerror (e));
+    if ((errno = pthread_attr_setdetachstate (
+      &tattr, PTHREAD_CREATE_DETACHED))) {
+        log_errno (EMUNGE_SNAFU, LOG_ERR,
+            "Unable to set pthread detached attribute");
     }
     while (!done) {
         if ((sd = accept (conf->ld, NULL, NULL)) < 0) {
@@ -160,8 +158,8 @@ munge_sock_accept (conf_t conf)
             else if (errno == ECONNABORTED)
                 continue;
             else
-                log_err (EMUNGE_SNAFU, LOG_ERR,
-                    "Unable to accept connection: %s", strerror (errno));
+                log_errno (EMUNGE_SNAFU, LOG_ERR,
+                    "Unable to accept connection");
         }
         /*  XXX: The munge_msg_server_thread() is responsible for
          *       destroying this msg via _munge_msg_destroy().
@@ -170,15 +168,16 @@ munge_sock_accept (conf_t conf)
             close (sd);
             log_msg (LOG_WARNING, "Unable to create message struct");
         }
-        else if ((e = pthread_create (&tid, &tattr,
+        else if ((errno = pthread_create (&tid, &tattr,
           (thrfun_t) munge_msg_server_thread, m))) {
             _munge_msg_destroy (m);
-            log_msg (LOG_WARNING, "Unable to create thread: %s", strerror (e));
+            log_msg (LOG_WARNING,
+                "Unable to create thread: %s", strerror (errno));
         }
     }
-    if ((e = pthread_attr_destroy (&tattr))) {
-        log_err (EMUNGE_SNAFU, LOG_ERR,
-            "Unable to destroy pthread attribute: %s", strerror (e));
+    if ((errno = pthread_attr_destroy (&tattr))) {
+        log_errno (EMUNGE_SNAFU, LOG_ERR,
+            "Unable to destroy pthread attribute");
     }
     return;
 }

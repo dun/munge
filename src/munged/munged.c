@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munged.c,v 1.3 2003/05/07 00:33:29 dun Exp $
+ *  $Id: munged.c,v 1.4 2003/05/16 23:44:17 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -167,8 +167,8 @@ daemonize_init (void)
     limit.rlim_cur = 0;
     limit.rlim_max = 0;
     if (setrlimit (RLIMIT_CORE, &limit) < 0) {
-        log_err (EMUNGE_SNAFU, LOG_ERR,
-            "Unable to prevent creation of core file: %s", strerror (errno));
+        log_errno (EMUNGE_SNAFU, LOG_ERR,
+            "Unable to prevent creation of core file");
     }
     /*  Create pipe for IPC so parent process will wait to terminate until
      *    signaled by grandchild process.  This allows messages written to
@@ -176,38 +176,35 @@ daemonize_init (void)
      *    the parent process returns control to the shell.
      */
     if (pipe (fds) < 0) {
-        log_err (EMUNGE_SNAFU, LOG_ERR,
-            "Unable to create daemon pipe: %s", strerror (errno));
+        log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to create daemon pipe");
     }
     /*  Automatically background the process and
      *    ensure child is not a process group leader.
      */
     if ((pid = fork ()) < 0) {
-        log_err (EMUNGE_SNAFU, LOG_ERR,
-            "Unable to create child process: %s", strerror (errno));
+        log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to create child process");
     }
     else if (pid > 0) {
         if (close (fds[1]) < 0) {
-            log_err (EMUNGE_SNAFU, LOG_ERR,
-                "Unable to close write-pipe in parent: %s", strerror (errno));
+            log_errno (EMUNGE_SNAFU, LOG_ERR,
+                "Unable to close write-pipe in parent");
         }
         if (read (fds[0], &c, 1) < 0) {
-            log_err (EMUNGE_SNAFU, LOG_ERR,
-                "Read failed while awaiting EOF from grandchild: %s",
-                strerror (errno));
+            log_errno (EMUNGE_SNAFU, LOG_ERR,
+                "Read failed while awaiting EOF from grandchild");
         }
         exit (0);
     }
     if (close (fds[0]) < 0) {
-        log_err (EMUNGE_SNAFU, LOG_ERR,
-            "Unable to close read-pipe in child: %s", strerror (errno));
+        log_errno (EMUNGE_SNAFU, LOG_ERR,
+            "Unable to close read-pipe in child");
     }
     /*  Become a session leader and process group leader
      *    with no controlling tty.
      */
     if (setsid () < 0) {
-        log_err (EMUNGE_SNAFU, LOG_ERR,
-            "Unable to disassociate controlling tty: %s", strerror (errno));
+        log_errno (EMUNGE_SNAFU, LOG_ERR,
+            "Unable to disassociate controlling tty");
     }
     /*  Ignore SIGHUP to keep child from terminating when
      *    the session leader (ie, the parent) terminates.
@@ -219,8 +216,8 @@ daemonize_init (void)
      *    daemon cannot automatically re-acquire a controlling tty.
      */
     if ((pid = fork ()) < 0) {
-        log_err (EMUNGE_SNAFU, LOG_ERR,
-            "Unable to create grandchild process: %s", strerror (errno));
+        log_errno (EMUNGE_SNAFU, LOG_ERR,
+            "Unable to create grandchild process");
     }
     else if (pid > 0) {
         exit (0);
@@ -241,36 +238,34 @@ daemonize_fini (int fd)
      *  XXX: Avoid relative pathnames from this point on!
      */
     if (chdir ("/") < 0) {
-        log_err (EMUNGE_SNAFU, LOG_ERR,
-            "Unable to change to root directory: %s", strerror (errno));
+        log_errno (EMUNGE_SNAFU, LOG_ERR,
+            "Unable to change to root directory");
     }
     /*  Discard data to/from stdin, stdout, and stderr.
      */
     if ((dev_null = open ("/dev/null", O_RDWR)) < 0) {
-        log_err (EMUNGE_SNAFU, LOG_ERR,
-            "Unable to open \"/dev/null\": %s", strerror (errno));
+        log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to open \"/dev/null\"");
     }
     if (dup2 (dev_null, STDIN_FILENO) < 0) {
-        log_err (EMUNGE_SNAFU, LOG_ERR,
-            "Unable to dup \"/dev/null\" onto stdin: %s", strerror (errno));
+        log_errno (EMUNGE_SNAFU, LOG_ERR,
+            "Unable to dup \"/dev/null\" onto stdin");
     }
     if (dup2 (dev_null, STDOUT_FILENO) < 0) {
-        log_err (EMUNGE_SNAFU, LOG_ERR,
-            "Unable to dup \"/dev/null\" onto stdout: %s", strerror (errno));
+        log_errno (EMUNGE_SNAFU, LOG_ERR,
+            "Unable to dup \"/dev/null\" onto stdout");
     }
     if (dup2 (dev_null, STDERR_FILENO) < 0) {
-        log_err (EMUNGE_SNAFU, LOG_ERR,
-            "Unable to dup \"/dev/null\" onto stderr: %s", strerror (errno));
+        log_errno (EMUNGE_SNAFU, LOG_ERR,
+            "Unable to dup \"/dev/null\" onto stderr");
     }
     if (close (dev_null) < 0) {
-        log_err (EMUNGE_SNAFU, LOG_ERR,
-            "Unable to close \"/dev/null\": %s", strerror (errno));
+        log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to close \"/dev/null\"");
     }
     /*  Signal grandparent process to terminate.
      */
     if ((fd >= 0) && (close (fd) < 0)) {
-        log_err (EMUNGE_SNAFU, LOG_ERR,
-            "Unable to close write-pipe in grandchild: %s", strerror (errno));
+        log_errno (EMUNGE_SNAFU, LOG_ERR,
+            "Unable to close write-pipe in grandchild");
     }
     return;
 }

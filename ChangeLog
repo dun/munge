@@ -1,3 +1,8 @@
+2003-05-16  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/libcommon/log.c, src/libcommon/log.h:
+	  Added log_errno().  All callers changed.
+
 2003-05-07  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/munged/dec_v1.c(dec_v1_validate_time):

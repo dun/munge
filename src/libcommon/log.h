@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: log.h,v 1.3 2003/04/08 18:16:16 dun Exp $
+ *  $Id: log.h,v 1.4 2003/05/16 23:44:17 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -70,6 +70,15 @@ void log_err (int status, int priority, const char *format, ...);
  *  Logs a fatal message at the specified [priority] level according to
  *    the printf-style [format] string, after which it exits the program
  *    with the specified [status] value.
+ */
+
+void log_errno (int status, int priority, const char *format, ...);
+/*
+ *  Logs a fatal message at the specified [priority] level according to
+ *    the printf-style [format] string, after which it exits the program
+ *    with the specified [status] value.
+ *  An error string will be appended to the message if the format string
+ *    is not terminated with a newline and errno is non-zero.
  */
 
 void log_msg (int priority, const char *format, ...);

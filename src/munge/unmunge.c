@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: unmunge.c,v 1.12 2003/05/02 19:52:02 dun Exp $
+ *  $Id: unmunge.c,v 1.13 2003/05/16 23:44:17 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -181,7 +181,7 @@ main (int argc, char *argv[])
         (void **) &conf->cred, &conf->clen);
     if (rc < 0) {
         if (errno == ENOMEM)
-            log_err (EMUNGE_NO_MEMORY, LOG_ERR, "%s", strerror (errno));
+            log_errno (EMUNGE_NO_MEMORY, LOG_ERR, "Unable to read input");
         else
             log_err (EMUNGE_SNAFU, LOG_ERR, "Read error");
     }
@@ -211,10 +211,10 @@ create_conf (void)
     int    maxlen;
 
     if (!(conf = malloc (sizeof (struct conf)))) {
-        log_err (EMUNGE_NO_MEMORY, LOG_ERR, "%s", strerror(errno));
+        log_errno (EMUNGE_NO_MEMORY, LOG_ERR, "Unable to create conf");
     }
     if (!(conf->ctx = munge_ctx_create())) {
-        log_err (EMUNGE_NO_MEMORY, LOG_ERR, "%s", strerror (errno));
+        log_errno (EMUNGE_NO_MEMORY, LOG_ERR, "Unable to create conf ctx");
     }
     conf->status = -1;
     conf->fn_in = "-";
@@ -251,22 +251,22 @@ destroy_conf (conf_t conf)
     }
     if (conf->fp_in != NULL) {
         if (fclose (conf->fp_in) < 0)
-            log_err (EMUNGE_SNAFU, LOG_ERR,
-                "Unable to close infile: %s", strerror (errno));
+            log_errno (EMUNGE_SNAFU, LOG_ERR,
+                "Unable to close infile");
         conf->fp_in = NULL;
     }
     if (conf->fp_meta != NULL) {
         if (fclose (conf->fp_meta) < 0)
-            log_err (EMUNGE_SNAFU, LOG_ERR,
-                "Unable to close metadata outfile: %s", strerror (errno));
+            log_errno (EMUNGE_SNAFU, LOG_ERR,
+                "Unable to close metadata outfile");
         conf->fp_meta = NULL;
     }
     if (conf->fp_out != NULL) {
         if (conf->fn_out && conf->fn_meta
           && strcmp (conf->fn_out, conf->fn_meta))
             if (fclose (conf->fp_out) < 0)
-                log_err (EMUNGE_SNAFU, LOG_ERR,
-                    "Unable to close payload outfile: %s", strerror (errno));
+                log_errno (EMUNGE_SNAFU, LOG_ERR,
+                    "Unable to close payload outfile");
         conf->fp_out = NULL;
     }
     if (conf->cred) {
@@ -351,8 +351,8 @@ parse_cmdline (conf_t conf, int argc, char **argv)
             case 't':
                 i = strtol (optarg, NULL, 10);
                 if ((i == LONG_MIN) || (i == LONG_MAX))
-                    log_err (EMUNGE_SNAFU, LOG_ERR,
-                        "Invalid time-to-live '%d': %s", i, strerror (errno));
+                    log_errno (EMUNGE_SNAFU, LOG_ERR,
+                        "Invalid time-to-live '%d'", i);
                 if (i < 0)
                     i = MUNGE_TTL_FOREVER;
                 e = munge_ctx_set (conf->ctx, MUNGE_OPT_TTL, i);
@@ -488,8 +488,8 @@ open_files (conf_t conf)
         if (!strcmp (conf->fn_in, "-"))
             conf->fp_in = stdin;
         else if (!(conf->fp_in = fopen (conf->fn_in, "r")))
-            log_err (EMUNGE_SNAFU, LOG_ERR, "Unable to read from \"%s\": %s",
-                conf->fn_in, strerror (errno));
+            log_errno (EMUNGE_SNAFU, LOG_ERR,
+                "Unable to read from \"%s\"", conf->fn_in);
     }
     if (conf->fn_meta) {
         if (!strcmp (conf->fn_meta, "-"))
@@ -499,8 +499,8 @@ open_files (conf_t conf)
                 "Cannot read and write to the same file \"%s\"",
                 conf->fn_meta);
         else if (!(conf->fp_meta = fopen (conf->fn_meta, "w")))
-            log_err (EMUNGE_SNAFU, LOG_ERR, "Unable to write to \"%s\": %s",
-                conf->fn_meta, strerror (errno));
+            log_errno (EMUNGE_SNAFU, LOG_ERR,
+                "Unable to write to \"%s\"", conf->fn_meta);
     }
     if (conf->fn_out) {
         if (!strcmp (conf->fn_out, "-"))
@@ -512,8 +512,8 @@ open_files (conf_t conf)
         else if (conf->fn_meta && !strcmp (conf->fn_out, conf->fn_meta))
             conf->fp_out = conf->fp_meta;
         else if (!(conf->fp_out = fopen (conf->fn_out, "w")))
-            log_err (EMUNGE_SNAFU, LOG_ERR, "Unable to write to \"%s\": %s",
-                conf->fn_out, strerror (errno));
+            log_errno (EMUNGE_SNAFU, LOG_ERR,
+                "Unable to write to \"%s\"", conf->fn_out);
     }
     return;
 }

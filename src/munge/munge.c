@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munge.c,v 1.12 2003/05/02 19:52:02 dun Exp $
+ *  $Id: munge.c,v 1.13 2003/05/16 23:44:17 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -130,7 +130,7 @@ main (int argc, char *argv[])
         rc = read_data_from_file (conf->fp_in, &conf->data, &conf->dlen);
     if (rc < 0) {
         if (errno == ENOMEM)
-            log_err (EMUNGE_NO_MEMORY, LOG_ERR, "%s", strerror (errno));
+            log_errno (EMUNGE_NO_MEMORY, LOG_ERR, "Unable to read input");
         else
             log_err (EMUNGE_SNAFU, LOG_ERR, "Read error");
     }
@@ -157,10 +157,10 @@ create_conf (void)
     conf_t conf;
 
     if (!(conf = malloc (sizeof (struct conf)))) {
-        log_err (EMUNGE_NO_MEMORY, LOG_ERR, "%s", strerror (errno));
+        log_errno (EMUNGE_NO_MEMORY, LOG_ERR, "Unable to create conf");
     }
     if (!(conf->ctx = munge_ctx_create())) {
-        log_err (EMUNGE_NO_MEMORY, LOG_ERR, "%s", strerror (errno));
+        log_errno (EMUNGE_NO_MEMORY, LOG_ERR, "Unable to create conf ctx");
     }
     conf->status = -1;
     conf->string = NULL;
@@ -187,14 +187,12 @@ destroy_conf (conf_t conf)
     }
     if (conf->fp_in != NULL) {
         if (fclose (conf->fp_in) < 0)
-            log_err (EMUNGE_SNAFU, LOG_ERR,
-                "Unable to close infile: %s", strerror (errno));
+            log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to close infile");
         conf->fp_in = NULL;
     }
     if (conf->fp_out != NULL) {
         if (fclose (conf->fp_out) < 0)
-            log_err (EMUNGE_SNAFU, LOG_ERR,
-                "Unable to close outfile: %s", strerror (errno));
+            log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to close outfile");
         conf->fp_out = NULL;
     }
     if (conf->data != NULL) {
@@ -455,15 +453,15 @@ open_files (conf_t conf)
         if (!strcmp (conf->fn_in, "-"))
             conf->fp_in = stdin;
         else if (!(conf->fp_in = fopen (conf->fn_in, "r")))
-            log_err (EMUNGE_SNAFU, LOG_ERR, "Unable to read from \"%s\": %s",
-                conf->fn_in, strerror (errno));
+            log_errno (EMUNGE_SNAFU, LOG_ERR,
+                "Unable to read from \"%s\"", conf->fn_in);
     }
     if (conf->fn_out) {
         if (!strcmp (conf->fn_out, "-"))
             conf->fp_out = stdout;
         else if (!(conf->fp_out = fopen (conf->fn_out, "w")))
-            log_err (EMUNGE_SNAFU, LOG_ERR, "Unable to write to \"%s\": %s",
-                conf->fn_out, strerror (errno));
+            log_errno (EMUNGE_SNAFU, LOG_ERR,
+                "Unable to write to \"%s\"", conf->fn_out);
     }
     return;
 }
@@ -475,6 +473,6 @@ display_cred (conf_t conf)
     if (!conf->fp_out)
         return;
     if (fprintf (conf->fp_out, "%s\n", conf->cred) < 0)
-        log_err (EMUNGE_SNAFU, LOG_ERR, "Write error: %s", strerror (errno));
+        log_errno (EMUNGE_SNAFU, LOG_ERR, "Write error");
     return;
 }

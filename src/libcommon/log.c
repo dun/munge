@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: log.c,v 1.3 2003/04/08 18:16:16 dun Exp $
+ *  $Id: log.c,v 1.4 2003/05/16 23:44:17 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -43,11 +43,19 @@
 #include "log.h"
 
 
+/*****************************************************************************
+ *  Constants
+ *****************************************************************************/
+
 #define LOG_BUFFER_MAXLEN       1024
 #define LOG_IDENTITY_MAXLEN     128
 #define LOG_PREFIX_MAXLEN       9
 #define LOG_TRUNC_SUFFIX        "+"
 
+
+/*****************************************************************************
+ *  Data Types
+ *****************************************************************************/
 
 struct log_ctx {
     FILE *fp;
@@ -58,12 +66,27 @@ struct log_ctx {
     char  id [LOG_IDENTITY_MAXLEN];
 };
 
+
+/*****************************************************************************
+ *  Static Variables
+ *****************************************************************************/
+
 static struct log_ctx log_ctx = { NULL, 0, 0, 0, 0 };
 
 
-static void _log_aux (int priority, const char *format, va_list vargs);
+/*****************************************************************************
+ *  Static Prototypes
+ *****************************************************************************/
+
+static void _log_aux (int errnum, int priority,
+                      const char *format, va_list vargs);
+static void _log_die (int status);
 static char * _log_prefix (int priority);
 
+
+/*****************************************************************************
+ *  Extern Functions
+ *****************************************************************************/
 
 int
 log_open_file (FILE *fp, char *identity, int priority, int options)
@@ -77,11 +100,12 @@ log_open_file (FILE *fp, char *identity, int priority, int options)
         log_ctx.got_init = 1;
         return (0);
     }
-    if (ferror (fp))
+    if (ferror (fp)) {
         return (-1);
-    if (setvbuf (fp, NULL, _IONBF, 0) != 0)     /* set stream unbuffered */
+    }
+    if (setvbuf (fp, NULL, _IONBF, 0) != 0) {   /* set stream unbuffered */
         return (-1);
-
+    }
     log_ctx.fp = fp;
     memset (log_ctx.id, 0, sizeof (log_ctx.id));
     if (identity) {
@@ -101,9 +125,9 @@ log_open_syslog (char *identity, int facility)
 {
     char *p;
 
-    if ((p = strrchr (identity, '/')))
+    if ((p = strrchr (identity, '/'))) {
         identity = p + 1;
-
+    }
     if (identity) {
         openlog (identity, LOG_NDELAY | LOG_PID, facility);
         log_ctx.got_syslog = 1;
@@ -123,14 +147,25 @@ log_err (int status, int priority, const char *format, ...)
     va_list vargs;
 
     va_start (vargs, format);
-    _log_aux (priority, format, vargs);
+    _log_aux (0, priority, format, vargs);
     va_end (vargs);
 
-#ifndef NDEBUG
-    if ((status != EXIT_SUCCESS) && getenv ("DEBUG"))
-        abort ();                       /* generate core for debugging */
-#endif /* !NDEBUG */
-    exit (status);
+    _log_die (status);
+    assert (1);                         /* not reached */
+}
+
+
+void
+log_errno (int status, int priority, const char *format, ...)
+{
+    va_list vargs;
+
+    va_start (vargs, format);
+    _log_aux (errno, priority, format, vargs);
+    va_end (vargs);
+
+    _log_die (status);
+    assert (1);                         /* not reached */
 }
 
 
@@ -140,15 +175,19 @@ log_msg (int priority, const char *format, ...)
     va_list vargs;
 
     va_start (vargs, format);
-    _log_aux (priority, format, vargs);
+    _log_aux (0, priority, format, vargs);
     va_end (vargs);
 
     return;
 }
 
 
+/*****************************************************************************
+ *  Static Functions
+ *****************************************************************************/
+
 static void
-_log_aux (int priority, const char *format, va_list vargs)
+_log_aux (int errnum, int priority, const char *format, va_list vargs)
 {
     char  buf [LOG_BUFFER_MAXLEN];      /* message buffer                    */
     char *p;                            /* current position in msg buf       */
@@ -170,7 +209,7 @@ _log_aux (int priority, const char *format, va_list vargs)
     sbuf = NULL;
     len = sizeof (buf);
 
-    if (format [strlen (format) - 1] != '\n') {
+    if ((!format) || (format [strlen (format) - 1] != '\n')) {
         append_nl = 1;
         --len;                          /* reserve space for trailing LF */
     }
@@ -234,9 +273,25 @@ _log_aux (int priority, const char *format, va_list vargs)
     }
     /*  Add actual message.
      */
-    if (len > 0) {
+    if ((len > 0) && (format)) {
         sbuf = p;
         n = vsnprintf (p, len, format, vargs);
+        if ((n < 0) || (n >= len)) {
+            p += len - 1;
+            len = 0;
+        }
+        else {
+            p += n;
+            len -= n;
+        }
+    }
+    /*  Add error string if:
+     *    - an error occurred (defined by errno), and
+     *    - the error string does not contain a trailing newline.
+     */
+    if ((len > 0) && (errnum) && (append_nl)) {
+        n = snprintf (p, len, "%s%s",
+            (format ? ": " : ""), strerror (errnum));
         if ((n < 0) || (n >= len)) {
             p += len - 1;
             len = 0;
@@ -277,6 +332,20 @@ _log_aux (int priority, const char *format, va_list vargs)
 }
 
 
+static void
+_log_die (int status)
+{
+    /*  Add support for generating backtrace.
+     */
+#ifndef NDEBUG
+    if ((status != EXIT_SUCCESS) && getenv ("DEBUG")) {
+        abort ();                       /* generate core for debugging */
+    }
+#endif /* !NDEBUG */
+    exit (status);
+}
+
+
 static char *
 _log_prefix (int priority)
 {
@@ -300,5 +369,5 @@ _log_prefix (int priority)
         default:
             return ("UNKNOWN");
     }
-    /* not reached */
+    assert (1);                         /* not reached */
 }

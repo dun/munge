@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: conf.c,v 1.6 2003/05/06 20:20:29 dun Exp $
+ *  $Id: conf.c,v 1.7 2003/05/16 23:44:17 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -75,7 +75,7 @@ create_conf (void)
     /*  FIXME: On ENOMEM, log which malloc op failed.
      */
     if (!(conf = malloc (sizeof (struct conf))))
-        log_err (EMUNGE_NO_MEMORY, LOG_ERR, "%s", strerror (errno));
+        log_errno (EMUNGE_NO_MEMORY, LOG_ERR, "Unable to create conf");
     conf->ld = -1;
     conf->got_clock_skew = 0;
     conf->got_force = 0;
@@ -92,17 +92,17 @@ create_conf (void)
      */
     conf->config_name = NULL;
     if (!(conf->socket_name = strdup (MUNGE_SOCKET_NAME)))
-        log_err (EMUNGE_NO_MEMORY, LOG_ERR, "%s", strerror (errno));
+        log_errno (EMUNGE_NO_MEMORY, LOG_ERR, "Cannot dup socket name string");
     /*
      *  FIXME: Add support for random seed filename.
      */
     if (!(conf->seed_name = strdup (MUNGED_RANDOM_SEED)))
-        log_err (EMUNGE_NO_MEMORY, LOG_ERR, "%s", strerror (errno));
+        log_errno (EMUNGE_NO_MEMORY, LOG_ERR, "Cannot dup seed name string");
     /*
      *  FIXME: Add support for configuring key filename.
      */
     if (!(conf->key_name = strdup (MUNGED_SECRET_KEY)))
-        log_err (EMUNGE_NO_MEMORY, LOG_ERR, "%s", strerror (errno));
+        log_errno (EMUNGE_NO_MEMORY, LOG_ERR, "Cannot dup key name string");
     conf->dek_key = NULL;
     conf->dek_key_len = 0;
     conf->mac_key = NULL;
@@ -191,8 +191,8 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                 if  (conf->socket_name)
                     free (conf->socket_name);
                 if (!(conf->socket_name = strdup (optarg)))
-                    log_err (EMUNGE_NO_MEMORY, LOG_ERR,
-                        "%s", strerror (errno));
+                    log_errno (EMUNGE_NO_MEMORY, LOG_ERR,
+                        "Cannot dup socket name string");
                 break;
             case '?':
                 if (optopt > 0)
@@ -297,8 +297,8 @@ create_subkeys (conf_t conf)
     /*  FIXME: Ignore keyfile if it does not have sane permissions.
      */
     if ((fd = open (conf->key_name, O_RDONLY)) < 0) {
-        log_err (EMUNGE_SNAFU, LOG_ERR, "Unable to open keyfile \"%s\": %s",
-            conf->key_name, strerror (errno));
+        log_errno (EMUNGE_SNAFU, LOG_ERR,
+            "Unable to open keyfile \"%s\"", conf->key_name);
     }
     /*  Compute keyfile's message digest.
      */
@@ -309,15 +309,14 @@ create_subkeys (conf_t conf)
         if ((n < 0) && (errno == EINTR))
             continue;
         if (n < 0)
-            log_err (EMUNGE_SNAFU, LOG_ERR,
-                "Unable to read keyfile \"%s\": %s",
-                conf->key_name, strerror (errno));
+            log_errno (EMUNGE_SNAFU, LOG_ERR,
+                "Unable to read keyfile \"%s\"", conf->key_name);
         if (md_update (&dek_ctx, buf, n) < 0)
             log_err (EMUNGE_SNAFU, LOG_ERR, "Unable to compute subkeys");
     }
     if (close (fd) < 0) {
-        log_err (EMUNGE_SNAFU, LOG_ERR, "Unable to close keyfile \"%s\": %s",
-            conf->key_name, strerror (errno));
+        log_errno (EMUNGE_SNAFU, LOG_ERR,
+            "Unable to close keyfile \"%s\"", conf->key_name);
     }
     if (md_copy (&mac_ctx, &dek_ctx) < 0) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
