@@ -1,6 +1,6 @@
 #!/bin/sh
 ##
-# $Id: munge.init,v 1.3 2003/04/30 21:40:28 dun Exp $
+# $Id: munge.init,v 1.4 2003/05/01 01:01:02 dun Exp $
 ##
 # chkconfig:	345 40 60
 # description:	The MUNGE daemon is used for user authentication.
@@ -15,17 +15,17 @@ DAEMON="munged"
 RETVAL="0"
 SUBSYS="`echo $0 | perl -pe 's|(.*/)?([SK][0-9]{2})?(.*)|$3|'`"
 
-# Disable disabling of suppression of stderr msgs for now.
 # Disable suppression of stderr msgs.
-#INITLOG_ARGS=""
+INITLOG_ARGS=""
 
 [ -x "/usr/sbin/$DAEMON" ] || exit 0
 
 # See how we were called.
 case "$1" in
   start)
-	echo -n "Starting $DAEMON: "
-	daemon $DAEMON -f &
+ 	echo -n "Starting $DAEMON: "
+#	daemon $DAEMON
+	$DAEMON -f 0>/dev/null 1>&0 2>&0 & 0>/dev/null 1>&0 2>&0
 	RETVAL=$?
 	echo
 	[ $RETVAL -eq 0 ] && touch /var/lock/subsys/$SUBSYS
