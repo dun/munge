@@ -1,5 +1,9 @@
 2004-11-11  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/libmissing/inet_ntop.h: Changed #ifndef x to #if !x.
+	* src/libmissing/strlcat.h, src/libmissing/strlcpy.h:
+	  Changed #if #else x to #if !x.
+
 	* src/libmunge/auth_send.c, src/libmunge/msg_client.c,
 	  src/munged/munged.c: Replaced strlcat/strlcpy includes w/ missing.h.
 

@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: inet_ntop.h,v 1.1 2004/11/12 00:29:18 dun Exp $
+ *  $Id: inet_ntop.h,v 1.2 2004/11/12 02:12:16 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -36,7 +36,7 @@
 #  define INET_ADDRSTRLEN 16
 #endif /* !INET_ADDRSTRLEN */
 
-#ifndef HAVE_INET_NTOP
+#if !HAVE_INET_NTOP
 const char *inet_ntop (int af, const void *src, char *dst, socklen_t cnt);
 #endif /* !HAVE_INET_NTOP */
 

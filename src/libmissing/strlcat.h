@@ -1,15 +1,12 @@
 /*****************************************************************************
- *  $Id: strlcat.h,v 1.2 2003/02/18 19:46:20 dun Exp $
+ *  $Id: strlcat.h,v 1.3 2004/11/12 02:12:16 dun Exp $
  *****************************************************************************/
 
 #if HAVE_CONFIG_H
 #  include "config.h"
 #endif /* HAVE_CONFIG_H */
 
-#if HAVE_STRLCAT
-#else /* !HAVE_STRLCAT */
-#define HAVE_STRLCAT 1
-
+#if !HAVE_STRLCAT
 size_t strlcat(char *dst, const char *src, size_t siz);
 /*
  *  Appends src to string dst of size siz (unlike strncat, siz is the
@@ -18,5 +15,4 @@ size_t strlcat(char *dst, const char *src, size_t siz);
  *  Returns strlen(src) + MIN(siz, strlen(initial dst)).
  *  If retval >= siz, truncation occurred.
  */
-
 #endif /* !HAVE_STRLCAT */
