@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munge.c,v 1.34 2004/08/24 19:58:08 dun Exp $
+ *  $Id: munge.c,v 1.35 2004/09/03 18:39:20 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -490,12 +490,12 @@ display_help (char *prog)
 void
 display_strings (const char *header, const char **strings)
 {
+/*  Display each non-empty string in the NULL-terminated list.
+ *    Empty strings (ie, "") are invalid.
+ */
     const char **pp;
-    int i;
+    int          i;
 
-    /*  Display each non-empty string in the NULL-terminated list.
-     *    Empty strings (ie, "") are invalid.
-     */
     printf ("%s:\n\n", header);
     for (pp=strings, i=0; *pp; pp++, i++) {
         if (*pp[0] != '\0') {
@@ -510,12 +510,18 @@ display_strings (const char *header, const char **strings)
 int
 str_to_int (const char *s, const char **strings)
 {
+/*  Convert the string [s] into an integer corresponding to its position
+ *    in the [strings] array of strings.
+ *  In the [strings] array, the empty string denotes a setting that is
+ *    invalid, whereas a NULL denotes the end of the list.
+ *  Returns the corresponding integer, or -1 if no match is found.
+ */
     const char **pp;
-    char *p;
-    int i;
-    int n;
+    char        *p;
+    int          i;
+    int          n;
 
-    if (!s || !*s) {
+    if (!s || !*s || !strings) {
         return (-1);
     }
     /*  Check to see if the given string matches a valid string.
