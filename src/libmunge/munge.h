@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munge.h,v 1.12 2003/05/02 16:44:06 dun Exp $
+ *  $Id: munge.h,v 1.13 2003/05/22 21:17:10 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -172,6 +172,7 @@ munge_err_t munge_decode (const char *cred, munge_ctx_t ctx,
  *    encode the credential.
  *  If [buf] and [len] are not NULL, [buf] will be set to the optional
  *    data munged into the credential and [len] will be set to its length.
+ *    An additional NUL is appended to [buf] which is not included in [len].
  *    The caller is responsible for freeing the memory referenced by [buf].
  *    If no data was munged into the credential or an error is encountered,
  *    [buf] will be set to NULL and [len] will be set to 0.

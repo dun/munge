@@ -1,5 +1,8 @@
 2003-05-22  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/libmunge/munge.h: Update docs for munge_decode() to reflect
+	  that an additional NUL is appended to the returned buffer.
+
 	* src/munge/munge.c, src/munge/unmunge.c:
 	  Changed manner in which strtol() is checked for error.
 
