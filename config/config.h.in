@@ -27,6 +27,9 @@
 /* Define to 1 if you have the `getopt_long' function. */
 #undef HAVE_GETOPT_LONG
 
+/* Define to 1 if you have the `getpeereid' function. */
+#undef HAVE_GETPEEREID
+
 /* Define to 1 if you have the `HMAC_Init_ex' function. */
 #undef HAVE_HMAC_INIT_EX
 
@@ -45,6 +48,9 @@
 /* Define to 1 if you have the <memory.h> header file. */
 #undef HAVE_MEMORY_H
 
+/* Define to 1 if you have the SO_PEERCRED socket option. */
+#undef HAVE_SO_PEERCRED
+
 /* Define to 1 if you have the <stdint.h> header file. */
 #undef HAVE_STDINT_H
 
@@ -62,6 +68,9 @@
 
 /* Define to 1 if you have the `strlcpy' function. */
 #undef HAVE_STRLCPY
+
+/* Define to 1 if the system has the type `struct strrecvfd'. */
+#undef HAVE_STRUCT_STRRECVFD
 
 /* Define to 1 if you have the <sys/stat.h> header file. */
 #undef HAVE_SYS_STAT_H

@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: configure.ac,v 1.12 2004/01/28 21:16:10 dun Exp $
+## $Id: configure.ac,v 1.13 2004/01/30 23:14:18 dun Exp $
 ##*****************************************************************************
 ## Process this file with autoconf to produce a configure script.
 ##*****************************************************************************
@@ -70,7 +70,13 @@ AC_CHECK_HEADERS( \
 AC_C_BIGENDIAN
 AC_C_CONST
 AC_TYPE_UID_T
-AC_CHECK_TYPES(CRYPTO_dynlock, [], [], [#include <openssl/crypto.h>])
+
+##
+# Checks for how to authenticate a non-parent process.
+##
+AC_CHECK_FUNCS(getpeereid)
+AC_CHECK_PEERCRED
+AC_CHECK_TYPES(struct strrecvfd, [], [], [#include <stropts.h>])
 
 ##
 # Checks for OpenSSL library functions.
@@ -86,6 +92,7 @@ AC_CHECK_FUNCS( \
   HMAC_Init_ex \
 )
 LIBS="$ac_save_LIBS"
+AC_CHECK_TYPES(CRYPTO_dynlock, [], [], [#include <openssl/crypto.h>])
 
 ##
 # Checks for Pthreads.

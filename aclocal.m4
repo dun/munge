@@ -6831,6 +6831,7 @@ fi
 INSTALL_STRIP_PROGRAM="\${SHELL} \$(install_sh) -c -s"
 AC_SUBST([INSTALL_STRIP_PROGRAM])])
 
+m4_include([config/ac_check_peercred.m4])
 m4_include([config/ac_debug.m4])
 m4_include([config/ac_gpl_licensed.m4])
 m4_include([config/ac_humor.m4])

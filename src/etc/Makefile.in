@@ -38,7 +38,8 @@ DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 	$(top_srcdir)/config/Make-inc.mk
 subdir = src/etc
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/config/ac_debug.m4 \
+am__aclocal_m4_deps = $(top_srcdir)/config/ac_check_peercred.m4 \
+	$(top_srcdir)/config/ac_debug.m4 \
 	$(top_srcdir)/config/ac_gpl_licensed.m4 \
 	$(top_srcdir)/config/ac_humor.m4 \
 	$(top_srcdir)/config/ac_ltlibobjs.m4 \
