@@ -1,3 +1,9 @@
+2004-01-29  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/libcommon/munge_msg.h, src/munged/conf.h, src/munged/cred.h:
+	  Replaced <stdint.h> with <inttypes.h> based on info from the
+	  autoconf doc (section 5.6.1: Portability of Headers).
+
 2004-01-28  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* : Re-bootstrap'd with autoconf-2.59, automake-1.8.2, libtool-1.5.2.

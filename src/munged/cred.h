@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: cred.h,v 1.4 2004/01/16 02:18:37 dun Exp $
+ *  $Id: cred.h,v 1.5 2004/01/29 19:09:12 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -29,10 +29,7 @@
 #define CRED_H
 
 
-#if HAVE_STDINT_H
-#  include <stdint.h>
-#endif /* HAVE_STDINT_H */
-
+#include <inttypes.h>
 #include <openssl/evp.h>
 #include "munge_defs.h"
 #include "munge_msg.h"

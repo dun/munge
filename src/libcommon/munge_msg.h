@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munge_msg.h,v 1.7 2004/01/16 02:18:37 dun Exp $
+ *  $Id: munge_msg.h,v 1.8 2004/01/29 19:09:11 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -33,10 +33,7 @@
 #  include "config.h"
 #endif /* HAVE_CONFIG_H */
 
-#if HAVE_STDINT_H
-#  include <stdint.h>
-#endif /* HAVE_STDING_H */
-
+#include <inttypes.h>
 #include <munge.h>
 #include <netinet/in.h>                 /* for struct in_addr                */
 

@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: conf.h,v 1.4 2003/09/18 21:09:26 dun Exp $
+ *  $Id: conf.h,v 1.5 2004/01/29 19:09:12 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -28,10 +28,7 @@
 #ifndef MUNGE_CONF_H
 #define MUNGE_CONF_H
 
-#if HAVE_STDINT_H
-#  include <stdint.h>
-#endif /* HAVE_STDINT_H */
-
+#include <inttypes.h>
 #include <munge.h>
 #include <netinet/in.h>
 
