@@ -1,3 +1,35 @@
+2004-04-30  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* : Released 0.3.
+
+	* README, munge.spec: Updated description.
+
+	* src/munge/munge.c, src/munged/gids.c: Tweaked includes for FreeBSD.
+	* src/munge/munge.c, src/munged/zip.c: Minor tweaks for Solaris.
+
+	* src/etc/Makefile.am: Replaced "/etc" with $(sysconfdir).
+
+	* configure.ac: Added checks for standards.h, socklen_t, /dev/spx,
+	  X_AC_CANONICAL, and X_AC_CHECK_FIFO_RECVFD.
+	* config/x_ac_canonical.m4:
+	  Added check to set the canonical host system type.
+	* config/x_ac_check_fifo_recvfd.m4:
+	  Added check to test whether an fd can be passed over a fifo.
+	* config/x_ac_check_cond_lib.m4, config/x_ac_check_peercred.m4,
+	  config/x_ac_check_pthreads.m4, config/x_ac_debug.m4,
+	  config/x_ac_gpl_licensed.m4, x_ac_humor.m4, x_ac_meta.m4:
+	  Reformatted.
+
+	* src/libcommon/Makefile.am, src/libcommon/auth_policy.h,
+	  src/libcommon/common.h, src/libcommon/munge_msg.h,
+	  src/libmunge/Makefile.am, src/libmunge/auth_send.c,
+	  src/libmunge/auth_send.h, src/libmunge/decode.c,
+	  src/libmunge/encode.c, src/munged/Makefile.am, src/munged/auth.c,
+	  src/munged/auth.h, src/munged/auth_recv.c, src/munged/auth_recv.h,
+	  src/munged/dec_v1.c, src/munged/enc_v1.c, src/munged/munged.c:
+	  Added support for authenticating clients under AIX & Solaris.
+	  Replaced auth.[ch] with auth_policy.h & auth_(send|recv).[ch].
+
 2004-04-21  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/munged/munged/gids.c(gids_create): Added log msg.

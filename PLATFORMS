@@ -1,4 +1,6 @@
 MUNGE has been successfully compiled on the following platforms:
 
+  AIX 5.1, 5.2
   FreeBSD 4.8-RELEASE-p17
-  Linux 2.4.x (i386, ia64) [RedHat 7.3/9.0/EL3.0]
+  Linux 2.4, 2.6 (i386, ia64) [RedHat 7.3/9.0/EL3.0]
+  Solaris 2.8

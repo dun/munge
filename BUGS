@@ -1,5 +1,5 @@
+- munged run in the foreground does not terminate on sigint
 - munged can occasionally drop a client request when it gets inundated
 - munged replay state is not saved across sessions, thereby allowing
   unexpired creds to be replayed after the daemon has been restarted
 - munged configuration is hard-coded in libcommon/munge_defs.h & munged/conf.c
-- munged run in the foreground does not terminate on sigint under !linux

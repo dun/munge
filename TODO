@@ -1,6 +1,6 @@
 -thread manager
--minimize pollution of libmunge namespace
--cross-platform (AIX, Tru64, Solaris, BSD)
+-minimize pollution of libmunge namespace (cf, drepper)
+-fix aix port so it doesn't require explicit LDFLAGS="-Wl,-brtl"
 -save/restore replay state
 -ensure safe perms on sensitive files/dirs
 -configuration file support
@@ -18,5 +18,3 @@
 -benchmark utility
 -server timeout for unresponsive clients
 -realm (multi-key) support
--sgid support?
--mlock support?

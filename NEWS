@@ -1,3 +1,11 @@
+Version 0.3 (2004-04-30):
+  - Support for AIX, FreeBSD, Solaris.
+  - Support for compression (bzlib & zlib).
+  - Support for replay detection/prevention.
+  - Support for restricting decode based on uid/gid.
+  - Changed credential format to v2.
+  - Changed protocol between client & server.
+
 Version 0.2 (2003-10-24):
   - Support for ia64.
   - Added ttl and origin IP addr to credential header.
