@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: gids.c,v 1.6 2004/09/16 20:14:25 dun Exp $
+ *  $Id: gids.c,v 1.7 2004/09/16 20:41:12 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -199,11 +199,11 @@ _gids_update (gids_t gids)
 {
 /*  Updates the GIDs mapping [gids] if needed.
  *
- *  The use of a static mtime here is groovy since there will never be
- *    multiple instances of this routine running concurrently.  Placing
- *    mtime within the gids struct would potentially require locking the
- *    struct twice per function invocation: once for the stat and once for
- *    the update.
+ *  The use of a static t_last_update here is groovy since there will
+ *    never be multiple instances of this routine running concurrently.
+ *    Placing t_last_update within the gids struct would potentially
+ *    require locking the struct twice per function invocation: once
+ *    for the stat and once for the update.
  */
     static time_t   t_last_update = 0;
     time_t          t_now;
