@@ -1,5 +1,7 @@
 2004-10-15  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* : Re-bootstrap'd with automake-1.9.2.
+
 	* munge.spec, src/etc/Makefile.am, src/etc/munge.init:
 	  Removed dependence on /etc/rc.d/init.d directory.
 
