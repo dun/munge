@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: conf.c,v 1.28 2004/09/23 20:56:43 dun Exp $
+ *  $Id: conf.c,v 1.29 2004/11/09 18:12:04 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -41,6 +41,7 @@
 #include <string.h>
 #include <sys/param.h>                  /* for MAXHOSTNAMELEN */
 #include <unistd.h>
+#include "auth_policy.h"
 #include "conf.h"
 #include "license.h"
 #include "log.h"
@@ -89,8 +90,9 @@ create_conf (void)
 
     /*  FIXME: On ENOMEM, log which malloc op failed.
      */
-    if (!(conf = malloc (sizeof (struct conf))))
+    if (!(conf = malloc (sizeof (struct conf)))) {
         log_errno (EMUNGE_NO_MEMORY, LOG_ERR, "Unable to create conf");
+    }
     conf->ld = -1;
     conf->got_clock_skew = 1;
     conf->got_force = 0;
@@ -110,23 +112,30 @@ create_conf (void)
      *  FIXME: Get file lock on configuration filename?
      */
     conf->config_name = NULL;
-    if (!(conf->socket_name = strdup (MUNGE_SOCKET_NAME)))
+    if (!(conf->socket_name = strdup (MUNGE_SOCKET_NAME))) {
         log_errno (EMUNGE_NO_MEMORY, LOG_ERR, "Cannot dup socket name string");
-    /*
-     *  FIXME: Add support for random seed filename.
+    }
+    /*  FIXME: Add support for random seed filename.
      */
-    if (!(conf->seed_name = strdup (MUNGED_RANDOM_SEED)))
+    if (!(conf->seed_name = strdup (MUNGED_RANDOM_SEED))) {
         log_errno (EMUNGE_NO_MEMORY, LOG_ERR, "Cannot dup seed name string");
-    /*
-     *  FIXME: Add support for configuring key filename.
+    }
+    /*  FIXME: Add support for configuring key filename.
      */
-    if (!(conf->key_name = strdup (MUNGED_SECRET_KEY)))
+    if (!(conf->key_name = strdup (MUNGED_SECRET_KEY))) {
         log_errno (EMUNGE_NO_MEMORY, LOG_ERR, "Cannot dup key name string");
+    }
     conf->dek_key = NULL;
     conf->dek_key_len = 0;
     conf->mac_key = NULL;
     conf->mac_key_len = 0;
     conf->nthreads = MUNGE_THREADS;
+
+    if (!(conf->auth_pipe_prefix = strdup (AUTH_PIPE_NAME_PREFIX))) {
+        log_errno (EMUNGE_NO_MEMORY, LOG_ERR,
+            "Cannot dup auth pipe name prefix string");
+    }
+    conf->auth_pipe_rnd_bytes = AUTH_PIPE_NAME_RND_BYTES;
 
     return (conf);
 }
@@ -163,6 +172,10 @@ destroy_conf (conf_t conf)
         memburn (conf->mac_key, 0, conf->mac_key_len);
         free (conf->mac_key);
         conf->mac_key = NULL;
+    }
+    if (conf->auth_pipe_prefix) {
+        free (conf->auth_pipe_prefix);
+        conf->auth_pipe_prefix = NULL;
     }
     free (conf);
 
@@ -381,10 +394,10 @@ lookup_ip_addr (conf_t conf)
     char *host_str;
     char *ip_str;
 
-    if (gethostname (hostname, sizeof (hostname)) < 0)
+    if (gethostname (hostname, sizeof (hostname)) < 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to determine hostname");
-    /*
-     *  The man page doesn't say what happens if the buffer is overrun,
+    }
+    /*  The man page doesn't say what happens if the buffer is overrun,
      *    so guarantee buffer NUL-termination just in case.
      */
     hostname [sizeof (hostname) - 1] = '\0';

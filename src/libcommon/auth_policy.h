@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: auth_policy.h,v 1.2 2004/05/14 00:47:59 dun Exp $
+ *  $Id: auth_policy.h,v 1.3 2004/11/09 18:12:04 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -62,6 +62,10 @@
 #endif /* HAVE_CONFIG_H */
 
 
+/*****************************************************************************
+ *  Client authentication type
+ *****************************************************************************/
+
 #if   HAVE_GETPEEREID
 #  define MUNGE_AUTH_GETPEEREID
 
@@ -83,23 +87,19 @@
 #endif /* MUNGE_AUTH_RECVFD_COMMON */
 
 
+/*****************************************************************************
+ *  Constants
+ *****************************************************************************/
+
+/*  The directory prefix for the pipe used to authenticate a particular
+ *    client via fd-passing.
+ */
+#define AUTH_PIPE_NAME_PREFIX           "/tmp"
+
 /*  The amount of entropy (in bytes) to place in the filename of the pipe used
  *    to authenticate a particular client via fd-passing.
  */
-#define AUTH_PIPE_NAME_RND_BYTES        8
-
-/*  The maximum string length for the filename of the pipe used to
- *    authenticate a particular client via fd-passing.
- *  The auth pipe name is of the form "PREFIX/.munge-RANDOM.pipe":
- *    (strlen (AUTH_PIPE_NAME_PREFIX) + (AUTH_PIPE_NAME_RND_BYTES * 2) + 14).
- */
-#define AUTH_PIPE_NAME_MAX_LEN          (4 +(AUTH_PIPE_NAME_RND_BYTES *2) +14)
-
-/*  The directory prefix for the pipe used to authenticate a particular client
- *    via fd-passing.
- *  Update AUTH_PIPE_NAME_MAX_LEN accordingly.
- */
-#define AUTH_PIPE_NAME_PREFIX           "/tmp"
+#define AUTH_PIPE_NAME_RND_BYTES        16
 
 
 #endif /* !MUNGE_AUTH_POLICY_H */

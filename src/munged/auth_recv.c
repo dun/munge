@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: auth_recv.c,v 1.6 2004/11/09 01:30:46 dun Exp $
+ *  $Id: auth_recv.c,v 1.7 2004/11/09 18:12:04 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -111,25 +111,28 @@ auth_recv (munge_msg_t m, uid_t *uid, gid_t *gid)
 
 #ifdef MUNGE_AUTH_RECVFD_MKFIFO
 
+#include <assert.h>
 #include <fcntl.h>                      /* open, O_RDONLY */
+#include <stdlib.h>                     /* free */
+#include <stropts.h>                    /* I_RECVFD, struct strrecvfd */
 #include <sys/ioctl.h>                  /* ioctl */
 #include <sys/stat.h>                   /* mkfifo, S_IWUSR, etc. */
-#include <stropts.h>                    /* I_RECVFD, struct strrecvfd */
 
-static int _name_auth_pipe (char *dst, int dstlen);
+static int _name_auth_pipe (char **dst);
 static int _send_auth_req (int sd, const char *pipe_name);
 
 int
 auth_recv (munge_msg_t m, uid_t *uid, gid_t *gid)
 {
-    char              pipe_name [AUTH_PIPE_NAME_MAX_LEN] = "";
+    char             *pipe_name = NULL;
     int               pipe_fd = -1;
     struct strrecvfd  recvfd;
 
-    if (_name_auth_pipe (pipe_name, sizeof (pipe_name)) < 0) {
+    if (_name_auth_pipe (&pipe_name) < 0) {
         log_msg (LOG_ERR, "Unable to name auth pipe");
         goto err;
     }
+    assert (pipe_name != NULL);
     unlink (pipe_name);                 /* in case it already exists */
     /*
      *  The auth pipe must be created in the filesystem before the auth req
@@ -175,13 +178,17 @@ auth_recv (munge_msg_t m, uid_t *uid, gid_t *gid)
     }
     *uid = recvfd.uid;
     *gid = recvfd.gid;
+    free (pipe_name);
     return (0);
 
 err:
-    if (pipe_fd >= 0)
+    if (pipe_fd >= 0) {
         close (pipe_fd);
-    if (pipe_name != NULL)
+    }
+    if (pipe_name != NULL) {
         unlink (pipe_name);
+        free (pipe_name);
+    }
     return (-1);
 }
 
@@ -194,7 +201,9 @@ err:
 
 #ifdef MUNGE_AUTH_RECVFD_MKNOD
 
+#include <assert.h>
 #include <fcntl.h>                      /* open, O_RDWR */
+#include <stdlib.h>                     /* free */
 #include <stropts.h>                    /* struct strrecvfd, I_RECVFD */
 #include <sys/ioctl.h>                  /* ioctl */
 #include <sys/stat.h>                   /* struct stat, mknod, S_IFCHR */
@@ -203,21 +212,23 @@ err:
 
 static int _ns_pipe (const char *name, int fds[2]);
 static int _s_pipe (int fd[2]);
-static int _name_auth_pipe (char *dst, int dstlen);
+static int _name_auth_pipe (char **dst);
 static int _send_auth_req (int sd, const char *pipe_name);
 
 int
 auth_recv (munge_msg_t m, uid_t *uid, gid_t *gid)
 {
-    char              pipe_name [AUTH_PIPE_NAME_MAX_LEN] = "";
+    char             *pipe_name = NULL;
     int               pipe_fds[2] = {-1, -1};
     struct strrecvfd  recvfd;
 
-    if (_name_auth_pipe (pipe_name, sizeof (pipe_name)) < 0) {
+    if (_name_auth_pipe (&pipe_name) < 0) {
         log_msg (LOG_ERR, "Unable to name auth pipe");
         goto err;
     }
-    /*  The auth pipe must be created in the filesystem before the auth req
+    assert (pipe_name != NULL);
+    /*
+     *  The auth pipe must be created in the filesystem before the auth req
      *    is sent to the client in order to prevent a race condition.
      */
     if ((_ns_pipe (pipe_name, pipe_fds)) < 0) {
@@ -258,15 +269,20 @@ auth_recv (munge_msg_t m, uid_t *uid, gid_t *gid)
     }
     *uid = recvfd.uid;
     *gid = recvfd.gid;
+    free (pipe_name);
     return (0);
 
 err:
-    if (pipe_fds[0] >= 0)
+    if (pipe_fds[0] >= 0) {
         close (pipe_fds[0]);
-    if (pipe_fds[1] >= 0)
+    }
+    if (pipe_fds[1] >= 0) {
         close (pipe_fds[1]);
-    if (pipe_name != NULL)
+    }
+    if (pipe_name != NULL) {
         unlink (pipe_name);
+        free (pipe_name);
+    }
     return (-1);
 }
 
@@ -367,36 +383,75 @@ _s_pipe (int fd[2])
 
 #ifdef MUNGE_AUTH_RECVFD_COMMON
 
+#include <assert.h>
 #include <stdio.h>                      /* snprintf */
-#include <stdlib.h>                     /* malloc */
+#include <stdlib.h>                     /* malloc, free */
 #include <string.h>                     /* memset, strlen */
+#include "conf.h"
 #include "random.h"                     /* random_pseudo_bytes */
 #include "str.h"                        /* strhex */
 
 static int
-_name_auth_pipe (char *dst, int dstlen)
+_name_auth_pipe (char **dst_p)
 {
 /*  Creates a unique filename for the authentication pipe,
- *    storing the result in buffer [dst] of length [dstlen].
+ *    storing the result in a newly-allocated string referenced by [dst_p].
+ *  The caller is responsible for freeing the string returned by [dst_p].
+ *  The auth pipe name is of the form "PREFIX/.munge-RANDOM.pipe".
  *  Returns 0 on success, -1 on error.
  */
-    unsigned char  nonce_bin [AUTH_PIPE_NAME_RND_BYTES];
-    char           nonce_str [(sizeof (nonce_bin) * 2) + 1];
-    char          *p;
+    unsigned char *nonce_bin = NULL;
+    int            nonce_bin_len;
+    char          *nonce_asc = NULL;
+    int            nonce_asc_len;
+    char          *dst = NULL;
+    int            dst_len;
     int            n;
 
-    random_pseudo_bytes (nonce_bin, sizeof (nonce_bin));
+    *dst_p = NULL;
+    assert (conf->auth_pipe_rnd_bytes > 0);
+    assert (conf->auth_pipe_prefix != NULL);
 
-    p = strhex (nonce_str, sizeof (nonce_str), nonce_bin, sizeof (nonce_bin));
-    if (p == NULL) {
-        return (-1);
+    nonce_bin_len = conf->auth_pipe_rnd_bytes;
+    if (!(nonce_bin = malloc (nonce_bin_len))) {
+        goto err;
     }
-    n = snprintf (dst, dstlen, "%s/.munge-%s.pipe",
-        AUTH_PIPE_NAME_PREFIX, nonce_str);
-    if ((n < 0) || (n >= dstlen)) {
-        return (-1);
+    nonce_asc_len = (2 * nonce_bin_len) + 1;
+    if (!(nonce_asc = malloc (nonce_asc_len))) {
+        goto err;
     }
+    dst_len = strlen (conf->auth_pipe_prefix)
+        + 8                             /* strlen ("/.munge-") */
+        + (2 * conf->auth_pipe_rnd_bytes)
+        + 6;                            /* strlen (".pipe") + "\0" */
+    if (!(dst = malloc (dst_len))) {
+        goto err;
+    }
+    random_pseudo_bytes (nonce_bin, nonce_bin_len);
+    if (!(strhex (nonce_asc, nonce_asc_len, nonce_bin, nonce_bin_len))) {
+        goto err;
+    }
+    n = snprintf (dst, dst_len, "%s/.munge-%s.pipe",
+        conf->auth_pipe_prefix, nonce_asc);
+    if ((n < 0) || (n >= dst_len)) {
+        goto err;
+    }
+    free (nonce_bin);
+    free (nonce_asc);
+    *dst_p = dst;
     return (0);
+
+err:
+    if (nonce_bin) {
+        free (nonce_bin);
+    }
+    if (nonce_asc) {
+        free (nonce_asc);
+    }
+    if (dst) {
+        free (dst);
+    }
+    return (-1);
 }
 
 static int

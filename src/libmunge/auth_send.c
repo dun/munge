@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: auth_send.c,v 1.4 2004/11/09 01:30:46 dun Exp $
+ *  $Id: auth_send.c,v 1.5 2004/11/09 18:12:04 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -55,8 +55,10 @@ auth_send (munge_msg_t m)
 
 #ifdef MUNGE_AUTH_RECVFD_COMMON
 
+#include <assert.h>
 #include <errno.h>
 #include <fcntl.h>                      /* open, O_RDONLY, etc. */
+#include <stdlib.h>
 #include <string.h>                     /* strdup, strerror, strrchr */
 #include <stropts.h>                    /* I_SENDFD */
 #include <sys/ioctl.h>                  /* ioctl */
@@ -65,28 +67,29 @@ auth_send (munge_msg_t m)
 #include "munge_defs.h"
 #include "str.h"
 #include "strlcat.h"
-#include "strlcpy.h"
 
-static int _recv_auth_req (int sd, char *dst, int dstlen);
-static int _name_auth_file (const char *src, char *dst, int dstlen);
+static int _recv_auth_req (int sd, char **dst_p);
+static int _name_auth_file (const char *src, char **dst_p);
 
 int
 auth_send (munge_msg_t m)
 {
-    char  pipe_name[AUTH_PIPE_NAME_MAX_LEN];
+    char *pipe_name = NULL;
     int   pipe_fd = -1;
-    char  file_name[AUTH_PIPE_NAME_MAX_LEN] = "";
+    char *file_name = NULL;
     int   file_fd = -1;
     char *estr;
 
-    if (_recv_auth_req (m->sd, pipe_name, sizeof (pipe_name)) < 0) {
+    if (_recv_auth_req (m->sd, &pipe_name) < 0) {
         estr = strdup ("Unable to receive auth request");
         goto err;
     }
-    if (_name_auth_file (pipe_name, file_name, sizeof (file_name)) < 0) {
+    assert (pipe_name != NULL);
+    if (_name_auth_file (pipe_name, &file_name) < 0) {
         estr = strdup ("Unable to name auth file");
         goto err;
     }
+    assert (file_name != NULL);
     unlink (file_name);                 /* in case it already exists */
 
     if ((file_fd= open (file_name, O_RDONLY | O_CREAT | O_EXCL, S_IRUSR)) <0) {
@@ -119,30 +122,41 @@ auth_send (munge_msg_t m)
             file_name, strerror (errno));
         goto err;
     }
-
+    free (pipe_name);
+    free (file_name);
     return (0);
 
 err:
-    if (pipe_fd >= 0)
+    if (pipe_fd >= 0) {
         close (pipe_fd);
-    if (file_fd >= 0)
+    }
+    if (pipe_name != NULL) {
+        free (pipe_name);
+    }
+    if (file_fd >= 0) {
         close (file_fd);
-    if (file_name != NULL)
+    }
+    if (file_name != NULL) {
         unlink (file_name);
+        free (file_name);
+    }
     return (munge_msg_set_err (m, EMUNGE_SNAFU, estr));
 }
 
 static int
-_recv_auth_req (int sd, char *dst, int dstlen)
+_recv_auth_req (int sd, char **dst_p)
 {
 /*  Receives an authentication request from the server on the established
- *    socket [sd], storing the name of the authentication pipe to use
- *    for sending an fd across in buffer [dst] of length [dstlen].
+ *    socket [sd], storing the name of the authentication pipe to use for
+ *    sending an fd across in a newly-allocated string referenced by [dst_p].
+ *  The caller is responsible for freeing the string returned by [dst_p].
  *  Returns 0 on success, -1 on error.
  */
     munge_msg_t          m;
     munge_err_t          e;
     struct munge_msg_v1 *m1;
+
+    *dst_p = NULL;
 
     if ((e = munge_msg_create (&m, sd)) != EMUNGE_SUCCESS) {
         goto end;
@@ -171,8 +185,8 @@ _recv_auth_req (int sd, char *dst, int dstlen)
      *  The string must be copied since munge_msg_destroy() will free
      *    the msg body, and the msg data here resides within that memory.
      */
-    if (strlcpy (dst, m1->data, dstlen) >= dstlen) {
-        e = EMUNGE_OVERFLOW;
+    if (!(*dst_p = strdup (m1->data))) {
+        e = EMUNGE_NO_MEMORY;
         goto end;
     }
 
@@ -187,25 +201,39 @@ end:
 }
 
 static int
-_name_auth_file (const char *src, char *dst, int dstlen)
+_name_auth_file (const char *src, char **dst_p)
 {
 /*  Creates a unique filename based on the name of authentication pipe [src],
- *    storing the result in buffer [dst] of length [dstlen].
+ *    storing the result in a newly-allocated string referenced by [dst_p].
+ *  The caller is responsible for freeing the string returned by [dst_p].
  *  Returns 0 on success, -1 on error.
  */
+    char *dst = NULL;
+    int   dst_len;
     char *p;
 
-    if (strlcpy (dst, src, dstlen) >= dstlen) {
-        return (-1);
+    *dst_p = NULL;
+
+    if (!(dst = strdup (src))) {
+        goto err;
     }
+    dst_len = strlen (dst) + 1;
+
     if (!(p = strrchr (dst, '.'))) {
-        return (-1);
+        goto err;
     }
     *p = '\0';
-    if (strlcat (dst, ".file", dstlen) >= dstlen) {
-        return (-1);
+    if (strlcat (dst, ".file", dst_len) >= dst_len) {
+        goto err;
     }
+    *dst_p = dst;
     return (0);
+
+err:
+    if (dst) {
+        free (dst);
+    }
+    return (-1);
 }
 
 #endif /* MUNGE_AUTH_RECVFD_COMMON */

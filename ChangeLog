@@ -1,5 +1,13 @@
 2004-11-09  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/libcommon/auth_policy.h:
+	  Removed AUTH_PIPE_NAME_MAX_LEN.
+	  Changed AUTH_PIPE_NAME_RND_BYTES from 8 to 16.
+	* src/libmunge/auth_send.c, src/munged/auth_recv.c:
+	  Changed static bufs using AUTH_PIPE_NAME_MAX_LEN to dynamic memory.
+	* src/munged/conf.c, src/munged/conf.h:
+	  Added auth_pipe_prefix & auth_pipe_rnd_bytes to conf struct.
+
 	* src/libmunge/munge.h:
 	  Changed indenting of preprocessor cmds so line begins with '#'.
 
