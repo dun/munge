@@ -1,12 +1,12 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.3 2003/04/18 23:20:18 dun Exp $
+## $Id: Makefile.am,v 1.4 2003/10/28 22:20:45 dun Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
 
 include $(top_srcdir)/config/Make-inc.mk
 
-CPPFLAGS = \
+AM_CPPFLAGS = \
 	-I$(top_srcdir)/src/libcommon \
 	-I$(top_srcdir)/src/libmissing \
 	-I$(top_srcdir)/src/libmunge

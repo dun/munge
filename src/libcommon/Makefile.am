@@ -1,12 +1,12 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.3 2003/05/03 00:41:00 dun Exp $
+## $Id: Makefile.am,v 1.4 2003/10/28 22:20:45 dun Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
 
 include $(top_srcdir)/config/Make-inc.mk
 
-CPPFLAGS = \
+AM_CPPFLAGS = \
 	-I$(top_srcdir)/src/libmunge
 
 noinst_LTLIBRARIES = \
