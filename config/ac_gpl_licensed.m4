@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: ac_gpl_licensed.m4,v 1.1 2003/02/17 02:29:41 dun Exp $
+## $Id: ac_gpl_licensed.m4,v 1.2 2003/05/07 17:02:44 dun Exp $
 ##*****************************************************************************
 #  AUTHOR:
 #    Chris Dunlap <cdunlap@llnl.gov>
@@ -13,7 +13,7 @@
 
 AC_DEFUN([AC_GPL_LICENSED],
 [
-  AC_DEFINE([GPL_LICENSED], 1,
+  AC_DEFINE([GPL_LICENSED], [1],
     [Define to 1 if licensed under terms of the GNU General Public License.]
   )
 ])

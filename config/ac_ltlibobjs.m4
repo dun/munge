@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: ac_ltlibobjs.m4,v 1.1 2003/02/13 17:59:16 dun Exp $
+## $Id: ac_ltlibobjs.m4,v 1.2 2003/05/07 17:02:44 dun Exp $
 ##*****************************************************************************
 #  AUTHOR:
 #    Chris Dunlap <cdunlap@llnl.gov>
@@ -19,5 +19,5 @@ AC_DEFUN([AC_LTLIBOBJS],
 [
   LIB@&t@OBJS=`echo "$LIB@&t@OBJS" | sed 's,\.[[^.]]* ,$U&,g;s,\.[[^.]]*$,$U&,'`
   LTLIBOBJS=`echo "$LIB@&t@OBJS" | sed 's,\.[[^.]]* ,.lo ,g;s,\.[[^.]]*$,.lo,'`
-  AC_SUBST(LTLIBOBJS)
+  AC_SUBST([LTLIBOBJS])
 ])

@@ -25,12 +25,12 @@ AC_DEFUN([AC_META],
   AC_MSG_CHECKING([metadata])
 
   PACKAGE="`perl -ne 'print,exit if s/^\s*NAME:\s*(\S*).*/\1/i' $srcdir/META`"
-  AC_DEFINE_UNQUOTED(PACKAGE, "$PACKAGE", [Define the package name.])
-  AC_SUBST(PACKAGE)
+  AC_DEFINE_UNQUOTED([PACKAGE], ["$PACKAGE"], [Define the package name.])
+  AC_SUBST([PACKAGE])
 
   VERSION="`perl -ne 'print,exit if s/^\s*VERSION:\s*(\S*).*/\1/i' $srcdir/META`"
-  AC_DEFINE_UNQUOTED(VERSION, "$VERSION", [Define the package version.])
-  AC_SUBST(VERSION)
+  AC_DEFINE_UNQUOTED([VERSION], ["$VERSION"], [Define the package version.])
+  AC_SUBST([VERSION])
 
   AC_MSG_RESULT([yes])
 ])
@@ -46,7 +46,7 @@ AC_DEFUN([AC_META],
 
 AC_DEFUN([AC_GPL_LICENSED],
 [
-  AC_DEFINE([GPL_LICENSED], 1,
+  AC_DEFINE([GPL_LICENSED], [1],
     [Define to 1 if licensed under terms of the GNU General Public License.]
   )
 ])
@@ -4586,12 +4586,12 @@ AC_MSG_RESULT([$SED])
 AC_DEFUN([AC_DEBUG],
 [
   AC_MSG_CHECKING([whether debugging is enabled])
-  AC_ARG_ENABLE(debug,
+  AC_ARG_ENABLE([debug],
     AC_HELP_STRING([--enable-debug], [enable debugging code for development]),
     [ case "$enableval" in
         yes) ac_debug=yes ;;
         no)  ac_debug=no ;;
-        *)   AC_MSG_RESULT(doh!)
+        *)   AC_MSG_RESULT([doh!])
              AC_MSG_ERROR([bad value "$enableval" for --enable-debug]) ;;
       esac
     ]
@@ -4605,10 +4605,10 @@ AC_DEFUN([AC_DEBUG],
     if test -z "$ac_save_CFLAGS"; then
       test "$GCC" = yes && CFLAGS="-O2 -Wall" || CFLAGS="-O"
     fi
-    AC_DEFINE(NDEBUG, 1,
+    AC_DEFINE([NDEBUG], [1],
       [Define to 1 if you are building a production release.])
   fi
-  AC_MSG_RESULT(${ac_debug=no})
+  AC_MSG_RESULT([${ac_debug=no}])
 ])
 
 #  AUTHOR:
@@ -4628,6 +4628,6 @@ AC_DEFUN([AC_LTLIBOBJS],
 [
   LIB@&t@OBJS=`echo "$LIB@&t@OBJS" | sed 's,\.[[^.]]* ,$U&,g;s,\.[[^.]]*$,$U&,'`
   LTLIBOBJS=`echo "$LIB@&t@OBJS" | sed 's,\.[[^.]]* ,.lo ,g;s,\.[[^.]]*$,.lo,'`
-  AC_SUBST(LTLIBOBJS)
+  AC_SUBST([LTLIBOBJS])
 ])
 
