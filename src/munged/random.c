@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: random.c,v 1.6 2004/04/03 21:53:00 dun Exp $
+ *  $Id: random.c,v 1.7 2004/09/17 21:30:44 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -29,10 +29,10 @@
 #  include <config.h>
 #endif /* HAVE_CONFIG_H */
 
-#include <assert.h>
 #include <munge.h>
 #include <openssl/rand.h>
 #include <string.h>
+#include "conf.h"
 #include "crypto_log.h"
 #include "log.h"
 #include "munge_defs.h"
@@ -57,15 +57,17 @@ random_init (const char *seed)
         /*
          *  FIXME: Ignore seed file if it does not have sane permissions.
          */
-        if ((n = RAND_load_file (seed, RANDOM_SEED_BYTES)) > 0)
+        if ((n = RAND_load_file (seed, RANDOM_SEED_BYTES)) > 0) {
             log_msg (LOG_INFO, "PRNG seeded with %d bytes from \"%s\"",
                 n, seed);
+        }
     }
     if (n < RANDOM_SEED_BYTES) {
         log_msg (LOG_NOTICE, "PRNG seeding in progress ...");
-        if ((n = RAND_load_file (RANDOM_SEED_DEFAULT, RANDOM_SEED_BYTES)) > 0)
+        if ((n = RAND_load_file (RANDOM_SEED_DEFAULT, RANDOM_SEED_BYTES)) >0) {
             log_msg (LOG_INFO, "PRNG seeded PRNG with %d bytes from \"%s\"",
                 n, RANDOM_SEED_DEFAULT);
+        }
     }
     if (n < RANDOM_SEED_BYTES) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
@@ -82,13 +84,16 @@ random_fini (const char *seed)
 
     if ((seed != NULL) && (*seed != '\0')) {
         n = RAND_write_file (seed);
-        if (n < 0)
+        if (n < 0) {
             log_msg (LOG_WARNING,
                 "Generated PRNG seed \"%s\" without adequate entropy", seed);
-        else if (n == 0)
+        }
+        else if (n == 0) {
             log_msg (LOG_WARNING, "Unable to write to PRNG seed \"%s\"", seed);
-        else
+        }
+        else {
             log_msg (LOG_INFO, "Wrote %d bytes to PRNG seed \"%s\"", n, seed);
+        }
     }
     RAND_cleanup ();
     return;
@@ -98,9 +103,9 @@ random_fini (const char *seed)
 void
 random_add (const void *buf, int n)
 {
-    assert (buf != NULL);
-    assert (n > 0);
-
+    if (!buf || (n <= 0)) {
+        return;
+    }
     RAND_seed (buf, n);
     return;
 }
@@ -111,9 +116,9 @@ random_bytes (unsigned char *buf, int n)
 {
     int rc;
 
-    assert (buf != NULL);
-    assert (n > 0);
-
+    if (!buf || (n <= 0)) {
+        return;
+    }
     rc = RAND_bytes (buf, n);
     if (rc == -1) {
         log_msg (LOG_ERR, "RAND method does not support RAND_bytes()");
@@ -130,9 +135,9 @@ random_pseudo_bytes (unsigned char *buf, int n)
 {
     int rc;
 
-    assert (buf != NULL);
-    assert (n > 0);
-
+    if (!buf || (n <= 0)) {
+        return;
+    }
     rc = RAND_pseudo_bytes (buf, n);
     if (rc == -1) {
         log_msg (LOG_ERR, "RAND method does not support RAND_pseudo_bytes()");

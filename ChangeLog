@@ -1,5 +1,7 @@
 2004-09-17  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/munged/random.c: Replaced parm asserts with if-guards.
+
 	* src/munged/gids.c:
 	  Added #ifndef's around GIDS_DEBUG and GIDS_GROUP_FILE.
 
