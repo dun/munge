@@ -1,5 +1,7 @@
 2003-05-03  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* HISTORY: Added.
+
 	* src/munged/msg_server.c(err_v1_process_msg):
 	  Fixed sending err msg with no body, but need to revisit this routine.
 
@@ -115,5 +117,5 @@
 
 2002-12-20  Chris Dunlap  <cdunlap@llnl.gov>
 
-	* : Initial commit.
+	* : Released 0.0.
 
