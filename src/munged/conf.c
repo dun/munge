@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: conf.c,v 1.3 2003/04/18 23:41:45 dun Exp $
+ *  $Id: conf.c,v 1.4 2003/04/30 21:45:15 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -61,7 +61,7 @@ struct option opt_table[] = {
 };
 #endif /* HAVE_GETOPT_H */
                                                                                 
-const char * const opt_string = "hLVvfS:";
+const char * const opt_string = "hLVvfFS:";
 
 
 /*****************************************************************************
