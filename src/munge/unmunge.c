@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: unmunge.c,v 1.13 2003/05/16 23:44:17 dun Exp $
+ *  $Id: unmunge.c,v 1.14 2003/05/22 21:08:59 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -290,6 +290,7 @@ parse_cmdline (conf_t conf, int argc, char **argv)
     int         got_keys = 0;
     char       *prog;
     char        c;
+    char       *p;
     munge_err_t e;
     int         i;
 
@@ -349,10 +350,10 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                         munge_ctx_strerror (conf->ctx));
                 break;
             case 't':
-                i = strtol (optarg, NULL, 10);
-                if ((i == LONG_MIN) || (i == LONG_MAX))
+                i = strtol (optarg, &p, 10);
+                if (optarg == p)
                     log_errno (EMUNGE_SNAFU, LOG_ERR,
-                        "Invalid time-to-live '%d'", i);
+                        "Invalid time-to-live '%s'", optarg);
                 if (i < 0)
                     i = MUNGE_TTL_FOREVER;
                 e = munge_ctx_set (conf->ctx, MUNGE_OPT_TTL, i);

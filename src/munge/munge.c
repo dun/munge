@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munge.c,v 1.13 2003/05/16 23:44:17 dun Exp $
+ *  $Id: munge.c,v 1.14 2003/05/22 21:08:59 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -424,6 +424,7 @@ int
 str_to_int (const char *s, const char **strings)
 {
     const char **pp;
+    char *p;
     int i;
     int n;
 
@@ -436,10 +437,8 @@ str_to_int (const char *s, const char **strings)
     /*  Check to see if the given string matches a valid enum.
      */
     if (isdigit (s[0])) {
-        n = strtol (s, NULL, 10);
-        if ((n == LONG_MIN) || (n == LONG_MAX))
-            return (-1);
-        if ((n >= 0) && (n < i) && (strings[n][0] != '\0'))
+        n = strtol (s, &p, 10);
+        if ((s != p) && (n >= 0) && (n < i) && (strings[n][0] != '\0'))
             return (n);
     }
     return (-1);
