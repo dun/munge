@@ -1,3 +1,8 @@
+2004-08-26  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/libmunge/ctx.c, src/libmunge/munge.h:
+	  Added munge_ctx_copy().  Added docs wrt context function usage.
+
 2004-08-25  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/libcommon/munge_defs.h:

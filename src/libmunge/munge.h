@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munge.h,v 1.21 2004/06/09 21:43:28 dun Exp $
+ *  $Id: munge.h,v 1.22 2004/08/26 17:45:58 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -195,6 +195,8 @@ munge_err_t munge_encode (char **cred, munge_ctx_t ctx,
  *    the caller is responsible for freeing this string.
  *  Returns EMUNGE_SUCCESS if the credential is successfully created;
  *    o/w, sets [cred] to NULL and returns the munge error number.
+ *    If a [ctx] was specified, it may contain a more detailed error
+ *    message accessible via munge_ctx_strerror().
  */
 
 munge_err_t munge_decode (const char *cred, munge_ctx_t ctx,
@@ -209,12 +211,13 @@ munge_err_t munge_decode (const char *cred, munge_ctx_t ctx,
  *    The caller is responsible for freeing the memory referenced by [buf].
  *    If no data was munged into the credential, [buf] will be set to NULL
  *    and [len] will be set to 0.  Note that in the case of some errors
- *    (eg, EMUNGE_CRED_EXPIRED, EMUNGE_CRED_REWOUND, EMUNGE_CRED_REPLAYED),
+ *    (ie, EMUNGE_CRED_EXPIRED, EMUNGE_CRED_REWOUND, EMUNGE_CRED_REPLAYED),
  *    [buf] and [len] will be updated as appropriate.
  *  If [uid] or [gid] is not NULL, they will be set to the UID/GID
  *    of the process that created the credential.
  *  Returns EMUNGE_SUCCESS if the credential is valid; o/w, returns the
- *    munge error number.
+ *    munge error number.  If a [ctx] was specified, it may contain a
+ *    more detailed error message accessible via munge_ctx_strerror().
  */
 
 const char * munge_strerror (munge_err_t e);
@@ -227,6 +230,17 @@ END_C_DECLS
 
 /*****************************************************************************
  *  Context Functions
+ ***************************************************************************** 
+ *  The context passed to munge_encode() is treated read-only except for the
+ *    error message that is set when an error is returned.
+ *  The context passed to munge_decode() is set according to the context used
+ *    to encode the credential; however, on error, its settings may be in a
+ *    state which is invalid for encoding.
+ *  Consequently, separate contexts should be used for encoding and decoding.
+ *  A context should not be shared between threads unless it is protected by
+ *    a mutex; however, a better alternative is to use a separate context
+ *    (or two) for each thread, either by creating a new one or copying an
+ *    existing one.
  *****************************************************************************/
 
 BEGIN_C_DECLS
@@ -234,6 +248,13 @@ BEGIN_C_DECLS
 munge_ctx_t munge_ctx_create (void);
 /*
  *  Creates and returns a new munge context, or NULL on error (out-of-memory).
+ *  Abandoning a context without calling munge_ctx_destroy() will result
+ *    in a memory leak.
+ */
+
+munge_ctx_t munge_ctx_copy (munge_ctx_t ctx);
+/*
+ *  Copies the context [ctx], returning a new munge context or NULL on error.
  *  Abandoning a context without calling munge_ctx_destroy() will result
  *    in a memory leak.
  */

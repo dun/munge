@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: ctx.c,v 1.13 2004/04/16 22:15:06 dun Exp $
+ *  $Id: ctx.c,v 1.14 2004/08/26 17:45:58 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -50,7 +50,7 @@ munge_ctx_create (void)
 {
     munge_ctx_t ctx;
 
-    if (!(ctx = malloc (sizeof (struct munge_ctx)))) {
+    if (!(ctx = malloc (sizeof (*ctx)))) {
         return (NULL);
     }
     ctx->cipher = MUNGE_CIPHER_DEFAULT;
@@ -63,23 +63,64 @@ munge_ctx_create (void)
     ctx->time1 = 0;
     ctx->auth_uid = MUNGE_UID_ANY;
     ctx->auth_gid = MUNGE_GID_ANY;
-    ctx->socket = strdup (MUNGE_SOCKET_NAME);
-    ctx->errnum = EMUNGE_SUCCESS;
-    ctx->errstr = NULL;
 
-    if (!(ctx->socket)) {
+    if (!(ctx->socket = strdup (MUNGE_SOCKET_NAME))) {
         munge_ctx_destroy (ctx);
         return (NULL);
     }
+    ctx->errnum = EMUNGE_SUCCESS;
+    ctx->errstr = NULL;
+
     return (ctx);
+}
+
+
+munge_ctx_t
+munge_ctx_copy (munge_ctx_t src)
+{
+    munge_ctx_t dst;
+
+    if (!src) {
+        return (NULL);
+    }
+    if (!(dst = malloc (sizeof (*dst)))) {
+        return (NULL);
+    }
+    *dst = *src;
+    /*
+     *  Since struct assignment is a shallow copy, first reset all strings.
+     *    This protects against calling munge_ctx_destroy (dst) on error.
+     *    If any of these still referenced the src strings at that time,
+     *    those strings would erroneously be free()d -- thereby corrupting
+     *    the src ctx by mistake.
+     */
+    dst->realm = NULL;
+    dst->socket = NULL;
+    dst->errstr = NULL;
+    /*
+     *  Reset the error condition.
+     */
+    dst->errnum = EMUNGE_SUCCESS;
+    /*
+     *  Copy the src strings.
+     */
+    if ((src->realm) && !(dst->realm = strdup (src->realm))) {
+        goto err;
+    }
+    if (!(dst->socket = strdup (src->socket))) {
+        goto err;
+    }
+    return (dst);
+
+err:
+    munge_ctx_destroy (dst);
+    return (NULL);
 }
 
 
 void
 munge_ctx_destroy (munge_ctx_t ctx)
 {
-    assert (ctx != NULL);
-
     if (!ctx) {
         return;
     }
@@ -100,8 +141,6 @@ munge_ctx_destroy (munge_ctx_t ctx)
 const char *
 munge_ctx_strerror (munge_ctx_t ctx)
 {
-    assert (ctx != NULL);
-
     if (!ctx) {
         return (NULL);
     }
@@ -125,8 +164,6 @@ munge_ctx_get (munge_ctx_t ctx, munge_opt_t opt, ...)
     uid_t           *p2uid;
     gid_t           *p2gid;
     va_list          vargs;
-
-    assert (ctx != NULL);
 
     if (!ctx) {
         return (EMUNGE_BAD_ARG);
@@ -198,8 +235,6 @@ munge_ctx_set (munge_ctx_t ctx, munge_opt_t opt, ...)
     char        *p;
     int          i;
     va_list      vargs;
-
-    assert (ctx != NULL);
 
     if (!ctx) {
         return (EMUNGE_BAD_ARG);
