@@ -6,9 +6,9 @@
 ##
 # REQUIREMENTS:
 # - requires project to be under CVS version control
-# - requires "PROJECT" macro definition set to the CVS project name
+# - requires "PACKAGE" macro definition set to the CVS project name
 # - requires "META" file to reside in the top-level directory of the project
-# - requires RPM spec file named "$(PROJECT).spec.in" or "$(PROJECT).spec"
+# - requires RPM spec file named "$(PACKAGE).spec.in" or "$(PACKAGE).spec"
 #     to reside in the top-level directory of the project
 ##
 # META FILE FORMAT:
@@ -17,7 +17,7 @@
 # - lines are of the form "TAG:VALUE"
 # - TAGs and VALUEs cannot contain whitespace
 # - supported tags: NAME, VERSION, RELEASE
-# - NAME tag must be set the same as the PROJECT macro definition
+# - NAME tag must be set the same as the PACKAGE macro definition
 ##
 # CVS TAG FORMAT:
 # - if RELEASE is not defined, tags are of the form "NAME-VERSION";
@@ -48,8 +48,8 @@
 ##
 
 tar rpm:
-	@proj=$(PROJECT); if test -z "$$proj"; then \
-	  echo "ERROR: PROJECT macro def is not defined." 1>&2; exit 1; fi; \
+	@proj=$(PACKAGE); if test -z "$$proj"; then \
+	  echo "ERROR: PACKAGE macro def is not defined." 1>&2; exit 1; fi; \
 	if test -z "$$tag"; then \
 	  if ! test -f META; then \
 	    echo "ERROR: Cannot find $$proj metadata in \"`pwd`/META\"." 1>&2;\
@@ -73,7 +73,7 @@ tar rpm:
 	  echo "ERROR: Cannot find $$proj metadata in CVS." 1>&2; exit 1; fi; \
 	name=`perl -ne 'print,exit if s/^\s*NAME:\s*(\S*).*/\1/i' $$meta`; \
 	if test "$$proj" != "$$name"; then \
-	  echo "ERROR: PROJECT does not match metadata." 1>&2; exit 1; fi; \
+	  echo "ERROR: PACKAGE does not match metadata." 1>&2; exit 1; fi; \
 	ver=`perl -ne 'print,exit if s/^\s*VERSION:\s*(\S*).*/\1/i' $$meta`; \
 	rel=`perl -ne 'print,exit if s/^\s*RELEASE:\s*(\S*).*/\1/i' $$meta`; \
 	test "$$tag" = "HEAD" && rel="`date +%y%m%d%H%M`"; \
