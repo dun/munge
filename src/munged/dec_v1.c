@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: dec_v1.c,v 1.1 2003/04/18 23:20:18 dun Exp $
+ *  $Id: dec_v1.c,v 1.2 2003/04/22 20:49:36 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -253,7 +253,8 @@ dec_v1_unpack_outer (munge_cred_t c)
  *  The "outer" part of the credential does not undergo cryptographic
  *    transformations (ie, compression and encryption).  It includes:
  *    cred version, cipher type, compression type, mac type, realm length,
- *    realm string (if present), and the initialization vector (if needed).
+ *    unterminated realm string (if realm_len > 0), and the cipher's
+ *    initialization vector (if encrypted).
  *  Validation of the "outer" credential occurs here as well since unpacking
  *    may not be able to continue if an invalid field is found.
  *  While the MAC is not technically part of the "outer" credential data,
@@ -357,12 +358,12 @@ dec_v1_unpack_outer (munge_cred_t c)
      *  Unpack the length of realm string.
      */
     n = sizeof (m1->realm_len);
-    assert (n == 4);
+    assert (n == 1);
     if (n > len) {
         return (_munge_msg_set_err (c->msg, EMUNGE_BAD_CRED,
             strdup ("Truncated credential realm length")));
     }
-    m1->realm_len = ntohl (* (uint32_t *) p);
+    m1->realm_len = *p;
     p += n;
     len -= n;
     /*

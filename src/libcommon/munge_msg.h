@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munge_msg.h,v 1.2 2003/04/18 23:20:18 dun Exp $
+ *  $Id: munge_msg.h,v 1.3 2003/04/22 20:49:35 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -66,7 +66,7 @@ struct munge_msg_v1 {
     uint8_t                 cipher;     /* munge_cipher_t enum               */
     uint8_t                 zip;        /* munge_zip_t enum                  */
     uint8_t                 mac;        /* munge_mac_t enum                  */
-    uint32_t                realm_len;  /* length of realm string            */
+    uint8_t                 realm_len;  /* length of realm string            */
     char                   *realm;      /* security realm string             */
     uint32_t                ttl;        /* time-to-live                      */
     uint32_t                time0;      /* time at which cred was encoded    */

@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: enc_v1.c,v 1.2 2003/04/18 23:20:18 dun Exp $
+ *  $Id: enc_v1.c,v 1.3 2003/04/22 20:49:36 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -276,11 +276,11 @@ enc_v1_pack_outer (munge_cred_t c)
  *  The "outer" part of the credential does not undergo cryptographic
  *    transformations (ie, compression and encryption).  It includes:
  *    cred version, cipher type, compression type, mac type, realm length,
- *    realm string (if present), and the initialization vector (if needed).
+ *    unterminated realm string (if realm_len > 0), and the cipher's
+ *    initialization vector (if encrypted).
  */
     struct munge_msg_v1 *m1;            /* munge msg (v1 format)             */
     unsigned char       *p;             /* ptr into packed data              */
-    uint32_t             u;             /* tmp for packing into into MSBF    */
 
     assert (c != NULL);
     assert (c->outer_mem == NULL);
@@ -318,9 +318,8 @@ enc_v1_pack_outer (munge_cred_t c)
     *p = m1->mac;
     p += sizeof (m1->mac);
 
-    assert (sizeof (m1->realm_len) == 4);
-    u = htonl (m1->realm_len);
-    memcpy (p, &u, sizeof (m1->realm_len));
+    assert (sizeof (m1->realm_len) == 1);
+    *p = m1->realm_len;
     p += sizeof (m1->realm_len);
 
     if (m1->realm_len > 0) {
