@@ -1,5 +1,9 @@
 2004-03-11  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* config/x_ac_check_cond_lib.m4, config/x_ac_check_peercred.m4,
+	  config/x_ac_debug.m4, config/x_ac_gpl_licensed.m4,
+	  config/x_ac_humor.m4, config/x_ac_meta.m4: Reformatted.
+
 	* src/munged/Makefile.am: Added _REENTRANT def to munged CFLAGS.
 
 	* configure.ac, config/x_ac_ltlibobjs.m4:

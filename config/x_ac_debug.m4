@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: x_ac_debug.m4,v 1.1 2004/03/05 20:04:18 dun Exp $
+## $Id: x_ac_debug.m4,v 1.2 2004/03/12 00:33:48 dun Exp $
 ##*****************************************************************************
 #  AUTHOR:
 #    Chris Dunlap <cdunlap@llnl.gov>
@@ -18,19 +18,20 @@
 ##*****************************************************************************
 
 AC_DEFUN([X_AC_DEBUG],
-[
-  AC_MSG_CHECKING([whether debugging is enabled])
-  AC_ARG_ENABLE([debug],
+[ AC_MSG_CHECKING([whether debugging is enabled])
+  AC_ARG_ENABLE(
+    [debug],
     AS_HELP_STRING([--enable-debug], [enable debugging code for development]),
-      [ case "$enableval" in
-          yes) x_ac_debug=yes ;;
-          no)  x_ac_debug=no ;;
-          *)   AC_MSG_RESULT([doh!])
-               AC_MSG_ERROR([bad value "$enableval" for --enable-debug]) ;;
-        esac ])
+    [ case "$enableval" in
+        yes) x_ac_debug=yes ;;
+         no) x_ac_debug=no ;;
+          *) AC_MSG_RESULT([doh!])
+             AC_MSG_ERROR([bad value "$enableval" for --enable-debug]) ;;
+      esac
+    ])
   if test "$x_ac_debug" = yes; then
     if test -z "$ac_save_CFLAGS"; then
-      test "$ac_cv_prog_cc_g" = yes && _x_ac_debug_g="-g"
+      test "$ac_cv_prog_cc_g" = yes && _x_ac_debug_g="-g" || _x_ac_debug_g=""
       test "$GCC" = yes && CFLAGS="-Wall -Werror $_x_ac_debug_g"
     fi
   else

@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: x_ac_check_cond_lib.m4,v 1.1 2004/03/11 21:04:39 dun Exp $
+## $Id: x_ac_check_cond_lib.m4,v 1.2 2004/03/12 00:33:48 dun Exp $
 ##*****************************************************************************
 #  AUTHOR:
 #    Chris Dunlap <cdunlap@llnl.gov>
@@ -20,10 +20,12 @@
 ##*****************************************************************************
 
 AC_DEFUN([X_AC_CHECK_COND_LIB],
-[
-  AC_CHECK_LIB([$1], [$2],
-  [ AH_CHECK_LIB([$1])
-    AS_TR_CPP([LIB$1])="-l$1";
-    AC_SUBST(AS_TR_CPP([LIB$1]))
-    AC_DEFINE_UNQUOTED(AS_TR_CPP([HAVE_LIB$1])) ])
+[ AC_CHECK_LIB(
+    [$1],
+    [$2],
+    [ AH_CHECK_LIB([$1])
+      AS_TR_CPP([LIB$1])="-l$1";
+      AC_SUBST(AS_TR_CPP([LIB$1]))
+      AC_DEFINE_UNQUOTED(AS_TR_CPP([HAVE_LIB$1]))
+    ])
 ])
