@@ -72,7 +72,7 @@
 /* Define to 1 if you have the <unistd.h> header file. */
 #undef HAVE_UNISTD_H
 
-/* Name of package */
+/* Define the package name. */
 #undef PACKAGE
 
 /* Define to the address where bug reports for this package should be sent. */
@@ -93,7 +93,7 @@
 /* Define to 1 if you have the ANSI C header files. */
 #undef STDC_HEADERS
 
-/* Version number of package */
+/* Define the package version. */
 #undef VERSION
 
 /* Define to 1 if your processor stores words with the most significant byte

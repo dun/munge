@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: configure.ac,v 1.9 2003/05/02 22:20:45 dun Exp $
+## $Id: configure.ac,v 1.10 2003/05/02 22:31:26 dun Exp $
 ##*****************************************************************************
 ## Process this file with autoconf to produce a configure script.
 ##*****************************************************************************
@@ -40,7 +40,7 @@ AC_HUMOR
 ##
 # Automake support.
 ##
-AM_INIT_AUTOMAKE([check-news dist-bzip2 gnu])
+AM_INIT_AUTOMAKE([check-news dist-bzip2 gnu no-define])
 AM_CONFIG_HEADER([config/config.h])
 AM_MAINTAINER_MODE
 
