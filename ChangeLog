@@ -1,5 +1,9 @@
 2004-08-05  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/munged/timer.c(timer_fini):
+	  Changed assert of pthread_join() rc to an explicit test.
+	  Reset timer_tid after timer thread has been joined.
+
 	* src/libcommon/munge_defs.h, src/munged/conf.c, src/munged/conf.h,
 	  src/munged/job.c, src/munged/job.h, src/munged/work.c,
 	  src/munged/work.h:

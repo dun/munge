@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: timer.c,v 1.8 2004/07/29 20:20:06 dun Exp $
+ *  $Id: timer.c,v 1.9 2004/08/05 21:18:40 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -157,7 +157,10 @@ timer_fini (void)
     if ((errno = pthread_join (timer_tid, &result)) != 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to join timer thread");
     }
-    assert (result == PTHREAD_CANCELED);
+    if (result != PTHREAD_CANCELED) {
+        log_err (EMUNGE_SNAFU, LOG_ERR, "Timer thread was not canceled");
+    }
+    timer_tid = 0;
     /*
      *  Cancel all pending timers.
      *  Note that this method doesn't preserve the ordering of the inactive
