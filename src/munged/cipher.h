@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: cipher.h,v 1.1 2003/04/08 18:16:16 dun Exp $
+ *  $Id: cipher.h,v 1.2 2003/04/18 23:17:38 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -47,6 +47,11 @@ typedef struct {
     int                 finalized;
 #endif /* !NDEBUG */
 } cipher_ctx;
+
+enum {
+    CIPHER_DECRYPT = 0,
+    CIPHER_ENCRYPT = 1
+};
 
 
 /*****************************************************************************
