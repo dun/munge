@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munge_msg.c,v 1.5 2003/06/03 19:51:25 dun Exp $
+ *  $Id: munge_msg.c,v 1.6 2003/06/27 17:52:56 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -121,26 +121,33 @@ _munge_msg_send (munge_msg_t m)
      */
     n = sizeof (m->head);
     if (fd_write_n (m->sd, &(m->head), n) < n) {
+        /*
+         *  XXX: 2003-06-27: This failed on alci when running ~860 node job.
+         */
         _munge_msg_set_err (m, EMUNGE_SOCKET,
-            strdupf ("Unable to write message header (%d bytes)", n));
+            strdupf ("Unable to write message header (%d bytes): %s",
+                n, strerror (errno)));
         return (EMUNGE_SOCKET);
     }
     n = sizeof (*m1);
     if (fd_write_n (m->sd, m1, n) < n) {
         _munge_msg_set_err (m, EMUNGE_SOCKET,
-            strdupf ("Unable to write v1 message body (%d bytes)", n));
+            strdupf ("Unable to write v1 message body (%d bytes): %s",
+                n, strerror (errno)));
         return (EMUNGE_SOCKET);
     }
     n = m1->realm_len;
     if ((n > 0) && (fd_write_n (m->sd, m1->realm, n) < n)) {
         _munge_msg_set_err (m, EMUNGE_SOCKET,
-            strdupf ("Unable to write v1 message realm (%d bytes)", n));
+            strdupf ("Unable to write v1 message realm (%d bytes): %s",
+                n, strerror (errno)));
         return (EMUNGE_SOCKET);
     }
     n = m1->data_len;
     if ((n > 0) && (fd_write_n (m->sd, m1->data, n) < n)) {
         _munge_msg_set_err (m, EMUNGE_SOCKET,
-            strdupf ("Unable to write v1 message data (%d bytes)", n));
+            strdupf ("Unable to write v1 message data (%d bytes): %s",
+                n, strerror (errno)));
         return (EMUNGE_SOCKET);
     }
     return (EMUNGE_SUCCESS);
@@ -160,7 +167,8 @@ _munge_msg_recv (munge_msg_t m)
     n = sizeof (m->head);
     if (fd_read_n (m->sd, &(m->head), n) < n) {
         _munge_msg_set_err (m, EMUNGE_SOCKET,
-            strdupf ("Unable to read message header (%d bytes)", n));
+            strdupf ("Unable to read message header (%d bytes): %s",
+                n, strerror (errno)));
         return (EMUNGE_SOCKET);
     }
     if (m->head.magic != MUNGE_MSG_MAGIC) {
@@ -188,7 +196,8 @@ _munge_msg_recv (munge_msg_t m)
     n = m->head.length;
     if (fd_read_n (m->sd, m->pbody, n) < n) {
         _munge_msg_set_err (m, EMUNGE_SOCKET,
-            strdupf ("Unable to read v1 message body (%d bytes)", n));
+            strdupf ("Unable to read v1 message body (%d bytes): %s",
+                n, strerror (errno)));
         return (EMUNGE_SOCKET);
     }
     m1 = m->pbody;

@@ -1,3 +1,8 @@
+2003-06-27  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/libcommon/munge_msg.c:
+	  Augmented err msgs with strerror() to track down failed fd_write_n().
+
 2003-06-12  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/munged/conf.c(create_conf):
