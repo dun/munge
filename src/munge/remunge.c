@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: remunge.c,v 1.4 2004/09/04 04:35:47 dun Exp $
+ *  $Id: remunge.c,v 1.5 2004/09/04 04:43:26 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -189,6 +189,11 @@ main (int argc, char *argv[])
     if (posignal (SIGPIPE, SIG_IGN) == SIG_ERR) {
         log_err (EMUNGE_SNAFU, LOG_ERR, "Unable to ignore signal=%d", SIGPIPE);
     }
+    /*  Close stdin since it is not used.
+     */
+    if (close (STDIN_FILENO) < 0) {
+        log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to close stdin");
+    }
     log_open_file (stderr, argv[0], LOG_INFO, LOG_OPT_PRIORITY);
     conf = create_conf ();
     parse_cmdline (conf, argc, argv);
@@ -238,7 +243,7 @@ create_conf (void)
     /*
      *  Compute the maximum number of threads available for the process.
      *    Each thread requires an open file descriptor to communicate with
-     *    the local munge daemon.  Reserve 3 fds for stdin/stdout/stderr.
+     *    the local munge daemon.  Reserve 2 fds for stdout and stderr.
      *    And reserve 2 fds in case LinuxThreads is being used.
      */
     errno = 0;
@@ -246,7 +251,7 @@ create_conf (void)
         log_errno (EMUNGE_SNAFU, LOG_ERR,
             "Unable to determine the maximum number of open files");
     }
-    if ((conf->max_threads = n - 3 - 2) < 1) {
+    if ((conf->max_threads = n - 2 - 2) < 1) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
             "Unable to compute the maximum number of threads");
     }
@@ -1162,7 +1167,7 @@ void
 output_msg (const char *format, ...)
 {
 /*  Outputs the current time followed by the [format] string
- *    to standard-output in a thread-safe manner.
+ *    to stdout in a thread-safe manner.
  */
     time_t     t;
     struct tm  tm;

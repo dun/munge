@@ -1,5 +1,6 @@
 2004-09-03  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/munge/remunge.c: Close stdin.
 	* src/munge/remunge.c: Ignore SIGHUP.
 	* src/munge/remunge.c: Changed DEF_DO_DECODE from 1 to 0.
 
