@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: conf.c,v 1.2 2003/04/18 23:20:18 dun Exp $
+ *  $Id: conf.c,v 1.3 2003/04/18 23:41:45 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -97,12 +97,12 @@ create_conf (void)
     /*
      *  FIXME: Add support for random seed filename.
      */
-    if (!(conf->seed_name = strdup ("/tmp/munge/rnd")))
+    if (!(conf->seed_name = strdup (MUNGED_RANDOM_SEED)))
         log_err (EMUNGE_NO_MEMORY, LOG_ERR, "%s", strerror (errno));
     /*
      *  FIXME: Add support for configuring key filename.
      */
-    if (!(conf->key_name = strdup ("/tmp/munge/key")))
+    if (!(conf->key_name = strdup (MUNGED_SECRET_KEY)))
         log_err (EMUNGE_NO_MEMORY, LOG_ERR, "%s", strerror (errno));
     conf->dek_key = NULL;
     conf->dek_key_len = 0;

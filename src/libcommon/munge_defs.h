@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munge_defs.h,v 1.3 2003/04/18 23:11:02 dun Exp $
+ *  $Id: munge_defs.h,v 1.4 2003/04/18 23:41:45 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -84,6 +84,16 @@
 /*  Number of attempts a client makes connecting to the server before failing.
  */
 #define MUNGE_SOCKET_RETRIES    5
+
+/*  String specifying the pathname of the random seed file.
+ *    FIXME: Temporary kludge until configuration file support is added.
+ */
+#define MUNGED_RANDOM_SEED      "/tmp/munge/rnd"
+
+/*  String specifying the pathname of the secret key file.
+ *    FIXME: Temporary kludge until configuration file support is added.
+ */
+#define MUNGED_SECRET_KEY       "/tmp/munge/key"
 
 
 #endif /* !MUNGE_DEFS_H */
