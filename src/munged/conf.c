@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: conf.c,v 1.21 2004/06/15 18:33:23 dun Exp $
+ *  $Id: conf.c,v 1.22 2004/06/15 18:35:01 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -62,6 +62,7 @@ struct option opt_table[] = {
     { "force",      0, NULL, 'f' },
     { "foreground", 0, NULL, 'F' },
     { "socket",     1, NULL, 'S' },
+    { "advice",     0, NULL, 'A' },
     {  NULL,        0, NULL,  0  }
 };
 
@@ -200,6 +201,9 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                     log_errno (EMUNGE_NO_MEMORY, LOG_ERR,
                         "Cannot dup socket name string");
                 break;
+            case 'A':
+                printf ("Don't Panic!\n");
+                exit (42);
             case '?':
                 if (optopt > 0)
                     log_err (EMUNGE_SNAFU, LOG_ERR,
