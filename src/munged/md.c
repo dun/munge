@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: md.c,v 1.1 2003/04/08 18:16:16 dun Exp $
+ *  $Id: md.c,v 1.2 2003/04/18 23:19:18 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -157,7 +157,5 @@ md_copy (md_ctx *xdst, md_ctx *xsrc)
 int
 md_size (const EVP_MD *md)
 {
-    assert (md != NULL);
-
-    return (EVP_MD_size (md));
+    return ((md == NULL) ? 0 : EVP_MD_size (md));
 }
