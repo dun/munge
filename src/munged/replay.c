@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: replay.c,v 1.9 2004/09/10 19:29:12 dun Exp $
+ *  $Id: replay.c,v 1.10 2004/09/10 22:49:33 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -61,7 +61,6 @@ union replay_key {
     }                    alloc;
     struct {
       time_t             t_expired;     /* time after which cred expires     */
-      int                mac_len;       /* length of mac data                */
       unsigned char      mac[MAX_MAC];  /* message authentication code       */
     }                    data;
 };
@@ -164,15 +163,16 @@ replay_insert (munge_cred_t c)
     if (!(r = replay_alloc ())) {
         return (-1);
     }
+    /*  The mac_len was removed from the replay struct in order to keep
+     *    the struct small.  Instead, the mac[] is first zero'd so any
+     *    remaining bytes won't effect the replay comparison.
+     */
     r->data.t_expired = (time_t) (m1->time0 + m1->ttl);
-    r->data.mac_len = c->mac_len;
-    memcpy (r->data.mac, c->mac, r->data.mac_len);
+    memset (r->data.mac, 0, sizeof (r->data.mac));
+    assert (c->mac_len <= sizeof (r->data.mac));
+    memcpy (r->data.mac, c->mac, c->mac_len);
     /*
-     *  The credential's "hash key" is defined by its MAC.  But since the MAC
-     *    is a variable-length byte array, the "hash key" must contain both
-     *    a pointer and a length.  The t_expired was just thrown in for
-     *    good measure since it was available.
-     *  As such, the replay hash key is the replay struct itself.
+     *  The replay hash key is just the replay struct itself.
      */
     if (hash_insert (replay_hash, r, r) != NULL) {
         return (0);
@@ -209,11 +209,12 @@ replay_remove (munge_cred_t c)
     }
     m1 = c->msg->pbody;
     /*
-     *  Recompute the cred's "hash key".
+     *  Compute the cred's "hash key".
      */
     rkey->data.t_expired = (time_t) (m1->time0 + m1->ttl);
-    rkey->data.mac_len = c->mac_len;
-    memcpy (rkey->data.mac, c->mac, rkey->data.mac_len);
+    memset (rkey->data.mac, 0, sizeof (rkey->data.mac));
+    assert (c->mac_len <= sizeof (rkey->data.mac));
+    memcpy (rkey->data.mac, c->mac, c->mac_len);
 
     if ((r = hash_remove (replay_hash, rkey))) {
         replay_free (r);
@@ -257,8 +258,7 @@ replay_purge (void)
 static unsigned int
 replay_key_f (const replay_t r)
 {
-/*  Use the first 8 bytes or so (depending on the size of a u_int)
- *    of the cred's mac as the hash key.
+/*  Use the first 4 bytes of the cred's mac as the hash key.
  *  While the results of this conversion are dependent on byte sex,
  *    we can ignore it since this data is local to the node.
  */
@@ -276,10 +276,7 @@ replay_cmp_f (const replay_t r1, const replay_t r2)
     if (r1->data.t_expired != r2->data.t_expired) {
         return (-1);
     }
-    if (r1->data.mac_len != r2->data.mac_len) {
-        return (-1);
-    }
-    if (memcmp (r1->data.mac, r2->data.mac, r2->data.mac_len)) {
+    if (memcmp (r1->data.mac, r2->data.mac, sizeof (r2->data.mac))) {
         return (-1);
     }
     return (0);
@@ -304,15 +301,14 @@ replay_alloc (void)
 /*  Allocates a replay struct.
  *  Returns a ptr to the object, or NULL if memory allocation fails.
  */
-    int         i, n;
+    int         i;
     replay_t    r;
 
     assert (REPLAY_ALLOC > 0);
 
     lsd_mutex_lock (&replay_free_lock);
     if (!replay_free_list) {
-        n = sizeof (*r);
-        if ((replay_free_list = calloc (REPLAY_ALLOC, n))) {
+        if ((replay_free_list = malloc (REPLAY_ALLOC * sizeof (*r)))) {
             for (i = 0; i < REPLAY_ALLOC - 1; i++)
                 replay_free_list[i].alloc.next = &replay_free_list[i+1];
             replay_free_list[i].alloc.next = NULL;
@@ -320,7 +316,6 @@ replay_alloc (void)
     }
     if ((r = replay_free_list)) {
         replay_free_list = r->alloc.next;
-        r->alloc.next = NULL;
     }
     else {
         errno = ENOMEM;
