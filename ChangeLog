@@ -1,5 +1,9 @@
 2004-05-13  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* : Re-bootstrap'd with automake-1.8.5.
+
+2004-05-13  Chris Dunlap  <cdunlap@llnl.gov>
+
 	* src/libcommon/auth_policy.h, src/libmunge/auth_send.c,
 	  src/libmunge/auth_send.h, src/libmunge/decode.c,
 	  src/libmunge/encode.c, src/munged/auth_recv.c,
