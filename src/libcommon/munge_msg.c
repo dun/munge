@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munge_msg.c,v 1.6 2003/06/27 17:52:56 dun Exp $
+ *  $Id: munge_msg.c,v 1.7 2003/07/18 18:41:52 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -97,7 +97,7 @@ _munge_msg_send (munge_msg_t m)
  *    and a version-specific message body.
  *  Currently, only v1 messages are used.
  */
-    int n;
+    int                  n, l;
     struct munge_msg_v1 *m1;
 
     assert (m != NULL);
@@ -120,34 +120,34 @@ _munge_msg_send (munge_msg_t m)
      *  FIXME: Replace multiple write()s with a single writev()?
      */
     n = sizeof (m->head);
-    if (fd_write_n (m->sd, &(m->head), n) < n) {
+    if ((l = fd_write_n (m->sd, &(m->head), n)) < n) {
         /*
          *  XXX: 2003-06-27: This failed on alci when running ~860 node job.
          */
         _munge_msg_set_err (m, EMUNGE_SOCKET,
-            strdupf ("Unable to write message header (%d bytes): %s",
-                n, strerror (errno)));
+            strdupf ("Unable to write message header (wrote %d/%d): %s",
+                l, n, strerror (errno)));
         return (EMUNGE_SOCKET);
     }
     n = sizeof (*m1);
-    if (fd_write_n (m->sd, m1, n) < n) {
+    if ((l = fd_write_n (m->sd, m1, n)) < n) {
         _munge_msg_set_err (m, EMUNGE_SOCKET,
-            strdupf ("Unable to write v1 message body (%d bytes): %s",
-                n, strerror (errno)));
+            strdupf ("Unable to write v1 message body (wrote %d/%d): %s",
+                l, n, strerror (errno)));
         return (EMUNGE_SOCKET);
     }
     n = m1->realm_len;
-    if ((n > 0) && (fd_write_n (m->sd, m1->realm, n) < n)) {
+    if ((n > 0) && ((l = fd_write_n (m->sd, m1->realm, n)) < n)) {
         _munge_msg_set_err (m, EMUNGE_SOCKET,
-            strdupf ("Unable to write v1 message realm (%d bytes): %s",
-                n, strerror (errno)));
+            strdupf ("Unable to write v1 message realm (wrote %d/%d): %s",
+                l, n, strerror (errno)));
         return (EMUNGE_SOCKET);
     }
     n = m1->data_len;
-    if ((n > 0) && (fd_write_n (m->sd, m1->data, n) < n)) {
+    if ((n > 0) && ((l = fd_write_n (m->sd, m1->data, n)) < n)) {
         _munge_msg_set_err (m, EMUNGE_SOCKET,
-            strdupf ("Unable to write v1 message data (%d bytes): %s",
-                n, strerror (errno)));
+            strdupf ("Unable to write v1 message data (wrote %d/%d): %s",
+                l, n, strerror (errno)));
         return (EMUNGE_SOCKET);
     }
     return (EMUNGE_SUCCESS);
@@ -157,7 +157,7 @@ _munge_msg_send (munge_msg_t m)
 munge_err_t
 _munge_msg_recv (munge_msg_t m)
 {
-    int                  n;
+    int                  n, l;
     struct munge_msg_v1 *m1;
 
     assert (m != NULL);
@@ -165,10 +165,10 @@ _munge_msg_recv (munge_msg_t m)
     assert (m->pbody == NULL);
 
     n = sizeof (m->head);
-    if (fd_read_n (m->sd, &(m->head), n) < n) {
+    if ((l = fd_read_n (m->sd, &(m->head), n)) < n) {
         _munge_msg_set_err (m, EMUNGE_SOCKET,
-            strdupf ("Unable to read message header (%d bytes): %s",
-                n, strerror (errno)));
+            strdupf ("Unable to read message header (read %d/%d): %s",
+                l, n, strerror (errno)));
         return (EMUNGE_SOCKET);
     }
     if (m->head.magic != MUNGE_MSG_MAGIC) {
@@ -194,10 +194,10 @@ _munge_msg_recv (munge_msg_t m)
     }
     m->pbody_len = n;
     n = m->head.length;
-    if (fd_read_n (m->sd, m->pbody, n) < n) {
+    if ((l = fd_read_n (m->sd, m->pbody, n)) < n) {
         _munge_msg_set_err (m, EMUNGE_SOCKET,
-            strdupf ("Unable to read v1 message body (%d bytes): %s",
-                n, strerror (errno)));
+            strdupf ("Unable to read v1 message body (read %d/%d): %s",
+                l, n, strerror (errno)));
         return (EMUNGE_SOCKET);
     }
     m1 = m->pbody;
@@ -218,7 +218,7 @@ _munge_msg_recv (munge_msg_t m)
     }
     if (n != m->head.length) {
         _munge_msg_set_err (m, EMUNGE_SOCKET,
-            strdupf ("Received unexpected message length %d/%d",
+            strdupf ("Received unexpected message length (%d/%d)",
                 m->head.length, n));
         return (EMUNGE_SOCKET);
     }

@@ -1,3 +1,7 @@
+2003-07-18  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/libcommon/munge_msg.c: Augmented err msgs once again.
+
 2003-07-02  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/libcommon/munge_defs.h:
