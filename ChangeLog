@@ -1,5 +1,7 @@
 2004-01-30  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/munged/auth.c: Added support for getpeereid().
+
 	* src/libmunge/ctx.c, src/libmunge/msg_client.c, src/munged/dec_v1.c,
 	  src/munged/enc_v1.c, src/munged/munged.c:
 	  Tweaked includes for FreeBSD.

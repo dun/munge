@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: auth.c,v 1.1 2003/04/08 18:16:16 dun Exp $
+ *  $Id: auth.c,v 1.2 2004/01/30 23:17:08 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -29,22 +29,41 @@
 #  include <config.h>
 #endif /* HAVE_CONFIG_H */
 
-#include <sys/socket.h>
 #include <sys/types.h>
 
+#if HAVE_GETPEEREID
+#  include <unistd.h>
+#elif HAVE_SO_PEERCRED
+#  include <sys/socket.h>
+#endif
 
-/*  FIXME: Add autoconf support for SO_PEERCRED sockopt().
- *  FIXME: Add autoconf support for socklen_t.
+
+/*  FIXME: Add autoconf support for socklen_t.
  */
+
+
 int
-auth_peer_get (int sd, uid_t *p2uid, gid_t *p2gid)
+auth_peer_get (int sd, uid_t *uid, gid_t *gid)
 {
+#if HAVE_GETPEEREID
+
+    return (getpeereid (sd, uid, gid));
+
+#elif HAVE_SO_PEERCRED
+
     struct ucred cred;
     socklen_t len = sizeof (cred);
 
     if (getsockopt (sd, SOL_SOCKET, SO_PEERCRED, &cred, &len) < 0)
         return (-1);
-    *p2uid = cred.uid;
-    *p2gid = cred.gid;
+    *uid = cred.uid;
+    *gid = cred.gid;
+
+#else
+
+#error "No support for authenticating a non-parent process."
+
+#endif
+
     return (0);
 }
