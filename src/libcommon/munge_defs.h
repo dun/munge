@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munge_defs.h,v 1.35 2004/11/09 21:54:28 dun Exp $
+ *  $Id: munge_defs.h,v 1.36 2004/11/10 21:13:14 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -129,6 +129,11 @@
 /*  Number of threads to create for processing credential requests.
  */
 #define MUNGE_THREADS                   2
+
+/* Flag to allow root to decode any credential regardless of its
+ *   UID/GID restrictions.
+ */
+#define MUNGE_AUTH_ROOT_ALLOW_FLAG      0
 
 /*  The directory in which the pipe used to authenticate a particular client
  *    via fd-passing will be created.

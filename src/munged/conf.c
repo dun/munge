@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: conf.c,v 1.35 2004/11/10 20:53:07 dun Exp $
+ *  $Id: conf.c,v 1.36 2004/11/10 21:13:13 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -99,7 +99,7 @@ create_conf (void)
     conf->got_foreground = 0;
     conf->got_group_stat = MUNGE_GROUP_STAT_FLAG;
     conf->got_replay_retry = MUNGE_REPLAY_RETRY_FLAG;
-    conf->got_root_auth = 0;
+    conf->got_root_auth = MUNGE_AUTH_ROOT_ALLOW_FLAG;
     conf->def_cipher = MUNGE_DEFAULT_CIPHER;
     conf->def_zip = zip_select_default_type (MUNGE_DEFAULT_ZIP);
     conf->def_mac = MUNGE_DEFAULT_MAC;

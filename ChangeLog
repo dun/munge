@@ -1,5 +1,8 @@
 2004-11-10  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/libcommon/munge_defs.h, src/munged/conf.c:
+	  Added MUNGE_AUTH_ROOT_ALLOW_FLAG.
+
 	* src/munged/conf.c: Changed "--keyfile" cmdline opt to "--key-file".
 
 	* src/munged/conf.c: Added "--auth-pipe-dir" cmdline opt.
