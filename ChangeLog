@@ -1,5 +1,7 @@
 2004-12-07  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* : Released 0.4.
+
 	* HISTORY, META, NEWS, PLATFORMS: Updated for 0.4 release.
 
 	* src/libmunge/munge.3.in, src/libmunge/munge.h,
