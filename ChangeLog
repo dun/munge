@@ -1,5 +1,7 @@
 2004-10-13  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/munged/job.c: Added include for building on SuSE SLES-8.
+
 	* README: Updated.
 
 	* src/libcommon/munge_defs.h: Added MUNGE_MAXIMUM_REQ_LEN.

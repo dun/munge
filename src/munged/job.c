@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: job.c,v 1.8 2004/10/13 21:52:56 dun Exp $
+ *  $Id: job.c,v 1.9 2004/10/13 22:51:11 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -33,6 +33,7 @@
 #include <errno.h>
 #include <munge.h>
 #include <string.h>
+#include <sys/socket.h>
 #include <unistd.h>
 #include "conf.h"
 #include "dec_v1.h"
