@@ -1,29 +1,29 @@
 ##*****************************************************************************
-## $Id: configure.ac,v 1.3 2002/12/20 23:21:58 dun Exp $
+## $Id: configure.ac,v 1.4 2003/02/13 17:59:16 dun Exp $
 ##*****************************************************************************
 ## Process this file with autoconf to produce a configure script.
 ##*****************************************************************************
+## This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
+## For details, see <http://www.llnl.gov/linux/munge/>.
+## UCRL-CODE-2003-???.
+##
 ## Copyright (C) 2002-2003 The Regents of the University of California.
 ## Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
 ## Written by Chris Dunlap <cdunlap@llnl.gov>.
-## UCRL-CODE-2003-???.
-## 
-## This file is part of Munge, an authentication library.
-## For details, see <http://www.llnl.gov/linux/munge/>.
-## 
-## Munge is free software; you can redistribute it and/or modify it under
-## the terms of the GNU General Public License as published by the Free
-## Software Foundation; either version 2 of the License, or (at your option)
-## any later version.
-## 
-## Munge is distributed in the hope that it will be useful, but WITHOUT ANY
-## WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-## FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
-## details.
-## 
-## You should have received a copy of the GNU General Public License along
-## with Munge; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.
+##
+## This is free software; you can redistribute it and/or modify it
+## under the terms of the GNU General Public License as published by
+## the Free Software Foundation; either version 2 of the License, or
+## (at your option) any later version.
+##
+## This is distributed in the hope that it will be useful, but WITHOUT
+## ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+## FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+## for more details.
+##
+## You should have received a copy of the GNU General Public License;
+## if not, write to the Free Software Foundation, Inc., 59 Temple Place,
+## Suite 330, Boston, MA  02111-1307  USA.
 ##*****************************************************************************
 
 ##
@@ -65,10 +65,7 @@ AC_PROG_MAKE_SET
 ##
 AC_HEADER_STDC
 AC_CHECK_HEADERS( \
-  errno.h \
-  stdlib.h \
-  string.h \
-  unistd.h \
+  getopt.h \
 )
 
 ##
@@ -83,8 +80,14 @@ AC_TYPE_UID_T
 ##
 AC_FUNC_MALLOC
 AC_CHECK_FUNCS( \
-  strchr \
+  getopt_long \
+  localtime_r \
 )
+AC_REPLACE_FUNCS( \
+  strlcat \
+  strlcpy \
+)
+AC_LTLIBOBJS
 
 ##
 # Epilogue.
@@ -92,7 +95,10 @@ AC_CHECK_FUNCS( \
 AC_CONFIG_FILES( \
   Makefile \
   src/Makefile \
+  src/libcommon/Makefile \
+  src/libmissing/Makefile \
   src/libmunge/Makefile \
+  src/munge/Makefile \
   src/munged/Makefile \
 )
 AC_OUTPUT
