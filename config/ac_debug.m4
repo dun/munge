@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: ac_debug.m4,v 1.2 2003/05/07 17:02:44 dun Exp $
+## $Id: ac_debug.m4,v 1.3 2004/01/30 23:10:04 dun Exp $
 ##*****************************************************************************
 #  AUTHOR:
 #    Chris Dunlap <cdunlap@llnl.gov>
@@ -21,7 +21,7 @@ AC_DEFUN([AC_DEBUG],
 [
   AC_MSG_CHECKING([whether debugging is enabled])
   AC_ARG_ENABLE([debug],
-    AC_HELP_STRING([--enable-debug], [enable debugging code for development]),
+    AS_HELP_STRING([--enable-debug], [enable debugging code for development]),
     [ case "$enableval" in
         yes) ac_debug=yes ;;
         no)  ac_debug=no ;;
