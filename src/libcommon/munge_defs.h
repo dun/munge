@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munge_defs.h,v 1.7 2003/04/30 20:26:09 dun Exp $
+ *  $Id: munge_defs.h,v 1.8 2003/04/30 21:21:31 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -82,7 +82,7 @@
 
 /*  String specifying the unix domain socket pathname for client-server comms.
  */
-#define MUNGE_SOCKET_NAME       "/tmp/.munge_socket"
+#define MUNGE_SOCKET_NAME       "/tmp/.munge-sock"
 
 /*  Number of attempts a client makes connecting to the server before failing.
  */
@@ -91,7 +91,7 @@
 /*  String specifying the pathname of the random seed file.
  *    FIXME: Temporary kludge until configuration file support is added.
  */
-#define MUNGED_RANDOM_SEED      "/tmp/.munge.rnd"
+#define MUNGED_RANDOM_SEED      "/tmp/.munge-seed"
 
 /*  String specifying the pathname of the secret key file.
  *    FIXME: Temporary kludge until configuration file support is added.
