@@ -1,4 +1,4 @@
-# $Id: munge.spec,v 1.4 2003/02/04 00:18:33 dun Exp $
+# $Id: munge.spec,v 1.5 2003/02/13 17:57:24 dun Exp $
 
 Name:		munge
 Version:	0.0
@@ -19,11 +19,11 @@ a process to securely authenticate the UID/GID of another local or remote
 process within an administrative domain.  Processes can create and verify
 these credentials without the use of root privileges or reserved ports.
 
-In actuality, a credential is created and verified by the local root 'munged'
-daemon (pronounced MUNGE-dee) running on each node.  But a process creates
-or verifies a given credential through the use of a munge client such as the
-libmunge library or munge/unmunge executables; these clients are responsible
-for communicating with the local munged daemon.
+In actuality, a credential is created and verified by the local root
+'munged' daemon running on each node.  But a process creates or verifies
+a given credential through the use of a munge client such as the libmunge
+library or munge/unmunge executables; these clients are responsible for
+communicating with the local munged daemon.
 
 The contents of the credential (including any application-supplied data)
 are encrypted.  The integrity of the credential is ensured by a MAC.
@@ -91,12 +91,13 @@ fi
 %doc ChangeLog
 %doc DISCLAIMER
 %doc INSTALL
+%doc JARGON
 %doc NEWS
 %doc README
 #%config(noreplace) /etc/munge.conf
 #%config(noreplace) /etc/logrotate.d/munge
 #%config(noreplace) /etc/rc.d/init.d/munge
-#%{_bindir}/*/*
+%{_bindir}/*
 %{_includedir}/*
 %{_libdir}/*
 #%{_mandir}/*/*
