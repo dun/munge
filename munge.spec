@@ -1,4 +1,4 @@
-# $Id: munge.spec,v 1.25 2004/12/02 03:43:23 dun Exp $
+# $Id: munge.spec,v 1.26 2004/12/22 01:05:04 dun Exp $
 
 Name:		munge
 Version:	0
@@ -34,6 +34,9 @@ DESTDIR="$RPM_BUILD_ROOT" make install
 
 %clean
 rm -rf "$RPM_BUILD_ROOT"
+
+%pre
+find /etc/rc.d/rc?.d/ -type l -name "[SK]-1munge" -exec rm -f {} \;
 
 %post
 /sbin/ldconfig %{_libdir}
