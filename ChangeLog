@@ -1,5 +1,7 @@
 2004-12-02  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/etc/munge.init: Revamped for SuSE and maybe LSB.
+
 	* configure.ac, config/x_ac_check_ssl.m4:
 	  Moved X_AC_CHECK_SSL before AC_PROG_LIBTOOL to allow the
 	  linker's libpath to be computed correctly under AIX.

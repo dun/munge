@@ -1,69 +1,293 @@
-#know !/bin/sh
+#!/bin/sh
 ###############################################################################
-# $Id: munge.init,v 1.10 2004/10/15 17:26:42 dun Exp $
+# $Id: munge.init,v 1.11 2004/12/03 00:34:37 dun Exp $
 ###############################################################################
-# chkconfig:	345 40 60
-# description:	The MUNGE daemon is a user authentication service.
-# processname:	munged
-# config:	/etc/sysconfig/munge
+### BEGIN INIT INFO
+# Provides:       munge
+# Required-Start: $named $time
+# Default-Start:  3 5
+# Default-Stop:   0 1 2 6
+# Description:    Start the MUNGE user authentication service.
+### END INIT INFO
+###############################################################################
+# chkconfig:      345 40 60
+# description:    Start the MUNGE user authentication service.
+# processname:    munged
 ###############################################################################
 
-DAEMON="munged"
+SERVICE="MUNGE"
+DAEMON="/usr/sbin/munged"
 
-source /etc/init.d/functions
+PATH=/sbin:/usr/sbin:/usr/local/sbin:/bin:/usr/bin:/usr/local/bin
+
+[ -x "${DAEMON}" ] || exit 5
+
 [ -f /etc/sysconfig/munge ] && source /etc/sysconfig/munge
 
-SUBSYS="/var/lock/subsys/`echo $0 | perl -pe 's,(.*/)?([SK][0-9]{2})?(.*),$3,'`"
+###############################################################################
 
-# Disable suppression of stderr msgs.
-INITLOG_ARGS=""
+service_init ()
+{
+#  Determine the system type and initialize the environment.
+#
+#  Note that the shell positional parameters must be preserved when calling
+#    this function in order for SuSE to initialize its environment properly.
+#
+  local RH_SUBSYS_BASENAME
 
-# Ensure the package is still installed.
-# [ -x "/usr/sbin/$DAEMON" ] || exit 5
-which "$DAEMON" 1>/dev/null 2>&1 || exit 5
+  if test -f /etc/init.d/functions; then
+    SYSTEM="REDHAT"
+    source /etc/init.d/functions
+    RH_SUBSYS_BASENAME="`echo $0 | perl -pe 's,(.*/)?([SK][0-9]{2})?(.*),$3,'`"
+    RH_SUBSYS="/var/lock/subsys/${RH_SUBSYS_BASENAME}"
+    INITLOG_ARGS=""                     # Disable RH suppression of stderr msgs
+  elif test -f /etc/rc.status; then
+    SYSTEM="SUSE"
+    source /etc/rc.status
+    rc_reset
+  elif test -f /lib/lsb/init-functions; then
+    SYSTEM="LSB"
+    source /lib/lsb/init-functions
+  else
+    SYSTEM="UNKNOWN"
+  fi
+}
 
-# See how we were called.
+###############################################################################
+
+service_fini ()
+{
+#  Return the exit status.
+#
+  case ${SYSTEM} in
+    SUSE)
+      rc_exit
+      ;;
+    LSB|REDHAT|*)
+      exit $rc
+      ;;
+  esac
+}
+
+###############################################################################
+
+service_start ()
+{
+# Start the service.  Required by LSB.
+#
+  echo -n "Starting ${SERVICE}: "
+  case ${SYSTEM} in
+    LSB)
+      start_daemon ${DAEMON} ${OPTIONS} --force
+      rc=$?
+      [ $rc -eq 0 ] && log_success_msg || log_failure_msg
+      ;;
+    REDHAT)
+      #
+      # FIXME: Since munged isn't using a pid file (ie, /var/run/base.pid),
+      #        RH isn't able to check if another instance of the daemon is
+      #        already running.
+      #
+      daemon ${DAEMON} ${OPTIONS} --force
+      rc=$?
+      echo
+      [ $rc -eq 0 ] && touch ${RH_SUBSYS} 2>/dev/null
+      ;;
+    SUSE)
+      startproc ${DAEMON} ${OPTIONS} --force
+      rc_status -v
+      ;;
+    *)
+      ${DAEMON} ${OPTIONS} --force 2>/dev/null
+      rc=$?
+      [ $rc -eq 0 ] && echo success || echo failure
+      ;;
+  esac
+}
+
+###############################################################################
+
+service_stop ()
+{
+# Stop the service.  Required by LSB.
+#
+  echo -n "Stopping ${SERVICE}: "
+  case ${SYSTEM} in
+    LSB)
+      killproc ${DAEMON}
+      rc=$?
+      [ $rc -eq 0 ] && log_success_msg || log_failure_msg
+      ;;
+    REDHAT)
+      killproc ${DAEMON}
+      rc=$?
+      echo
+      [ $rc -eq 0 ] && rm -f ${RH_SUBSYS} 2>/dev/null
+      ;;
+    SUSE)
+      killproc ${DAEMON}
+      rc_status -v
+      ;;
+    *)
+      rc=4 # FIXME
+      [ $rc -eq 0 ] && echo success || echo failure
+      ;;
+  esac
+}
+
+###############################################################################
+
+service_restart ()
+{
+# Stop and restart the service if the service is already running,
+#   otherwise start the service.  Required by LSB.
+#
+  $0 stop
+  $0 start
+
+  case ${SYSTEM} in
+    SUSE)
+      rc_status
+      ;;
+    LSB|REDHAT|*)
+      rc=$?
+      ;;
+  esac
+}
+
+###############################################################################
+
+service_try_restart ()
+{
+# Restart the service if the service is already running.  Optional for LSB.
+#
+  rc=0
+  case ${SYSTEM} in
+    REDHAT)
+      [ -f ${RH_SUBSYS} ] && $0 restart || :
+      rc=$?
+      ;;
+    SUSE)
+      $0 status >/dev/null && $0 restart || :
+      rc_status
+      ;;
+    LSB|*)
+      $0 status >/dev/null && $0 restart || :
+      rc=$?
+      ;;
+  esac
+}
+
+###############################################################################
+
+service_reload ()
+{
+# Cause the configuration of the service to be reloaded without actually
+#   stopping and restarting the service.  Optional for LSB.
+#
+  rc=4 # FIXME
+  echo -n "Reloading ${SERVICE}: "
+  case ${SYSTEM} in
+    LSB)
+      [ $rc -eq 0 ] && log_success_msg || log_failure_msg
+      ;;
+    REDHAT)
+      echo_failure
+      echo
+      ;;
+    SUSE)
+      rc_failed $rc
+      rc_status -v
+      ;;
+    *)
+      [ $rc -eq 0 ] && echo success || echo failure
+      ;;
+  esac
+}
+
+###############################################################################
+
+service_force_reload ()
+{
+# Cause the configuration of the service to be reloaded if the service supports
+#   this, otherwise restart the service if it is running.  Required by LSB.
+#
+  $0 try-restart
+
+  case ${SYSTEM} in
+    SUSE)
+      rc_status
+      ;;
+    LSB|REDHAT|*)
+      rc=$?
+      ;;
+  esac
+}
+
+###############################################################################
+
+service_status ()
+{
+# Print the current status of the service.  Required by LSB.
+#
+  case ${SYSTEM} in
+    LSB)
+      pids=`pidofproc ${DAEMON} 2>/dev/null`
+      rc=$?
+      if [ $rc -eq 0 ]; then
+        echo "${DAEMON} (pid $pids) is running..."
+      else
+        echo "${DAEMON} is stopped"
+      fi
+      ;;
+    REDHAT)
+      status ${DAEMON}
+      rc=$?
+      ;;
+    SUSE)
+      echo -n "Checking for ${SERVICE}: "
+      checkproc ${DAEMON}
+      rc_status -v
+      ;;
+    *)
+      rc=4 # FIXME
+      [ $rc -eq 0 ] && echo success || echo failure
+      ;;
+  esac
+}
+
+###############################################################################
+
+rc=4
+service_init "$@"
+
 case "$1" in
   start)
- 	echo -n "Starting $DAEMON: "
-	daemon $DAEMON -f $OPTIONS
-	RETVAL=$?
-	echo
-	[ $RETVAL -eq 0 ] && touch $SUBSYS
-	;;
+    service_start
+    ;;
   stop)
-	echo -n "Stopping $DAEMON: "
-	killproc $DAEMON
-	RETVAL=$?
-	echo
-	[ $RETVAL -eq 0 ] && rm -f $SUBSYS
-	;;
+    service_stop
+    ;;
   restart)
-	$0 stop
-	$0 start
-	RETVAL=$?
-	;;
+    service_restart
+    ;;
   try-restart|condrestart)
-	[ -f $SUBSYS ] && $0 restart
-	;;
+    service_try_restart
+    ;;
   reload)
-	echo -n "Reloading $DAEMON: "
-	killproc $DAEMON -HUP
-	RETVAL=$?
-	echo
-	;;
+    service_reload
+    ;;
   force-reload)
-	$0 try-restart
-	RETVAL=$?
-	;;
+    service_force_reload
+    ;;
   status)
-	status $DAEMON
-	RETVAL=$?
-	;;
+    service_status
+    ;;
   *)
-	COMMANDS="start|stop|restart|try-restart|reload|force-reload|status"
-	echo "Usage: $DAEMON {$COMMANDS}"
-	exit 1
+    COMMANDS="start|stop|restart|try-restart|reload|force-reload|status"
+    echo "Usage: $0 {${COMMANDS}}"
+    exit 1
+    ;;
 esac
 
-exit $RETVAL
+service_fini
