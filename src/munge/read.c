@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: read.c,v 1.3 2004/02/05 21:36:03 dun Exp $
+ *  $Id: read.c,v 1.4 2004/03/16 19:42:11 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -94,7 +94,7 @@ read_data_from_file (FILE *fp, void **buf, int *len)
      */
     if (!(buftmp = realloc (bufmem, n + 1)))
         goto err;
-    memset (buftmp + n, 0, 1);          /* NUL-terminate */
+    buftmp[n] = '\0';
     *buf = buftmp;
     *len = n;
     return (n);
