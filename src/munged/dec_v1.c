@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: dec_v1.c,v 1.13 2004/01/30 23:16:33 dun Exp $
+ *  $Id: dec_v1.c,v 1.14 2004/03/11 21:04:40 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -49,6 +49,7 @@
 #include "random.h"
 #include "replay.h"
 #include "str.h"
+#include "zip.h"
 
 
 /*****************************************************************************
@@ -67,7 +68,7 @@ static int dec_v1_timestamp (munge_cred_t c);
 static int dec_v1_unarmor (munge_cred_t c);
 static int dec_v1_unpack_outer (munge_cred_t c);
 static int dec_v1_decrypt (munge_cred_t c);
-static int dec_v1_uncompress (munge_cred_t c);
+static int dec_v1_decompress (munge_cred_t c);
 static int dec_v1_unpack_inner (munge_cred_t c);
 static int dec_v1_validate_mac (munge_cred_t c);
 static int dec_v1_validate_time (munge_cred_t c);
@@ -96,7 +97,7 @@ dec_v1_process_msg (munge_msg_t m)
         ;
     else if (dec_v1_decrypt (c) < 0)
         ;
-    else if (dec_v1_uncompress (c) < 0)
+    else if (dec_v1_decompress (c) < 0)
         ;
     else if (dec_v1_validate_mac (c) < 0)
         ;
@@ -127,6 +128,8 @@ dec_v1_process_msg (munge_msg_t m)
 static int
 dec_v1_validate_msg (munge_msg_t m)
 {
+/*  Validates a credential exists for decoding.
+ */
     struct munge_msg_v1 *m1;            /* munge msg (v1 format)             */
 
     assert (m != NULL);
@@ -141,7 +144,7 @@ dec_v1_validate_msg (munge_msg_t m)
      */
     m->head.type = MUNGE_MSG_DEC_RSP;
 
-    if (!m1->data_len || !m1->data) {
+    if ((m1->data_len == 0) || (m1->data == NULL)) {
         return (_munge_msg_set_err (m, EMUNGE_SNAFU,
             strdup ("No credential specified in decode request")));
     }
@@ -266,7 +269,6 @@ dec_v1_unarmor (munge_cred_t c)
      */
     c->outer = c->outer_mem;
     c->outer_len = n;
-
     return (0);
 }
 
@@ -354,7 +356,7 @@ dec_v1_unpack_outer (munge_cred_t c)
             strdup ("Truncated credential compression type")));
     }
     m1->zip = *p;
-    if (m1->zip != MUNGE_ZIP_NONE) {
+    if ((m1->zip != MUNGE_ZIP_NONE) && (!zip_is_valid_type (m1->zip))) {
         return (_munge_msg_set_err (c->msg, EMUNGE_BAD_ZIP,
             strdupf ("Invalid compression type %d", m1->zip)));
     }
@@ -447,7 +449,6 @@ dec_v1_unpack_outer (munge_cred_t c)
      */
     c->salt_len = MUNGE_CRED_SALT_LEN;
     assert (c->salt_len <= sizeof (c->salt));
-
     return (0);
 }
 
@@ -463,8 +464,8 @@ dec_v1_decrypt (munge_cred_t c)
  *    enabled and the final block is not correctly formatted.
  *  If block cipher padding errors are not treated the same as MAC verification
  *    errors, an attacker may be able to launch Vaudenay's attack on padding:
- *    - <http://lasecwww.epfl.ch/query.msql?ref=Vau01>
- *    - <http://lasecwww.epfl.ch/~vaudenay/pub.html>
+ *    - <http://lasecwww.epfl.ch/php_code/publications/search.php?ref=Vau01>
+ *    - <http://lasecwww.epfl.ch/php_code/publications/search.php?ref=Vau02a>
  *    - <http://lasecwww.epfl.ch/memo_ssl.shtml>
  *    - <http://www.openssl.org/~bodo/tls-cbc.txt>
  *  Consequently, if cipher_final() returns a failure, the error condition is
@@ -507,9 +508,8 @@ dec_v1_decrypt (munge_cred_t c)
 
     if (mac_block (md, conf->dek_key, conf->dek_key_len,
                        c->dek, &n, c->mac, c->mac_len) < 0) {
-        _munge_msg_set_err (c->msg, EMUNGE_SNAFU,
-            strdup ("Unable to compute dek"));
-        goto err1;
+        return (_munge_msg_set_err (c->msg, EMUNGE_SNAFU,
+            strdup ("Unable to compute dek")));
     }
     assert (n == c->dek_len);
 
@@ -518,40 +518,106 @@ dec_v1_decrypt (munge_cred_t c)
      */
     buf_len = c->inner_len + cipher_block_size (ci);
     if (!(buf = malloc (buf_len))) {
-        _munge_msg_set_err (c->msg, EMUNGE_NO_MEMORY, NULL);
-        goto err1;
+        return (_munge_msg_set_err (c->msg, EMUNGE_NO_MEMORY, NULL));
     }
     /*  Decrypt "inner" data.
      */
     if (cipher_init (&x, ci, c->dek, c->iv, CIPHER_DECRYPT) < 0) {
-        goto err2;
+        goto err;
     }
     buf_ptr = buf;
     n = 0;
     if (cipher_update (&x, buf_ptr, &m, c->inner, c->inner_len) < 0) {
-        goto err3;
+        goto err_cleanup;
     }
     buf_ptr += m;
     n += m;
     if (cipher_final (&x, buf_ptr, &m) < 0) {
-        /*
-         *  Defer error until dec_v1_validate_mac().
-         */
+        /*  Set but defer error until dec_v1_validate_mac().  */
         _munge_msg_set_err (c->msg, EMUNGE_CRED_INVALID, NULL);
+    }
+    else {
+        /*  Only assert invariant upon successful decryption.  */
+        assert (n + m <= buf_len);
     }
     buf_ptr += m;
     n += m;
     if (cipher_cleanup (&x) < 0) {
-        goto err2;
+        goto err;
     }
-    assert (n <= buf_len);
-
     /*  Replace "inner" ciphertext with plaintext.
      */
     assert (c->inner_mem == NULL);
+    assert (c->inner_mem_len == 0);
+    c->inner_mem = buf;
+    c->inner_mem_len = buf_len;
+    c->inner = buf;
+    c->inner_len = n;
+    return (0);
+
+err_cleanup:
+    cipher_cleanup (&x);
+err:
+    memset (buf, 0, buf_len);
+    free (buf);
+    return (_munge_msg_set_err (c->msg, EMUNGE_SNAFU,
+        strdup ("Unable to decrypt credential")));
+}
+
+
+static int
+dec_v1_decompress (munge_cred_t c)
+{
+/*  Decompresses the "inner" credential data.
+ *
+ *  Note that if zip_decompress_block() returns a failure, an error condition
+ *    is set but an error status is not returned (yet) for the same reason as
+ *    in dec_v1_decrypt().  Instead, the dec_v1_validate_mac() MAC computation
+ *    is still performed in order to minimize information leaked via timing.
+ */
+    struct munge_msg_v1 *m1;            /* munge msg (v1 format)             */
+    unsigned char       *buf;           /* decompression buffer              */
+    int                  buf_len;       /* length of decompression buffer    */
+    int                  n;             /* length of decompressed data       */
+
+    assert (c != NULL);
+    assert (c->msg != NULL);
+    assert (c->msg->head.version == 1);
+
+    m1 = c->msg->pbody;
+
+    /*  Is this credential compressed?
+     */
+    if (m1->zip == MUNGE_ZIP_NONE) {
+        return (0);
+    }
+    /*  Compression type already checked by dec_v1_unpack_outer().
+     */
+    assert (zip_is_valid_type (m1->zip));
     /*
-     *  FIXME: 20040109: I think inner_mem must always be NULL at this point.
-     *         If so, the following test for it can be removed.
+     *  Allocate memory for decompressed "inner" data.
+     */
+    buf_len = zip_decompress_length (m1->zip, c->inner, c->inner_len);
+    if (buf_len < 0) {
+        goto err;
+    }
+    if (!(buf = malloc (buf_len))) {
+        _munge_msg_set_err (c->msg, EMUNGE_NO_MEMORY, NULL);
+        goto err;
+    }
+    /*  Decompress "inner" data.
+     */
+    n = buf_len;
+    if (zip_decompress_block (m1->zip, buf, &n, c->inner, c->inner_len) < 0) {
+        /*  Set but defer error until dec_v1_validate_mac().  */
+        _munge_msg_set_err (c->msg, EMUNGE_CRED_INVALID, NULL);
+    }
+    else {
+        /*  Only assert invariant upon successful decompression.  */
+        assert (n == buf_len);
+    }
+    /*
+     *  Replace compressed data with "inner" data.
      */
     if (c->inner_mem) {
         assert (c->inner_mem_len > 0);
@@ -562,44 +628,15 @@ dec_v1_decrypt (munge_cred_t c)
     c->inner_mem_len = buf_len;
     c->inner = buf;
     c->inner_len = n;
-
     return (0);
 
-err3:
-    cipher_cleanup (&x);
-err2:
-    memset (buf, 0, buf_len);
-    free (buf);
-    _munge_msg_set_err (c->msg, EMUNGE_SNAFU,
-        strdup ("Unable to decrypt credential"));
-err1:
-    return (-1);
-}
-
-
-static int
-dec_v1_uncompress (munge_cred_t c)
-{
-/*  Uncompresses the "inner" credential data.
- *  XXX: Protect against timing attack here as well.
- */
-    struct munge_msg_v1 *m1;            /* munge msg (v1 format)             */
-
-    assert (c != NULL);
-    assert (c->msg != NULL);
-    assert (c->msg->head.version == 1);
-
-    m1 = c->msg->pbody;
-
-    /*  Is this credential compressed?
-     */
-    if (m1->zip == MUNGE_ZIP_NONE)
-        return (0);
-
-    /*  FIXME: Not implemented.
-     */
+err:
+    if ((buf_len > 0) && (buf != NULL)) {
+        memset (buf, 0, buf_len);
+        free (buf);
+    }
     return (_munge_msg_set_err (c->msg, EMUNGE_SNAFU,
-        strdup ("Compression not supported")));
+        strdup ("Unable to decompress credential")));
 }
 
 
@@ -630,19 +667,19 @@ dec_v1_validate_mac (munge_cred_t c)
     /*  Compute MAC.
      */
     if (mac_init (&x, md, conf->mac_key, conf->mac_key_len) < 0) {
-        goto err1;
+        goto err;
     }
     if (mac_update (&x, c->outer, c->outer_len) < 0) {
-        goto err2;
+        goto err_cleanup;
     }
     if (mac_update (&x, c->inner, c->inner_len) < 0) {
-        goto err2;
+        goto err_cleanup;
     }
     if (mac_final (&x, mac, &n) < 0) {
-        goto err2;
+        goto err_cleanup;
     }
     if (mac_cleanup (&x) < 0) {
-        goto err1;
+        goto err;
     }
     assert (n <= sizeof (mac));
 
@@ -659,9 +696,9 @@ dec_v1_validate_mac (munge_cred_t c)
     }
     return (0);
 
-err2:
+err_cleanup:
     mac_cleanup (&x);
-err1:
+err:
     return (_munge_msg_set_err (c->msg, EMUNGE_SNAFU,
         strdup ("Unable to mac credential")));
 }
@@ -879,10 +916,10 @@ dec_v1_validate_replay (munge_cred_t c)
 
     rc = replay_insert (c);
 
-    if (rc > 0) {
+    if (rc == 0) {
         return (0);
     }
-    if (rc == 0) {
+    if (rc > 0) {
         return (_munge_msg_set_err (c->msg, EMUNGE_CRED_REPLAYED, NULL));
     }
     if (errno == ENOMEM) {

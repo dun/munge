@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: enc_v1.c,v 1.10 2004/01/30 23:16:33 dun Exp $
+ *  $Id: enc_v1.c,v 1.11 2004/03/11 21:04:40 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -49,6 +49,7 @@
 #include "munge_msg.h"
 #include "random.h"
 #include "str.h"
+#include "zip.h"
 
 
 /*****************************************************************************
@@ -68,6 +69,7 @@ static int enc_v1_authenticate (munge_cred_t c);
 static int enc_v1_timestamp (munge_cred_t c);
 static int enc_v1_pack_outer (munge_cred_t c);
 static int enc_v1_pack_inner (munge_cred_t c);
+static int enc_v1_precompress (munge_cred_t c);
 static int enc_v1_mac (munge_cred_t c);
 static int enc_v1_compress (munge_cred_t c);
 static int enc_v1_encrypt (munge_cred_t c);
@@ -98,6 +100,8 @@ enc_v1_process_msg (munge_msg_t m)
     else if (enc_v1_pack_outer (c) < 0)
         ;
     else if (enc_v1_pack_inner (c) < 0)
+        ;
+    else if (enc_v1_precompress (c) < 0)
         ;
     else if (enc_v1_mac (c) < 0)
         ;
@@ -130,6 +134,8 @@ enc_v1_process_msg (munge_msg_t m)
 static int
 enc_v1_validate_msg (munge_msg_t m)
 {
+/*  Validates message types, setting defaults and limits as needed.
+ */
     struct munge_msg_v1 *m1;            /* munge msg (v1 format)             */
 
     assert (m != NULL);
@@ -157,6 +163,7 @@ enc_v1_validate_msg (munge_msg_t m)
             strdupf ("Invalid cipher type %d", m1->cipher)));
     }
     /*  Validate compression type.
+     *  Disable compression if no optional data was specified.
      */
     if (m1->zip == MUNGE_ZIP_DEFAULT) {
         m1->zip = conf->def_zip;
@@ -164,9 +171,12 @@ enc_v1_validate_msg (munge_msg_t m)
     else if (m1->zip == MUNGE_ZIP_NONE) {
         ; /* disable compression */
     }
-    else if (m1->zip >= MUNGE_ZIP_LAST_ENTRY) {
+    else if (!zip_is_valid_type (m1->zip)) {
         return (_munge_msg_set_err (m, EMUNGE_BAD_ZIP,
             strdupf ("Invalid compression type %d", m1->zip)));
+    }
+    if (m1->data_len == 0) {
+        m1->zip = MUNGE_ZIP_NONE;
     }
     /*  Validate message authentication code type.
      *  Note that MUNGE_MAC_NONE is not valid -- MACs are REQUIRED!
@@ -205,6 +215,8 @@ enc_v1_validate_msg (munge_msg_t m)
 static int
 enc_v1_init (munge_cred_t c)
 {
+/*  Initializes state necessary for encoding a credential.
+ */
     struct munge_msg_v1 *m1;            /* munge msg (v1 format)             */
 
     assert (c != NULL);
@@ -241,7 +253,7 @@ enc_v1_authenticate (munge_cred_t c)
 
     m1 = c->msg->pbody;
 
-    /*  Determine identity of peer.
+    /*  Determine identity of client process.
      */
     if (auth_peer_get (c->msg->sd, &(m1->uid), &(m1->gid)) < 0) {
         return (_munge_msg_set_err (c->msg, EMUNGE_SNAFU,
@@ -319,6 +331,7 @@ enc_v1_pack_outer (munge_cred_t c)
     p += sizeof (m1->cipher);
 
     assert (sizeof (m1->zip) == 1);
+    c->outer_zip_ref = p;
     *p = m1->zip;
     p += sizeof (m1->zip);
 
@@ -427,6 +440,79 @@ enc_v1_pack_inner (munge_cred_t c)
 
 
 static int
+enc_v1_precompress (munge_cred_t c)
+{
+/*  "Pre"-compresses the "inner" credential data.
+ *  If the compressed data is larger than the original data, the
+ *    compressed buffer is discarded and compression is disabled.
+ *    This requires resetting the compression type in the credential's
+ *    "outer" data header.  And since that field is included in the MAC,
+ *    compression must be attempted before the MAC is computed.
+ *  Note that the MAC is computed over the original (ie, uncompressed)
+ *    "inner" data.  That allows it to catch any errors (however unlikely)
+ *    that would occur during the compression stage.
+ */
+    struct munge_msg_v1 *m1;            /* munge msg (v1 format)             */
+    unsigned char       *buf;           /* compression buffer                */
+    int                  buf_len;       /* length of compression buffer      */
+    int                  n;             /* length of compressed data         */
+
+    assert (c != NULL);
+    assert (c->msg != NULL);
+    assert (c->msg->head.version == 1);
+
+    m1 = c->msg->pbody;
+
+    /*  Is compression disabled?
+     */
+    if (m1->zip == MUNGE_ZIP_NONE) {
+        return (0);
+    }
+    /*  Allocate memory for compressed "inner" data.
+     */
+    buf_len = zip_compress_length (m1->zip, c->inner, c->inner_len);
+    if (buf_len < 0) {
+        goto err;
+    }
+    if (!(buf = malloc (buf_len))) {
+        _munge_msg_set_err (c->msg, EMUNGE_NO_MEMORY, NULL);
+        goto err;
+    }
+    /*  Compress "inner" data.
+     */
+    n = buf_len;
+    if (zip_compress_block (m1->zip, buf, &n, c->inner, c->inner_len) < 0) {
+        goto err;
+    }
+    /*  Disable compression and discard compressed data if it's larger.
+     *    Save compressed data if it's not.  Note that c->inner and friends
+     *    cannot be updated until after the MAC has been computed.
+     */
+    if (n >= c->inner_len) {
+        m1->zip = MUNGE_ZIP_NONE;
+        *c->outer_zip_ref = m1->zip;
+        memset (buf, 0, buf_len);
+        free (buf);
+    }
+    else {
+        c->zippy_mem = buf;
+        c->zippy_mem_len = buf_len;
+        c->zippy = buf;
+        c->zippy_len = n;
+    }
+    return (0);
+
+err:
+    if ((buf_len > 0) && (buf != NULL)) {
+        memset (buf, 0, buf_len);
+        free (buf);
+    }
+    return (_munge_msg_set_err (c->msg, EMUNGE_SNAFU,
+        strdup ("Unable to compress credential")));
+}
+
+
+static int
 enc_v1_mac (munge_cred_t c)
 {
 /*  Computes the Message Authentication Code (MAC) over the entire message
@@ -457,27 +543,26 @@ enc_v1_mac (munge_cred_t c)
     /*  Compute MAC.
      */
     if (mac_init (&x, md, conf->mac_key, conf->mac_key_len) < 0) {
-        goto err1;
+        goto err;
     }
     if (mac_update (&x, c->outer, c->outer_len) < 0) {
-        goto err2;
+        goto err_cleanup;
     }
     if (mac_update (&x, c->inner, c->inner_len) < 0) {
-        goto err2;
+        goto err_cleanup;
     }
     if (mac_final (&x, c->mac, &n) < 0) {
-        goto err2;
+        goto err_cleanup;
     }
     if (mac_cleanup (&x) < 0) {
-        goto err1;
+        goto err;
     }
     assert (c->mac_len == n);
-
     return (0);
 
-err2:
+err_cleanup:
     mac_cleanup (&x);
-err1:
+err:
     return (_munge_msg_set_err (c->msg, EMUNGE_SNAFU,
         strdup ("Unable to mac credential")));
 }
@@ -487,6 +572,8 @@ static int
 enc_v1_compress (munge_cred_t c)
 {
 /*  Compresses the "inner" credential data.
+ *  The compression has already been done by enc_v1_precompress().
+ *    All that's left is to swap the inner data with the compressed data.
  */
     struct munge_msg_v1 *m1;            /* munge msg (v1 format)             */
 
@@ -498,13 +585,28 @@ enc_v1_compress (munge_cred_t c)
 
     /*  Is compression disabled?
      */
-    if (m1->zip == MUNGE_ZIP_NONE)
+    if (m1->zip == MUNGE_ZIP_NONE) {
         return (0);
-
-    /*  FIXME: Not implemented.
+    }
+    assert (c->zippy != NULL);
+    assert (c->zippy_len > 0);
+    /*
+     *  Replace "inner" data with compressed data.
      */
-    return (_munge_msg_set_err (c->msg, EMUNGE_SNAFU,
-        strdup ("Compression not supported")));
+    assert (c->inner_mem_len > 0);
+    memset (c->inner_mem, 0, c->inner_mem_len);
+    free (c->inner_mem);
+
+    assert (c->zippy_mem != NULL);
+    assert (c->zippy_mem_len > 0);
+    c->inner_mem = c->zippy_mem,
+    c->inner_mem_len = c->zippy_mem_len;
+    c->inner = c->zippy;
+    c->inner_len = c->zippy_len;
+
+    c->zippy_mem = NULL;
+    c->zippy_mem_len = 0;
+    return (0);
 }
 
 
@@ -549,9 +651,8 @@ enc_v1_encrypt (munge_cred_t c)
 
     if (mac_block (md, conf->dek_key, conf->dek_key_len,
                        c->dek, &n, c->mac, c->mac_len) < 0) {
-        _munge_msg_set_err (c->msg, EMUNGE_SNAFU,
-            strdup ("Unable to compute dek"));
-        goto err1;
+        return (_munge_msg_set_err (c->msg, EMUNGE_SNAFU,
+            strdup ("Unable to compute dek")));
     }
     assert (n == c->dek_len);
 
@@ -560,54 +661,49 @@ enc_v1_encrypt (munge_cred_t c)
      */
     buf_len = c->inner_len + cipher_block_size (ci);
     if (!(buf = malloc (buf_len))) {
-        _munge_msg_set_err (c->msg, EMUNGE_NO_MEMORY, NULL);
-        goto err1;
+        return (_munge_msg_set_err (c->msg, EMUNGE_NO_MEMORY, NULL));
     }
     /*  Encrypt "inner" data.
      */
     if (cipher_init (&x, ci, c->dek, c->iv, CIPHER_ENCRYPT) < 0) {
-        goto err2;
+        goto err;
     }
     buf_ptr = buf;
     n = 0;
     if (cipher_update (&x, buf_ptr, &m, c->inner, c->inner_len) < 0) {
-        goto err3;
+        goto err_cleanup;
     }
     buf_ptr += m;
     n += m;
     if (cipher_final (&x, buf_ptr, &m) < 0) {
-        goto err3;
+        goto err_cleanup;
     }
     buf_ptr += m;
     n += m;
     if (cipher_cleanup (&x) < 0) {
-        goto err2;
+        goto err;
     }
     assert (n <= buf_len);
 
     /*  Replace "inner" plaintext with ciphertext.
      */
-    if (c->inner_mem) {
-        assert (c->inner_mem_len > 0);
-        memset (c->inner_mem, 0, c->inner_mem_len);
-        free (c->inner_mem);
-    }
+    assert (c->inner_mem_len > 0);
+    memset (c->inner_mem, 0, c->inner_mem_len);
+    free (c->inner_mem);
+
     c->inner_mem = buf;
     c->inner_mem_len = buf_len;
     c->inner = buf;
     c->inner_len = n;
-
     return (0);
 
-err3:
+err_cleanup:
     cipher_cleanup (&x);
-err2:
+err:
     memset (buf, 0, buf_len);
     free (buf);
-    _munge_msg_set_err (c->msg, EMUNGE_SNAFU,
-        strdup ("Unable to encrypt credential"));
-err1:
-    return (-1);
+    return (_munge_msg_set_err (c->msg, EMUNGE_SNAFU,
+        strdup ("Unable to encrypt credential")));
 }
 
 
@@ -637,19 +733,11 @@ enc_v1_armor (munge_cred_t c)
 
     /*  Allocate memory for armor'd data.
      */
-    n = 0;
-    n += c->outer_len;
-    n += c->mac_len;
-    n += c->inner_len;
-
-    buf_len = 0;
-    buf_len += prefix_len;
-    buf_len += suffix_len;
-    buf_len += base64_encode_length (n);
+    n = c->outer_len + c->mac_len + c->inner_len;
+    buf_len = prefix_len + base64_encode_length (n) + suffix_len;
 
     if (!(buf = malloc (buf_len))) {
-        _munge_msg_set_err (c->msg, EMUNGE_NO_MEMORY, NULL);
-        goto err1;
+        return (_munge_msg_set_err (c->msg, EMUNGE_NO_MEMORY, NULL));
     }
     buf_ptr = buf;
 
@@ -663,31 +751,31 @@ enc_v1_armor (munge_cred_t c)
      *  The data will be NUL-terminated by in the process.
      */
     if (base64_init (&x) < 0) {
-        goto err2;
+        goto err;
     }
     n = 0;
     if (base64_encode_update (&x, buf_ptr, &m, c->outer, c->outer_len) < 0) {
-        goto err3;
+        goto err_cleanup;
     }
     buf_ptr += m;
     n += m;
     if (base64_encode_update (&x, buf_ptr, &m, c->mac, c->mac_len) < 0) {
-        goto err3;
+        goto err_cleanup;
     }
     buf_ptr += m;
     n += m;
     if (base64_encode_update (&x, buf_ptr, &m, c->inner, c->inner_len) < 0) {
-        goto err3;
+        goto err_cleanup;
     }
     buf_ptr += m;
     n += m;
     if (base64_encode_final (&x, buf_ptr, &m) < 0) {
-        goto err3;
+        goto err_cleanup;
     }
     buf_ptr += m;
     n += m;
     if (base64_cleanup (&x) < 0) {
-        goto err2;
+        goto err;
     }
     n++;                                /* count the terminating NUL char */
 
@@ -699,35 +787,40 @@ enc_v1_armor (munge_cred_t c)
     }
     assert ((buf_ptr - buf) < buf_len);
 
-    /*  Replace "outer" data with armor'd data.
+    /*  Replace "outer+inner" data with armor'd data.
      */
-    if (c->outer_mem) {
-        assert (c->outer_mem_len > 0);
-        memset (c->outer_mem, 0, c->outer_mem_len);
-        free (c->outer_mem);
-    }
+    assert (c->outer_mem_len > 0);
+    memset (c->outer_mem, 0, c->outer_mem_len);
+    free (c->outer_mem);
+
     c->outer_mem = buf;
     c->outer_mem_len = buf_len;
     c->outer = buf;
     c->outer_len = buf_ptr - buf + 1;
 
+    assert (c->inner_mem_len > 0);
+    memset (c->inner_mem, 0, c->inner_mem_len);
+    free (c->inner_mem);
+
+    c->inner_mem = NULL;
+    c->inner_mem_len = 0;
     return (0);
 
-err3:
+err_cleanup:
     base64_cleanup (&x);
-err2:
+err:
     memset (buf, 0, buf_len);
     free (buf);
-    _munge_msg_set_err (c->msg, EMUNGE_SNAFU,
-        strdup ("Unable to base64-encode credential"));
-err1:
-    return (-1);
+    return (_munge_msg_set_err (c->msg, EMUNGE_SNAFU,
+        strdup ("Unable to base64-encode credential")));
 }
 
 
 static int
 enc_v1_fini (munge_cred_t c)
 {
+/*  Finalizes encoding a credential, ensuring it is ready for transit.
+ */
     struct munge_msg_v1 *m1;            /* munge msg (v1 format)             */
 
     assert (c != NULL);
@@ -737,11 +830,13 @@ enc_v1_fini (munge_cred_t c)
     m1 = c->msg->pbody;
 
     /*  Place credential in message "data" payload for transit.
-     *  Note that the old 'm1->data' lies within m->pbody's malloc region,
-     *    so it will be free'd by the msg destructor when pbody is free'd.
+     *  Note that the old m1->data lies within m->pbody's malloc region,
+     *    so it will be free()d by the msg destructor when pbody is free()d
+     *    by _munge_msg_destroy() called from the munge_msg_server_thread().
+     *  Also note that by keeping the c->outer ref valid, this cred memory
+     *    will be free()d by cred_destroy() called from enc_v1_process_msg().
      */
     m1->data = c->outer;
     m1->data_len = c->outer_len;
-
     return (0);
 }

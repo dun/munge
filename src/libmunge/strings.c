@@ -1,11 +1,11 @@
 /*****************************************************************************
- *  $Id: strings.c,v 1.2 2003/04/25 23:23:11 dun Exp $
+ *  $Id: strings.c,v 1.3 2004/03/11 21:04:39 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
  *  UCRL-CODE-2003-???.
  *
- *  Copyright (C) 2002-2003 The Regents of the University of California.
+ *  Copyright (C) 2002-2004 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
  *  Written by Chris Dunlap <cdunlap@llnl.gov>.
  *
@@ -31,6 +31,7 @@
 
 #include <stdio.h>
 #include <munge.h>
+#include "common.h"
 
 
 /*****************************************************************************
@@ -40,12 +41,12 @@
 /*  Keep in sync with munge_cipher_t enum.
  */
 const char * munge_cipher_strings[] = {
-    "None",
-    "Default",
-    "Blowfish",
-    "CAST5",
+    "none",
+    "default",
+    "blowfish",
+    "cast5",
 #if HAVE_EVP_AES_128_CBC
-    "AES128",
+    "aes128",
 #else  /* !HAVE_EVP_AES_128_CBC */
     "",
 #endif /* !HAVE_EVP_AES_128_CBC */
@@ -56,17 +57,27 @@ const char * munge_cipher_strings[] = {
  */
 const char * munge_mac_strings[] = {
     "",
-    "Default",
-    "MD5",
-    "SHA1",
-    "RIPEMD160",
+    "default",
+    "md5",
+    "sha1",
+    "ripemd160",
      NULL
 };
 
 /*  Keep in sync with munge_zip_t enum.
  */
 const char * munge_zip_strings[] = {
-    "None",
-    "Default",
+    "none",
+    "default",
+#if HAVE_PKG_BZLIB
+    "bzlib",
+#else  /* !HAVE_PKG_BZLIB */
+    "",
+#endif /* !HAVE_PKG_BZLIB */
+#if HAVE_PKG_ZLIB
+    "zlib",
+#else  /* !HAVE_PKG_ZLIB */
+    "",
+#endif /* HAVE_PKG_ZLIB */
      NULL
 };

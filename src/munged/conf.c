@@ -1,11 +1,11 @@
 /*****************************************************************************
- *  $Id: conf.c,v 1.12 2004/01/29 00:15:49 dun Exp $
+ *  $Id: conf.c,v 1.13 2004/03/11 21:04:40 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
  *  UCRL-CODE-2003-???.
  *
- *  Copyright (C) 2003 The Regents of the University of California.
+ *  Copyright (C) 2003-2004 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
  *  Written by Chris Dunlap <cdunlap@llnl.gov>.
  *
@@ -46,6 +46,7 @@
 #include "md.h"
 #include "munge_defs.h"
 #include "replay.h"
+#include "zip.h"
 
 
 /*****************************************************************************
@@ -86,7 +87,7 @@ create_conf (void)
     conf->got_force = 0;
     conf->got_foreground = 0;
     conf->def_cipher = MUNGE_DEFAULT_CIPHER;
-    conf->def_zip = MUNGE_DEFAULT_ZIP;
+    conf->def_zip = zip_select_default_type (MUNGE_DEFAULT_ZIP);
     conf->def_mac = MUNGE_DEFAULT_MAC;
     conf->def_ttl = MUNGE_DEFAULT_TTL;
     conf->max_ttl = MUNGE_MAXIMUM_TTL;

@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: configure.ac,v 1.13 2004/01/30 23:14:18 dun Exp $
+## $Id: configure.ac,v 1.14 2004/03/11 21:04:39 dun Exp $
 ##*****************************************************************************
 ## Process this file with autoconf to produce a configure script.
 ##*****************************************************************************
@@ -30,12 +30,12 @@
 # Prologue.
 ##
 AC_INIT([munge], [0])
-AC_META
+X_AC_META
 AC_CONFIG_AUX_DIR([config])
 AC_CONFIG_SRCDIR([src/libmunge/munge.h])
 AC_CANONICAL_TARGET
-AC_GPL_LICENSED
-AC_HUMOR
+X_AC_GPL_LICENSED
+X_AC_HUMOR
 
 ##
 # Automake support.
@@ -50,18 +50,22 @@ AM_MAINTAINER_MODE
 AC_PROG_CC
 AC_PROG_LIBTOOL
 AC_PROG_MAKE_SET
-AC_DEBUG
+X_AC_DEBUG
 
 ##
 # Checks for libraries.
 ##
+X_AC_CHECK_COND_LIB(bz2, BZ2_bzBuffToBuffCompress)
+X_AC_CHECK_COND_LIB(z, compress)
 
 ##
 # Checks for header files.
 ##
 AC_HEADER_STDC
 AC_CHECK_HEADERS( \
+  bzlib.h \
   getopt.h \
+  zlib.h \
 )
 
 ##
@@ -75,7 +79,7 @@ AC_TYPE_UID_T
 # Checks for how to authenticate a non-parent process.
 ##
 AC_CHECK_FUNCS(getpeereid)
-AC_CHECK_PEERCRED
+X_AC_CHECK_PEERCRED
 AC_CHECK_TYPES(struct strrecvfd, [], [], [#include <stropts.h>])
 
 ##
@@ -113,7 +117,7 @@ AC_REPLACE_FUNCS( \
   strlcat \
   strlcpy \
 )
-AC_LTLIBOBJS
+X_AC_LTLIBOBJS
 
 ##
 # Epilogue.

@@ -43,12 +43,13 @@ sbin_PROGRAMS = munged$(EXEEXT)
 check_PROGRAMS = $(am__EXEEXT_1)
 subdir = src/munged
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/config/ac_check_peercred.m4 \
-	$(top_srcdir)/config/ac_debug.m4 \
-	$(top_srcdir)/config/ac_gpl_licensed.m4 \
-	$(top_srcdir)/config/ac_humor.m4 \
-	$(top_srcdir)/config/ac_ltlibobjs.m4 \
-	$(top_srcdir)/config/ac_meta.m4 $(top_srcdir)/configure.ac
+am__aclocal_m4_deps = $(top_srcdir)/config/x_ac_check_cond_lib.m4 \
+	$(top_srcdir)/config/x_ac_check_peercred.m4 \
+	$(top_srcdir)/config/x_ac_debug.m4 \
+	$(top_srcdir)/config/x_ac_gpl_licensed.m4 \
+	$(top_srcdir)/config/x_ac_humor.m4 \
+	$(top_srcdir)/config/x_ac_ltlibobjs.m4 \
+	$(top_srcdir)/config/x_ac_meta.m4 $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(SHELL) $(top_srcdir)/config/mkinstalldirs
@@ -70,7 +71,8 @@ am_munged_OBJECTS = munged-auth.$(OBJEXT) munged-base64.$(OBJEXT) \
 	munged-md.$(OBJEXT) munged-msg_server.$(OBJEXT) \
 	munged-random.$(OBJEXT) munged-replay.$(OBJEXT) \
 	munged-sock.$(OBJEXT) munged-thread.$(OBJEXT) \
-	munged-timer.$(OBJEXT) munged-munged.$(OBJEXT)
+	munged-timer.$(OBJEXT) munged-zip.$(OBJEXT) \
+	munged-munged.$(OBJEXT)
 munged_OBJECTS = $(am_munged_OBJECTS)
 munged_DEPENDENCIES = $(top_builddir)/src/libcommon/libcommon.la \
 	$(top_builddir)/src/libmissing/libmissing.la \
@@ -98,7 +100,8 @@ am__depfiles_maybe = depfiles
 @AMDEP_TRUE@	./$(DEPDIR)/munged-replay.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/munged-sock.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/munged-thread.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/munged-timer.Po
+@AMDEP_TRUE@	./$(DEPDIR)/munged-timer.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/munged-zip.Po
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) \
@@ -146,9 +149,11 @@ INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
 INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
 LDFLAGS = @LDFLAGS@
+LIBBZ2 = @LIBBZ2@
 LIBOBJS = @LIBOBJS@
 LIBS = @LIBS@
 LIBTOOL = @LIBTOOL@
+LIBZ = @LIBZ@
 LN_S = @LN_S@
 LTLIBOBJS = @LTLIBOBJS@
 MAINT = @MAINT@
@@ -226,7 +231,9 @@ munged_LDADD = \
 	$(top_builddir)/src/libmissing/libmissing.la \
 	$(top_builddir)/src/libmunge/libmunge.la \
 	-lpthread \
-	-lcrypto
+	-lcrypto \
+	@LIBBZ2@ \
+	@LIBZ@
 
 munged_SOURCES = \
 	auth.c \
@@ -267,6 +274,8 @@ munged_SOURCES = \
 	thread.h \
 	timer.c \
 	timer.h \
+	zip.c \
+	zip.h \
 	munged.c
 
 TESTS = \
@@ -380,6 +389,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/munged-sock.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/munged-thread.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/munged-timer.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/munged-zip.Po@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	if $(COMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \
@@ -860,6 +870,30 @@ munged-timer.lo: timer.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/munged-timer.Plo' tmpdepfile='$(DEPDIR)/munged-timer.TPlo' @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -c -o munged-timer.lo `test -f 'timer.c' || echo '$(srcdir)/'`timer.c
+
+munged-zip.o: zip.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -MT munged-zip.o -MD -MP -MF "$(DEPDIR)/munged-zip.Tpo" -c -o munged-zip.o `test -f 'zip.c' || echo '$(srcdir)/'`zip.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/munged-zip.Tpo" "$(DEPDIR)/munged-zip.Po"; else rm -f "$(DEPDIR)/munged-zip.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='zip.c' object='munged-zip.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/munged-zip.Po' tmpdepfile='$(DEPDIR)/munged-zip.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -c -o munged-zip.o `test -f 'zip.c' || echo '$(srcdir)/'`zip.c
+
+munged-zip.obj: zip.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -MT munged-zip.obj -MD -MP -MF "$(DEPDIR)/munged-zip.Tpo" -c -o munged-zip.obj `if test -f 'zip.c'; then $(CYGPATH_W) 'zip.c'; else $(CYGPATH_W) '$(srcdir)/zip.c'; fi`; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/munged-zip.Tpo" "$(DEPDIR)/munged-zip.Po"; else rm -f "$(DEPDIR)/munged-zip.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='zip.c' object='munged-zip.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/munged-zip.Po' tmpdepfile='$(DEPDIR)/munged-zip.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -c -o munged-zip.obj `if test -f 'zip.c'; then $(CYGPATH_W) 'zip.c'; else $(CYGPATH_W) '$(srcdir)/zip.c'; fi`
+
+munged-zip.lo: zip.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -MT munged-zip.lo -MD -MP -MF "$(DEPDIR)/munged-zip.Tpo" -c -o munged-zip.lo `test -f 'zip.c' || echo '$(srcdir)/'`zip.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/munged-zip.Tpo" "$(DEPDIR)/munged-zip.Plo"; else rm -f "$(DEPDIR)/munged-zip.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='zip.c' object='munged-zip.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/munged-zip.Plo' tmpdepfile='$(DEPDIR)/munged-zip.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -c -o munged-zip.lo `test -f 'zip.c' || echo '$(srcdir)/'`zip.c
 
 munged-munged.o: munged.c
 @am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -MT munged-munged.o -MD -MP -MF "$(DEPDIR)/munged-munged.Tpo" -c -o munged-munged.o `test -f 'munged.c' || echo '$(srcdir)/'`munged.c; \

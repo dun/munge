@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: cred.h,v 1.5 2004/01/29 19:09:12 dun Exp $
+ *  $Id: cred.h,v 1.6 2004/03/11 21:04:40 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -68,6 +68,10 @@ struct munge_cred {
     unsigned char      *inner_mem;      /* inner cred memory allocation      */
     int                 inner_len;      /* length of inner credential data   */
     unsigned char      *inner;          /* ptr to inner credential data      */
+    int                 zippy_mem_len;  /* length of inner compressed memory */
+    unsigned char      *zippy_mem;      /* inner compressed mem allocation   */
+    int                 zippy_len;      /* length of inner compressed data   */
+    unsigned char      *zippy;          /* ptr to inner compressed data      */
     int                 realm_mem_len;  /* length of realm string memory     */
     unsigned char      *realm_mem;      /* realm string memory allocation    */
     int                 salt_len;       /* length of salt data               */
@@ -78,6 +82,7 @@ struct munge_cred {
     unsigned char       dek[MAX_DEK];   /* symmetric data encryption key     */
     int                 iv_len;         /* length of iv data                 */
     unsigned char       iv[MAX_IV];     /* initialization vector             */
+    unsigned char      *outer_zip_ref;  /* ref to zip_t in outer cred memory */
 };
 
 typedef struct munge_cred * munge_cred_t;

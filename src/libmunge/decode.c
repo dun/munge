@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: decode.c,v 1.8 2004/01/16 02:18:37 dun Exp $
+ *  $Id: decode.c,v 1.9 2004/03/11 21:04:39 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -35,6 +35,7 @@
 #include <string.h>
 #include <sys/types.h>
 #include <munge.h>
+#include "common.h"
 #include "ctx.h"
 #include "msg_client.h"
 #include "munge_defs.h"

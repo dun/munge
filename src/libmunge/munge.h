@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munge.h,v 1.16 2004/01/16 02:18:37 dun Exp $
+ *  $Id: munge.h,v 1.17 2004/03/11 21:04:39 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -93,6 +93,8 @@ typedef enum munge_mac {
 typedef enum munge_zip {
     MUNGE_ZIP_NONE              =  0,   /* compression disabled              */
     MUNGE_ZIP_DEFAULT           =  1,   /* default zip specified by daemon   */
+    MUNGE_ZIP_BZLIB             =  2,   /* bzip2 by Julian Seward            */
+    MUNGE_ZIP_ZLIB              =  3,   /* zlib "deflate" by Gailly & Adler  */
     MUNGE_ZIP_LAST_ENTRY
 } munge_zip_t;
 
@@ -136,16 +138,15 @@ typedef enum munge_err {
  *  Extern Variables
  *****************************************************************************/
 
-/*  NULL-terminated array of descriptive strings for the munge_cipher_t.
+/*  The following NULL-terminated arrays contain descriptive strings for the
+ *    corresponding munge types.  If a given string is set to the empty string
+ *    (ie, ""), that setting is not defined in the configuration as currently
+ *    compiled.
  */
 extern const char * munge_cipher_strings[];
 
-/*  NULL-terminated array of descriptive strings for the munge_mac_t.
- */
 extern const char * munge_mac_strings[];
 
-/*  NULL-terminated array of descriptive strings for the munge_zip_t.
- */
 extern const char * munge_zip_strings[];
 
 

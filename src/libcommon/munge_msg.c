@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munge_msg.c,v 1.13 2004/01/16 02:18:37 dun Exp $
+ *  $Id: munge_msg.c,v 1.14 2004/03/11 21:04:39 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -35,8 +35,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/uio.h>
+#include <unistd.h>
+#include "fd.h"
+#include "munge_defs.h"
 #include "munge_msg.h"
-#include "common.h"
+#include "str.h"
 
 
 /*****************************************************************************

@@ -1,11 +1,11 @@
 /*****************************************************************************
- *  $Id: common.h,v 1.3 2003/05/03 00:41:00 dun Exp $
+ *  $Id: common.h,v 1.4 2004/03/11 21:04:39 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
  *  UCRL-CODE-2003-???.
  *
- *  Copyright (C) 2003 The Regents of the University of California.
+ *  Copyright (C) 2003-2004 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
  *  Written by Chris Dunlap <cdunlap@llnl.gov>.
  *
@@ -29,8 +29,10 @@
 #define MUNGE_COMMON_H
 
 
-/*  These contain prototypes and whatnot for libcommon.
- */
+#if HAVE_CONFIG_H
+#  include <config.h>
+#endif /* HAVE_CONFIG_H */
+                                                                                
 #include "fd.h"
 #include "license.h"
 #include "log.h"
@@ -40,6 +42,14 @@
 #include "str.h"
 
 
+#if HAVE_BZLIB_H && HAVE_LIBBZ2
+#  define HAVE_PKG_BZLIB 1
+#endif
+                                                                                
+#if HAVE_ZLIB_H && HAVE_LIBZ
+#  define HAVE_PKG_ZLIB 1
+#endif
+                                                                                
 #ifndef MAX
 #  define MAX(a,b) ((a >= b) ? (a) : (b))
 #endif /* !MAX */

@@ -41,12 +41,13 @@ DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 	$(top_srcdir)/config/Make-inc.mk
 subdir = src/libcommon
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/config/ac_check_peercred.m4 \
-	$(top_srcdir)/config/ac_debug.m4 \
-	$(top_srcdir)/config/ac_gpl_licensed.m4 \
-	$(top_srcdir)/config/ac_humor.m4 \
-	$(top_srcdir)/config/ac_ltlibobjs.m4 \
-	$(top_srcdir)/config/ac_meta.m4 $(top_srcdir)/configure.ac
+am__aclocal_m4_deps = $(top_srcdir)/config/x_ac_check_cond_lib.m4 \
+	$(top_srcdir)/config/x_ac_check_peercred.m4 \
+	$(top_srcdir)/config/x_ac_debug.m4 \
+	$(top_srcdir)/config/x_ac_gpl_licensed.m4 \
+	$(top_srcdir)/config/x_ac_humor.m4 \
+	$(top_srcdir)/config/x_ac_ltlibobjs.m4 \
+	$(top_srcdir)/config/x_ac_meta.m4 $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(SHELL) $(top_srcdir)/config/mkinstalldirs
@@ -110,9 +111,11 @@ INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
 INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
 LDFLAGS = @LDFLAGS@
+LIBBZ2 = @LIBBZ2@
 LIBOBJS = @LIBOBJS@
 LIBS = @LIBS@
 LIBTOOL = @LIBTOOL@
+LIBZ = @LIBZ@
 LN_S = @LN_S@
 LTLIBOBJS = @LTLIBOBJS@
 MAINT = @MAINT@

@@ -1,8 +1,8 @@
 -dead store removal protection
--compression support
+-minimize pollution of libmunge namespace
 -thread manager
--save/restore replay state
 -cross-platform (AIX, Tru64, Solaris, BSD)
+-save/restore replay state
 -ensure safe perms on sensitive files/dirs
 -/* FALLTHROUGH */
 -valgrindify

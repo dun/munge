@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munge_defs.h,v 1.17 2004/01/16 02:18:37 dun Exp $
+ *  $Id: munge_defs.h,v 1.18 2004/03/11 21:04:39 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -72,7 +72,7 @@
 
 /*  Default munge_zip_t for compressing credentials.
  */
-#define MUNGE_DEFAULT_ZIP               MUNGE_ZIP_NONE
+#define MUNGE_DEFAULT_ZIP               MUNGE_ZIP_ZLIB
 
 /*  Integer (uint32_t) sentinel for valid munge message.
  */
