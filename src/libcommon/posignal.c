@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: posignal.c,v 1.3 2004/04/03 21:53:00 dun Exp $
+ *  $Id: posignal.c,v 1.4 2004/04/30 19:28:35 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -27,7 +27,7 @@
  *****************************************************************************/
 
 
-#ifdef HAVE_CONFIG_H
+#if HAVE_CONFIG_H
 #  include "config.h"
 #endif /* HAVE_CONFIG_H */
 
