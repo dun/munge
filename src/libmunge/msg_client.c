@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: msg_client.c,v 1.3 2003/05/03 00:41:00 dun Exp $
+ *  $Id: msg_client.c,v 1.4 2003/05/22 18:24:21 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -106,7 +106,7 @@ _munge_msg_client_connect (munge_msg_t m, char *path)
         if (i >= MUNGE_SOCKET_RETRIES)
             break;
         sleep (delay);
-        delay *= 2;                     /* exponential backoff */
+        delay++;
         i++;
     }
     if (n < 0) {
