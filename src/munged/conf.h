@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: conf.h,v 1.10 2004/09/16 20:13:36 dun Exp $
+ *  $Id: conf.h,v 1.11 2004/09/18 23:00:01 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -70,7 +70,7 @@ typedef struct conf * conf_t;
  *  External Varables
  *****************************************************************************/
 
-extern conf_t       conf;               /* defined in munged.c               */
+extern conf_t conf;                     /* defined in conf.c                 */
 
 
 /*****************************************************************************

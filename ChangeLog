@@ -1,3 +1,8 @@
+2004-09-18  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/munged/conf.c, src/munged/conf.h, src/munged/munged.c:
+	  Moved global conf definition from munged.c to conf.c.
+
 2004-09-17  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/munged/random.c: Allow lack of entropy to be forced (-f).

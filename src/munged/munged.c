@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munged.c,v 1.16 2004/09/03 18:54:33 dun Exp $
+ *  $Id: munged.c,v 1.17 2004/09/18 23:00:01 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -74,8 +74,7 @@ static void sock_destroy (conf_t conf);
  *  Global Variables
  *****************************************************************************/
 
-conf_t  conf = NULL;                    /* global configuration struct       */
-int     done = 0;                       /* global flag set true for exit     */
+int done = 0;                           /* global flag set true for exit     */
 
 
 /*****************************************************************************
