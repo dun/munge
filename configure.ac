@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: configure.ac,v 1.28 2004/11/24 19:05:15 dun Exp $
+## $Id: configure.ac,v 1.29 2004/11/29 23:03:35 dun Exp $
 ##*****************************************************************************
 ## Process this file with autoconf to produce a configure script.
 ##*****************************************************************************
@@ -56,6 +56,7 @@ X_AC_DEBUG
 # Checks for libraries.
 ##
 X_AC_CHECK_PTHREADS
+X_AC_CHECK_SSL
 X_AC_CHECK_COND_LIB(nsl, gethostbyname)
 X_AC_CHECK_COND_LIB(socket, socket)
 X_AC_CHECK_COND_LIB(bz2, BZ2_bzBuffToBuffCompress)

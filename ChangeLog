@@ -1,3 +1,7 @@
+2004-11-29  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* configure.ac, config/x_ac_check_ssl.m4: Added X_AC_CHECK_SSL.
+
 2004-11-24  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/libmunge/munge_ctx.3.in, src/munge/munge.1.in,
