@@ -3,7 +3,7 @@
 ##   by Chris Dunlap <cdunlap@llnl.gov>
 ##*
 ## ConManId: Make-rpm.mk,v 1.20 2002/08/16 00:18:29 dun Exp
-## $Id: Make-rpm.mk,v 1.4 2002/12/20 21:07:28 dun Exp $
+## $Id: Make-rpm.mk,v 1.5 2003/02/03 23:59:28 dun Exp $
 ##*
 ## REQUIREMENTS:
 ## - requires project to be under CVS version control
@@ -111,10 +111,11 @@ rpm-internal: tar-internal
 	    <$$spec >$$tmp/SPECS/$$proj.spec; \
 	if ! test -s $$tmp/SPECS/$$proj.spec; then \
 	  echo "ERROR: Cannot create $$proj.spec." 1>&2; exit 1; fi; \
-	rpm --showrc | egrep "[[:space:]]_(gpg|pgp)_name[[:space:]]" \
+	rpmbuild --showrc | egrep "[[:space:]]_(gpg|pgp)_name[[:space:]]" \
 	  >/dev/null && sign="--sign"; \
-	if ! rpm -ba --define "_tmppath $$tmp/TMP" --define "_topdir $$tmp" \
-	  $$sign --quiet $$tmp/SPECS/$$proj.spec >$$tmp/rpm.log 2>&1; then \
+	if ! rpmbuild -ba --define "_tmppath $$tmp/TMP" \
+	  --define "_topdir $$tmp" $$sign --quiet $$tmp/SPECS/$$proj.spec \
+	  >$$tmp/rpm.log 2>&1; then \
 	    cat $$tmp/rpm.log; exit 1; fi; \
 	cp -p $$tmp/RPMS/*/$$proj-*.rpm $$tmp/SRPMS/$$proj-*.src.rpm . \
 	  || exit 1
