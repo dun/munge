@@ -1,4 +1,4 @@
-# $Id: munge.spec,v 1.5 2003/02/13 17:57:24 dun Exp $
+# $Id: munge.spec,v 1.6 2003/02/13 19:27:02 dun Exp $
 
 Name:		munge
 Version:	0.0
@@ -38,7 +38,7 @@ virtually any transport.
 %setup
 
 %build
-%configure
+%configure --program-prefix=%{?_program_prefix:%{_program_prefix}}
 make
 
 %install
