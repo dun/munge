@@ -20777,11 +20777,6 @@ done
 
 
 
-  LIBOBJS=`echo "$LIBOBJS" | sed 's,\.[^.]* ,$U&,g;s,\.[^.]*$,$U&,'`
-  LTLIBOBJS=`echo "$LIBOBJS" | sed 's,\.[^.]* ,.lo ,g;s,\.[^.]*$,.lo,'`
-
-
-
 ##
 # Epilogue.
 ##

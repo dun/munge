@@ -49,7 +49,6 @@ am__aclocal_m4_deps = $(top_srcdir)/config/x_ac_check_cond_lib.m4 \
 	$(top_srcdir)/config/x_ac_debug.m4 \
 	$(top_srcdir)/config/x_ac_gpl_licensed.m4 \
 	$(top_srcdir)/config/x_ac_humor.m4 \
-	$(top_srcdir)/config/x_ac_ltlibobjs.m4 \
 	$(top_srcdir)/config/x_ac_meta.m4 $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
