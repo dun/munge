@@ -40,8 +40,7 @@ DIST_COMMON = README $(am__configure_deps) $(srcdir)/Makefile.am \
 	$(top_srcdir)/config/config.h.in $(top_srcdir)/configure \
 	AUTHORS COPYING ChangeLog INSTALL NEWS TODO config/compile \
 	config/config.guess config/config.sub config/depcomp \
-	config/install-sh config/ltmain.sh config/missing \
-	config/mkinstalldirs
+	config/install-sh config/ltmain.sh config/missing
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/config/x_ac_check_cond_lib.m4 \
@@ -56,7 +55,7 @@ am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
  configure.lineno configure.status.lineno
-mkinstalldirs = $(SHELL) $(top_srcdir)/config/mkinstalldirs
+mkinstalldirs = $(mkdir_p)
 CONFIG_HEADER = $(top_builddir)/config/config.h
 CONFIG_CLEAN_FILES =
 SOURCES =

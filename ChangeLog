@@ -1,3 +1,10 @@
+2004-03-18  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* config/compile, config/config.guess, config/config.sub,
+	  config/depcomp, config/install-sh, config/ltmain.sh, config/missing:
+	  Updated with latest versions via the bootstrap script.  This fixes
+	  the bug where the ".so" suffix disappeared from the shared libs.
+
 2004-03-17  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* : Re-bootstrap'd with autoconf-2.59, automake-1.8.3, libtool-1.5.2.
