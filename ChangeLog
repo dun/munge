@@ -1,5 +1,9 @@
 2004-11-09  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/munged/conf.c:
+	  Changed "--nthreads" cmdline opt to "--num-threads".
+	  Tweaked display_help() information.
+
 	* src/munge/munge.c, src/munge/remunge.c, src/munge/unmunge.c:
 	  Tweaked display_help() information.
 

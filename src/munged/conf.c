@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: conf.c,v 1.30 2004/11/09 20:06:14 dun Exp $
+ *  $Id: conf.c,v 1.31 2004/11/09 20:17:15 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -64,7 +64,7 @@ struct option opt_table[] = {
     { "socket",     1, NULL, 'S' },
     { "advice",     0, NULL, 'A' },
     { "keyfile",    1, NULL, '0' },	/* xyzzy: tmp secret cmdline opt */
-    { "nthreads",   1, NULL, '1' },	/* xyzzy: tmp secret cmdline opt */
+    { "num-threads",1, NULL, '1' },	/* xyzzy: tmp secret cmdline opt */
     {  NULL,        0, NULL,  0  }
 };
 
@@ -291,7 +291,7 @@ display_help (char *prog)
             "Run process in the foreground (do not fork)");
 
     printf ("  %*s %s\n", w, "-S, --socket=STRING",
-            "Specify local domain socket");
+            "Specify local domain socket for daemon");
 
     printf ("\n");
     return;
