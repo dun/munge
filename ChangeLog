@@ -1,3 +1,8 @@
+2004-08-11  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/munged/work.c(work_fini):
+	  Fixed bug preventing the worker thread(s) from being canceled.
+
 2004-08-05  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/munged/timer.c(timer_fini):

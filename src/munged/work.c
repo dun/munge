@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: work.c,v 1.1 2004/08/05 21:10:50 dun Exp $
+ *  $Id: work.c,v 1.2 2004/08/11 22:11:11 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -142,7 +142,7 @@ work_init (work_func_t f, int n_threads)
     wp->n_working = 0;
     wp->got_fini = 0;
     /*
-     *  Start worker threads.
+     *  Start worker thread(s).
      */
     for (i = 0; i < wp->n_workers; i++) {
         if ((errno = pthread_create
@@ -191,8 +191,16 @@ work_fini (work_p wp, int do_wait)
             }
         }
     }
-    /*  Stop worker threads.
+    /*  Stop worker thread(s).
+     *  The mutex must be unlocked in order to cancel the worker
+     *    thread(s) which may be blocked on pthread_cond_wait().
+     *    When a pthread_cond_wait() is canceled, the mutex is
+     *    re-acquired before the cleanup handlers are invoked.
      */
+    if ((errno = pthread_mutex_unlock (&wp->lock)) != 0) {
+        log_errno (EMUNGE_SNAFU, LOG_ERR,
+            "Unable to unlock work thread mutex");
+    }
     for (i = 0; i < wp->n_workers; i++) {
         if ((errno = pthread_cancel (wp->workers[i])) != 0) {
             log_errno (EMUNGE_SNAFU, LOG_ERR,
