@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munge_msg.c,v 1.17 2004/04/03 21:53:00 dun Exp $
+ *  $Id: munge_msg.c,v 1.18 2004/05/06 01:41:12 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -104,7 +104,6 @@ _munge_msg_send (munge_msg_t m)
 /*  Sends the message [m] to the recipient at the other end of the
  *    already-specified socket.
  *  This message contains a common header and a version-specific body.
- *    Currently, only v1 messages are used.
  *  Returns a standard munge error code.
  */
     struct munge_msg_v1 *m1;
@@ -118,12 +117,6 @@ _munge_msg_send (munge_msg_t m)
     assert (m->head.version == MUNGE_MSG_VERSION);
     assert (m->pbody != NULL);
 
-    if (m->head.version != 1) {
-        _munge_msg_set_err (m, EMUNGE_SOCKET,
-            strdupf ("Unable to send unsupported message version %d",
-            m->head.version));
-        return (EMUNGE_SOCKET);
-    }
     m1 = m->pbody;
     m->head.length = sizeof (*m1);
     m->head.length += m1->realm_len;
@@ -208,12 +201,12 @@ _munge_msg_recv (munge_msg_t m)
             strdupf ("Received invalid message magic %d", m->head.magic));
         return (EMUNGE_SOCKET);
     }
-    else if (m->head.version > MUNGE_MSG_VERSION) {
+    else if (m->head.version != MUNGE_MSG_VERSION) {
         _munge_msg_set_err (m, EMUNGE_SOCKET,
             strdupf ("Received invalid message version %d", m->head.version));
         return (EMUNGE_SOCKET);
     }
-    else if (m->head.length <= 0) {
+    else if (m->head.length < sizeof (struct munge_msg_v1)) {
         _munge_msg_set_err (m, EMUNGE_SOCKET,
             strdupf ("Received invalid message length %d", m->head.length));
         return (EMUNGE_SOCKET);

@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: msg_server.c,v 1.10 2004/04/03 21:53:00 dun Exp $
+ *  $Id: msg_server.c,v 1.11 2004/05/06 01:41:12 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -56,7 +56,7 @@ munge_msg_server_thread (munge_msg_t m)
     if ((e = _munge_msg_recv (m)) != EMUNGE_SUCCESS) {
         ; /* fall out of if clause, log error, and drop request */
     }
-    else if (m->head.version > MUNGE_MSG_VERSION) {
+    else if (m->head.version != MUNGE_MSG_VERSION) {
         _munge_msg_set_err (m, EMUNGE_SNAFU,
             strdupf ("Invalid message version %d", m->head.version));
     }

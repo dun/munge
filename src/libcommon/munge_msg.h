@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munge_msg.h,v 1.12 2004/05/01 05:08:26 dun Exp $
+ *  $Id: munge_msg.h,v 1.13 2004/05/06 01:41:12 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -36,6 +36,19 @@
 #include <inttypes.h>
 #include <munge.h>
 #include <netinet/in.h>                 /* for struct in_addr                */
+
+
+/*****************************************************************************
+ *  Constants
+ *****************************************************************************/
+
+/*  Current version of the munge client-server message format.
+ *
+ *  This must be incremented whenever the client/server msg format changes;
+ *    otherwise, the message may be parsed incorrectly when decoded.
+ *  In retrospect, the struct munge_msg_v1 type name was poorly chosen.
+ */
+#define MUNGE_MSG_VERSION               2
 
 
 /*****************************************************************************

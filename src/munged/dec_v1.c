@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: dec_v1.c,v 1.20 2004/05/01 05:08:26 dun Exp $
+ *  $Id: dec_v1.c,v 1.21 2004/05/06 01:41:12 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -141,7 +141,6 @@ dec_v1_validate_msg (munge_msg_t m)
     struct munge_msg_v1 *m1;            /* munge msg (v1 format)             */
 
     assert (m != NULL);
-    assert (m->head.version == 1);
     assert (m->head.type == MUNGE_MSG_DEC_REQ);
 
     m1 = m->pbody;
@@ -170,7 +169,6 @@ dec_v1_timestamp (munge_cred_t c)
 
     assert (c != NULL);
     assert (c->msg != NULL);
-    assert (c->msg->head.version == 1);
 
     m1 = c->msg->pbody;
 
@@ -197,7 +195,6 @@ dec_v1_authenticate (munge_cred_t c)
 
     assert (c != NULL);
     assert (c->msg);
-    assert (c->msg->head.version == 1);
 
     m1 = c->msg->pbody;
     p_uid = (uid_t *) &(m1->client_uid);
@@ -229,7 +226,6 @@ dec_v1_unarmor (munge_cred_t c)
 
     assert (c != NULL);
     assert (c->msg != NULL);
-    assert (c->msg->head.version == 1);
 
     m1 = c->msg->pbody;
 
@@ -334,7 +330,6 @@ dec_v1_unpack_outer (munge_cred_t c)
     assert (c != NULL);
     assert (c->outer != NULL);
     assert (c->msg != NULL);
-    assert (c->msg->head.version == 1);
 
     /*  Initialize.
      */
@@ -519,7 +514,6 @@ dec_v1_decrypt (munge_cred_t c)
 
     assert (c != NULL);
     assert (c->msg != NULL);
-    assert (c->msg->head.version == 1);
 
     m1 = c->msg->pbody;
 
@@ -618,7 +612,6 @@ dec_v1_decompress (munge_cred_t c)
 
     assert (c != NULL);
     assert (c->msg != NULL);
-    assert (c->msg->head.version == 1);
 
     m1 = c->msg->pbody;
 
@@ -691,7 +684,6 @@ dec_v1_validate_mac (munge_cred_t c)
 
     assert (c != NULL);
     assert (c->msg != NULL);
-    assert (c->msg->head.version == 1);
 
     m1 = c->msg->pbody;
 
@@ -766,7 +758,6 @@ dec_v1_unpack_inner (munge_cred_t c)
     assert (c != NULL);
     assert (c->inner != NULL);
     assert (c->msg != NULL);
-    assert (c->msg->head.version == 1);
 
     /*  Initialize.
      */
@@ -931,7 +922,6 @@ dec_v1_validate_auth (munge_cred_t c)
 
     assert (c != NULL);
     assert (c->msg != NULL);
-    assert (c->msg->head.version == 1);
 
     m1 = c->msg->pbody;
 
@@ -967,7 +957,6 @@ dec_v1_validate_time (munge_cred_t c)
 
     assert (c != NULL);
     assert (c->msg != NULL);
-    assert (c->msg->head.version == 1);
 
     m1 = c->msg->pbody;
     /*
@@ -1006,7 +995,6 @@ dec_v1_validate_replay (munge_cred_t c)
 
     assert (c != NULL);
     assert (c->msg != NULL);
-    assert (c->msg->head.version == 1);
 
     m1 = c->msg->pbody;
 

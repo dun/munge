@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: decode.c,v 1.13 2004/05/01 05:08:26 dun Exp $
+ *  $Id: decode.c,v 1.14 2004/05/06 01:41:12 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -169,7 +169,6 @@ decode_req_v1 (munge_msg_t m, munge_ctx_t ctx, const char *cred)
     struct munge_msg_v1 *m1;
 
     assert (m != NULL);
-    assert (m->head.version == 1);
     assert (m->pbody == NULL);
     assert (cred != NULL);
     assert (strlen (cred) > 0);
@@ -210,7 +209,6 @@ decode_rsp_v1 (munge_msg_t m, munge_ctx_t ctx,
     int                  n;
 
     assert (m != NULL);
-    assert (m->head.version == 1);
 
     m1 = (struct munge_msg_v1 *) m->pbody;
     /*

@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munge_defs.h,v 1.22 2004/04/16 22:15:06 dun Exp $
+ *  $Id: munge_defs.h,v 1.23 2004/05/06 01:41:12 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -40,10 +40,6 @@
  */
 #define MUNGE_CRED_SUFFIX               ":"
 
-/*  Current version of the munge credential format.
- */
-#define MUNGE_CRED_VERSION              2
-
 /*  Amount of salt (in bytes) encoded into a credential.
  */
 #define MUNGE_CRED_SALT_LEN             8
@@ -77,10 +73,6 @@
 /*  Integer (uint32_t) sentinel for valid munge message.
  */
 #define MUNGE_MSG_MAGIC                 0x00606D4B
-
-/*  Current version of the munge client-server message format.
- */
-#define MUNGE_MSG_VERSION               1
 
 /*  Socket backlog for the server listening on the unix domain socket.
  */
