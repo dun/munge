@@ -1,4 +1,4 @@
-.\" $Id: munged.8.in,v 1.3 2004/11/18 19:55:44 dun Exp $
+.\" $Id: munged.8.in,v 1.4 2004/11/30 20:18:19 dun Exp $
 
 .TH MUNGED 8 "@DATE@" "@PACKAGE@-@VERSION@" "Munge Uid 'N' Gid Emporium"
 
@@ -43,7 +43,8 @@ Display license information.
 Display version information.
 .TP
 .BI "-f, --force"
-Force the process to run if at all possible.
+Force the process to run if at all possible.  This overrides warnings such
+as an existing local domain socket or a lack of entropy for the PRNG.
 .TP
 .BI "-F, --foreground"
 Run the process in the foreground.

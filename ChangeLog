@@ -1,3 +1,7 @@
+2004-11-30  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/munged/munged.8.in: Updated info for '--force' cmdline opt.
+
 2004-11-29  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/munged/conf.c: Added <sys/socket.h> for AF_INET.
@@ -30,7 +34,7 @@
 	  Renamed src/libcommon/msg.[ch] to m_msg.[ch].
 	  Renamed src/libmunge/msg_client.[ch] to m_msg_client.[ch].
 	  Changed "msg_" prefix to "m_msg_".  All callers changed.
-	  Fixed "previous declaration of `msg_t'" error under AIX.
+	  Fixed "previous declaration of 'msg_t'" error under AIX.
 
 	* src/libmunge/Makefile.am:
 	  Added -export-symbols-regex to libmunge.
