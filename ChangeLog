@@ -1,6 +1,11 @@
+2004-03-19  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/libcommon/munge_msg.c, src/munge/unmunge.c, src/munged/conf.c:
+	  Minor tweaks for FreeBSD.
+
 2004-03-18  Chris Dunlap  <cdunlap@llnl.gov>
 
-	* bootstrap: Forced replacement of existing bootstrap-related files.
+	* bootstrap: Force replacement of existing bootstrap-related files.
 
 	* config/mkinstalldirs: Updated with latest version from automake-1.8.
 

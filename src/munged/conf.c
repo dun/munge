@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: conf.c,v 1.14 2004/03/16 23:03:22 dun Exp $
+ *  $Id: conf.c,v 1.15 2004/03/19 23:39:01 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -29,13 +29,14 @@
 #  include <config.h>
 #endif /* HAVE_CONFIG_H */
 
+#include <sys/types.h>                  /* include before in.h for bsd */
+#include <netinet/in.h>                 /* include before inet.h for bsd */
 #include <arpa/inet.h>                  /* for inet_ntoa() */
 #include <assert.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <munge.h>
 #include <netdb.h>                      /* for gethostbyname() */
-#include <netinet/in.h>                 /* for struct in_addr */
 #include <stdlib.h>
 #include <string.h>
 #include <sys/param.h>                  /* for MAXHOSTNAMELEN */

@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munge_msg.c,v 1.14 2004/03/11 21:04:39 dun Exp $
+ *  $Id: munge_msg.c,v 1.15 2004/03/19 23:39:01 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -130,10 +130,10 @@ _munge_msg_send (munge_msg_t m)
     m->head.length += m1->data_len;
     m->head.length += m1->error_len;
 
-    iov[0].iov_base = &(m->head);
+    iov[0].iov_base = (char *) &(m->head);
     iov[0].iov_len = sizeof (m->head);
 
-    iov[1].iov_base = m1;
+    iov[1].iov_base = (char *) m1;
     iov[1].iov_len = sizeof (*m1);
 
     iov[2].iov_base = m1->realm;

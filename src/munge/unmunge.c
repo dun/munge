@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: unmunge.c,v 1.20 2004/03/16 23:03:22 dun Exp $
+ *  $Id: unmunge.c,v 1.21 2004/03/19 23:39:01 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -29,6 +29,8 @@
 #  include "config.h"
 #endif /* HAVE_CONFIG_H */
 
+#include <sys/types.h>                  /* include before in.h for bsd       */
+#include <netinet/in.h>                 /* include before inet.h for bsd     */
 #include <arpa/inet.h>                  /* for inet_ntoa()                   */
 #include <assert.h>
 #include <errno.h>
@@ -42,7 +44,6 @@
 #include <string.h>
 #include <sys/socket.h>                 /* for AF_INET                       */
 #include <sys/stat.h>
-#include <sys/types.h>
 #include <time.h>
 #include <unistd.h>
 #include <munge.h>
