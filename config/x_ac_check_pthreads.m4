@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: x_ac_check_pthreads.m4,v 1.1 2004/03/25 00:14:57 dun Exp $
+## $Id: x_ac_check_pthreads.m4,v 1.2 2004/05/01 05:22:27 dun Exp $
 ##*****************************************************************************
 #  AUTHOR:
 #    Chris Dunlap <cdunlap@llnl.gov>
@@ -16,31 +16,34 @@
 #      <http://pauillac.inria.fr/~xleroy/linuxthreads/faq.html#H>.
 ##*****************************************************************************
 
-AC_DEFUN([X_AC_CHECK_PTHREADS],
-[ AC_CACHE_CHECK(
+AC_DEFUN([X_AC_CHECK_PTHREADS], [
+  AC_CACHE_CHECK(
     [how to link against pthreads],
-    [x_ac_cv_check_pthreads],
-    [
+    [x_ac_cv_check_pthreads], [
       LIBPTHREAD=""
       _x_ac_check_pthreads_libs_save="$LIBS"
       for flag in -lpthread -pthread; do
         LIBS="$flag"
-        AC_LINK_IFELSE(
-          [AC_LANG_PROGRAM(
+        AC_LINK_IFELSE([
+          AC_LANG_PROGRAM(
             [[#include <pthread.h>]],
-            [[pthread_join (0, 0);]])],
+            [[pthread_join (0, 0);]]
+          )],
           [x_ac_cv_check_pthreads="$flag"; break],
-          [x_ac_cv_check_pthreads=FAILED])
+          [x_ac_cv_check_pthreads=FAILED]
+        )
       done
-      LIBS="$_x_ac_check_pthreads_libs_save"
-    ])
+      LIBS="$_x_ac_check_pthreads_libs_save" ]
+  )
   if test "$x_ac_cv_check_pthreads" = "FAILED"; then
     AC_MSG_FAILURE([cannot link against pthreads])
   fi
   LIBPTHREAD="$x_ac_cv_check_pthreads"
   AC_SUBST(LIBPTHREAD)
   AC_DEFINE([_REENTRANT], [1],
-    [Define to 1 if you plan to link against multithreaded code.])
+    [Define to 1 if you plan to link against multithreaded code.]
+  )
   AC_DEFINE([_THREAD_SAFE], [1],
-    [Define to 1 if you plan to link against multithreaded code.])
-])
+    [Define to 1 if you plan to link against multithreaded code.]
+  )]
+)

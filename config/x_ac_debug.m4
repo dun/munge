@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: x_ac_debug.m4,v 1.3 2004/04/01 01:03:24 dun Exp $
+## $Id: x_ac_debug.m4,v 1.4 2004/05/01 05:22:27 dun Exp $
 ##*****************************************************************************
 #  AUTHOR:
 #    Chris Dunlap <cdunlap@llnl.gov>
@@ -17,8 +17,8 @@
 #    This macro must be placed after AC_PROG_CC or equivalent.
 ##*****************************************************************************
 
-AC_DEFUN([X_AC_DEBUG],
-[ AC_MSG_CHECKING([whether debugging is enabled])
+AC_DEFUN([X_AC_DEBUG], [
+  AC_MSG_CHECKING([whether debugging is enabled])
   AC_ARG_ENABLE(
     [debug],
     AS_HELP_STRING([--enable-debug], [enable debugging code for development]),
@@ -28,7 +28,8 @@ AC_DEFUN([X_AC_DEBUG],
           *) AC_MSG_RESULT([doh!])
              AC_MSG_ERROR([bad value "$enableval" for --enable-debug]) ;;
       esac
-    ])
+    ]
+  )
   if test "$x_ac_debug" = yes; then
     if test -z "$ac_save_CFLAGS"; then
       test "$ac_cv_prog_cc_g" = yes && _x_ac_debug_g="-g" || _x_ac_debug_g=""
@@ -39,7 +40,9 @@ AC_DEFUN([X_AC_DEBUG],
       test "$GCC" = yes && CFLAGS="-O2 -Wall" || CFLAGS="-O"
     fi
     AC_DEFINE([NDEBUG], [1],
-      [Define to 1 if you are building a production release.])
+      [Define to 1 if you are building a production release.]
+    )
   fi
   AC_MSG_RESULT([${x_ac_debug=no}])
-])
+  ]
+)

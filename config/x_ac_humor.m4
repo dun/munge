@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: x_ac_humor.m4,v 1.2 2004/03/12 00:33:48 dun Exp $
+## $Id: x_ac_humor.m4,v 1.3 2004/05/01 05:22:27 dun Exp $
 ##*****************************************************************************
 #  AUTHOR:
 #    Chris Dunlap <cdunlap@llnl.gov>
@@ -11,12 +11,12 @@
 #    Check for random silliness.
 ##*****************************************************************************
 
-AC_DEFUN([X_AC_HUMOR],
-[ AC_CACHE_CHECK(
+AC_DEFUN([X_AC_HUMOR], [
+  AC_CACHE_CHECK(
     [for a sense of humor],
-    [x_ac_cv_humor],
-    [
-      x_ac_cv_humor=no
-      true && x_ac_cv_humor=yes
-    ])
-])
+    [x_ac_cv_humor], [
+      AS_VAR_SET(x_ac_cv_humor, no)
+      AS_IF([true], AS_VAR_SET(x_ac_cv_humor, yes))
+    ]
+  )]
+)

@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: x_ac_meta.m4,v 1.3 2004/03/12 00:33:48 dun Exp $
+## $Id: x_ac_meta.m4,v 1.4 2004/05/01 05:22:27 dun Exp $
 ##*****************************************************************************
 #  AUTHOR:
 #    Chris Dunlap <cdunlap@llnl.gov>
@@ -11,8 +11,8 @@
 #    Set PACKAGE and VERSION from the META file.
 ##*****************************************************************************
 
-AC_DEFUN([X_AC_META],
-[ AC_MSG_CHECKING([metadata])
+AC_DEFUN([X_AC_META], [
+  AC_MSG_CHECKING([metadata])
 
   _x_ac_meta_got_file=no
   if test -f "$srcdir/META"; then
@@ -28,4 +28,5 @@ AC_DEFUN([X_AC_META],
   fi
 
   AC_MSG_RESULT([$_x_ac_meta_got_file])
-])
+  ]
+)

@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: x_ac_check_cond_lib.m4,v 1.3 2004/04/09 01:44:32 dun Exp $
+## $Id: x_ac_check_cond_lib.m4,v 1.4 2004/05/01 05:22:27 dun Exp $
 ##*****************************************************************************
 #  AUTHOR:
 #    Chris Dunlap <cdunlap@llnl.gov>
@@ -20,22 +20,25 @@
 #    Also note that this checks to see if the library is even needed at all.
 ##*****************************************************************************
 
-AC_DEFUN([X_AC_CHECK_COND_LIB],
-[ AC_CACHE_CHECK(
+AC_DEFUN([X_AC_CHECK_COND_LIB], [
+  AC_CACHE_CHECK(
     [for $2 in default libs],
-    [x_ac_cv_lib_none_$2],
-    [ AC_LINK_IFELSE(
-        AC_LANG_CALL([], [$2]),
-        [AS_VAR_SET(x_ac_cv_lib_none_$2, yes)],
-        [AS_VAR_SET(x_ac_cv_lib_none_$2, no)])
-    ])
+    [x_ac_cv_lib_none_$2], [
+    AC_LINK_IFELSE(
+      AC_LANG_CALL([], [$2]),
+      AS_VAR_SET(x_ac_cv_lib_none_$2, yes),
+      AS_VAR_SET(x_ac_cv_lib_none_$2, no)
+    )]
+  )
   AS_IF([test AS_VAR_GET(x_ac_cv_lib_none_$2) = no],
     AC_CHECK_LIB(
       [$1],
-      [$2],
-      [ AH_CHECK_LIB([$1])
+      [$2], [
+        AH_CHECK_LIB([$1])
         AS_TR_CPP([LIB$1])="-l$1";
         AC_SUBST(AS_TR_CPP([LIB$1]))
         AC_DEFINE_UNQUOTED(AS_TR_CPP([HAVE_LIB$1]))
-      ]))
-])
+      ]
+    )
+  )]
+)
