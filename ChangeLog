@@ -1,3 +1,8 @@
+2004-11-17  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/libcommon/str.c, src/munged/auth_recv.c, src/munged/hash.c,
+	  src/munged/munged.c: Tweaked formatting.
+
 2004-11-11  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* configure.ac: Tweaked inet_ntop replacement test for Solaris.

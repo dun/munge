@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munged.c,v 1.18 2004/11/12 02:09:59 dun Exp $
+ *  $Id: munged.c,v 1.19 2004/11/17 21:53:15 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -117,12 +117,12 @@ main (int argc, char *argv[])
     random_init (conf->seed_name);
     crypto_thread_init ();
     create_subkeys (conf);
-    conf->gids = gids_create();
+    conf->gids = gids_create ();
     replay_init ();
     timer_init ();
 
     log_msg (LOG_NOTICE, "Starting %s daemon %s (pid %d)",
-        PACKAGE, VERSION, (int) getpid());
+        PACKAGE, VERSION, (int) getpid ());
 
     sock_create (conf);
     job_accept (conf);
@@ -136,7 +136,7 @@ main (int argc, char *argv[])
     destroy_conf (conf);
 
     log_msg (LOG_NOTICE, "Stopping %s daemon %s (pid %d)",
-        PACKAGE, VERSION, (int) getpid());
+        PACKAGE, VERSION, (int) getpid ());
 
     exit (EMUNGE_SUCCESS);
 }

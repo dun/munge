@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: str.c,v 1.6 2004/04/03 21:53:00 dun Exp $
+ *  $Id: str.c,v 1.7 2004/11/17 21:53:15 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -82,7 +82,7 @@ strcatf (char *dst, size_t size, const char *fmt, ...)
     int      nleft;
 
     if (!dst || !size) {
-        return(0);
+        return (0);
     }
     p = dst;
     q = dst + size;
@@ -101,15 +101,15 @@ strcatf (char *dst, size_t size, const char *fmt, ...)
     if (nleft <= 1) {                   /* dst already full */
         return (-1);
     }
-    va_start(vargs, fmt);
-    n = vsnprintf(p, nleft, fmt, vargs);
-    va_end(vargs);
+    va_start (vargs, fmt);
+    n = vsnprintf (p, nleft, fmt, vargs);
+    va_end (vargs);
 
     if ((n < 0) || (n >= nleft)) {
         dst[size - 1] = '\0';           /* ensure dst is NUL-terminated */
-        return(-1);
+        return (-1);
     }
-    return(len + n);
+    return (len + n);
 }
 
 

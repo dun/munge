@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: hash.c,v 1.6 2004/09/16 20:16:14 dun Exp $
+ *  $Id: hash.c,v 1.7 2004/11/17 21:53:15 dun Exp $
  *  LSD-Id: hash.c,v 1.8 2003/11/19 23:33:48 dun Exp
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
@@ -261,7 +261,7 @@ hash_insert (hash_t h, const void *key, void *data)
             goto end;
         }
     }
-    if (!(p = hash_node_alloc())) {
+    if (!(p = hash_node_alloc ())) {
         data = lsd_nomem_error (__FILE__, __LINE__, "hash_insert");
         goto end;
     }

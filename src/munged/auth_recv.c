@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: auth_recv.c,v 1.8 2004/11/09 21:54:28 dun Exp $
+ *  $Id: auth_recv.c,v 1.9 2004/11/17 21:53:15 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -46,7 +46,7 @@ void
 auth_recv_init (void)
 {
 #ifdef MUNGE_AUTH_RECVFD_MKNOD
-    if (geteuid() != 0) {
+    if (geteuid () != 0) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
             "The munge daemon requires root privileges");
     }
