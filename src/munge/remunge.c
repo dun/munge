@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: remunge.c,v 1.7 2004/09/04 08:27:45 dun Exp $
+ *  $Id: remunge.c,v 1.8 2004/09/10 00:54:16 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -349,6 +349,7 @@ parse_cmdline (conf_t conf, int argc, char **argv)
     int            c;
     char          *p;
     int            i;
+    long int       l;
     unsigned long  u;
     int            multiplier;
     munge_err_t    e;
@@ -432,41 +433,41 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                 conf->do_decode = 1;
                 break;
             case 'l':
-                i = strtol (optarg, &p, 10);
+                l = strtol (optarg, &p, 10);
                 if ((optarg == p) || ((*p != '\0') && *(p+1) != '\0')
-                        || (i < 0)) {
+                        || (l < 0)) {
                     log_err (EMUNGE_SNAFU, LOG_ERR,
                         "Invalid number of bytes '%s'", optarg);
                 }
-                if ((i == LONG_MAX) && (errno == ERANGE)) {
+                if (((l == LONG_MAX) && (errno == ERANGE)) || (l > INT_MAX)) {
                     log_err (EMUNGE_SNAFU, LOG_ERR,
-                        "Exceeded maximum number of %d bytes", LONG_MAX);
+                        "Exceeded maximum number of %d bytes", INT_MAX);
                 }
                 if (!(multiplier = get_si_multiple (*p))) {
                     log_err (EMUNGE_SNAFU, LOG_ERR,
                         "Invalid number specifier '%c'", *p);
                 }
-                if (i > (LONG_MAX / multiplier)) {
+                if (l > (INT_MAX / multiplier)) {
                     log_err (EMUNGE_SNAFU, LOG_ERR,
-                        "Exceeded maximum number of %d bytes", LONG_MAX);
+                        "Exceeded maximum number of %d bytes", INT_MAX);
                 }
-                conf->num_payload = i * multiplier;
+                conf->num_payload = (int) (l * multiplier);
                 break;
             case 't':
-                i = strtol (optarg, &p, 10);
+                l = strtol (optarg, &p, 10);
                 if ((optarg == p) || (*p != '\0')) {
                     log_err (EMUNGE_SNAFU, LOG_ERR,
                         "Invalid time-to-live '%s'", optarg);
                 }
-                if ((i == LONG_MAX) && (errno == ERANGE)) {
+                if (((l == LONG_MAX) && (errno == ERANGE)) || (l > INT_MAX)) {
                     log_err (EMUNGE_SNAFU, LOG_ERR,
                         "Exceeded maximum time-to-live of %d seconds",
-                        LONG_MAX);
+                        INT_MAX);
                 }
-                if (i < 0) {
-                    i = MUNGE_TTL_MAXIMUM;
+                if (l < 0) {
+                    l = MUNGE_TTL_MAXIMUM;
                 }
-                e = munge_ctx_set (conf->ctx, MUNGE_OPT_TTL, i);
+                e = munge_ctx_set (conf->ctx, MUNGE_OPT_TTL, (int) l);
                 if (e != EMUNGE_SUCCESS) {
                     log_err (EMUNGE_SNAFU, LOG_ERR,
                         "Unable to set time-to-live: %s",
@@ -482,24 +483,24 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                 }
                 break;
             case 'D':
-                i = strtol (optarg, &p, 10);
+                l = strtol (optarg, &p, 10);
                 if ((optarg == p) || ((*p != '\0') && (*(p+1) != '\0'))) {
                     log_err (EMUNGE_SNAFU, LOG_ERR,
                         "Invalid duration '%s'", optarg);
                 }
-                if ((i == LONG_MAX) && (errno == ERANGE)) {
+                if (((l == LONG_MAX) && (errno == ERANGE)) || (l > INT_MAX)) {
                     log_err (EMUNGE_SNAFU, LOG_ERR,
-                        "Exceeded maximum duration of %d seconds", LONG_MAX);
+                        "Exceeded maximum duration of %d seconds", INT_MAX);
                 }
                 if (!(multiplier = get_time_multiple (*p))) {
                     log_err (EMUNGE_SNAFU, LOG_ERR,
                         "Invalid duration specifier '%c'", *p);
                 }
-                if (i > (LONG_MAX / multiplier)) {
+                if (l > (INT_MAX / multiplier)) {
                     log_err (EMUNGE_SNAFU, LOG_ERR,
-                        "Exceeded maximum duration of %d seconds", LONG_MAX);
+                        "Exceeded maximum duration of %d seconds", INT_MAX);
                 }
-                conf->num_seconds = i * multiplier;
+                conf->num_seconds = (int) (l * multiplier);
                 break;
             case 'N':
                 u = strtoul (optarg, &p, 10);
@@ -524,31 +525,31 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                 conf->num_creds = u * multiplier;
                 break;
             case 'T':
-                i = strtol (optarg, &p, 10);
-                if ((optarg == p) || (*p != '\0') || (i < 1)) {
+                l = strtol (optarg, &p, 10);
+                if ((optarg == p) || (*p != '\0') || (l < 1)) {
                     log_err (EMUNGE_SNAFU, LOG_ERR,
                         "Invalid number of threads '%s'", optarg);
                 }
-                if (((i == LONG_MAX) && (errno == ERANGE))
-                        || (i > conf->max_threads)) {
+                if (((l == LONG_MAX) && (errno == ERANGE))
+                        || (l > conf->max_threads)) {
                     log_err (EMUNGE_SNAFU, LOG_ERR,
                         "Exceeded maximum number of %d thread%s",
                         conf->max_threads,
                         (conf->max_threads == 1) ? "" : "s");
                 }
-                conf->num_threads = i;
+                conf->num_threads = (int) l;
                 break;
             case 'W':
-                i = strtol (optarg, &p, 10);
-                if ((optarg == p) || (*p != '\0') || (i < 1)) {
+                l = strtol (optarg, &p, 10);
+                if ((optarg == p) || (*p != '\0') || (l < 1)) {
                     log_err (EMUNGE_SNAFU, LOG_ERR,
                         "Invalid number of seconds '%s'", optarg);
                 }
-                if ((i == LONG_MAX) && (errno == ERANGE)) {
+                if (((l == LONG_MAX) && (errno == ERANGE)) || (l > INT_MAX)) {
                     log_err (EMUNGE_SNAFU, LOG_ERR,
-                        "Exceeded maximum number of %d seconds", LONG_MAX);
+                        "Exceeded maximum number of %d seconds", INT_MAX);
                 }
-                conf->warn_time = i;
+                conf->warn_time = (int) l;
                 break;
             case '?':
                 if (optopt > 0) {
@@ -897,7 +898,7 @@ process_creds (conf_t conf)
         to.tv_nsec = conf->t_main_start.tv_usec * 1e3;
     }
     else {
-        to.tv_sec = LONG_MAX;           /* FIXME by 2038 */
+        to.tv_sec = LONG_MAX;
         to.tv_nsec = 0;
     }
     /*  Recompute the number of seconds in case the specified duration

@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munge.c,v 1.35 2004/09/03 18:39:20 dun Exp $
+ *  $Id: munge.c,v 1.36 2004/09/10 00:54:16 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -222,13 +222,14 @@ destroy_conf (conf_t conf)
 void
 parse_cmdline (conf_t conf, int argc, char **argv)
 {
-    char           *prog;
-    int             c;
-    char           *p;
-    munge_err_t     e;
-    int             i = 0;              /* suppress false compiler warning */
-    struct passwd  *pw_ptr;
-    struct group   *gr_ptr;
+    char          *prog;
+    int            c;
+    char          *p;
+    munge_err_t    e;
+    int            i;
+    long int       l;
+    struct passwd *pw_ptr;
+    struct group  *gr_ptr;
 
     opterr = 0;                         /* suppress default getopt err msgs */
 
@@ -360,20 +361,20 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                 }
                 break;
             case 't':
-                i = strtol (optarg, &p, 10);
+                l = strtol (optarg, &p, 10);
                 if ((optarg == p) || (*p != '\0')) {
                     log_err (EMUNGE_SNAFU, LOG_ERR,
                         "Invalid time-to-live '%s'", optarg);
                 }
-                if ((i == LONG_MAX) && (errno == ERANGE)) {
+                if (((l == LONG_MAX) && (errno == ERANGE)) || (l > INT_MAX)) {
                     log_err (EMUNGE_SNAFU, LOG_ERR,
                         "Exceeded maximum time-to-live of %d seconds",
-                        LONG_MAX);
+                        INT_MAX);
                 }
-                if (i < 0) {
-                    i = MUNGE_TTL_MAXIMUM;
+                if (l < 0) {
+                    l = MUNGE_TTL_MAXIMUM;
                 }
-                e = munge_ctx_set (conf->ctx, MUNGE_OPT_TTL, i);
+                e = munge_ctx_set (conf->ctx, MUNGE_OPT_TTL, (int) l);
                 if (e != EMUNGE_SUCCESS) {
                     log_err (EMUNGE_SNAFU, LOG_ERR,
                         "Unable to set time-to-live: %s",

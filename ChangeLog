@@ -1,3 +1,8 @@
+2004-09-09  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/munge/munge.c, src/munge/remunge.c:
+	  Fixed strtol() int/long mismatches for 64-bit platforms.
+
 2004-09-07  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/munged/gids.h: Changed GIDS_HASH_SIZE from 1213 to 2053.
