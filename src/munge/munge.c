@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munge.c,v 1.24 2004/04/16 22:15:06 dun Exp $
+ *  $Id: munge.c,v 1.25 2004/05/01 05:00:24 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -221,7 +221,7 @@ parse_cmdline (conf_t conf, int argc, char **argv)
     int             c;
     char           *p;
     munge_err_t     e;
-    int             i;
+    int             i = 0;              /* suppress false compiler warning */
     struct passwd  *pw_ptr;
     struct group   *gr_ptr;
 
