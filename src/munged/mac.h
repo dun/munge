@@ -1,11 +1,11 @@
 /*****************************************************************************
- *  $Id: mac.h,v 1.1 2003/04/08 18:16:16 dun Exp $
+ *  $Id: mac.h,v 1.2 2004/02/05 21:36:03 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
  *  UCRL-CODE-2003-???.
  *
- *  Copyright (C) 2003 The Regents of the University of California.
+ *  Copyright (C) 2003-2004 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
  *  Written by Chris Dunlap <cdunlap@llnl.gov>.
  *
@@ -62,14 +62,14 @@ int mac_init (mac_ctx *x, const EVP_MD *md,
  *  Returns 0 on success, or -1 on error.
  */
 
-int mac_update (mac_ctx *x, const void *src, unsigned int srclen);
+int mac_update (mac_ctx *x, const void *src, int srclen);
 /*
  *  Updates the MAC context [x], reading [srclen] bytes from [src].
  *    This can be called multiple times to process successive blocks of data.
  *  Returns 0 on success, or -1 on error.
  */
 
-int mac_final (mac_ctx *x, void *dst, unsigned int *dstlen);
+int mac_final (mac_ctx *x, void *dst, int *dstlen);
 /*
  *  Finalizes the MAC context [x], placing the MAC in [dst] which must
  *    have sufficient space for the message digest output (mac_size).
@@ -90,8 +90,7 @@ int mac_size (const EVP_MD *md);
  */
 
 int mac_block (const EVP_MD *md, const void *key, int keylen,
-               void *dst, unsigned int *dstlen,
-               const void *src, unsigned int srclen);
+               void *dst, int *dstlen, const void *src, int srclen);
 /*
  *  Computes the MAC without the need of a context; this requires
  *    the [src] to be contiguous.

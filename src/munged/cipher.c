@@ -1,11 +1,11 @@
 /*****************************************************************************
- *  $Id: cipher.c,v 1.2 2003/04/18 23:18:42 dun Exp $
+ *  $Id: cipher.c,v 1.3 2004/02/05 21:36:03 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
  *  UCRL-CODE-2003-???.
  *
- *  Copyright (C) 2003 The Regents of the University of California.
+ *  Copyright (C) 2003-2004 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
  *  Written by Chris Dunlap <cdunlap@llnl.gov>.
  *
@@ -88,8 +88,8 @@ cipher_init (cipher_ctx *x, const EVP_CIPHER *ci,
 
 
 int
-cipher_update (cipher_ctx *x, void *dst, unsigned int *dstlen,
-               const void *src, unsigned int srclen)
+cipher_update (cipher_ctx *x, void *dst, int *dstlen,
+               const void *src, int srclen)
 {
     assert (x != NULL);
     assert (x->magic == CIPHER_MAGIC);
@@ -108,7 +108,7 @@ cipher_update (cipher_ctx *x, void *dst, unsigned int *dstlen,
 
 
 int
-cipher_final (cipher_ctx *x, void *dst, unsigned int *dstlen)
+cipher_final (cipher_ctx *x, void *dst, int *dstlen)
 {
     assert (x != NULL);
     assert (x->magic == CIPHER_MAGIC);

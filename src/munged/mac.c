@@ -1,11 +1,11 @@
 /*****************************************************************************
- *  $Id: mac.c,v 1.2 2003/04/18 23:19:06 dun Exp $
+ *  $Id: mac.c,v 1.3 2004/02/05 21:36:03 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
  *  UCRL-CODE-2003-???.
  *
- *  Copyright (C) 2003 The Regents of the University of California.
+ *  Copyright (C) 2003-2004 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
  *  Written by Chris Dunlap <cdunlap@llnl.gov>.
  *
@@ -77,7 +77,7 @@ mac_init (mac_ctx *x, const EVP_MD *md, const void *key, int keylen)
 
 
 int
-mac_update (mac_ctx *x, const void *src, unsigned int srclen)
+mac_update (mac_ctx *x, const void *src, int srclen)
 {
     assert (x != NULL);
     assert (x->magic == MAC_MAGIC);
@@ -90,14 +90,14 @@ mac_update (mac_ctx *x, const void *src, unsigned int srclen)
 
 
 int
-mac_final (mac_ctx *x, void *dst, unsigned int *dstlen)
+mac_final (mac_ctx *x, void *dst, int *dstlen)
 {
     assert (x != NULL);
     assert (x->magic == MAC_MAGIC);
     assert (x->finalized != 1);
     assert (dst != NULL);
 
-    HMAC_Final (&(x->ctx), dst, dstlen);
+    HMAC_Final (&(x->ctx), dst, (unsigned int *) dstlen);
     assert (x->finalized = 1);
     return (0);
 }
@@ -129,15 +129,14 @@ mac_size (const EVP_MD *md)
 
 int
 mac_block (const EVP_MD *md, const void *key, int keylen,
-           void *dst, unsigned int *dstlen,
-           const void *src, unsigned int srclen)
+           void *dst, int *dstlen, const void *src, int srclen)
 {
     assert (md != NULL);
     assert (key != NULL);
     assert (src != NULL);
     assert (dst != NULL);
 
-    HMAC (md, key, keylen, src, srclen, dst, dstlen);
+    HMAC (md, key, keylen, src, srclen, dst, (unsigned int *) dstlen);
 
     return (0);
 }

@@ -1,11 +1,11 @@
 /*****************************************************************************
- *  $Id: base64.c,v 1.1 2003/04/08 18:16:16 dun Exp $
+ *  $Id: base64.c,v 1.2 2004/02/05 21:36:03 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
  *  UCRL-CODE-2003-???.
  *
- *  Copyright (C) 2003 The Regents of the University of California.
+ *  Copyright (C) 2003-2004 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
  *  Written by Chris Dunlap <cdunlap@llnl.gov>.
  *
@@ -115,12 +115,14 @@ base64_init (base64_ctx *x)
 
 
 int
-base64_encode_update (base64_ctx *x, void *dst, unsigned int *dstlen,
-                      const void *src, unsigned int srclen)
+base64_encode_update (base64_ctx *x, void *vdst, int *dstlen,
+                      const void *vsrc, int srclen)
 {
     int n;
     int num_read;
     int num_write;
+    unsigned char *dst = (unsigned char *) vdst;
+    unsigned char *src = (unsigned char *) vsrc;
 
     assert (x != NULL);
     assert (x->magic == BASE64_MAGIC);
@@ -166,7 +168,7 @@ base64_encode_update (base64_ctx *x, void *dst, unsigned int *dstlen,
 
 
 int
-base64_encode_final (base64_ctx *x, void *dst, unsigned int *dstlen)
+base64_encode_final (base64_ctx *x, void *dst, int *dstlen)
 {
     assert (x != NULL);
     assert (x->magic == BASE64_MAGIC);
@@ -189,8 +191,8 @@ base64_encode_final (base64_ctx *x, void *dst, unsigned int *dstlen)
 
 
 int
-base64_decode_update (base64_ctx *x, void *dst, unsigned int *dstlen,
-                      const void *src, unsigned int srclen)
+base64_decode_update (base64_ctx *x, void *dst, int *dstlen,
+                      const void *src, int srclen)
 {
 /*  Context [x] should only be NULL when called via base64_decode_block().
  */
@@ -269,7 +271,7 @@ base64_decode_update (base64_ctx *x, void *dst, unsigned int *dstlen,
 
 
 int
-base64_decode_final (base64_ctx *x, void *dst, unsigned int *dstlen)
+base64_decode_final (base64_ctx *x, void *dst, int *dstlen)
 {
     int rc = 0;
 
@@ -299,8 +301,7 @@ base64_cleanup (base64_ctx *x)
 
 
 int
-base64_encode_block (void *dst, unsigned int *dstlen,
-                     const void *src, unsigned int srclen)
+base64_encode_block (void *dst, int *dstlen, const void *src, int srclen)
 {
     unsigned char       *pdst;
     const unsigned char *psrc;
@@ -339,8 +340,7 @@ base64_encode_block (void *dst, unsigned int *dstlen,
 
 
 int
-base64_decode_block (void *dst, unsigned int *dstlen,
-                     const void *src, unsigned int srclen)
+base64_decode_block (void *dst, int *dstlen, const void *src, int srclen)
 {
     return (base64_decode_update (NULL, dst, dstlen, src, srclen));
 }

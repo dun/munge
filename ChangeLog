@@ -1,3 +1,10 @@
+2004-02-05  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/libmunge/encode.c, src/munge/read.c, src/munged/base64.c,
+	  src/munged/base64.h, src/munged/cipher.c, src/munged/cipher.h,
+	  src/munged/mac.c, src/munged/mac.h, src/munged/md.c, src/munged/md.h:
+	  Pedantic tweaks for AIX compiler.
+
 2004-01-30  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/munged/auth.c: Added support for getpeereid().

@@ -1,11 +1,11 @@
 /*****************************************************************************
- *  $Id: md.c,v 1.2 2003/04/18 23:19:18 dun Exp $
+ *  $Id: md.c,v 1.3 2004/02/05 21:36:03 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
  *  UCRL-CODE-2003-???.
  *
- *  Copyright (C) 2003 The Regents of the University of California.
+ *  Copyright (C) 2003-2004 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
  *  Written by Chris Dunlap <cdunlap@llnl.gov>.
  *
@@ -78,7 +78,7 @@ md_init (md_ctx *x, const EVP_MD *md)
 
 
 int
-md_update (md_ctx *x, const void *src, unsigned int srclen)
+md_update (md_ctx *x, const void *src, int srclen)
 {
     assert (x != NULL);
     assert (x->magic == MD_MAGIC);
@@ -86,17 +86,17 @@ md_update (md_ctx *x, const void *src, unsigned int srclen)
     assert (src != NULL);
 
 #if HAVE_EVP_DIGESTINIT_EX
-    if (!(EVP_DigestUpdate (&(x->ctx), src, srclen)))
+    if (!(EVP_DigestUpdate (&(x->ctx), src, (unsigned int) srclen)))
         return (-1);
 #else  /* !HAVE_EVP_DIGESTINIT_EX */
-    EVP_DigestUpdate (&(x->ctx), src, srclen);
+    EVP_DigestUpdate (&(x->ctx), src, (unsigned int) srclen);
 #endif /* !HAVE_EVP_DIGESTINIT_EX */
     return (0);
 }
 
 
 int
-md_final (md_ctx *x, void *dst, unsigned int *dstlen)
+md_final (md_ctx *x, void *dst, int *dstlen)
 {
     assert (x != NULL);
     assert (x->magic == MD_MAGIC);
@@ -104,10 +104,10 @@ md_final (md_ctx *x, void *dst, unsigned int *dstlen)
     assert (dst != NULL);
 
 #if HAVE_EVP_DIGESTINIT_EX
-    if (!(EVP_DigestFinal_ex (&(x->ctx), dst, dstlen)))
+    if (!(EVP_DigestFinal_ex (&(x->ctx), dst, (unsigned int *) dstlen)))
         return (-1);
 #else  /* !HAVE_EVP_DIGESTINIT_EX */
-    EVP_DigestFinal (&(x->ctx), dst, dstlen);
+    EVP_DigestFinal (&(x->ctx), dst, (unsigned int *) dstlen);
 #endif /* !HAVE_EVP_DIGESTINIT_EX */
     assert (x->finalized = 1);
     return (0);

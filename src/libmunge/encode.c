@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: encode.c,v 1.7 2004/01/16 02:18:37 dun Exp $
+ *  $Id: encode.c,v 1.8 2004/02/05 21:36:03 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -249,6 +249,6 @@ encode_rsp_v1 (munge_msg_t m, char **cred)
     /*
      *  Return the credential to the caller.
      */
-    *cred = p;
+    *cred = (char *) p;
     return (m1->error_num);
 }

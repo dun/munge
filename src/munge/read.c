@@ -1,11 +1,11 @@
 /*****************************************************************************
- *  $Id: read.c,v 1.2 2003/02/18 19:46:20 dun Exp $
+ *  $Id: read.c,v 1.3 2004/02/05 21:36:03 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
  *  UCRL-CODE-2003-???.
  *
- *  Copyright (C) 2003 The Regents of the University of California.
+ *  Copyright (C) 2003-2004 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
  *  Written by Chris Dunlap <cdunlap@llnl.gov>.
  *
@@ -42,12 +42,12 @@
 int
 read_data_from_file (FILE *fp, void **buf, int *len)
 {
-    void *bufmem;                       /* base ptr to buffer memory         */
-    void *buftmp;                       /* tmp ptr to bufmem for realloc's   */
-    void *bufptr;                       /* current ptr to unused bufmem      */
-    int   buflen;                       /* num bytes of unused bufmem        */
-    int   bufsiz;                       /* size allocated for bufmem         */
-    int   n;
+    unsigned char *bufmem;              /* base ptr to buffer memory         */
+    unsigned char *buftmp;              /* tmp ptr to bufmem for realloc's   */
+    unsigned char *bufptr;              /* current ptr to unused bufmem      */
+    int            buflen;              /* num bytes of unused bufmem        */
+    int            bufsiz;              /* size allocated for bufmem         */
+    int            n;
 
     assert (fp != NULL);
     assert (buf != NULL);
@@ -108,8 +108,8 @@ err:
 int
 read_data_from_string (const char *s, void **buf, int *len)
 {
-    int   n;
     char *p;
+    int   n;
 
     assert (buf != NULL);
     assert (len != NULL);

@@ -1,11 +1,11 @@
 /*****************************************************************************
- *  $Id: md.h,v 1.1 2003/04/08 18:16:16 dun Exp $
+ *  $Id: md.h,v 1.2 2004/02/05 21:36:03 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
  *  UCRL-CODE-2003-???.
  *
- *  Copyright (C) 2003 The Regents of the University of California.
+ *  Copyright (C) 2003-2004 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
  *  Written by Chris Dunlap <cdunlap@llnl.gov>.
  *
@@ -59,14 +59,14 @@ int md_init (md_ctx *x, const EVP_MD *md);
  *  Returns 0 on success, or -1 on error.
  */
 
-int md_update (md_ctx *x, const void *src, unsigned int srclen);
+int md_update (md_ctx *x, const void *src, int srclen);
 /*
  *  Updates the message digest context [x], reading [srclen] bytes from [src].
  *    This can be called multiple times to process successive blocks of data.
  *  Returns 0 on success, or -1 on error.
  */
 
-int md_final (md_ctx *x, void *dst, unsigned int *dstlen);
+int md_final (md_ctx *x, void *dst, int *dstlen);
 /*
  *  Finalizes the message digest context [x], placing the MAC in [dst] which
  *    must have sufficient space for the message digest output (md_size).
