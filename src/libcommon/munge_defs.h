@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munge_defs.h,v 1.26 2004/08/18 23:35:55 dun Exp $
+ *  $Id: munge_defs.h,v 1.27 2004/08/26 00:39:01 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -54,8 +54,10 @@
 #define MUNGE_DEFAULT_MAC               MUNGE_MAC_SHA1
 
 /*  Default munge_zip_t for compressing credentials.
+ *    Compression incurs a substantial performance penalty.
+ *    And most payloads are too small to achieve any compression.
  */
-#define MUNGE_DEFAULT_ZIP               MUNGE_ZIP_ZLIB
+#define MUNGE_DEFAULT_ZIP               MUNGE_ZIP_NONE
 
 /*  Integer for the default number of seconds before a credential expires.
  */
