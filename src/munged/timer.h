@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: timer.h,v 1.3 2004/04/03 21:53:00 dun Exp $
+ *  $Id: timer.h,v 1.4 2004/09/16 20:16:42 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -52,7 +52,8 @@ typedef void (*callback_f) (void *arg);
 
 void timer_init (void);
 /*
- *  Initialize the timer thread.  This must be called before timers are set.
+ *  Initialize the timer thread.  Timers can be set before calling this
+ *    routine, but expired timers will not be processed until it is called.
  */
 
 void timer_fini (void);
