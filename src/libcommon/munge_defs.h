@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munge_defs.h,v 1.24 2004/08/05 21:10:50 dun Exp $
+ *  $Id: munge_defs.h,v 1.25 2004/08/17 21:13:51 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -87,9 +87,8 @@
 #define MUNGE_SOCKET_CONNECT_RETRIES    5
 
 /*  Number of threads to create for processing credential requests.
- *  FIXME: Default should be 2.
  */
-#define MUNGE_THREADS                   4
+#define MUNGE_THREADS                   2
 
 /*  String specifying the pathname of the daemon's logfile.
  *  FIXME: Temporary kludge until configuration file support is added.

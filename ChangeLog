@@ -1,3 +1,7 @@
+2004-08-17  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/libcommon/munge_defs.h: Changed MUNGE_THREADS from 4 to 2.
+
 2004-08-11  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* : Re-bootstrap'd with automake-1.9.
