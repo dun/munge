@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: unmunge.c,v 1.32 2004/11/12 00:29:18 dun Exp $
+ *  $Id: unmunge.c,v 1.33 2004/11/12 01:46:06 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -546,7 +546,7 @@ display_meta (conf_t conf)
     munge_err_t     e;                  /* munge error condition             */
     struct in_addr  addr;               /* IPv4 addr                         */
     struct hostent *hptr;               /* ptr to static hostent struct      */
-    char            ip_buf[INET_ADDRSTRLEN]; /* ip addr string buffer         */
+    char            ip_buf[INET_ADDRSTRLEN]; /* ip addr string buffer        */
     time_t          t;                  /* time (seconds since epoch)        */
     struct tm      *tm_ptr;             /* ptr to broken-down time entry     */
     int             t_len;              /* length of time string             */
