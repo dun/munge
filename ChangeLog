@@ -1,3 +1,8 @@
+2004-07-23  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/munged/auth_recv.c: Fixed bug in MUNGE_AUTH_RECVFD_MKNOD codepath
+	  causing an auth pipe fd leak resulting in poor performance on aix.
+
 2004-07-21  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/munged/sock.c, src/munged/timer.c:

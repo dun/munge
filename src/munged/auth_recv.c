@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: auth_recv.c,v 1.3 2004/06/08 23:43:12 dun Exp $
+ *  $Id: auth_recv.c,v 1.4 2004/07/23 22:22:21 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -201,8 +201,7 @@ err:
 #include <sys/stream.h>                 /* queue_t */
 #include <sys/uio.h>                    /* include before stream.h for aix */
 
-static int _create_auth_pipe (const char *name);
-static int _ns_pipe (const char *name, int fd[2]);
+static int _ns_pipe (const char *name, int fds[2]);
 static int _s_pipe (int fd[2]);
 static int _name_auth_pipe (char *dst, int dstlen);
 static int _send_auth_req (int sd, const char *pipe_name);
@@ -211,7 +210,7 @@ int
 auth_recv (munge_msg_t m, uid_t *uid, gid_t *gid)
 {
     char              pipe_name [AUTH_PIPE_NAME_MAX_LEN] = "";
-    int               pipe_fd = -1;
+    int               pipe_fds[2] = {-1, -1};
     struct strrecvfd  recvfd;
 
     if (_name_auth_pipe (pipe_name, sizeof (pipe_name)) < 0) {
@@ -221,8 +220,8 @@ auth_recv (munge_msg_t m, uid_t *uid, gid_t *gid)
     /*  The auth pipe must be created in the filesystem before the auth req
      *    is sent to the client in order to prevent a race condition.
      */
-    if ((pipe_fd = _create_auth_pipe (pipe_name)) < 0) {
-        log_msg (LOG_ERR, "Unable to create auth pipe");
+    if ((_ns_pipe (pipe_name, pipe_fds)) < 0) {
+        log_msg (LOG_ERR, "Unable to create auth pipe \"%s\"", pipe_name);
         goto err;
     }
     if (_send_auth_req (m->sd, pipe_name) < 0) {
@@ -231,7 +230,7 @@ auth_recv (munge_msg_t m, uid_t *uid, gid_t *gid)
     }
     /*  FIXME: The ioctl() call could block and lead to a DoS attack.
      */
-    if (ioctl (pipe_fd, I_RECVFD, &recvfd) < 0) {
+    if (ioctl (pipe_fds[0], I_RECVFD, &recvfd) < 0) {
         log_msg (LOG_ERR, "Unable to receive client identity: %s",
             strerror (errno));
         goto err;
@@ -243,8 +242,14 @@ auth_recv (munge_msg_t m, uid_t *uid, gid_t *gid)
         log_msg (LOG_WARNING, "Unable to close auth fd from \"%s\": %s",
             pipe_name, strerror (errno));
     }
-    if (close (pipe_fd) < 0) {
-        log_msg (LOG_WARNING, "Unable to close auth pipe \"%s\": %s",
+    if (close (pipe_fds[0]) < 0) {
+        log_msg (LOG_WARNING,
+            "Unable to close auth pipe \"%s\" for reading: %s",
+            pipe_name, strerror (errno));
+    }
+    if (close (pipe_fds[1]) < 0) {
+        log_msg (LOG_WARNING,
+            "Unable to close auth pipe \"%s\" for writing: %s",
             pipe_name, strerror (errno));
     }
     if (unlink (pipe_name) < 0) {
@@ -256,31 +261,13 @@ auth_recv (munge_msg_t m, uid_t *uid, gid_t *gid)
     return (0);
 
 err:
-    if (pipe_fd >= 0)
-        close (pipe_fd);
+    if (pipe_fds[0] >= 0)
+        close (pipe_fds[0]);
+    if (pipe_fds[1] >= 0)
+        close (pipe_fds[1]);
     if (pipe_name != NULL)
         unlink (pipe_name);
     return (-1);
-}
-
-static int
-_create_auth_pipe (const char *name)
-{
-/*  Creates the authentication pipe [name].
- *  Returns the opened file descriptor on success, -1 on error.
- */
-    int fd = -1;
-    int fd_pair [2];
-
-    if (_ns_pipe (name, fd_pair) < 0) {
-        return (-1);
-    }
-    /*  Since the _ns_pipe() function associates the name with fd[0],
-     *    we need to read from fd[1] (ie, the other end of the pipe).
-     */
-    fd = fd_pair[1];
-
-    return (fd);
 }
 
 static int
@@ -291,6 +278,8 @@ _ns_pipe (const char *name, int fd[2])
  *    user can call it to create a FIFO, only root can call it for any other
  *    purpose.  Consequently, root privileges are required to create a named
  *    stream pipe.
+ *  The "write" end (ie, fd[1]) of this named stream pipe will be bound to
+ *    [name] since the client will open it by name in order to write its fd.
  *  Returns 0 on success, -1 on error.
  */
     int omask;
@@ -301,23 +290,23 @@ _ns_pipe (const char *name, int fd[2])
     if (_s_pipe (fd) < 0) {
         return (-1);
     }
-    /*  Assign the name to one end of the pipe (ie, fd[0]).
-     *  But first, determine its major/minor device numbers for mknod().
+    /*  Ensure mode is 0666, notb.
      */
-    if (fstat (fd[0], &stbuf) < 0) {
+    omask = umask (0);
+    /*
+     *  Unlink this name in case it already exists.
+     */
+    unlink (name);
+    /*
+     *  Determine the major/minor device numbers of one end of the pipe.
+     */
+    if (fstat (fd[1], &stbuf) < 0) {
         close (fd[0]);
         close (fd[1]);
         return (-1);
     }
-    /*  Unlink this name in case it already exists.
-     */
-    unlink (name);
-    /*
-     *  Ensure mode is 0666, notb.
-     */
-    omask = umask (0);
-    /*
-     *  Create the filesystem entry.  Requires root privileges.
+    /*  Create the filesystem entry by assigning the [name] to one end
+     *    of the pipe.  This requires root privileges.
      */
     if (mknod (name, S_IFCHR | 0666, stbuf.st_rdev) < 0) {
         close (fd[0]);
