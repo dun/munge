@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.8 2004/03/12 20:16:36 dun Exp $
+## $Id: Makefile.am,v 1.9 2004/03/25 00:14:57 dun Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
@@ -21,10 +21,10 @@ munged_LDADD = \
 	$(top_builddir)/src/libcommon/libcommon.la \
 	$(top_builddir)/src/libmissing/libmissing.la \
 	$(top_builddir)/src/libmunge/libmunge.la \
-	-lpthread \
 	-lcrypto \
-	@LIBBZ2@ \
-	@LIBZ@
+	$(LIBPTHREAD) \
+	$(LIBBZ2) \
+	$(LIBZ)
 
 munged_SOURCES = \
 	auth.c \

@@ -45,9 +45,6 @@
 /* Define to 1 if you have the `crypto' library (-lcrypto). */
 #undef HAVE_LIBCRYPTO
 
-/* Define to 1 if you have the `pthread' library (-lpthread). */
-#undef HAVE_LIBPTHREAD
-
 /* Define to 1 if you have the `z' library (-lz). */
 #undef HAVE_LIBZ
 
@@ -124,8 +121,11 @@
    first (like Motorola and SPARC, unlike Intel and VAX). */
 #undef WORDS_BIGENDIAN
 
-/* Define to 1 if you are compiling multithreaded code. */
+/* Define to 1 if you plan to link against multithreaded code. */
 #undef _REENTRANT
+
+/* Define to 1 if you plan to link against multithreaded code. */
+#undef _THREAD_SAFE
 
 /* Define to empty if `const' does not conform to ANSI C. */
 #undef const

@@ -1,3 +1,12 @@
+2004-03-24  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* configure.ac, config/x_ac_check_pthreads.m4,
+	  config/x_ac_reentrant.m4, src/munged/Makefile.am:
+	  Added configure test to determine how to link against pthreads.
+
+	* src/munged/crypto_thread.c, src/munged/crypto_thread.h:
+	  Removed ifdef for HAVE_LIBPTHREAD.
+
 2004-03-19  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/libcommon/munge_msg.c, src/munge/unmunge.c, src/munged/conf.c:

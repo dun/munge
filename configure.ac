@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: configure.ac,v 1.16 2004/03/12 20:16:36 dun Exp $
+## $Id: configure.ac,v 1.17 2004/03/25 00:14:57 dun Exp $
 ##*****************************************************************************
 ## Process this file with autoconf to produce a configure script.
 ##*****************************************************************************
@@ -7,7 +7,7 @@
 ## For details, see <http://www.llnl.gov/linux/munge/>.
 ## UCRL-CODE-2003-???.
 ##
-## Copyright (C) 2002-2003 The Regents of the University of California.
+## Copyright (C) 2002-2004 The Regents of the University of California.
 ## Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
 ## Written by Chris Dunlap <cdunlap@llnl.gov>.
 ##
@@ -36,7 +36,6 @@ AC_CONFIG_SRCDIR([src/libmunge/munge.h])
 AC_CANONICAL_TARGET
 X_AC_GPL_LICENSED
 X_AC_HUMOR
-X_AC_REENTRANT
 
 ##
 # Automake support.
@@ -56,6 +55,7 @@ X_AC_DEBUG
 ##
 # Checks for libraries.
 ##
+X_AC_CHECK_PTHREADS
 X_AC_CHECK_COND_LIB(bz2, BZ2_bzBuffToBuffCompress)
 X_AC_CHECK_COND_LIB(z, compress)
 
@@ -98,14 +98,6 @@ AC_CHECK_FUNCS( \
 )
 LIBS="$ac_save_LIBS"
 AC_CHECK_TYPES(CRYPTO_dynlock, [], [], [#include <openssl/crypto.h>])
-
-##
-# Checks for Pthreads.
-#   Prevent libpthread from being linked into all binaries.
-##
-ac_save_LIBS="$LIBS"
-AC_CHECK_LIB(pthread, pthread_create)
-LIBS="$ac_save_LIBS"
 
 ##
 # Checks for library functions.
