@@ -1,5 +1,8 @@
 2003-10-14  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/munged/dec_v1.c(dec_v1_unpack_inner):
+	  Fixed unaligned access on ia64 {gnats:303}.
+
 	* src/munged/dec_v1.c, src/munged/enc_v1.c:
 	  Fixed ia64 compiler warning that time_t "comparison is always false
 	  due to limited range of data type".

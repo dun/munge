@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: dec_v1.c,v 1.9 2003/10/14 17:12:41 dun Exp $
+ *  $Id: dec_v1.c,v 1.10 2003/10/14 17:57:47 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -668,6 +668,7 @@ dec_v1_unpack_inner (munge_cred_t c)
     unsigned char       *p;             /* ptr into packed data              */
     int                  len;           /* length of packed data remaining   */
     int                  n;             /* all-purpose int                   */
+    uint32_t             u;             /* all-purpose uint32                */
 
     assert (c != NULL);
     assert (c->inner != NULL);
@@ -702,7 +703,7 @@ dec_v1_unpack_inner (munge_cred_t c)
         return (_munge_msg_set_err (c->msg, EMUNGE_BAD_CRED,
             strdup ("Truncated credential origin ip addr length")));
     }
-    m1->addr_len = *p;
+    m1->addr_len = *p;                  /* a single byte is always aligned */
     p += n;
     len -= n;
     /*
@@ -728,7 +729,8 @@ dec_v1_unpack_inner (munge_cred_t c)
         return (_munge_msg_set_err (c->msg, EMUNGE_BAD_CRED,
             strdup ("Truncated credential encode time")));
     }
-    m1->time0 = ntohl (* (uint32_t *) p);
+    memcpy (&u, p, n);                  /* ensure proper byte-alignment */
+    m1->time0 = ntohl (u);
     p += n;
     len -= n;
     /*
@@ -740,7 +742,8 @@ dec_v1_unpack_inner (munge_cred_t c)
         return (_munge_msg_set_err (c->msg, EMUNGE_BAD_CRED,
             strdup ("Truncated credential time-to-live")));
     }
-    m1->ttl = ntohl (* (uint32_t *) p);
+    memcpy (&u, p, n);                  /* ensure proper byte-alignment */
+    m1->ttl = ntohl (u);
     p += n;
     len -= n;
     /*
@@ -752,7 +755,8 @@ dec_v1_unpack_inner (munge_cred_t c)
         return (_munge_msg_set_err (c->msg, EMUNGE_BAD_CRED,
             strdup ("Truncated credential uid")));
     }
-    m1->uid = ntohl (* (uint32_t *) p);
+    memcpy (&u, p, n);                  /* ensure proper byte-alignment */
+    m1->uid = ntohl (u);
     p += n;
     len -= n;
     /*
@@ -764,7 +768,8 @@ dec_v1_unpack_inner (munge_cred_t c)
         return (_munge_msg_set_err (c->msg, EMUNGE_BAD_CRED,
             strdup ("Truncated credential gid")));
     }
-    m1->gid = ntohl (* (uint32_t *) p);
+    memcpy (&u, p, n);                  /* ensure proper byte-alignment */
+    m1->gid = ntohl (u);
     p += n;
     len -= n;
     /*
@@ -776,7 +781,8 @@ dec_v1_unpack_inner (munge_cred_t c)
         return (_munge_msg_set_err (c->msg, EMUNGE_BAD_CRED,
             strdup ("Truncated credential data length")));
     }
-    m1->data_len = ntohl (* (uint32_t *) p);
+    memcpy (&u, p, n);                  /* ensure proper byte-alignment */
+    m1->data_len = ntohl (u);
     p += n;
     len -= n;
     /*
