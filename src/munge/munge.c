@@ -1,11 +1,11 @@
 /*****************************************************************************
- *  $Id: munge.c,v 1.16 2004/01/29 00:15:49 dun Exp $
+ *  $Id: munge.c,v 1.17 2004/03/02 00:28:48 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
  *  UCRL-CODE-2003-???.
  *
- *  Copyright (C) 2003 The Regents of the University of California.
+ *  Copyright (C) 2003-2004 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
  *  Written by Chris Dunlap <cdunlap@llnl.gov>.
  *
@@ -192,7 +192,7 @@ destroy_conf (conf_t conf)
         conf->fp_in = NULL;
     }
     if (conf->fp_out != NULL) {
-        if (fclose (conf->fp_out) < 0)
+        if ((fclose (conf->fp_out) < 0) && (errno != EPIPE))
             log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to close outfile");
         conf->fp_out = NULL;
     }

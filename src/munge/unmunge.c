@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: unmunge.c,v 1.18 2004/01/29 00:15:49 dun Exp $
+ *  $Id: unmunge.c,v 1.19 2004/03/02 00:28:48 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -272,7 +272,7 @@ destroy_conf (conf_t conf)
         conf->fp_in = NULL;
     }
     if (conf->fp_meta != NULL) {
-        if (fclose (conf->fp_meta) < 0)
+        if ((fclose (conf->fp_meta) < 0) && (errno != EPIPE))
             log_errno (EMUNGE_SNAFU, LOG_ERR,
                 "Unable to close metadata outfile");
         conf->fp_meta = NULL;
@@ -280,7 +280,7 @@ destroy_conf (conf_t conf)
     if (conf->fp_out != NULL) {
         if (conf->fn_out && conf->fn_meta
           && strcmp (conf->fn_out, conf->fn_meta))
-            if (fclose (conf->fp_out) < 0)
+            if ((fclose (conf->fp_out) < 0) && (errno != EPIPE))
                 log_errno (EMUNGE_SNAFU, LOG_ERR,
                     "Unable to close payload outfile");
         conf->fp_out = NULL;
