@@ -1,10 +1,10 @@
 /*****************************************************************************
- *  $Id: missing.h,v 1.4 2004/11/12 00:29:18 dun Exp $
+ *  $Id: inet_ntop.h,v 1.1 2004/11/12 00:29:18 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
  *
- *  Copyright (C) 2003-2004 The Regents of the University of California.
+ *  Copyright (C) 2004 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
  *  Written by Chris Dunlap <cdunlap@llnl.gov>.
  *  UCRL-CODE-155910.
@@ -25,15 +25,19 @@
  *****************************************************************************/
 
 
-#ifndef MUNGE_MISSING_H
-#define MUNGE_MISSING_H
+#ifndef INET_NTOP_H
+#define INET_NTOP_H
 
+#if HAVE_CONFIG_H
+#  include "config.h"
+#endif /* HAVE_CONFIG_H */
 
-/*  These contain prototypes and whatnot for libmissing.
- */
-#include "inet_ntop.h"
-#include "strlcat.h"
-#include "strlcpy.h"
+#ifndef INET_ADDRSTRLEN
+#  define INET_ADDRSTRLEN 16
+#endif /* !INET_ADDRSTRLEN */
 
+#ifndef HAVE_INET_NTOP
+const char *inet_ntop (int af, const void *src, char *dst, socklen_t cnt);
+#endif /* !HAVE_INET_NTOP */
 
-#endif /* !MUNGE_MISSING_H */
+#endif /* !INET_NTOP_H */

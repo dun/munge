@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: conf.c,v 1.36 2004/11/10 21:13:13 dun Exp $
+ *  $Id: conf.c,v 1.37 2004/11/12 00:29:18 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -31,7 +31,7 @@
 
 #include <sys/types.h>                  /* include before in.h for bsd */
 #include <netinet/in.h>                 /* include before inet.h for bsd */
-#include <arpa/inet.h>                  /* for inet_ntoa() */
+#include <arpa/inet.h>                  /* for inet_ntop() */
 #include <assert.h>
 #include <errno.h>
 #include <fcntl.h>
@@ -45,6 +45,7 @@
 #include "license.h"
 #include "log.h"
 #include "md.h"
+#include "missing.h"
 #include "munge_defs.h"
 #include "str.h"
 #include "zip.h"
@@ -399,9 +400,8 @@ void
 lookup_ip_addr (conf_t conf)
 {
     char hostname [MAXHOSTNAMELEN];
+    char ip_buf [INET_ADDRSTRLEN];
     struct hostent *hptr;
-    char *host_str;
-    char *ip_str;
 
     if (gethostname (hostname, sizeof (hostname)) < 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to determine hostname");
@@ -421,16 +421,12 @@ lookup_ip_addr (conf_t conf)
         log_err (EMUNGE_SNAFU, LOG_ERR,
             "Unable to resolve host \"%s\"", hostname);
     }
+    assert (sizeof (conf->addr) == hptr->h_length);
     memcpy (&conf->addr, hptr->h_addr_list[0], sizeof (conf->addr));
-    /*
-     *  The inet_ntoa() call is not reentrant, but that's ok (as above).
-     *
-     *  Yes, I realize inet_ntoa() is dated, but inet_ntop() isn't
-     *    commonplace yet, and this one invocation isn't worth autoconfing.
-     *    Besides, we don't need to be thread-safe just yet.
-     */
-    host_str = hptr->h_name;
-    ip_str = inet_ntoa (conf->addr);
-    log_msg (LOG_NOTICE, "Running on host \"%s\" (%s)", host_str, ip_str);
+
+    if (!inet_ntop (AF_INET, &conf->addr, ip_buf, sizeof (ip_buf))) {
+        log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to determine ip address");
+    }
+    log_msg (LOG_NOTICE, "Running on host \"%s\" (%s)", hptr->h_name, ip_buf);
     return;
 }

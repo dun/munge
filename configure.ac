@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: configure.ac,v 1.23 2004/11/11 00:06:36 dun Exp $
+## $Id: configure.ac,v 1.24 2004/11/12 00:29:18 dun Exp $
 ##*****************************************************************************
 ## Process this file with autoconf to produce a configure script.
 ##*****************************************************************************
@@ -111,6 +111,7 @@ AC_CHECK_FUNCS( \
   localtime_r \
 )
 AC_REPLACE_FUNCS( \
+  inet_ntop \
   strlcat \
   strlcpy \
 )

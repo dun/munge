@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: unmunge.c,v 1.31 2004/11/09 20:15:24 dun Exp $
+ *  $Id: unmunge.c,v 1.32 2004/11/12 00:29:18 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -31,7 +31,7 @@
 
 #include <sys/types.h>                  /* include before in.h for bsd       */
 #include <netinet/in.h>                 /* include before inet.h for bsd     */
-#include <arpa/inet.h>                  /* for inet_ntoa()                   */
+#include <arpa/inet.h>                  /* for inet_ntop()                   */
 #include <assert.h>
 #include <errno.h>
 #include <fcntl.h>
@@ -48,6 +48,7 @@
 #include <unistd.h>
 #include <munge.h>
 #include "common.h"
+#include "missing.h"
 #include "read.h"
 
 
@@ -545,10 +546,11 @@ display_meta (conf_t conf)
     munge_err_t     e;                  /* munge error condition             */
     struct in_addr  addr;               /* IPv4 addr                         */
     struct hostent *hptr;               /* ptr to static hostent struct      */
+    char            ip_buf[INET_ADDRSTRLEN]; /* ip addr string buffer         */
     time_t          t;                  /* time (seconds since epoch)        */
     struct tm      *tm_ptr;             /* ptr to broken-down time entry     */
-    int             tlen;               /* length of time string             */
-    char            tbuf[MAX_TIME_STR]; /* time string buffer                */
+    int             t_len;              /* length of time string             */
+    char            t_buf[MAX_TIME_STR];/* time string buffer                */
     int             i;                  /* all-purpose int                   */
     struct passwd  *pw_ptr;             /* ptr to broken-down password entry */
     struct group   *gr_ptr;             /* ptr to broken-down group entry    */
@@ -572,10 +574,14 @@ display_meta (conf_t conf)
                 munge_ctx_strerror (conf->ctx));
         }
         hptr = gethostbyaddr ((char *) &addr, sizeof (addr), AF_INET);
+        if (!inet_ntop (AF_INET, &addr, ip_buf, sizeof (ip_buf))) {
+            log_err (EMUNGE_SNAFU, LOG_ERR,
+                "Unable to convert ip address string");
+        }
         s = key_val_to_str (MUNGE_KEY_ORIGIN);
         w = pad - strlen (s);
         fprintf (conf->fp_meta, "%s:%*c%s (%s)\n", s, w, 0x20,
-            (hptr ? hptr->h_name : "???"), inet_ntoa (addr));
+            (hptr ? hptr->h_name : "???"), ip_buf);
     }
     if (conf->key[MUNGE_KEY_ENCODE_TIME]) {
         e = munge_ctx_get (conf->ctx, MUNGE_OPT_ENCODE_TIME, &t);
@@ -585,20 +591,20 @@ display_meta (conf_t conf)
                 munge_ctx_strerror (conf->ctx));
         }
         tm_ptr = localtime (&t);
-        tlen = strftime (tbuf, sizeof (tbuf), "%Y-%m-%d %H:%M:%S", tm_ptr);
-        if ((tlen == 0) || (tlen >= sizeof (tbuf))) {
+        t_len = strftime (t_buf, sizeof (t_buf), "%Y-%m-%d %H:%M:%S", tm_ptr);
+        if ((t_len == 0) || (t_len >= sizeof (t_buf))) {
             log_err (EMUNGE_OVERFLOW, LOG_ERR,
                 "Overran buffer for encode time");
         }
         /*  Since ISO C does not support the '%s' strftime format option ...
          */
-        if (strcatf (tbuf, sizeof (tbuf), " (%ld)", (long) t) < 0) {
+        if (strcatf (t_buf, sizeof (t_buf), " (%ld)", (long) t) < 0) {
             log_err (EMUNGE_OVERFLOW, LOG_ERR,
                 "Overran buffer for encode time");
         }
         s = key_val_to_str (MUNGE_KEY_ENCODE_TIME);
         w = pad - strlen (s);
-        fprintf (conf->fp_meta, "%s:%*c%s\n", s, w, 0x20, tbuf);
+        fprintf (conf->fp_meta, "%s:%*c%s\n", s, w, 0x20, t_buf);
     }
     if (conf->key[MUNGE_KEY_DECODE_TIME]) {
         e = munge_ctx_get (conf->ctx, MUNGE_OPT_DECODE_TIME, &t);
@@ -608,20 +614,20 @@ display_meta (conf_t conf)
                 munge_ctx_strerror (conf->ctx));
         }
         tm_ptr = localtime (&t);
-        tlen = strftime (tbuf, sizeof (tbuf), "%Y-%m-%d %H:%M:%S", tm_ptr);
-        if ((tlen == 0) || (tlen >= sizeof (tbuf))) {
+        t_len = strftime (t_buf, sizeof (t_buf), "%Y-%m-%d %H:%M:%S", tm_ptr);
+        if ((t_len == 0) || (t_len >= sizeof (t_buf))) {
             log_err (EMUNGE_OVERFLOW, LOG_ERR,
                 "Overran buffer for decode time");
         }
         /*  Since ISO C does not support the '%s' strftime format option ...
          */
-        if (strcatf (tbuf, sizeof (tbuf), " (%ld)", (long) t) < 0) {
+        if (strcatf (t_buf, sizeof (t_buf), " (%ld)", (long) t) < 0) {
             log_err (EMUNGE_OVERFLOW, LOG_ERR,
                 "Overran buffer for decode time");
         }
         s = key_val_to_str (MUNGE_KEY_DECODE_TIME);
         w = pad - strlen (s);
-        fprintf (conf->fp_meta, "%s:%*c%s\n", s, w, 0x20, tbuf);
+        fprintf (conf->fp_meta, "%s:%*c%s\n", s, w, 0x20, t_buf);
     }
     if (conf->key[MUNGE_KEY_TTL]) {
         e = munge_ctx_get (conf->ctx, MUNGE_OPT_TTL, &i);

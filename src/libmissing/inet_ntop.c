@@ -1,10 +1,10 @@
 /*****************************************************************************
- *  $Id: missing.h,v 1.4 2004/11/12 00:29:18 dun Exp $
+ *  $Id: inet_ntop.c,v 1.1 2004/11/12 00:29:18 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
  *
- *  Copyright (C) 2003-2004 The Regents of the University of California.
+ *  Copyright (C) 2004 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
  *  Written by Chris Dunlap <cdunlap@llnl.gov>.
  *  UCRL-CODE-155910.
@@ -25,15 +25,37 @@
  *****************************************************************************/
 
 
-#ifndef MUNGE_MISSING_H
-#define MUNGE_MISSING_H
+#if HAVE_CONFIG_H
+#  include "config.h"
+#endif /* HAVE_CONFIG_H */
 
+#ifndef HAVE_INET_NTOP
 
-/*  These contain prototypes and whatnot for libmissing.
- */
+#include <errno.h>
+#include <stdio.h>
+#include <sys/socket.h>
 #include "inet_ntop.h"
-#include "strlcat.h"
-#include "strlcpy.h"
 
+const char *
+inet_ntop (int af, const void *src, char *dst, socklen_t cnt)
+{
+    const unsigned char *p = src;
+    int n;
 
-#endif /* !MUNGE_MISSING_H */
+    if (af != AF_INET) {
+        errno = EAFNOSUPPORT;
+        return (NULL);
+    }
+    if (!src || !dst) {
+        errno = EINVAL;
+        return (NULL);
+    }
+    n = snprintf (dst, cnt, "%d.%d.%d.%d", p[0], p[1], p[2], p[3]);
+    if ((n < 0) || (n >= cnt)) {
+        errno = ENOSPC;
+        return (NULL);
+    }
+    return (dst);
+}
+
+#endif /* !HAVE_INET_NTOP */

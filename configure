@@ -21408,7 +21408,9 @@ done
 
 
 
+
 for ac_func in \
+  inet_ntop \
   strlcat \
   strlcpy \
 
