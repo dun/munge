@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: x_ac_check_fifo_recvfd.m4,v 1.1 2004/05/01 05:19:04 dun Exp $
+## $Id: x_ac_check_fifo_recvfd.m4,v 1.2 2004/05/01 06:10:45 dun Exp $
 ##*****************************************************************************
 #  AUTHOR:
 #    Chris Dunlap <cdunlap@llnl.gov>
@@ -17,6 +17,7 @@ AC_DEFUN([X_AC_CHECK_FIFO_RECVFD], [
   AC_CACHE_CHECK(
     [if file descriptors can be passed over a fifo],
     [x_ac_cv_check_fifo_recvfd], [
+    AS_VAR_SET(x_ac_cv_check_fifo_recvfd, no)
     AS_IF([test AS_VAR_GET(ac_cv_type_struct_strrecvfd) = yes], [
       AC_RUN_IFELSE([
         AC_LANG_PROGRAM([[
