@@ -1,5 +1,11 @@
 2004-11-09  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/libcommon/munge_defs.h, src/munged/auth_recv.c,
+	  src/munged/conf.c, src/munged/conf.h:
+	  Changed MUNGE_AUTH_PIPE_NAME_PREFIX to MUNGE_AUTH_PIPE_DIR.
+	  Changed MUNGE_AUTH_PIPE_NAME_RND_BYTES to MUNGE_AUTH_PIPE_RND_BYTES.
+	  Changed conf struct auth_pipe_prefix to auth_pipe_dir.
+
 	* src/munged/conf.c:
 	  Changed "--nthreads" cmdline opt to "--num-threads".
 	  Tweaked display_help() information.

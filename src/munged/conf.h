@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: conf.h,v 1.13 2004/11/09 18:12:04 dun Exp $
+ *  $Id: conf.h,v 1.14 2004/11/09 21:54:28 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -62,7 +62,7 @@ struct conf {
     struct in_addr  addr;               /* IPv4 addr in n/w byte order       */
     gids_t          gids;               /* supplementary group information   */
     int             nthreads;           /* num threads for processing creds  */
-    char           *auth_pipe_prefix;   /* prefix for auth pipe name         */
+    char           *auth_pipe_dir;      /* dir in which to create auth pipe  */
     int             auth_pipe_rnd_bytes;/* num rnd bytes in auth pipe name   */
 };
 

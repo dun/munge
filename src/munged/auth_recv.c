@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: auth_recv.c,v 1.7 2004/11/09 18:12:04 dun Exp $
+ *  $Id: auth_recv.c,v 1.8 2004/11/09 21:54:28 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -410,7 +410,7 @@ _name_auth_pipe (char **dst_p)
 
     *dst_p = NULL;
     assert (conf->auth_pipe_rnd_bytes > 0);
-    assert (conf->auth_pipe_prefix != NULL);
+    assert (conf->auth_pipe_dir != NULL);
 
     nonce_bin_len = conf->auth_pipe_rnd_bytes;
     if (!(nonce_bin = malloc (nonce_bin_len))) {
@@ -420,7 +420,7 @@ _name_auth_pipe (char **dst_p)
     if (!(nonce_asc = malloc (nonce_asc_len))) {
         goto err;
     }
-    dst_len = strlen (conf->auth_pipe_prefix)
+    dst_len = strlen (conf->auth_pipe_dir)
         + 8                             /* strlen ("/.munge-") */
         + (2 * conf->auth_pipe_rnd_bytes)
         + 6;                            /* strlen (".pipe") + "\0" */
@@ -432,7 +432,7 @@ _name_auth_pipe (char **dst_p)
         goto err;
     }
     n = snprintf (dst, dst_len, "%s/.munge-%s.pipe",
-        conf->auth_pipe_prefix, nonce_asc);
+        conf->auth_pipe_dir, nonce_asc);
     if ((n < 0) || (n >= dst_len)) {
         goto err;
     }
