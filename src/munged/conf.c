@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: conf.c,v 1.9 2003/06/12 16:14:39 dun Exp $
+ *  $Id: conf.c,v 1.10 2003/09/18 21:09:26 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -88,6 +88,7 @@ create_conf (void)
     conf->def_zip = MUNGE_DEFAULT_ZIP;
     conf->def_mac = MUNGE_DEFAULT_MAC;
     conf->def_ttl = MUNGE_DEFAULT_TTL;
+    conf->max_ttl = MUNGE_MAXIMUM_TTL;
     /*
      *  FIXME: Add support for default realm.
      */

@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munge.c,v 1.14 2003/05/22 21:08:59 dun Exp $
+ *  $Id: munge.c,v 1.15 2003/09/18 21:09:26 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -61,13 +61,14 @@ struct option opt_table[] = {
     { "output",       1, NULL, 'o' },
     { "string",       1, NULL, 's' },
     { "socket",       1, NULL, 'S' },
+    { "ttl",          1, NULL, 't' },
     { "zip",          1, NULL, 'z' },
     { "list-zips",    0, NULL, 'Z' },
     {  NULL,          0, NULL,  0  }
 };
 #endif /* HAVE_GETOPT_H */
 
-const char * const opt_string = "hLVc:Ci:m:Mno:s:S:z:Z";
+const char * const opt_string = "hLVc:Ci:m:Mno:s:S:t:z:Z";
 
 
 /***************************************************************************** 
@@ -213,10 +214,11 @@ destroy_conf (conf_t conf)
 void
 parse_cmdline (conf_t conf, int argc, char **argv)
 {
-    char       *prog;
-    char        c;
-    munge_err_t e;
-    int         i;
+    char        *prog;
+    char         c;
+    char        *p;
+    munge_err_t  e;
+    int          i;
 
     opterr = 0;                         /* suppress default getopt err msgs */
 
@@ -293,6 +295,19 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                 if (e != EMUNGE_SUCCESS)
                     log_err (EMUNGE_SNAFU, LOG_ERR,
                         "Unable to set munge socket name: %s",
+                        munge_ctx_strerror (conf->ctx));
+                break;
+            case 't':
+                i = strtol (optarg, &p, 10);
+                if (optarg == p)
+                    log_errno (EMUNGE_SNAFU, LOG_ERR,
+                        "Invalid time-to-live '%s'", optarg);
+                if (i < 0)
+                    i = MUNGE_TTL_MAXIMUM;
+                e = munge_ctx_set (conf->ctx, MUNGE_OPT_TTL, i);
+                if (e != EMUNGE_SUCCESS)
+                    log_err (EMUNGE_SNAFU, LOG_ERR,
+                        "Unable to set time-to-live: %s",
                         munge_ctx_strerror (conf->ctx));
                 break;
             case 'z':
@@ -393,6 +408,9 @@ display_help (char *prog)
 
     printf ("  %*s %s\n", w, (got_long ? "-S, --socket=STRING" : "-S STRING"),
             "Specify local domain socket");
+
+    printf ("  %*s %s\n", w, (got_long ? "-t, --ttl=INTEGER" : "-t INTEGER"),
+            "Specify time-to-live (in seconds; 0=default, -1=max)");
 
     printf ("\n");
     printf ("By default, data is read from stdin and written to stdout.\n\n");

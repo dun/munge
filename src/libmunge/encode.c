@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: encode.c,v 1.5 2003/05/30 01:20:12 dun Exp $
+ *  $Id: encode.c,v 1.6 2003/09/18 21:09:26 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -115,7 +115,7 @@ encode_req_v1 (munge_msg_t m, munge_ctx_t ctx, const void *buf, int len)
 {
 /*  Creates an Encode Request message to be sent to the local munge daemon.
  *  The inputs to this message are as follows:
- *    cipher, mac, zip, realm_len, realm, data_len, data.
+ *    cipher, mac, zip, realm_len, realm, ttl, data_len, data.
  *  Note that the realm string is *not* NUL-terminated.
  */
     struct munge_msg_v1 *m1;
@@ -149,6 +149,7 @@ encode_req_v1 (munge_msg_t m, munge_ctx_t ctx, const void *buf, int len)
             m1->realm_len = 0;
             m1->realm = NULL;
         }
+        m1->ttl = ctx->ttl;
     }
     else {
         m1->cipher = MUNGE_CIPHER_DEFAULT;
@@ -156,6 +157,7 @@ encode_req_v1 (munge_msg_t m, munge_ctx_t ctx, const void *buf, int len)
         m1->zip = MUNGE_ZIP_DEFAULT;
         m1->realm_len = 0;
         m1->realm = NULL;
+        m1->ttl = MUNGE_TTL_DEFAULT;
     }
     /*  Pass optional data to be encoded into the credential.
      */
@@ -172,7 +174,7 @@ encode_rsp_v1 (munge_msg_t m, char **cred)
  *  The relevant outputs from this message are as follows:
  *    status, data_len, data.
  *  The ignored outputs from this message are as follows:
- *    cipher, mac, zip, realm_len, realm, time0, uid, gid.
+ *    cipher, mac, zip, realm_len, realm, time0, ttl, uid, gid.
  *  These are ignored because the encode() ctx is considered read-only
  *    (with the exception of using it to pass detailed error messages).
  *    This allows the same ctx to be used to encode multiple credentials

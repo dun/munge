@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munge_defs.h,v 1.12 2003/07/02 17:59:47 dun Exp $
+ *  $Id: munge_defs.h,v 1.13 2003/09/18 21:09:26 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -57,9 +57,13 @@
  */
 #define MUNGE_DEFAULT_MAC       MUNGE_MAC_SHA1
 
-/*  Default integer for the number of seconds before a credential expires.
+/*  Integer for the default number of seconds before a credential expires.
  */
 #define MUNGE_DEFAULT_TTL       300
+
+/*  Integer for the maximum number of seconds before a credential expires.
+ */
+#define MUNGE_MAXIMUM_TTL       3600
 
 /*  Default munge_zip_t for compressing credentials.
  */
@@ -97,6 +101,8 @@
 
 /*  String specifying the pathname of the secret key file.
  *    FIXME: Temporary kludge until configuration file support is added.
+ */
+/* #define MUNGED_SECRET_KEY       "/tmp/.munge-key"
  */
 #define MUNGED_SECRET_KEY       "/etc/ssh/ssh_host_key"
 

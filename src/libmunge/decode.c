@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: decode.c,v 1.6 2003/05/30 01:20:12 dun Exp $
+ *  $Id: decode.c,v 1.7 2003/09/18 21:09:26 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -127,6 +127,7 @@ decode_init (munge_ctx_t ctx, void **buf, int *len, uid_t *uid, gid_t *gid)
             free (ctx->realm);
             ctx->realm = NULL;
         }
+        ctx->ttl = -1;
         ctx->addr.s_addr = 0;
         ctx->time0 = -1;
         ctx->time1 = -1;
@@ -157,7 +158,7 @@ decode_req_v1 (munge_msg_t m, munge_ctx_t ctx, const char *cred)
 {
 /*  Creates a Decode Request message to be sent to the local munge daemon.
  *  The inputs to this message are as follows:
- *    ttl, data_len, data.
+ *    data_len, data.
  */
     struct munge_msg_v1 *m1;
 
@@ -178,15 +179,7 @@ decode_req_v1 (munge_msg_t m, munge_ctx_t ctx, const char *cred)
     memset (m->pbody, 0, m->pbody_len);
     m1 = m->pbody;
     /*
-     *  Sets opts from ctx (if present); o/w, use defaults.
-     */
-    if (ctx) {
-        m1->ttl = ctx->ttl;
-    }
-    else {
-        m1->ttl = MUNGE_TTL_DEFAULT;
-    }
-    /*  Pass the NUL-terminated credential to be decoded.
+     *  Pass the NUL-terminated credential to be decoded.
      */
     m1->data_len = strlen (cred) + 1;
     m1->data = (void *) cred;

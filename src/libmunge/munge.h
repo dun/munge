@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munge.h,v 1.14 2003/05/30 01:20:12 dun Exp $
+ *  $Id: munge.h,v 1.15 2003/09/18 21:09:26 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -99,7 +99,7 @@ typedef enum munge_zip {
 /*  Munge credential time-to-live (in seconds)
  */
 typedef enum munge_ttl {
-    MUNGE_TTL_FOREVER           = -1,   /* credential never expires          */
+    MUNGE_TTL_MAXIMUM           = -1,   /* maximum ttl allowed by daemon     */
     MUNGE_TTL_DEFAULT           =  0,   /* default ttl specified by daemon   */
     MUNGE_TTL_LAST_ENTRY
 } munge_ttl_t;

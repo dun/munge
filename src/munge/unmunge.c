@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: unmunge.c,v 1.15 2003/05/30 01:20:12 dun Exp $
+ *  $Id: unmunge.c,v 1.16 2003/09/18 21:09:26 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -74,12 +74,11 @@ struct option opt_table[] = {
     { "no-output",    0, NULL, 'n' },
     { "output",       1, NULL, 'o' },
     { "socket",       1, NULL, 'S' },
-    { "ttl",          1, NULL, 't' },
     {  NULL,          0, NULL,  0  }
 };
 #endif /* HAVE_GETOPT_H */
 
-const char * const opt_string = "hLVi:k:Km:no:S:t:";
+const char * const opt_string = "hLVi:k:Km:no:S:";
 
 
 /*****************************************************************************
@@ -96,6 +95,7 @@ typedef enum {
     MUNGE_KEY_ORIGIN,
     MUNGE_KEY_ENCODE_TIME,
     MUNGE_KEY_DECODE_TIME,
+    MUNGE_KEY_TTL,
     MUNGE_KEY_CIPHER_TYPE,
     MUNGE_KEY_MAC_TYPE,   
     MUNGE_KEY_ZIP_TYPE,   
@@ -110,6 +110,7 @@ strval_t munge_keys[] = {
     { MUNGE_KEY_ORIGIN,      "ORIGIN"  },
     { MUNGE_KEY_ENCODE_TIME, "ENCODED" },
     { MUNGE_KEY_DECODE_TIME, "DECODED" },
+    { MUNGE_KEY_TTL,         "TTL"     },
     { MUNGE_KEY_CIPHER_TYPE, "CIPHER"  },
     { MUNGE_KEY_MAC_TYPE,    "MAC"     },
     { MUNGE_KEY_ZIP_TYPE,    "ZIP"     },
@@ -292,12 +293,11 @@ destroy_conf (conf_t conf)
 void
 parse_cmdline (conf_t conf, int argc, char **argv)
 {
-    int         got_keys = 0;
-    char       *prog;
-    char        c;
-    char       *p;
-    munge_err_t e;
-    int         i;
+    int          got_keys = 0;
+    char        *prog;
+    char         c;
+    munge_err_t  e;
+    int          i;
 
     opterr = 0;                         /* suppress default getopt err msgs */
 
@@ -352,19 +352,6 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                 if (e != EMUNGE_SUCCESS)
                     log_err (EMUNGE_SNAFU, LOG_ERR,
                         "Unable to set munge socket name: %s",
-                        munge_ctx_strerror (conf->ctx));
-                break;
-            case 't':
-                i = strtol (optarg, &p, 10);
-                if (optarg == p)
-                    log_errno (EMUNGE_SNAFU, LOG_ERR,
-                        "Invalid time-to-live '%s'", optarg);
-                if (i < 0)
-                    i = MUNGE_TTL_FOREVER;
-                e = munge_ctx_set (conf->ctx, MUNGE_OPT_TTL, i);
-                if (e != EMUNGE_SUCCESS)
-                    log_err (EMUNGE_SNAFU, LOG_ERR,
-                        "Unable to set time-to-live: %s",
                         munge_ctx_strerror (conf->ctx));
                 break;
             case '?':
@@ -443,9 +430,6 @@ display_help (char *prog)
 
     printf ("  %*s %s\n", w, (got_long ? "-S, --socket=STRING" : "-S STRING"),
             "Specify local domain socket");
-
-    printf ("  %*s %s\n", w, (got_long ? "-t, --ttl=INTEGER" : "-t INTEGER"),
-            "Specify time-to-live (in seconds, -1=forever)");
 
     printf ("\n");
     printf ("By default, data is read from stdin and written to stdout.\n\n");
@@ -599,6 +583,16 @@ display_meta (conf_t conf)
         s = key_val_to_str (MUNGE_KEY_DECODE_TIME);
         w = pad - strlen (s);
         fprintf (conf->fp_meta, "%s:%*c%s\n", s, w, 0x20, tbuf);
+    }
+    if (conf->key[MUNGE_KEY_TTL]) {
+        e = munge_ctx_get (conf->ctx, MUNGE_OPT_TTL, &i);
+        if (e != EMUNGE_SUCCESS)
+            log_err (EMUNGE_SNAFU, LOG_ERR,
+                "Unable to retrieve ttl: %s",
+                munge_ctx_strerror (conf->ctx));
+        s = key_val_to_str (MUNGE_KEY_TTL);
+        w = pad - strlen (s);
+        fprintf (conf->fp_meta, "%s:%*c%d\n", s, w, 0x20, i);
     }
     if (conf->key[MUNGE_KEY_CIPHER_TYPE]) {
         e = munge_ctx_get (conf->ctx, MUNGE_OPT_CIPHER_TYPE, &i);

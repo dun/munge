@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: dec_v1.c,v 1.7 2003/05/30 01:20:12 dun Exp $
+ *  $Id: dec_v1.c,v 1.8 2003/09/18 21:09:26 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -135,11 +135,6 @@ dec_v1_validate_msg (munge_msg_t m)
 
     m1 = m->pbody;
 
-    /*  Validate time-to-live.
-     */
-    if (m1->ttl == MUNGE_TTL_DEFAULT) {
-        m1->ttl = conf->def_ttl;
-    }
     /*  Reset message type for the response.
      */
     m->head.type = MUNGE_MSG_DEC_RSP;
@@ -658,8 +653,8 @@ dec_v1_unpack_inner (munge_cred_t c)
 /*  Unpacks the "inner" credential data from MSBF (ie, big endian) format.
  *  The "inner" part of the credential may have been subjected to cryptographic
  *    transformations (ie, compression and encryption).  It includes:
- *    salt, ip addr len, origin ip addr, encode time, uid, gid, data length,
- *    and data (if present).
+ *    salt, ip addr len, origin ip addr, encode time, ttl, uid, gid,
+ *    data length, and data (if present).
  *  Validation of the "inner" credential occurs here as well since unpacking
  *    may not be able to continue if an invalid field is found.
  *
@@ -736,6 +731,18 @@ dec_v1_unpack_inner (munge_cred_t c)
     p += n;
     len -= n;
     /*
+     *  Unpack the time-to-live.
+     */
+    n = sizeof (m1->ttl);
+    assert (n == 4);
+    if (n > len) {
+        return (_munge_msg_set_err (c->msg, EMUNGE_BAD_CRED,
+            strdup ("Truncated credential time-to-live")));
+    }
+    m1->ttl = ntohl (* (uint32_t *) p);
+    p += n;
+    len -= n;
+    /*
      *  Unpack the UID.
      */
     n = sizeof (m1->uid);
@@ -802,10 +809,10 @@ dec_v1_validate_time (munge_cred_t c)
 
     m1 = c->msg->pbody;
     /*
-     *  A TTL of FOREVER disables time validation.
+     *  Bound the cred's ttl by the configuration's max ttl.
      */
-    if (m1->ttl == MUNGE_TTL_FOREVER) {
-        return (0);
+    if (m1->ttl > conf->max_ttl) {
+        m1->ttl = conf->max_ttl;
     }
     /*  Even if no clock skew is allowed, allow the cred's timestamp to be
      *    "rewound" by up to 1 second.  Before this, we were seeing an

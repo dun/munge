@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: enc_v1.c,v 1.6 2003/05/30 01:20:12 dun Exp $
+ *  $Id: enc_v1.c,v 1.7 2003/09/18 21:09:26 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -178,14 +178,25 @@ enc_v1_validate_msg (munge_msg_t m)
             strdupf ("Invalid mac type %d", m1->mac)));
     }
     assert (m1->mac != MUNGE_MAC_NONE);
-
-    /*  Validate realm.
+    /*
+     *  Validate realm.
      *
      *  FIXME: Validate realm and set default string if needed.
      *         Validate that the realm string is NUL-terminated.
      *         The realm string may need to be stored in the
      *         aux cred struct in order to be de-allocated.
      */
+    /*  Validate time-to-live.
+     *  Ensure it is bounded by the configuration's max ttl.
+     *    A sensible ttl is needed to allow a validated cred's
+     *    state to be flushed from the replay hash at some point.
+     */
+    if (m1->ttl == 0) {
+        m1->ttl = conf->def_ttl;
+    }
+    else if (m1->ttl > conf->max_ttl) {
+        m1->ttl = conf->max_ttl;
+    }
     return (0);
 }
 
@@ -336,8 +347,8 @@ enc_v1_pack_inner (munge_cred_t c)
 /*  Packs the "inner" credential data into MSBF (ie, big endian) format.
  *  The "inner" part of the credential may be subjected to cryptographic
  *    transformations (ie, compression and encryption).  It includes:
- *    salt, ip addr len, origin ip addr, encode time, uid, gid, data length,
- *    and data (if present).
+ *    salt, ip addr len, origin ip addr, encode time, ttl, uid, gid,
+ *    data length, and data (if present).
  */
     struct munge_msg_v1 *m1;            /* munge msg (v1 format)             */
     unsigned char       *p;             /* ptr into packed data              */
@@ -355,6 +366,7 @@ enc_v1_pack_inner (munge_cred_t c)
     c->inner_mem_len += sizeof (m1->addr_len);
     c->inner_mem_len += sizeof (m1->addr);
     c->inner_mem_len += sizeof (m1->time0);
+    c->inner_mem_len += sizeof (m1->ttl);
     c->inner_mem_len += sizeof (m1->uid);
     c->inner_mem_len += sizeof (m1->gid);
     c->inner_mem_len += sizeof (m1->data_len);
@@ -382,6 +394,11 @@ enc_v1_pack_inner (munge_cred_t c)
     u32 = htonl (m1->time0);
     memcpy (p, &u32, sizeof (m1->time0));
     p += sizeof (m1->time0);
+
+    assert (sizeof (m1->ttl) == 4);
+    u32 = htonl (m1->ttl);
+    memcpy (p, &u32, sizeof (m1->ttl));
+    p += sizeof (m1->ttl);
 
     assert (sizeof (m1->uid) == 4);
     u32 = htonl (m1->uid);

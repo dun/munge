@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: conf.h,v 1.3 2003/05/30 01:20:12 dun Exp $
+ *  $Id: conf.h,v 1.4 2003/09/18 21:09:26 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -49,6 +49,7 @@ struct conf {
     munge_zip_t     def_zip;            /* default compression type          */
     munge_mac_t     def_mac;            /* default message auth code type    */
     munge_ttl_t     def_ttl;            /* default time-to-live              */
+    munge_ttl_t     max_ttl;            /* default time-to-live              */
     char           *config_name;        /* configuration filename            */
     char           *socket_name;        /* unix domain socket filename       */
     char           *seed_name;          /* random seed filename              */

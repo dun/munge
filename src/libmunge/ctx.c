@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: ctx.c,v 1.7 2003/05/30 01:20:12 dun Exp $
+ *  $Id: ctx.c,v 1.8 2003/09/18 21:09:26 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -184,6 +184,7 @@ munge_ctx_set (munge_ctx_t ctx, munge_opt_t opt, ...)
 {
     char        *str;
     char        *p;
+    int          i;
     va_list      vargs;
 
     assert (ctx != NULL);
@@ -220,7 +221,9 @@ munge_ctx_set (munge_ctx_t ctx, munge_opt_t opt, ...)
             ctx->realm = p;
             break;
         case MUNGE_OPT_TTL:
-            ctx->ttl = va_arg (vargs, int);
+            i = va_arg (vargs, int);
+            ctx->ttl = (i < 0) ? -1 : i;
+            /*  Note signed to unsigned conversion here.  */
             break;
         case MUNGE_OPT_SOCKET:
             str = va_arg (vargs, char *);

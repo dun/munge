@@ -1,5 +1,11 @@
 2003-09-18  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* doc/credential_v1_format.txt, src/libcommon/munge_defs.h,
+	  src/libmunge/ctx.c, src/libmunge/decode.c, src/libmunge/encode.c,
+	  src/libmunge/munge.h, src/munge/munge.c, src/munge/unmunge.c,
+	  src/munged/conf.c, src/munged/conf.h, src/munged/dec_v1.c,
+	  src/munged/enc_v1.c: Added ttl back into credential (for replay).
+
 	* src/libcommon/fd.c: Tweaked formatting.
 
 2003-07-18  Chris Dunlap  <cdunlap@llnl.gov>
