@@ -1,4 +1,4 @@
-# $Id: munge.spec,v 1.21 2004/10/29 17:27:29 dun Exp $
+# $Id: munge.spec,v 1.22 2004/10/29 18:36:51 dun Exp $
 
 Name:		munge
 Version:	0
@@ -93,5 +93,5 @@ fi
 %{_bindir}/*
 %{_includedir}/*
 %{_libdir}/*
-%{_mandir}/*/*
+#%{_mandir}/*/*
 %{_sbindir}/*
