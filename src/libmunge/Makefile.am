@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.13 2004/11/19 00:25:43 dun Exp $
+## $Id: Makefile.am,v 1.14 2004/11/24 00:25:12 dun Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
@@ -17,6 +17,7 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/src/libmissing
 
 libmunge_la_LDFLAGS = \
+	-export-symbols-regex "^munge_.*" \
 	-version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE)
 
 libmunge_la_LIBADD = \

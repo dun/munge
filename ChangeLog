@@ -1,5 +1,8 @@
 2004-11-23  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/libmunge/Makefile.am:
+	  Added -export-symbols-regex to libmunge.
+
 	* src/libcommon/Makefile.am, src/libcommon/common.h,
 	  src/libcommon/msg.c, src/libcommon/msg.h,
 	  src/libcommon/munge_msg.c, src/libcommon/munge_msg.h,
