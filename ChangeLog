@@ -1,5 +1,8 @@
 2004-09-16  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/munged/conf.c, src/munged/conf.h:
+	  Made extern declaration of conf.
+	  Added got_group_stat flag to struct conf.
 	* src/libcommon/munge_defs.h:
 	  Added MUNGE_GROUP_STAT_FLAG and MUNGE_GROUP_PARSE_TIMER.
 

@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: conf.h,v 1.9 2004/08/05 21:10:50 dun Exp $
+ *  $Id: conf.h,v 1.10 2004/09/16 20:13:36 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -41,6 +41,7 @@
 struct conf {
     int             ld;                 /* listening socket descriptor       */
     unsigned        got_clock_skew:1;   /* flag for allowing clock skew      */
+    unsigned        got_group_stat:1;   /* flag for gids stat'ing /etc/group */
     unsigned        got_force:1;        /* flag for FORCE option             */
     unsigned        got_foreground:1;   /* flag for FOREGROUND option        */
     unsigned        got_root_auth:1;    /* flag if root can decode any cred  */
@@ -63,6 +64,13 @@ struct conf {
 };
 
 typedef struct conf * conf_t;
+
+
+/*****************************************************************************
+ *  External Varables
+ *****************************************************************************/
+
+extern conf_t       conf;               /* defined in munged.c               */
 
 
 /*****************************************************************************
