@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: configure.ac,v 1.21 2004/04/09 01:44:32 dun Exp $
+## $Id: configure.ac,v 1.22 2004/05/01 05:26:46 dun Exp $
 ##*****************************************************************************
 ## Process this file with autoconf to produce a configure script.
 ##*****************************************************************************
@@ -33,7 +33,7 @@ AC_INIT([munge], [0])
 X_AC_META
 AC_CONFIG_AUX_DIR([config])
 AC_CONFIG_SRCDIR([src/libmunge/munge.h])
-AC_CANONICAL_TARGET
+X_AC_CANONICAL
 X_AC_GPL_LICENSED
 X_AC_HUMOR
 
@@ -67,6 +67,7 @@ X_AC_CHECK_COND_LIB(z, compress)
 AC_HEADER_STDC
 AC_CHECK_HEADERS( \
   bzlib.h \
+  standards.h \
   zlib.h \
 )
 
@@ -76,13 +77,16 @@ AC_CHECK_HEADERS( \
 AC_C_BIGENDIAN
 AC_C_CONST
 AC_TYPE_UID_T
+AC_CHECK_TYPES(socklen_t, [], [], [#include <sys/socket.h>])
+
 
 ##
 # Checks for how to authenticate a non-parent process.
 ##
 AC_CHECK_FUNCS(getpeereid)
 X_AC_CHECK_PEERCRED
-AC_CHECK_TYPES(struct strrecvfd, [], [], [#include <stropts.h>])
+AC_CHECK_FILES(/dev/spx)
+X_AC_CHECK_FIFO_RECVFD
 
 ##
 # Checks for OpenSSL library functions.
