@@ -1,5 +1,8 @@
 2004-09-17  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/munged/timer.c:
+	  Moved pthread_cond_signal() outside of critical region.
+
 	* src/munged/gids.c(gids_destroy):
 	  Moved hash_destroy() outside of critical region.
 

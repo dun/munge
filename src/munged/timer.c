@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: timer.c,v 1.9 2004/08/05 21:18:40 dun Exp $
+ *  $Id: timer.c,v 1.10 2004/09/17 20:21:42 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -193,6 +193,7 @@ timer_set_absolute (callback_f cb, void *arg, const struct timespec *tsp)
     _timer_t    t_curr;
     _timer_t   *t_prev_ptr;
     static int  id = 1;
+    int         do_signal = 0;
 
     if (!cb) {
         errno = EINVAL;
@@ -223,16 +224,21 @@ timer_set_absolute (callback_f cb, void *arg, const struct timespec *tsp)
     }
     *t_prev_ptr = t;
     t->next = t_curr;
-
-    /*  Only signal the timer thread if the active timer has changed.
+    /*
+     *  Only signal the timer thread if the active timer has changed.
+     *  Set a flag here so the signal can be done outside the monitor lock.
      */
     if (t_prev_ptr == &timer_active) {
-        if ((errno = pthread_cond_signal (&timer_cond)) != 0)
-            log_errno (EMUNGE_SNAFU, LOG_ERR,
-                "Unable to signal timer condition");
+        do_signal = 1;
     }
     if ((errno = pthread_mutex_unlock (&timer_mutex)) != 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to unlock timer mutex");
+    }
+    if (do_signal) {
+        if ((errno = pthread_cond_signal (&timer_cond)) != 0) {
+            log_errno (EMUNGE_SNAFU, LOG_ERR,
+                "Unable to signal timer condition");
+        }
     }
     assert (t->id > 0);
     return (t->id);
@@ -277,6 +283,7 @@ timer_cancel (int id)
  */
     _timer_t    t_curr;
     _timer_t   *t_prev_ptr;
+    int         do_signal = 0;
 
     if (id <= 0) {
         errno = EINVAL;
@@ -301,16 +308,20 @@ timer_cancel (int id)
         timer_inactive = t_curr;
         /*
          *  Only signal the timer thread if the active timer was canceled.
+         *  Set a flag here so the signal can be done outside the monitor lock.
          */
         if (t_prev_ptr == &timer_active) {
-            if ((errno = pthread_cond_signal (&timer_cond)) != 0) {
-                log_errno (EMUNGE_SNAFU, LOG_ERR,
-                    "Unable to signal timer condition");
-            }
+            do_signal = 1;
         }
     }
     if ((errno = pthread_mutex_unlock (&timer_mutex)) != 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to unlock timer mutex");
+    }
+    if (do_signal) {
+        if ((errno = pthread_cond_signal (&timer_cond)) != 0) {
+            log_errno (EMUNGE_SNAFU, LOG_ERR,
+                "Unable to signal timer condition");
+        }
     }
     return (t_curr ? 1 : 0);
 }
