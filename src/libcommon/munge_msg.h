@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munge_msg.h,v 1.15 2004/09/23 21:10:11 dun Exp $
+ *  $Id: munge_msg.h,v 1.16 2004/10/13 20:07:37 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -48,7 +48,7 @@
  *    otherwise, the message may be parsed incorrectly when decoded.
  *  In retrospect, the struct munge_msg_v1 type name was poorly chosen.
  */
-#define MUNGE_MSG_VERSION               2
+#define MUNGE_MSG_VERSION               3
 
 
 /*****************************************************************************

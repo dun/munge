@@ -1,3 +1,8 @@
+2004-10-13  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/libcommon/munge_msg.h: Incremented MUNGE_MSG_VERSION to 3
+	  since retry field was added to munge_msg_head struct.
+
 2004-09-24  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/libcommon/munge_defs.h: Tweaked comments.
