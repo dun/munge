@@ -1,3 +1,7 @@
+2004-04-06  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/etc/munge.init: Tweaked in an attempt to make path independent.
+
 2004-04-02  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* : Added official UCRL number.

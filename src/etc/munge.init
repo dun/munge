@@ -1,6 +1,6 @@
-#!/bin/sh
+#know !/bin/sh
 ###############################################################################
-# $Id: munge.init,v 1.7 2004/04/02 21:00:25 dun Exp $
+# $Id: munge.init,v 1.8 2004/04/06 20:16:09 dun Exp $
 ###############################################################################
 # chkconfig:	345 40 60
 # description:	The MUNGE daemon is a user authentication service.
@@ -17,8 +17,8 @@ SUBSYS="/var/lock/subsys/`echo $0 | perl -pe 's,(.*/)?([SK][0-9]{2})?(.*),$3,'`"
 INITLOG_ARGS=""
 
 # Ensure the package is still installed.
-# which "$DAEMON" 1>/dev/null 2>&1 || exit 5
-[ -x "/usr/sbin/$DAEMON" ] || exit 5
+# [ -x "/usr/sbin/$DAEMON" ] || exit 5
+which "$DAEMON" 1>/dev/null 2>&1 || exit 5
 
 # See how we were called.
 case "$1" in
