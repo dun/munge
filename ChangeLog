@@ -1,3 +1,7 @@
+2003-04-24  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/munge/unmunge.c: Changed "t" & "T" cmdline opts to "k" & "K".
+
 2003-04-23  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/munged/dec_v1.c: Ensured MUNGE_TTL_FOREVER never expires.
@@ -60,3 +64,4 @@
 2002-12-20  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* : Initial commit.
+

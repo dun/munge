@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: unmunge.c,v 1.6 2003/04/23 18:22:35 dun Exp $
+ *  $Id: unmunge.c,v 1.7 2003/04/24 19:58:38 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -54,17 +54,17 @@ struct option opt_table[] = {
     { "version",    0, NULL, 'V' },
     { "verbose",    0, NULL, 'v' },
     { "input",      1, NULL, 'i' },
+    { "keys",       1, NULL, 'k' },
+    { "list-keys",  0, NULL, 'K' },
     { "metadata",   1, NULL, 'm' },
     { "no-output",  0, NULL, 'n' },
     { "output",     1, NULL, 'o' },
     { "socket",     1, NULL, 'S' },
-    { "tags",       1, NULL, 't' },
-    { "list-tags",  0, NULL, 'T' },
     {  NULL,        0, NULL,  0  }
 };
 #endif /* HAVE_GETOPT_H */
 
-const char * const opt_string = "hLVvi:m:no:S:t:T";
+const char * const opt_string = "hLVvi:k:Km:no:S:";
 
 
 /*****************************************************************************
@@ -74,24 +74,24 @@ const char * const opt_string = "hLVvi:m:no:S:t:T";
 typedef struct {
     int   val;
     char *str;
-} tag_t;
+} strval_t;
 
 typedef enum {
-    MUNGE_TAG_STATUS_CODE,
-    MUNGE_TAG_STATUS_TEXT,
-    MUNGE_TAG_UID,
-    MUNGE_TAG_GID,
-    MUNGE_TAG_LENGTH,
-    MUNGE_TAG_LAST
-} munge_tag_t;
+    MUNGE_KEY_STATUS_CODE,
+    MUNGE_KEY_STATUS_TEXT,
+    MUNGE_KEY_UID,
+    MUNGE_KEY_GID,
+    MUNGE_KEY_LENGTH,
+    MUNGE_KEY_LAST
+} munge_key_t;
 
-tag_t munge_tags[] = {
-    { MUNGE_TAG_STATUS_CODE, "STATUS-CODE" },
-    { MUNGE_TAG_STATUS_TEXT, "STATUS-TEXT" },
-    { MUNGE_TAG_UID,         "UID"         },
-    { MUNGE_TAG_GID,         "GID"         },
-    { MUNGE_TAG_LENGTH,      "LENGTH"      },
-    { MUNGE_TAG_LAST,         NULL         }
+strval_t munge_keys[] = {
+    { MUNGE_KEY_STATUS_CODE, "STATUS-CODE" },
+    { MUNGE_KEY_STATUS_TEXT, "STATUS-TEXT" },
+    { MUNGE_KEY_UID,         "UID"         },
+    { MUNGE_KEY_GID,         "GID"         },
+    { MUNGE_KEY_LENGTH,      "LENGTH"      },
+    { MUNGE_KEY_LAST,         NULL         }
 };
 
 
@@ -114,8 +114,8 @@ struct conf {
     void        *data;                  /* unmunged payload data             */
     uid_t        uid;                   /* process uid according to cred     */
     gid_t        gid;                   /* process gid according to cred     */
-    char         tag[MUNGE_TAG_LAST];   /* tag flag array (true if enabled)  */
-    int          tag_max_str_len;       /* max strlen of any given tag       */
+    char         key[MUNGE_KEY_LAST];   /* key flag array (true if enabled)  */
+    int          key_max_str_len;       /* max strlen of any given key       */
 };
 
 typedef struct conf * conf_t;
@@ -129,13 +129,13 @@ conf_t create_conf (void);
 void destroy_conf (conf_t conf);
 void parse_cmdline (conf_t conf, int argc, char **argv);
 void display_help (char *prog);
-void parse_tags (conf_t conf, char *tags);
-void display_tags (void);
+void parse_keys (conf_t conf, char *keys);
+void display_keys (void);
 void open_files (conf_t conf);
 void display_meta (conf_t conf);
 void display_data (conf_t conf);
-int tag_str_to_val (char *str);
-char * tag_val_to_str (int val);
+int key_str_to_val (char *str);
+char * key_val_to_str (int val);
 
 
 /*****************************************************************************
@@ -208,12 +208,12 @@ create_conf (void)
     conf->data = NULL;
     conf->uid = -1;
     conf->gid = -1;
-    for (i=0, maxlen=0; i<MUNGE_TAG_LAST; i++) {
-        conf->tag[i] = 0;
-        len = strlen (tag_val_to_str (i));
+    for (i=0, maxlen=0; i<MUNGE_KEY_LAST; i++) {
+        conf->key[i] = 0;
+        len = strlen (key_val_to_str (i));
         maxlen = MAX (maxlen, len);
     }
-    conf->tag_max_str_len = maxlen;
+    conf->key_max_str_len = maxlen;
 
     return (conf);
 }
@@ -266,7 +266,7 @@ destroy_conf (conf_t conf)
 void
 parse_cmdline (conf_t conf, int argc, char **argv)
 {
-    int         got_tags = 0;
+    int         got_keys = 0;
     char       *prog;
     char        c;
     munge_err_t e;
@@ -303,6 +303,14 @@ parse_cmdline (conf_t conf, int argc, char **argv)
             case 'i':
                 conf->fn_in = optarg;
                 break;
+            case 'k':
+                got_keys = 1;
+                parse_keys (conf, optarg);
+                break;
+            case 'K':
+                display_keys ();
+                exit (EMUNGE_SUCCESS);
+                break;
             case 'm':
                 conf->fn_meta = optarg;
                 break;
@@ -318,14 +326,6 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                 if (e != EMUNGE_SUCCESS)
                     log_err (EMUNGE_SNAFU, LOG_ERR,
                         "Unable to set munge socket name");
-                break;
-            case 't':
-                got_tags = 1;
-                parse_tags (conf, optarg);
-                break;
-            case 'T':
-                display_tags ();
-                exit (EMUNGE_SUCCESS);
                 break;
             case '?':
                 if (optopt > 0)
@@ -345,11 +345,11 @@ parse_cmdline (conf_t conf, int argc, char **argv)
         log_err (EMUNGE_SNAFU, LOG_ERR,
             "Unrecognized parameter \"%s\"", argv[optind]);
     }
-    /*  Enable all metadata tags if a subset was not specified.
+    /*  Enable all metadata keys if a subset was not specified.
      */
-    if (!got_tags) {
-        for (i=0; i<MUNGE_TAG_LAST; i++)
-            conf->tag[i] = 1;
+    if (!got_keys) {
+        for (i=0; i<MUNGE_KEY_LAST; i++)
+            conf->key[i] = 1;
     }
     return;
 }
@@ -382,26 +382,30 @@ display_help (char *prog)
     printf ("  %*s %s\n", w, (got_long ? "-v, --verbose" : "-v"),
             "Be verbose");
 
+    printf ("\n");
+
     printf ("  %*s %s\n", w, (got_long ? "-i, --input=FILE" : "-i FILE"),
             "Input credential from FILE");
 
     printf ("  %*s %s\n", w, (got_long ? "-m, --metadata=FILE" : "-m FILE"),
             "Output metadata to FILE");
 
-    printf ("  %*s %s\n", w, (got_long ? "-n, --no-output" : "-n"),
-            "Redirect all output to /dev/null");
-
     printf ("  %*s %s\n", w, (got_long ? "-o, --output=FILE" : "-o FILE"),
             "Output payload to FILE");
 
+    printf ("  %*s %s\n", w, (got_long ? "-n, --no-output" : "-n"),
+            "Redirect all output to /dev/null");
+
+    printf ("\n");
+
+    printf ("  %*s %s\n", w, (got_long ? "-k, --keys=STRING" : "-k STRING"),
+            "Specify subset of metadata keys to output");
+
+    printf ("  %*s %s\n", w, (got_long ? "-K, --list-keys" : "-K"),
+            "Print a list of metadata keys");
+
     printf ("  %*s %s\n", w, (got_long ? "-S, --socket=STRING" : "-S STRING"),
             "Specify local domain socket");
-
-    printf ("  %*s %s\n", w, (got_long ? "-t, --tags=STRING" : "-t STRING"),
-            "Specify subset of metadata tags to output");
-
-    printf ("  %*s %s\n", w, (got_long ? "-T, --list-tags" : "-T"),
-            "Print a list of metadata tags");
 
     printf ("\n");
     printf ("By default, data is read from stdin and written to stdout.\n\n");
@@ -411,32 +415,32 @@ display_help (char *prog)
 
 
 void
-parse_tags (conf_t conf, char *tags)
+parse_keys (conf_t conf, char *keys)
 {
     const char *separators = " \t\n.,;";
-    char       *tag;
+    char       *key;
     int         val;
 
-    if (!tags || !*tags)
+    if (!keys || !*keys)
         return;
-    tag = strtok (tags, separators);
-    while (tag != NULL) {
-        val = tag_str_to_val (tag);
+    key = strtok (keys, separators);
+    while (key != NULL) {
+        val = key_str_to_val (key);
         if (val >= 0)
-            conf->tag[val] = 1;
-        tag = strtok (NULL, separators);
+            conf->key[val] = 1;
+        key = strtok (NULL, separators);
     }
     return;
 }
 
 
 void
-display_tags (void)
+display_keys (void)
 {
     int i;
 
-    for (i=0; i<MUNGE_TAG_LAST; i++)
-        printf ("%s\n", munge_tags[i].str);
+    for (i=0; i<MUNGE_KEY_LAST; i++)
+        printf ("%s\n", munge_keys[i].str);
     return;
 }
 
@@ -489,15 +493,15 @@ display_meta (conf_t conf)
     if (!conf->fp_meta)
         return;
 
-    pad = conf->tag_max_str_len + 2;
+    pad = conf->key_max_str_len + 2;
 
-    if (conf->tag[MUNGE_TAG_STATUS_CODE]) {
-        s = tag_val_to_str (MUNGE_TAG_STATUS_CODE);
+    if (conf->key[MUNGE_KEY_STATUS_CODE]) {
+        s = key_val_to_str (MUNGE_KEY_STATUS_CODE);
         w = pad - strlen (s);
         fprintf (conf->fp_meta, "%s:%*c%d\n", s, w, 0x20, conf->status);
     }
-    if (conf->tag[MUNGE_TAG_STATUS_TEXT]) {
-        s = tag_val_to_str (MUNGE_TAG_STATUS_TEXT);
+    if (conf->key[MUNGE_KEY_STATUS_TEXT]) {
+        s = key_val_to_str (MUNGE_KEY_STATUS_TEXT);
         w = pad - strlen (s);
         fprintf (conf->fp_meta, "%s:%*c%s\n", s, w, 0x20,
             munge_strerror (conf->status));
@@ -505,18 +509,18 @@ display_meta (conf_t conf)
     if (conf->status != EMUNGE_SUCCESS)
         return;
 
-    if (conf->tag[MUNGE_TAG_UID]) {
-        s = tag_val_to_str (MUNGE_TAG_UID);
+    if (conf->key[MUNGE_KEY_UID]) {
+        s = key_val_to_str (MUNGE_KEY_UID);
         w = pad - strlen (s);
         fprintf (conf->fp_meta, "%s:%*c%d\n", s, w, 0x20, conf->uid);
     }
-    if (conf->tag[MUNGE_TAG_GID]) {
-        s = tag_val_to_str (MUNGE_TAG_GID);
+    if (conf->key[MUNGE_KEY_GID]) {
+        s = key_val_to_str (MUNGE_KEY_GID);
         w = pad - strlen (s);
         fprintf (conf->fp_meta, "%s:%*c%d\n", s, w, 0x20, conf->gid);
     }
-    if (conf->tag[MUNGE_TAG_LENGTH]) {
-        s = tag_val_to_str (MUNGE_TAG_LENGTH);
+    if (conf->key[MUNGE_KEY_LENGTH]) {
+        s = key_val_to_str (MUNGE_KEY_LENGTH);
         w = pad - strlen (s);
         fprintf (conf->fp_meta, "%s:%*c%d\n", s, w, 0x20, conf->dlen);
     }
@@ -546,14 +550,14 @@ display_data (conf_t conf)
 
 
 int
-tag_str_to_val (char *str)
+key_str_to_val (char *str)
 {
     int i;
 
     if (!str || !*str)
         return (-1);
-    for (i=0; i<MUNGE_TAG_LAST; i++) {
-        if (!strcasecmp (str, munge_tags[i].str))
+    for (i=0; i<MUNGE_KEY_LAST; i++) {
+        if (!strcasecmp (str, munge_keys[i].str))
             return (i);
     }
     return (-1);
@@ -561,13 +565,13 @@ tag_str_to_val (char *str)
 
 
 char *
-tag_val_to_str (int val)
+key_val_to_str (int val)
 {
     int i;
 
-    for (i=0; i<MUNGE_TAG_LAST; i++) {
-        if (val == munge_tags[i].val)
-            return (munge_tags[i].str);
+    for (i=0; i<MUNGE_KEY_LAST; i++) {
+        if (val == munge_keys[i].val)
+            return (munge_keys[i].str);
     }
     return (NULL);
 }
