@@ -1,15 +1,15 @@
 #!/bin/sh
 ##
-# $Id: bootstrap,v 1.2 2003/02/13 17:53:04 dun Exp $
+# $Id: bootstrap,v 1.3 2004/03/18 19:17:51 dun Exp $
 ##
 
 PATH=/bin:/usr/bin:/usr/local/bin
 
 set -x
 aclocal -I config || exit 1
-libtoolize --automake --copy || exit 1
+libtoolize --automake --copy --force || exit 1
 autoheader || exit 1
-automake --add-missing --copy --gnu || exit 1
-autoconf --warnings=all || exit 1
+automake --add-missing --copy --force-missing --gnu || exit 1
+autoconf --force --warnings=all || exit 1
 rm -fr autom4te*.cache
 exit 0
