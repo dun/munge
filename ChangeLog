@@ -1,5 +1,8 @@
 2004-09-16  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/munged/dec_v1.c, src/munged/enc_v1.c:
+	  Removed extern declaration of conf -- now in conf.h.
+
 	* src/munged/gids.c, src/munged/gids.h:
 	  Added timer to periodically re-parse group info.
 	* src/munged/conf.c, src/munged/conf.h:
