@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: license.c,v 1.2 2003/02/18 19:46:19 dun Exp $
+ *  $Id: license.c,v 1.3 2003/04/08 18:16:16 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -22,8 +22,6 @@
  *  You should have received a copy of the GNU General Public License;
  *  if not, write to the Free Software Foundation, Inc., 59 Temple Place,
  *  Suite 330, Boston, MA  02111-1307  USA.
- *****************************************************************************
- *  Refer to "license.h" for documentation on public functions.
  *****************************************************************************/
 
 
@@ -33,9 +31,11 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include "license.h"
 
 
 static const char *license = \
+    "Welcome to the Munge Uid 'N' Gid Emporium (MUNGE).\n\n"                  \
     "Copyright (C) 2002-2003 The Regents of the University of California.\n"  \
     "Produced at Lawrence Livermore National Laboratory.\n"                   \
     "Written by Chris Dunlap <cdunlap@llnl.gov>.\n"                           \
@@ -43,7 +43,7 @@ static const char *license = \
     "UCRL-CODE-2003-???\n\n"                                                  \
     "Munge is free software; you can redistribute it and/or modify it\n"      \
     "under the terms of the GNU General Public License as published by\n"     \
-    "the Free Software Foundation.\n";
+    "the Free Software Foundation.\n\n";
 
 
 void
