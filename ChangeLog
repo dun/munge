@@ -1,3 +1,8 @@
+2004-12-21  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/etc/munge.init:
+	  Fixed bug preventing priorities from being recognized by chkconfig.
+
 2004-12-08  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/munged/auth_recv.c: Added <sys/types.h> include for getpeereid().

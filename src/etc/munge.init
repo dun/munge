@@ -1,6 +1,8 @@
 #!/bin/sh
 ###############################################################################
-# $Id: munge.init,v 1.11 2004/12/03 00:34:37 dun Exp $
+# $Id: munge.init,v 1.12 2004/12/22 00:58:06 dun Exp $
+###############################################################################
+# chkconfig:      345 40 60
 ###############################################################################
 ### BEGIN INIT INFO
 # Provides:       munge
@@ -9,10 +11,6 @@
 # Default-Stop:   0 1 2 6
 # Description:    Start the MUNGE user authentication service.
 ### END INIT INFO
-###############################################################################
-# chkconfig:      345 40 60
-# description:    Start the MUNGE user authentication service.
-# processname:    munged
 ###############################################################################
 
 SERVICE="MUNGE"
