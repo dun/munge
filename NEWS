@@ -10,6 +10,7 @@ Version 0.4 (2004-12-07):
   - Added manpages.
   - Added support for configure to locate OpenSSL installation.
   - Added support for fd-passing over ramdisks.
+  - Added support for SuSE/LSB to init script.
   - Added support for C++.
   - Improved support for AIX.
   - Optimized memory usage.
