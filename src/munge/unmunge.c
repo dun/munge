@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: unmunge.c,v 1.14 2003/05/22 21:08:59 dun Exp $
+ *  $Id: unmunge.c,v 1.15 2003/05/30 01:20:12 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -29,15 +29,18 @@
 #  include "config.h"
 #endif /* HAVE_CONFIG_H */
 
+#include <arpa/inet.h>                  /* for inet_ntoa()                   */
 #include <assert.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <grp.h>
 #include <limits.h>
+#include <netdb.h>                      /* for gethostbyaddr()               */
 #include <pwd.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/socket.h>                 /* for AF_INET                       */
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <time.h>
@@ -90,6 +93,7 @@ typedef struct {
 
 typedef enum {
     MUNGE_KEY_STATUS,
+    MUNGE_KEY_ORIGIN,
     MUNGE_KEY_ENCODE_TIME,
     MUNGE_KEY_DECODE_TIME,
     MUNGE_KEY_CIPHER_TYPE,
@@ -103,6 +107,7 @@ typedef enum {
 
 strval_t munge_keys[] = {
     { MUNGE_KEY_STATUS,      "STATUS"  },
+    { MUNGE_KEY_ORIGIN,      "ORIGIN"  },
     { MUNGE_KEY_ENCODE_TIME, "ENCODED" },
     { MUNGE_KEY_DECODE_TIME, "DECODED" },
     { MUNGE_KEY_CIPHER_TYPE, "CIPHER"  },
@@ -523,17 +528,19 @@ open_files (conf_t conf)
 void
 display_meta (conf_t conf)
 {
-    int            pad;                 /* num chars reserved for key field  */
-    char          *s;                   /* key field string                  */
-    int            w;                   /* width of space chars to fill pad  */
-    munge_err_t    e;                   /* munge error condition             */
-    time_t         t;                   /* time (seconds since epoch)        */
-    struct tm     *tm_ptr;              /* ptr to broken-down time entry     */
-    int            tlen;                /* length of time string             */
-    char           tbuf[MAX_TIME_STR];  /* time string buffer                */
-    int            i;                   /* all-purpose int                   */
-    struct passwd *pw_ptr;              /* ptr to broken-down password entry */
-    struct group  *gr_ptr;              /* ptr to broken-down group entry    */
+    int             pad;                /* num chars reserved for key field  */
+    char           *s;                  /* key field string                  */
+    int             w;                  /* width of space chars to fill pad  */
+    munge_err_t     e;                  /* munge error condition             */
+    struct in_addr  addr;               /* IPv4 addr                         */
+    struct hostent *hptr;               /* ptr to static hostent struct      */
+    time_t          t;                  /* time (seconds since epoch)        */
+    struct tm      *tm_ptr;             /* ptr to broken-down time entry     */
+    int             tlen;               /* length of time string             */
+    char            tbuf[MAX_TIME_STR]; /* time string buffer                */
+    int             i;                  /* all-purpose int                   */
+    struct passwd  *pw_ptr;             /* ptr to broken-down password entry */
+    struct group   *gr_ptr;             /* ptr to broken-down group entry    */
 
     if (!conf->fp_meta) {
         return;
@@ -548,6 +555,18 @@ display_meta (conf_t conf)
     }
     if (conf->status != EMUNGE_SUCCESS) {
         return;
+    }
+    if (conf->key[MUNGE_KEY_ORIGIN]) {
+        e = munge_ctx_get (conf->ctx, MUNGE_OPT_ADDR4, &addr);
+        if (e != EMUNGE_SUCCESS)
+            log_err (EMUNGE_SNAFU, LOG_ERR,
+                "Unable to retrieve origin ip address: %s",
+                munge_ctx_strerror (conf->ctx));
+        hptr = gethostbyaddr ((char *) &addr, sizeof (addr), AF_INET);
+        s = key_val_to_str (MUNGE_KEY_ORIGIN);
+        w = pad - strlen (s);
+        fprintf (conf->fp_meta, "%s:%*c%s (%s)\n", s, w, 0x20,
+            (hptr ? hptr->h_name : "???"), inet_ntoa (addr));
     }
     if (conf->key[MUNGE_KEY_ENCODE_TIME]) {
         e = munge_ctx_get (conf->ctx, MUNGE_OPT_ENCODE_TIME, &t);

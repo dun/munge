@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: conf.h,v 1.2 2003/04/18 23:20:18 dun Exp $
+ *  $Id: conf.h,v 1.3 2003/05/30 01:20:12 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -33,6 +33,7 @@
 #endif /* HAVE_STDINT_H */
 
 #include <munge.h>
+#include <netinet/in.h>
 
 
 /*****************************************************************************
@@ -56,6 +57,7 @@ struct conf {
     int             dek_key_len;        /* length of cipher subkey           */
     unsigned char  *mac_key;            /* subkey for mac ops                */
     int             mac_key_len;        /* length of mac subkey              */
+    struct in_addr  addr;               /* IPv4 addr in n/w byte order       */
 };
 
 typedef struct conf * conf_t;
@@ -74,6 +76,8 @@ void parse_cmdline (conf_t conf, int argc, char **argv);
 void display_help (char *prog);
 
 void create_subkeys (conf_t conf);
+
+void lookup_ip_addr (conf_t conf);
 
 
 #endif /* !MUNGE_CONF_H */

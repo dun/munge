@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munge_msg.h,v 1.5 2003/04/30 00:11:00 dun Exp $
+ *  $Id: munge_msg.h,v 1.6 2003/05/30 01:20:12 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -38,6 +38,7 @@
 #endif /* HAVE_STDING_H */
 
 #include <munge.h>
+#include <netinet/in.h>                 /* for struct in_addr                */
 
 
 /*****************************************************************************
@@ -69,6 +70,8 @@ struct munge_msg_v1 {
     uint8_t                 realm_len;  /* length of realm string            */
     char                   *realm;      /* security realm string             */
     uint32_t                ttl;        /* time-to-live                      */
+    uint8_t                 addr_len;   /* length of IP address              */
+    struct in_addr          addr;       /* IP addr where cred was encoded    */
     uint32_t                time0;      /* time at which cred was encoded    */
     uint32_t                time1;      /* time at which cred was decoded    */
     uint32_t                uid;        /* client process UID encoding cred  */

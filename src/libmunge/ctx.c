@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: ctx.c,v 1.6 2003/04/30 00:11:00 dun Exp $
+ *  $Id: ctx.c,v 1.7 2003/05/30 01:20:12 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -30,6 +30,7 @@
 #endif /* HAVE_CONFIG_H */
 
 #include <assert.h>
+#include <netinet/in.h>
 #include <stdarg.h>
 #include <stdlib.h>
 #include <string.h>
@@ -53,10 +54,11 @@ munge_ctx_create (void)
         return (NULL);
     }
     ctx->cipher = MUNGE_CIPHER_DEFAULT;
-    ctx->zip = MUNGE_ZIP_DEFAULT;
     ctx->mac = MUNGE_MAC_DEFAULT;
-    ctx->ttl = MUNGE_TTL_DEFAULT;
+    ctx->zip = MUNGE_ZIP_DEFAULT;
     ctx->realm = NULL;
+    ctx->ttl = MUNGE_TTL_DEFAULT;
+    ctx->addr.s_addr = 0;
     ctx->time0 = 0;
     ctx->time1 = 0;
     ctx->socket = strdup (MUNGE_SOCKET_NAME);
@@ -114,10 +116,11 @@ munge_ctx_strerror (munge_ctx_t ctx)
 munge_err_t
 munge_ctx_get (munge_ctx_t ctx, munge_opt_t opt, ...)
 {
-    int         *p2int;
-    char       **p2str;
-    time_t      *p2time;
-    va_list      vargs;
+    int             *p2int;
+    char           **p2str;
+    struct in_addr  *p2addr;
+    time_t          *p2time;
+    va_list          vargs;
 
     assert (ctx != NULL);
 
@@ -135,21 +138,25 @@ munge_ctx_get (munge_ctx_t ctx, munge_opt_t opt, ...)
             p2int = va_arg (vargs, int *);
             *p2int = ctx->cipher;
             break;
+        case MUNGE_OPT_MAC_TYPE:
+            p2int = va_arg (vargs, int *);
+            *p2int = ctx->mac;
+            break;
         case MUNGE_OPT_ZIP_TYPE:
             p2int = va_arg (vargs, int *);
             *p2int = ctx->zip;
             break;
-        case MUNGE_OPT_MAC_TYPE:
-            p2int = va_arg (vargs, int *);
-            *p2int = ctx->mac;
+        case MUNGE_OPT_REALM:
+            p2str = va_arg (vargs, char **);
+            *p2str = ctx->realm;
             break;
         case MUNGE_OPT_TTL:
             p2int = va_arg (vargs, int *);
             *p2int = ctx->ttl;
             break;
-        case MUNGE_OPT_REALM:
-            p2str = va_arg (vargs, char **);
-            *p2str = ctx->realm;
+        case MUNGE_OPT_ADDR4:
+            p2addr = va_arg (vargs, struct in_addr *);
+            *p2addr = ctx->addr;
             break;
         case MUNGE_OPT_ENCODE_TIME:
             p2time = va_arg (vargs, time_t *);
@@ -194,14 +201,11 @@ munge_ctx_set (munge_ctx_t ctx, munge_opt_t opt, ...)
         case MUNGE_OPT_CIPHER_TYPE:
             ctx->cipher = va_arg (vargs, int);
             break;
-        case MUNGE_OPT_ZIP_TYPE:
-            ctx->zip = va_arg (vargs, int);
-            break;
         case MUNGE_OPT_MAC_TYPE:
             ctx->mac = va_arg (vargs, int);
             break;
-        case MUNGE_OPT_TTL:
-            ctx->ttl = va_arg (vargs, int);
+        case MUNGE_OPT_ZIP_TYPE:
+            ctx->zip = va_arg (vargs, int);
             break;
         case MUNGE_OPT_REALM:
             str = va_arg (vargs, char *);
@@ -215,11 +219,8 @@ munge_ctx_set (munge_ctx_t ctx, munge_opt_t opt, ...)
                 free (ctx->realm);
             ctx->realm = p;
             break;
-        case MUNGE_OPT_ENCODE_TIME:
-            ctx->time0 = va_arg (vargs, time_t);
-            break;
-        case MUNGE_OPT_DECODE_TIME:
-            ctx->time1 = va_arg (vargs, time_t);
+        case MUNGE_OPT_TTL:
+            ctx->ttl = va_arg (vargs, int);
             break;
         case MUNGE_OPT_SOCKET:
             str = va_arg (vargs, char *);
@@ -233,6 +234,12 @@ munge_ctx_set (munge_ctx_t ctx, munge_opt_t opt, ...)
                 free (ctx->socket);
             ctx->socket = p;
             break;
+        case MUNGE_OPT_ADDR4:
+            /* this option cannot be set; fall through to error case */
+        case MUNGE_OPT_ENCODE_TIME:
+            /* this option cannot be set; fall through to error case */
+        case MUNGE_OPT_DECODE_TIME:
+            /* this option cannot be set; fall through to error case */
         default:
             ctx->errnum = EMUNGE_BAD_ARG;
             break;

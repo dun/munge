@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: enc_v1.c,v 1.5 2003/04/25 23:23:11 dun Exp $
+ *  $Id: enc_v1.c,v 1.6 2003/05/30 01:20:12 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -336,11 +336,13 @@ enc_v1_pack_inner (munge_cred_t c)
 /*  Packs the "inner" credential data into MSBF (ie, big endian) format.
  *  The "inner" part of the credential may be subjected to cryptographic
  *    transformations (ie, compression and encryption).  It includes:
- *    salt, encode time, uid, gid, data length, and data (if present).
+ *    salt, ip addr len, origin ip addr, encode time, uid, gid, data length,
+ *    and data (if present).
  */
     struct munge_msg_v1 *m1;            /* munge msg (v1 format)             */
     unsigned char       *p;             /* ptr into packed data              */
-    uint32_t             u;             /* tmp for packing into into MSBF    */
+    uint8_t              u8;            /* tmp for packing single octet      */
+    uint32_t             u32;           /* tmp for packing into into MSBF    */
 
     assert (c != NULL);
     assert (c->inner_mem == NULL);
@@ -350,6 +352,8 @@ enc_v1_pack_inner (munge_cred_t c)
     m1 = c->msg->pbody;
 
     c->inner_mem_len += c->salt_len;
+    c->inner_mem_len += sizeof (m1->addr_len);
+    c->inner_mem_len += sizeof (m1->addr);
     c->inner_mem_len += sizeof (m1->time0);
     c->inner_mem_len += sizeof (m1->uid);
     c->inner_mem_len += sizeof (m1->gid);
@@ -365,24 +369,33 @@ enc_v1_pack_inner (munge_cred_t c)
     memcpy (p, c->salt, c->salt_len);
     p += c->salt_len;
 
+    assert (sizeof (m1->addr_len) == 1);
+    assert (sizeof (conf->addr) == sizeof (m1->addr));
+    assert (sizeof (conf->addr) < 256);
+    u8 = sizeof (conf->addr);
+    memcpy (p, &u8, sizeof (m1->addr_len));
+    p += sizeof (m1->addr_len);
+    memcpy (p, &conf->addr, sizeof (m1->addr));
+    p += sizeof (m1->addr);
+
     assert (sizeof (m1->time0) == 4);
-    u = htonl (m1->time0);
-    memcpy (p, &u, sizeof (m1->time0));
+    u32 = htonl (m1->time0);
+    memcpy (p, &u32, sizeof (m1->time0));
     p += sizeof (m1->time0);
 
     assert (sizeof (m1->uid) == 4);
-    u = htonl (m1->uid);
-    memcpy (p, &u, sizeof (m1->uid));
+    u32 = htonl (m1->uid);
+    memcpy (p, &u32, sizeof (m1->uid));
     p += sizeof (m1->uid);
 
     assert (sizeof (m1->gid) == 4);
-    u = htonl (m1->gid);
-    memcpy (p, &u, sizeof (m1->gid));
+    u32 = htonl (m1->gid);
+    memcpy (p, &u32, sizeof (m1->gid));
     p += sizeof (m1->gid);
 
     assert (sizeof (m1->data_len) == 4);
-    u = htonl (m1->data_len);
-    memcpy (p, &u, sizeof (m1->data_len));
+    u32 = htonl (m1->data_len);
+    memcpy (p, &u32, sizeof (m1->data_len));
     p += sizeof (m1->data_len);
 
     if (m1->data_len > 0) {

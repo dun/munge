@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munged.c,v 1.5 2003/05/22 17:59:32 dun Exp $
+ *  $Id: munged.c,v 1.6 2003/05/30 01:20:12 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -82,11 +82,12 @@ main (int argc, char *argv[])
     conf = create_conf ();
     parse_cmdline (conf, argc, argv);
 
-    if (!conf->got_foreground)
+    if (!conf->got_foreground) {
         fd = daemonize_init ();
-
+    }
     /*  FIXME: Parse config file.  */
 
+    lookup_ip_addr (conf);
     random_init (conf->seed_name);
     crypto_thread_init ();
     create_subkeys (conf);

@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munge.h,v 1.13 2003/05/22 21:17:10 dun Exp $
+ *  $Id: munge.h,v 1.14 2003/05/30 01:20:12 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -59,9 +59,10 @@ typedef enum munge_opt {
     MUNGE_OPT_ZIP_TYPE          =  2,   /* compression type (int)            */
     MUNGE_OPT_REALM             =  3,   /* security realm (str)              */
     MUNGE_OPT_TTL               =  4,   /* time-to-live (int)                */
-    MUNGE_OPT_ENCODE_TIME       =  5,   /* time when cred encoded (time_t)   */
-    MUNGE_OPT_DECODE_TIME       =  6,   /* time when cred decoded (time_t)   */
-    MUNGE_OPT_SOCKET            =  7,   /* socket for comm w/ daemon (str)   */
+    MUNGE_OPT_ADDR4             =  5,   /* src IPv4 addr (struct in_addr)    */
+    MUNGE_OPT_ENCODE_TIME       =  6,   /* time when cred encoded (time_t)   */
+    MUNGE_OPT_DECODE_TIME       =  7,   /* time when cred decoded (time_t)   */
+    MUNGE_OPT_SOCKET            =  8,   /* socket for comm w/ daemon (str)   */
     MUNGE_OPT_LAST_ENTRY
 } munge_opt_t;
 

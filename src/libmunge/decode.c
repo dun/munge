@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: decode.c,v 1.5 2003/05/02 16:46:47 dun Exp $
+ *  $Id: decode.c,v 1.6 2003/05/30 01:20:12 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -121,12 +121,13 @@ decode_init (munge_ctx_t ctx, void **buf, int *len, uid_t *uid, gid_t *gid)
  */
     if (ctx) {
         ctx->cipher = -1;
-        ctx->zip = -1;
         ctx->mac = -1;
+        ctx->zip = -1;
         if (ctx->realm) {
             free (ctx->realm);
             ctx->realm = NULL;
         }
+        ctx->addr.s_addr = 0;
         ctx->time0 = -1;
         ctx->time1 = -1;
         ctx->errnum = EMUNGE_SUCCESS;
@@ -199,7 +200,7 @@ decode_rsp_v1 (munge_msg_t m, munge_ctx_t ctx,
 {
 /*  Extracts a Decode Response message received from the local munge daemon.
  *  The outputs from this message are as follows:
- *    status, cipher, zip, mac, realm, ttl,
+ *    status, cipher, mac, zip, realm, ttl, addr,
  *    time0, time1, uid, gid, data_len, data.
  */
     struct munge_msg_v1 *m1;
@@ -229,9 +230,8 @@ decode_rsp_v1 (munge_msg_t m, munge_ctx_t ctx,
      */
     if (ctx) {
         ctx->cipher = m1->cipher;
-        ctx->zip = m1->zip;
         ctx->mac = m1->mac;
-        ctx->ttl = m1->ttl;
+        ctx->zip = m1->zip;
         /*
          *  The credential's realm is not NUL-terminated.
          */
@@ -239,6 +239,8 @@ decode_rsp_v1 (munge_msg_t m, munge_ctx_t ctx,
             memcpy (ctx->realm, m1->realm, m1->realm_len);
             ctx->realm[m1->realm_len] = '\0';
         }
+        ctx->ttl = m1->ttl;
+        ctx->addr.s_addr = m1->addr.s_addr;;
         ctx->time0 = m1->time0;
         ctx->time1 = m1->time1;
         ctx->errnum = m1->errnum;

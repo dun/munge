@@ -1,3 +1,13 @@
+2003-05-29  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/libcommon/munge_msg.h, src/libmunge/ctx.c, src/libmunge/ctx.h,
+	  src/libmunge/decode.c, src/libmunge/encode.c, src/libmunge/munge.h,
+	  src/munge/unmunge.c, src/munged/conf.c, src/munged/conf.h,
+	  src/munged/dec_v1.c, src/munged/enc_v1.c, src/munged/munged.c:
+	  Added IP address where cred was encoded into the credential.
+	  This breaks backwards-compatibility with existing credentials.
+	  Added MUNGE_OPT_ADDR4 enum (and tweaked the enum values).
+
 2003-05-22  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/libmunge/munge.h: Update docs for munge_decode() to reflect

@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: dec_v1.c,v 1.6 2003/05/08 00:32:08 dun Exp $
+ *  $Id: dec_v1.c,v 1.7 2003/05/30 01:20:12 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -658,7 +658,8 @@ dec_v1_unpack_inner (munge_cred_t c)
 /*  Unpacks the "inner" credential data from MSBF (ie, big endian) format.
  *  The "inner" part of the credential may have been subjected to cryptographic
  *    transformations (ie, compression and encryption).  It includes:
- *    salt, encode time, uid, gid, data length, and data (if present).
+ *    salt, ip addr len, origin ip addr, encode time, uid, gid, data length,
+ *    and data (if present).
  *  Validation of the "inner" credential occurs here as well since unpacking
  *    may not be able to continue if an invalid field is found.
  *
@@ -696,6 +697,32 @@ dec_v1_unpack_inner (munge_cred_t c)
     }
     p += c->salt_len;
     len -= c->salt_len;
+    /*
+     *  Unpack the length of the origin IP address.
+     */
+    n = sizeof (m1->addr_len);
+    assert (n == 1);
+    if (n > len) {
+        return (_munge_msg_set_err (c->msg, EMUNGE_BAD_CRED,
+            strdup ("Truncated credential origin ip addr length")));
+    }
+    m1->addr_len = *p;
+    p += n;
+    len -= n;
+    /*
+     *  Unpack the origin IP address.
+     */
+    if (m1->addr_len != sizeof (m1->addr)) {
+        return (_munge_msg_set_err (c->msg, EMUNGE_BAD_CRED,
+            strdup ("Invalid credential origin ip addr length")));
+    }
+    if (m1->addr_len > len) {
+        return (_munge_msg_set_err (c->msg, EMUNGE_BAD_CRED,
+            strdup ("Truncated credential origin ip addr")));
+    }
+    memcpy (&m1->addr, p, m1->addr_len);
+    p += m1->addr_len;
+    len -= m1->addr_len;
     /*
      *  Unpack the encode time.
      */

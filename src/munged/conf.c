@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: conf.c,v 1.7 2003/05/16 23:44:17 dun Exp $
+ *  $Id: conf.c,v 1.8 2003/05/30 01:20:12 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -29,12 +29,16 @@
 #  include <config.h>
 #endif /* HAVE_CONFIG_H */
 
+#include <arpa/inet.h>                  /* for inet_ntoa() */
 #include <assert.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <munge.h>
+#include <netdb.h>                      /* for gethostbyname() */
+#include <netinet/in.h>                 /* for struct in_addr */
 #include <stdlib.h>
 #include <string.h>
+#include <sys/param.h>                  /* for MAXHOSTNAMELEN */
 #include <unistd.h>
 #include "conf.h"
 #include "license.h"
@@ -64,7 +68,7 @@ const char * const opt_string = "hLVfFS:";
 
 
 /*****************************************************************************
- *  Functions
+ *  Extern Functions
  *****************************************************************************/
 
 conf_t
@@ -340,5 +344,46 @@ create_subkeys (conf_t conf)
     }
     assert (n == conf->mac_key_len);
 
+    return;
+}
+
+
+void
+lookup_ip_addr (conf_t conf)
+{
+    char hostname [MAXHOSTNAMELEN];
+    struct hostent *hptr;
+    char *host_str;
+    char *ip_str;
+
+    if (gethostname (hostname, sizeof (hostname)) < 0)
+        log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to determine hostname");
+    /*
+     *  The man page doesn't say what happens if the buffer is overrun,
+     *    so guarantee buffer NUL-termination just in case.
+     */
+    hostname [sizeof (hostname) - 1] = '\0';
+    /*
+     *  The gethostbyname() call is not reentrant, but that's ok because:
+     *    1. there is only one thread active at this point, and
+     *    2. this is the only call to gethostbyname().
+     *
+     *  Note that gethostbyname() DOES NOT set errno.
+     */
+    if (!(hptr = gethostbyname (hostname))) {
+        log_err (EMUNGE_SNAFU, LOG_ERR,
+            "Unable to resolve host \"%s\"", hostname);
+    }
+    memcpy (&conf->addr, hptr->h_addr_list[0], sizeof (conf->addr));
+    /*
+     *  The inet_ntoa() call is not reentrant, but that's ok (as above).
+     *
+     *  Yes, I realize inet_ntoa() is dated, but inet_ntop() isn't
+     *    commonplace yet, and this one invocation isn't worth autoconfing.
+     *    Besides, we don't need to be thread-safe just yet.
+     */
+    host_str = hptr->h_name;
+    ip_str = inet_ntoa (conf->addr);
+    log_msg (LOG_NOTICE, "Running on host \"%s\" (%s)", host_str, ip_str);
     return;
 }
