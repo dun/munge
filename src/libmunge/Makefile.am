@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.9 2004/04/09 04:52:13 dun Exp $
+## $Id: Makefile.am,v 1.10 2004/05/01 05:08:26 dun Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
@@ -22,6 +22,8 @@ libmunge_la_LIBADD = \
 	$(LIBSOCKET)
 
 libmunge_la_SOURCES = \
+	auth_send.c \
+	auth_send.h \
 	ctx.c \
 	ctx.h \
 	decode.c \

@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munge_msg.h,v 1.11 2004/04/16 22:15:06 dun Exp $
+ *  $Id: munge_msg.h,v 1.12 2004/05/01 05:08:26 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -54,6 +54,11 @@
  *    NUL-terminated; instead, it is represented as a length followed by an
  *    unterminated string.  This saved space in the credential (since the
  *    NUL would have been redundant) and allowed for quicker unpacking.  
+ *  The MUNGE_MSG_AUTH_FD_REQ type uses the same v1 msg format, even though
+ *    all it needs to do is pass a single string across.  It's really an
+ *    inefficient use of the struct.  Mea culpa.
+ *
+ *  FIXME: The msg layer between client & server should be revamped.
  */
 
 enum munge_type {                       /* message type                      */
@@ -62,6 +67,7 @@ enum munge_type {                       /* message type                      */
     MUNGE_MSG_ENC_RSP,                  /*  encode response message          */
     MUNGE_MSG_DEC_REQ,                  /*  decode request message           */
     MUNGE_MSG_DEC_RSP,                  /*  decode response message          */
+    MUNGE_MSG_AUTH_FD_REQ,              /*  auth via fd request message      */
     MUNGE_MSG_LAST_ENTRY
 };
 

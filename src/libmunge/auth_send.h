@@ -1,13 +1,13 @@
 /*****************************************************************************
- *  $Id: auth.h,v 1.3 2004/04/03 21:53:00 dun Exp $
+ *  $Id: auth_send.h,v 1.1 2004/05/01 05:08:26 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
+ *  UCRL-CODE-155910.
  *
- *  Copyright (C) 2003-2004 The Regents of the University of California.
+ *  Copyright (C) 2004 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
  *  Written by Chris Dunlap <cdunlap@llnl.gov>.
- *  UCRL-CODE-155910.
  *
  *  This is free software; you can redistribute it and/or modify it
  *  under the terms of the GNU General Public License as published by
@@ -25,13 +25,18 @@
  *****************************************************************************/
 
 
-#ifndef MUNGE_AUTH_H
-#define MUNGE_AUTH_H
+#ifndef MUNGE_AUTH_CLIENT_H
+#define MUNGE_AUTH_CLIENT_H
 
-#include <sys/types.h>
-
-
-int auth_peer_get (int sd, uid_t *p2uid, gid_t *p2gid);
+#include <munge.h>
+#include "munge_msg.h"
 
 
-#endif /* !MUNGE_AUTH_H */
+munge_err_t auth_send (munge_msg_t m);
+/*
+ *  Sends data needed to prove the identity of the client to the server
+ *    that sent the auth req msg [m].
+ */
+
+
+#endif /* !MUNGE_AUTH_CLIENT_H */

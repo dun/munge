@@ -1,13 +1,13 @@
 /*****************************************************************************
- *  $Id: auth.c,v 1.4 2004/04/03 21:53:00 dun Exp $
+ *  $Id: auth_recv.h,v 1.1 2004/05/01 05:08:26 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
+ *  UCRL-CODE-155910.
  *
  *  Copyright (C) 2003-2004 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
  *  Written by Chris Dunlap <cdunlap@llnl.gov>.
- *  UCRL-CODE-155910.
  *
  *  This is free software; you can redistribute it and/or modify it
  *  under the terms of the GNU General Public License as published by
@@ -25,45 +25,26 @@
  *****************************************************************************/
 
 
-#if HAVE_CONFIG_H
-#  include <config.h>
-#endif /* HAVE_CONFIG_H */
+#ifndef MUNGE_AUTH_SERVER_H
+#define MUNGE_AUTH_SERVER_H
 
 #include <sys/types.h>
-
-#if HAVE_GETPEEREID
-#  include <unistd.h>
-#elif HAVE_SO_PEERCRED
-#  include <sys/socket.h>
-#endif
+#include <munge.h>
+#include "munge_msg.h"
 
 
-/*  FIXME: Add autoconf support for socklen_t.
+void auth_recv_init (void);
+/*
+ *  Checks for required privileges needed to perform client authentication.
+ */
+
+munge_err_t auth_recv (munge_msg_t m, uid_t *uid, gid_t *gid);
+/*
+ *  Receives the identity of the client that sent msg [m],
+ *    storing the result in the output parms [uid] and [gid].
+ *  Note that the server NEVER simply trusts the client to
+ *    directly provide its identity.
  */
 
 
-int
-auth_peer_get (int sd, uid_t *uid, gid_t *gid)
-{
-#if HAVE_GETPEEREID
-
-    return (getpeereid (sd, uid, gid));
-
-#elif HAVE_SO_PEERCRED
-
-    struct ucred cred;
-    socklen_t len = sizeof (cred);
-
-    if (getsockopt (sd, SOL_SOCKET, SO_PEERCRED, &cred, &len) < 0)
-        return (-1);
-    *uid = cred.uid;
-    *gid = cred.gid;
-
-#else
-
-#error "No support for authenticating a non-parent process."
-
-#endif
-
-    return (0);
-}
+#endif /* !MUNGE_AUTH_SERVER_H */

@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: dec_v1.c,v 1.19 2004/04/16 22:15:06 dun Exp $
+ *  $Id: dec_v1.c,v 1.20 2004/05/01 05:08:26 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -35,7 +35,7 @@
 #include <sys/types.h>                  /* include before in.h for bsd */
 #include <netinet/in.h>
 #include <string.h>
-#include "auth.h"
+#include "auth_recv.h"
 #include "base64.h"
 #include "cipher.h"
 #include "conf.h"
@@ -192,16 +192,20 @@ dec_v1_authenticate (munge_cred_t c)
 /*  Ascertains the UID/GID of the client process.
  */
     struct munge_msg_v1 *m1;            /* munge msg (v1 format)             */
+    uid_t               *p_uid;
+    gid_t               *p_gid;
 
     assert (c != NULL);
     assert (c->msg);
     assert (c->msg->head.version == 1);
 
     m1 = c->msg->pbody;
+    p_uid = (uid_t *) &(m1->client_uid);
+    p_gid = (gid_t *) &(m1->client_gid);
 
     /*  Determine identity of client process.
      */
-    if (auth_peer_get (c->msg->sd, &(m1->client_uid), &(m1->client_gid)) < 0) {
+    if (auth_recv (c->msg, p_uid, p_gid) != EMUNGE_SUCCESS) {
         return (_munge_msg_set_err (c->msg, EMUNGE_SNAFU,
             strdup ("Unable to determine identity of client")));
     }

@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.11 2004/04/16 22:15:06 dun Exp $
+## $Id: Makefile.am,v 1.12 2004/05/01 05:08:26 dun Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
@@ -28,8 +28,8 @@ munged_LDADD = \
 	$(LIBZ)
 
 munged_SOURCES = \
-	auth.c \
-	auth.h \
+	auth_recv.c \
+	auth_recv.h \
 	base64.c \
 	base64.h \
 	cipher.c \

@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: encode.c,v 1.11 2004/04/16 22:15:06 dun Exp $
+ *  $Id: encode.c,v 1.12 2004/05/01 05:08:26 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -35,9 +35,11 @@
 #include <string.h>
 #include <sys/types.h>
 #include <munge.h>
+#include "auth_send.h"
 #include "ctx.h"
 #include "msg_client.h"
 #include "munge_defs.h"
+#include "munge_msg.h"
 #include "str.h"
 
 
@@ -89,6 +91,8 @@ munge_encode (char **cred, munge_ctx_t ctx, const void *buf, int len)
     else if ((e = _munge_msg_client_connect (m, socket)) != EMUNGE_SUCCESS)
         ;
     else if ((e = _munge_msg_send (m)) != EMUNGE_SUCCESS)
+        ;
+    else if ((e = auth_send (m)) != EMUNGE_SUCCESS)
         ;
     else if ((e = _munge_msg_reset (m)) != EMUNGE_SUCCESS)
         ;

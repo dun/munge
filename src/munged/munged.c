@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munged.c,v 1.11 2004/04/03 21:53:00 dun Exp $
+ *  $Id: munged.c,v 1.12 2004/05/01 05:08:26 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -39,6 +39,7 @@
 #include <sys/resource.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include "auth_recv.h"
 #include "common.h"
 #include "conf.h"
 #include "crypto_thread.h"
@@ -87,6 +88,7 @@ main (int argc, char *argv[])
 
     conf = create_conf ();
     parse_cmdline (conf, argc, argv);
+    auth_recv_init ();
 
     if (!conf->got_foreground) {
         fd = daemonize_init ();
