@@ -1,5 +1,7 @@
 2003-04-25  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/libmunge/munge.h, src/libmunge/ctx.c: Tweaked MUNGE_OPT_* enums.
+
 	* src/libmunge/Makefile.am, src/libmunge/Makefile.in,
 	  src/libmunge/strings.c: Added descriptive string arrays for enums.
 

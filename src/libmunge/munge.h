@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munge.h,v 1.9 2003/04/18 23:28:06 dun Exp $
+ *  $Id: munge.h,v 1.10 2003/04/25 21:20:50 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -54,13 +54,13 @@ typedef struct munge_ctx * munge_ctx_t;
 /*  Munge context options
  */
 typedef enum munge_opt {
-    MUNGE_OPT_CIPHER            =  0,   /* symmetric cipher type (int)       */
-    MUNGE_OPT_ZIP               =  1,   /* compression type (int)            */
-    MUNGE_OPT_MAC               =  2,   /* message auth code type (int)      */
+    MUNGE_OPT_CIPHER_TYPE       =  0,   /* symmetric cipher type (int)       */
+    MUNGE_OPT_ZIP_TYPE          =  1,   /* compression type (int)            */
+    MUNGE_OPT_MAC_TYPE          =  2,   /* message auth code type (int)      */
     MUNGE_OPT_REALM             =  3,   /* security realm (str)              */
     MUNGE_OPT_TTL               =  4,   /* time-to-live (int)                */
-    MUNGE_OPT_TIME_ENCODE       =  5,   /* time when cred encoded (time_t)   */
-    MUNGE_OPT_TIME_DECODE       =  6,   /* time when cred decoded (time_t)   */
+    MUNGE_OPT_ENCODE_TIME       =  5,   /* time when cred encoded (time_t)   */
+    MUNGE_OPT_DECODE_TIME       =  6,   /* time when cred decoded (time_t)   */
     MUNGE_OPT_SOCKET            =  7,   /* socket for comm w/ daemon (str)   */
     MUNGE_OPT_LAST_ENTRY
 } munge_opt_t;
@@ -76,14 +76,6 @@ typedef enum munge_cipher {
     MUNGE_CIPHER_LAST_ENTRY
 } munge_cipher_t;
 
-/*  Munge compression types
- */
-typedef enum munge_zip {
-    MUNGE_ZIP_NONE              =  0,   /* compression disabled              */
-    MUNGE_ZIP_DEFAULT           =  1,   /* default zip specified by daemon   */
-    MUNGE_ZIP_LAST_ENTRY
-} munge_zip_t;
-
 /*  Munge message authentication code types
  */
 typedef enum munge_mac {
@@ -97,6 +89,14 @@ typedef enum munge_mac {
     MUNGE_MAC_RIPEMD160_HALF    =  7,   /* RIPEMD-160 w/ 80b-digest          */
     MUNGE_MAC_LAST_ENTRY
 } munge_mac_t;
+
+/*  Munge compression types
+ */
+typedef enum munge_zip {
+    MUNGE_ZIP_NONE              =  0,   /* compression disabled              */
+    MUNGE_ZIP_DEFAULT           =  1,   /* default zip specified by daemon   */
+    MUNGE_ZIP_LAST_ENTRY
+} munge_zip_t;
 
 /*  Munge credential time-to-live (in seconds)
  */
@@ -132,6 +132,23 @@ typedef enum munge_err {
     EMUNGE_CRED_REPLAYED        = 17,   /* Credential replayed               */
     EMUNGE_LAST_ENTRY
 } munge_err_t;
+
+
+/*****************************************************************************
+ *  Extern Variables
+ *****************************************************************************/
+
+/*  NULL-terminated array of descriptive strings for the munge_cipher_t.
+ */
+extern const char * munge_cipher_strings[];
+
+/*  NULL-terminated array of descriptive strings for the munge_mac_t.
+ */
+extern const char * munge_mac_strings[];
+
+/*  NULL-terminated array of descriptive strings for the munge_zip_t.
+ */
+extern const char * munge_zip_strings[];
 
 
 /*****************************************************************************

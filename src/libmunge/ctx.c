@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: ctx.c,v 1.4 2003/04/23 18:22:35 dun Exp $
+ *  $Id: ctx.c,v 1.5 2003/04/25 21:20:50 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -131,15 +131,15 @@ munge_ctx_get (munge_ctx_t ctx, munge_opt_t opt, ...)
     }
     va_start (vargs, opt);
     switch (opt) {
-        case MUNGE_OPT_CIPHER:
+        case MUNGE_OPT_CIPHER_TYPE:
             p2int = va_arg (vargs, int *);
             *p2int = ctx->cipher;
             break;
-        case MUNGE_OPT_ZIP:
+        case MUNGE_OPT_ZIP_TYPE:
             p2int = va_arg (vargs, int *);
             *p2int = ctx->zip;
             break;
-        case MUNGE_OPT_MAC:
+        case MUNGE_OPT_MAC_TYPE:
             p2int = va_arg (vargs, int *);
             *p2int = ctx->mac;
             break;
@@ -151,11 +151,11 @@ munge_ctx_get (munge_ctx_t ctx, munge_opt_t opt, ...)
             p2str = va_arg (vargs, char **);
             *p2str = ctx->realm;
             break;
-        case MUNGE_OPT_TIME_ENCODE:
+        case MUNGE_OPT_ENCODE_TIME:
             p2time = va_arg (vargs, time_t *);
             *p2time = ctx->time0;
             break;
-        case MUNGE_OPT_TIME_DECODE:
+        case MUNGE_OPT_DECODE_TIME:
             p2time = va_arg (vargs, time_t *);
             *p2time = ctx->time1;
             break;
@@ -191,13 +191,13 @@ munge_ctx_set (munge_ctx_t ctx, munge_opt_t opt, ...)
     }
     va_start (vargs, opt);
     switch (opt) {
-        case MUNGE_OPT_CIPHER:
+        case MUNGE_OPT_CIPHER_TYPE:
             ctx->cipher = va_arg (vargs, int);
             break;
-        case MUNGE_OPT_ZIP:
+        case MUNGE_OPT_ZIP_TYPE:
             ctx->zip = va_arg (vargs, int);
             break;
-        case MUNGE_OPT_MAC:
+        case MUNGE_OPT_MAC_TYPE:
             ctx->mac = va_arg (vargs, int);
             break;
         case MUNGE_OPT_TTL:
@@ -215,10 +215,10 @@ munge_ctx_set (munge_ctx_t ctx, munge_opt_t opt, ...)
                 free (ctx->realm);
             ctx->realm = p;
             break;
-        case MUNGE_OPT_TIME_ENCODE:
+        case MUNGE_OPT_ENCODE_TIME:
             ctx->time0 = va_arg (vargs, time_t);
             break;
-        case MUNGE_OPT_TIME_DECODE:
+        case MUNGE_OPT_DECODE_TIME:
             ctx->time1 = va_arg (vargs, time_t);
             break;
         case MUNGE_OPT_SOCKET:
