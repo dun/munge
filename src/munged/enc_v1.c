@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: enc_v1.c,v 1.7 2003/09/18 21:09:26 dun Exp $
+ *  $Id: enc_v1.c,v 1.8 2003/10/14 17:12:41 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -256,6 +256,7 @@ enc_v1_timestamp (munge_cred_t c)
 /*  Queries the current time.
  */
     struct munge_msg_v1 *m1;            /* munge msg (v1 format)             */
+    time_t now;
 
     assert (c != NULL);
     assert (c->msg != NULL);
@@ -265,12 +266,12 @@ enc_v1_timestamp (munge_cred_t c)
 
     /*  Set the "encode" time.
      */
-    m1->time0 = time(NULL);
-    m1->time1 = 0;
-    if (m1->time0 == ((time_t) -1)) {
+    if (time (&now) == ((time_t) -1)) {
         return (_munge_msg_set_err (c->msg, EMUNGE_SNAFU,
             strdup ("Unable to query current time")));
     }
+    m1->time0 = now;                    /* potential 64b value for 32b var */
+    m1->time1 = 0;
     return (0);
 }
 

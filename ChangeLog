@@ -1,3 +1,9 @@
+2003-10-14  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/munged/dec_v1.c, src/munged/enc_v1.c:
+	  Fixed ia64 compiler warning that time_t "comparison is always false
+	  due to limited range of data type".
+
 2003-09-18  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* doc/credential_v1_format.txt, src/libcommon/munge_defs.h,
