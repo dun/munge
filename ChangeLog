@@ -1,5 +1,7 @@
 2004-10-29  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* : Re-bootstrap'd with libtool-1.5.6 Debian: 220.
+
 	* munge.spec: Added %config(noreplace) to init script.
 
 2004-10-15  Chris Dunlap  <cdunlap@llnl.gov>
