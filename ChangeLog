@@ -1,5 +1,8 @@
 2003-12-11  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/libcommon/munge_msg.c(_munge_msg_send):
+	  Changed to use gather-writes.
+
 	* src/libcommon/munge_defs.h:
 	  Increased MUNGE_SOCKET_BACKLOG from 128 to 256.
 

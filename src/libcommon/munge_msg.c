@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munge_msg.c,v 1.7 2003/07/18 18:41:52 dun Exp $
+ *  $Id: munge_msg.c,v 1.8 2003/12/12 00:30:00 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -34,6 +34,7 @@
 #include <munge.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/uio.h>
 #include "munge_msg.h"
 #include "common.h"
 
@@ -99,6 +100,7 @@ _munge_msg_send (munge_msg_t m)
  */
     int                  n, l;
     struct munge_msg_v1 *m1;
+    struct iovec         iov[4];
 
     assert (m != NULL);
     assert (m->sd >= 0);
@@ -116,40 +118,30 @@ _munge_msg_send (munge_msg_t m)
     m->head.length = sizeof (*m1);
     m->head.length += m1->realm_len;
     m->head.length += m1->data_len;
-    /*
-     *  FIXME: Replace multiple write()s with a single writev()?
-     */
-    n = sizeof (m->head);
-    if ((l = fd_write_n (m->sd, &(m->head), n)) < n) {
-        /*
-         *  XXX: 2003-06-27: This failed on alci when running ~860 node job.
-         */
+
+    iov[0].iov_base = &(m->head);
+    iov[0].iov_len = sizeof (m->head);
+
+    iov[1].iov_base = m1;
+    iov[1].iov_len = sizeof (*m1);
+
+    iov[2].iov_base = m1->realm;
+    iov[2].iov_len = m1->realm_len;
+
+    iov[3].iov_base = m1->data;
+    iov[3].iov_len = m1->data_len;
+
+    n = iov[0].iov_len + iov[1].iov_len + iov[2].iov_len + iov[3].iov_len;
+
+again:
+    if ((l = writev (m->sd, iov, 4)) < n) {
+        if ((l == -1) && (errno == EINTR))
+            goto again;
         _munge_msg_set_err (m, EMUNGE_SOCKET,
-            strdupf ("Unable to write message header (wrote %d/%d): %s",
-                l, n, strerror (errno)));
+            strdupf ("Unable to send message: %s", strerror (errno)));
         return (EMUNGE_SOCKET);
     }
-    n = sizeof (*m1);
-    if ((l = fd_write_n (m->sd, m1, n)) < n) {
-        _munge_msg_set_err (m, EMUNGE_SOCKET,
-            strdupf ("Unable to write v1 message body (wrote %d/%d): %s",
-                l, n, strerror (errno)));
-        return (EMUNGE_SOCKET);
-    }
-    n = m1->realm_len;
-    if ((n > 0) && ((l = fd_write_n (m->sd, m1->realm, n)) < n)) {
-        _munge_msg_set_err (m, EMUNGE_SOCKET,
-            strdupf ("Unable to write v1 message realm (wrote %d/%d): %s",
-                l, n, strerror (errno)));
-        return (EMUNGE_SOCKET);
-    }
-    n = m1->data_len;
-    if ((n > 0) && ((l = fd_write_n (m->sd, m1->data, n)) < n)) {
-        _munge_msg_set_err (m, EMUNGE_SOCKET,
-            strdupf ("Unable to write v1 message data (wrote %d/%d): %s",
-                l, n, strerror (errno)));
-        return (EMUNGE_SOCKET);
-    }
+    assert (l == n);
     return (EMUNGE_SUCCESS);
 }
 
@@ -167,8 +159,8 @@ _munge_msg_recv (munge_msg_t m)
     n = sizeof (m->head);
     if ((l = fd_read_n (m->sd, &(m->head), n)) < n) {
         _munge_msg_set_err (m, EMUNGE_SOCKET,
-            strdupf ("Unable to read message header (read %d/%d): %s",
-                l, n, strerror (errno)));
+            strdupf ("Unable to receive message header: %s",
+                strerror (errno)));
         return (EMUNGE_SOCKET);
     }
     if (m->head.magic != MUNGE_MSG_MAGIC) {
@@ -196,8 +188,7 @@ _munge_msg_recv (munge_msg_t m)
     n = m->head.length;
     if ((l = fd_read_n (m->sd, m->pbody, n)) < n) {
         _munge_msg_set_err (m, EMUNGE_SOCKET,
-            strdupf ("Unable to read v1 message body (read %d/%d): %s",
-                l, n, strerror (errno)));
+            strdupf ("Unable to receive message body: %s", strerror (errno)));
         return (EMUNGE_SOCKET);
     }
     m1 = m->pbody;
