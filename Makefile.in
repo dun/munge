@@ -631,8 +631,8 @@ tar rpm:
 	  if ! test -f META; then \
 	    echo "ERROR: Cannot find $$proj metadata in \"`pwd`/META\"." 1>&2;\
 	      exit 1; fi; \
-	  name=`perl -ne 'print,exit if s/^\s*(NAME|PACKAGE):\s*(\S*).*/\1/i' \
-	    META`; \
+	  name=`perl -ne \
+	    'print,exit if s/^\s*(?:NAME|PACKAGE):\s*(\S*).*/\1/i' META`; \
 	  ver=`perl -ne 'print,exit if s/^\s*VERSION:\s*(\S*).*/\1/i' META`; \
 	  rel=`perl -ne 'print,exit if s/^\s*RELEASE:\s*(\S*).*/\1/i' META`; \
 	  test -z "$$rel" && pkg=$$name-$$ver || pkg=$$name-$$ver-$$rel; \
@@ -649,8 +649,8 @@ tar rpm:
 	meta=$$tmp/$$proj/META; \
 	if test ! -f "$$meta"; then \
 	  echo "ERROR: Cannot find $$proj metadata in CVS." 1>&2; exit 1; fi; \
-	name=`perl -ne 'print,exit if s/^\s*(NAME|PACKAGE):\s*(\S*).*/\1/i' \
-	  $$meta`; \
+	name=`perl -ne \
+	  'print,exit if s/^\s*(?:NAME|PACKAGE):\s*(\S*).*/\1/i' $$meta`; \
 	if test "$$proj" != "$$name"; then \
 	  echo "ERROR: PACKAGE does not match metadata." 1>&2; exit 1; fi; \
 	ver=`perl -ne 'print,exit if s/^\s*VERSION:\s*(\S*).*/\1/i' $$meta`; \
