@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.7 2003/10/28 22:20:45 dun Exp $
+## $Id: Makefile.am,v 1.8 2004/04/09 01:44:32 dun Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
@@ -18,7 +18,9 @@ AM_CPPFLAGS = \
 
 libmunge_la_LIBADD = \
 	$(top_builddir)/src/libcommon/libcommon.la \
-	$(top_builddir)/src/libmissing/libmissing.la
+	$(top_builddir)/src/libmissing/libmissing.la \
+	$(LIBNSL) \
+	$(LIBSOCKET)
 
 libmunge_la_SOURCES = \
 	ctx.c \

@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: x_ac_check_cond_lib.m4,v 1.2 2004/03/12 00:33:48 dun Exp $
+## $Id: x_ac_check_cond_lib.m4,v 1.3 2004/04/09 01:44:32 dun Exp $
 ##*****************************************************************************
 #  AUTHOR:
 #    Chris Dunlap <cdunlap@llnl.gov>
@@ -17,15 +17,25 @@
 #    except that instead of modifying LIBS (which will affect the linking of
 #    all executables), the shell variable LIB<library> is defined so it can be
 #    added to the linking of just those executables needing this library.
+#    Also note that this checks to see if the library is even needed at all.
 ##*****************************************************************************
 
 AC_DEFUN([X_AC_CHECK_COND_LIB],
-[ AC_CHECK_LIB(
-    [$1],
-    [$2],
-    [ AH_CHECK_LIB([$1])
-      AS_TR_CPP([LIB$1])="-l$1";
-      AC_SUBST(AS_TR_CPP([LIB$1]))
-      AC_DEFINE_UNQUOTED(AS_TR_CPP([HAVE_LIB$1]))
+[ AC_CACHE_CHECK(
+    [for $2 in default libs],
+    [x_ac_cv_lib_none_$2],
+    [ AC_LINK_IFELSE(
+        AC_LANG_CALL([], [$2]),
+        [AS_VAR_SET(x_ac_cv_lib_none_$2, yes)],
+        [AS_VAR_SET(x_ac_cv_lib_none_$2, no)])
     ])
+  AS_IF([test AS_VAR_GET(x_ac_cv_lib_none_$2) = no],
+    AC_CHECK_LIB(
+      [$1],
+      [$2],
+      [ AH_CHECK_LIB([$1])
+        AS_TR_CPP([LIB$1])="-l$1";
+        AC_SUBST(AS_TR_CPP([LIB$1]))
+        AC_DEFINE_UNQUOTED(AS_TR_CPP([HAVE_LIB$1]))
+      ]))
 ])

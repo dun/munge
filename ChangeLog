@@ -1,5 +1,8 @@
 2004-04-08  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* configure.ac, config/x_ac_check_cond_lib.m4,
+	  src/libmunge/Makefile.am: Added checks for libnsl & libsocket.
+
 	* configure.ac, src/libmissing/Makefile.am, src/libmissing/getopt.c,
 	  src/libmissing/getopt.h, src/libmissing/getopt1.c, src/munge/munge.c,
 	  src/munge/unmunge.c, src/munged/conf.c:
