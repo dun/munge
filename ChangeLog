@@ -1,3 +1,8 @@
+2004-10-15  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* munge.spec, src/etc/Makefile.am, src/etc/munge.init:
+	  Removed dependence on /etc/rc.d/init.d directory.
+
 2004-10-13  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/munged/job.c: Added include for building on SuSE SLES-8.

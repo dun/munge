@@ -1,6 +1,6 @@
 #know !/bin/sh
 ###############################################################################
-# $Id: munge.init,v 1.8 2004/04/06 20:16:09 dun Exp $
+# $Id: munge.init,v 1.9 2004/10/15 16:50:50 dun Exp $
 ###############################################################################
 # chkconfig:	345 40 60
 # description:	The MUNGE daemon is a user authentication service.
@@ -10,7 +10,7 @@
 
 DAEMON="munged"
 
-source /etc/rc.d/init.d/functions
+source /etc/init.d/functions || source /etc/rc.d/init.d/functions
 SUBSYS="/var/lock/subsys/`echo $0 | perl -pe 's,(.*/)?([SK][0-9]{2})?(.*),$3,'`"
 
 # Disable suppression of stderr msgs.

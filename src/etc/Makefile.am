@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.3 2004/05/01 05:24:02 dun Exp $
+## $Id: Makefile.am,v 1.4 2004/10/15 16:50:50 dun Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
@@ -7,7 +7,7 @@
 include $(top_srcdir)/config/Make-inc.mk
 
 install-data-local:
-	@for d in $(sysconfdir)/rc.d/init.d $(sysconfdir)/init.d; do \
+	@for d in $(sysconfdir)/init.d $(sysconfdir)/rc.d/init.d; do \
 	  if test -d "$$d"; then \
 	    echo $(INSTALL) -m 755 -d $(DESTDIR)$$d; \
 	    $(INSTALL) -m 755 -d $(DESTDIR)$$d; \
