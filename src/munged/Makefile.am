@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.6 2004/03/11 21:04:40 dun Exp $
+## $Id: Makefile.am,v 1.7 2004/03/11 22:32:20 dun Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
@@ -15,6 +15,7 @@ sbin_PROGRAMS = \
 	munged
 
 munged_CFLAGS = \
+	-D_REENTRANT \
 	-DWITH_PTHREADS
 
 munged_LDADD = \

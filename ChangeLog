@@ -1,17 +1,15 @@
 2004-03-11  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/munged/Makefile.am: Added _REENTRANT def to munged CFLAGS.
+
 	* configure.ac, config/x_ac_ltlibobjs.m4:
 	  Removed munging of LIBOBJS & LTLIBOBJS for automake & libtool.
 	  Refer to autoconf docs 15.6.4: AC_LIBOBJ vs. LIBOBJS.
 
-	* Makefile.in, aclocal.m4, configure, configure.ac, config/config.h.in,
-	  config/x_ac_check_cond_lib.m4, src/Makefile.in, src/etc/Makefile.in,
-	  src/libcommon/Makefile.in, src/libcommon/common.h,
+	* configure.ac, config/x_ac_check_cond_lib.m4, src/libcommon/common.h,
 	  src/libcommon/munge_defs.h, src/libcommon/munge_msg.c,
-	  src/libmissing/Makefile.in, src/libmunge/Makefile.in,
 	  src/libmunge/decode.c, src/libmunge/munge.h, src/libmunge/strings.c,
-	  src/munge/Makefile.in, src/munged/Makefile.am,
-	  src/munged/Makefile.in, src/munged/conf.c, src/munged/cred.c,
+	  src/munged/Makefile.am, src/munged/conf.c, src/munged/cred.c,
 	  src/munged/cred.h, src/munged/dec_v1.c, src/munged/enc_v1.c,
 	  src/munged/zip.c, src/munged/zip.h: Added support for compression.
 

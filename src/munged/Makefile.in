@@ -223,6 +223,7 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/src/libmunge
 
 munged_CFLAGS = \
+	-D_REENTRANT \
 	-DWITH_PTHREADS
 
 munged_LDADD = \
