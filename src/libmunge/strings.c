@@ -1,0 +1,75 @@
+/*****************************************************************************
+ *  $Id: strings.c,v 1.1 2003/04/25 21:17:29 dun Exp $
+ *****************************************************************************
+ *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
+ *  For details, see <http://www.llnl.gov/linux/munge/>.
+ *  UCRL-CODE-2003-???.
+ *
+ *  Copyright (C) 2002-2003 The Regents of the University of California.
+ *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
+ *  Written by Chris Dunlap <cdunlap@llnl.gov>.
+ *
+ *  This is free software; you can redistribute it and/or modify it
+ *  under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This is distributed in the hope that it will be useful, but WITHOUT
+ *  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ *  FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+ *  for more details.
+ *
+ *  You should have received a copy of the GNU General Public License;
+ *  if not, write to the Free Software Foundation, Inc., 59 Temple Place,
+ *  Suite 330, Boston, MA  02111-1307  USA.
+ *****************************************************************************/
+
+
+#if HAVE_CONFIG_H
+#  include <config.h>
+#endif /* HAVE_CONFIG_H */
+
+#include <stdio.h>
+#include <munge.h>
+
+
+/*****************************************************************************
+ *  Munge Strings
+ *****************************************************************************/
+
+/*  Keep in sync with munge_cipher_t enum.
+ */
+const char * munge_cipher_strings[] = {
+    "None",
+    "Default",
+    "Blowfish",
+    "CAST5",
+#if HAVE_EVP_AES_128_CBC
+    "AES-128",
+#else  /* !HAVE_EVP_AES_128_CBC */
+    "",
+#endif /* !HAVE_EVP_AES_128_CBC */
+     NULL
+};
+
+/*  Keep in sync with munge_mac_t enum.
+ */
+const char * munge_mac_strings[] = {
+    "",
+    "Default",
+    "MD5",
+    "MD5-Half",
+    "SHA1",
+    "SHA1-Half",
+    "RIPEMD-160",
+    "RIPEMD-160-Half",
+     NULL
+};
+
+/*  Keep in sync with munge_zip_t enum.
+ */
+const char * munge_zip_strings[] = {
+    "None",
+    "Default",
+     NULL
+};

@@ -1,3 +1,8 @@
+2003-04-25  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/libmunge/Makefile.am, src/libmunge/Makefile.in,
+	  src/libmunge/strings.c: Added descriptive string arrays for enums.
+
 2003-04-24  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/munge/unmunge.c: Changed "t" & "T" cmdline opts to "k" & "K".

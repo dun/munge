@@ -116,6 +116,7 @@ libmunge_la_SOURCES = \
 	msg_client.c \
 	msg_client.h \
 	strerror.c \
+	strings.c \
 	munge.h
 
 subdir = src/libmunge
@@ -128,7 +129,7 @@ libmunge_la_LDFLAGS =
 libmunge_la_DEPENDENCIES = $(top_builddir)/src/libcommon/libcommon.la \
 	$(top_builddir)/src/libmissing/libmissing.la
 am_libmunge_la_OBJECTS = ctx.lo decode.lo encode.lo msg_client.lo \
-	strerror.lo
+	strerror.lo strings.lo
 libmunge_la_OBJECTS = $(am_libmunge_la_OBJECTS)
 
 DEFS = @DEFS@
@@ -139,7 +140,7 @@ depcomp = $(SHELL) $(top_srcdir)/config/depcomp
 am__depfiles_maybe = depfiles
 @AMDEP_TRUE@DEP_FILES = ./$(DEPDIR)/ctx.Plo ./$(DEPDIR)/decode.Plo \
 @AMDEP_TRUE@	./$(DEPDIR)/encode.Plo ./$(DEPDIR)/msg_client.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/strerror.Plo
+@AMDEP_TRUE@	./$(DEPDIR)/strerror.Plo ./$(DEPDIR)/strings.Plo
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) \
@@ -205,6 +206,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/encode.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/msg_client.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/strerror.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/strings.Plo@am__quote@
 
 distclean-depend:
 	-rm -rf ./$(DEPDIR)
