@@ -1,5 +1,9 @@
 2004-09-23  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* libcommon/munge_msg.c, libcommon/munge_msg.h:
+	  Removed leading underscore from public functions.
+	  All callers changed.
+
 	* src/libcommon/munge_defs.h:
 	  Added MUNGE_REPLAY_RETRY_FLAG.  Added MUNGE_SOCKET_XFER_ATTEMPTS.
 	  Named MUNGE_SOCKET_CONNECT_RETRIES as MUNGE_SOCKET_CONNECT_ATTEMPTS.

@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: decode.c,v 1.16 2004/09/23 20:56:43 dun Exp $
+ *  $Id: decode.c,v 1.17 2004/09/23 21:10:11 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -78,7 +78,7 @@ munge_decode (const char *cred, munge_ctx_t ctx,
     }
     /*  Ask the daemon to decode a credential.
      */
-    if ((e = _munge_msg_create (&m, -1)) != EMUNGE_SUCCESS)
+    if ((e = munge_msg_create (&m, -1)) != EMUNGE_SUCCESS)
         ;
     else if ((e = _decode_req_v1 (m, ctx, cred)) != EMUNGE_SUCCESS)
         ;
@@ -92,7 +92,7 @@ munge_decode (const char *cred, munge_ctx_t ctx,
         _munge_ctx_set_err (ctx, e, m->errstr);
         m->errstr = NULL;
     }
-    _munge_msg_destroy (m);
+    munge_msg_destroy (m);
     return (e);
 }
 
@@ -198,7 +198,7 @@ _decode_rsp_v1 (munge_msg_t m, munge_ctx_t ctx,
      *  Perform sanity checks.
      */
     if (m->head.type != MUNGE_MSG_DEC_RSP) {
-        _munge_msg_set_err (m, EMUNGE_SNAFU,
+        munge_msg_set_err (m, EMUNGE_SNAFU,
             strdupf ("Client received invalid message type %d", m->head.type));
         return (EMUNGE_SNAFU);
     }
@@ -219,7 +219,7 @@ _decode_rsp_v1 (munge_msg_t m, munge_ctx_t ctx,
     if (buf && len && (m1->data_len > 0)) {
         n = m1->data_len + 1;
         if (!(p = malloc (n))) {
-            _munge_msg_set_err (m, EMUNGE_NO_MEMORY,
+            munge_msg_set_err (m, EMUNGE_NO_MEMORY,
                 strdupf ("Client unable to allocate %d bytes for data", n));
         }
         memcpy (p, m1->data, m1->data_len);

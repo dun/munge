@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: enc_v1.c,v 1.21 2004/09/23 20:56:43 dun Exp $
+ *  $Id: enc_v1.c,v 1.22 2004/09/23 21:10:11 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -116,7 +116,7 @@ enc_v1_process_msg (munge_msg_t m)
     if (rc < 0) {
         job_error (m);
     }
-    if (_munge_msg_send (m) != EMUNGE_SUCCESS) {
+    if (munge_msg_send (m) != EMUNGE_SUCCESS) {
         rc = -1;
     }
     cred_destroy (c);
@@ -155,7 +155,7 @@ enc_v1_validate_msg (munge_msg_t m)
         ; /* disable encryption */
     }
     else if (!(lookup_cipher (m1->cipher))) {
-        return (_munge_msg_set_err (m, EMUNGE_BAD_CIPHER,
+        return (munge_msg_set_err (m, EMUNGE_BAD_CIPHER,
             strdupf ("Invalid cipher type %d", m1->cipher)));
     }
     /*  Validate compression type.
@@ -168,7 +168,7 @@ enc_v1_validate_msg (munge_msg_t m)
         ; /* disable compression */
     }
     else if (!zip_is_valid_type (m1->zip)) {
-        return (_munge_msg_set_err (m, EMUNGE_BAD_ZIP,
+        return (munge_msg_set_err (m, EMUNGE_BAD_ZIP,
             strdupf ("Invalid compression type %d", m1->zip)));
     }
     if (m1->data_len == 0) {
@@ -181,7 +181,7 @@ enc_v1_validate_msg (munge_msg_t m)
         m1->mac = conf->def_mac;
     }
     else if (!(lookup_mac (m1->mac))) {
-        return (_munge_msg_set_err (m, EMUNGE_BAD_MAC,
+        return (munge_msg_set_err (m, EMUNGE_BAD_MAC,
             strdupf ("Invalid mac type %d", m1->mac)));
     }
     assert (m1->mac != MUNGE_MAC_NONE);
@@ -255,7 +255,7 @@ enc_v1_authenticate (munge_cred_t c)
     /*  Determine identity of client process.
      */
     if (auth_recv (c->msg, p_uid, p_gid) != EMUNGE_SUCCESS) {
-        return (_munge_msg_set_err (c->msg, EMUNGE_SNAFU,
+        return (munge_msg_set_err (c->msg, EMUNGE_SNAFU,
             strdup ("Unable to determine identity of client")));
     }
     return (0);
@@ -282,7 +282,7 @@ enc_v1_check_retry (munge_cred_t c)
             mh.retry, m1->client_uid, m1->client_gid);
     }
     if (mh.retry > MUNGE_SOCKET_XFER_ATTEMPTS) {
-        return (_munge_msg_set_err (c->msg, EMUNGE_SOCKET,
+        return (munge_msg_set_err (c->msg, EMUNGE_SOCKET,
             strdupf ("Exceeded maximum transaction retry attempts")));
     }
     return (0);
@@ -305,7 +305,7 @@ enc_v1_timestamp (munge_cred_t c)
     /*  Set the "encode" time.
      */
     if (time (&now) == ((time_t) -1)) {
-        return (_munge_msg_set_err (c->msg, EMUNGE_SNAFU,
+        return (munge_msg_set_err (c->msg, EMUNGE_SNAFU,
             strdup ("Unable to query current time")));
     }
     m1->time0 = now;                    /* potential 64b value for 32b var */
@@ -341,7 +341,7 @@ enc_v1_pack_outer (munge_cred_t c)
     c->outer_mem_len += m1->realm_len;
     c->outer_mem_len += c->iv_len;
     if (!(c->outer_mem = malloc (c->outer_mem_len))) {
-        return (_munge_msg_set_err (c->msg, EMUNGE_NO_MEMORY, NULL));
+        return (munge_msg_set_err (c->msg, EMUNGE_NO_MEMORY, NULL));
     }
     p = c->outer = c->outer_mem;
     c->outer_len = c->outer_mem_len;
@@ -412,7 +412,7 @@ enc_v1_pack_inner (munge_cred_t c)
     c->inner_mem_len += sizeof (m1->data_len);
     c->inner_mem_len += m1->data_len;
     if (!(c->inner_mem = malloc (c->inner_mem_len))) {
-        return (_munge_msg_set_err (c->msg, EMUNGE_NO_MEMORY, NULL));
+        return (munge_msg_set_err (c->msg, EMUNGE_NO_MEMORY, NULL));
     }
     p = c->inner = c->inner_mem;
     c->inner_len = c->inner_mem_len;
@@ -510,7 +510,7 @@ enc_v1_precompress (munge_cred_t c)
         goto err;
     }
     if (!(buf = malloc (buf_len))) {
-        _munge_msg_set_err (c->msg, EMUNGE_NO_MEMORY, NULL);
+        munge_msg_set_err (c->msg, EMUNGE_NO_MEMORY, NULL);
         goto err;
     }
     /*  Compress "inner" data.
@@ -542,7 +542,7 @@ err:
         memset (buf, 0, buf_len);
         free (buf);
     }
-    return (_munge_msg_set_err (c->msg, EMUNGE_SNAFU,
+    return (munge_msg_set_err (c->msg, EMUNGE_SNAFU,
         strdup ("Unable to compress credential")));
 }
 
@@ -597,7 +597,7 @@ enc_v1_mac (munge_cred_t c)
 err_cleanup:
     mac_cleanup (&x);
 err:
-    return (_munge_msg_set_err (c->msg, EMUNGE_SNAFU,
+    return (munge_msg_set_err (c->msg, EMUNGE_SNAFU,
         strdup ("Unable to mac credential")));
 }
 
@@ -683,7 +683,7 @@ enc_v1_encrypt (munge_cred_t c)
 
     if (mac_block (md, conf->dek_key, conf->dek_key_len,
                        c->dek, &n, c->mac, c->mac_len) < 0) {
-        return (_munge_msg_set_err (c->msg, EMUNGE_SNAFU,
+        return (munge_msg_set_err (c->msg, EMUNGE_SNAFU,
             strdup ("Unable to compute dek")));
     }
     assert (n == c->dek_len);
@@ -693,7 +693,7 @@ enc_v1_encrypt (munge_cred_t c)
      */
     buf_len = c->inner_len + cipher_block_size (ci);
     if (!(buf = malloc (buf_len))) {
-        return (_munge_msg_set_err (c->msg, EMUNGE_NO_MEMORY, NULL));
+        return (munge_msg_set_err (c->msg, EMUNGE_NO_MEMORY, NULL));
     }
     /*  Encrypt "inner" data.
      */
@@ -734,7 +734,7 @@ err_cleanup:
 err:
     memset (buf, 0, buf_len);
     free (buf);
-    return (_munge_msg_set_err (c->msg, EMUNGE_SNAFU,
+    return (munge_msg_set_err (c->msg, EMUNGE_SNAFU,
         strdup ("Unable to encrypt credential")));
 }
 
@@ -768,7 +768,7 @@ enc_v1_armor (munge_cred_t c)
     buf_len = prefix_len + base64_encode_length (n) + suffix_len;
 
     if (!(buf = malloc (buf_len))) {
-        return (_munge_msg_set_err (c->msg, EMUNGE_NO_MEMORY, NULL));
+        return (munge_msg_set_err (c->msg, EMUNGE_NO_MEMORY, NULL));
     }
     buf_ptr = buf;
 
@@ -842,7 +842,7 @@ err_cleanup:
 err:
     memset (buf, 0, buf_len);
     free (buf);
-    return (_munge_msg_set_err (c->msg, EMUNGE_SNAFU,
+    return (munge_msg_set_err (c->msg, EMUNGE_SNAFU,
         strdup ("Unable to base64-encode credential")));
 }
 
@@ -862,7 +862,7 @@ enc_v1_fini (munge_cred_t c)
     /*  Place credential in message "data" payload for transit.
      *  Note that the old m1->data lies within m->pbody's malloc region,
      *    so it will be free()d by the msg destructor when pbody is free()d
-     *    by _munge_msg_destroy() called from the munge_msg_server_thread().
+     *    by munge_msg_destroy() called from the munge_msg_server_thread().
      *  Also note that by keeping the c->outer ref valid, this cred memory
      *    will be free()d by cred_destroy() called from enc_v1_process_msg().
      */

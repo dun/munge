@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: encode.c,v 1.15 2004/09/23 20:56:43 dun Exp $
+ *  $Id: encode.c,v 1.16 2004/09/23 21:10:11 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -76,7 +76,7 @@ munge_encode (char **cred, munge_ctx_t ctx, const void *buf, int len)
     }
     /*  Ask the daemon to encode a credential.
      */
-    if ((e = _munge_msg_create (&m, -1)) != EMUNGE_SUCCESS)
+    if ((e = munge_msg_create (&m, -1)) != EMUNGE_SUCCESS)
         ;
     else if ((e = _encode_req_v1 (m, ctx, buf, len)) != EMUNGE_SUCCESS)
         ;
@@ -90,7 +90,7 @@ munge_encode (char **cred, munge_ctx_t ctx, const void *buf, int len)
         _munge_ctx_set_err (ctx, e, m->errstr);
         m->errstr = NULL;
     }
-    _munge_msg_destroy (m);
+    munge_msg_destroy (m);
     return (e);
 }
 
@@ -208,12 +208,12 @@ _encode_rsp_v1 (munge_msg_t m, char **cred)
      *  Perform sanity checks.
      */
     if (m->head.type != MUNGE_MSG_ENC_RSP) {
-        _munge_msg_set_err (m, EMUNGE_SNAFU,
+        munge_msg_set_err (m, EMUNGE_SNAFU,
             strdupf ("Client received invalid message type %d", m->head.type));
         return (EMUNGE_SNAFU);
     }
     if (m1->data_len <= 0) {
-        _munge_msg_set_err (m, EMUNGE_SNAFU,
+        munge_msg_set_err (m, EMUNGE_SNAFU,
             strdupf ("Client received invalid data length %d", m1->data_len));
         return (EMUNGE_SNAFU);
     }
@@ -224,7 +224,7 @@ _encode_rsp_v1 (munge_msg_t m, char **cred)
      */
     n = m1->data_len + 1;
     if (!(p = malloc (n))) {
-        _munge_msg_set_err (m, EMUNGE_NO_MEMORY,
+        munge_msg_set_err (m, EMUNGE_NO_MEMORY,
             strdupf ("Client unable to allocate %d bytes for data", n));
         return (EMUNGE_NO_MEMORY);
     }

@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munge_msg.h,v 1.14 2004/09/23 20:56:43 dun Exp $
+ *  $Id: munge_msg.h,v 1.15 2004/09/23 21:10:11 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -132,15 +132,15 @@ typedef struct munge_msg * munge_msg_t;
  *  Prototypes
  *****************************************************************************/
 
-munge_err_t _munge_msg_create (munge_msg_t *pm, int sd);
+munge_err_t munge_msg_create (munge_msg_t *pm, int sd);
 
-void _munge_msg_destroy (munge_msg_t m);
+void munge_msg_destroy (munge_msg_t m);
 
-munge_err_t _munge_msg_send (munge_msg_t m);
+munge_err_t munge_msg_send (munge_msg_t m);
 
-munge_err_t _munge_msg_recv (munge_msg_t m);
+munge_err_t munge_msg_recv (munge_msg_t m);
 
-int _munge_msg_set_err (munge_msg_t m, munge_err_t e, char *s);
+int munge_msg_set_err (munge_msg_t m, munge_err_t e, char *s);
 
 
 #endif /* !MUNGE_MSG_H */

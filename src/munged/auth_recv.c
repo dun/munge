@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: auth_recv.c,v 1.4 2004/07/23 22:22:21 dun Exp $
+ *  $Id: auth_recv.c,v 1.5 2004/09/23 21:10:11 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -417,7 +417,7 @@ _send_auth_req (int sd, const char *pipe_name)
     munge_err_t          e;
     struct munge_msg_v1 *m1;
 
-    if ((e = _munge_msg_create (&m, sd)) != EMUNGE_SUCCESS) {
+    if ((e = munge_msg_create (&m, sd)) != EMUNGE_SUCCESS) {
         goto end;
     }
     m->head.type = MUNGE_MSG_AUTH_FD_REQ;
@@ -431,21 +431,21 @@ _send_auth_req (int sd, const char *pipe_name)
     m1 = m->pbody;
     /*
      *  Note that the actual string reference (not a copy) is used here
-     *    since _munge_msg_destroy() does not free any m1 fields.
+     *    since munge_msg_destroy() does not free any m1 fields.
      */
     m1->data_len = strlen ((char *) pipe_name) + 1;
     m1->data = (char *) pipe_name;
 
-    if ((e = _munge_msg_send (m)) != EMUNGE_SUCCESS) {
+    if ((e = munge_msg_send (m)) != EMUNGE_SUCCESS) {
         goto end;
     }
 
 end:
-    /*  Clear the msg sd to prevent closing the socket by _munge_msg_destroy().
+    /*  Clear the msg sd to prevent closing the socket by munge_msg_destroy().
      */
     if (m) {
         m->sd = -1;
-        _munge_msg_destroy (m);
+        munge_msg_destroy (m);
     }
     return (e == EMUNGE_SUCCESS ? 0 : -1);
 }

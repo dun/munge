@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: msg_client.c,v 1.10 2004/09/23 20:56:43 dun Exp $
+ *  $Id: msg_client.c,v 1.11 2004/09/23 21:10:11 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -80,16 +80,16 @@ munge_msg_client_xfer (munge_msg_t *pm, munge_ctx_t ctx)
         if ((e = _munge_msg_client_connect (mreq, socket)) != EMUNGE_SUCCESS) {
             break;
         }
-        else if ((e = _munge_msg_send (mreq)) != EMUNGE_SUCCESS) {
+        else if ((e = munge_msg_send (mreq)) != EMUNGE_SUCCESS) {
             ; /* empty */
         }
         else if (auth_send (mreq) < 0) {
             e = EMUNGE_SOCKET;
         }
-        else if ((e = _munge_msg_create (&mrsp, mreq->sd)) != EMUNGE_SUCCESS) {
+        else if ((e = munge_msg_create (&mrsp, mreq->sd)) != EMUNGE_SUCCESS) {
             break;
         }
-        else if ((e = _munge_msg_recv (mrsp)) != EMUNGE_SUCCESS) {
+        else if ((e = munge_msg_recv (mrsp)) != EMUNGE_SUCCESS) {
             ; /* empty */
         }
         else if ((e = _munge_msg_client_disconnect (mrsp)) != EMUNGE_SUCCESS) {
@@ -104,7 +104,7 @@ munge_msg_client_xfer (munge_msg_t *pm, munge_ctx_t ctx)
         }
         if (mrsp != NULL) {
             mrsp->sd = -1;              /* prevent socket close by destroy() */
-            _munge_msg_destroy (mrsp);
+            munge_msg_destroy (mrsp);
             mrsp = NULL;
         }
         if (mreq->sd >= 0) {
@@ -117,7 +117,7 @@ munge_msg_client_xfer (munge_msg_t *pm, munge_ctx_t ctx)
     if (mrsp) {
         *pm = mrsp;
         mreq->sd = -1;                  /* prevent socket close by destroy() */
-        _munge_msg_destroy (mreq);
+        munge_msg_destroy (mreq);
     }
     return (e);
 }
@@ -141,22 +141,22 @@ _munge_msg_client_connect (munge_msg_t m, char *path)
     assert (m->sd < 0);
 
     if ((path == NULL) || (*path == '\0')) {
-        _munge_msg_set_err (m, EMUNGE_SOCKET,
+        munge_msg_set_err (m, EMUNGE_SOCKET,
             strdup ("Munge socket has no name"));
         return (EMUNGE_SOCKET);
     }
     if (stat (path, &st) < 0) {
-        _munge_msg_set_err (m, EMUNGE_SOCKET,
+        munge_msg_set_err (m, EMUNGE_SOCKET,
             strdupf ("Unable to access \"%s\": %s", path, strerror (errno)));
         return (EMUNGE_SOCKET);
     }
     if (!S_ISSOCK (st.st_mode)) {
-        _munge_msg_set_err (m, EMUNGE_SOCKET,
+        munge_msg_set_err (m, EMUNGE_SOCKET,
             strdupf ("Invalid file type for socket \"%s\"", path));
         return (EMUNGE_SOCKET);
     }
     if ((sd = socket (PF_UNIX, SOCK_STREAM, 0)) < 0) {
-        _munge_msg_set_err (m, EMUNGE_SOCKET,
+        munge_msg_set_err (m, EMUNGE_SOCKET,
             strdupf ("Unable to create socket: %s", strerror (errno)));
         return (EMUNGE_SOCKET);
     }
@@ -165,7 +165,7 @@ _munge_msg_client_connect (munge_msg_t m, char *path)
     n = strlcpy (addr.sun_path, path, sizeof (addr.sun_path));
     if (n >= sizeof (addr.sun_path)) {
         close (sd);
-        _munge_msg_set_err (m, EMUNGE_OVERFLOW,
+        munge_msg_set_err (m, EMUNGE_OVERFLOW,
             strdup ("Exceeded maximum length of socket pathname"));
         return (EMUNGE_OVERFLOW);
     }
@@ -198,7 +198,7 @@ _munge_msg_client_connect (munge_msg_t m, char *path)
     }
     if (n < 0) {
         close (sd);
-        _munge_msg_set_err (m, EMUNGE_SOCKET,
+        munge_msg_set_err (m, EMUNGE_SOCKET,
             strdupf ("Unable to connect to \"%s\": %s", path,
             strerror (errno)));
         return (EMUNGE_SOCKET);
@@ -216,7 +216,7 @@ _munge_msg_client_disconnect (munge_msg_t m) {
     assert (m->sd >= 0);
 
     if (close (m->sd) < 0) {
-        _munge_msg_set_err (m, EMUNGE_SOCKET,
+        munge_msg_set_err (m, EMUNGE_SOCKET,
             strdupf ("Unable to close socket: %s", strerror (errno)));
         e = EMUNGE_SOCKET;
     }

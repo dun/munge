@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munge_msg.c,v 1.19 2004/09/23 20:56:43 dun Exp $
+ *  $Id: munge_msg.c,v 1.20 2004/09/23 21:10:11 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -47,7 +47,7 @@
  *****************************************************************************/
 
 munge_err_t
-_munge_msg_create (munge_msg_t *pm, int sd)
+munge_msg_create (munge_msg_t *pm, int sd)
 {
 /*  Creates a message bound to the socket [sd], returning it via the [pm] ptr.
  *  Returns a standard munge error code.
@@ -77,7 +77,7 @@ _munge_msg_create (munge_msg_t *pm, int sd)
 
 
 void
-_munge_msg_destroy (munge_msg_t m)
+munge_msg_destroy (munge_msg_t m)
 {
 /*  Destroys the message [m].
  */
@@ -103,7 +103,7 @@ _munge_msg_destroy (munge_msg_t m)
 
 
 munge_err_t
-_munge_msg_send (munge_msg_t m)
+munge_msg_send (munge_msg_t m)
 {
 /*  Sends the message [m] to the recipient at the other end of the
  *    already-specified socket.
@@ -153,12 +153,12 @@ again:
     if ((n = writev (m->sd, iov, iov_num)) < 0) {
         if (errno == EINTR)
             goto again;
-        _munge_msg_set_err (m, EMUNGE_SOCKET,
+        munge_msg_set_err (m, EMUNGE_SOCKET,
             strdupf ("Unable to send message: %s", strerror (errno)));
         return (EMUNGE_SOCKET);
     }
     if (n != nsend) {
-        _munge_msg_set_err (m, EMUNGE_SOCKET,
+        munge_msg_set_err (m, EMUNGE_SOCKET,
             strdupf ("Sent incomplete message: %d of %d bytes", n, nsend));
         return (EMUNGE_SOCKET);
     }
@@ -167,7 +167,7 @@ again:
 
 
 munge_err_t
-_munge_msg_recv (munge_msg_t m)
+munge_msg_recv (munge_msg_t m)
 {
 /*  Receives a message from the sender at the other end of the already-
  *    specified socket.  This message is stored in the already-allocated [m].
@@ -184,34 +184,34 @@ _munge_msg_recv (munge_msg_t m)
      */
     nrecv = sizeof (m->head);
     if ((n = fd_read_n (m->sd, &(m->head), nrecv)) < 0) {
-        _munge_msg_set_err (m, EMUNGE_SOCKET,
+        munge_msg_set_err (m, EMUNGE_SOCKET,
             strdupf ("Unable to receive message header: %s",
                 strerror (errno)));
         return (EMUNGE_SOCKET);
     }
     else if (n == 0) {
-        _munge_msg_set_err (m, EMUNGE_SOCKET,
+        munge_msg_set_err (m, EMUNGE_SOCKET,
             strdupf ("Received empty message"));
         return (EMUNGE_SOCKET);
     }
     else if (n != nrecv) {
-        _munge_msg_set_err (m, EMUNGE_SOCKET,
+        munge_msg_set_err (m, EMUNGE_SOCKET,
             strdupf ("Received incomplete message header: %d of %d bytes",
             n, nrecv));
         return (EMUNGE_SOCKET);
     }
     else if (m->head.magic != MUNGE_MSG_MAGIC) {
-        _munge_msg_set_err (m, EMUNGE_SOCKET,
+        munge_msg_set_err (m, EMUNGE_SOCKET,
             strdupf ("Received invalid message magic %d", m->head.magic));
         return (EMUNGE_SOCKET);
     }
     else if (m->head.version != MUNGE_MSG_VERSION) {
-        _munge_msg_set_err (m, EMUNGE_SOCKET,
+        munge_msg_set_err (m, EMUNGE_SOCKET,
             strdupf ("Received invalid message version %d", m->head.version));
         return (EMUNGE_SOCKET);
     }
     else if (m->head.length < sizeof (struct munge_msg_v1)) {
-        _munge_msg_set_err (m, EMUNGE_SOCKET,
+        munge_msg_set_err (m, EMUNGE_SOCKET,
             strdupf ("Received invalid message length %d", m->head.length));
         return (EMUNGE_SOCKET);
     }
@@ -221,18 +221,18 @@ _munge_msg_recv (munge_msg_t m)
      */
     m->pbody_len = m->head.length + 1;
     if (!(m->pbody = malloc (m->pbody_len))) {
-        _munge_msg_set_err (m, EMUNGE_NO_MEMORY,
+        munge_msg_set_err (m, EMUNGE_NO_MEMORY,
             strdupf ("Unable to malloc %d bytes for message", m->pbody_len));
         return (EMUNGE_NO_MEMORY);
     }
     nrecv = m->head.length;
     if ((n = fd_read_n (m->sd, m->pbody, nrecv)) < 0) {
-        _munge_msg_set_err (m, EMUNGE_SOCKET,
+        munge_msg_set_err (m, EMUNGE_SOCKET,
             strdupf ("Unable to receive message: %s", strerror (errno)));
         return (EMUNGE_SOCKET);
     }
     if (n != nrecv) {
-        _munge_msg_set_err (m, EMUNGE_SOCKET,
+        munge_msg_set_err (m, EMUNGE_SOCKET,
             strdupf ("Received incomplete message: %d of %d bytes", n, nrecv));
         return (EMUNGE_SOCKET);
     }
@@ -272,7 +272,7 @@ _munge_msg_recv (munge_msg_t m)
     /*  Validate the length of the version-specific message body.
      */
     if (n != m->head.length) {
-        _munge_msg_set_err (m, EMUNGE_SOCKET,
+        munge_msg_set_err (m, EMUNGE_SOCKET,
             strdupf ("Received unexpected message length: %d of %d bytes",
                 m->head.length, n));
         return (EMUNGE_SOCKET);
@@ -294,7 +294,7 @@ _munge_msg_recv (munge_msg_t m)
 
 
 int
-_munge_msg_set_err (munge_msg_t m, munge_err_t e, char *s)
+munge_msg_set_err (munge_msg_t m, munge_err_t e, char *s)
 {
 /*  Set an error code [e] and string [s] if an error condition
  *    does not already exist (ie, m->errnum == EMUNGE_SUCCESS).

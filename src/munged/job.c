@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: job.c,v 1.4 2004/08/26 23:06:45 dun Exp $
+ *  $Id: job.c,v 1.5 2004/09/23 21:10:11 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -102,12 +102,12 @@ job_accept (conf_t conf)
                     break;
             }
         }
-        if (_munge_msg_create (&m, sd) != EMUNGE_SUCCESS) {
+        if (munge_msg_create (&m, sd) != EMUNGE_SUCCESS) {
             close (sd);
             log_msg (LOG_WARNING, "Unable to create client request");
         }
         else if (work_queue (w, m) < 0) {
-            _munge_msg_destroy (m);
+            munge_msg_destroy (m);
             log_msg (LOG_WARNING, "Unable to queue client request");
         }
     }
@@ -151,11 +151,11 @@ _job_exec (munge_msg_t m)
 
     assert (m != NULL);
 
-    if ((e = _munge_msg_recv (m)) != EMUNGE_SUCCESS) {
+    if ((e = munge_msg_recv (m)) != EMUNGE_SUCCESS) {
         ; /* fall out of if clause, log error, and drop request */
     }
     else if (m->head.version != MUNGE_MSG_VERSION) {
-        _munge_msg_set_err (m, EMUNGE_SNAFU,
+        munge_msg_set_err (m, EMUNGE_SNAFU,
             strdupf ("Invalid message version %d", m->head.version));
     }
     else {
@@ -167,7 +167,7 @@ _job_exec (munge_msg_t m)
                 dec_v1_process_msg (m);
                 break;
             default:
-                _munge_msg_set_err (m, EMUNGE_SNAFU,
+                munge_msg_set_err (m, EMUNGE_SNAFU,
                     strdupf ("Invalid message type %d", m->head.type));
                 break;
         }
@@ -176,6 +176,6 @@ _job_exec (munge_msg_t m)
         p = (m->errstr != NULL) ? m->errstr : munge_strerror (m->errnum);
         log_msg (LOG_INFO, "%s", p);
     }
-    _munge_msg_destroy (m);
+    munge_msg_destroy (m);
     return;
 }

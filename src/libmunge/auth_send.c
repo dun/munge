@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: auth_send.c,v 1.2 2004/05/14 00:47:59 dun Exp $
+ *  $Id: auth_send.c,v 1.3 2004/09/23 21:10:11 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -129,7 +129,7 @@ err:
         close (file_fd);
     if (file_name != NULL)
         unlink (file_name);
-    return (_munge_msg_set_err (m, EMUNGE_SNAFU, estr));
+    return (munge_msg_set_err (m, EMUNGE_SNAFU, estr));
 }
 
 static int
@@ -144,14 +144,14 @@ _recv_auth_req (int sd, char *dst, int dstlen)
     munge_err_t          e;
     struct munge_msg_v1 *m1;
 
-    if ((e = _munge_msg_create (&m, sd)) != EMUNGE_SUCCESS) {
+    if ((e = munge_msg_create (&m, sd)) != EMUNGE_SUCCESS) {
         goto end;
     }
-    if ((e = _munge_msg_recv (m)) != EMUNGE_SUCCESS) {
+    if ((e = munge_msg_recv (m)) != EMUNGE_SUCCESS) {
         goto end;
     }
     /*  Note that errstr will be set if the received message is an error
-     *    message, whereas _munge_msg_recv()'s return code (e) will be set
+     *    message, whereas munge_msg_recv()'s return code (e) will be set
      *    according to how that message is received.
      */
     if (m->errstr != NULL) {
@@ -168,7 +168,7 @@ _recv_auth_req (int sd, char *dst, int dstlen)
     }
     m1 = m->pbody;
     /*
-     *  The string must be copied since _munge_msg_destroy() will free
+     *  The string must be copied since munge_msg_destroy() will free
      *    the msg body, and the msg data here resides within that memory.
      */
     if (strlcpy (dst, m1->data, dstlen) >= dstlen) {
@@ -177,11 +177,11 @@ _recv_auth_req (int sd, char *dst, int dstlen)
     }
 
 end:
-    /*  Clear the msg sd to prevent closing the socket by _munge_msg_destroy().
+    /*  Clear the msg sd to prevent closing the socket by munge_msg_destroy().
      */
     if (m) {
         m->sd = -1;
-        _munge_msg_destroy (m);
+        munge_msg_destroy (m);
     }
     return (e == EMUNGE_SUCCESS ? 0 : -1);
 }
