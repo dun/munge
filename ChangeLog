@@ -1,5 +1,7 @@
 2004-03-18  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* config/mkinstalldirs: Updated with latest version from automake-1.8.
+
 	* config/compile, config/config.guess, config/config.sub,
 	  config/depcomp, config/install-sh, config/ltmain.sh, config/missing:
 	  Updated with latest versions via the bootstrap script.  This fixes
