@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: gids.c,v 1.1 2004/04/16 22:15:06 dun Exp $
+ *  $Id: gids.c,v 1.2 2004/04/21 23:01:59 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -109,6 +109,7 @@ gids_create (void)
     struct group *gr_ptr;
     struct passwd *pw_ptr;
     char **pp;
+    int n;
 
     if (!(gids = malloc (sizeof (*gids)))) {
         log_errno (EMUNGE_NO_MEMORY, LOG_ERR,
@@ -135,6 +136,9 @@ gids_create (void)
         }
     }
     endgrent ();
+    n = hash_count (gids->hash);
+    log_msg (LOG_INFO, "Found %d user%s with supplementary groups",
+        n, ((n == 1) ? "" : "s"));
     return (gids);
 }
 
