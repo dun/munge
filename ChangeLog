@@ -1,5 +1,8 @@
 2004-12-07  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/libmunge/munge.3.in, src/libmunge/munge.h,
+	  src/libmunge/strerror.c: Cleaned up error codes.
+
 	* README, src/libcommon/munge.7.in, src/libmunge/munge.3.in,
 	  src/munged/munged.8.in: Tweaked verbage.
 

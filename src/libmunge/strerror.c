@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: strerror.c,v 1.5 2004/10/13 21:52:56 dun Exp $
+ *  $Id: strerror.c,v 1.6 2004/12/07 19:53:07 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -48,8 +48,6 @@ munge_strerror (munge_err_t errnum)
             return ("Buffer overflow");
         case EMUNGE_NO_MEMORY:
             return ("Out of memory");
-        case EMUNGE_NO_DAEMON:
-            return ("Munged not responding");
         case EMUNGE_SOCKET:
             return ("Munged communication error");
         case EMUNGE_TIMEOUT:
@@ -60,10 +58,10 @@ munge_strerror (munge_err_t errnum)
             return ("Unrecognized credential version");
         case EMUNGE_BAD_CIPHER:
             return ("Unrecognized credential cipher type");
-        case EMUNGE_BAD_ZIP:
-            return ("Unrecognized credential zip type");
         case EMUNGE_BAD_MAC:
             return ("Unrecognized credential mac type");
+        case EMUNGE_BAD_ZIP:
+            return ("Unrecognized credential zip type");
         case EMUNGE_BAD_REALM:
             return ("Unrecognized credential security realm");
         case EMUNGE_CRED_INVALID:

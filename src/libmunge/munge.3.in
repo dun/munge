@@ -1,4 +1,4 @@
-.\" $Id: munge.3.in,v 1.4 2004/12/07 19:24:40 dun Exp $
+.\" $Id: munge.3.in,v 1.5 2004/12/07 19:53:07 dun Exp $
 
 .TH MUNGE 3 "@DATE@" "@PACKAGE@-@VERSION@" "Munge Uid 'N' Gid Emporium"
 
@@ -77,9 +77,6 @@ Exceeded the maximum length of a buffer.
 .B EMUNGE_NO_MEMORY
 Unable to allocate the requisite memory.
 .TP
-.B EMUNGE_NO_DAEMON
-Unable to contact the daemon on the domain socket.
-.TP
 .B EMUNGE_SOCKET
 Unable to communicate with the daemon on the domain socket.
 .\" .TP
@@ -105,13 +102,20 @@ The credential contains an unsupported compression type.
 The credential contains an unrecognized security realm.
 .TP
 .B EMUNGE_CRED_INVALID
-The credential is invalid.
+The credential is invalid.  This means the credential could not be
+successfully decoded.  More than likely, the secret keys on the encoding
+and decoding hosts do not match.
 .TP
 .B EMUNGE_CRED_EXPIRED
-The credential has expired.
+The credential has expired.  This means more than 'ttl' seconds have elapsed
+sinced the credential was encoded.  Another possibility is that the clocks
+on the encoding and decoding hosts are out of sync.
 .TP
 .B EMUNGE_CRED_REWOUND
 The credential appears to have been encoded at some point in the future.
+This means the clock on the decoding host is slower than that of the
+encoding host by more than the allowable clock skew.  More than likely,
+the clocks on the encoding and decoding hosts are out of sync.
 .TP
 .B EMUNGE_CRED_REPLAYED
 The credential has been previously decoded on this host.

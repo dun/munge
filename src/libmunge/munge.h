@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munge.h,v 1.27 2004/11/18 19:55:44 dun Exp $
+ *  $Id: munge.h,v 1.28 2004/12/07 19:53:07 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -150,20 +150,19 @@ typedef enum munge_err {
     EMUNGE_BAD_LENGTH           =  3,   /* Exceeded maximum message length   */
     EMUNGE_OVERFLOW             =  4,   /* Buffer overflow                   */
     EMUNGE_NO_MEMORY            =  5,   /* Out of memory                     */
-    EMUNGE_NO_DAEMON            =  6,   /* Munged not found                  */
-    EMUNGE_SOCKET               =  7,   /* Munged communication error        */
-    EMUNGE_TIMEOUT              =  8,   /* Munged timeout                    */
-    EMUNGE_BAD_CRED             =  9,   /* Bad credential format             */
-    EMUNGE_BAD_VERSION          = 10,   /* Bad credential version            */
-    EMUNGE_BAD_CIPHER           = 11,   /* Bad credential cipher type        */
+    EMUNGE_SOCKET               =  6,   /* Munged communication error        */
+    EMUNGE_TIMEOUT              =  7,   /* Munged timeout                    */
+    EMUNGE_BAD_CRED             =  8,   /* Bad credential format             */
+    EMUNGE_BAD_VERSION          =  9,   /* Bad credential version            */
+    EMUNGE_BAD_CIPHER           = 10,   /* Bad credential cipher type        */
+    EMUNGE_BAD_MAC              = 11,   /* Bad credential msg auth code type */
     EMUNGE_BAD_ZIP              = 12,   /* Bad credential compression type   */
-    EMUNGE_BAD_MAC              = 13,   /* Bad credential msg auth code type */
-    EMUNGE_BAD_REALM            = 14,   /* Bad credential security realm     */
-    EMUNGE_CRED_INVALID         = 15,   /* Credential invalid                */
-    EMUNGE_CRED_EXPIRED         = 16,   /* Credential expired                */
-    EMUNGE_CRED_REWOUND         = 17,   /* Credential created in the future  */
-    EMUNGE_CRED_REPLAYED        = 18,   /* Credential replayed               */
-    EMUNGE_CRED_UNAUTHORIZED    = 19    /* Credential decode unauthorized    */
+    EMUNGE_BAD_REALM            = 13,   /* Bad credential security realm     */
+    EMUNGE_CRED_INVALID         = 14,   /* Credential invalid                */
+    EMUNGE_CRED_EXPIRED         = 15,   /* Credential expired                */
+    EMUNGE_CRED_REWOUND         = 16,   /* Credential created in the future  */
+    EMUNGE_CRED_REPLAYED        = 17,   /* Credential replayed               */
+    EMUNGE_CRED_UNAUTHORIZED    = 18    /* Credential decode unauthorized    */
 } munge_err_t;
 
 
