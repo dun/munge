@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munge_msg.c,v 1.8 2003/12/12 00:30:00 dun Exp $
+ *  $Id: munge_msg.c,v 1.9 2003/12/12 18:22:27 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -134,14 +134,18 @@ _munge_msg_send (munge_msg_t m)
     n = iov[0].iov_len + iov[1].iov_len + iov[2].iov_len + iov[3].iov_len;
 
 again:
-    if ((l = writev (m->sd, iov, 4)) < n) {
-        if ((l == -1) && (errno == EINTR))
+    if ((l = writev (m->sd, iov, 4)) < 0) {
+        if (errno == EINTR)
             goto again;
         _munge_msg_set_err (m, EMUNGE_SOCKET,
             strdupf ("Unable to send message: %s", strerror (errno)));
         return (EMUNGE_SOCKET);
     }
-    assert (l == n);
+    if (l != n) {
+        _munge_msg_set_err (m, EMUNGE_SOCKET,
+            strdupf ("Sent incomplete message (%d/%d)", l, n));
+        return (EMUNGE_SOCKET);
+    }
     return (EMUNGE_SUCCESS);
 }
 
@@ -157,10 +161,15 @@ _munge_msg_recv (munge_msg_t m)
     assert (m->pbody == NULL);
 
     n = sizeof (m->head);
-    if ((l = fd_read_n (m->sd, &(m->head), n)) < n) {
+    if ((l = fd_read_n (m->sd, &(m->head), n)) < 0) {
         _munge_msg_set_err (m, EMUNGE_SOCKET,
             strdupf ("Unable to receive message header: %s",
                 strerror (errno)));
+        return (EMUNGE_SOCKET);
+    }
+    if (l != n) {
+        _munge_msg_set_err (m, EMUNGE_SOCKET,
+            strdupf ("Received incomplete message header (%d/%d)", l, n));
         return (EMUNGE_SOCKET);
     }
     if (m->head.magic != MUNGE_MSG_MAGIC) {
@@ -186,9 +195,14 @@ _munge_msg_recv (munge_msg_t m)
     }
     m->pbody_len = n;
     n = m->head.length;
-    if ((l = fd_read_n (m->sd, m->pbody, n)) < n) {
+    if ((l = fd_read_n (m->sd, m->pbody, n)) < 0) {
         _munge_msg_set_err (m, EMUNGE_SOCKET,
-            strdupf ("Unable to receive message body: %s", strerror (errno)));
+            strdupf ("Unable to receive message: %s", strerror (errno)));
+        return (EMUNGE_SOCKET);
+    }
+    if (l != n) {
+        _munge_msg_set_err (m, EMUNGE_SOCKET,
+            strdupf ("Received incomplete message (%d/%d)", l, n));
         return (EMUNGE_SOCKET);
     }
     m1 = m->pbody;

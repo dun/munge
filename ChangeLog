@@ -1,3 +1,8 @@
+2003-12-12  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/libcommon/munge_msg.c(_munge_msg_send, _munge_msg_recv):
+	  Fixed error conditions that were not errno conditions.
+
 2003-12-11  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/libcommon/munge_msg.c(_munge_msg_send):
