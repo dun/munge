@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: log.c,v 1.2 2003/02/18 19:46:19 dun Exp $
+ *  $Id: log.c,v 1.3 2003/04/08 18:16:16 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -46,7 +46,7 @@
 #define LOG_BUFFER_MAXLEN       1024
 #define LOG_IDENTITY_MAXLEN     128
 #define LOG_PREFIX_MAXLEN       9
-#define LOG_TRUNC_STRING        "+"
+#define LOG_TRUNC_SUFFIX        "+"
 
 
 struct log_ctx {
@@ -61,30 +61,8 @@ struct log_ctx {
 static struct log_ctx log_ctx = { NULL, 0, 0, 0, 0 };
 
 
-static void log_aux (int priority, const char *format, va_list vargs);
-static char * log_prefix (int priority);
-
-
-void
-dprintf (int level, const char *format, ...)
-{
-    static int debug_level = -1;
-    va_list vargs;
-    char *p;
-    int i = 0;
-
-    if (debug_level < 0) {
-        if ((p = getenv ("DEBUG")))
-            i = atoi (p);
-        debug_level = (i > 0) ? i : 0;
-    }
-    if ((level > 0) && (level <= debug_level)) {
-        va_start (vargs, format);
-        vfprintf (stderr, format, vargs);
-        va_end (vargs);
-    }
-    return;
-}
+static void _log_aux (int priority, const char *format, va_list vargs);
+static char * _log_prefix (int priority);
 
 
 int
@@ -140,12 +118,12 @@ log_open_syslog (char *identity, int facility)
 
 
 void
-log_err (int status, const char *format, ...)
+log_err (int status, int priority, const char *format, ...)
 {
     va_list vargs;
 
     va_start (vargs, format);
-    log_aux (LOG_ERR, format, vargs);
+    _log_aux (priority, format, vargs);
     va_end (vargs);
 
 #ifndef NDEBUG
@@ -162,7 +140,7 @@ log_msg (int priority, const char *format, ...)
     va_list vargs;
 
     va_start (vargs, format);
-    log_aux (priority, format, vargs);
+    _log_aux (priority, format, vargs);
     va_end (vargs);
 
     return;
@@ -170,15 +148,15 @@ log_msg (int priority, const char *format, ...)
 
 
 static void
-log_aux (int priority, const char *format, va_list vargs)
+_log_aux (int priority, const char *format, va_list vargs)
 {
     char  buf [LOG_BUFFER_MAXLEN];      /* message buffer                    */
     char *p;                            /* current position in msg buf       */
     char *sbuf;                         /* syslog portion of message buffer  */
     char *prefix;                       /* priority prefix message           */
-    int  n;                             /* return value of num chars written */
-    int  len;                           /* remaining len in buf includes \0  */
-    int  append_nl = 0;                 /* set to 1 if trailing nl is needed */
+    int   n;                            /* return value of num chars written */
+    int   len;                          /* remaining len in buf includes nul */
+    int   append_nl = 0;                /* set to 1 if trailing nl is needed */
 
     /*  If no log has been specified, output log msgs to stderr.
      */
@@ -196,7 +174,7 @@ log_aux (int priority, const char *format, va_list vargs)
         append_nl = 1;
         --len;                          /* reserve space for trailing LF */
     }
-    /*  Add identity.
+    /*  Add identity string.
      */
     if (log_ctx.id [0] != '\0') {
         n = snprintf (p, len, "%s: ", log_ctx.id);
@@ -237,7 +215,7 @@ log_aux (int priority, const char *format, va_list vargs)
     /*  Add priority string.
      */
     if ((len > 0) && (log_ctx.options & LOG_OPT_PRIORITY)) {
-        if ((prefix = log_prefix (priority))) {
+        if ((prefix = _log_prefix (priority))) {
             int m = 1;
             if (log_ctx.options & LOG_OPT_JUSTIFY) {
                 if ((m = LOG_PREFIX_MAXLEN + 1 - strlen (prefix)) < 0)
@@ -268,17 +246,17 @@ log_aux (int priority, const char *format, va_list vargs)
             len -= n;
         }
     }
-    /*  Add truncation string if buffer was overrun along the way.
+    /*  Add truncation string if buffer was overrun.
      */
     if (len <= 0) {
         char *q;
-        n = strlen (LOG_TRUNC_STRING);
+        n = strlen (LOG_TRUNC_SUFFIX);
         q = buf + sizeof (buf) - 1 - append_nl - n;
         p = (p < q) ? p : q;
-        strcpy (p, LOG_TRUNC_STRING);
+        strcpy (p, LOG_TRUNC_SUFFIX);
         p += n;
     }
-    /*  Terminate the buffer with a trailing newline and terminating NUL.
+    /*  Terminate buffer with trailing newline and terminating NUL.
      */
     if (append_nl)
         *p++ = '\n';
@@ -300,27 +278,27 @@ log_aux (int priority, const char *format, va_list vargs)
 
 
 static char *
-log_prefix (int priority)
+_log_prefix (int priority)
 {
     switch (priority) {
         case LOG_EMERG:
-            return ("Emergency");
+            return ("EMERGENCY");
         case LOG_ALERT:
-            return ("Alert");
+            return ("ALERT");
         case LOG_CRIT:
-            return ("Critical");
+            return ("CRITICAL");
         case LOG_ERR:
-            return ("Error");
+            return ("ERROR");
         case LOG_WARNING:
-            return ("Warning");
+            return ("WARNING");
         case LOG_NOTICE:
-            return ("Notice");
+            return ("NOTICE");
         case LOG_INFO:
-            return ("Info");
+            return ("INFO");
         case LOG_DEBUG:
-            return ("Debug");
+            return ("DEBUG");
         default:
-            return ("Unknown");
+            return ("UNKNOWN");
     }
     /* not reached */
 }

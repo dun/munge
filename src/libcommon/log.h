@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: log.h,v 1.2 2003/02/18 19:46:19 dun Exp $
+ *  $Id: log.h,v 1.3 2003/04/08 18:16:16 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -25,8 +25,8 @@
  *****************************************************************************/
 
 
-#ifndef MUNGE_LOG_H
-#define MUNGE_LOG_H
+#ifndef LOG_H
+#define LOG_H
 
 
 #if HAVE_CONFIG_H
@@ -37,27 +37,11 @@
 #include <syslog.h>
 
 
-/*  DPRINTF((level, format, ...))
- *    A wrapper for dprintf() allowing it to be removed from production code.
- */
-#ifndef NDEBUG
-#  define DPRINTF(args) dprintf args
-#else /* NDEBUG */
-#  define DPRINTF(args)
-#endif /* NDEBUG */
-
-
 #define LOG_OPT_NONE            0x00
 #define LOG_OPT_JUSTIFY         0x01    /* justify priority str field width  */
 #define LOG_OPT_PRIORITY        0x02    /* add priority string to message    */
 #define LOG_OPT_TIMESTAMP       0x04    /* add timestamp to message          */
 
-
-void dprintf (int level, const char *format, ...);
-/*
- *  Similar to printf, except output is always to stderr and only done
- *    when 'level' is less than or equal to the "DEBUG" env var.
- */
 
 int log_open_file (FILE *fp, char *identity, int priority, int options);
 /*
@@ -81,17 +65,18 @@ int log_open_syslog (char *identity, int facility);
  *  Returns 1 if the syslog is opened, or 0 if closed.
  */
 
-void log_err (int status, const char *format, ...);
+void log_err (int status, int priority, const char *format, ...);
 /*
- *  Logs a fatal message according to the printf-style [format] string,
- *    after which it exits the program with the [status] value.
+ *  Logs a fatal message at the specified [priority] level according to
+ *    the printf-style [format] string, after which it exits the program
+ *    with the specified [status] value.
  */
 
 void log_msg (int priority, const char *format, ...);
 /*
- *  Logs a non-fatal message at the specified [priority] according to the
- *    printf-style [format] string.
+ *  Logs a non-fatal message at the specified [priority] level according to
+ *    the printf-style [format] string.
  */
 
 
-#endif /* !MUNGE_LOG_H */
+#endif /* !LOG_H */
