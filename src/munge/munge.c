@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munge.c,v 1.27 2004/08/19 19:22:13 dun Exp $
+ *  $Id: munge.c,v 1.28 2004/08/19 20:20:32 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -486,7 +486,7 @@ str_to_int (const char *s, const char **strings)
         return (-1);
     }
     /*  Check to see if the given string matches a valid string.
-     *  Also determine the number of s trings in the array.
+     *  Also determine the number of strings in the array.
      */
     for (pp=strings, i=0; *pp; pp++, i++) {
         if (!strcasecmp (s, *pp))
