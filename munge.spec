@@ -1,4 +1,4 @@
-# $Id: munge.spec,v 1.14 2004/03/25 21:48:20 dun Exp $
+# $Id: munge.spec,v 1.15 2004/04/02 21:00:25 dun Exp $
 
 Name:		munge
 Version:	0.1
@@ -53,35 +53,23 @@ DESTDIR="$RPM_BUILD_ROOT" make install
 %clean
 rm -rf "$RPM_BUILD_ROOT"
 
-%pre
-if [ -x /etc/rc.d/init.d/munge ]; then
-  if /etc/rc.d/init.d/munge status | grep running >/dev/null 2>&1; then
-    /etc/rc.d/init.d/munge stop
-  fi
-fi
-
 %post
 /sbin/ldconfig %{_libdir}
-if [ -x /etc/rc.d/init.d/munge ]; then
-  [ -x /sbin/chkconfig ] && /sbin/chkconfig --del munge
-  [ -x /sbin/chkconfig ] && /sbin/chkconfig --add munge
-  if ! /etc/rc.d/init.d/munge status | grep running >/dev/null 2>&1; then
-    /etc/rc.d/init.d/munge start
-  fi
+if [ $1 = 1 ]; then
+  /sbin/chkconfig --add munge
 fi
 
 %preun
-if [ "$1" = 0 ]; then
-  if [ -x /etc/rc.d/init.d/munge ]; then
-    [ -x /sbin/chkconfig ] && /sbin/chkconfig --del munge
-    if /etc/rc.d/init.d/munge status | grep running >/dev/null 2>&1; then
-      /etc/rc.d/init.d/munge stop
-    fi
-  fi
+if [ $1 = 0 ]; then
+  /sbin/service munge stop >/dev/null 2>&1
+  /sbin/chkconfig --del munge
 fi
 
 %postun
 /sbin/ldconfig %{_libdir}
+if [ $1 -ge 1 ]; then
+  /sbin/service munge condrestart >/dev/null 2>&1
+fi
 
 %files
 %defattr(-,root,root,0755)

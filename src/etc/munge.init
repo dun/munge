@@ -1,24 +1,24 @@
 #!/bin/sh
-##
-# $Id: munge.init,v 1.6 2003/05/08 00:34:58 dun Exp $
-##
+###############################################################################
+# $Id: munge.init,v 1.7 2004/04/02 21:00:25 dun Exp $
+###############################################################################
 # chkconfig:	345 40 60
-# description:	The MUNGE daemon is used for user authentication.
-# processname:	/usr/sbin/munged
+# description:	The MUNGE daemon is a user authentication service.
+# processname:	munged
 # config:	not-yet-supported
-##
-
-# Source function library.
-. /etc/rc.d/init.d/functions
+###############################################################################
 
 DAEMON="munged"
-RETVAL="0"
-SUBSYS="`echo $0 | perl -pe 's|(.*/)?([SK][0-9]{2})?(.*)|$3|'`"
+
+source /etc/rc.d/init.d/functions
+SUBSYS="/var/lock/subsys/`echo $0 | perl -pe 's,(.*/)?([SK][0-9]{2})?(.*),$3,'`"
 
 # Disable suppression of stderr msgs.
 INITLOG_ARGS=""
 
-[ -x "/usr/sbin/$DAEMON" ] || exit 0
+# Ensure the package is still installed.
+# which "$DAEMON" 1>/dev/null 2>&1 || exit 5
+[ -x "/usr/sbin/$DAEMON" ] || exit 5
 
 # See how we were called.
 case "$1" in
@@ -27,23 +27,22 @@ case "$1" in
 	daemon $DAEMON -f
 	RETVAL=$?
 	echo
-	[ $RETVAL -eq 0 ] && touch /var/lock/subsys/$SUBSYS
+	[ $RETVAL -eq 0 ] && touch $SUBSYS
 	;;
   stop)
 	echo -n "Stopping $DAEMON: "
 	killproc $DAEMON
 	RETVAL=$?
 	echo
-	[ $RETVAL -eq 0 ] && rm -f /var/lock/subsys/$SUBSYS
-	;;
-  status)
-	status $DAEMON
-	RETVAL=$?
+	[ $RETVAL -eq 0 ] && rm -f $SUBSYS
 	;;
   restart)
 	$0 stop
 	$0 start
 	RETVAL=$?
+	;;
+  try-restart|condrestart)
+	[ -f $SUBSYS ] && $0 restart
 	;;
   reload)
 	echo -n "Reloading $DAEMON: "
@@ -51,8 +50,17 @@ case "$1" in
 	RETVAL=$?
 	echo
 	;;
+  force-reload)
+	$0 try-restart
+	RETVAL=$?
+	;;
+  status)
+	status $DAEMON
+	RETVAL=$?
+	;;
   *)
-	echo "Usage: $DAEMON {start|stop|status|restart|reload}"
+	COMMANDS="start|stop|restart|try-restart|reload|force-reload|status"
+	echo "Usage: $DAEMON {$COMMANDS}"
 	exit 1
 esac
 

@@ -1,3 +1,8 @@
+2004-04-02  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* munge.spec, src/etc/munge.init:
+	  Changed daemon rpm (re)start behavior at install or upgrade.
+
 2004-03-31  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* config/x_ac_debug.m4, src/munge/unmunge.c, src/munged/dec_v1.c,
