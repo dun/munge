@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munge_defs.h,v 1.9 2003/05/06 20:20:29 dun Exp $
+ *  $Id: munge_defs.h,v 1.10 2003/05/16 23:48:13 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -78,7 +78,7 @@
 
 /*  Socket backlog for the server listening on the unix domain socket.
  */
-#define MUNGE_SOCKET_BACKLOG    10
+#define MUNGE_SOCKET_BACKLOG    64
 
 /*  String specifying the unix domain socket pathname for client-server comms.
  */
@@ -102,6 +102,5 @@
  *    FIXME: Temporary kludge until configuration file support is added.
  */
 #define MUNGED_SECRET_KEY       "/etc/ssh/ssh_host_key"
-
 
 #endif /* !MUNGE_DEFS_H */
