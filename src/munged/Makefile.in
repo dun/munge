@@ -69,11 +69,11 @@ am_munged_OBJECTS = munged-auth_recv.$(OBJEXT) munged-base64.$(OBJEXT) \
 	munged-cred.$(OBJEXT) munged-crypto_log.$(OBJEXT) \
 	munged-crypto_thread.$(OBJEXT) munged-dec_v1.$(OBJEXT) \
 	munged-enc_v1.$(OBJEXT) munged-gids.$(OBJEXT) \
-	munged-hash.$(OBJEXT) munged-lookup.$(OBJEXT) \
-	munged-mac.$(OBJEXT) munged-md.$(OBJEXT) \
-	munged-msg_server.$(OBJEXT) munged-random.$(OBJEXT) \
-	munged-replay.$(OBJEXT) munged-sock.$(OBJEXT) \
-	munged-thread.$(OBJEXT) munged-timer.$(OBJEXT) \
+	munged-hash.$(OBJEXT) munged-job.$(OBJEXT) \
+	munged-lookup.$(OBJEXT) munged-mac.$(OBJEXT) \
+	munged-md.$(OBJEXT) munged-random.$(OBJEXT) \
+	munged-replay.$(OBJEXT) munged-thread.$(OBJEXT) \
+	munged-timer.$(OBJEXT) munged-work.$(OBJEXT) \
 	munged-zip.$(OBJEXT) munged-munged.$(OBJEXT)
 munged_OBJECTS = $(am_munged_OBJECTS)
 am__DEPENDENCIES_1 =
@@ -98,15 +98,15 @@ am__depfiles_maybe = depfiles
 @AMDEP_TRUE@	./$(DEPDIR)/munged-enc_v1.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/munged-gids.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/munged-hash.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/munged-job.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/munged-lookup.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/munged-mac.Po ./$(DEPDIR)/munged-md.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/munged-msg_server.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/munged-munged.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/munged-random.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/munged-replay.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/munged-sock.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/munged-thread.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/munged-timer.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/munged-work.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/munged-zip.Po
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
@@ -264,24 +264,24 @@ munged_SOURCES = \
 	gids.h \
 	hash.c \
 	hash.h \
+	job.c \
+	job.h \
 	lookup.c \
 	lookup.h \
 	mac.c \
 	mac.h \
 	md.c \
 	md.h \
-	msg_server.c \
-	msg_server.h \
 	random.c \
 	random.h \
 	replay.c \
 	replay.h \
-	sock.c \
-	sock.h \
 	thread.c \
 	thread.h \
 	timer.c \
 	timer.h \
+	work.c \
+	work.h \
 	zip.c \
 	zip.h \
 	munged.c
@@ -388,16 +388,16 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/munged-enc_v1.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/munged-gids.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/munged-hash.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/munged-job.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/munged-lookup.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/munged-mac.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/munged-md.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/munged-msg_server.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/munged-munged.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/munged-random.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/munged-replay.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/munged-sock.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/munged-thread.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/munged-timer.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/munged-work.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/munged-zip.Po@am__quote@
 
 .c.o:
@@ -688,6 +688,30 @@ munged-hash.lo: hash.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -c -o munged-hash.lo `test -f 'hash.c' || echo '$(srcdir)/'`hash.c
 
+munged-job.o: job.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -MT munged-job.o -MD -MP -MF "$(DEPDIR)/munged-job.Tpo" -c -o munged-job.o `test -f 'job.c' || echo '$(srcdir)/'`job.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/munged-job.Tpo" "$(DEPDIR)/munged-job.Po"; else rm -f "$(DEPDIR)/munged-job.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='job.c' object='munged-job.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/munged-job.Po' tmpdepfile='$(DEPDIR)/munged-job.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -c -o munged-job.o `test -f 'job.c' || echo '$(srcdir)/'`job.c
+
+munged-job.obj: job.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -MT munged-job.obj -MD -MP -MF "$(DEPDIR)/munged-job.Tpo" -c -o munged-job.obj `if test -f 'job.c'; then $(CYGPATH_W) 'job.c'; else $(CYGPATH_W) '$(srcdir)/job.c'; fi`; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/munged-job.Tpo" "$(DEPDIR)/munged-job.Po"; else rm -f "$(DEPDIR)/munged-job.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='job.c' object='munged-job.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/munged-job.Po' tmpdepfile='$(DEPDIR)/munged-job.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -c -o munged-job.obj `if test -f 'job.c'; then $(CYGPATH_W) 'job.c'; else $(CYGPATH_W) '$(srcdir)/job.c'; fi`
+
+munged-job.lo: job.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -MT munged-job.lo -MD -MP -MF "$(DEPDIR)/munged-job.Tpo" -c -o munged-job.lo `test -f 'job.c' || echo '$(srcdir)/'`job.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/munged-job.Tpo" "$(DEPDIR)/munged-job.Plo"; else rm -f "$(DEPDIR)/munged-job.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='job.c' object='munged-job.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/munged-job.Plo' tmpdepfile='$(DEPDIR)/munged-job.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -c -o munged-job.lo `test -f 'job.c' || echo '$(srcdir)/'`job.c
+
 munged-lookup.o: lookup.c
 @am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -MT munged-lookup.o -MD -MP -MF "$(DEPDIR)/munged-lookup.Tpo" -c -o munged-lookup.o `test -f 'lookup.c' || echo '$(srcdir)/'`lookup.c; \
 @am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/munged-lookup.Tpo" "$(DEPDIR)/munged-lookup.Po"; else rm -f "$(DEPDIR)/munged-lookup.Tpo"; exit 1; fi
@@ -760,30 +784,6 @@ munged-md.lo: md.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -c -o munged-md.lo `test -f 'md.c' || echo '$(srcdir)/'`md.c
 
-munged-msg_server.o: msg_server.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -MT munged-msg_server.o -MD -MP -MF "$(DEPDIR)/munged-msg_server.Tpo" -c -o munged-msg_server.o `test -f 'msg_server.c' || echo '$(srcdir)/'`msg_server.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/munged-msg_server.Tpo" "$(DEPDIR)/munged-msg_server.Po"; else rm -f "$(DEPDIR)/munged-msg_server.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='msg_server.c' object='munged-msg_server.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/munged-msg_server.Po' tmpdepfile='$(DEPDIR)/munged-msg_server.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -c -o munged-msg_server.o `test -f 'msg_server.c' || echo '$(srcdir)/'`msg_server.c
-
-munged-msg_server.obj: msg_server.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -MT munged-msg_server.obj -MD -MP -MF "$(DEPDIR)/munged-msg_server.Tpo" -c -o munged-msg_server.obj `if test -f 'msg_server.c'; then $(CYGPATH_W) 'msg_server.c'; else $(CYGPATH_W) '$(srcdir)/msg_server.c'; fi`; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/munged-msg_server.Tpo" "$(DEPDIR)/munged-msg_server.Po"; else rm -f "$(DEPDIR)/munged-msg_server.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='msg_server.c' object='munged-msg_server.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/munged-msg_server.Po' tmpdepfile='$(DEPDIR)/munged-msg_server.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -c -o munged-msg_server.obj `if test -f 'msg_server.c'; then $(CYGPATH_W) 'msg_server.c'; else $(CYGPATH_W) '$(srcdir)/msg_server.c'; fi`
-
-munged-msg_server.lo: msg_server.c
-@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -MT munged-msg_server.lo -MD -MP -MF "$(DEPDIR)/munged-msg_server.Tpo" -c -o munged-msg_server.lo `test -f 'msg_server.c' || echo '$(srcdir)/'`msg_server.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/munged-msg_server.Tpo" "$(DEPDIR)/munged-msg_server.Plo"; else rm -f "$(DEPDIR)/munged-msg_server.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='msg_server.c' object='munged-msg_server.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/munged-msg_server.Plo' tmpdepfile='$(DEPDIR)/munged-msg_server.TPlo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -c -o munged-msg_server.lo `test -f 'msg_server.c' || echo '$(srcdir)/'`msg_server.c
-
 munged-random.o: random.c
 @am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -MT munged-random.o -MD -MP -MF "$(DEPDIR)/munged-random.Tpo" -c -o munged-random.o `test -f 'random.c' || echo '$(srcdir)/'`random.c; \
 @am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/munged-random.Tpo" "$(DEPDIR)/munged-random.Po"; else rm -f "$(DEPDIR)/munged-random.Tpo"; exit 1; fi
@@ -832,30 +832,6 @@ munged-replay.lo: replay.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -c -o munged-replay.lo `test -f 'replay.c' || echo '$(srcdir)/'`replay.c
 
-munged-sock.o: sock.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -MT munged-sock.o -MD -MP -MF "$(DEPDIR)/munged-sock.Tpo" -c -o munged-sock.o `test -f 'sock.c' || echo '$(srcdir)/'`sock.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/munged-sock.Tpo" "$(DEPDIR)/munged-sock.Po"; else rm -f "$(DEPDIR)/munged-sock.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='sock.c' object='munged-sock.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/munged-sock.Po' tmpdepfile='$(DEPDIR)/munged-sock.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -c -o munged-sock.o `test -f 'sock.c' || echo '$(srcdir)/'`sock.c
-
-munged-sock.obj: sock.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -MT munged-sock.obj -MD -MP -MF "$(DEPDIR)/munged-sock.Tpo" -c -o munged-sock.obj `if test -f 'sock.c'; then $(CYGPATH_W) 'sock.c'; else $(CYGPATH_W) '$(srcdir)/sock.c'; fi`; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/munged-sock.Tpo" "$(DEPDIR)/munged-sock.Po"; else rm -f "$(DEPDIR)/munged-sock.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='sock.c' object='munged-sock.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/munged-sock.Po' tmpdepfile='$(DEPDIR)/munged-sock.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -c -o munged-sock.obj `if test -f 'sock.c'; then $(CYGPATH_W) 'sock.c'; else $(CYGPATH_W) '$(srcdir)/sock.c'; fi`
-
-munged-sock.lo: sock.c
-@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -MT munged-sock.lo -MD -MP -MF "$(DEPDIR)/munged-sock.Tpo" -c -o munged-sock.lo `test -f 'sock.c' || echo '$(srcdir)/'`sock.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/munged-sock.Tpo" "$(DEPDIR)/munged-sock.Plo"; else rm -f "$(DEPDIR)/munged-sock.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='sock.c' object='munged-sock.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/munged-sock.Plo' tmpdepfile='$(DEPDIR)/munged-sock.TPlo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -c -o munged-sock.lo `test -f 'sock.c' || echo '$(srcdir)/'`sock.c
-
 munged-thread.o: thread.c
 @am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -MT munged-thread.o -MD -MP -MF "$(DEPDIR)/munged-thread.Tpo" -c -o munged-thread.o `test -f 'thread.c' || echo '$(srcdir)/'`thread.c; \
 @am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/munged-thread.Tpo" "$(DEPDIR)/munged-thread.Po"; else rm -f "$(DEPDIR)/munged-thread.Tpo"; exit 1; fi
@@ -903,6 +879,30 @@ munged-timer.lo: timer.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/munged-timer.Plo' tmpdepfile='$(DEPDIR)/munged-timer.TPlo' @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -c -o munged-timer.lo `test -f 'timer.c' || echo '$(srcdir)/'`timer.c
+
+munged-work.o: work.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -MT munged-work.o -MD -MP -MF "$(DEPDIR)/munged-work.Tpo" -c -o munged-work.o `test -f 'work.c' || echo '$(srcdir)/'`work.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/munged-work.Tpo" "$(DEPDIR)/munged-work.Po"; else rm -f "$(DEPDIR)/munged-work.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='work.c' object='munged-work.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/munged-work.Po' tmpdepfile='$(DEPDIR)/munged-work.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -c -o munged-work.o `test -f 'work.c' || echo '$(srcdir)/'`work.c
+
+munged-work.obj: work.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -MT munged-work.obj -MD -MP -MF "$(DEPDIR)/munged-work.Tpo" -c -o munged-work.obj `if test -f 'work.c'; then $(CYGPATH_W) 'work.c'; else $(CYGPATH_W) '$(srcdir)/work.c'; fi`; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/munged-work.Tpo" "$(DEPDIR)/munged-work.Po"; else rm -f "$(DEPDIR)/munged-work.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='work.c' object='munged-work.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/munged-work.Po' tmpdepfile='$(DEPDIR)/munged-work.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -c -o munged-work.obj `if test -f 'work.c'; then $(CYGPATH_W) 'work.c'; else $(CYGPATH_W) '$(srcdir)/work.c'; fi`
+
+munged-work.lo: work.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -MT munged-work.lo -MD -MP -MF "$(DEPDIR)/munged-work.Tpo" -c -o munged-work.lo `test -f 'work.c' || echo '$(srcdir)/'`work.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/munged-work.Tpo" "$(DEPDIR)/munged-work.Plo"; else rm -f "$(DEPDIR)/munged-work.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='work.c' object='munged-work.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/munged-work.Plo' tmpdepfile='$(DEPDIR)/munged-work.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -c -o munged-work.lo `test -f 'work.c' || echo '$(srcdir)/'`work.c
 
 munged-zip.o: zip.c
 @am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -MT munged-zip.o -MD -MP -MF "$(DEPDIR)/munged-zip.Tpo" -c -o munged-zip.o `test -f 'zip.c' || echo '$(srcdir)/'`zip.c; \

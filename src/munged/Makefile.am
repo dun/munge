@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Makefile.am,v 1.12 2004/05/01 05:08:26 dun Exp $
+## $Id: Makefile.am,v 1.13 2004/08/05 21:12:42 dun Exp $
 ##*****************************************************************************
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
@@ -50,24 +50,24 @@ munged_SOURCES = \
 	gids.h \
 	hash.c \
 	hash.h \
+	job.c \
+	job.h \
 	lookup.c \
 	lookup.h \
 	mac.c \
 	mac.h \
 	md.c \
 	md.h \
-	msg_server.c \
-	msg_server.h \
 	random.c \
 	random.h \
 	replay.c \
 	replay.h \
-	sock.c \
-	sock.h \
 	thread.c \
 	thread.h \
 	timer.c \
 	timer.h \
+	work.c \
+	work.h \
 	zip.c \
 	zip.h \
 	munged.c
