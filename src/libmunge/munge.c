@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munge.c,v 1.2 2003/02/03 23:45:04 dun Exp $
+ *  $Id: munge.c,v 1.3 2003/02/04 23:55:33 dun Exp $
  *****************************************************************************
  *  Copyright (C) 2002-2003 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
@@ -215,11 +215,13 @@ munge_decode (const char *m, munge_ctx_t *ctx,
             *pbuf = NULL;
         }
         else {
-            if (!(*pbuf = malloc(len))) {
+            if (!(*pbuf = malloc(len + 1))) {
                 free(tmpbuf);
                 return(EMUNGE_NOMEM);
             }
             memcpy(*pbuf, p, len);
+            memset(*pbuf + len, 0, 1);		/* ensure buf is NUL-term'd */
+
         }
     }
     free(tmpbuf);
