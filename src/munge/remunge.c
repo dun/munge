@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: remunge.c,v 1.6 2004/09/04 04:58:32 dun Exp $
+ *  $Id: remunge.c,v 1.7 2004/09/04 08:27:45 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -192,7 +192,7 @@ main (int argc, char *argv[])
     /*  Close stdin since it is not used.
      */
     if (close (STDIN_FILENO) < 0) {
-        log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to close stdin");
+        log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to close standard input");
     }
     /*  Set stdout to be line buffered.
      */
