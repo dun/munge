@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: str.h,v 1.2 2003/04/18 23:14:39 dun Exp $
+ *  $Id: str.h,v 1.3 2004/01/28 01:04:59 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -57,6 +57,15 @@ void strdump (const char *prefix, void *x, int n);
 /*
  *  Debugging aid for dumping the byte array [x] of length [n] to stdout,
  *    prefixing the output with the [prefix] string.
+ */
+
+void * memburn (void *v, int c, size_t n);
+/*
+ *  Implementation of memset to prevent "dead store removal" optimization,
+ *    thereby ensuring secrets are overwritten.
+ *  Fills the first [n] bytes of the memory area pointed to by [v]
+ *    with the constant byte [c].
+ *  Returns a pointer to the memory area [v].
  */
 
 

@@ -1,3 +1,7 @@
+2004-01-27  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/libcommon/str.c, src/libcommon/str.h: Added memburn().
+
 2004-01-15  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/libcommon/license.c: Updated copyright date range.

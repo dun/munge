@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: str.c,v 1.2 2003/04/18 23:14:39 dun Exp $
+ *  $Id: str.c,v 1.3 2004/01/28 01:04:59 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -123,4 +123,27 @@ strdump (const char *prefix, void *x, int n)
         printf ("%02x", p[i]);
     printf ("\n");
     return;
+}
+
+
+void *
+memburn (void *v, int c, size_t n)
+{
+/*  From David A. Wheeler's "Secure Programming for Linux and Unix HOWTO"
+ *    <http://www.dwheeler.com/secure-programs/> (section 11.4):
+ *  Many compilers, including many C/C++ compilers, remove writes to stores
+ *    that are no longer used -- this is often referred to as "dead store
+ *    removal".  Unfortunately, if the write is really to overwrite the value
+ *    of a secret, this means that code that appears to be correct will be
+ *    silently discarded.
+ *  One approach that seems to work on all platforms is to write your own
+ *    implementation of memset with internal "volatilization" of the first
+ *    argument (this code is based on a workaround proposed by Michael Howard):
+ */
+    volatile char *p = v;
+
+    while (n--) {
+        *p++ = c;
+    }
+    return (v);
 }
