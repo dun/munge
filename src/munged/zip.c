@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: zip.c,v 1.5 2004/04/03 21:53:00 dun Exp $
+ *  $Id: zip.c,v 1.6 2004/05/01 04:59:38 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -30,6 +30,7 @@
 #endif /* HAVE_CONFIG_H */
 
 #if HAVE_BZLIB_H
+#  include <stdio.h>                    /* for Solaris */
 #  include <bzlib.h>
 #endif /* HAVE_BZLIB_H */
 
