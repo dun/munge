@@ -1,3 +1,6 @@
+Version 0.4.1 (2004-12-21):
+  - Fixed bug in init script preventing chkconfig from setting priorities.
+
 Version 0.4 (2004-12-07):
   - Added persistent pool of threads.
   - Added retry for failed requests.

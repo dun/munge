@@ -1,8 +1,9 @@
 -fix signal handlers
+-fix remunge to exit on persistent errors
 -add configuration file support
 -add munged pidfile support
 -add munged 'k' cmdline opt to kill daemon
--ensure safe perms on sensitive files/dirs
+-ensure safe permissions on sensitive files/dirs
 -restrict decode to host/ip/range
 -add debian support
 -add realm (multi-key) support
