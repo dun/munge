@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: job.c,v 1.1 2004/08/05 21:10:50 dun Exp $
+ *  $Id: job.c,v 1.2 2004/08/17 21:34:10 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -73,9 +73,11 @@ job_accept (conf_t conf)
 
     if (!(w = work_init ((work_func_t) _job_exec, conf->nthreads))) {
         log_errno (EMUNGE_SNAFU, LOG_ERR,
-            "Unable to create %d work threads", conf->nthreads);
+            "Unable to create %d work thread%s", conf->nthreads,
+            ((conf->nthreads > 1) ? "s" : ""));
     }
-    log_msg (LOG_INFO, "Created %d work threads", conf->nthreads);
+    log_msg (LOG_INFO, "Created %d work thread%s", conf->nthreads,
+            ((conf->nthreads > 1) ? "s" : ""));
 
     while (!done) {
         if ((sd = accept (conf->ld, NULL, NULL)) < 0) {
