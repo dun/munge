@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: sock.c,v 1.3 2003/05/16 23:44:17 dun Exp $
+ *  $Id: sock.c,v 1.4 2004/01/29 00:15:49 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -77,11 +77,11 @@ munge_sock_create (conf_t conf)
     if ((conf->socket_name == NULL) || (*conf->socket_name == '\0')) {
         log_err (EMUNGE_SNAFU, LOG_ERR, "Munge socket has no name");
     }
-    if ((sd = socket (PF_LOCAL, SOCK_STREAM, 0)) < 0) {
+    if ((sd = socket (PF_UNIX, SOCK_STREAM, 0)) < 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to create socket");
     }
     memset (&addr, 0, sizeof (addr));
-    addr.sun_family = AF_LOCAL;
+    addr.sun_family = AF_UNIX;
     n = strlcpy (addr.sun_path, conf->socket_name, sizeof (addr.sun_path));
     if (n >= sizeof (addr.sun_path)) {
         log_err (EMUNGE_SNAFU, LOG_ERR,

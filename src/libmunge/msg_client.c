@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: msg_client.c,v 1.5 2004/01/16 02:18:37 dun Exp $
+ *  $Id: msg_client.c,v 1.6 2004/01/29 00:15:49 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -73,13 +73,13 @@ _munge_msg_client_connect (munge_msg_t m, char *path)
             strdupf ("Invalid file type for socket \"%s\"", path));
         return (EMUNGE_SOCKET);
     }
-    if ((sd = socket (PF_LOCAL, SOCK_STREAM, 0)) < 0) {
+    if ((sd = socket (PF_UNIX, SOCK_STREAM, 0)) < 0) {
         _munge_msg_set_err (m, EMUNGE_SOCKET,
             strdupf ("Unable to create socket: %s", strerror (errno)));
         return (EMUNGE_SOCKET);
     }
     memset (&addr, 0, sizeof (addr));
-    addr.sun_family = AF_LOCAL;
+    addr.sun_family = AF_UNIX;
     n = strlcpy (addr.sun_path, path, sizeof (addr.sun_path));
     if (n >= sizeof (addr.sun_path)) {
         close (sd);

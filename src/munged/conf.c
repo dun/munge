@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: conf.c,v 1.11 2003/11/26 23:07:49 dun Exp $
+ *  $Id: conf.c,v 1.12 2004/01/29 00:15:49 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -164,7 +164,7 @@ void
 parse_cmdline (conf_t conf, int argc, char **argv)
 {
     char *prog;
-    char  c;
+    int   c;
 
     opterr = 0;                         /* suppress default getopt err msgs */
 

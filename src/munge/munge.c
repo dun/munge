@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munge.c,v 1.15 2003/09/18 21:09:26 dun Exp $
+ *  $Id: munge.c,v 1.16 2004/01/29 00:15:49 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -215,7 +215,7 @@ void
 parse_cmdline (conf_t conf, int argc, char **argv)
 {
     char        *prog;
-    char         c;
+    int          c;
     char        *p;
     munge_err_t  e;
     int          i;
