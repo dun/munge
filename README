@@ -1,14 +1,3 @@
--------------------------------------------------------------------------------
-
-DANGER, WILL ROBINSON! DANGER!
-
-This release should be considered alpha software.  It is being provided
-in its current state for evaluation purposes.  Some key features are
-still missing, including a configuration file and man pages.  It is
-not yet recommended for deployment within a production environment.
-
--------------------------------------------------------------------------------
-
 MUNGE (Munge Uid 'N' Gid Emporium) is a service for creating and
 validating credentials in order to allow a process to securely
 authenticate the UID and GID of another local or remote process
@@ -71,14 +60,12 @@ Getting started:
 
 Testing the installation:
 
-  Try "munge -n | unmunge".  If that succeeds, all is well.
+  Try "munge -n | unmunge" or "remunge".  If that succeeds, all is well.
 
 
-Munging creds:
+Munging credentials:
 
   Applications written in C/C++ will want to use the interface provided
   by <libmunge.h>.  Scripts will want to use the interface provided
-  by /usr/local/bin/munge and /usr/local/bin/unmunge -- specify "-h"
-  or "--help" for usage information.
-
--------------------------------------------------------------------------------
+  by the "munge" and "unmunge" executables -- specify "-h" or "--help"
+  for usage information.

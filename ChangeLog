@@ -1,5 +1,7 @@
 2004-10-13  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* README: Updated.
+
 	* src/libcommon/munge_defs.h: Added MUNGE_MAXIMUM_REQ_LEN.
 	* src/libcommon/munge_msg.c, src/libcommon/munge_msg.h:
 	  Added maxlen parm to munge_msg_send() and munge_msg_recv().
