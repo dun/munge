@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: unmunge.c,v 1.29 2004/08/19 21:57:56 dun Exp $
+ *  $Id: unmunge.c,v 1.30 2004/08/24 19:58:08 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -267,9 +267,6 @@ destroy_conf (conf_t conf)
     /*  XXX: Don't free() conf's fn_in/fn_meta/fn_out
      *       since they point inside argv[].
      */
-    if (conf->ctx != NULL) {
-        munge_ctx_destroy (conf->ctx);
-    }
     if (conf->fp_in != NULL) {
         if (fclose (conf->fp_in) < 0) {
             log_errno (EMUNGE_SNAFU, LOG_ERR,
@@ -306,6 +303,7 @@ destroy_conf (conf_t conf)
         free (conf->data);
         conf->data = NULL;
     }
+    munge_ctx_destroy (conf->ctx);
     free (conf);
     return;
 }

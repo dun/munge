@@ -1,3 +1,8 @@
+2004-08-24  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/munge/munge.c(destroy_conf): Removed unnecessary test for ctx.
+	* src/munge/unmunge.c(destroy_conf): Removed unnecessary test for ctx.
+
 2004-08-20  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/munge/munge.c(parse_cmdline):

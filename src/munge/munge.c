@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munge.c,v 1.33 2004/08/21 05:50:49 dun Exp $
+ *  $Id: munge.c,v 1.34 2004/08/24 19:58:08 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -191,9 +191,6 @@ destroy_conf (conf_t conf)
     /*  XXX: Don't free conf's string/fn_in/fn_out
      *       since they point inside argv[].
      */
-    if (conf->ctx != NULL) {
-        munge_ctx_destroy (conf->ctx);
-    }
     if (conf->fp_in != NULL) {
         if (fclose (conf->fp_in) < 0) {
             log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to close infile");
@@ -216,6 +213,7 @@ destroy_conf (conf_t conf)
         free (conf->cred);
         conf->cred = NULL;
     }
+    munge_ctx_destroy (conf->ctx);
     free (conf);
     return;
 }
