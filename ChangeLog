@@ -1,3 +1,7 @@
+2003-10-28  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/etc/Makefile.am: Added support for /etc/init.d/ (Debian).
+
 2003-10-24  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* : Released 0.2.
