@@ -1,3 +1,8 @@
+2003-07-02  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/libcommon/munge_defs.h:
+	  Increased MUNGE_SOCKET_BACKLOG from 64 to 128.
+
 2003-06-27  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/libcommon/munge_msg.c:
