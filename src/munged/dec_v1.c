@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: dec_v1.c,v 1.14 2004/03/11 21:04:40 dun Exp $
+ *  $Id: dec_v1.c,v 1.15 2004/03/12 22:45:02 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -597,6 +597,7 @@ dec_v1_decompress (munge_cred_t c)
     /*
      *  Allocate memory for decompressed "inner" data.
      */
+    buf = NULL;
     buf_len = zip_decompress_length (m1->zip, c->inner, c->inner_len);
     if (buf_len < 0) {
         goto err;

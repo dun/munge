@@ -114,7 +114,7 @@ zip_compress_block (munge_zip_t type,
     }
     xdst = dst + sizeof (meta);
     xdstlen = *dstlen - sizeof (meta);
-    xsrc = src;
+    xsrc = (unsigned char *) src;
     xsrclen = srclen;
 
 #if HAVE_PKG_BZLIB
@@ -126,10 +126,17 @@ zip_compress_block (munge_zip_t type,
 #endif /* HAVE_PKG_BZLIB */
 
 #if HAVE_PKG_ZLIB
+    /*
+     *  XXX: The use of the "xdstlen_ul" temporary variable is to avoid the
+     *       gcc3.3 compiler warning: "dereferencing type-punned pointer
+     *       will break strict-aliasing rules".  A mere cast doesn't suffice.
+     */
     if (type == MUNGE_ZIP_ZLIB) {
-        if (compress (xdst, (unsigned long *) &xdstlen,
+        unsigned long xdstlen_ul = xdstlen;
+        if (compress (xdst, &xdstlen_ul,
                 xsrc, (unsigned long) xsrclen) != Z_OK)
             return (-1);
+        xdstlen = xdstlen_ul;
     }
 #endif /* HAVE_PKG_ZLIB */
 
@@ -166,7 +173,7 @@ zip_decompress_block (munge_zip_t type,
     }
     xdst = dst;
     xdstlen = *dstlen;
-    xsrc = src + sizeof (meta);
+    xsrc = (unsigned char *) src + sizeof (meta);
     xsrclen = srclen - sizeof (meta);
 
 #if HAVE_PKG_BZLIB
@@ -178,10 +185,17 @@ zip_decompress_block (munge_zip_t type,
 #endif /* HAVE_PKG_BZLIB */
 
 #if HAVE_PKG_ZLIB
+    /*
+     *  XXX: The use of the "xdstlen_ul" temporary variable is to avoid the
+     *       gcc3.3 compiler warning: "dereferencing type-punned pointer
+     *       will break strict-aliasing rules".  A mere cast doesn't suffice.
+     */
     if (type == MUNGE_ZIP_ZLIB) {
-        if (uncompress (xdst, (unsigned long *) &xdstlen,
+        unsigned long xdstlen_ul = xdstlen;
+        if (uncompress (xdst, &xdstlen_ul,
                 xsrc, (unsigned long) xsrclen) != Z_OK)
             return (-1);
+        xdstlen = xdstlen_ul;
     }
 #endif /* HAVE_PKG_ZLIB */
 

@@ -1,5 +1,8 @@
 2004-03-12  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/munged/dec_v1.c, src/munged/enc_v1.c, src/munged/zip.c:
+	  Fixed gcc 3.3.3 (Debian 20040306) compiler warnings with "-O2".
+
 	* configure.ac, config/x_ac_reentrant.m4, src/munged/Makefile.am:
 	  Moved _REENTRANT to top-level "config.h".
 
