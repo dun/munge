@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munge.h,v 1.24 2004/11/09 17:20:43 dun Exp $
+ *  $Id: munge.h,v 1.25 2004/11/18 00:48:13 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -134,6 +134,14 @@ typedef enum munge_gid {
     MUNGE_GID_ANY               = -1    /* do not restrict decode via gid    */
 } munge_gid_t;
 
+/*  Munge enum types for str/int conversions
+ */
+typedef enum munge_enum {
+    MUNGE_ENUM_CIPHER           =  0,   /* cipher enum type                  */
+    MUNGE_ENUM_MAC              =  1,   /* mac enum type                     */
+    MUNGE_ENUM_ZIP              =  2    /* zip enum type                     */
+} munge_enum_t;
+
 /*  Munge error codes
  *
  *  XXX: Error codes must be in the range [1..255] in order to
@@ -162,22 +170,6 @@ typedef enum munge_err {
     EMUNGE_CRED_UNAUTHORIZED    = 19,   /* Credential decode unauthorized    */
     EMUNGE_LAST_ENTRY
 } munge_err_t;
-
-
-/*****************************************************************************
- *  Extern Variables
- *****************************************************************************/
-
-/*  The following NULL-terminated arrays contain descriptive strings for the
- *    corresponding munge types.  If a given string is set to the empty string
- *    (ie, ""), that setting is not defined in the configuration as currently
- *    compiled.
- */
-extern const char * munge_cipher_strings[];
-
-extern const char * munge_mac_strings[];
-
-extern const char * munge_zip_strings[];
 
 
 /*****************************************************************************
@@ -290,6 +282,37 @@ munge_err_t munge_ctx_set (munge_ctx_t ctx, munge_opt_t opt, ...);
  *  Sets the option [opt] for the context [ctx] from the following argument(s).
  *    Refer to the munge_opt_t enum comments for argument types.
  *  Returns EMUNGE_SUCCESS on success; o/w, returns the munge error number.
+ */
+
+END_C_DECLS
+
+
+/*****************************************************************************
+ *  Enumeration Functions
+ *****************************************************************************/
+
+BEGIN_C_DECLS
+
+int munge_enum_is_valid (munge_enum_t type, int val);
+/*
+ *  Returns non-zero if the given value [val] is a valid enumeration of the
+ *    specified [type] in the software configuration as currently compiled;
+ *    o/w, returns 0.
+ */
+
+const char * munge_enum_int_to_str (munge_enum_t type, int val);
+/*
+ *  Converts the munge enumeration [val] of the specified [type] into a
+ *    text string.
+ *  Returns a NUL-terminated constant text string, or NULL on error;
+ *    this string should not be freed or modified by the caller.
+ */
+
+int munge_enum_str_to_int (munge_enum_t type, const char *str);
+/*
+ *  Converts the NUL-terminated case-insensitive string [str] into
+ *    the corresponding munge enumeration of the specified [type].
+ *  Returns a munge enumeration on success (>=0), or -1 on error.
  */
 
 END_C_DECLS

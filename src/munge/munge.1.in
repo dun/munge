@@ -1,4 +1,4 @@
-.\" $Id: munge.1.in,v 1.1 2004/11/11 00:06:37 dun Exp $
+.\" $Id: munge.1.in,v 1.2 2004/11/18 00:48:13 dun Exp $
 
 .TH MUNGE 1 "@DATE@" "@PACKAGE@-@VERSION@" "Munge Uid 'N' Gid Emporium"
 
@@ -99,6 +99,7 @@ Foundation.
 .BR unmunge (1),
 .BR munge (3),
 .BR munge_ctx (3),
+.BR munge_enum (3),
 .BR munge (7),
 .BR munged (8).
 .PP

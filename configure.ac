@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: configure.ac,v 1.26 2004/11/12 02:58:31 dun Exp $
+## $Id: configure.ac,v 1.27 2004/11/18 00:48:13 dun Exp $
 ##*****************************************************************************
 ## Process this file with autoconf to produce a configure script.
 ##*****************************************************************************
@@ -137,6 +137,7 @@ AC_CONFIG_FILES( \
   src/libmunge/Makefile \
   src/libmunge/munge.3 \
   src/libmunge/munge_ctx.3 \
+  src/libmunge/munge_enum.3 \
   src/munge/Makefile \
   src/munge/munge.1 \
   src/munge/remunge.1 \

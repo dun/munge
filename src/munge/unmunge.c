@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: unmunge.c,v 1.33 2004/11/12 01:46:06 dun Exp $
+ *  $Id: unmunge.c,v 1.34 2004/11/18 00:48:13 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -235,7 +235,7 @@ create_conf (void)
     if (!(conf = malloc (sizeof (struct conf)))) {
         log_errno (EMUNGE_NO_MEMORY, LOG_ERR, "Unable to create conf");
     }
-    if (!(conf->ctx = munge_ctx_create())) {
+    if (!(conf->ctx = munge_ctx_create ())) {
         log_errno (EMUNGE_NO_MEMORY, LOG_ERR, "Unable to create conf ctx");
     }
     conf->status = -1;
@@ -650,7 +650,7 @@ display_meta (conf_t conf)
         s = key_val_to_str (MUNGE_KEY_CIPHER_TYPE);
         w = pad - strlen (s);
         fprintf (conf->fp_meta, "%s:%*c%s (%d)\n", s, w, 0x20,
-            munge_cipher_strings[i], i);
+            munge_enum_int_to_str (MUNGE_ENUM_CIPHER, i), i);
     }
     if (conf->key[MUNGE_KEY_MAC_TYPE]) {
         e = munge_ctx_get (conf->ctx, MUNGE_OPT_MAC_TYPE, &i);
@@ -662,7 +662,7 @@ display_meta (conf_t conf)
         s = key_val_to_str (MUNGE_KEY_MAC_TYPE);
         w = pad - strlen (s);
         fprintf (conf->fp_meta, "%s:%*c%s (%d)\n", s, w, 0x20,
-            munge_mac_strings[i], i);
+            munge_enum_int_to_str (MUNGE_ENUM_MAC, i), i);
     }
     if (conf->key[MUNGE_KEY_ZIP_TYPE]) {
         e = munge_ctx_get (conf->ctx, MUNGE_OPT_ZIP_TYPE, &i);
@@ -674,7 +674,7 @@ display_meta (conf_t conf)
         s = key_val_to_str (MUNGE_KEY_ZIP_TYPE);
         w = pad - strlen (s);
         fprintf (conf->fp_meta, "%s:%*c%s (%d)\n", s, w, 0x20,
-            munge_zip_strings[i], i);
+            munge_enum_int_to_str (MUNGE_ENUM_ZIP, i), i);
     }
     if (conf->key[MUNGE_KEY_UID]) {
         pw_ptr = getpwuid (conf->uid);

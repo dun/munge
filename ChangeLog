@@ -1,7 +1,20 @@
 2004-11-17  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* configure.ac, src/libcommon/munge.7.in, src/libmunge/munge.3.in,
+	  src/libmunge/munge_ctx.3.in, src/libmunge/munge_enum.3.in,
+	  src/munge/munge.1.in, src/munge/remunge.1.in, src/munge/unmunge.1.in,
+	  src/munged/munged.8.in: Added munge_enum manpage.
+	* src/libmunge/Makefile.am, src/libmunge/enum.c, src/libmunge/munge.h,
+	  src/libmunge/strings.c: Added munge_enum_is_valid(),
+	  munge_enum_int_to_str(), and munge_enum_str_to_int().
+	  Removed munge_cipher_strings, munge_mac_strings, munge_zip_strings.
+	  Replaced libmunge/strings.c with libmunge/enum.c.
+	* src/munge/munge.c, src/munge/remunge.c, src/munge/unmunge.c:
+	  Replaced use of munge_cipher_strings, munge_mac_strings, and
+	  munge_zip_strings.
+
 	* src/libcommon/str.c, src/munged/auth_recv.c, src/munged/hash.c,
-	  src/munged/munged.c: Tweaked formatting.
+	  src/munged/munged.c, src/munge/read.c: Tweaked formatting.
 
 2004-11-11  Chris Dunlap  <cdunlap@llnl.gov>
 

@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: remunge.c,v 1.10 2004/11/09 20:15:23 dun Exp $
+ *  $Id: remunge.c,v 1.11 2004/11/18 00:48:13 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -147,8 +147,7 @@ tdata_t create_tdata (conf_t conf);
 void    destroy_tdata (tdata_t tdata);
 void    parse_cmdline (conf_t conf, int argc, char **argv);
 void    display_help (char *prog);
-void    display_strings (const char *header, const char **strings);
-int     str_to_int (const char *s, const char **strings);
+void    display_strings (const char *header, munge_enum_t type);
 int     get_si_multiple (char c);
 int     get_time_multiple (char c);
 void    start_threads (conf_t conf);
@@ -229,7 +228,7 @@ create_conf (void)
     if (!(conf = malloc (sizeof (*conf)))) {
         log_errno (EMUNGE_NO_MEMORY, LOG_ERR, "Unable to create conf");
     }
-    if (!(conf->ctx = munge_ctx_create())) {
+    if (!(conf->ctx = munge_ctx_create ())) {
         log_errno (EMUNGE_NO_MEMORY, LOG_ERR, "Unable to create conf ctx");
     }
     if ((errno = pthread_mutex_init (&conf->mutex, NULL)) != 0) {
@@ -385,7 +384,8 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                 exit (EMUNGE_SUCCESS);
                 break;
             case 'c':
-                if ((i = str_to_int (optarg, munge_cipher_strings)) < 0) {
+                i = munge_enum_str_to_int (MUNGE_ENUM_CIPHER, optarg);
+                if ((i < 0) || !munge_enum_is_valid (MUNGE_ENUM_CIPHER, i)) {
                     log_err (EMUNGE_SNAFU, LOG_ERR,
                         "Invalid cipher type \"%s\"", optarg);
                 }
@@ -397,11 +397,12 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                 }
                 break;
             case 'C':
-                display_strings ("Cipher types", munge_cipher_strings);
+                display_strings ("Cipher types", MUNGE_ENUM_CIPHER);
                 exit (EMUNGE_SUCCESS);
                 break;
             case 'm':
-                if ((i = str_to_int (optarg, munge_mac_strings)) < 0) {
+                i = munge_enum_str_to_int (MUNGE_ENUM_MAC, optarg);
+                if ((i < 0) || !munge_enum_is_valid (MUNGE_ENUM_MAC, i)) {
                     log_err (EMUNGE_SNAFU, LOG_ERR,
                         "Invalid message auth code type \"%s\"", optarg);
                 }
@@ -413,11 +414,12 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                 }
                 break;
             case 'M':
-                display_strings ("MAC types", munge_mac_strings);
+                display_strings ("MAC types", MUNGE_ENUM_MAC);
                 exit (EMUNGE_SUCCESS);
                 break;
             case 'z':
-                if ((i = str_to_int (optarg, munge_zip_strings)) < 0) {
+                i = munge_enum_str_to_int (MUNGE_ENUM_ZIP, optarg);
+                if ((i < 0) || !munge_enum_is_valid (MUNGE_ENUM_ZIP, i)) {
                     log_err (EMUNGE_SNAFU, LOG_ERR,
                         "Invalid compression type \"%s\"", optarg);
                 }
@@ -429,7 +431,7 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                 }
                 break;
             case 'Z':
-                display_strings ("Compression types", munge_zip_strings);
+                display_strings ("Compression types", MUNGE_ENUM_ZIP);
                 exit (EMUNGE_SUCCESS);
                 break;
             case 'e':
@@ -722,63 +724,21 @@ display_help (char *prog)
 
 
 void
-display_strings (const char *header, const char **strings)
+display_strings (const char *header, munge_enum_t type)
 {
-/*  Display each non-empty string in the NULL-terminated list.
- *    Empty strings (ie, "") are invalid.
- */
-    const char **pp;
-    int          i;
+    int         i;
+    const char *p;
 
-    printf ("%s:\n\n", header);
-    for (pp=strings, i=0; *pp; pp++, i++) {
-        if (*pp[0] != '\0') {
-            printf ("  %s (%d)\n", *pp, i);
+    if (header) {
+        printf ("%s:\n\n", header);
+    }
+    for (i = 0; (p = munge_enum_int_to_str (type, i)); i++) {
+        if (munge_enum_is_valid (type, i)) {
+            printf ("  %s (%d)\n", p, i);
         }
     }
     printf ("\n");
     return;
-}
-
-
-int
-str_to_int (const char *s, const char **strings)
-{
-/*  Convert the string [s] into an integer corresponding to its position
- *    in the [strings] array of strings.
- *  In the [strings] array, the empty string denotes a setting that is
- *    invalid, whereas a NULL denotes the end of the list.
- *  Returns the corresponding integer, or -1 if no match is found.
- */
-    const char **pp;
-    char        *p;
-    int          i;
-    int          n;
-
-    if (!s || !*s || !strings) {
-        return (-1);
-    }
-    /*  Check to see if the given string matches a valid string.
-     *  Also determine the number of strings in the array.
-     */
-    for (pp=strings, i=0; *pp; pp++, i++) {
-        if (!strcasecmp (s, *pp)) {
-            return (i);
-        }
-    }
-    /*  Check to see if the given string matches a valid enum.
-     */
-    n = strtol (s, &p, 10);
-    if ((s == p) || (*p != '\0')) {
-        return (-1);
-    }
-    if ((n < 0) || (n >= i)) {
-        return (-1);
-    }
-    if (strings[n][0] == '\0') {
-        return (-1);
-    }
-    return (n);
 }
 
 
@@ -1265,8 +1225,8 @@ output_msg (const char *format, ...)
     va_end (vargs);
 
     if ((n < 0) || (n >= len)) {
-        buf[sizeof(buf) - 2] = '+';
-        buf[sizeof(buf) - 1] = '\0';    /* technically redundant */
+        buf[sizeof (buf) - 2] = '+';
+        buf[sizeof (buf) - 1] = '\0';   /* technically redundant */
     }
     printf ("%s\n", buf);
     return;

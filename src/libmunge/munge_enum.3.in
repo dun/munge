@@ -1,0 +1,112 @@
+.\" $Id: munge_enum.3.in,v 1.1 2004/11/18 00:48:13 dun Exp $
+
+.TH MUNGE_ENUM 3 "@DATE@" "@PACKAGE@-@VERSION@" "Munge Uid 'N' Gid Emporium"
+
+.SH NAME
+munge_enum_is_valid, munge_enum_int_to_str, munge_enum_str_to_int \- MUNGE enumeration functions
+
+.SH SYNOPSIS
+.nf
+.B #define GPL_LICENSED 1
+.B #include <munge.h>
+.PP
+.BI "int munge_enum_is_valid (munge_enum_t " type ", int " val );
+.PP
+.BI "const char * munge_enum_int_to_str (munge_enum_t " type ", int " val );
+.PP
+.BI "int munge_enum_str_to_int (munge_enum_t " type ", const char *" str );
+.PP
+.B cc ... -lmunge
+.fi
+
+.SH DESCRIPTION
+The \fBmunge_enum_is_valid()\fR function checks if the given value \fIval\fR
+is a valid MUNGE enumeration of the specified type \fItype\fR in the software
+configuration as currently compiled.  Some enumerations correspond to options
+that can only be enabled at compile-time.
+.PP
+The \fBmunge_enum_int_to_str()\fR function converts the MUNGE enumeration
+\fIval\fR of the specified type \fItype\fR into a text string.
+.PP
+The \fBmunge_enum_str_to_int()\fR function converts the NUL-terminated
+case-insensitive string \fIstr\fR into the corresponding MUNGE enumeration
+of the specified type \fItype\fR.
+
+.SH RETURN VALUE
+The \fBmunge_enum_is_valid()\fR function returns non-zero if the given value
+\fIval\fR is a valid enumeration.
+.PP
+The \fBmunge_enum_int_to_str()\fR function returns a NUL-terminated constant
+text string, or NULL on error; this string should not be freed or modified by
+the caller.
+.PP
+The \fBmunge_enum_str_to_int()\fR function returns a MUNGE enumeration on
+success (i.e., >= 0), or -1 on error.
+
+.SH "ENUM TYPES"
+The following enumeration types can be specified.
+.TP
+.B MUNGE_ENUM_CIPHER
+Specify enumerations for the available cipher types.
+.TP
+.B MUNGE_ENUM_MAC
+Specify enumerations for the available MAC types.
+.TP
+.B MUNGE_ENUM_ZIP
+Specify enumerations for the available compression types.
+
+.SH ERRORS
+Refer to \fBmunge\fR(3) for a complete list of errors.
+
+.SH EXAMPLE
+The following example program illustrates how a list of available cipher
+types can be queried.
+.PP
+.nf
+#define GPL_LICENSED 1
+
+#include <stdio.h>                      /* for printf() */
+#include <stdlib.h>                     /* for exit() */
+#include <munge.h>
+
+int
+main (int argc, char *argv[])
+{
+    int           i;
+    const char   *p;
+    munge_enum_t  t = MUNGE_ENUM_CIPHER;
+
+    for (i = 0; (p = munge_enum_int_to_str (t, i)) != NULL; i++) {
+        if (munge_enum_is_valid (t, i)) {
+            printf ("%2d = %s\\n", i, p);
+        }
+    }
+    exit (0);
+}
+.fi
+
+.SH AUTHOR
+Chris Dunlap <cdunlap@llnl.gov>
+
+.SH COPYRIGHT
+Copyright (C) 2003-2004 The Regents of the University of California.
+Produced at Lawrence Livermore National Laboratory.  UCRL-CODE-155910.
+
+MUNGE is free software; you can redistribute it and/or modify it under the
+terms of the GNU General Public License as published by the Free Software
+Foundation.
+
+.SH "SEE ALSO"
+.BR munge (1),
+.BR remunge (1),
+.BR unmunge (1),
+.BR munge (3),
+.BR munge_ctx (3),
+.BR munge (7),
+.BR munged (8).
+.PP
+The MUNGE Web page:
+  \fB<http://www.llnl.gov/linux/munge/>\fR
+.PP
+The MUNGE FTP site:
+  \fB<ftp://ftp.llnl.gov/pub/linux/munge/>\fR

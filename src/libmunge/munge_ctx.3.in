@@ -1,4 +1,4 @@
-.\" $Id: munge_ctx.3.in,v 1.1 2004/11/11 00:06:37 dun Exp $
+.\" $Id: munge_ctx.3.in,v 1.2 2004/11/18 00:48:13 dun Exp $
 
 .TH MUNGE_CTX 3 "@DATE@" "@PACKAGE@-@VERSION@" "Munge Uid 'N' Gid Emporium"
 
@@ -52,7 +52,8 @@ The \fBmunge_ctx_create()\fR and \fBmunge_ctx_copy()\fR functions return a
 newly allocated munge context, or NULL on error.
 .PP
 The \fBmunge_cxt_strerror()\fR function returns a pointer to a NUL-terminated
-constant text string; this string should not be freed by the caller.
+constant text string; this string should not be freed or modified by the
+caller.
 .PP
 The \fBmunge_ctx_get()\fR and \fBmunge_ctx_set()\fR functions return
 \fBEMUNGE_SUCCESS\fR on success; otherwise, a munge error number is returned.
@@ -65,46 +66,47 @@ or the variable type of a pointer used for the subsequent argument in
 \fBmunge_ctx_get()\fR.
 .TP
 \fBMUNGE_OPT_CIPHER_TYPE\fR , \fIint\fR
-Gets or sets the cipher type (cf, \fBCIPHER TYPES\fR).
+Get or set the cipher type (cf, \fBCIPHER TYPES\fR).
 .TP
 \fBMUNGE_OPT_MAC_TYPE\fR , \fIint\fR
-Gets or sets the MAC type (cf, \fBMAC TYPES\fR).
+Get or set the MAC type (cf, \fBMAC TYPES\fR).
 .TP
 \fBMUNGE_OPT_ZIP_TYPE\fR , \fIint\fR
-Gets or sets the compression type (cf, \fBZIP TYPES\fR).
+Get or set the compression type (cf, \fBZIP TYPES\fR).
 .TP
 \fBMUNGE_OPT_REALM\fR , \fIchar *\fR
-Gets or sets the security realm, where the \fIchar *\fR type is a
+Get or set the security realm, where the \fIchar *\fR type is a
 NUL-terminated character string.  The string returned by \fBmunge_ctx_get()\fR
-should not be freed by the caller.  \fBNOT YET SUPPORTED\fR.
+should not be freed or modified by the caller.  \fBNOT YET SUPPORTED\fR.
 .TP
 \fBMUNGE_OPT_TTL\fR , \fIint\fR
-Gets or sets the time-to-live (in seconds) (cf, \fBTTL TYPES\fR).
+Get or set the time-to-live (in seconds) (cf, \fBTTL TYPES\fR).
 .TP
 \fBMUNGE_OPT_ADDR4\fR , \fIstruct in_addr\fR
-Gets the IPv4 address of the host where the credential was encoded.
+Get the IPv4 address of the host where the credential was encoded.
 This option cannot be explicitly set.
 .TP
 \fBMUNGE_OPT_ENCODE_TIME\fR , \fItime_t\fR
-Gets the time (in seconds since the epoch) at which the credential was encoded.
+Get the time (in seconds since the epoch) at which the credential was encoded.
 This option cannot be explicitly set.
 .TP
 \fBMUNGE_OPT_DECODE_TIME\fR , \fItime_t\fR
-Gets the time (in seconds since the epoch) at which the credential was decoded.
+Get the time (in seconds since the epoch) at which the credential was decoded.
 This option cannot be explicitly set.
 .TP
 \fBMUNGE_OPT_SOCKET\fR , \fIchar *\fR
-Gets or sets the local domain socket for connecting with \fBmunged\fR, where
+Get or set the local domain socket for connecting with \fBmunged\fR, where
 the \fIchar *\fR type is a NUL-terminated character string.  The string
-returned by \fBmunge_ctx_get()\fR should not be freed by the caller.
+returned by \fBmunge_ctx_get()\fR should not be freed or modified by the
+caller.
 .TP
 \fBMUNGE_OPT_UID_RESTRICTION\fR , \fIuid_t\fR
-Gets or sets the UID allowed to decode the credential (cf, \fBUID & GID
+Get or set the UID allowed to decode the credential (cf, \fBUID & GID
 TYPES\fR).  This value will be matched against the effective user ID of the
 process requesting the credential decode.
 .TP
 \fBMUNGE_OPT_GID_RESTRICTION\fR , \fIgid_t\fR
-Gets or sets the GID allowed to decode the credential (cf, \fBUID & GID
+Get or set the GID allowed to decode the credential (cf, \fBUID & GID
 TYPES\fR).  This value will be matched against the effective group ID of
 the process requesting the credential decode, as well as each supplementary
 group of which the effective user ID of that process is a memeber.
@@ -291,6 +293,7 @@ Foundation.
 .BR remunge (1),
 .BR unmunge (1),
 .BR munge (3),
+.BR munge_enum (3),
 .BR munge (7),
 .BR munged (8).
 .PP

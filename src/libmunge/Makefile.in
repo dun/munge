@@ -41,7 +41,8 @@ build_triplet = @build@
 host_triplet = @host@
 DIST_COMMON = $(include_HEADERS) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(srcdir)/munge.3.in \
-	$(srcdir)/munge_ctx.3.in $(top_srcdir)/config/Make-inc.mk
+	$(srcdir)/munge_ctx.3.in $(srcdir)/munge_enum.3.in \
+	$(top_srcdir)/config/Make-inc.mk
 subdir = src/libmunge
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/config/x_ac_canonical.m4 \
@@ -57,7 +58,7 @@ am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(SHELL) $(top_srcdir)/config/mkinstalldirs
 CONFIG_HEADER = $(top_builddir)/config/config.h
-CONFIG_CLEAN_FILES = munge.3 munge_ctx.3
+CONFIG_CLEAN_FILES = munge.3 munge_ctx.3 munge_enum.3
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
 am__vpath_adj = case $$p in \
     $(srcdir)/*) f=`echo "$$p" | sed "s|^$$srcdirstrip/||"`;; \
@@ -73,7 +74,7 @@ libmunge_la_DEPENDENCIES = $(top_builddir)/src/libcommon/libcommon.la \
 	$(top_builddir)/src/libmissing/libmissing.la \
 	$(am__DEPENDENCIES_1)
 am_libmunge_la_OBJECTS = auth_send.lo ctx.lo decode.lo encode.lo \
-	msg_client.lo strerror.lo strings.lo
+	enum.lo msg_client.lo strerror.lo
 libmunge_la_OBJECTS = $(am_libmunge_la_OBJECTS)
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)/config
 depcomp = $(SHELL) $(top_srcdir)/config/depcomp
@@ -224,15 +225,16 @@ libmunge_la_SOURCES = \
 	ctx.h \
 	decode.c \
 	encode.c \
+	enum.c \
 	msg_client.c \
 	msg_client.h \
 	strerror.c \
-	strings.c \
 	munge.h
 
 man_MANS = \
 	munge.3 \
-	munge_ctx.3
+	munge_ctx.3 \
+	munge_enum.3
 
 all: all-am
 
@@ -270,6 +272,8 @@ $(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
 munge.3: $(top_builddir)/config.status $(srcdir)/munge.3.in
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
 munge_ctx.3: $(top_builddir)/config.status $(srcdir)/munge_ctx.3.in
+	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
+munge_enum.3: $(top_builddir)/config.status $(srcdir)/munge_enum.3.in
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
 install-libLTLIBRARIES: $(lib_LTLIBRARIES)
 	@$(NORMAL_INSTALL)
@@ -311,9 +315,9 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ctx.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/decode.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/encode.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/enum.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/msg_client.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/strerror.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/strings.Plo@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	if $(COMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \
@@ -610,6 +614,9 @@ install-data-local:
 	done
 	for man in create copy destroy strerror get set; do \
 	  ln -f -s munge_ctx.3 $(DESTDIR)$(mandir)/man3/munge_ctx_$$man.3; \
+	done
+	for man in is_valid int_to_str str_to_int; do \
+	  ln -f -s munge_enum.3 $(DESTDIR)$(mandir)/man3/munge_enum_$$man.3; \
 	done
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

@@ -1,4 +1,4 @@
-.\" $Id: munge.3.in,v 1.1 2004/11/11 00:06:37 dun Exp $
+.\" $Id: munge.3.in,v 1.2 2004/11/18 00:48:13 dun Exp $
 
 .TH MUNGE 3 "@DATE@" "@PACKAGE@-@VERSION@" "Munge Uid 'N' Gid Emporium"
 
@@ -18,10 +18,6 @@ munge_encode, munge_decode, munge_strerror \- MUNGE primary functions
 .BI "                          uid_t *" uid ", gid_t *" gid );
 .PP
 .BI "const char * munge_strerror (munge_err_t " e );
-.PP
-.BI "extern const char *" munge_cipher_strings [];
-.BI "extern const char *" munge_mac_strings [];
-.BI "extern const char *" munge_zip_strings [];
 .PP
 .B cc ... -lmunge
 .fi
@@ -49,12 +45,6 @@ they will be set to the UID/GID of the process that created the credential.
 .PP
 The \fBmunge_strerror()\fR function returns a descriptive text string
 describing the munge error number \fIe\fR.
-.PP
-The \fImunge_cipher_strings\fR, \fImunge_mac_strings\fR, and
-\fImunge_zip_strings\fR variables are NULL-terminated arrays of NUL-terminated
-character strings containing descriptive strings for the corresponding types.
-If a given string is set to the empty string (ie, "\\0"), that setting is
-not defined in the configuration as currently compiled.
 
 .SH RETURN VALUE
 The \fBmunge_encode()\fR and \fBmunge_decode()\fR functions return
@@ -63,7 +53,8 @@ If a munge context was used, it may contain a more detailed error message
 accessible via \fBmunge_ctx_strerror\fR.
 .PP
 The \fBmunge_strerror()\fR function returns a pointer to a NUL-terminated
-constant text string; this string should not be freed by the caller.
+constant text string; this string should not be freed or modified by the
+caller.
 
 .SH ERRORS
 .TP
@@ -188,6 +179,7 @@ Foundation.
 .BR remunge (1),
 .BR unmunge (1),
 .BR munge_ctx (3),
+.BR munge_enum (3),
 .BR munge (7),
 .BR munged (8).
 .PP
