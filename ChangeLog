@@ -1,5 +1,7 @@
 2003-04-25  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/munge/munge.c, src/munge/unmunge.c: Tweaked "list" output.
+
 	* src/munge/munge.c: Added c/C/m/M/z/Z cmdline opts.
 
 	* src/munge/unmunge.c: Added t cmdline opt for setting TTL.

@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munge.c,v 1.9 2003/04/25 21:27:36 dun Exp $
+ *  $Id: munge.c,v 1.10 2003/04/25 22:36:03 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -99,7 +99,7 @@ conf_t create_conf (void);
 void destroy_conf (conf_t conf);
 void parse_cmdline (conf_t conf, int argc, char **argv);
 void display_help (char *prog);
-void display_strings (const char **strings);
+void display_strings (const char *header, const char **strings);
 int str_to_int (const char *s, const char **strings);
 void open_files (conf_t conf);
 void display_cred (conf_t conf);
@@ -257,7 +257,7 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                         munge_ctx_strerror (conf->ctx));
                 break;
             case 'C':
-                display_strings (munge_cipher_strings);
+                display_strings ("Cipher types", munge_cipher_strings);
                 exit (EMUNGE_SUCCESS);
                 break;
             case 'i':
@@ -275,7 +275,7 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                         munge_ctx_strerror (conf->ctx));
                 break;
             case 'M':
-                display_strings (munge_mac_strings);
+                display_strings ("MAC types", munge_mac_strings);
                 exit (EMUNGE_SUCCESS);
                 break;
             case 'n':
@@ -307,7 +307,7 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                         munge_ctx_strerror (conf->ctx));
                 break;
             case 'Z':
-                display_strings (munge_zip_strings);
+                display_strings ("Compression types", munge_zip_strings);
                 exit (EMUNGE_SUCCESS);
                 break;
             case '?':
@@ -403,7 +403,7 @@ display_help (char *prog)
 
 
 void
-display_strings (const char **strings)
+display_strings (const char *header, const char **strings)
 {
     const char **pp;
     int i;
@@ -411,10 +411,12 @@ display_strings (const char **strings)
     /*  Display each non-empty string in the NULL-terminated list.
      *    Empty strings (ie, "") are invalid.
      */
+    printf ("%s:\n\n", header);
     for (pp=strings, i=0; *pp; pp++, i++) {
         if (*pp[0] != '\0')
-            printf ("%s (%d)\n", *pp, i);
+            printf ("  %s (%d)\n", *pp, i);
     }
+    printf ("\n");
     return;
 }
 

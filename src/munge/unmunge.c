@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: unmunge.c,v 1.8 2003/04/25 21:25:45 dun Exp $
+ *  $Id: unmunge.c,v 1.9 2003/04/25 22:36:03 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -471,8 +471,10 @@ display_keys (void)
 {
     int i;
 
+    printf ("Metadata keys:\n\n");
     for (i=0; i<MUNGE_KEY_LAST; i++)
-        printf ("%s\n", munge_keys[i].str);
+        printf ("  %s\n", munge_keys[i].str);
+    printf ("\n");
     return;
 }
 
