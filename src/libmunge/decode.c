@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: decode.c,v 1.4 2003/04/30 00:11:00 dun Exp $
+ *  $Id: decode.c,v 1.5 2003/05/02 16:46:47 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -243,14 +243,14 @@ decode_rsp_v1 (munge_msg_t m, munge_ctx_t ctx,
         ctx->time1 = m1->time1;
         ctx->errnum = m1->errnum;
     }
-    if (buf) {
+    if (buf && len && (m1->data_len > 0)) {
         n = m1->data_len + 1;
         if (!(p = malloc (n))) {
             _munge_msg_set_err (m, EMUNGE_NO_MEMORY,
                 strdupf ("Client unable to allocate %d bytes for data", n));
         }
         memcpy (p, m1->data, m1->data_len);
-        p[n] = '\0';
+        p[m1->data_len] = '\0';
         *buf = p;
     }
     if (len) {

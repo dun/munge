@@ -1,3 +1,9 @@
+2003-05-02  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/libmunge/decode.c(decode_rsp_v1):
+	  Fixed dataless cred decode to match header (ie, no data is malloc'd).
+	  Fixed overwrite of returned data buffer.
+
 2003-04-30  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* : Released 0.1.
