@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: ctx.c,v 1.2 2003/04/18 23:20:18 dun Exp $
+ *  $Id: ctx.c,v 1.3 2003/04/18 23:28:06 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -94,7 +94,7 @@ munge_ctx_destroy (munge_ctx_t ctx)
 
 
 const char *
-munge_ctx_err (munge_ctx_t ctx)
+munge_ctx_strerror (munge_ctx_t ctx)
 {
     assert (ctx != NULL);
 

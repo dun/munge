@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munge.c,v 1.6 2003/04/08 18:16:16 dun Exp $
+ *  $Id: munge.c,v 1.7 2003/04/18 23:28:06 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -127,7 +127,7 @@ main (int argc, char *argv[])
     }
     e = munge_encode (&conf->cred, conf->ctx, conf->data, conf->dlen);
     if (e != EMUNGE_SUCCESS) {
-        if ((p = munge_ctx_err (conf->ctx)))
+        if ((p = munge_ctx_strerror (conf->ctx)))
             log_err (e, LOG_ERR, "%s", p);
         else
             log_err (e, LOG_ERR, "%s", munge_strerror (e));

@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munge.h,v 1.8 2003/04/18 23:20:18 dun Exp $
+ *  $Id: munge.h,v 1.9 2003/04/18 23:28:06 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -189,7 +189,7 @@ void munge_ctx_destroy (munge_ctx_t ctx);
  *  Destroys the context [ctx].
  */
 
-const char * munge_ctx_err (munge_ctx_t ctx);
+const char * munge_ctx_strerror (munge_ctx_t ctx);
 /*
  *  Returns the error message associated with the last munge operation in
  *    which the context [ctx] was passed, or NULL if no error condition exists.
