@@ -1,3 +1,8 @@
+2004-09-16  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/libcommon/munge_defs.h:
+	  Added MUNGE_GROUP_STAT_FLAG and MUNGE_GROUP_PARSE_TIMER.
+
 2004-09-10  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/munged/replay.c: Removed mac_len from union replay_key

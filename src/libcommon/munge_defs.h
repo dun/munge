@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munge_defs.h,v 1.28 2004/08/27 03:54:58 dun Exp $
+ *  $Id: munge_defs.h,v 1.29 2004/09/16 20:11:37 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -67,8 +67,18 @@
  */
 #define MUNGE_MAXIMUM_TTL               3600
 
+/*  Set to 1 if group information comes from "/etc/group".
+ *  If set, group information will not be re-parsed unless
+ *    the file modification time changes.
+ */
+#define MUNGE_GROUP_STAT_FLAG           1
+
+/*  Integer for the number of seconds between updating group information.
+ */
+#define MUNGE_GROUP_PARSE_TIMER         900
+
 /*  Integer for the number of seconds between purging the replay hash
- *    of expired creds.
+ *    of expired credentials.
  */
 #define MUNGE_REPLAY_PURGE_TIMER        60
 
