@@ -1,3 +1,7 @@
+2005-01-18  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/munged/hash.c(hash_destroy): Fixed memory leak.
+
 2004-12-21  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* : Released 0.4.1.

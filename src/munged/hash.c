@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: hash.c,v 1.7 2004/11/17 21:53:15 dun Exp $
+ *  $Id: hash.c,v 1.8 2005/01/18 19:57:17 dun Exp $
  *  LSD-Id: hash.c,v 1.8 2003/11/19 23:33:48 dun Exp
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
@@ -176,6 +176,7 @@ hash_destroy (hash_t h)
     assert (h->magic = ~HASH_MAGIC);    /* clear magic via assert abuse */
     lsd_mutex_unlock (&h->mutex);
     lsd_mutex_destroy (&h->mutex);
+    free (h->table);
     free (h);
     return;
 }
