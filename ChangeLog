@@ -5,7 +5,7 @@
 	* HISTORY, META, NEWS, TODO: Updated for 0.4.1 release.
 
 	* munge.spec:
-	  Added %pre to remove chkconfig droppings from the "-1 priority" bug.
+	  Added %post to remove chkconfig droppings from the "-1 priority" bug.
 
 	* src/etc/munge.init:
 	  Fixed bug preventing priorities from being recognized by chkconfig.
