@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: conf.c,v 1.24 2004/08/17 21:37:32 dun Exp $
+ *  $Id: conf.c,v 1.25 2004/09/03 18:41:15 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -260,6 +260,8 @@ display_help (char *prog)
 
     printf ("  %*s %s\n", w, "-V, --version",
             "Display version information");
+
+    printf ("\n");
 
     printf ("  %*s %s\n", w, "-f, --force",
             "Force process to run if possible");

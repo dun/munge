@@ -1,7 +1,8 @@
 2004-09-03  Chris Dunlap  <cdunlap@llnl.gov>
 
-	* src/munge/munge.c(display_strings,str_to_int):
-	  Tweaked comments and formatting.
+	* src/munged/conf.c(display_help): Added newline.
+
+	* src/munge/munge.c(display_strings,str_to_int): Tweaked formatting.
 
 	* src/munge/Makefile.am, src/munge/remunge.c: Added.
 
