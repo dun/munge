@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munge.h,v 1.25 2004/11/18 00:48:13 dun Exp $
+ *  $Id: munge.h,v 1.26 2004/11/18 01:55:31 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -79,8 +79,7 @@ typedef enum munge_opt {
     MUNGE_OPT_DECODE_TIME       =  7,   /* time when cred decoded (time_t)   */
     MUNGE_OPT_SOCKET            =  8,   /* socket for comm w/ daemon (str)   */
     MUNGE_OPT_UID_RESTRICTION   =  9,   /* UID able to decode cred (uid_t)   */
-    MUNGE_OPT_GID_RESTRICTION   = 10,   /* GID able to decode cred (gid_t)   */
-    MUNGE_OPT_LAST_ENTRY
+    MUNGE_OPT_GID_RESTRICTION   = 10    /* GID able to decode cred (gid_t)   */
 } munge_opt_t;
 
 /*  Munge symmetric cipher types
@@ -90,8 +89,7 @@ typedef enum munge_cipher {
     MUNGE_CIPHER_DEFAULT        =  1,   /* default ciphr specified by daemon */
     MUNGE_CIPHER_BLOWFISH       =  2,   /* Blowfish CBC w/ 64b-blk/128b-key  */
     MUNGE_CIPHER_CAST5          =  3,   /* CAST5 CBC w/ 64b-blk/128b-key     */
-    MUNGE_CIPHER_AES_128        =  4,   /* AES CBC w/ 128b-blk/128b-key      */
-    MUNGE_CIPHER_LAST_ENTRY
+    MUNGE_CIPHER_AES_128        =  4    /* AES CBC w/ 128b-blk/128b-key      */
 } munge_cipher_t;
 
 /*  Munge message authentication code types
@@ -101,8 +99,7 @@ typedef enum munge_mac {
     MUNGE_MAC_DEFAULT           =  1,   /* default mac specified by daemon   */
     MUNGE_MAC_MD5               =  2,   /* MD5 w/ 128b-digest                */
     MUNGE_MAC_SHA1              =  3,   /* SHA-1 w/ 160b-digest              */
-    MUNGE_MAC_RIPEMD160         =  4,   /* RIPEMD-160 w/ 160b-digest         */
-    MUNGE_MAC_LAST_ENTRY
+    MUNGE_MAC_RIPEMD160         =  4    /* RIPEMD-160 w/ 160b-digest         */
 } munge_mac_t;
 
 /*  Munge compression types
@@ -111,8 +108,7 @@ typedef enum munge_zip {
     MUNGE_ZIP_NONE              =  0,   /* compression disabled              */
     MUNGE_ZIP_DEFAULT           =  1,   /* default zip specified by daemon   */
     MUNGE_ZIP_BZLIB             =  2,   /* bzip2 by Julian Seward            */
-    MUNGE_ZIP_ZLIB              =  3,   /* zlib "deflate" by Gailly & Adler  */
-    MUNGE_ZIP_LAST_ENTRY
+    MUNGE_ZIP_ZLIB              =  3    /* zlib "deflate" by Gailly & Adler  */
 } munge_zip_t;
 
 /*  Munge credential time-to-live (in seconds)
@@ -167,8 +163,7 @@ typedef enum munge_err {
     EMUNGE_CRED_EXPIRED         = 16,   /* Credential expired                */
     EMUNGE_CRED_REWOUND         = 17,   /* Credential created in the future  */
     EMUNGE_CRED_REPLAYED        = 18,   /* Credential replayed               */
-    EMUNGE_CRED_UNAUTHORIZED    = 19,   /* Credential decode unauthorized    */
-    EMUNGE_LAST_ENTRY
+    EMUNGE_CRED_UNAUTHORIZED    = 19    /* Credential decode unauthorized    */
 } munge_err_t;
 
 

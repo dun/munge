@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: zip.c,v 1.6 2004/05/01 04:59:38 dun Exp $
+ *  $Id: zip.c,v 1.7 2004/11/18 01:55:31 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -101,8 +101,6 @@ zip_compress_block (munge_zip_t type,
     unsigned int   xsrclen;
     zip_meta_t     meta;
 
-    assert (type > MUNGE_ZIP_NONE);
-    assert (type < MUNGE_ZIP_LAST_ENTRY);
     assert (dst != NULL);
     assert (dstlen != NULL);
     assert (src != NULL);
@@ -158,8 +156,6 @@ zip_decompress_block (munge_zip_t type,
     unsigned int   xsrclen;
     zip_meta_t     meta;
 
-    assert (type > MUNGE_ZIP_NONE);
-    assert (type < MUNGE_ZIP_LAST_ENTRY);
     assert (dst != NULL);
     assert (dstlen != NULL);
     assert (src != NULL);

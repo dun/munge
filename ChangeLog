@@ -1,5 +1,10 @@
 2004-11-17  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/libmunge/munge.h:
+	  Removed MUNGE_OPT_LAST_ENTRY, MUNGE_CIPHER_LAST_ENTRY,
+	  MUNGE_MAC_LAST_ENTRY, MUNGE_ZIP_LAST_ENTRY, EMUNGE_LAST_ENTRY.
+	* src/munged/zip.c: Removed use of MUNGE_ZIP_LAST_ENTRY.
+
 	* src/libcommon/munge_msg.h: Removed MUNGE_MSG_LAST_ENTRY.
 
 	* configure.ac, src/libcommon/munge.7.in, src/libmunge/munge.3.in,
