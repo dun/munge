@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munge_msg.c,v 1.4 2003/04/30 00:11:00 dun Exp $
+ *  $Id: munge_msg.c,v 1.5 2003/06/03 19:51:25 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -207,7 +207,12 @@ _munge_msg_recv (munge_msg_t m)
     else {
         m1->data = NULL;
     }
-    assert (n == m->head.length);
+    if (n != m->head.length) {
+        _munge_msg_set_err (m, EMUNGE_SOCKET,
+            strdupf ("Received unexpected message length %d/%d",
+                m->head.length, n));
+        return (EMUNGE_SOCKET);
+    }
     ((char *) m->pbody)[m->head.length] = '\0';
     /*
      *  If an error message was returned, copy the error condition
