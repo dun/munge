@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munge_msg.c,v 1.10 2003/12/12 18:40:06 dun Exp $
+ *  $Id: munge_msg.c,v 1.11 2003/12/12 22:15:42 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -143,7 +143,7 @@ again:
     }
     if (l != n) {
         _munge_msg_set_err (m, EMUNGE_SOCKET,
-            strdupf ("Sent incomplete message: %d/%d bytes", l, n));
+            strdupf ("Sent incomplete message: %d of %d bytes", l, n));
         return (EMUNGE_SOCKET);
     }
     return (EMUNGE_SUCCESS);
@@ -169,7 +169,8 @@ _munge_msg_recv (munge_msg_t m)
     }
     if (l != n) {
         _munge_msg_set_err (m, EMUNGE_SOCKET,
-            strdupf ("Received incomplete message header: %d/%d bytes", l, n));
+            strdupf ("Received incomplete message header: %d of %d bytes",
+            l, n));
         return (EMUNGE_SOCKET);
     }
     if (m->head.magic != MUNGE_MSG_MAGIC) {
@@ -202,7 +203,7 @@ _munge_msg_recv (munge_msg_t m)
     }
     if (l != n) {
         _munge_msg_set_err (m, EMUNGE_SOCKET,
-            strdupf ("Received incomplete message: %d/%d bytes", l, n));
+            strdupf ("Received incomplete message: %d of %d bytes", l, n));
         return (EMUNGE_SOCKET);
     }
     m1 = m->pbody;
@@ -223,7 +224,7 @@ _munge_msg_recv (munge_msg_t m)
     }
     if (n != m->head.length) {
         _munge_msg_set_err (m, EMUNGE_SOCKET,
-            strdupf ("Received unexpected message length: %d/%d bytes",
+            strdupf ("Received unexpected message length: %d of %d bytes",
                 m->head.length, n));
         return (EMUNGE_SOCKET);
     }
