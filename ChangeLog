@@ -1,5 +1,7 @@
 2004-09-24  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/munged/job.c(job_accept): Changed log msg for processing backlog.
+
 	* src/munged/dec_v1.c(dec_v1_validate_replay):
 	  Added log msg when allowing credential replay due to retry.
 

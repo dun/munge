@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: job.c,v 1.6 2004/09/24 16:50:46 dun Exp $
+ *  $Id: job.c,v 1.7 2004/09/24 17:16:44 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -90,7 +90,7 @@ job_accept (conf_t conf)
                 case ENOBUFS:
                 case ENOMEM:
                     log_msg (LOG_INFO,
-                        "Suspended connections until work queue emptied");
+                        "Suspended new connections while processing backlog");
                     work_wait (w);
                     continue;
                 default:
