@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: gids.c,v 1.3 2004/05/01 06:17:14 dun Exp $
+ *  $Id: gids.c,v 1.4 2004/05/06 23:32:34 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -122,7 +122,10 @@ gids_create (void)
     for (;;) {
         errno = 0;
         if (!(gr_ptr = getgrent ())) {
-            if (errno == 0)
+            /*
+             *  glibc-2.2.5 returns ENOENT.
+             */
+            if ((errno == 0) || (errno == ENOENT))
                 break;
             if (errno == EINTR)
                 continue;
