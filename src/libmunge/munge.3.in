@@ -1,4 +1,4 @@
-.\" $Id: munge.3.in,v 1.5 2004/12/07 19:53:07 dun Exp $
+.\" $Id: munge.3.in,v 1.6 2004/12/07 20:07:37 dun Exp $
 
 .TH MUNGE 3 "@DATE@" "@PACKAGE@-@VERSION@" "Munge Uid 'N' Gid Emporium"
 
@@ -104,7 +104,8 @@ The credential contains an unrecognized security realm.
 .B EMUNGE_CRED_INVALID
 The credential is invalid.  This means the credential could not be
 successfully decoded.  More than likely, the secret keys on the encoding
-and decoding hosts do not match.
+and decoding hosts do not match.  Another possibility is that the credential
+has been altered since it was encoded.
 .TP
 .B EMUNGE_CRED_EXPIRED
 The credential has expired.  This means more than 'ttl' seconds have elapsed
