@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: munge.c,v 1.30 2004/08/19 20:55:30 dun Exp $
+ *  $Id: munge.c,v 1.31 2004/08/19 21:57:56 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -54,24 +54,24 @@ struct option opt_table[] = {
     { "help",         0, NULL, 'h' },
     { "license",      0, NULL, 'L' },
     { "version",      0, NULL, 'V' },
+    { "no-input",     0, NULL, 'n' },
+    { "string",       1, NULL, 's' },
+    { "input",        1, NULL, 'i' },
+    { "output",       1, NULL, 'o' },
     { "cipher",       1, NULL, 'c' },
     { "list-ciphers", 0, NULL, 'C' },
-    { "restrict-gid", 1, NULL, 'g' },
-    { "input",        1, NULL, 'i' },
     { "mac",          1, NULL, 'm' },
     { "list-macs",    0, NULL, 'M' },
-    { "no-input",     0, NULL, 'n' },
-    { "output",       1, NULL, 'o' },
-    { "string",       1, NULL, 's' },
-    { "socket",       1, NULL, 'S' },
-    { "ttl",          1, NULL, 't' },
-    { "restrict-uid", 1, NULL, 'u' },
     { "zip",          1, NULL, 'z' },
     { "list-zips",    0, NULL, 'Z' },
+    { "restrict-uid", 1, NULL, 'u' },
+    { "restrict-gid", 1, NULL, 'g' },
+    { "ttl",          1, NULL, 't' },
+    { "socket",       1, NULL, 'S' },
     {  NULL,          0, NULL,  0  }
 };
 
-const char * const opt_string = "hLVc:Cg:i:m:Mno:s:S:t:u:z:Z";
+const char * const opt_string = "hLVns:i:o:c:Cm:Mz:Zu:g:t:S:";
 
 
 /***************************************************************************** 
@@ -120,30 +120,35 @@ main (int argc, char *argv[])
     int          rc = 0;
     const char  *p;
 
-    if (posignal (SIGPIPE, SIG_IGN) == SIG_ERR)
+    if (posignal (SIGPIPE, SIG_IGN) == SIG_ERR) {
         log_err (EMUNGE_SNAFU, LOG_ERR, "Unable to ignore signal=%d", SIGPIPE);
-
+    }
     log_open_file (stderr, argv[0], LOG_INFO, LOG_OPT_PRIORITY);
     conf = create_conf ();
     parse_cmdline (conf, argc, argv);
     open_files (conf);
 
-    if (conf->string)
+    if (conf->string) {
         rc = read_data_from_string (conf->string, &conf->data, &conf->dlen);
-    else if (conf->fn_in)
+    }
+    else if (conf->fn_in) {
         rc = read_data_from_file (conf->fp_in, &conf->data, &conf->dlen);
+    }
     if (rc < 0) {
-        if (errno == ENOMEM)
+        if (errno == ENOMEM) {
             log_errno (EMUNGE_NO_MEMORY, LOG_ERR, "Unable to read input");
-        else
+        }
+        else {
             log_err (EMUNGE_SNAFU, LOG_ERR, "Read error");
+        }
     }
     conf->status = munge_encode (&conf->cred, conf->ctx,
         conf->data, conf->dlen);
 
     if (conf->status != EMUNGE_SUCCESS) {
-        if (!(p = munge_ctx_strerror (conf->ctx)))
+        if (!(p = munge_ctx_strerror (conf->ctx))) {
             p = munge_strerror (conf->status);
+        }
         log_err (conf->status, LOG_ERR, "%s", p);
     }
     conf->clen = strlen (conf->cred);
@@ -190,13 +195,15 @@ destroy_conf (conf_t conf)
         munge_ctx_destroy (conf->ctx);
     }
     if (conf->fp_in != NULL) {
-        if (fclose (conf->fp_in) < 0)
+        if (fclose (conf->fp_in) < 0) {
             log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to close infile");
+        }
         conf->fp_in = NULL;
     }
     if (conf->fp_out != NULL) {
-        if ((fclose (conf->fp_out) < 0) && (errno != EPIPE))
+        if ((fclose (conf->fp_out) < 0) && (errno != EPIPE)) {
             log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to close outfile");
+        }
         conf->fp_out = NULL;
     }
     if (conf->data != NULL) {
@@ -249,122 +256,144 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                 printf ("%s-%s\n", PACKAGE, VERSION);
                 exit (EMUNGE_SUCCESS);
                 break;
-            case 'c':
-                if ((i = str_to_int (optarg, munge_cipher_strings)) < 0)
-                    log_err (EMUNGE_SNAFU, LOG_ERR,
-                        "Invalid cipher type \"%s\"", optarg);
-                e = munge_ctx_set (conf->ctx, MUNGE_OPT_CIPHER_TYPE, i);
-                if (e != EMUNGE_SUCCESS)
-                    log_err (EMUNGE_SNAFU, LOG_ERR,
-                        "Unable to set cipher type: %s",
-                        munge_ctx_strerror (conf->ctx));
-                break;
-            case 'C':
-                display_strings ("Cipher types", munge_cipher_strings);
-                exit (EMUNGE_SUCCESS);
-                break;
-            case 'g':
-                if (strlen (optarg) == 0)
-                    i = getgid ();
-                else if (strlen (optarg) == strspn (optarg, "0123456789"))
-                    i = strtol (optarg, NULL, 10);
-                else if ((gr_ptr = getgrnam (optarg)) != NULL)
-                    i = gr_ptr->gr_gid;
-                else
-                    log_err (EMUNGE_SNAFU, LOG_ERR,
-                        "Unrecognized group \"%s\"", optarg);
-                e = munge_ctx_set (conf->ctx, MUNGE_OPT_GID_RESTRICTION, i);
-                if (e != EMUNGE_SUCCESS)
-                    log_err (EMUNGE_SNAFU, LOG_ERR,
-                        "Unable to set gid restriction: %s",
-                        munge_ctx_strerror (conf->ctx));
-                break;
-            case 'i':
-                conf->fn_in = optarg;
-                conf->string = NULL;
-                break;
-            case 'm':
-                if ((i = str_to_int (optarg, munge_mac_strings)) < 0)
-                    log_err (EMUNGE_SNAFU, LOG_ERR,
-                        "Invalid message auth code type \"%s\"", optarg);
-                e = munge_ctx_set (conf->ctx, MUNGE_OPT_MAC_TYPE, i);
-                if (e != EMUNGE_SUCCESS)
-                    log_err (EMUNGE_SNAFU, LOG_ERR,
-                        "Unable to set message auth code type: %s",
-                        munge_ctx_strerror (conf->ctx));
-                break;
-            case 'M':
-                display_strings ("MAC types", munge_mac_strings);
-                exit (EMUNGE_SUCCESS);
-                break;
             case 'n':
                 conf->fn_in = NULL;
                 conf->string = NULL;
-                break;
-            case 'o':
-                conf->fn_out = optarg;
                 break;
             case 's':
                 conf->fn_in = NULL;
                 conf->string = optarg;
                 break;
-            case 'S':
-                e = munge_ctx_set (conf->ctx, MUNGE_OPT_SOCKET, optarg);
-                if (e != EMUNGE_SUCCESS)
-                    log_err (EMUNGE_SNAFU, LOG_ERR,
-                        "Unable to set munge socket name: %s",
-                        munge_ctx_strerror (conf->ctx));
+            case 'i':
+                conf->fn_in = optarg;
+                conf->string = NULL;
                 break;
-            case 't':
-                i = strtol (optarg, &p, 10);
-                if ((optarg == p) || (*p != '\0'))
-                    log_errno (EMUNGE_SNAFU, LOG_ERR,
-                        "Invalid time-to-live '%s'", optarg);
-                if (i < 0)
-                    i = MUNGE_TTL_MAXIMUM;
-                e = munge_ctx_set (conf->ctx, MUNGE_OPT_TTL, i);
-                if (e != EMUNGE_SUCCESS)
-                    log_err (EMUNGE_SNAFU, LOG_ERR,
-                        "Unable to set time-to-live: %s",
-                        munge_ctx_strerror (conf->ctx));
+            case 'o':
+                conf->fn_out = optarg;
                 break;
-            case 'u':
-                if (strlen (optarg) == 0)
-                    i = getuid ();
-                else if (strlen (optarg) == strspn (optarg, "0123456789"))
-                    i = strtol (optarg, NULL, 10);
-                else if ((pw_ptr = getpwnam (optarg)) != NULL)
-                    i = pw_ptr->pw_uid;
-                else
+            case 'c':
+                if ((i = str_to_int (optarg, munge_cipher_strings)) < 0) {
                     log_err (EMUNGE_SNAFU, LOG_ERR,
-                        "Unrecognized user \"%s\"", optarg);
-                e = munge_ctx_set (conf->ctx, MUNGE_OPT_UID_RESTRICTION, i);
-                if (e != EMUNGE_SUCCESS)
+                        "Invalid cipher type \"%s\"", optarg);
+                }
+                e = munge_ctx_set (conf->ctx, MUNGE_OPT_CIPHER_TYPE, i);
+                if (e != EMUNGE_SUCCESS) {
                     log_err (EMUNGE_SNAFU, LOG_ERR,
-                        "Unable to set uid restriction: %s",
+                        "Unable to set cipher type: %s",
                         munge_ctx_strerror (conf->ctx));
+                }
+                break;
+            case 'C':
+                display_strings ("Cipher types", munge_cipher_strings);
+                exit (EMUNGE_SUCCESS);
+                break;
+            case 'm':
+                if ((i = str_to_int (optarg, munge_mac_strings)) < 0) {
+                    log_err (EMUNGE_SNAFU, LOG_ERR,
+                        "Invalid message auth code type \"%s\"", optarg);
+                }
+                e = munge_ctx_set (conf->ctx, MUNGE_OPT_MAC_TYPE, i);
+                if (e != EMUNGE_SUCCESS) {
+                    log_err (EMUNGE_SNAFU, LOG_ERR,
+                        "Unable to set message auth code type: %s",
+                        munge_ctx_strerror (conf->ctx));
+                }
+                break;
+            case 'M':
+                display_strings ("MAC types", munge_mac_strings);
+                exit (EMUNGE_SUCCESS);
                 break;
             case 'z':
-                if ((i = str_to_int (optarg, munge_zip_strings)) < 0)
+                if ((i = str_to_int (optarg, munge_zip_strings)) < 0) {
                     log_err (EMUNGE_SNAFU, LOG_ERR,
                         "Invalid compression type \"%s\"", optarg);
+                }
                 e = munge_ctx_set (conf->ctx, MUNGE_OPT_ZIP_TYPE, i);
-                if (e != EMUNGE_SUCCESS)
+                if (e != EMUNGE_SUCCESS) {
                     log_err (EMUNGE_SNAFU, LOG_ERR,
                         "Unable to set compression type: %s",
                         munge_ctx_strerror (conf->ctx));
+                }
                 break;
             case 'Z':
                 display_strings ("Compression types", munge_zip_strings);
                 exit (EMUNGE_SUCCESS);
                 break;
+            case 'u':
+                if (strlen (optarg) == 0) {
+                    i = getuid ();
+                }
+                else if (strlen (optarg) == strspn (optarg, "0123456789")) {
+                    i = strtol (optarg, NULL, 10);
+                }
+                else if ((pw_ptr = getpwnam (optarg)) != NULL) {
+                    i = pw_ptr->pw_uid;
+                }
+                else {
+                    log_err (EMUNGE_SNAFU, LOG_ERR,
+                        "Unrecognized user \"%s\"", optarg);
+                }
+                e = munge_ctx_set (conf->ctx, MUNGE_OPT_UID_RESTRICTION, i);
+                if (e != EMUNGE_SUCCESS) {
+                    log_err (EMUNGE_SNAFU, LOG_ERR,
+                        "Unable to set uid restriction: %s",
+                        munge_ctx_strerror (conf->ctx));
+                }
+                break;
+            case 'g':
+                if (strlen (optarg) == 0) {
+                    i = getgid ();
+                }
+                else if (strlen (optarg) == strspn (optarg, "0123456789")) {
+                    i = strtol (optarg, NULL, 10);
+                }
+                else if ((gr_ptr = getgrnam (optarg)) != NULL) {
+                    i = gr_ptr->gr_gid;
+                }
+                else {
+                    log_err (EMUNGE_SNAFU, LOG_ERR,
+                        "Unrecognized group \"%s\"", optarg);
+                }
+                e = munge_ctx_set (conf->ctx, MUNGE_OPT_GID_RESTRICTION, i);
+                if (e != EMUNGE_SUCCESS) {
+                    log_err (EMUNGE_SNAFU, LOG_ERR,
+                        "Unable to set gid restriction: %s",
+                        munge_ctx_strerror (conf->ctx));
+                }
+                break;
+            case 't':
+                i = strtol (optarg, &p, 10);
+                if ((optarg == p) || (*p != '\0')) {
+                    log_errno (EMUNGE_SNAFU, LOG_ERR,
+                        "Invalid time-to-live '%s'", optarg);
+                }
+                if (i < 0) {
+                    i = MUNGE_TTL_MAXIMUM;
+                }
+                e = munge_ctx_set (conf->ctx, MUNGE_OPT_TTL, i);
+                if (e != EMUNGE_SUCCESS) {
+                    log_err (EMUNGE_SNAFU, LOG_ERR,
+                        "Unable to set time-to-live: %s",
+                        munge_ctx_strerror (conf->ctx));
+                }
+                break;
+            case 'S':
+                e = munge_ctx_set (conf->ctx, MUNGE_OPT_SOCKET, optarg);
+                if (e != EMUNGE_SUCCESS) {
+                    log_err (EMUNGE_SNAFU, LOG_ERR,
+                        "Unable to set munge socket name: %s",
+                        munge_ctx_strerror (conf->ctx));
+                }
+                break;
             case '?':
-                if (optopt > 0)
+                if (optopt > 0) {
                     log_err (EMUNGE_SNAFU, LOG_ERR,
                         "Invalid option \"-%c\"", optopt);
-                else
+                }
+                else {
                     log_err (EMUNGE_SNAFU, LOG_ERR,
                         "Invalid option \"%s\"", argv[optind - 1]);
+                }
                 break;
             default:
                 log_err (EMUNGE_SNAFU, LOG_ERR,
@@ -385,7 +414,7 @@ display_help (char *prog)
 {
 /*  Displays a help message describing the command-line options.
  */
-    const int w = -24;                  /* pad for width of option string */
+    const int w = -25;                  /* pad for width of option string */
 
     assert (prog != NULL);
 
@@ -437,14 +466,14 @@ display_help (char *prog)
 
     printf ("\n");
 
-    printf ("  %*s %s\n", w, "-t, --ttl=INTEGER",
-            "Specify time-to-live (in seconds; 0=default, -1=max)");
-
     printf ("  %*s %s\n", w, "-u, --restrict-uid=UID",
             "Restrict credential decoding to only this UID");
 
     printf ("  %*s %s\n", w, "-g, --restrict-gid=GID",
             "Restrict credential decoding to only this GID");
+
+    printf ("  %*s %s\n", w, "-t, --ttl=INTEGER",
+            "Specify time-to-live (in seconds; 0=default -1=max)");
 
     printf ("  %*s %s\n", w, "-S, --socket=STRING",
             "Specify local domain socket");
@@ -466,8 +495,9 @@ display_strings (const char *header, const char **strings)
      */
     printf ("%s:\n\n", header);
     for (pp=strings, i=0; *pp; pp++, i++) {
-        if (*pp[0] != '\0')
+        if (*pp[0] != '\0') {
             printf ("  %s (%d)\n", *pp, i);
+        }
     }
     printf ("\n");
     return;
@@ -482,15 +512,16 @@ str_to_int (const char *s, const char **strings)
     int i;
     int n;
 
-    if ((!s) || (*s == '\0')) {
+    if (!s || !*s) {
         return (-1);
     }
     /*  Check to see if the given string matches a valid string.
      *  Also determine the number of strings in the array.
      */
     for (pp=strings, i=0; *pp; pp++, i++) {
-        if (!strcasecmp (s, *pp))
+        if (!strcasecmp (s, *pp)) {
             return (i);
+        }
     }
     /*  Check to see if the given string matches a valid enum.
      */
@@ -512,18 +543,22 @@ void
 open_files (conf_t conf)
 {
     if (conf->fn_in) {
-        if (!strcmp (conf->fn_in, "-"))
+        if (!strcmp (conf->fn_in, "-")) {
             conf->fp_in = stdin;
-        else if (!(conf->fp_in = fopen (conf->fn_in, "r")))
+        }
+        else if (!(conf->fp_in = fopen (conf->fn_in, "r"))) {
             log_errno (EMUNGE_SNAFU, LOG_ERR,
                 "Unable to read from \"%s\"", conf->fn_in);
+        }
     }
     if (conf->fn_out) {
-        if (!strcmp (conf->fn_out, "-"))
+        if (!strcmp (conf->fn_out, "-")) {
             conf->fp_out = stdout;
-        else if (!(conf->fp_out = fopen (conf->fn_out, "w")))
+        }
+        else if (!(conf->fp_out = fopen (conf->fn_out, "w"))) {
             log_errno (EMUNGE_SNAFU, LOG_ERR,
                 "Unable to write to \"%s\"", conf->fn_out);
+        }
     }
     return;
 }
@@ -532,9 +567,11 @@ open_files (conf_t conf)
 void
 display_cred (conf_t conf)
 {
-    if (!conf->fp_out)
+    if (!conf->fp_out) {
         return;
-    if (fprintf (conf->fp_out, "%s\n", conf->cred) < 0)
+    }
+    if (fprintf (conf->fp_out, "%s\n", conf->cred) < 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Write error");
+    }
     return;
 }

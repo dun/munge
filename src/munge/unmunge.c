@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: unmunge.c,v 1.28 2004/08/19 20:23:13 dun Exp $
+ *  $Id: unmunge.c,v 1.29 2004/08/19 21:57:56 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -68,16 +68,16 @@ struct option opt_table[] = {
     { "license",      0, NULL, 'L' },
     { "version",      0, NULL, 'V' },
     { "input",        1, NULL, 'i' },
+    { "no-output",    0, NULL, 'n' },
+    { "metadata",     1, NULL, 'm' },
+    { "output",       1, NULL, 'o' },
     { "keys",         1, NULL, 'k' },
     { "list-keys",    0, NULL, 'K' },
-    { "metadata",     1, NULL, 'm' },
-    { "no-output",    0, NULL, 'n' },
-    { "output",       1, NULL, 'o' },
     { "socket",       1, NULL, 'S' },
     {  NULL,          0, NULL,  0  }
 };
 
-const char * const opt_string = "hLVi:k:Km:no:S:";
+const char * const opt_string = "hLVi:nm:o:k:KS:";
 
 
 /*****************************************************************************
@@ -178,9 +178,9 @@ main (int argc, char *argv[])
     int          rc;
     const char  *p;
 
-    if (posignal (SIGPIPE, SIG_IGN) == SIG_ERR)
+    if (posignal (SIGPIPE, SIG_IGN) == SIG_ERR) {
         log_err (EMUNGE_SNAFU, LOG_ERR, "Unable to ignore signal=%d", SIGPIPE);
-
+    }
     log_open_file (stderr, argv[0], LOG_INFO, LOG_OPT_PRIORITY);
     conf = create_conf ();
     parse_cmdline (conf, argc, argv);
@@ -189,10 +189,12 @@ main (int argc, char *argv[])
     rc = read_data_from_file (conf->fp_in,
         (void **) &conf->cred, &conf->clen);
     if (rc < 0) {
-        if (errno == ENOMEM)
+        if (errno == ENOMEM) {
             log_errno (EMUNGE_NO_MEMORY, LOG_ERR, "Unable to read input");
-        else
+        }
+        else {
             log_err (EMUNGE_SNAFU, LOG_ERR, "Read error");
+        }
     }
     conf->status = munge_decode (conf->cred, conf->ctx,
         &conf->data, &conf->dlen, &conf->uid, &conf->gid);
@@ -269,23 +271,27 @@ destroy_conf (conf_t conf)
         munge_ctx_destroy (conf->ctx);
     }
     if (conf->fp_in != NULL) {
-        if (fclose (conf->fp_in) < 0)
+        if (fclose (conf->fp_in) < 0) {
             log_errno (EMUNGE_SNAFU, LOG_ERR,
                 "Unable to close infile");
+        }
         conf->fp_in = NULL;
     }
     if (conf->fp_meta != NULL) {
-        if ((fclose (conf->fp_meta) < 0) && (errno != EPIPE))
+        if ((fclose (conf->fp_meta) < 0) && (errno != EPIPE)) {
             log_errno (EMUNGE_SNAFU, LOG_ERR,
                 "Unable to close metadata outfile");
+        }
         conf->fp_meta = NULL;
     }
     if (conf->fp_out != NULL) {
         if (conf->fn_out && conf->fn_meta
-          && strcmp (conf->fn_out, conf->fn_meta))
-            if ((fclose (conf->fp_out) < 0) && (errno != EPIPE))
+                && strcmp (conf->fn_out, conf->fn_meta)) {
+            if ((fclose (conf->fp_out) < 0) && (errno != EPIPE)) {
                 log_errno (EMUNGE_SNAFU, LOG_ERR,
                     "Unable to close payload outfile");
+            }
+        }
         conf->fp_out = NULL;
     }
     if (conf->cred) {
@@ -341,6 +347,16 @@ parse_cmdline (conf_t conf, int argc, char **argv)
             case 'i':
                 conf->fn_in = optarg;
                 break;
+            case 'n':
+                conf->fn_meta = NULL;
+                conf->fn_out = NULL;
+                break;
+            case 'm':
+                conf->fn_meta = optarg;
+                break;
+            case 'o':
+                conf->fn_out = optarg;
+                break;
             case 'k':
                 got_keys = 1;
                 parse_keys (conf, optarg);
@@ -349,30 +365,23 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                 display_keys ();
                 exit (EMUNGE_SUCCESS);
                 break;
-            case 'm':
-                conf->fn_meta = optarg;
-                break;
-            case 'n':
-                conf->fn_meta = NULL;
-                conf->fn_out = NULL;
-                break;
-            case 'o':
-                conf->fn_out = optarg;
-                break;
             case 'S':
                 e = munge_ctx_set (conf->ctx, MUNGE_OPT_SOCKET, optarg);
-                if (e != EMUNGE_SUCCESS)
+                if (e != EMUNGE_SUCCESS) {
                     log_err (EMUNGE_SNAFU, LOG_ERR,
                         "Unable to set munge socket name: %s",
                         munge_ctx_strerror (conf->ctx));
+                }
                 break;
             case '?':
-                if (optopt > 0)
+                if (optopt > 0) {
                     log_err (EMUNGE_SNAFU, LOG_ERR,
                         "Invalid option \"-%c\"", optopt);
-                else
+                }
+                else {
                     log_err (EMUNGE_SNAFU, LOG_ERR,
                         "Invalid option \"%s\"", argv[optind - 1]);
+                }
                 break;
             default:
                 log_err (EMUNGE_SNAFU, LOG_ERR,
@@ -387,8 +396,9 @@ parse_cmdline (conf_t conf, int argc, char **argv)
     /*  Enable all metadata keys if a subset was not specified.
      */
     if (!got_keys) {
-        for (i=0; i<MUNGE_KEY_LAST; i++)
+        for (i=0; i<MUNGE_KEY_LAST; i++) {
             conf->key[i] = 1;
+        }
     }
     return;
 }
@@ -397,7 +407,7 @@ parse_cmdline (conf_t conf, int argc, char **argv)
 void
 display_help (char *prog)
 {
-    const int w = -24;                  /* pad for width of option string */
+    const int w = -25;                  /* pad for width of option string */
 
     assert (prog != NULL);
 
@@ -451,13 +461,15 @@ parse_keys (conf_t conf, char *keys)
     char       *key;
     int         val;
 
-    if (!keys || !*keys)
+    if (!keys || !*keys) {
         return;
+    }
     key = strtok (keys, separators);
     while (key != NULL) {
         val = key_str_to_val (key);
-        if (val >= 0)
+        if (val >= 0) {
             conf->key[val] = 1;
+        }
         key = strtok (NULL, separators);
     }
     return;
@@ -470,8 +482,9 @@ display_keys (void)
     int i;
 
     printf ("Metadata keys:\n\n");
-    for (i=0; i<MUNGE_KEY_LAST; i++)
+    for (i=0; i<MUNGE_KEY_LAST; i++) {
         printf ("  %s\n", munge_keys[i].str);
+    }
     printf ("\n");
     return;
 }
@@ -481,35 +494,44 @@ void
 open_files (conf_t conf)
 {
     if (conf->fn_in) {
-        if (!strcmp (conf->fn_in, "-"))
+        if (!strcmp (conf->fn_in, "-")) {
             conf->fp_in = stdin;
-        else if (!(conf->fp_in = fopen (conf->fn_in, "r")))
+        }
+        else if (!(conf->fp_in = fopen (conf->fn_in, "r"))) {
             log_errno (EMUNGE_SNAFU, LOG_ERR,
                 "Unable to read from \"%s\"", conf->fn_in);
+        }
     }
     if (conf->fn_meta) {
-        if (!strcmp (conf->fn_meta, "-"))
+        if (!strcmp (conf->fn_meta, "-")) {
             conf->fp_meta = stdout;
-        else if (conf->fn_in && !strcmp (conf->fn_meta, conf->fn_in))
+        }
+        else if (conf->fn_in && !strcmp (conf->fn_meta, conf->fn_in)) {
             log_err (EMUNGE_SNAFU, LOG_ERR,
                 "Cannot read and write to the same file \"%s\"",
                 conf->fn_meta);
-        else if (!(conf->fp_meta = fopen (conf->fn_meta, "w")))
+        }
+        else if (!(conf->fp_meta = fopen (conf->fn_meta, "w"))) {
             log_errno (EMUNGE_SNAFU, LOG_ERR,
                 "Unable to write to \"%s\"", conf->fn_meta);
+        }
     }
     if (conf->fn_out) {
-        if (!strcmp (conf->fn_out, "-"))
+        if (!strcmp (conf->fn_out, "-")) {
             conf->fp_out = stdout;
-        else if (conf->fn_in && !strcmp (conf->fn_out, conf->fn_in))
+        }
+        else if (conf->fn_in && !strcmp (conf->fn_out, conf->fn_in)) {
             log_err (EMUNGE_SNAFU, LOG_ERR,
                 "Cannot read and write to the same file \"%s\"",
                 conf->fn_out);
-        else if (conf->fn_meta && !strcmp (conf->fn_out, conf->fn_meta))
+        }
+        else if (conf->fn_meta && !strcmp (conf->fn_out, conf->fn_meta)) {
             conf->fp_out = conf->fp_meta;
-        else if (!(conf->fp_out = fopen (conf->fn_out, "w")))
+        }
+        else if (!(conf->fp_out = fopen (conf->fn_out, "w"))) {
             log_errno (EMUNGE_SNAFU, LOG_ERR,
                 "Unable to write to \"%s\"", conf->fn_out);
+        }
     }
     return;
 }
@@ -545,10 +567,11 @@ display_meta (conf_t conf)
     }
     if (conf->key[MUNGE_KEY_ORIGIN]) {
         e = munge_ctx_get (conf->ctx, MUNGE_OPT_ADDR4, &addr);
-        if (e != EMUNGE_SUCCESS)
+        if (e != EMUNGE_SUCCESS) {
             log_err (EMUNGE_SNAFU, LOG_ERR,
                 "Unable to retrieve origin ip address: %s",
                 munge_ctx_strerror (conf->ctx));
+        }
         hptr = gethostbyaddr ((char *) &addr, sizeof (addr), AF_INET);
         s = key_val_to_str (MUNGE_KEY_ORIGIN);
         w = pad - strlen (s);
@@ -557,62 +580,68 @@ display_meta (conf_t conf)
     }
     if (conf->key[MUNGE_KEY_ENCODE_TIME]) {
         e = munge_ctx_get (conf->ctx, MUNGE_OPT_ENCODE_TIME, &t);
-        if (e != EMUNGE_SUCCESS)
+        if (e != EMUNGE_SUCCESS) {
             log_err (EMUNGE_SNAFU, LOG_ERR,
                 "Unable to retrieve encode time: %s",
                 munge_ctx_strerror (conf->ctx));
+        }
         tm_ptr = localtime (&t);
         tlen = strftime (tbuf, sizeof (tbuf), "%Y-%m-%d %H:%M:%S", tm_ptr);
-        if ((tlen == 0) || (tlen >= sizeof (tbuf)))
+        if ((tlen == 0) || (tlen >= sizeof (tbuf))) {
             log_err (EMUNGE_OVERFLOW, LOG_ERR,
                 "Overran buffer for encode time");
-        /*
-         *  Since ISO C does not support the '%s' strftime format option ...
+        }
+        /*  Since ISO C does not support the '%s' strftime format option ...
          */
-        if (strcatf (tbuf, sizeof (tbuf), " (%ld)", (long) t) < 0)
+        if (strcatf (tbuf, sizeof (tbuf), " (%ld)", (long) t) < 0) {
             log_err (EMUNGE_OVERFLOW, LOG_ERR,
                 "Overran buffer for encode time");
+        }
         s = key_val_to_str (MUNGE_KEY_ENCODE_TIME);
         w = pad - strlen (s);
         fprintf (conf->fp_meta, "%s:%*c%s\n", s, w, 0x20, tbuf);
     }
     if (conf->key[MUNGE_KEY_DECODE_TIME]) {
         e = munge_ctx_get (conf->ctx, MUNGE_OPT_DECODE_TIME, &t);
-        if (e != EMUNGE_SUCCESS)
+        if (e != EMUNGE_SUCCESS) {
             log_err (EMUNGE_SNAFU, LOG_ERR,
                 "Unable to retrieve decode time: %s",
                 munge_ctx_strerror (conf->ctx));
+        }
         tm_ptr = localtime (&t);
         tlen = strftime (tbuf, sizeof (tbuf), "%Y-%m-%d %H:%M:%S", tm_ptr);
-        if ((tlen == 0) || (tlen >= sizeof (tbuf)))
+        if ((tlen == 0) || (tlen >= sizeof (tbuf))) {
             log_err (EMUNGE_OVERFLOW, LOG_ERR,
                 "Overran buffer for decode time");
-        /*
-         *  Since ISO C does not support the '%s' strftime format option ...
+        }
+        /*  Since ISO C does not support the '%s' strftime format option ...
          */
-        if (strcatf (tbuf, sizeof (tbuf), " (%ld)", (long) t) < 0)
+        if (strcatf (tbuf, sizeof (tbuf), " (%ld)", (long) t) < 0) {
             log_err (EMUNGE_OVERFLOW, LOG_ERR,
                 "Overran buffer for decode time");
+        }
         s = key_val_to_str (MUNGE_KEY_DECODE_TIME);
         w = pad - strlen (s);
         fprintf (conf->fp_meta, "%s:%*c%s\n", s, w, 0x20, tbuf);
     }
     if (conf->key[MUNGE_KEY_TTL]) {
         e = munge_ctx_get (conf->ctx, MUNGE_OPT_TTL, &i);
-        if (e != EMUNGE_SUCCESS)
+        if (e != EMUNGE_SUCCESS) {
             log_err (EMUNGE_SNAFU, LOG_ERR,
                 "Unable to retrieve ttl: %s",
                 munge_ctx_strerror (conf->ctx));
+        }
         s = key_val_to_str (MUNGE_KEY_TTL);
         w = pad - strlen (s);
         fprintf (conf->fp_meta, "%s:%*c%d\n", s, w, 0x20, i);
     }
     if (conf->key[MUNGE_KEY_CIPHER_TYPE]) {
         e = munge_ctx_get (conf->ctx, MUNGE_OPT_CIPHER_TYPE, &i);
-        if (e != EMUNGE_SUCCESS)
+        if (e != EMUNGE_SUCCESS) {
             log_err (EMUNGE_SNAFU, LOG_ERR,
                 "Unable to retrieve cipher type: %s",
                 munge_ctx_strerror (conf->ctx));
+        }
         s = key_val_to_str (MUNGE_KEY_CIPHER_TYPE);
         w = pad - strlen (s);
         fprintf (conf->fp_meta, "%s:%*c%s (%d)\n", s, w, 0x20,
@@ -620,10 +649,11 @@ display_meta (conf_t conf)
     }
     if (conf->key[MUNGE_KEY_MAC_TYPE]) {
         e = munge_ctx_get (conf->ctx, MUNGE_OPT_MAC_TYPE, &i);
-        if (e != EMUNGE_SUCCESS)
+        if (e != EMUNGE_SUCCESS) {
             log_err (EMUNGE_SNAFU, LOG_ERR,
                 "Unable to retrieve message auth code type: %s",
                 munge_ctx_strerror (conf->ctx));
+        }
         s = key_val_to_str (MUNGE_KEY_MAC_TYPE);
         w = pad - strlen (s);
         fprintf (conf->fp_meta, "%s:%*c%s (%d)\n", s, w, 0x20,
@@ -631,10 +661,11 @@ display_meta (conf_t conf)
     }
     if (conf->key[MUNGE_KEY_ZIP_TYPE]) {
         e = munge_ctx_get (conf->ctx, MUNGE_OPT_ZIP_TYPE, &i);
-        if (e != EMUNGE_SUCCESS)
+        if (e != EMUNGE_SUCCESS) {
             log_err (EMUNGE_SNAFU, LOG_ERR,
                 "Unable to retrieve compression type: %s",
                 munge_ctx_strerror (conf->ctx));
+        }
         s = key_val_to_str (MUNGE_KEY_ZIP_TYPE);
         w = pad - strlen (s);
         fprintf (conf->fp_meta, "%s:%*c%s (%d)\n", s, w, 0x20,
@@ -656,10 +687,11 @@ display_meta (conf_t conf)
     }
     if (conf->key[MUNGE_KEY_UID_RESTRICTION]) {
         e = munge_ctx_get (conf->ctx, MUNGE_OPT_UID_RESTRICTION, &i);
-        if (e != EMUNGE_SUCCESS)
+        if (e != EMUNGE_SUCCESS) {
             log_err (EMUNGE_SNAFU, LOG_ERR,
                 "Unable to retrieve uid restriction: %s",
                 munge_ctx_strerror (conf->ctx));
+        }
         if (i != MUNGE_UID_ANY) {
             pw_ptr = getpwuid (i);
             s = key_val_to_str (MUNGE_KEY_UID_RESTRICTION);
@@ -670,10 +702,11 @@ display_meta (conf_t conf)
     }
     if (conf->key[MUNGE_KEY_GID_RESTRICTION]) {
         e = munge_ctx_get (conf->ctx, MUNGE_OPT_GID_RESTRICTION, &i);
-        if (e != EMUNGE_SUCCESS)
+        if (e != EMUNGE_SUCCESS) {
             log_err (EMUNGE_SNAFU, LOG_ERR,
                 "Unable to retrieve gid restriction: %s",
                 munge_ctx_strerror (conf->ctx));
+        }
         if (i != MUNGE_GID_ANY) {
             gr_ptr = getgrgid (i);
             s = key_val_to_str (MUNGE_KEY_GID_RESTRICTION);
@@ -706,12 +739,15 @@ display_meta (conf_t conf)
 void
 display_data (conf_t conf)
 {
-    if ((conf->dlen <= 0) || (!conf->data))
+    if ((conf->dlen <= 0) || (!conf->data)) {
         return;
-    if (!conf->fp_out)
+    }
+    if (!conf->fp_out) {
         return;
-    if (fwrite (conf->data, 1, conf->dlen, conf->fp_out) != conf->dlen)
+    }
+    if (fwrite (conf->data, 1, conf->dlen, conf->fp_out) != conf->dlen) {
         log_err (EMUNGE_SNAFU, LOG_ERR, "Write error");
+    }
     return;
 }
 
@@ -721,11 +757,13 @@ key_str_to_val (char *str)
 {
     int i;
 
-    if (!str || !*str)
+    if (!str || !*str) {
         return (-1);
+    }
     for (i=0; i<MUNGE_KEY_LAST; i++) {
-        if (!strcasecmp (str, munge_keys[i].str))
+        if (!strcasecmp (str, munge_keys[i].str)) {
             return (i);
+        }
     }
     return (-1);
 }
@@ -737,8 +775,9 @@ key_val_to_str (int val)
     int i;
 
     for (i=0; i<MUNGE_KEY_LAST; i++) {
-        if (val == munge_keys[i].val)
+        if (val == munge_keys[i].val) {
             return (munge_keys[i].str);
+        }
     }
     return (NULL);
 }

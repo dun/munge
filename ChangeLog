@@ -1,5 +1,8 @@
 2004-08-19  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/munge/munge.c, src/munge/unmunge.c:
+	  Reformatted code.  Changed help option string width.
+
 	* src/munge/munge.c: Tweaked use of strtol().
 	* src/munge/munge.c(str_to_int): Revamped.
 
