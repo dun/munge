@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: auth_recv.c,v 1.5 2004/09/23 21:10:11 dun Exp $
+ *  $Id: auth_recv.c,v 1.6 2004/11/09 01:30:46 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -436,7 +436,7 @@ _send_auth_req (int sd, const char *pipe_name)
     m1->data_len = strlen ((char *) pipe_name) + 1;
     m1->data = (char *) pipe_name;
 
-    if ((e = munge_msg_send (m)) != EMUNGE_SUCCESS) {
+    if ((e = munge_msg_send (m, 0)) != EMUNGE_SUCCESS) {
         goto end;
     }
 

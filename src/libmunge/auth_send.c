@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: auth_send.c,v 1.3 2004/09/23 21:10:11 dun Exp $
+ *  $Id: auth_send.c,v 1.4 2004/11/09 01:30:46 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -147,7 +147,7 @@ _recv_auth_req (int sd, char *dst, int dstlen)
     if ((e = munge_msg_create (&m, sd)) != EMUNGE_SUCCESS) {
         goto end;
     }
-    if ((e = munge_msg_recv (m)) != EMUNGE_SUCCESS) {
+    if ((e = munge_msg_recv (m, 0)) != EMUNGE_SUCCESS) {
         goto end;
     }
     /*  Note that errstr will be set if the received message is an error

@@ -1,5 +1,10 @@
 2004-11-08  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/libmunge/auth_send.c:
+	  Added missing maxlen parm to invocation of munge_msg_recv().
+	* src/munged/auth_recv.c:
+	  Added missing maxlen parm to invocation of munge_msg_send().
+
 	* : Re-bootstrap'd with automake-1.9.3.
 
 2004-10-29  Chris Dunlap  <cdunlap@llnl.gov>
