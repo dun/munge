@@ -1,5 +1,7 @@
 2003-04-30  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* : Added 'distclean-local' hook via Make-inc.mk.
+
 	* : Added startup script.
 
 2003-04-29  Chris Dunlap  <cdunlap@llnl.gov>

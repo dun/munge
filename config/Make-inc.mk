@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: Make-inc.mk,v 1.1 2003/02/13 17:59:16 dun Exp $
+## $Id: Make-inc.mk,v 1.2 2003/04/30 18:44:14 dun Exp $
 ##*****************************************************************************
 
 # Dependencies to ensure libraries get rebuilt.
@@ -10,4 +10,12 @@ $(top_builddir)/src/libmunge/libmunge.la \
 : force-dependency-check
 	@cd `dirname $@` && make `basename $@`
 
-force-dependency-check :
+force-dependency-check:
+
+# Generic 'distclean' hook.
+# 
+# The double-colon allows this target to be defined multiple times,
+#   thereby allowing a Makefile.am to include its own distclean-local hook.
+#
+distclean-local::
+	-rm -f *~ \#* .\#* cscope*.out core core.* tags TAGS

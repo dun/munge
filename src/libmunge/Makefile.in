@@ -358,7 +358,8 @@ clean-am: clean-generic clean-libLTLIBRARIES clean-libtool \
 distclean: distclean-am
 
 distclean-am: clean-am distclean-compile distclean-depend \
-	distclean-generic distclean-libtool distclean-tags
+	distclean-generic distclean-libtool distclean-local \
+	distclean-tags
 
 dvi: dvi-am
 
@@ -393,8 +394,8 @@ uninstall-am: uninstall-includeHEADERS uninstall-info-am \
 .PHONY: GTAGS all all-am check check-am clean clean-generic \
 	clean-libLTLIBRARIES clean-libtool distclean distclean-compile \
 	distclean-depend distclean-generic distclean-libtool \
-	distclean-tags distdir dvi dvi-am info info-am install \
-	install-am install-data install-data-am install-exec \
+	distclean-local distclean-tags distdir dvi dvi-am info info-am \
+	install install-am install-data install-data-am install-exec \
 	install-exec-am install-includeHEADERS install-info \
 	install-info-am install-libLTLIBRARIES install-man \
 	install-strip installcheck installcheck-am installdirs \
@@ -412,7 +413,15 @@ $(top_builddir)/src/libmunge/libmunge.la \
 : force-dependency-check
 	@cd `dirname $@` && make `basename $@`
 
-force-dependency-check :
+force-dependency-check:
+
+# Generic 'distclean' hook.
+# 
+# The double-colon allows this target to be defined multiple times,
+#   thereby allowing a Makefile.am to include its own distclean-local hook.
+#
+distclean-local::
+	-rm -f *~ \#* .\#* cscope*.out core core.* tags TAGS
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

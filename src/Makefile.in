@@ -300,7 +300,7 @@ clean-am: clean-generic clean-libtool mostlyclean-am
 distclean: distclean-recursive
 
 distclean-am: clean-am distclean-generic distclean-libtool \
-	distclean-tags
+	distclean-local distclean-tags
 
 dvi: dvi-recursive
 
@@ -334,17 +334,18 @@ uninstall-info: uninstall-info-recursive
 
 .PHONY: $(RECURSIVE_TARGETS) GTAGS all all-am check check-am clean \
 	clean-generic clean-libtool clean-recursive distclean \
-	distclean-generic distclean-libtool distclean-recursive \
-	distclean-tags distdir dvi dvi-am dvi-recursive info info-am \
-	info-recursive install install-am install-data install-data-am \
-	install-data-recursive install-exec install-exec-am \
-	install-exec-recursive install-info install-info-am \
-	install-info-recursive install-man install-recursive \
-	install-strip installcheck installcheck-am installdirs \
-	installdirs-am installdirs-recursive maintainer-clean \
-	maintainer-clean-generic maintainer-clean-recursive mostlyclean \
-	mostlyclean-generic mostlyclean-libtool mostlyclean-recursive \
-	tags tags-recursive uninstall uninstall-am uninstall-info-am \
+	distclean-generic distclean-libtool distclean-local \
+	distclean-recursive distclean-tags distdir dvi dvi-am \
+	dvi-recursive info info-am info-recursive install install-am \
+	install-data install-data-am install-data-recursive \
+	install-exec install-exec-am install-exec-recursive \
+	install-info install-info-am install-info-recursive install-man \
+	install-recursive install-strip installcheck installcheck-am \
+	installdirs installdirs-am installdirs-recursive \
+	maintainer-clean maintainer-clean-generic \
+	maintainer-clean-recursive mostlyclean mostlyclean-generic \
+	mostlyclean-libtool mostlyclean-recursive tags tags-recursive \
+	uninstall uninstall-am uninstall-info-am \
 	uninstall-info-recursive uninstall-recursive
 
 
@@ -356,7 +357,15 @@ $(top_builddir)/src/libmunge/libmunge.la \
 : force-dependency-check
 	@cd `dirname $@` && make `basename $@`
 
-force-dependency-check :
+force-dependency-check:
+
+# Generic 'distclean' hook.
+# 
+# The double-colon allows this target to be defined multiple times,
+#   thereby allowing a Makefile.am to include its own distclean-local hook.
+#
+distclean-local::
+	-rm -f *~ \#* .\#* cscope*.out core core.* tags TAGS
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:
