@@ -1,3 +1,8 @@
+2003-06-12  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/munged/conf.c(create_conf):
+	  Changed default value for got_clock_skew flag to true.
+
 2003-06-03  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/libcommon/munge_msg.c(_munge_msg_recv):
