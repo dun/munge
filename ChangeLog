@@ -1,5 +1,7 @@
 2004-09-16  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/munge/remunge.c: Added "-u" and "-g" cmdline opts.
+
 	* src/munged/timer.h: Tweaked timer_init() docs.
 
 	* src/munged/hash.c: Replaced parm asserts with if-guards.

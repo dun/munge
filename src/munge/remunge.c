@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  $Id: remunge.c,v 1.8 2004/09/10 00:54:16 dun Exp $
+ *  $Id: remunge.c,v 1.9 2004/09/16 22:10:40 dun Exp $
  *****************************************************************************
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
@@ -31,8 +31,10 @@
 
 #include <assert.h>
 #include <errno.h>
+#include <grp.h>
 #include <limits.h>
 #include <pthread.h>
+#include <pwd.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -75,6 +77,8 @@ struct option opt_table[] = {
     { "encode",       0, NULL, 'e' },
     { "decode",       0, NULL, 'd' },
     { "length",       1, NULL, 'l' },
+    { "restrict-uid", 1, NULL, 'u' },
+    { "restrict-gid", 1, NULL, 'g' },
     { "ttl",          1, NULL, 't' },
     { "socket",       1, NULL, 'S' },
     { "duration",     1, NULL, 'D' },
@@ -84,7 +88,7 @@ struct option opt_table[] = {
     {  NULL,          0, NULL,  0  }
 };
 
-const char * const opt_string = "hLVc:Cm:Mz:Zedl:t:S:D:N:T:W:";
+const char * const opt_string = "hLVc:Cm:Mz:Zedl:u:g:t:S:D:N:T:W:";
 
 
 /***************************************************************************** 
@@ -352,6 +356,8 @@ parse_cmdline (conf_t conf, int argc, char **argv)
     long int       l;
     unsigned long  u;
     int            multiplier;
+    struct passwd *pw_ptr;
+    struct group  *gr_ptr;
     munge_err_t    e;
 
     opterr = 0;                         /* suppress default getopt err msgs */
@@ -452,6 +458,48 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                         "Exceeded maximum number of %d bytes", INT_MAX);
                 }
                 conf->num_payload = (int) (l * multiplier);
+                break;
+            case 'u':
+                if ((pw_ptr = getpwnam (optarg)) != NULL) {
+                    i = pw_ptr->pw_uid;
+                }
+                else {
+                    l = strtol (optarg, &p, 10);
+                    if ((optarg == p) || (*p != '\0')
+                            || (l < 0) || (l > INT_MAX)
+                            || ((l == LONG_MAX) && (errno == ERANGE))) {
+                        log_err (EMUNGE_SNAFU, LOG_ERR,
+                            "Unrecognized user \"%s\"", optarg);
+                    }
+                    i = (int) l;
+                }
+                e = munge_ctx_set (conf->ctx, MUNGE_OPT_UID_RESTRICTION, i);
+                if (e != EMUNGE_SUCCESS) {
+                    log_err (EMUNGE_SNAFU, LOG_ERR,
+                        "Unable to set uid restriction: %s",
+                        munge_ctx_strerror (conf->ctx));
+                }
+                break;
+            case 'g':
+                if ((gr_ptr = getgrnam (optarg)) != NULL) {
+                    i = gr_ptr->gr_gid;
+                }
+                else {
+                    l = strtol (optarg, &p, 10);
+                    if ((optarg == p) || (*p != '\0')
+                            || (l < 0) || (l > INT_MAX)
+                            || ((l == LONG_MAX) && (errno == ERANGE))) {
+                        log_err (EMUNGE_SNAFU, LOG_ERR,
+                            "Unrecognized group \"%s\"", optarg);
+                    }
+                    i = (int) l;
+                }
+                e = munge_ctx_set (conf->ctx, MUNGE_OPT_GID_RESTRICTION, i);
+                if (e != EMUNGE_SUCCESS) {
+                    log_err (EMUNGE_SNAFU, LOG_ERR,
+                        "Unable to set gid restriction: %s",
+                        munge_ctx_strerror (conf->ctx));
+                }
                 break;
             case 't':
                 l = strtol (optarg, &p, 10);
@@ -641,6 +689,12 @@ display_help (char *prog)
 
     printf ("  %*s %s\n", w, "-l, --length=INTEGER",
             "Specify payload length (in bytes)");
+
+    printf ("  %*s %s\n", w, "-u, --restrict-uid=UID",
+            "Restrict credential decoding to only this UID");
+
+    printf ("  %*s %s\n", w, "-g, --restrict-gid=GID",
+            "Restrict credential decoding to only this GID");
 
     printf ("  %*s %s\n", w, "-t, --ttl=INTEGER",
             "Specify time-to-live (in seconds; 0=default -1=max)");
