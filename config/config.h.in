@@ -124,6 +124,9 @@
    first (like Motorola and SPARC, unlike Intel and VAX). */
 #undef WORDS_BIGENDIAN
 
+/* Define to 1 if you are compiling multithreaded code. */
+#undef _REENTRANT
+
 /* Define to empty if `const' does not conform to ANSI C. */
 #undef const
 

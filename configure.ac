@@ -1,5 +1,5 @@
 ##*****************************************************************************
-## $Id: configure.ac,v 1.15 2004/03/11 21:17:04 dun Exp $
+## $Id: configure.ac,v 1.16 2004/03/12 20:16:36 dun Exp $
 ##*****************************************************************************
 ## Process this file with autoconf to produce a configure script.
 ##*****************************************************************************
@@ -36,6 +36,7 @@ AC_CONFIG_SRCDIR([src/libmunge/munge.h])
 AC_CANONICAL_TARGET
 X_AC_GPL_LICENSED
 X_AC_HUMOR
+X_AC_REENTRANT
 
 ##
 # Automake support.

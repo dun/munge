@@ -1,3 +1,8 @@
+2004-03-12  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* configure.ac, config/x_ac_reentrant.m4, src/munged/Makefile.am:
+	  Moved _REENTRANT to top-level "config.h".
+
 2004-03-11  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* config/x_ac_check_cond_lib.m4, config/x_ac_check_peercred.m4,
