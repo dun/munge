@@ -1,3 +1,8 @@
+2005-06-01  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* config/x_ac_check_ssl.m4: Fixed bug causing wrong ssl dir to be set.
+	* : Re-bootstrap'd with updated autotools jazz.
+
 2005-04-05  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* : Re-bootstrap'd with updated autotools-dev.

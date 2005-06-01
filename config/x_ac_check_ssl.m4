@@ -17,7 +17,7 @@
 
 AC_DEFUN([X_AC_CHECK_SSL], [
 
-  _x_ac_check_ssl_dirs="/usr /usr/local /usr/local/openssl /opt/openssl /opt/freeware"
+  _x_ac_check_ssl_dirs="/usr /usr/local /usr/local/openssl* /opt/openssl* /opt/freeware /opt/freeware/openssl*"
 
   AC_ARG_WITH(
     [ssl-dir],
@@ -36,12 +36,12 @@ AC_DEFUN([X_AC_CHECK_SSL], [
         test -f "$d/include/openssl/evp.h" || continue
         test -d "$d/lib" || continue
         _x_ac_check_ssl_libs_save="$LIBS"
-        LIBS="-lcrypto -L$d/lib $LIBS"
+        LIBS="-L$d/lib -lcrypto $LIBS"
         AC_LINK_IFELSE(
           AC_LANG_CALL([], RAND_status),
           AS_VAR_SET(x_ac_cv_check_ssl_dir, $d))
         LIBS="$_x_ac_check_ssl_libs_save"
-        test -n "$_x_ac_check_ssl_dir" && break
+        test -n "$x_ac_cv_check_ssl_dir" && break
       done
     ])
 

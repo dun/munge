@@ -3249,7 +3249,7 @@ fi
 
 
 
-  _x_ac_check_ssl_dirs="/usr /usr/local /usr/local/openssl /opt/openssl /opt/freeware"
+  _x_ac_check_ssl_dirs="/usr /usr/local /usr/local/openssl* /opt/openssl* /opt/freeware /opt/freeware/openssl*"
 
 
 # Check whether --with-ssl-dir or --without-ssl-dir was given.
@@ -3270,7 +3270,7 @@ else
         test -f "$d/include/openssl/evp.h" || continue
         test -d "$d/lib" || continue
         _x_ac_check_ssl_libs_save="$LIBS"
-        LIBS="-lcrypto -L$d/lib $LIBS"
+        LIBS="-L$d/lib -lcrypto $LIBS"
         cat >conftest.$ac_ext <<_ACEOF
 /* confdefs.h.  */
 _ACEOF
@@ -3323,7 +3323,7 @@ fi
 rm -f conftest.err conftest.$ac_objext \
       conftest$ac_exeext conftest.$ac_ext
         LIBS="$_x_ac_check_ssl_libs_save"
-        test -n "$_x_ac_check_ssl_dir" && break
+        test -n "$x_ac_cv_check_ssl_dir" && break
       done
 
 fi
