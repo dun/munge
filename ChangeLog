@@ -1,3 +1,8 @@
+2005-06-29  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* munge.spec: Created dynamic test for init.d & sysconfig %files.
+	* munge.spec: Set void version number -- build script will rewrite it.
+
 2005-06-01  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* config/x_ac_check_ssl.m4: Fixed bug causing wrong ssl dir to be set.

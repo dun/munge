@@ -1,7 +1,7 @@
 # $Id$
 
 Name:		munge
-Version:	0.4.1
+Version:	0
 Release:	1
 
 Summary:	Munge Uid 'N' Gid Emporium
@@ -46,6 +46,13 @@ rm -rf "$RPM_BUILD_ROOT"
 mkdir -p "$RPM_BUILD_ROOT"
 DESTDIR="$RPM_BUILD_ROOT" make install
 
+#Check for the following %files:
+#  %config(noreplace) %{_sysconfdir}/init.d/*
+#  %config(noreplace) %{_sysconfdir}/sysconfig/*
+ls -d "$RPM_BUILD_ROOT"/%{_sysconfdir}/init.d/* \
+  "$RPM_BUILD_ROOT"/%{_sysconfdir}/sysconfig/* 2>/dev/null \
+| perl -pe "s#^$RPM_BUILD_ROOT/#%config(noreplace) #" | sort >munge-files-aux
+
 %clean
 rm -rf "$RPM_BUILD_ROOT"
 
@@ -71,7 +78,7 @@ fi
 %postun libs
 /sbin/ldconfig %{_libdir}
 
-%files
+%files -f munge-files-aux
 %defattr(-,root,root,0755)
 %doc AUTHORS
 %doc BUGS
@@ -86,8 +93,6 @@ fi
 %doc README
 %doc TODO
 %doc doc/*
-%config(noreplace) %{_sysconfdir}/init.d/*
-%config(noreplace) %{_sysconfdir}/sysconfig/*
 %{_bindir}/*
 %{_sbindir}/*
 %{_mandir}/*[^3]/*
