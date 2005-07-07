@@ -1,3 +1,20 @@
+2005-07-06  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* META: Tweaked formatting.  Replaced Package with Name.
+	* src/libcommon/munge.7.in, src/libmunge/munge.3.in,
+	  src/libmunge/munge_ctx.3.in, src/libmunge/munge_enum.3.in,
+	  src/munge/munge.1.in, src/munge/remunge.1.in,
+	  src/munge/unmunge.1.in, src/munged/munged.8.in:
+	  Updated copyright.  Added META_DATE and META_ALIAS.
+	* src/munge/munge.c, src/munge/remunge.c, src/munge/unmunge.c,
+	  src/munged/conf.c, src/munged/munged.c: Invoked display_version().
+	* src/libcommon/version.c, src/libcommon/version.h,
+	  src/libcommon/Makefile.am: Added.  Created display_version().
+	* src/libcommon/license.c, src/libcommon/license.h: Updated copyright.
+	* src/libmunge/Makefile.am: Prefixed meta LT vars with "META_".
+	* config/x_ac_meta.m4: Revamped.  Prefixed meta vars with "META_".
+	  Replaced PACKAGE with META_NAME.  Added META_ALIAS.
+
 2005-06-29  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* munge.spec: Created dynamic test for init.d & sysconfig %files.

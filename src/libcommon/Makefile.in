@@ -61,7 +61,7 @@ CONFIG_CLEAN_FILES = munge.7
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 libcommon_la_LIBADD =
 am_libcommon_la_OBJECTS = fd.lo license.lo log.lo m_msg.lo posignal.lo \
-	str.lo
+	str.lo version.lo
 libcommon_la_OBJECTS = $(am_libcommon_la_OBJECTS)
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)/config
 depcomp = $(SHELL) $(top_srcdir)/config/depcomp
@@ -88,7 +88,6 @@ AMDEP_FALSE = @AMDEP_FALSE@
 AMDEP_TRUE = @AMDEP_TRUE@
 AMTAR = @AMTAR@
 AR = @AR@
-AUTHOR = @AUTHOR@
 AUTOCONF = @AUTOCONF@
 AUTOHEADER = @AUTOHEADER@
 AUTOMAKE = @AUTOMAKE@
@@ -103,7 +102,6 @@ CXXCPP = @CXXCPP@
 CXXDEPMODE = @CXXDEPMODE@
 CXXFLAGS = @CXXFLAGS@
 CYGPATH_W = @CYGPATH_W@
-DATE = @DATE@
 DEFS = @DEFS@
 DEPDIR = @DEPDIR@
 ECHO = @ECHO@
@@ -129,13 +127,19 @@ LIBTOOL = @LIBTOOL@
 LIBZ = @LIBZ@
 LN_S = @LN_S@
 LTLIBOBJS = @LTLIBOBJS@
-LT_AGE = @LT_AGE@
-LT_CURRENT = @LT_CURRENT@
-LT_REVISION = @LT_REVISION@
 MAINT = @MAINT@
 MAINTAINER_MODE_FALSE = @MAINTAINER_MODE_FALSE@
 MAINTAINER_MODE_TRUE = @MAINTAINER_MODE_TRUE@
 MAKEINFO = @MAKEINFO@
+META_ALIAS = @META_ALIAS@
+META_AUTHOR = @META_AUTHOR@
+META_DATE = @META_DATE@
+META_LT_AGE = @META_LT_AGE@
+META_LT_CURRENT = @META_LT_CURRENT@
+META_LT_REVISION = @META_LT_REVISION@
+META_NAME = @META_NAME@
+META_RELEASE = @META_RELEASE@
+META_VERSION = @META_VERSION@
 OBJEXT = @OBJEXT@
 PACKAGE = @PACKAGE@
 PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
@@ -213,7 +217,9 @@ libcommon_la_SOURCES = \
 	posignal.c \
 	posignal.h \
 	str.c \
-	str.h
+	str.h \
+	version.c \
+	version.h
 
 man_MANS = \
 	munge.7
@@ -277,6 +283,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/m_msg.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/posignal.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/str.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/version.Plo@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	if $(COMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \

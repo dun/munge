@@ -4,7 +4,7 @@
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
  *
- *  Copyright (C) 2003-2004 The Regents of the University of California.
+ *  Copyright (C) 2003-2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
  *  Written by Chris Dunlap <cdunlap@llnl.gov>.
  *  UCRL-CODE-155910.
@@ -42,7 +42,9 @@
 #include <unistd.h>
 #include <munge.h>
 #include "common.h"
+#include "license.h"
 #include "read.h"
+#include "version.h"
 
 
 /***************************************************************************** 
@@ -251,7 +253,7 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                 exit (EMUNGE_SUCCESS);
                 break;
             case 'V':
-                printf ("%s-%s\n", PACKAGE, VERSION);
+                display_version ();
                 exit (EMUNGE_SUCCESS);
                 break;
             case 'n':

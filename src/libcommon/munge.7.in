@@ -1,6 +1,6 @@
 .\" $Id$
 
-.TH MUNGE 7 "@DATE@" "@PACKAGE@-@VERSION@" "Munge Uid 'N' Gid Emporium"
+.TH MUNGE 7 "@META_DATE@" "@META_ALIAS@" "Munge Uid 'N' Gid Emporium"
 
 .SH NAME
 munge \- Munge Uid 'N' Gid Emporium
@@ -36,7 +36,7 @@ base64 encoded to allow it to be transmitted over virtually any transport.
 Chris Dunlap <cdunlap@llnl.gov>
 
 .SH COPYRIGHT
-Copyright (C) 2003-2004 The Regents of the University of California.
+Copyright (C) 2003-2005 The Regents of the University of California.
 Produced at Lawrence Livermore National Laboratory.  UCRL-CODE-155910.
 
 MUNGE is free software; you can redistribute it and/or modify it under the

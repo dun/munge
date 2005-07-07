@@ -14,61 +14,90 @@
 AC_DEFUN([X_AC_META], [
   AC_MSG_CHECKING([metadata])
 
+  META="$srcdir/META"
   _x_ac_meta_got_file=no
-  if test -f "$srcdir/META"; then
+  if test -f "$META"; then
     _x_ac_meta_got_file=yes
 
-    PACKAGE="`perl -ne \
-      'print,exit if s/^\s*(?:NAME|PACKAGE):\s*(\S+).*/\1/i' $srcdir/META`"
-    AC_DEFINE_UNQUOTED([PACKAGE], ["$PACKAGE"],
-      [Define the package name.]
-    )
-    AC_SUBST([PACKAGE])
+    META_NAME="`perl -ne \
+      'print,exit if s/^\s*(?:NAME|PROJECT|PACKAGE):\s*(\S+).*/\1/i' $META`"
+    if test -n "$META_NAME"; then
+      AC_DEFINE_UNQUOTED([META_NAME], ["$META_NAME"],
+        [Define the project name.]
+      )
+      AC_SUBST([META_NAME])
+    fi
 
-    VERSION="`perl -ne \
-      'print,exit if s/^\s*VERSION:\s*(\S+).*/\1/i' $srcdir/META`"
-    AC_DEFINE_UNQUOTED([VERSION], ["$VERSION"],
-      [Define the package version.]
-    )
-    AC_SUBST([VERSION])
+    META_VERSION="`perl -ne \
+      'print,exit if s/^\s*VERSION:\s*(\S+).*/\1/i' $META`"
+    if test -n "$META_VERSION"; then
+      AC_DEFINE_UNQUOTED([META_VERSION], ["$META_VERSION"],
+        [Define the project version.]
+      )
+      AC_SUBST([META_VERSION])
+    fi
 
-    DATE="`perl -ne \
-      'print,exit if s/^\s*DATE:\s*(\S+).*/\1/i' $srcdir/META`"
-    AC_DEFINE_UNQUOTED([DATE], ["$DATE"],
-      [Define the package release date.] 
-    )
-    AC_SUBST([DATE])
+    META_RELEASE="`perl -ne \
+      'print,exit if s/^\s*RELEASE:\s*(\S+).*/\1/i' $META`"
+    if test -n "$META_RELEASE"; then
+      AC_DEFINE_UNQUOTED([META_RELEASE], ["$META_RELEASE"],
+        [Define the project release.]
+      )
+      AC_SUBST([META_RELEASE])
+    fi
 
-    AUTHOR="`perl -ne \
-      'print,exit if s/^\s*AUTHOR:\s*(\S+).*/\1/i' $srcdir/META`"
-    AC_DEFINE_UNQUOTED([AUTHOR], ["$AUTHOR"],
-      [Define the package author.]
-    )
-    AC_SUBST([AUTHOR])
+    if test -n "$META_NAME" -a -n "$META_VERSION"; then
+        META_ALIAS="$META_NAME-$META_VERSION"
+        test -n "$META_RELEASE" && META_ALIAS="$META_ALIAS-$META_RELEASE"
+        AC_DEFINE_UNQUOTED([META_ALIAS], ["$META_ALIAS"],
+          [Define the project alias string (name-version-release).]
+        )
+        AC_SUBST([META_ALIAS])
+    fi
 
-    LT_CURRENT="`perl -ne \
-      'print,exit if s/^\s*LT_CURRENT:\s*(\S+).*/\1/i' $srcdir/META`"
-    test -z "$LT_CURRENT" && LT_CURRENT="0"
-    AC_DEFINE_UNQUOTED([LT_CURRENT], ["$LT_CURRENT"],
-      [Define the libtool library 'current' version information.]
-    )
-    AC_SUBST([LT_CURRENT])
+    META_DATE="`perl -ne \
+      'print,exit if s/^\s*DATE:\s*(\S+).*/\1/i' $META`"
+    if test -n "$META_DATE"; then
+      AC_DEFINE_UNQUOTED([META_DATE], ["$META_DATE"],
+        [Define the project release date.] 
+      )
+      AC_SUBST([META_DATE])
+    fi
 
-    LT_REVISION="`perl -ne \
-      'print,exit if s/^\s*LT_REVISION:\s*(\S+).*/\1/i' $srcdir/META`"
-    test -z "$LT_REVISION" && LT_REVISION="0"
-    AC_DEFINE_UNQUOTED([LT_REVISION], ["$LT_REVISION"],
-      [Define the libtool library 'revision' version information.]
-    )
-    AC_SUBST([LT_REVISION])
+    META_AUTHOR="`perl -ne \
+      'print,exit if s/^\s*AUTHOR:\s*(\S+).*/\1/i' $META`"
+    if test -n "$META_AUTHOR"; then
+      AC_DEFINE_UNQUOTED([META_AUTHOR], ["$META_AUTHOR"],
+        [Define the project author.]
+      )
+      AC_SUBST([META_AUTHOR])
+    fi
 
-    LT_AGE="`perl -ne \
-      'print,exit if s/^\s*LT_AGE:\s*(\S+).*/\1/i' $srcdir/META`"
-    test -z "$LT_AGE" && LT_AGE="0"
-    AC_DEFINE_UNQUOTED([LT_AGE], ["$LT_AGE"],
-      [Define the libtool library 'age' version information.]
-    )
-    AC_SUBST([LT_AGE])
+    META_LT_CURRENT="`perl -ne \
+      'print,exit if s/^\s*LT_CURRENT:\s*(\S+).*/\1/i' $META`"
+    META_LT_REVISION="`perl -ne \
+      'print,exit if s/^\s*LT_REVISION:\s*(\S+).*/\1/i' $META`"
+    META_LT_AGE="`perl -ne \
+      'print,exit if s/^\s*LT_AGE:\s*(\S+).*/\1/i' $META`"
+    if test -n "$META_LT_CURRENT" \
+         -o -n "$META_LT_REVISION" \
+         -o -n "$META_LT_AGE"; then
+      test -n "$META_LT_CURRENT" || META_LT_CURRENT="0"
+      test -n "$META_LT_REVISION" || META_LT_REVISION="0"
+      test -n "$META_LT_AGE" || META_LT_AGE="0"
+      AC_DEFINE_UNQUOTED([META_LT_CURRENT], ["$META_LT_CURRENT"],
+        [Define the libtool library 'current' version information.]
+      )
+      AC_DEFINE_UNQUOTED([META_LT_REVISION], ["$META_LT_REVISION"],
+        [Define the libtool library 'revision' version information.]
+      )
+      AC_DEFINE_UNQUOTED([META_LT_AGE], ["$META_LT_AGE"],
+        [Define the libtool library 'age' version information.]
+      )
+      AC_SUBST([META_LT_CURRENT])
+      AC_SUBST([META_LT_REVISION])
+      AC_SUBST([META_LT_AGE])
+    fi
   fi
 
   AC_MSG_RESULT([$_x_ac_meta_got_file])

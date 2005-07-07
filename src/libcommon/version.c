@@ -4,7 +4,7 @@
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
  *
- *  Copyright (C) 2003-2005 The Regents of the University of California.
+ *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
  *  Written by Chris Dunlap <cdunlap@llnl.gov>.
  *  UCRL-CODE-155910.
@@ -25,11 +25,21 @@
  *****************************************************************************/
 
 
-#ifndef MUNGE_LICENSE_H
-#define MUNGE_LICENSE_H
+#if HAVE_CONFIG_H
+#  include "config.h"
+#endif /* HAVE_CONFIG_H */
+
+#include <stdio.h>
+#include "version.h"
 
 
-void display_license (void);
-
-
-#endif /* !MUNGE_LICENSE_H */
+void
+display_version (void)
+{
+    printf ("%s", META_ALIAS);
+#ifdef META_DATE
+    printf (" (%s)", META_DATE);
+#endif /* META_DATE */
+    printf ("\n");
+    return;
+}

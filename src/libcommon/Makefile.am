@@ -27,7 +27,9 @@ libcommon_la_SOURCES = \
 	posignal.c \
 	posignal.h \
 	str.c \
-	str.h
+	str.h \
+	version.c \
+	version.h
 
 man_MANS = \
 	munge.7

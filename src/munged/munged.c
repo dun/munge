@@ -4,7 +4,7 @@
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
  *
- *  Copyright (C) 2003-2004 The Regents of the University of California.
+ *  Copyright (C) 2003-2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
  *  Written by Chris Dunlap <cdunlap@llnl.gov>.
  *  UCRL-CODE-155910.
@@ -55,6 +55,7 @@
 #include "random.h"
 #include "replay.h"
 #include "timer.h"
+#include "version.h"
 
 
 /*****************************************************************************
@@ -121,8 +122,8 @@ main (int argc, char *argv[])
     replay_init ();
     timer_init ();
 
-    log_msg (LOG_NOTICE, "Starting %s daemon %s (pid %d)",
-        PACKAGE, VERSION, (int) getpid ());
+    log_msg (LOG_NOTICE, "Starting %s daemon (pid %d)",
+        META_ALIAS, (int) getpid ());
 
     sock_create (conf);
     job_accept (conf);
@@ -135,8 +136,8 @@ main (int argc, char *argv[])
     random_fini (conf->seed_name);
     destroy_conf (conf);
 
-    log_msg (LOG_NOTICE, "Stopping %s daemon %s (pid %d)",
-        PACKAGE, VERSION, (int) getpid ());
+    log_msg (LOG_NOTICE, "Stopping %s daemon (pid %d)",
+        META_ALIAS, (int) getpid ());
 
     exit (EMUNGE_SUCCESS);
 }

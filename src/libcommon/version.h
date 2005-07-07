@@ -4,7 +4,7 @@
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
  *
- *  Copyright (C) 2003-2005 The Regents of the University of California.
+ *  Copyright (C) 2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
  *  Written by Chris Dunlap <cdunlap@llnl.gov>.
  *  UCRL-CODE-155910.
@@ -25,11 +25,11 @@
  *****************************************************************************/
 
 
-#ifndef MUNGE_LICENSE_H
-#define MUNGE_LICENSE_H
+#ifndef MUNGE_VERSION_H
+#define MUNGE_VERSION_H
 
 
-void display_license (void);
+void display_version (void);
 
 
-#endif /* !MUNGE_LICENSE_H */
+#endif /* !MUNGE_VERSION_H */

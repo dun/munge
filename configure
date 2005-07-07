@@ -464,7 +464,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS PACKAGE VERSION DATE AUTHOR LT_CURRENT LT_REVISION LT_AGE build build_cpu build_vendor build_os host host_cpu host_vendor host_os INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM mkdir_p AWK SET_MAKE am__leading_dot AMTAR am__tar am__untar MAINTAINER_MODE_TRUE MAINTAINER_MODE_FALSE MAINT CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CCDEPMODE am__fastdepCC_TRUE am__fastdepCC_FALSE EGREP LN_S ECHO AR ac_ct_AR RANLIB ac_ct_RANLIB CPP CXX CXXFLAGS ac_ct_CXX CXXDEPMODE am__fastdepCXX_TRUE am__fastdepCXX_FALSE CXXCPP F77 FFLAGS ac_ct_F77 LIBTOOL LIBPTHREAD LIBNSL LIBSOCKET LIBBZ2 LIBZ LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS META_NAME META_VERSION META_RELEASE META_ALIAS META_DATE META_AUTHOR META_LT_CURRENT META_LT_REVISION META_LT_AGE build build_cpu build_vendor build_os host host_cpu host_vendor host_os INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM mkdir_p AWK SET_MAKE am__leading_dot AMTAR am__tar am__untar MAINTAINER_MODE_TRUE MAINTAINER_MODE_FALSE MAINT CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CCDEPMODE am__fastdepCC_TRUE am__fastdepCC_FALSE EGREP LN_S ECHO AR ac_ct_AR RANLIB ac_ct_RANLIB CPP CXX CXXFLAGS ac_ct_CXX CXXDEPMODE am__fastdepCXX_TRUE am__fastdepCXX_FALSE CXXCPP F77 FFLAGS ac_ct_F77 LIBTOOL LIBPTHREAD LIBNSL LIBSOCKET LIBBZ2 LIBZ LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -1503,75 +1503,108 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
   echo "$as_me:$LINENO: checking metadata" >&5
 echo $ECHO_N "checking metadata... $ECHO_C" >&6
 
+  META="$srcdir/META"
   _x_ac_meta_got_file=no
-  if test -f "$srcdir/META"; then
+  if test -f "$META"; then
     _x_ac_meta_got_file=yes
 
-    PACKAGE="`perl -ne \
-      'print,exit if s/^\s*(?:NAME|PACKAGE):\s*(\S+).*/\1/i' $srcdir/META`"
+    META_NAME="`perl -ne \
+      'print,exit if s/^\s*(?:NAME|PROJECT|PACKAGE):\s*(\S+).*/\1/i' $META`"
+    if test -n "$META_NAME"; then
 
 cat >>confdefs.h <<_ACEOF
-#define PACKAGE "$PACKAGE"
+#define META_NAME "$META_NAME"
+_ACEOF
+
+
+    fi
+
+    META_VERSION="`perl -ne \
+      'print,exit if s/^\s*VERSION:\s*(\S+).*/\1/i' $META`"
+    if test -n "$META_VERSION"; then
+
+cat >>confdefs.h <<_ACEOF
+#define META_VERSION "$META_VERSION"
+_ACEOF
+
+
+    fi
+
+    META_RELEASE="`perl -ne \
+      'print,exit if s/^\s*RELEASE:\s*(\S+).*/\1/i' $META`"
+    if test -n "$META_RELEASE"; then
+
+cat >>confdefs.h <<_ACEOF
+#define META_RELEASE "$META_RELEASE"
+_ACEOF
+
+
+    fi
+
+    if test -n "$META_NAME" -a -n "$META_VERSION"; then
+        META_ALIAS="$META_NAME-$META_VERSION"
+        test -n "$META_RELEASE" && META_ALIAS="$META_ALIAS-$META_RELEASE"
+
+cat >>confdefs.h <<_ACEOF
+#define META_ALIAS "$META_ALIAS"
+_ACEOF
+
+
+    fi
+
+    META_DATE="`perl -ne \
+      'print,exit if s/^\s*DATE:\s*(\S+).*/\1/i' $META`"
+    if test -n "$META_DATE"; then
+
+cat >>confdefs.h <<_ACEOF
+#define META_DATE "$META_DATE"
+_ACEOF
+
+
+    fi
+
+    META_AUTHOR="`perl -ne \
+      'print,exit if s/^\s*AUTHOR:\s*(\S+).*/\1/i' $META`"
+    if test -n "$META_AUTHOR"; then
+
+cat >>confdefs.h <<_ACEOF
+#define META_AUTHOR "$META_AUTHOR"
+_ACEOF
+
+
+    fi
+
+    META_LT_CURRENT="`perl -ne \
+      'print,exit if s/^\s*LT_CURRENT:\s*(\S+).*/\1/i' $META`"
+    META_LT_REVISION="`perl -ne \
+      'print,exit if s/^\s*LT_REVISION:\s*(\S+).*/\1/i' $META`"
+    META_LT_AGE="`perl -ne \
+      'print,exit if s/^\s*LT_AGE:\s*(\S+).*/\1/i' $META`"
+    if test -n "$META_LT_CURRENT" \
+         -o -n "$META_LT_REVISION" \
+         -o -n "$META_LT_AGE"; then
+      test -n "$META_LT_CURRENT" || META_LT_CURRENT="0"
+      test -n "$META_LT_REVISION" || META_LT_REVISION="0"
+      test -n "$META_LT_AGE" || META_LT_AGE="0"
+
+cat >>confdefs.h <<_ACEOF
+#define META_LT_CURRENT "$META_LT_CURRENT"
+_ACEOF
+
+
+cat >>confdefs.h <<_ACEOF
+#define META_LT_REVISION "$META_LT_REVISION"
+_ACEOF
+
+
+cat >>confdefs.h <<_ACEOF
+#define META_LT_AGE "$META_LT_AGE"
 _ACEOF
 
 
 
-    VERSION="`perl -ne \
-      'print,exit if s/^\s*VERSION:\s*(\S+).*/\1/i' $srcdir/META`"
 
-cat >>confdefs.h <<_ACEOF
-#define VERSION "$VERSION"
-_ACEOF
-
-
-
-    DATE="`perl -ne \
-      'print,exit if s/^\s*DATE:\s*(\S+).*/\1/i' $srcdir/META`"
-
-cat >>confdefs.h <<_ACEOF
-#define DATE "$DATE"
-_ACEOF
-
-
-
-    AUTHOR="`perl -ne \
-      'print,exit if s/^\s*AUTHOR:\s*(\S+).*/\1/i' $srcdir/META`"
-
-cat >>confdefs.h <<_ACEOF
-#define AUTHOR "$AUTHOR"
-_ACEOF
-
-
-
-    LT_CURRENT="`perl -ne \
-      'print,exit if s/^\s*LT_CURRENT:\s*(\S+).*/\1/i' $srcdir/META`"
-    test -z "$LT_CURRENT" && LT_CURRENT="0"
-
-cat >>confdefs.h <<_ACEOF
-#define LT_CURRENT "$LT_CURRENT"
-_ACEOF
-
-
-
-    LT_REVISION="`perl -ne \
-      'print,exit if s/^\s*LT_REVISION:\s*(\S+).*/\1/i' $srcdir/META`"
-    test -z "$LT_REVISION" && LT_REVISION="0"
-
-cat >>confdefs.h <<_ACEOF
-#define LT_REVISION "$LT_REVISION"
-_ACEOF
-
-
-
-    LT_AGE="`perl -ne \
-      'print,exit if s/^\s*LT_AGE:\s*(\S+).*/\1/i' $srcdir/META`"
-    test -z "$LT_AGE" && LT_AGE="0"
-
-cat >>confdefs.h <<_ACEOF
-#define LT_AGE "$LT_AGE"
-_ACEOF
-
-
+    fi
   fi
 
   echo "$as_me:$LINENO: result: $_x_ac_meta_got_file" >&5
@@ -3886,7 +3919,7 @@ ia64-*-hpux*)
   ;;
 *-*-irix6*)
   # Find out which ABI we are using.
-  echo '#line 3889 "configure"' > conftest.$ac_ext
+  echo '#line 3922 "configure"' > conftest.$ac_ext
   if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -5450,7 +5483,7 @@ fi
 
 
 # Provide some information about the compiler.
-echo "$as_me:5453:" \
+echo "$as_me:5486:" \
      "checking for Fortran 77 compiler version" >&5
 ac_compiler=`set X $ac_compile; echo $2`
 { (eval echo "$as_me:$LINENO: \"$ac_compiler --version </dev/null >&5\"") >&5
@@ -6482,11 +6515,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:6485: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:6518: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:6489: \$? = $ac_status" >&5
+   echo "$as_me:6522: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings
@@ -6715,11 +6748,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:6718: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:6751: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:6722: \$? = $ac_status" >&5
+   echo "$as_me:6755: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings
@@ -6775,11 +6808,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:6778: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:6811: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:6782: \$? = $ac_status" >&5
+   echo "$as_me:6815: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -8963,7 +8996,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 8966 "configure"
+#line 8999 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -9061,7 +9094,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 9064 "configure"
+#line 9097 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -11238,11 +11271,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:11241: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:11274: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:11245: \$? = $ac_status" >&5
+   echo "$as_me:11278: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings
@@ -11298,11 +11331,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:11301: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:11334: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:11305: \$? = $ac_status" >&5
+   echo "$as_me:11338: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -12667,7 +12700,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 12670 "configure"
+#line 12703 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -12765,7 +12798,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 12768 "configure"
+#line 12801 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -13592,11 +13625,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:13595: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:13628: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:13599: \$? = $ac_status" >&5
+   echo "$as_me:13632: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings
@@ -13652,11 +13685,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:13655: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:13688: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:13659: \$? = $ac_status" >&5
+   echo "$as_me:13692: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -15697,11 +15730,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:15700: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:15733: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:15704: \$? = $ac_status" >&5
+   echo "$as_me:15737: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings
@@ -15930,11 +15963,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:15933: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:15966: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:15937: \$? = $ac_status" >&5
+   echo "$as_me:15970: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings
@@ -15990,11 +16023,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:15993: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:16026: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:15997: \$? = $ac_status" >&5
+   echo "$as_me:16030: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -18178,7 +18211,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 18181 "configure"
+#line 18214 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -18276,7 +18309,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 18279 "configure"
+#line 18312 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -22524,13 +22557,15 @@ s,@ECHO_C@,$ECHO_C,;t t
 s,@ECHO_N@,$ECHO_N,;t t
 s,@ECHO_T@,$ECHO_T,;t t
 s,@LIBS@,$LIBS,;t t
-s,@PACKAGE@,$PACKAGE,;t t
-s,@VERSION@,$VERSION,;t t
-s,@DATE@,$DATE,;t t
-s,@AUTHOR@,$AUTHOR,;t t
-s,@LT_CURRENT@,$LT_CURRENT,;t t
-s,@LT_REVISION@,$LT_REVISION,;t t
-s,@LT_AGE@,$LT_AGE,;t t
+s,@META_NAME@,$META_NAME,;t t
+s,@META_VERSION@,$META_VERSION,;t t
+s,@META_RELEASE@,$META_RELEASE,;t t
+s,@META_ALIAS@,$META_ALIAS,;t t
+s,@META_DATE@,$META_DATE,;t t
+s,@META_AUTHOR@,$META_AUTHOR,;t t
+s,@META_LT_CURRENT@,$META_LT_CURRENT,;t t
+s,@META_LT_REVISION@,$META_LT_REVISION,;t t
+s,@META_LT_AGE@,$META_LT_AGE,;t t
 s,@build@,$build,;t t
 s,@build_cpu@,$build_cpu,;t t
 s,@build_vendor@,$build_vendor,;t t
@@ -22543,6 +22578,8 @@ s,@INSTALL_PROGRAM@,$INSTALL_PROGRAM,;t t
 s,@INSTALL_SCRIPT@,$INSTALL_SCRIPT,;t t
 s,@INSTALL_DATA@,$INSTALL_DATA,;t t
 s,@CYGPATH_W@,$CYGPATH_W,;t t
+s,@PACKAGE@,$PACKAGE,;t t
+s,@VERSION@,$VERSION,;t t
 s,@ACLOCAL@,$ACLOCAL,;t t
 s,@AUTOCONF@,$AUTOCONF,;t t
 s,@AUTOMAKE@,$AUTOMAKE,;t t

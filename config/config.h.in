@@ -1,11 +1,5 @@
 /* config/config.h.in.  Generated from configure.ac by autoheader.  */
 
-/* Define the package author. */
-#undef AUTHOR
-
-/* Define the package release date. */
-#undef DATE
-
 /* Define to 1 if licensed under terms of the GNU General Public License. */
 #undef GPL_LICENSED
 
@@ -123,20 +117,35 @@
 /* Define the canonical host vendor type. */
 #undef HOST_VENDOR
 
+/* Define the project alias string (name-version-release). */
+#undef META_ALIAS
+
+/* Define the project author. */
+#undef META_AUTHOR
+
+/* Define the project release date. */
+#undef META_DATE
+
 /* Define the libtool library 'age' version information. */
-#undef LT_AGE
+#undef META_LT_AGE
 
 /* Define the libtool library 'current' version information. */
-#undef LT_CURRENT
+#undef META_LT_CURRENT
 
 /* Define the libtool library 'revision' version information. */
-#undef LT_REVISION
+#undef META_LT_REVISION
+
+/* Define the project name. */
+#undef META_NAME
+
+/* Define the project release. */
+#undef META_RELEASE
+
+/* Define the project version. */
+#undef META_VERSION
 
 /* Define to 1 if you are building a production release. */
 #undef NDEBUG
-
-/* Define the package name. */
-#undef PACKAGE
 
 /* Define to the address where bug reports for this package should be sent. */
 #undef PACKAGE_BUGREPORT
@@ -155,9 +164,6 @@
 
 /* Define to 1 if you have the ANSI C header files. */
 #undef STDC_HEADERS
-
-/* Define the package version. */
-#undef VERSION
 
 /* Define to 1 if your processor stores words with the most significant byte
    first (like Motorola and SPARC, unlike Intel and VAX). */

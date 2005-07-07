@@ -18,7 +18,7 @@ AM_CPPFLAGS = \
 
 libmunge_la_LDFLAGS = \
 	-export-symbols-regex "^munge_.*" \
-	-version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE)
+	-version-info $(META_LT_CURRENT):$(META_LT_REVISION):$(META_LT_AGE)
 
 libmunge_la_LIBADD = \
 	$(top_builddir)/src/libcommon/libcommon.la \
