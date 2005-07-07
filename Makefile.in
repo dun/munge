@@ -37,7 +37,6 @@ build_triplet = @build@
 host_triplet = @host@
 DIST_COMMON = README $(am__configure_deps) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(top_srcdir)/config/Make-inc.mk \
-	$(top_srcdir)/config/Make-rpm.mk \
 	$(top_srcdir)/config/config.h.in $(top_srcdir)/configure \
 	AUTHORS COPYING ChangeLog INSTALL NEWS TODO config/compile \
 	config/config.guess config/config.sub config/depcomp \
@@ -209,7 +208,7 @@ all: all-recursive
 .SUFFIXES:
 am--refresh:
 	@:
-$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(top_srcdir)/config/Make-rpm.mk $(top_srcdir)/config/Make-inc.mk $(am__configure_deps)
+$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(top_srcdir)/config/Make-inc.mk $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
 	    *$$dep*) \
@@ -639,80 +638,6 @@ uninstall-info: uninstall-info-recursive
 	mostlyclean-recursive pdf pdf-am ps ps-am tags tags-recursive \
 	uninstall uninstall-am uninstall-info-am
 
-
-tar rpm:
-	@proj=$(PACKAGE); if test -z "$$proj"; then \
-	  echo "ERROR: PACKAGE macro def is not defined." 1>&2; exit 1; fi; \
-	if test -z "$$tag"; then \
-	  if ! test -f META; then \
-	    echo "ERROR: Cannot find $$proj metadata in \"`pwd`/META\"." 1>&2;\
-	      exit 1; fi; \
-	  name=`perl -ne \
-	    'print,exit if s/^\s*(?:NAME|PACKAGE):\s*(\S*).*/\1/i' META`; \
-	  ver=`perl -ne 'print,exit if s/^\s*VERSION:\s*(\S*).*/\1/i' META`; \
-	  rel=`perl -ne 'print,exit if s/^\s*RELEASE:\s*(\S*).*/\1/i' META`; \
-	  test -z "$$rel" && pkg=$$name-$$ver || pkg=$$name-$$ver-$$rel; \
-	  tag=`echo $$pkg | sed 's/\./-/g'`; fi; \
-	tmp=$${TMPDIR-/tmp}/tmp-$$proj-$$$$; \
-	rm -rf $$tmp || exit 1; \
-	test -n "$(mkinstalldirs)" \
-	  && mkdir="$(mkinstalldirs)" || mkdir="mkdir -p"; \
-	if ! $$mkdir $$tmp >/dev/null; then \
-	  echo "ERROR: Cannot create \"$$tmp\" dir." 1>&2; exit 1; fi; \
-	test -f CVS/Root && cvs="cvs -d `cat CVS/Root`" || cvs="cvs"; \
-	echo "Fetching $$proj from CVS (tag=$$tag) ..."; \
-	(cd $$tmp; $$cvs -Q export -kv -r $$tag $$proj) || exit 1; \
-	meta=$$tmp/$$proj/META; \
-	if test ! -f "$$meta"; then \
-	  echo "ERROR: Cannot find $$proj metadata in CVS." 1>&2; exit 1; fi; \
-	name=`perl -ne \
-	  'print,exit if s/^\s*(?:NAME|PACKAGE):\s*(\S*).*/\1/i' $$meta`; \
-	if test "$$proj" != "$$name"; then \
-	  echo "ERROR: PACKAGE does not match metadata." 1>&2; exit 1; fi; \
-	ver=`perl -ne 'print,exit if s/^\s*VERSION:\s*(\S*).*/\1/i' $$meta`; \
-	rel=`perl -ne 'print,exit if s/^\s*RELEASE:\s*(\S*).*/\1/i' $$meta`; \
-	test "$$tag" = "HEAD" && rel="`date +%y%m%d%H%M`"; \
-	if test -n "$$rel"; then pkg=$$proj-$$ver-$$rel; \
-	  else pkg=$$proj-$$ver; test -n "$$rev" -a "$$tag" = "HEAD" \
-	    && rel="$$rev" || rel="1"; fi; \
-	mv "$$tmp/$$proj" "$$tmp/$$proj-$$ver" || exit 1; \
-	$(MAKE) -s $@-internal mkdir="$$mkdir" tmp="$$tmp" \
-	  proj="$$proj" pkg="$$pkg" ver="$$ver" rel="$$rel" \
-	    && rm -rf $$tmp
-
-tar-internal:
-	@echo "Creating $$pkg.tar.gz ..."; \
-	rm -f $$pkg.tar.gz || exit 1; \
-	(cd $$tmp; tar -cf - $$proj-$$ver) | gzip -c9 >$$tmp/$$pkg.tar.gz; \
-	cp -p $$tmp/$$pkg.tar.gz $$pkg.tar.gz || exit 1
-
-rpm-internal: tar-internal
-	@echo "Creating $$pkg*rpm ..."; \
-	for d in BUILD RPMS SOURCES SPECS SRPMS TMP; do \
-	  if ! $$mkdir $$tmp/$$d >/dev/null; then \
-	    echo "ERROR: Cannot create \"$$tmp/$$d\" dir." 1>&2; exit 1; fi; \
-	      done; \
-	mv $$tmp/$$pkg.tar.gz $$tmp/SOURCES/ || exit 1; \
-	test -f $$tmp/$$proj-$$ver/$$proj.spec.in \
-	  && spec=$$tmp/$$proj-$$ver/$$proj.spec.in \
-	  || spec=$$tmp/$$proj-$$ver/$$proj.spec; \
-	if ! test -f $$spec; then \
-	  echo "ERROR: Cannot find $$proj spec file in CVS." 1>&2; exit 1; fi;\
-	sed -e "s/^\([ 	]*Name:\).*/\1 $$proj/i" \
-	    -e "s/^\([ 	]*Version:\).*/\1 $$ver/i" \
-	    -e "s/^\([ 	]*Release:\).*/\1 $$rel/i" \
-	    -e "s/^\([ 	]*Source0\?:\).*/\1 $$pkg.tar.gz/i" \
-	    <$$spec >$$tmp/SPECS/$$proj.spec; \
-	if ! test -s $$tmp/SPECS/$$proj.spec; then \
-	  echo "ERROR: Cannot create $$proj.spec." 1>&2; exit 1; fi; \
-	rpmbuild --showrc | egrep "[[:space:]]_(gpg|pgp)_name[[:space:]]" \
-	  >/dev/null && sign="--sign"; \
-	if ! rpmbuild -ba --define "_tmppath $$tmp/TMP" \
-	  --define "_topdir $$tmp" $$sign $$tmp/SPECS/$$proj.spec \
-	  >$$tmp/rpm.log 2>&1; then \
-	    cat $$tmp/rpm.log; exit 1; fi; \
-	cp -p $$tmp/RPMS/*/$$proj-*.rpm $$tmp/SRPMS/$$proj-*.src.rpm . \
-	  || exit 1
 
 # Dependencies to ensure libraries get rebuilt.
 #

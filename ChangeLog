@@ -1,3 +1,7 @@
+2005-07-07  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* Makefile.am, config/Make-rpm.mk: Removed deprecated Make-rpm.
+
 2005-07-06  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* META: Tweaked formatting.  Replaced Package with Name.
