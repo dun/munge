@@ -1,12 +1,12 @@
-- libcrypto (openssl) license is incompatible with gpl
+- libcrypto (openssl) license is incompatible with gpl; replace with libgcrypt
 - munged does not terminate on sigint or sigterm on many platforms
 - munged needs support for a configuration file; configuration is currently
   set by src/libcommon/munge_defs.h at compile-time
 - munged does not ensure sensitive files & dirs are permissioned properly
+- 32b libmunge does not function with 64b munged (multilib)
 - munged replay state is not saved across sessions, thereby allowing
   unexpired creds to be replayed after the daemon has been restarted
 - credentials cannot be restricted based on where they can be decoded
   (eg, hostname/hostrange/regex or ip-addr/netmask)
 - munged hangs if client does not respond to auth req (auth via fd passing)
 - client hangs if auth-pipe-dir is permissioned wrong (auth via fd passing)
-- 32b libmunge does not function with 64b munged (multilib)
