@@ -1,5 +1,8 @@
 2005-07-07  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/etc/munge.init: Fixed 'start' behavior under RedHat so daemon is
+	  not started if it is already running (Thanx to Christopher Holmes).
+
 	* Makefile.am, config/Make-rpm.mk: Removed deprecated Make-rpm.
 
 2005-07-06  Chris Dunlap  <cdunlap@llnl.gov>

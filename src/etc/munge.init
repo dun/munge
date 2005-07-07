@@ -81,13 +81,12 @@ service_start ()
       [ $rc -eq 0 ] && log_success_msg || log_failure_msg
       ;;
     REDHAT)
-      #
-      # FIXME: Since munged isn't using a pid file (ie, /var/run/base.pid),
-      #        RH isn't able to check if another instance of the daemon is
-      #        already running.
-      #
-      daemon ${DAEMON} ${OPTIONS} --force
+      status ${DAEMON} >/dev/null
       rc=$?
+      if [ $rc -ne 0 ]; then
+        daemon ${DAEMON} ${OPTIONS} --force
+        rc=$?
+      fi
       echo
       [ $rc -eq 0 ] && touch ${RH_SUBSYS} 2>/dev/null
       ;;
