@@ -1,3 +1,4 @@
+- libmunge is incorrectly linked on aix due to what I think is a libtool bug
 - libcrypto (openssl) license is incompatible with gpl; replace with libgcrypt
 - munged does not terminate on sigint or sigterm on many platforms
 - munged needs support for a configuration file; configuration is currently
