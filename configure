@@ -1510,7 +1510,7 @@ echo $ECHO_N "checking metadata... $ECHO_C" >&6
 
     META_NAME=`perl -n\
     -e "BEGIN { \\$key=shift @ARGV; }"\
-    -e "next unless s/^\s*\\$key://i;"\
+    -e "next unless s/^\s*\\$key[:=]//i;"\
     -e "s/^((?:[^'\"#]*(?:(['\"])[^\2]*\2)*)*)#.*/\\$1/;"\
     -e "s/^\s+//;"\
     -e "s/\s+$//;"\
@@ -1529,7 +1529,7 @@ _ACEOF
 
     META_VERSION=`perl -n\
     -e "BEGIN { \\$key=shift @ARGV; }"\
-    -e "next unless s/^\s*\\$key://i;"\
+    -e "next unless s/^\s*\\$key[:=]//i;"\
     -e "s/^((?:[^'\"#]*(?:(['\"])[^\2]*\2)*)*)#.*/\\$1/;"\
     -e "s/^\s+//;"\
     -e "s/\s+$//;"\
@@ -1548,7 +1548,7 @@ _ACEOF
 
     META_RELEASE=`perl -n\
     -e "BEGIN { \\$key=shift @ARGV; }"\
-    -e "next unless s/^\s*\\$key://i;"\
+    -e "next unless s/^\s*\\$key[:=]//i;"\
     -e "s/^((?:[^'\"#]*(?:(['\"])[^\2]*\2)*)*)#.*/\\$1/;"\
     -e "s/^\s+//;"\
     -e "s/\s+$//;"\
@@ -1578,7 +1578,7 @@ _ACEOF
 
     META_DATE=`perl -n\
     -e "BEGIN { \\$key=shift @ARGV; }"\
-    -e "next unless s/^\s*\\$key://i;"\
+    -e "next unless s/^\s*\\$key[:=]//i;"\
     -e "s/^((?:[^'\"#]*(?:(['\"])[^\2]*\2)*)*)#.*/\\$1/;"\
     -e "s/^\s+//;"\
     -e "s/\s+$//;"\
@@ -1597,7 +1597,7 @@ _ACEOF
 
     META_AUTHOR=`perl -n\
     -e "BEGIN { \\$key=shift @ARGV; }"\
-    -e "next unless s/^\s*\\$key://i;"\
+    -e "next unless s/^\s*\\$key[:=]//i;"\
     -e "s/^((?:[^'\"#]*(?:(['\"])[^\2]*\2)*)*)#.*/\\$1/;"\
     -e "s/^\s+//;"\
     -e "s/\s+$//;"\
@@ -1616,7 +1616,7 @@ _ACEOF
 
     META_LT_CURRENT=`perl -n\
     -e "BEGIN { \\$key=shift @ARGV; }"\
-    -e "next unless s/^\s*\\$key://i;"\
+    -e "next unless s/^\s*\\$key[:=]//i;"\
     -e "s/^((?:[^'\"#]*(?:(['\"])[^\2]*\2)*)*)#.*/\\$1/;"\
     -e "s/^\s+//;"\
     -e "s/\s+$//;"\
@@ -1626,7 +1626,7 @@ _ACEOF
     'LT_CURRENT' $META`;
     META_LT_REVISION=`perl -n\
     -e "BEGIN { \\$key=shift @ARGV; }"\
-    -e "next unless s/^\s*\\$key://i;"\
+    -e "next unless s/^\s*\\$key[:=]//i;"\
     -e "s/^((?:[^'\"#]*(?:(['\"])[^\2]*\2)*)*)#.*/\\$1/;"\
     -e "s/^\s+//;"\
     -e "s/\s+$//;"\
@@ -1636,7 +1636,7 @@ _ACEOF
     'LT_REVISION' $META`;
     META_LT_AGE=`perl -n\
     -e "BEGIN { \\$key=shift @ARGV; }"\
-    -e "next unless s/^\s*\\$key://i;"\
+    -e "next unless s/^\s*\\$key[:=]//i;"\
     -e "s/^((?:[^'\"#]*(?:(['\"])[^\2]*\2)*)*)#.*/\\$1/;"\
     -e "s/^\s+//;"\
     -e "s/\s+$//;"\

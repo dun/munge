@@ -8,7 +8,7 @@
 #    X_AC_META
 #
 #  DESCRIPTION:
-#    Read metadata tags from the META file.
+#    Read metadata from the META file.
 ##*****************************************************************************
 
 AC_DEFUN([X_AC_META], [
@@ -99,7 +99,7 @@ AC_DEFUN([X_AC_META], [
 AC_DEFUN([_X_AC_META_GETVAL], 
   [`perl -n\
     -e "BEGIN { \\$key=shift @ARGV; }"\
-    -e "next unless s/^\s*\\$key://i;"\
+    -e "next unless s/^\s*\\$key@<:@:=@:>@//i;"\
     -e "s/^((?:@<:@^'\"#@:>@*(?:(@<:@'\"@:>@)@<:@^\2@:>@*\2)*)*)#.*/\\@S|@1/;"\
     -e "s/^\s+//;"\
     -e "s/\s+$//;"\
