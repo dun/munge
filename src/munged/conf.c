@@ -307,6 +307,19 @@ display_help (char *prog)
             "Specify local domain socket for daemon");
 
     printf ("\n");
+
+    /* Begin deprecated cmdline opts */
+    printf ("  %*s %s\n", w, "--auth-pipe-dir=DIR",
+            "Specify alternate auth-pipe directory");
+
+    printf ("  %*s %s\n", w, "--key-file=FILE",
+            "Specify alternate secret key file");
+
+    printf ("  %*s %s\n", w, "--num-threads=INT",
+            "Specify number of threads to spawn");
+    /* End deprecated cmdline opts */
+
+    printf ("\n");
     return;
 }
 
