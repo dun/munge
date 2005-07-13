@@ -96,7 +96,7 @@ fi
 %doc README
 %doc TODO
 %doc doc/*
-%dir %attr(0700,root,root) /etc/munge
+%dir %attr(0700,root,root) %config /etc/munge
 %dir %attr(0755,root,root) /var/lib/munge
 %{_bindir}/*
 %{_sbindir}/*
