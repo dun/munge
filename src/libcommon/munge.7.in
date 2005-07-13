@@ -33,7 +33,7 @@ is encoded in a platform-independent manner.  And the credential itself is
 base64 encoded to allow it to be transmitted over virtually any transport.
 
 .SH AUTHOR
-Chris Dunlap <cdunlap@llnl.gov>
+@META_AUTHOR@
 
 .SH COPYRIGHT
 Copyright (C) 2003-2005 The Regents of the University of California.

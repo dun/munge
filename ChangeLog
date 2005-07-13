@@ -1,5 +1,11 @@
 2005-07-12  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* META: Updated Author tag.
+	* src/libcommon/munge.7.in, src/libmunge/munge.3.in,
+	  src/libmunge/munge_ctx.3.in, src/libmunge/munge_enum.3.in,
+	  src/munge/munge.1.in, src/munge/remunge.1.in,
+	  src/munge/unmunge.1.in, src/munged/munged.8.in: Added META_AUTHOR.
+
 	* config/x_ac_meta.m4: Added _X_AC_META_GETVAL to parse META file.
 
 2005-07-07  Chris Dunlap  <cdunlap@llnl.gov>

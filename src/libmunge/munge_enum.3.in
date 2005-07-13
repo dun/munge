@@ -86,7 +86,7 @@ main (int argc, char *argv[])
 .fi
 
 .SH AUTHOR
-Chris Dunlap <cdunlap@llnl.gov>
+@META_AUTHOR@
 
 .SH COPYRIGHT
 Copyright (C) 2003-2005 The Regents of the University of California.

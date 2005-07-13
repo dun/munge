@@ -81,7 +81,7 @@ particular host more than once, nothing prevents it from being decoded on
 another host within the security realm before it expires.
 
 .SH AUTHOR
-Chris Dunlap <cdunlap@llnl.gov>
+@META_AUTHOR@
 
 .SH COPYRIGHT
 Copyright (C) 2003-2005 The Regents of the University of California.

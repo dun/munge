@@ -169,7 +169,7 @@ the caller is responsible for freeing.  Failure to do so will result in a
 memory leak.
 
 .SH AUTHOR
-Chris Dunlap <cdunlap@llnl.gov>
+@META_AUTHOR@
 
 .SH COPYRIGHT
 Copyright (C) 2003-2005 The Regents of the University of California.
