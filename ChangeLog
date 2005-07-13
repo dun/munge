@@ -1,5 +1,9 @@
 2005-07-13  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/libcommon/munge_defs.h: Updated values for MUNGE_SOCKET_NAME,
+	  MUNGE_AUTH_PIPE_DIR, MUNGED_LOGFILE, MUNGED_RANDOM_SEED, and
+	  MUNGED_SECRET_KEY to comply with the Filesystem Hierarchy Standard.
+
 	* src/munged/conf.c(display_help): Documented deprecated cmdline opts.
 
 	* src/libcommon/munge_defs.h:

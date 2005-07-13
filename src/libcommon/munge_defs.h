@@ -4,7 +4,7 @@
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
  *
- *  Copyright (C) 2002-2004 The Regents of the University of California.
+ *  Copyright (C) 2002-2005 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
  *  Written by Chris Dunlap <cdunlap@llnl.gov>.
  *  UCRL-CODE-155910.
@@ -109,7 +109,7 @@
 
 /*  String specifying the unix domain socket pathname for client-server comms.
  */
-#define MUNGE_SOCKET_NAME               "/tmp/.munge-sock"
+#define MUNGE_SOCKET_NAME               "/var/run/munge.socket"
 
 /*  Number of attempts a client makes connecting to the server before failing.
  */
@@ -138,7 +138,7 @@
 /*  The directory in which the pipe used to authenticate a particular client
  *    via fd-passing will be created.
  */
-#define MUNGE_AUTH_PIPE_DIR             "/tmp"
+#define MUNGE_AUTH_PIPE_DIR             "/var/lib/munge"
 
 /*  The amount of entropy (in bytes) to place in the filename of the pipe used
  *    to authenticate a particular client via fd-passing.
@@ -146,23 +146,19 @@
 #define MUNGE_AUTH_PIPE_RND_BYTES       16
 
 /*  String specifying the pathname of the daemon's logfile.
- *  FIXME: Temporary kludge until configuration file support is added.
  */
-#define MUNGED_LOGFILE                  "/tmp/.munge-log"
+#define MUNGED_LOGFILE                  "/var/log/munge.log"
 
 /*  String specifying the pathname of the random seed file.
- *  FIXME: Temporary kludge until configuration file support is added.
  */
-#define MUNGED_RANDOM_SEED              "/tmp/.munge-seed"
+#define MUNGED_RANDOM_SEED              "/var/lib/munge/munge.seed"
 
 /*  String specifying the pathname of the secret key file.
- *  FIXME: Temporary kludge until configuration file support is added.
  */
-#define MUNGED_SECRET_KEY               "/etc/ssh/ssh_host_key"
+#define MUNGED_SECRET_KEY               "/etc/munge/munge.key"
 
 /*  String specifying the pathname of the random number source device to use
  *    in case the MUNGED_RANDOM_SEED file contains insufficient entropy.
- *  FIXME: Default should be for "/dev/random".
  */
 #define RANDOM_SEED_DEFAULT             "/dev/urandom"
 
