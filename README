@@ -28,11 +28,20 @@ is base64 encoded to allow it to be transmitted over virtually any transport.
 
 Getting started:
 
-  1. Edit src/libcommon/munge_defs.h.  The defaults for MUNGED_SECRET_KEY,
-     MUNGED_RANDOM_SEED, and MUNGED_LOGFILE may not be to your liking.
-     Define them as you see fit.  Configuration file support is forthcoming.
+  1. Edit src/libcommon/munge_defs.h.  Configuration file support is planned
+     for future development.
 
-  2. ./configure; make; make install -- you know the drill.
+     The default value for MUNGED_SECRET_KEY is "/etc/munge/munge.key".
+     The "/etc/munge/" directory will need to be created, and the "munge.key"
+     file will need to be generated and distributed as detailed below (#3).
+
+     The default value for MUNGED_RANDOM_SEED is "/var/lib/munge/munge.seed".
+     The "/var/lib/munge/" directory will need to be created.
+     The "munge.seed" file will be automatically generated.
+
+     The default value for MUNGED_LOGFILE is "/var/log/munge.log".
+
+  2. ./configure && make && make install.
 
   3. Create a secret key.  The format of the key doesn't matter.
 

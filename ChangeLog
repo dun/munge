@@ -1,5 +1,7 @@
 2005-07-13  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* README: Updated info regarding defaults in munge_defs.h.
+
 	* src/libcommon/munge_defs.h: Updated values for MUNGE_SOCKET_NAME,
 	  MUNGE_AUTH_PIPE_DIR, MUNGED_LOGFILE, MUNGED_RANDOM_SEED, and
 	  MUNGED_SECRET_KEY to comply with the Filesystem Hierarchy Standard.
