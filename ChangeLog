@@ -1,3 +1,7 @@
+2005-07-12  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* config/x_ac_meta.m4: Added _X_AC_META_GETVAL to parse META file.
+
 2005-07-07  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/etc/munge.init: Fixed 'start' behavior under RedHat so daemon is

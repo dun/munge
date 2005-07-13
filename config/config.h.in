@@ -117,7 +117,7 @@
 /* Define the canonical host vendor type. */
 #undef HOST_VENDOR
 
-/* Define the project alias string (name-version-release). */
+/* Define the project alias string (name-ver or name-ver-rel). */
 #undef META_ALIAS
 
 /* Define the project author. */
