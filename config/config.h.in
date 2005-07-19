@@ -117,6 +117,10 @@
 /* Define the canonical host vendor type. */
 #undef HOST_VENDOR
 
+/* Define to the sub-directory in which libtool stores uninstalled libraries.
+   */
+#undef LT_OBJDIR
+
 /* Define the project alias string (name-ver or name-ver-rel). */
 #undef META_ALIAS
 

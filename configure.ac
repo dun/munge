@@ -29,7 +29,7 @@
 ##
 # Prologue.
 ##
-AC_INIT([munge])
+AC_INIT
 X_AC_META
 AC_CONFIG_AUX_DIR([config])
 AC_CONFIG_SRCDIR([src/libmunge/munge.h])
@@ -49,7 +49,7 @@ AM_MAINTAINER_MODE
 ##
 AC_PROG_CC
 X_AC_CHECK_SSL
-AC_PROG_LIBTOOL
+LT_INIT
 AC_PROG_MAKE_SET
 X_AC_DEBUG
 

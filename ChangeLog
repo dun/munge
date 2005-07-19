@@ -1,5 +1,20 @@
 2005-07-19  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* config/argz.m4, config/libtool.m4, config/ltoptions.m4,
+	  config/ltsugar.m4, config/ltversion.m4:
+	  Added as a result of upgrading to the cvs HEAD release of libtool.
+	* aclocal.m4, config/config.h.in, config/ltmain.sh, configure:
+	  Updated as a result of upgrading to the cvs HEAD release of libtool.
+	* configure.ac: Replaced AC_PROG_LIBTOOL with LT_INIT for new libtool.
+	* : Re-bootstrap'd with the cvs HEAD release of libtool version 2.1a,
+	  GNU libtool 1.1984 2005/07/11 12:11:25, in order to fix a bug under
+	  AIX where the convenience libs were not being added to libmunge;
+	  this appears to be the result of libtool's $whole_archive_flag_spec
+	  being set to ' ' instead of ''.  This also fixes a bug in the
+	  libtool --mode=link cmd for libmunge that failed to properly expand
+	  $allow_undefined_flag, thereby causing $archive_expsym_cmds to
+	  contain "${wl}-berok" after being eval'd.
+
 	* bootstrap: Removed PATH (in order to use a non-standard libtool).
 
 	* Makefile.am: Replaced PACKAGE with META_NAME.
@@ -1049,8 +1064,8 @@
 
 	* src/libmunge/munge.h, src/libmunge/ctx.c: Tweaked MUNGE_OPT_* enums.
 
-	* src/libmunge/Makefile.am, src/libmunge/Makefile.in,
-	  src/libmunge/strings.c: Added descriptive string arrays for enums.
+	* src/libmunge/Makefile.am, src/libmunge/strings.c:
+	  Added descriptive string arrays for enums.
 
 2003-04-24  Chris Dunlap  <cdunlap@llnl.gov>
 
