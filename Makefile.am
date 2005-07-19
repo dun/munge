@@ -14,4 +14,4 @@ SUBDIRS =                       src
 
 distclean-local::
 	-rm -fr autom4te*.cache autoscan.*
-	-rm -fr $(PACKAGE)-*
+	-rm -fr $(META_NAME)-*

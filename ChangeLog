@@ -1,3 +1,7 @@
+2005-07-19  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* Makefile.am: Replaced PACKAGE with META_NAME.
+
 2005-07-13  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* munge.spec: Marked /etc/munge dir with %config attr.
