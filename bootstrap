@@ -3,8 +3,6 @@
 # $Id$
 ##
 
-PATH=/bin:/usr/bin:/usr/local/bin
-
 set -x
 aclocal -I config || exit 1
 libtoolize --automake --copy --force || exit 1
