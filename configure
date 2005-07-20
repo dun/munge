@@ -1582,7 +1582,7 @@ _ACEOF
 
     fi
 
-    ;
+
     META_LT_CURRENT=`perl -n\
     -e "BEGIN { \\$key=shift @ARGV; }"\
     -e "next unless s/^\s*\\$key[:=]//i;"\
