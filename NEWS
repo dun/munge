@@ -1,3 +1,9 @@
+Version 0.4.2 (2005-07-20):
+  - Updated default paths to comply with the Filesystem Hierarchy Standard.
+  - Fixed libtool bug causing libmunge to be linked incorrectly on AIX.
+  - Fixed init script start behavior under RedHat.
+  - Added devel & libs rpm subpackages.
+
 Version 0.4.1 (2004-12-21):
   - Fixed bug in init script preventing chkconfig from setting priorities.
 

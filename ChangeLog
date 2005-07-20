@@ -1,5 +1,7 @@
 2005-07-20  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* : Released 0.4.2.
+
 	* config/x_ac_meta.m4: Removed trailing ';' from m4_pattern_allow.
 
 	* config/x_ac_meta.m4: Added m4_pattern_allow to suppress the
