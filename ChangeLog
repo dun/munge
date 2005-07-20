@@ -1,3 +1,8 @@
+2005-07-20  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* config/x_ac_meta.m4: Added m4_pattern_allow to suppress the
+	  "possibly undefined macro" warnings under the new libtool.
+
 2005-07-19  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* : Updated FSF Address.
