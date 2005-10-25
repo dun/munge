@@ -7,6 +7,7 @@
 ### BEGIN INIT INFO
 # Provides:       munge
 # Required-Start: $named $time
+# Required-Stop:  $named $time
 # Default-Start:  3 5
 # Default-Stop:   0 1 2 6
 # Description:    Start the MUNGE user authentication service.
