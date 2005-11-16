@@ -1,3 +1,8 @@
+2005-11-16  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* config/x_ac_debug.m4: Changed behavior to allow existing CFLAGS to
+	  be preserved when debugging is enabled.
+
 2005-10-31  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* : Released 0.4.3.

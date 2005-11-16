@@ -9,9 +9,8 @@
 #
 #  DESCRIPTION:
 #    Add support for the "--enable-debug" configure script option.
-#    If CFLAGS is not passed to configure, it will be set based on
-#    whether debugging has been enabled.  Also, the NDEBUG macro
-#    (used by assert) will be set accordingly.
+#    If debugging is enabled, CFLAGS will be prepended with the debug flags.
+#    The NDEBUG macro (used by assert) will also be set accordingly.
 #
 #  WARNINGS:
 #    This macro must be placed after AC_PROG_CC or equivalent.
@@ -31,10 +30,8 @@ AC_DEFUN([X_AC_DEBUG], [
     ]
   )
   if test "$x_ac_debug" = yes; then
-    if test -z "$ac_save_CFLAGS"; then
-      test "$ac_cv_prog_cc_g" = yes && _x_ac_debug_g="-g" || _x_ac_debug_g=""
-      test "$GCC" = yes && CFLAGS="-Wall -Werror -pedantic $_x_ac_debug_g"
-    fi
+    test "$ac_cv_prog_cc_g" = yes && CFLAGS="-g $CFLAGS"
+    test "$GCC" = yes && CFLAGS="-Wall -Werror -pedantic $CFLAGS"
   else
     if test -z "$ac_save_CFLAGS"; then
       test "$GCC" = yes && CFLAGS="-O2 -Wall" || CFLAGS="-O"
