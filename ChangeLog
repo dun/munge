@@ -1,3 +1,8 @@
+2005-11-17  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/munged/zip.c(zip_compress_block,zip_decompress_block):
+	  Added check to ensure (srclen > 0).
+
 2005-11-16  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* config/x_ac_debug.m4: Fixed behavior when enable-debug && !CFLAGS.

@@ -39,6 +39,7 @@
 #endif /* HAVE_ZLIB_H */
 
 #include <assert.h>
+#include <inttypes.h>
 #include <netinet/in.h>
 #include <string.h>
 #include <munge.h>
@@ -72,8 +73,8 @@
  *****************************************************************************/
 
 typedef struct {
-    unsigned int magic;
-    unsigned int length;
+    uint32_t magic;
+    uint32_t length;
 } zip_meta_t;
 
 
@@ -116,6 +117,9 @@ zip_compress_block (munge_zip_t type,
         return (-1);
     }
     if (*pdstlen < sizeof (zip_meta_t)) {
+        return (-1);
+    }
+    if (srclen <= 0) {
         return (-1);
     }
     xdst = (unsigned char *) dst + sizeof (zip_meta_t);
@@ -176,6 +180,9 @@ zip_decompress_block (munge_zip_t type,
         return (-1);
     }
     if (*pdstlen < n) {
+        return (-1);
+    }
+    if (srclen <= 0) {
         return (-1);
     }
     xdst = dst;
