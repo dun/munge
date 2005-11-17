@@ -49,24 +49,24 @@ int zip_is_valid_type (munge_zip_t type);
  */
 
 int zip_compress_block (munge_zip_t type,
-    void *dst, int *dstlen, const void *src, int srclen);
+    void *dst, int *pdstlen, const void *src, int srclen);
 /*
  *  Compresses the [src] buffer of length [srclen] in a single pass using the
  *    compression method [type].  The resulting compressed output is stored
  *    in the [dst] buffer.
- *  Upon entry, [*dstlen] must be set to the size of the [dst] buffer.
- *  Upon exit, [*dstlen] is set to the size of the compressed data.
+ *  Upon entry, [*pdstlen] must be set to the size of the [dst] buffer.
+ *  Upon exit, [*pdstlen] is set to the size of the compressed data.
  *  Returns 0 on success, or -1 or error.
  */
 
 int zip_decompress_block (munge_zip_t type,
-    void *dst, int *dstlen, const void *src, int srclen);
+    void *dst, int *pdstlen, const void *src, int srclen);
 /*
  *  Decompresses the [src] buffer of length [srclen] in a single pass using the
  *    compression method [type].  The resulting decompressed (original) output
  *    is stored in the [dst] buffer.
- *  Upon entry, [*dstlen] must be set to the size of the [dst] buffer.
- *  Upon exit, [*dstlen] is set to the size of the decompressed data.
+ *  Upon entry, [*pdstlen] must be set to the size of the [dst] buffer.
+ *  Upon exit, [*pdstlen] is set to the size of the decompressed data.
  *  Returns 0 on success, or -1 or error.
  */
 

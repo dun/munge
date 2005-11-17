@@ -1,5 +1,10 @@
 2005-11-16  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/munged/zip.c: Added magic sentinel to beginning of zip_meta_t
+	  to check if embedded length of original uncompressed data is valid.
+	* src/munged/zip.h(zip_compress_block,zip_decompress_block):
+	  Changed name of dstlen parm to pdstlen.
+
 	* config/x_ac_debug.m4: Changed behavior to allow existing CFLAGS to
 	  be preserved when debugging is enabled.
 

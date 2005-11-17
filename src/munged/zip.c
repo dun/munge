@@ -52,22 +52,29 @@
 /*
  *  Neither the zlib nor bzlib compression routines encode the original length
  *    of the uncompressed data in the compressed output.
- *  The following "zip" routines allocate an additional 4 bytes (zip_meta_t)
- *    for this purpose.  The original length of the uncompressed data is stored
- *    in the first 4 bytes of the compressed output in MSBF (ie, big endian)
- *    format.
- *  I was tempted to place a sentinel next to this encoded length, but it
- *    didn't seem worth the space, time, or effort.  Modifications to this
- *    length are already detected by the base64 checksum, the cipher checksum
- *    (if encrypted), the compression checksum, and eventually the MAC.
+ *  The following "zip" routines allocate an additional 8 bytes of metadata
+ *    (zip_meta_t) that is prepended to the compressed output for this purpose.
+ *    The first 4 bytes contain a sentinel to check if the metadata is valid.
+ *    The next 4 bytes contain the original length of the uncompressed data.
+ *    Both values are in MSBF (ie, big endian) format.
  */
+
+
+/*****************************************************************************
+ *  Constants
+ *****************************************************************************/
+
+#define ZIP_MAGIC                       0xCACACACA
 
 
 /*****************************************************************************
  *  Data Types
  *****************************************************************************/
 
-typedef unsigned int zip_meta_t;
+typedef struct {
+    unsigned int magic;
+    unsigned int length;
+} zip_meta_t;
 
 
 /*****************************************************************************
@@ -93,26 +100,26 @@ zip_is_valid_type (munge_zip_t type)
 
 int
 zip_compress_block (munge_zip_t type,
-                    void *dst, int *dstlen, const void *src, int srclen)
+                    void *dst, int *pdstlen, const void *src, int srclen)
 {
     unsigned char *xdst;
     unsigned int   xdstlen;
     unsigned char *xsrc;
     unsigned int   xsrclen;
-    zip_meta_t     meta;
+    zip_meta_t    *pmeta;
 
     assert (dst != NULL);
-    assert (dstlen != NULL);
+    assert (pdstlen != NULL);
     assert (src != NULL);
 
     if (!zip_is_valid_type (type)) {
         return (-1);
     }
-    if (*dstlen < sizeof (meta)) {
+    if (*pdstlen < sizeof (zip_meta_t)) {
         return (-1);
     }
-    xdst = (unsigned char *) dst + sizeof (meta);
-    xdstlen = *dstlen - sizeof (meta);
+    xdst = (unsigned char *) dst + sizeof (zip_meta_t);
+    xdstlen = *pdstlen - sizeof (zip_meta_t);
     xsrc = (unsigned char *) src;
     xsrclen = srclen;
 
@@ -139,39 +146,42 @@ zip_compress_block (munge_zip_t type,
     }
 #endif /* HAVE_PKG_ZLIB */
 
-    *dstlen = xdstlen + sizeof (meta);
-    meta = htonl (xsrclen);
-    memcpy (dst, &meta, sizeof (meta));
+    *pdstlen = xdstlen + sizeof (zip_meta_t);
+    pmeta = dst;
+    pmeta->magic = htonl (ZIP_MAGIC);
+    pmeta->length = htonl (xsrclen);
     return (0);
 }
 
 
 int
 zip_decompress_block (munge_zip_t type,
-                      void *dst, int *dstlen, const void *src, int srclen)
+                      void *dst, int *pdstlen, const void *src, int srclen)
 {
     unsigned char *xdst;
     unsigned int   xdstlen;
     unsigned char *xsrc;
     unsigned int   xsrclen;
-    zip_meta_t     meta;
+    int            n;
 
     assert (dst != NULL);
-    assert (dstlen != NULL);
+    assert (pdstlen != NULL);
     assert (src != NULL);
 
     if (!zip_is_valid_type (type)) {
         return (-1);
     }
-    memcpy (&meta, src, sizeof (meta));
-    meta = ntohl (meta);
-    if (*dstlen < (int) meta) {
+    n = zip_decompress_length (type, src, srclen);
+    if (n < 0) {
+        return (-1);
+    }
+    if (*pdstlen < n) {
         return (-1);
     }
     xdst = dst;
-    xdstlen = *dstlen;
-    xsrc = (unsigned char *) src + sizeof (meta);
-    xsrclen = srclen - sizeof (meta);
+    xdstlen = *pdstlen;
+    xsrc = (unsigned char *) src + sizeof (zip_meta_t);
+    xsrclen = srclen - sizeof (zip_meta_t);
 
 #if HAVE_PKG_BZLIB
     if (type == MUNGE_ZIP_BZLIB) {
@@ -196,7 +206,7 @@ zip_decompress_block (munge_zip_t type,
     }
 #endif /* HAVE_PKG_ZLIB */
 
-    *dstlen = xdstlen;
+    *pdstlen = xdstlen;
     return (0);
 }
 
@@ -232,16 +242,18 @@ zip_decompress_length (munge_zip_t type, const void *src, int len)
 {
 /*  XXX: Note the [type] parm is not currently used here.
  */
-    zip_meta_t     meta;
+    zip_meta_t    *pmeta;
 
     assert (src != NULL);
 
-    if (len < sizeof (meta)) {
+    if (len < sizeof (zip_meta_t)) {
         return (-1);
     }
-    memcpy (&meta, src, sizeof (meta));
-    meta = ntohl (meta);
-    return ((int) meta);
+    pmeta = src;
+    if (ntohl (pmeta->magic) != ZIP_MAGIC) {
+        return (-1);
+    }
+    return ((int) ntohl (pmeta->length));
 }
 
 
