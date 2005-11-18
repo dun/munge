@@ -67,8 +67,8 @@ static int dec_v1_unarmor (munge_cred_t c);
 static int dec_v1_unpack_outer (munge_cred_t c);
 static int dec_v1_decrypt (munge_cred_t c);
 static int dec_v1_decompress (munge_cred_t c);
-static int dec_v1_unpack_inner (munge_cred_t c);
 static int dec_v1_validate_mac (munge_cred_t c);
+static int dec_v1_unpack_inner (munge_cred_t c);
 static int dec_v1_validate_time (munge_cred_t c);
 static int dec_v1_validate_auth (munge_cred_t c);
 static int dec_v1_validate_replay (munge_cred_t c);
@@ -304,7 +304,6 @@ dec_v1_unarmor (munge_cred_t c)
      *  XXX: This may be somewhat inefficient if the suffix isn't there.
      *       If all goes well, the suffix will match on the 3rd comparison
      *       due to the trailing "\n\0".
-     *  XXX: Would strstr() be better here instead?
      */
     if (suffix_len > 0) {
         base64_tmp = base64_ptr + base64_len - suffix_len;
@@ -388,7 +387,7 @@ dec_v1_unpack_outer (munge_cred_t c)
             strdup ("Truncated credential version")));
     }
     c->version = *p;
-    if ((!c->version) || (c->version != MUNGE_CRED_VERSION)) {
+    if (c->version != MUNGE_CRED_VERSION) {
         return (m_msg_set_err (c->msg, EMUNGE_BAD_VERSION,
             strdupf ("Unsupported credential version %d", c->version)));
     }
@@ -472,6 +471,10 @@ dec_v1_unpack_outer (munge_cred_t c)
                 strdup ("Truncated credential realm string")));
         }
         c->realm_mem_len = m1->realm_len + 1;
+        /*
+         *  Since the realm len is a uint8, the max memory malloc'd here
+         *    for the realm string is 256 bytes.
+         */
         if (!(c->realm_mem = malloc (c->realm_mem_len))) {
             return (m_msg_set_err (c->msg, EMUNGE_NO_MEMORY, NULL));
         }
@@ -512,12 +515,6 @@ dec_v1_unpack_outer (munge_cred_t c)
      */
     c->inner = p;
     c->inner_len = len;
-    /*
-     *  Since this routine currently only handles version 1 credentials,
-     *    initialize the length of the credential salt here as well.
-     */
-    c->salt_len = MUNGE_CRED_SALT_LEN;
-    assert (c->salt_len <= sizeof (c->salt));
     return (0);
 }
 
@@ -658,6 +655,13 @@ dec_v1_decompress (munge_cred_t c)
     if (m1->zip == MUNGE_ZIP_NONE) {
         return (0);
     }
+    /*  Has an error condition already been set by dec_v1_decrypt()?
+     *    If so, abort decompression since the encoded length of the
+     *    uncompressed data (stored in the zip header) cannot be trusted.
+     */
+    if (c->msg->errnum != EMUNGE_SUCCESS) {
+        return (0);
+    }
     /*  Compression type already checked by dec_v1_unpack_outer().
      */
     assert (zip_is_valid_type (m1->zip));
@@ -666,7 +670,7 @@ dec_v1_decompress (munge_cred_t c)
      */
     buf = NULL;
     buf_len = zip_decompress_length (m1->zip, c->inner, c->inner_len);
-    if (buf_len < 0) {
+    if (buf_len <= 0) {
         goto err;
     }
     if (!(buf = malloc (buf_len))) {
@@ -806,6 +810,8 @@ dec_v1_unpack_inner (munge_cred_t c)
      *  Unpack the salt.
      *  Add it to the PRNG entropy pool if it's encrypted.
      */
+    c->salt_len = MUNGE_CRED_SALT_LEN;
+    assert (c->salt_len <= sizeof (c->salt));
     if (c->salt_len > len) {
         return (m_msg_set_err (c->msg, EMUNGE_BAD_CRED,
             strdup ("Truncated credential salt")));

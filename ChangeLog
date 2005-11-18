@@ -1,5 +1,10 @@
 2005-11-17  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/munged/dec_v1.c(dec_v1_decompress): Added test to abort
+	  decompression if a block cipher padding error has already occurred.
+	* src/munged/dec_v1.c: Moved c->salt_len initialization from
+	  dec_v1_unpack_outer() to dec_v1_unpack_inner().
+
 	* src/munged/zip.c(zip_compress_block,zip_decompress_block):
 	  Added check to ensure (srclen > 0).
 
