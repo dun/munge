@@ -258,6 +258,10 @@ munge_ctx_set (munge_ctx_t ctx, munge_opt_t opt, ...)
             str = va_arg (vargs, char *);
             if (!str)
                 p = NULL;
+            else if (strlen (str) > 255) {
+                ctx->errnum = EMUNGE_BAD_LENGTH;
+                break;
+            }
             else if (!(p = strdup (str))) {
                 ctx->errnum = EMUNGE_NO_MEMORY;
                 break;

@@ -1,6 +1,8 @@
 2005-11-18  Chris Dunlap  <cdunlap@llnl.gov>
 
-	* NEWS: Updated.
+	* src/libmunge/ctx.c(munge_ctx_set): Added test for MUNGE_OPT_REALM
+	  to ensure realm strlen < 256.
+
 	* src/munged/enc_v1.c: Removed enc_v1_precompress().
 	  Moved enc_v1_mac() between enc_v1_compress() & enc_v1_encrypt().
 	* src/munged/dec_v1.c:
@@ -12,6 +14,7 @@
 	* doc/credential_v1_format.txt, doc/credential_v2_format.txt: Updated.
 	* doc/credential_v3_format.txt: Added to fix bug with credential's
 	  compression header not being protected by the mac.
+	* NEWS: Updated.
 
 2005-11-17  Chris Dunlap  <cdunlap@llnl.gov>
 
