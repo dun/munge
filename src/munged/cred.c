@@ -75,11 +75,6 @@ cred_destroy (munge_cred_t c)
         memset (c->inner_mem, 0, c->inner_mem_len);
         free (c->inner_mem);
     }
-    if (c->zippy_mem) {
-        assert (c->zippy_mem_len > 0);
-        memset (c->zippy_mem, 0, c->zippy_mem_len);
-        free (c->zippy_mem);
-    }
     if (c->realm_mem) {
         assert (c->realm_mem_len > 0);
         memset (c->realm_mem, 0, c->realm_mem_len);

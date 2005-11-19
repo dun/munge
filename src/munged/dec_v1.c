@@ -66,8 +66,8 @@ static int dec_v1_check_retry (munge_cred_t c);
 static int dec_v1_unarmor (munge_cred_t c);
 static int dec_v1_unpack_outer (munge_cred_t c);
 static int dec_v1_decrypt (munge_cred_t c);
-static int dec_v1_decompress (munge_cred_t c);
 static int dec_v1_validate_mac (munge_cred_t c);
+static int dec_v1_decompress (munge_cred_t c);
 static int dec_v1_unpack_inner (munge_cred_t c);
 static int dec_v1_validate_time (munge_cred_t c);
 static int dec_v1_validate_auth (munge_cred_t c);
@@ -100,9 +100,9 @@ dec_v1_process_msg (m_msg_t m)
         ;
     else if (dec_v1_decrypt (c) < 0)
         ;
-    else if (dec_v1_decompress (c) < 0)
-        ;
     else if (dec_v1_validate_mac (c) < 0)
+        ;
+    else if (dec_v1_decompress (c) < 0)
         ;
     else if (dec_v1_unpack_inner (c) < 0)
         ;
@@ -631,88 +631,6 @@ err:
 
 
 static int
-dec_v1_decompress (munge_cred_t c)
-{
-/*  Decompresses the "inner" credential data.
- *
- *  Note that if zip_decompress_block() returns a failure, an error condition
- *    is set but an error status is not returned (yet) for the same reason as
- *    in dec_v1_decrypt().  Instead, the dec_v1_validate_mac() MAC computation
- *    is still performed in order to minimize information leaked via timing.
- */
-    struct m_msg_v1 *m1;
-    unsigned char   *buf;               /* decompression buffer              */
-    int              buf_len;           /* length of decompression buffer    */
-    int              n;                 /* length of decompressed data       */
-
-    assert (c != NULL);
-    assert (c->msg != NULL);
-
-    m1 = c->msg->pbody;
-
-    /*  Is this credential compressed?
-     */
-    if (m1->zip == MUNGE_ZIP_NONE) {
-        return (0);
-    }
-    /*  Has an error condition already been set by dec_v1_decrypt()?
-     *    If so, abort decompression since the encoded length of the
-     *    uncompressed data (stored in the zip header) cannot be trusted.
-     */
-    if (c->msg->errnum != EMUNGE_SUCCESS) {
-        return (0);
-    }
-    /*  Compression type already checked by dec_v1_unpack_outer().
-     */
-    assert (zip_is_valid_type (m1->zip));
-    /*
-     *  Allocate memory for decompressed "inner" data.
-     */
-    buf = NULL;
-    buf_len = zip_decompress_length (m1->zip, c->inner, c->inner_len);
-    if (buf_len <= 0) {
-        goto err;
-    }
-    if (!(buf = malloc (buf_len))) {
-        m_msg_set_err (c->msg, EMUNGE_NO_MEMORY, NULL);
-        goto err;
-    }
-    /*  Decompress "inner" data.
-     */
-    n = buf_len;
-    if (zip_decompress_block (m1->zip, buf, &n, c->inner, c->inner_len) < 0) {
-        /*  Set but defer error until dec_v1_validate_mac().  */
-        m_msg_set_err (c->msg, EMUNGE_CRED_INVALID, NULL);
-    }
-    else {
-        /*  Only assert invariant upon successful decompression.  */
-        assert (n == buf_len);
-    }
-    /*
-     *  Replace compressed data with "inner" data.
-     */
-    if (c->inner_mem) {
-        assert (c->inner_mem_len > 0);
-        memset (c->inner_mem, 0, c->inner_mem_len);
-        free (c->inner_mem);
-    }
-    c->inner_mem = buf;
-    c->inner_mem_len = buf_len;
-    c->inner = buf;
-    c->inner_len = n;
-    return (0);
-
-err:
-    if ((buf_len > 0) && (buf != NULL)) {
-        memset (buf, 0, buf_len);
-        free (buf);
-    }
-    return (m_msg_set_err (c->msg, EMUNGE_SNAFU,
-        strdup ("Unable to decompress credential")));
-}
-
-
-static int
 dec_v1_validate_mac (munge_cred_t c)
 {
 /*  Validates the Message Authentication Code (MAC) over the entire message
@@ -772,6 +690,72 @@ err_cleanup:
 err:
     return (m_msg_set_err (c->msg, EMUNGE_SNAFU,
         strdup ("Unable to mac credential")));
+}
+
+
+static int
+dec_v1_decompress (munge_cred_t c)
+{
+/*  Decompresses the "inner" credential data.
+ */
+    struct m_msg_v1 *m1;
+    unsigned char   *buf;               /* decompression buffer              */
+    int              buf_len;           /* length of decompression buffer    */
+    int              n;                 /* length of decompressed data       */
+
+    assert (c != NULL);
+    assert (c->msg != NULL);
+
+    m1 = c->msg->pbody;
+
+    /*  Is this credential compressed?
+     */
+    if (m1->zip == MUNGE_ZIP_NONE) {
+        return (0);
+    }
+    /*  Compression type already checked by dec_v1_unpack_outer().
+     */
+    assert (zip_is_valid_type (m1->zip));
+    /*
+     *  Allocate memory for decompressed "inner" data.
+     */
+    buf = NULL;
+    buf_len = zip_decompress_length (m1->zip, c->inner, c->inner_len);
+    if (buf_len <= 0) {
+        goto err;
+    }
+    if (!(buf = malloc (buf_len))) {
+        m_msg_set_err (c->msg, EMUNGE_NO_MEMORY, NULL);
+        goto err;
+    }
+    /*  Decompress "inner" data.
+     */
+    n = buf_len;
+    if (zip_decompress_block (m1->zip, buf, &n, c->inner, c->inner_len) < 0) {
+        return (m_msg_set_err (c->msg, EMUNGE_CRED_INVALID, NULL));
+    }
+    assert (n == buf_len);
+    /*
+     *  Replace compressed data with "inner" data.
+     */
+    if (c->inner_mem) {
+        assert (c->inner_mem_len > 0);
+        memset (c->inner_mem, 0, c->inner_mem_len);
+        free (c->inner_mem);
+    }
+    c->inner_mem = buf;
+    c->inner_mem_len = buf_len;
+    c->inner = buf;
+    c->inner_len = n;
+    return (0);
+
+err:
+    if ((buf_len > 0) && (buf != NULL)) {
+        memset (buf, 0, buf_len);
+        free (buf);
+    }
+    return (m_msg_set_err (c->msg, EMUNGE_SNAFU,
+        strdup ("Unable to decompress credential")));
 }
 
 

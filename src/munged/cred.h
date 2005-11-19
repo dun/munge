@@ -41,7 +41,7 @@
 
 /*  Current version of the munge credential format.
  */
-#define MUNGE_CRED_VERSION              2
+#define MUNGE_CRED_VERSION              3
 
 /*  MAX_MAC is currently set to 20 (ie, 160 bits).  This handles the largest
  *    message digests supported by munge_mac_t.  Note, however, <openssl/evp.h>
@@ -71,10 +71,6 @@ struct munge_cred {
     unsigned char      *inner_mem;      /* inner cred memory allocation      */
     int                 inner_len;      /* length of inner credential data   */
     unsigned char      *inner;          /* ptr to inner credential data      */
-    int                 zippy_mem_len;  /* length of inner compressed memory */
-    unsigned char      *zippy_mem;      /* inner compressed mem allocation   */
-    int                 zippy_len;      /* length of inner compressed data   */
-    unsigned char      *zippy;          /* ptr to inner compressed data      */
     int                 realm_mem_len;  /* length of realm string memory     */
     unsigned char      *realm_mem;      /* realm string memory allocation    */
     int                 salt_len;       /* length of salt data               */

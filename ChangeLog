@@ -1,3 +1,18 @@
+2005-11-18  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* NEWS: Updated.
+	* src/munged/enc_v1.c: Removed enc_v1_precompress().
+	  Moved enc_v1_mac() between enc_v1_compress() & enc_v1_encrypt().
+	* src/munged/dec_v1.c:
+	  Moved dec_v1_mac() between dec_v1_decrypt() & dec_v1_decompress().
+	* src/munged/cred.c, src/munged/cred.h: Removed from struct munge_cred
+	  the zippy_mem_len, zippy_mem, zippy_len, & zippy fields used by
+	  enc_v1_precompress().
+	* src/munged/cred.h: Incremented MUNGE_CRED_VERSION to 3.
+	* doc/credential_v1_format.txt, doc/credential_v2_format.txt: Updated.
+	* doc/credential_v3_format.txt: Added to fix bug with credential's
+	  compression header not being protected by the mac.
+
 2005-11-17  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/munged/dec_v1.c(dec_v1_decompress): Added test to abort

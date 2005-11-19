@@ -64,9 +64,8 @@ static int enc_v1_check_retry (munge_cred_t c);
 static int enc_v1_timestamp (munge_cred_t c);
 static int enc_v1_pack_outer (munge_cred_t c);
 static int enc_v1_pack_inner (munge_cred_t c);
-static int enc_v1_precompress (munge_cred_t c);
-static int enc_v1_mac (munge_cred_t c);
 static int enc_v1_compress (munge_cred_t c);
+static int enc_v1_mac (munge_cred_t c);
 static int enc_v1_encrypt (munge_cred_t c);
 static int enc_v1_armor (munge_cred_t c);
 static int enc_v1_fini (munge_cred_t c);
@@ -98,11 +97,9 @@ enc_v1_process_msg (m_msg_t m)
         ;
     else if (enc_v1_pack_inner (c) < 0)
         ;
-    else if (enc_v1_precompress (c) < 0)
+    else if (enc_v1_compress (c) < 0)
         ;
     else if (enc_v1_mac (c) < 0)
-        ;
-    else if (enc_v1_compress (c) < 0)
         ;
     else if (enc_v1_encrypt (c) < 0)
         ;
@@ -475,17 +472,14 @@ enc_v1_pack_inner (munge_cred_t c)
 
 
 static int
-enc_v1_precompress (munge_cred_t c)
+enc_v1_compress (munge_cred_t c)
 {
-/*  "Pre"-compresses the "inner" credential data.
+/*  Compresses the "inner" credential data.
  *  If the compressed data is larger than the original data, the
  *    compressed buffer is discarded and compression is disabled.
  *    This requires resetting the compression type in the credential's
  *    "outer" data header.  And since that field is included in the MAC,
  *    compression must be attempted before the MAC is computed.
- *  Note that the MAC is computed over the original (ie, uncompressed)
- *    "inner" data.  That allows it to catch any errors (however unlikely)
- *    that would occur during the compression stage.
  */
     struct m_msg_v1 *m1;
     unsigned char   *buf;               /* compression buffer                */
@@ -520,8 +514,7 @@ enc_v1_precompress (munge_cred_t c)
         goto err;
     }
     /*  Disable compression and discard compressed data if it's larger.
-     *    Save compressed data if it's not.  Note that c->inner and friends
-     *    cannot be updated until after the MAC has been computed.
+     *    Replace "inner" data with compressed data if it's not.
      */
     if (n >= c->inner_len) {
         m1->zip = MUNGE_ZIP_NONE;
@@ -530,10 +523,14 @@ enc_v1_precompress (munge_cred_t c)
         free (buf);
     }
     else {
-        c->zippy_mem = buf;
-        c->zippy_mem_len = buf_len;
-        c->zippy = buf;
-        c->zippy_len = n;
+        assert (c->inner_mem_len > 0);
+        memset (c->inner_mem, 0, c->inner_mem_len);
+        free (c->inner_mem);
+
+        c->inner_mem = buf;
+        c->inner_mem_len = buf_len;
+        c->inner = buf;
+        c->inner_len = n;
     }
     return (0);
 
@@ -599,47 +596,6 @@ err_cleanup:
 err:
     return (m_msg_set_err (c->msg, EMUNGE_SNAFU,
         strdup ("Unable to mac credential")));
-}
-
-
-static int
-enc_v1_compress (munge_cred_t c)
-{
-/*  Compresses the "inner" credential data.
- *  The compression has already been done by enc_v1_precompress().
- *    All that's left is to swap the inner data with the compressed data.
- */
-    struct m_msg_v1 *m1;
-
-    assert (c != NULL);
-    assert (c->msg != NULL);
-
-    m1 = c->msg->pbody;
-
-    /*  Is compression disabled?
-     */
-    if (m1->zip == MUNGE_ZIP_NONE) {
-        return (0);
-    }
-    assert (c->zippy != NULL);
-    assert (c->zippy_len > 0);
-    /*
-     *  Replace "inner" data with compressed data.
-     */
-    assert (c->inner_mem_len > 0);
-    memset (c->inner_mem, 0, c->inner_mem_len);
-    free (c->inner_mem);
-
-    assert (c->zippy_mem != NULL);
-    assert (c->zippy_mem_len > 0);
-    c->inner_mem = c->zippy_mem,
-    c->inner_mem_len = c->zippy_mem_len;
-    c->inner = c->zippy;
-    c->inner_len = c->zippy_len;
-
-    c->zippy_mem = NULL;
-    c->zippy_mem_len = 0;
-    return (0);
 }
 
 
