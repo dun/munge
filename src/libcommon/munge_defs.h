@@ -28,6 +28,9 @@
 #ifndef MUNGE_DEFS_H
 #define MUNGE_DEFS_H
 
+#if HAVE_CONFIG_H
+#  include "config.h"
+#endif /* HAVE_CONFIG_H */
 
 #include <munge.h>
 
@@ -46,7 +49,11 @@
 
 /*  Default munge_cipher_t for encrypting credentials.
  */
-#define MUNGE_DEFAULT_CIPHER            MUNGE_CIPHER_CAST5
+#if HAVE_EVP_AES_128_CBC
+#  define MUNGE_DEFAULT_CIPHER          MUNGE_CIPHER_AES_128
+#else  /* !HAVE_EVP_AES_128_CBC */
+#  define MUNGE_DEFAULT_CIPHER          MUNGE_CIPHER_CAST5
+#endif /* !HAVE_EVP_AES_128_CBC */
 
 /*  Default munge_mac_t for validating credentials.
  *    This should NEVER be set to MUNGE_MAC_NONE.

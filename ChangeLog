@@ -1,5 +1,8 @@
 2005-11-18  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/libcommon/munge_defs.h: Changed default cipher to aes128.
+	* NEWS: Updated.
+
 	* src/libmunge/ctx.c(munge_ctx_set): Added test for MUNGE_OPT_REALM
 	  to ensure realm strlen < 256.
 

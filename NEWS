@@ -1,6 +1,7 @@
 Version ? (????-??-??):
   - Fixed bug with credential's compression header not being protected by mac.
   - Changed credential format.
+  - Changed default cipher to aes128.
 
 Version 0.4.3 (2005-10-31):
   - Fixed init script to work with RedHat's RHEL4-U1 chkconfig.
