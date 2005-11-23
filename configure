@@ -1000,6 +1000,7 @@ Optional Features:
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
   --enable-maintainer-mode  enable make rules and dependencies not useful
 			  (and sometimes confusing) to the casual installer
+  --enable-arch=n         specify either a 32 or 64 bit arch
   --disable-dependency-tracking  speeds up one-time build
   --enable-dependency-tracking   do not reject slow dependency extractors
   --enable-shared[=PKGS]
@@ -2214,6 +2215,35 @@ fi
 ##
 # Checks for programs.
 ##
+
+  echo "$as_me:$LINENO: checking for specified code architecture" >&5
+echo $ECHO_N "checking for specified code architecture... $ECHO_C" >&6
+  # Check whether --enable-arch or --disable-arch was given.
+if test "${enable_arch+set}" = set; then
+  enableval="$enable_arch"
+   case "$enableval" in
+        32) x_ac_arch=$enableval ;;
+        64) x_ac_arch=$enableval ;;
+         *) echo "$as_me:$LINENO: result: specify either 32 or 64" >&5
+echo "${ECHO_T}specify either 32 or 64" >&6
+            { { echo "$as_me:$LINENO: error: bad value \"$enableval\" for --enable-arch" >&5
+echo "$as_me: error: bad value \"$enableval\" for --enable-arch" >&2;}
+   { (exit 1); exit 1; }; } ;;
+      esac
+
+
+fi;
+  if test "$x_ac_arch" == "32"; then
+    CFLAGS="$CFLAGS -m32"
+    LDFLAGS="-L/lib -L/usr/lib $LDFLAGS"
+  elif test "$x_ac_arch" == "64"; then
+    CFLAGS="$CFLAGS -m64"
+    LDFLAGS="-L/lib64 -L/usr/lib64 $LDFLAGS"
+  fi
+  echo "$as_me:$LINENO: result: ${x_ac_arch=no}" >&5
+echo "${ECHO_T}${x_ac_arch=no}" >&6
+
+
 ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
 ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -5745,7 +5775,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 5748 "configure"
+#line 5778 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -5843,7 +5873,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 5846 "configure"
+#line 5876 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -5992,7 +6022,7 @@ ia64-*-hpux*)
   ;;
 *-*-irix6*)
   # Find out which ABI we are using.
-  echo '#line 5995 "configure"' > conftest.$ac_ext
+  echo '#line 6025 "configure"' > conftest.$ac_ext
   if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -6680,11 +6710,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:6683: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:6713: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:6687: \$? = $ac_status" >&5
+   echo "$as_me:6717: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -6974,11 +7004,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:6977: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:7007: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:6981: \$? = $ac_status" >&5
+   echo "$as_me:7011: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -7078,11 +7108,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:7081: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:7111: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:7085: \$? = $ac_status" >&5
+   echo "$as_me:7115: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -7134,11 +7164,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:7137: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:7167: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:7141: \$? = $ac_status" >&5
+   echo "$as_me:7171: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -9257,14 +9287,10 @@ echo "$as_me: error: bad value \"$enableval\" for --enable-debug" >&2;}
 
 fi;
   if test "$x_ac_debug" = yes; then
-    if test -z "$ac_save_CFLAGS"; then
-      test "$ac_cv_prog_cc_g" = yes && _x_ac_debug_g="-g" || _x_ac_debug_g=""
-      test "$GCC" = yes && CFLAGS="-Wall -Werror -pedantic $_x_ac_debug_g"
-    fi
+    test "$ac_save_CFLAGS" && CFLAGS="$ac_save_CFLAGS" || CFLAGS=""
+    test "$ac_cv_prog_cc_g" = yes && CFLAGS="-g $CFLAGS"
+    test "$GCC" = yes && CFLAGS="-Wall -Werror -pedantic $CFLAGS"
   else
-    if test -z "$ac_save_CFLAGS"; then
-      test "$GCC" = yes && CFLAGS="-O2 -Wall" || CFLAGS="-O"
-    fi
 
 cat >>confdefs.h <<\_ACEOF
 #define NDEBUG 1

@@ -1,3 +1,9 @@
+2005-11-22  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* configure.ac, config/x_ac_arch.m4: Added X_AC_ARCH (--enable-arch=n)
+	  to specify whether to generate 32-bit or 64-bit code.
+	* munge.spec: Added support to rpm build --with "arch32" or "arch64".
+
 2005-11-18  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/libcommon/munge_defs.h: Changed default cipher to aes128.

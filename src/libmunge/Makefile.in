@@ -50,6 +50,7 @@ am__aclocal_m4_deps = $(top_srcdir)/config/libtool.m4 \
 	$(top_srcdir)/config/ltsugar.m4 \
 	$(top_srcdir)/config/ltversion.m4 \
 	$(top_srcdir)/config/x_ac_aix.m4 \
+	$(top_srcdir)/config/x_ac_arch.m4 \
 	$(top_srcdir)/config/x_ac_canonical.m4 \
 	$(top_srcdir)/config/x_ac_check_cond_lib.m4 \
 	$(top_srcdir)/config/x_ac_check_fifo_recvfd.m4 \

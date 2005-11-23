@@ -38,7 +38,10 @@ A shared library for applications using MUNGE.
 %setup
 
 %build
-%configure --program-prefix=%{?_program_prefix:%{_program_prefix}}
+%configure \
+  %{?_with_arch32: --enable-arch=32} \
+  %{?_with_arch64: --enable-arch=64} \
+  --program-prefix=%{?_program_prefix:%{_program_prefix}}
 make
 
 %install

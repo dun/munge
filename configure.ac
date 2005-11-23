@@ -47,6 +47,7 @@ AM_MAINTAINER_MODE
 ##
 # Checks for programs.
 ##
+X_AC_ARCH
 AC_PROG_CC
 X_AC_CHECK_SSL
 LT_INIT
