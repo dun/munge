@@ -347,7 +347,7 @@ dec_v1_unpack_outer (munge_cred_t c)
 /*  Unpacks the "outer" credential data from MSBF (ie, big endian) format.
  *  The "outer" part of the credential does not undergo cryptographic
  *    transformations (ie, compression and encryption).  It includes:
- *    cred version, cipher type, compression type, mac type, realm length,
+ *    cred version, cipher type, mac type, compression type, realm length,
  *    unterminated realm string (if realm_len > 0), and the cipher's
  *    initialization vector (if encrypted).
  *  Validation of the "outer" credential occurs here as well since unpacking
@@ -415,22 +415,6 @@ dec_v1_unpack_outer (munge_cred_t c)
     p += n;
     len -= n;
     /*
-     *  Unpack the compression type.
-     */
-    n = sizeof (m1->zip);
-    assert (n == 1);
-    if (n > len) {
-        return (m_msg_set_err (c->msg, EMUNGE_BAD_CRED,
-            strdup ("Truncated credential compression type")));
-    }
-    m1->zip = *p;
-    if ((m1->zip != MUNGE_ZIP_NONE) && (!zip_is_valid_type (m1->zip))) {
-        return (m_msg_set_err (c->msg, EMUNGE_BAD_ZIP,
-            strdupf ("Invalid compression type %d", m1->zip)));
-    }
-    p += n;
-    len -= n;
-    /*
      *  Unpack the message authentication code type.
      */
     n = sizeof (m1->mac);
@@ -447,6 +431,22 @@ dec_v1_unpack_outer (munge_cred_t c)
     }
     c->mac_len = md_size (md);
     assert (c->mac_len <= sizeof (c->mac));
+    p += n;
+    len -= n;
+    /*
+     *  Unpack the compression type.
+     */
+    n = sizeof (m1->zip);
+    assert (n == 1);
+    if (n > len) {
+        return (m_msg_set_err (c->msg, EMUNGE_BAD_CRED,
+            strdup ("Truncated credential compression type")));
+    }
+    m1->zip = *p;
+    if ((m1->zip != MUNGE_ZIP_NONE) && (!zip_is_valid_type (m1->zip))) {
+        return (m_msg_set_err (c->msg, EMUNGE_BAD_ZIP,
+            strdupf ("Invalid compression type %d", m1->zip)));
+    }
     p += n;
     len -= n;
     /*

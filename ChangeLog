@@ -1,3 +1,8 @@
+2005-12-06  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/libcommon/m_msg.h, src/munged/enc_v1.c, src/munged/dec_v1.c,
+	  doc/credential_v3_format.txt: Swapped ordering of mac & zip fields.
+
 2005-11-22  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* configure.ac, config/x_ac_arch.m4: Added X_AC_ARCH (--enable-arch=n)

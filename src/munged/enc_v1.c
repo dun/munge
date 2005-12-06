@@ -155,7 +155,19 @@ enc_v1_validate_msg (m_msg_t m)
         return (m_msg_set_err (m, EMUNGE_BAD_CIPHER,
             strdupf ("Invalid cipher type %d", m1->cipher)));
     }
-    /*  Validate compression type.
+    /*  Validate message authentication code type.
+     *  Note that MUNGE_MAC_NONE is not valid -- MACs are REQUIRED!
+     */
+    if (m1->mac == MUNGE_MAC_DEFAULT) {
+        m1->mac = conf->def_mac;
+    }
+    else if (!(lookup_mac (m1->mac))) {
+        return (m_msg_set_err (m, EMUNGE_BAD_MAC,
+            strdupf ("Invalid mac type %d", m1->mac)));
+    }
+    assert (m1->mac != MUNGE_MAC_NONE);
+    /*
+     *  Validate compression type.
      *  Disable compression if no optional data was specified.
      */
     if (m1->zip == MUNGE_ZIP_DEFAULT) {
@@ -171,19 +183,7 @@ enc_v1_validate_msg (m_msg_t m)
     if (m1->data_len == 0) {
         m1->zip = MUNGE_ZIP_NONE;
     }
-    /*  Validate message authentication code type.
-     *  Note that MUNGE_MAC_NONE is not valid -- MACs are REQUIRED!
-     */
-    if (m1->mac == MUNGE_MAC_DEFAULT) {
-        m1->mac = conf->def_mac;
-    }
-    else if (!(lookup_mac (m1->mac))) {
-        return (m_msg_set_err (m, EMUNGE_BAD_MAC,
-            strdupf ("Invalid mac type %d", m1->mac)));
-    }
-    assert (m1->mac != MUNGE_MAC_NONE);
-    /*
-     *  Validate realm.
+    /*  Validate realm.
      *
      *  FIXME: Validate realm and set default string if needed.
      *         Validate that the realm string is NUL-terminated.
@@ -317,7 +317,7 @@ enc_v1_pack_outer (munge_cred_t c)
 /*  Packs the "outer" credential data into MSBF (ie, big endian) format.
  *  The "outer" part of the credential does not undergo cryptographic
  *    transformations (ie, compression and encryption).  It includes:
- *    cred version, cipher type, compression type, mac type, realm length,
+ *    cred version, cipher type, mac type, compression type, realm length,
  *    unterminated realm string (if realm_len > 0), and the cipher's
  *    initialization vector (if encrypted).
  */
@@ -332,8 +332,8 @@ enc_v1_pack_outer (munge_cred_t c)
 
     c->outer_mem_len += sizeof (c->version);
     c->outer_mem_len += sizeof (m1->cipher);
-    c->outer_mem_len += sizeof (m1->zip);
     c->outer_mem_len += sizeof (m1->mac);
+    c->outer_mem_len += sizeof (m1->zip);
     c->outer_mem_len += sizeof (m1->realm_len);
     c->outer_mem_len += m1->realm_len;
     c->outer_mem_len += c->iv_len;
@@ -351,14 +351,14 @@ enc_v1_pack_outer (munge_cred_t c)
     *p = m1->cipher;
     p += sizeof (m1->cipher);
 
+    assert (sizeof (m1->mac) == 1);
+    *p = m1->mac;
+    p += sizeof (m1->mac);
+
     assert (sizeof (m1->zip) == 1);
     c->outer_zip_ref = p;
     *p = m1->zip;
     p += sizeof (m1->zip);
-
-    assert (sizeof (m1->mac) == 1);
-    *p = m1->mac;
-    p += sizeof (m1->mac);
 
     assert (sizeof (m1->realm_len) == 1);
     *p = m1->realm_len;

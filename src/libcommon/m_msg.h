@@ -93,8 +93,8 @@ struct m_msg_head {
 
 struct m_msg_v1 {
     uint8_t            cipher;          /* munge_cipher_t enum               */
-    uint8_t            zip;             /* munge_zip_t enum                  */
     uint8_t            mac;             /* munge_mac_t enum                  */
+    uint8_t            zip;             /* munge_zip_t enum                  */
     uint8_t            realm_len;       /* length of realm string            */
     char              *realm;           /* security realm string             */
     uint32_t           ttl;             /* time-to-live                      */
