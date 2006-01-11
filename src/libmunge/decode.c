@@ -158,6 +158,7 @@ _decode_req (m_msg_t m, munge_ctx_t ctx, const char *cred)
      */
     m->data_len = strlen (cred) + 1;
     m->data = (void *) cred;
+    m->data_is_copy = 1;
     return (EMUNGE_SUCCESS);
 }
 
