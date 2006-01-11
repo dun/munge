@@ -42,10 +42,10 @@ munged_SOURCES = \
 	crypto_log.h \
 	crypto_thread.c \
 	crypto_thread.h \
-	dec_v1.c \
-	dec_v1.h \
-	enc_v1.c \
-	enc_v1.h \
+	dec.c \
+	dec.h \
+	enc.c \
+	enc.h \
 	gids.c \
 	gids.h \
 	hash.c \

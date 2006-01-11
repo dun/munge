@@ -4,7 +4,7 @@
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
  *
- *  Copyright (C) 2002-2005 The Regents of the University of California.
+ *  Copyright (C) 2002-2006 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
  *  Written by Chris Dunlap <cdunlap@llnl.gov>.
  *  UCRL-CODE-155910.
@@ -48,10 +48,10 @@
 static void _decode_init (munge_ctx_t ctx, void **buf, int *len,
     uid_t *uid, gid_t *gid);
 
-static munge_err_t _decode_req_v1 (m_msg_t m, munge_ctx_t ctx,
+static munge_err_t _decode_req (m_msg_t m, munge_ctx_t ctx,
     const char *cred);
 
-static munge_err_t _decode_rsp_v1 (m_msg_t m, munge_ctx_t ctx,
+static munge_err_t _decode_rsp (m_msg_t m, munge_ctx_t ctx,
     void **buf, int *len, uid_t *uid, gid_t *gid);
 
 
@@ -63,8 +63,8 @@ munge_err_t
 munge_decode (const char *cred, munge_ctx_t ctx,
               void **buf, int *len, uid_t *uid, gid_t *gid)
 {
-    munge_err_t   e;
-    m_msg_t       m;
+    munge_err_t  e;
+    m_msg_t      m;
 
     /*  Init output parms in case of early return.
      */
@@ -78,20 +78,20 @@ munge_decode (const char *cred, munge_ctx_t ctx,
     }
     /*  Ask the daemon to decode a credential.
      */
-    if ((e = m_msg_create (&m, -1)) != EMUNGE_SUCCESS)
+    if ((e = m_msg_create (&m)) != EMUNGE_SUCCESS)
         ;
-    else if ((e = _decode_req_v1 (m, ctx, cred)) != EMUNGE_SUCCESS)
+    else if ((e = _decode_req (m, ctx, cred)) != EMUNGE_SUCCESS)
         ;
-    else if ((e = m_msg_client_xfer (&m, ctx)) != EMUNGE_SUCCESS)
-        ;
-    else if ((e = _decode_rsp_v1 (m, ctx, buf, len, uid, gid))
+    else if ((e = m_msg_client_xfer (&m, MUNGE_MSG_DEC_REQ, ctx))
             != EMUNGE_SUCCESS)
+        ;
+    else if ((e = _decode_rsp (m, ctx, buf, len, uid, gid)) != EMUNGE_SUCCESS)
         ;
     /*  Clean up and return.
      */
     if (ctx) {
-        _munge_ctx_set_err (ctx, e, m->errstr);
-        m->errstr = NULL;
+        _munge_ctx_set_err (ctx, e, m->error_str);
+        m->error_is_copy = 1;
     }
     m_msg_destroy (m);
     return (e);
@@ -109,11 +109,11 @@ _decode_init (munge_ctx_t ctx, void **buf, int *len, uid_t *uid, gid_t *gid)
  */
     if (ctx) {
         ctx->cipher = -1;
-        ctx->zip = -1;
         ctx->mac = -1;
-        if (ctx->realm) {
-            free (ctx->realm);
-            ctx->realm = NULL;
+        ctx->zip = -1;
+        if (ctx->realm_str) {
+            free (ctx->realm_str);
+            ctx->realm_str = NULL;
         }
         ctx->ttl = -1;
         ctx->addr.s_addr = 0;
@@ -121,10 +121,10 @@ _decode_init (munge_ctx_t ctx, void **buf, int *len, uid_t *uid, gid_t *gid)
         ctx->time1 = -1;
         ctx->auth_uid = -1;
         ctx->auth_gid = -1;
-        ctx->errnum = EMUNGE_SUCCESS;
-        if (ctx->errstr) {
-            free (ctx->errstr);
-            ctx->errstr = NULL;
+        ctx->error_num = EMUNGE_SUCCESS;
+        if (ctx->error_str) {
+            free (ctx->error_str);
+            ctx->error_str = NULL;
         }
     }
     if (buf) {
@@ -144,97 +144,79 @@ _decode_init (munge_ctx_t ctx, void **buf, int *len, uid_t *uid, gid_t *gid)
 
 
 static munge_err_t
-_decode_req_v1 (m_msg_t m, munge_ctx_t ctx, const char *cred)
+_decode_req (m_msg_t m, munge_ctx_t ctx, const char *cred)
 {
 /*  Creates a Decode Request message to be sent to the local munge daemon.
  *  The inputs to this message are as follows:
  *    data_len, data.
  */
-    struct m_msg_v1 *m1;
-
     assert (m != NULL);
-    assert (m->pbody == NULL);
     assert (cred != NULL);
     assert (strlen (cred) > 0);
 
-    m->head.type = MUNGE_MSG_DEC_REQ;
-
-    m->pbody_len = sizeof (struct m_msg_v1);
-    if (!(m->pbody = malloc (m->pbody_len))) {
-        return (EMUNGE_NO_MEMORY);
-    }
-    /*  Init ints to 0, ptrs to NULL.
+    /*  Pass the NUL-terminated credential to be decoded.
      */
-    memset (m->pbody, 0, m->pbody_len);
-    m1 = m->pbody;
-    /*
-     *  Pass the NUL-terminated credential to be decoded.
-     */
-    m1->data_len = strlen (cred) + 1;
-    m1->data = (void *) cred;
+    m->data_len = strlen (cred) + 1;
+    m->data = (void *) cred;
     return (EMUNGE_SUCCESS);
 }
 
 
 static munge_err_t
-_decode_rsp_v1 (m_msg_t m, munge_ctx_t ctx,
+_decode_rsp (m_msg_t m, munge_ctx_t ctx,
                void **buf, int *len, uid_t *uid, gid_t *gid)
 {
 /*  Extracts a Decode Response message received from the local munge daemon.
  *  The outputs from this message are as follows:
- *    cipher, zip, mac, realm, ttl, addr, time0, time1,
- *    uid, gid, auth_uid, auth_gid, data_len, data, error_num, error_str.
- *  Note that the security realm string here is NUL-terminated.
+ *    cipher, mac, zip, realm, ttl, addr, time0, time1, cred_uid, cred_gid,
+ *    auth_uid, auth_gid, data_len, data, error_num, error_len, error_str.
  *  Note that error_num and error_str are set by _munge_ctx_set_err()
  *    called from munge_decode() (ie, the parent of this stack frame).
  */
-    struct m_msg_v1 *m1;
     unsigned char   *p;
     int              n;
 
     assert (m != NULL);
 
-    m1 = (struct m_msg_v1 *) m->pbody;
-    /*
-     *  Perform sanity checks.
+    /*  Perform sanity checks.
      */
-    if (m->head.type != MUNGE_MSG_DEC_RSP) {
+    if (m->type != MUNGE_MSG_DEC_RSP) {
         m_msg_set_err (m, EMUNGE_SNAFU,
-            strdupf ("Client received invalid message type %d", m->head.type));
+            strdupf ("Client received invalid message type %d", m->type));
         return (EMUNGE_SNAFU);
     }
     /*  Return the result.
      */
     if (ctx) {
-        ctx->cipher = m1->cipher;
-        ctx->zip = m1->zip;
-        ctx->mac = m1->mac;
-        ctx->realm = (m1->realm ? strdup (m1->realm) : NULL);
-        ctx->ttl = m1->ttl;
-        ctx->addr.s_addr = m1->addr.s_addr;;
-        ctx->time0 = m1->time0;
-        ctx->time1 = m1->time1;
-        ctx->auth_uid = m1->auth_uid;
-        ctx->auth_gid = m1->auth_gid;
+        ctx->cipher = m->cipher;
+        ctx->mac = m->mac;
+        ctx->zip = m->zip;
+        ctx->realm_str = (m->realm_str ? strdup (m->realm_str) : NULL);
+        ctx->ttl = m->ttl;
+        ctx->addr.s_addr = m->addr.s_addr;;
+        ctx->time0 = m->time0;
+        ctx->time1 = m->time1;
+        ctx->auth_uid = m->auth_uid;
+        ctx->auth_gid = m->auth_gid;
     }
-    if (buf && len && (m1->data_len > 0)) {
-        n = m1->data_len + 1;
+    if (buf && len && (m->data_len > 0)) {
+        n = m->data_len + 1;
         if (!(p = malloc (n))) {
             m_msg_set_err (m, EMUNGE_NO_MEMORY,
                 strdupf ("Client unable to allocate %d bytes for data", n));
         }
-        memcpy (p, m1->data, m1->data_len);
-        p[m1->data_len] = '\0';
+        memcpy (p, m->data, m->data_len);
+        p[m->data_len] = '\0';
         *buf = p;
     }
     if (len) {
-        *len = m1->data_len;
+        *len = m->data_len;
     }
     if (uid) {
-        *uid = m1->cred_uid;
+        *uid = m->cred_uid;
     }
     if (gid) {
-        *gid = m1->cred_gid;
+        *gid = m->cred_gid;
     }
-    return (m1->error_num);
+    return (m->error_num);
 }

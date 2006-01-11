@@ -4,7 +4,7 @@
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
  *
- *  Copyright (C) 2002-2005 The Regents of the University of California.
+ *  Copyright (C) 2002-2006 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
  *  Written by Chris Dunlap <cdunlap@llnl.gov>.
  *  UCRL-CODE-155910.
@@ -41,18 +41,18 @@
 
 struct munge_ctx {
     int                 cipher;         /* symmetric cipher type             */
-    int                 zip;            /* compression type                  */
     int                 mac;            /* message authentication code type  */
-    char               *realm;          /* security realm                    */
+    int                 zip;            /* compression type                  */
+    char               *realm_str;      /* security realm string with NUL    */
     int                 ttl;            /* time-to-live                      */
     struct in_addr      addr;           /* IP addr where cred was encoded    */
     time_t              time0;          /* time at which cred was encoded    */
     time_t              time1;          /* time at which cred was decoded    */
     uid_t               auth_uid;       /* UID of client allowed to decode   */
     gid_t               auth_gid;       /* GID of client allowed to decode   */
-    char               *socket;         /* munge unix domain socket filename */
-    munge_err_t         errnum;         /* munge error status                */
-    char               *errstr;         /* munge error string                */
+    char               *socket_str;     /* munge domain sock filename w/ NUL */
+    munge_err_t         error_num;      /* munge error status                */
+    char               *error_str;      /* munge error string with NUL       */
 };
 
 

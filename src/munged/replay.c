@@ -4,7 +4,7 @@
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
  *
- *  Copyright (C) 2003-2005 The Regents of the University of California.
+ *  Copyright (C) 2003-2006 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
  *  Written by Chris Dunlap <cdunlap@llnl.gov>.
  *  UCRL-CODE-155910.
@@ -148,17 +148,14 @@ replay_insert (munge_cred_t c)
  *    Returns 1 if the credential is already present (ie, replay).
  *    Returns -1 on error with errno set.
  */
-    int              e;
-    replay_t         r;
-    struct m_msg_v1 *m1;
-
-    assert (c != NULL);
+    m_msg_t   m = c->msg;
+    int       e;
+    replay_t  r;
 
     if (!replay_hash) {
         errno = EPERM;
         return (-1);
     }
-    m1 = c->msg->pbody;
 
     if (!(r = replay_alloc ())) {
         return (-1);
@@ -167,7 +164,7 @@ replay_insert (munge_cred_t c)
      *    the struct small.  Instead, the mac[] is first zero'd so any
      *    remaining bytes won't effect the replay comparison.
      */
-    r->data.t_expired = (time_t) (m1->time0 + m1->ttl);
+    r->data.t_expired = (time_t) (m->time0 + m->ttl);
     memset (r->data.mac, 0, sizeof (r->data.mac));
     assert (c->mac_len <= sizeof (r->data.mac));
     memcpy (r->data.mac, c->mac, c->mac_len);
@@ -196,22 +193,18 @@ replay_remove (munge_cred_t c)
 {
 /*  Removes the credential [c] from the replay hash.
  */
-    union replay_key    rkey_st;
-    replay_t            rkey = &rkey_st;
-    replay_t            r;
-    struct m_msg_v1    *m1;
-
-    assert (c != NULL);
+    m_msg_t           m = c->msg;
+    union replay_key  rkey_st;
+    replay_t          rkey = &rkey_st;
+    replay_t          r;
 
     if (!replay_hash) {
         errno = EPERM;
         return (-1);
     }
-    m1 = c->msg->pbody;
-    /*
-     *  Compute the cred's "hash key".
+    /*  Compute the cred's "hash key".
      */
-    rkey->data.t_expired = (time_t) (m1->time0 + m1->ttl);
+    rkey->data.t_expired = (time_t) (m->time0 + m->ttl);
     memset (rkey->data.mac, 0, sizeof (rkey->data.mac));
     assert (c->mac_len <= sizeof (rkey->data.mac));
     memcpy (rkey->data.mac, c->mac, c->mac_len);

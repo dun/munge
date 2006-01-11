@@ -4,7 +4,7 @@
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
  *
- *  Copyright (C) 2003-2005 The Regents of the University of California.
+ *  Copyright (C) 2003-2006 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
  *  Written by Chris Dunlap <cdunlap@llnl.gov>.
  *  UCRL-CODE-155910.
@@ -29,8 +29,10 @@
 #  include "config.h"
 #endif /* HAVE_CONFIG_H */
 
+#include <arpa/inet.h>
 #include <assert.h>
 #include <errno.h>
+#include <inttypes.h>
 #include <munge.h>
 #include <stdlib.h>
 #include <string.h>
@@ -43,32 +45,52 @@
 
 
 /*****************************************************************************
+ *  Data Types
+ *****************************************************************************/
+
+typedef void ** vpp;
+
+
+/*****************************************************************************
+ *  Prototypes
+ *****************************************************************************/
+
+static int _msg_length (m_msg_t m, m_msg_type_t type);
+static munge_err_t _msg_pack (m_msg_t m, m_msg_type_t type,
+        void *dst, int dstlen);
+static munge_err_t _msg_unpack (m_msg_t m, m_msg_type_t type,
+        const void *src, int srclen);
+static int _alloc (void **pdst, int len);
+static int _copy (void *dst, void *src, int len,
+        const void *first, const void *last, void **pinc);
+static int _pack (void **pdst, void *src, int len, const void *last);
+static int _unpack (void *dst, void **psrc, int len, const void *last);
+
+
+/*****************************************************************************
  *  Public Functions
  *****************************************************************************/
 
 munge_err_t
-m_msg_create (m_msg_t *pm, int sd)
+m_msg_create (m_msg_t *pm)
 {
-/*  Creates a message bound to the socket [sd], returning it via the [pm] ptr.
+/*  Creates a message (passed by reference) for sending over the munge socket.
  *  Returns a standard munge error code.
  */
     m_msg_t m;
 
     assert (pm != NULL);
 
-    if (!(m = malloc (sizeof (struct m_msg)))) {
+    if (!(m = malloc (sizeof (*m)))) {
         *pm = NULL;
         return (EMUNGE_NO_MEMORY);
     }
     /*  Initialize ints to 0, ptrs to NULL.
      */
-    memset (m, 0, sizeof (struct m_msg));
+    memset (m, 0, sizeof (*m));
 
-    m->sd = sd;
-    m->head.magic = MUNGE_MSG_MAGIC;
-    m->head.version = MUNGE_MSG_VERSION;
-    m->head.type = MUNGE_MSG_UNKNOWN;
-    m->errnum = EMUNGE_SUCCESS;
+    m->sd = -1;
+    m->type = MUNGE_MSG_UNDEF;
 
     *pm = m;
     return (EMUNGE_SUCCESS);
@@ -83,75 +105,113 @@ m_msg_destroy (m_msg_t m)
     assert (m != NULL);
 
     if (m->sd >= 0) {
-        close (m->sd);                  /* ignoring errors on close() */
+        (void) close (m->sd);
         m->sd = -1;
     }
-    if (m->pbody) {
-        assert (m->pbody_len > 0);
-        memset (m->pbody, 0, m->pbody_len);
-        free (m->pbody);
+    if (m->pkt && !m->pkt_is_copy) {
+        assert (m->pkt_len > 0);
+        free (m->pkt);
     }
-    if (m->errstr) {
-        memset (m->errstr, 0, strlen (m->errstr));
-        free (m->errstr);
+    if (m->realm_str && !m->realm_is_copy) {
+        assert (m->realm_len > 0);
+        free (m->realm_str);
     }
-    memset (m, 0, sizeof (*m));
+    if (m->data && !m->data_is_copy) {
+        assert (m->data_len > 0);
+        free (m->data);
+    }
+    if (m->error_str && !m->error_is_copy) {
+        assert (m->error_len > 0);
+        free (m->error_str);
+    }
     free (m);
     return;
 }
 
 
 munge_err_t
-m_msg_send (m_msg_t m, int maxlen)
+m_msg_bind (m_msg_t m, int sd)
 {
-/*  Sends the message [m] to the recipient at the other end of the
- *    already-specified socket.
- *  If [maxlen] > 0, messages larger than this value will be discarded and
- *    a munge error will be returned to the caller.
- *  This message contains a common header and a version-specific body.
+/*  Binds the message [m] to the socket [sd].
+ */
+    assert (m != NULL);
+
+    if (m->sd >= 0) {
+        (void) close (m->sd);
+    }
+    m->sd = sd;
+    return (EMUNGE_SUCCESS);
+}
+
+
+munge_err_t
+m_msg_send (m_msg_t m, m_msg_type_t type, int maxlen)
+{
+/*  Sends the message [m] of type [type] to the recipient at the other end
+ *    of the already-specified socket.
+ *  If [maxlen] > 0, message bodies larger than this value will be discarded
+ *    and an error returned.
  *  Returns a standard munge error code.
  */
-    struct m_msg_v1 *m1;
-    int              i, n, nsend;
-    int              iov_num;
-    struct iovec     iov[5];
+    munge_err_t   e;
+    int           n, nsend;
+    uint8_t       hdr [MUNGE_MSG_HDR_SIZE];
+    struct iovec  iov [2];
 
     assert (m != NULL);
-    assert (m->sd >= 0);
-    assert (m->head.magic == MUNGE_MSG_MAGIC);
-    assert (m->head.version == MUNGE_MSG_VERSION);
-    assert (m->pbody != NULL);
+    assert (type != MUNGE_MSG_UNDEF);
+    assert (type != MUNGE_MSG_HDR);
 
-    m1 = m->pbody;
-    m->head.length = sizeof (*m1);
-    m->head.length += m1->realm_len;
-    m->head.length += m1->data_len;
-    m->head.length += m1->error_len;
-
-    iov[0].iov_base = (char *) &(m->head);
-    iov[0].iov_len = sizeof (m->head);
-
-    iov[1].iov_base = (char *) m1;
-    iov[1].iov_len = sizeof (*m1);
-
-    iov[2].iov_base = m1->realm;
-    iov[2].iov_len = m1->realm_len;
-
-    iov[3].iov_base = m1->data;
-    iov[3].iov_len = m1->data_len;
-
-    iov[4].iov_base = m1->error_str;
-    iov[4].iov_len = m1->error_len;
-
-    iov_num = sizeof (iov) / sizeof (iov[0]);
-    for (i=0, nsend=0; i < iov_num; i++) {
-        nsend += iov[i].iov_len;
+    /*  If the stored message type [m->type] does not match the given
+     *    message type [type], clean up the old packed message body.
+     */
+    if (m->type != type) {
+        if (m->pkt) {
+            assert (m->pkt_len > 0);
+            free (m->pkt);
+            m->pkt = NULL;
+            m->pkt_len = 0;
+        }
     }
+    /*  If a previously packed message body does not already exist,
+     *    create & pack the message body.
+     */
+    if (m->pkt == NULL) {
+        assert (m->pkt_len == 0);
+        n = _msg_length (m, type);
+        if (!(m->pkt = malloc (n))) {
+            m_msg_set_err (m, EMUNGE_NO_MEMORY,
+                strdupf ("Unable to malloc %d bytes for message send", n));
+            return (EMUNGE_NO_MEMORY);
+        }
+        m->pkt_len = n;
+        e = _msg_pack (m, type, m->pkt, m->pkt_len);
+        if (e != EMUNGE_SUCCESS) {
+            m_msg_set_err (m, e,
+                strdup ("Unable to pack message body"));
+            return (e);
+        }
+        m->type = type;
+    }
+    /*  Always recompute the message header.
+     */
+    e = _msg_pack (m, MUNGE_MSG_HDR, hdr, sizeof (hdr));
+    if (e != EMUNGE_SUCCESS) {
+        m_msg_set_err (m, e,
+            strdup ("Unable to pack message header"));
+        return (e);
+    }
+    nsend = 0;
+    iov[0].iov_base = hdr;
+    nsend += iov[0].iov_len = sizeof (hdr);
+    iov[1].iov_base = m->pkt;
+    nsend += iov[1].iov_len = m->pkt_len;
+
     /*  An EINTR should only occur before any data is transferred.
      *    As such, it should be jiggy to restart the whole writev() if needed.
      */
 again:
-    if ((n = writev (m->sd, iov, iov_num)) < 0) {
+    if ((n = writev (m->sd, iov, 2)) < 0) {
         if (errno == EINTR)
             goto again;
         m_msg_set_err (m, EMUNGE_SOCKET,
@@ -165,10 +225,10 @@ again:
      *    The daemon will abort its read after having read only the
      *    m_msg_head struct.
      */
-    if ((maxlen > 0) && (m->head.length > maxlen)) {
+    if ((maxlen > 0) && (m->pkt_len > maxlen)) {
         m_msg_set_err (m, EMUNGE_SOCKET,
             strdupf ("Unable to send message: length %d exceeds max of %d",
-                m->head.length, maxlen));
+                m->pkt_len, maxlen));
         return (EMUNGE_BAD_LENGTH);
     }
     if (n != nsend) {
@@ -181,25 +241,34 @@ again:
 
 
 munge_err_t
-m_msg_recv (m_msg_t m, int maxlen)
+m_msg_recv (m_msg_t m, m_msg_type_t type, int maxlen)
 {
-/*  Receives a message from the sender at the other end of the already-
- *    specified socket.  This message is stored in the already-allocated [m].
- *  If [maxlen] > 0, messages larger than this value will be discarded and
- *    a munge error will be returned to the caller.
+/*  Receives a message from the sender at the other end of the
+ *    already-specified socket.  This message is stored in the
+ *    previously-created [m].
+ *  If a [type] is specified (ie, not MUNGE_MSG_UNDEF) and does not match
+ *    the header type, the message will be discarded and an error returned.
+ *  If [maxlen] > 0, message bodies larger than this value will be discarded
+ *    and an error returned.
  *  Returns a standard munge error code.
  */
-    struct m_msg_v1 *m1;
-    int              n, nrecv;
+    int      n, nrecv;
+    uint8_t  hdr [MUNGE_MSG_HDR_SIZE];
 
     assert (m != NULL);
-    assert (m->sd >= 0);
-    assert (m->pbody == NULL);
+    assert (m->type != MUNGE_MSG_HDR);
+    assert (_msg_length (m, MUNGE_MSG_HDR) == MUNGE_MSG_HDR_SIZE);
 
+    if (m->pkt != NULL) {
+        assert (m->pkt_len > 0);
+        free (m->pkt);
+        m->pkt = NULL;
+        m->pkt_len = 0;
+    }
     /*  Read and validate the message header.
      */
-    nrecv = sizeof (m->head);
-    if ((n = fd_read_n (m->sd, &(m->head), nrecv)) < 0) {
+    nrecv = sizeof (hdr);
+    if ((n = fd_read_n (m->sd, &hdr, nrecv)) < 0) {
         m_msg_set_err (m, EMUNGE_SOCKET,
             strdupf ("Unable to receive message header: %s",
                 strerror (errno)));
@@ -207,7 +276,7 @@ m_msg_recv (m_msg_t m, int maxlen)
     }
     else if (n == 0) {
         m_msg_set_err (m, EMUNGE_SOCKET,
-            strdupf ("Received empty message"));
+            strdup ("Received empty message header"));
         return (EMUNGE_SOCKET);
     }
     else if (n != nrecv) {
@@ -216,101 +285,52 @@ m_msg_recv (m_msg_t m, int maxlen)
             n, nrecv));
         return (EMUNGE_SOCKET);
     }
-    else if (m->head.magic != MUNGE_MSG_MAGIC) {
+    else if (_msg_unpack (m, MUNGE_MSG_HDR, hdr, sizeof (hdr))
+            != EMUNGE_SUCCESS) {
         m_msg_set_err (m, EMUNGE_SOCKET,
-            strdupf ("Received invalid message magic %d", m->head.magic));
+            strdup ("Unable to unpack message header"));
         return (EMUNGE_SOCKET);
     }
-    else if (m->head.version != MUNGE_MSG_VERSION) {
+    else if ((type != MUNGE_MSG_UNDEF) && (m->type != type)) {
         m_msg_set_err (m, EMUNGE_SOCKET,
-            strdupf ("Received invalid message version %d", m->head.version));
+            strdupf ("Received unexpected message type: wanted %d, got %d",
+                type, m->type));
         return (EMUNGE_SOCKET);
     }
-    else if (m->head.length < sizeof (struct m_msg_v1)) {
-        m_msg_set_err (m, EMUNGE_SOCKET,
-            strdupf ("Received invalid message length %d", m->head.length));
-        return (EMUNGE_SOCKET);
-    }
-    else if ((maxlen > 0) && (m->head.length > maxlen)) {
+    else if ((maxlen > 0) && (m->pkt_len > maxlen)) {
         m_msg_set_err (m, EMUNGE_SOCKET,
             strdupf ("Received message length %d exceeding max of %d",
-                m->head.length, maxlen));
+                m->pkt_len, maxlen));
         return (EMUNGE_BAD_LENGTH);
     }
-    /*  Read the version-specific message body.
-     *  Reserve space for a terminating NUL character.  This NUL is not
-     *    received across the socket, but appended afterwards.
-     */
-    m->pbody_len = m->head.length + 1;
-    if (!(m->pbody = malloc (m->pbody_len))) {
-        m_msg_set_err (m, EMUNGE_NO_MEMORY,
-            strdupf ("Unable to malloc %d bytes for message", m->pbody_len));
-        return (EMUNGE_NO_MEMORY);
+    else if (!(m->pkt = malloc (m->pkt_len))) {
+            m_msg_set_err (m, EMUNGE_NO_MEMORY,
+                strdupf ("Unable to malloc %d bytes for message recv", n));
+            return (EMUNGE_NO_MEMORY);
     }
-    nrecv = m->head.length;
-    if ((n = fd_read_n (m->sd, m->pbody, nrecv)) < 0) {
+    else if ((n = fd_read_n (m->sd, m->pkt, m->pkt_len)) < 0) {
         m_msg_set_err (m, EMUNGE_SOCKET,
-            strdupf ("Unable to receive message: %s", strerror (errno)));
+            strdupf ("Unable to receive message body: %s",
+                strerror (errno)));
         return (EMUNGE_SOCKET);
     }
-    if (n != nrecv) {
+    else if (n != m->pkt_len) {
         m_msg_set_err (m, EMUNGE_SOCKET,
-            strdupf ("Received incomplete message: %d of %d bytes", n, nrecv));
+            strdupf ("Received incomplete message body: %d of %d bytes",
+            n, nrecv));
         return (EMUNGE_SOCKET);
     }
-    m1 = m->pbody;
-    n = sizeof (*m1);
-    /*
-     *  Locate the realm string (if present) within the message body.
-     *    It immediately follows the m_msg_v1 struct.
-     */
-    if (m1->realm_len > 0) {
-        m1->realm = ((char *) m1) + n;
-        n += m1->realm_len;
-    }
-    else {
-        m1->realm = NULL;
-    }
-    /*  Locate the message payload data (if present) within the message body.
-     *    It immediately follows the realm string.
-     */
-    if (m1->data_len > 0) {
-        m1->data = ((char *) m1) + n;
-        n += m1->data_len;
-    }
-    else {
-        m1->data = NULL;
-    }
-    /*  Locate the error string (if present) within the message body.
-     *    It immediately follows the data segment.
-     */
-    if (m1->error_len > 0) {
-        m1->error_str = ((char *) m1) + n;
-        n += m1->error_len;
-    }
-    else {
-        m1->error_str = NULL;
-    }
-    /*  Validate the length of the version-specific message body.
-     */
-    if (n != m->head.length) {
+    else if (_msg_unpack (m, m->type, m->pkt, m->pkt_len)
+            != EMUNGE_SUCCESS) {
         m_msg_set_err (m, EMUNGE_SOCKET,
-            strdupf ("Received unexpected message length: %d of %d bytes",
-                m->head.length, n));
+            strdup ("Unable to unpack message body"));
         return (EMUNGE_SOCKET);
     }
-    /*  Append the terminating NUL character now that the length is verified.
+    /*  The packed message can be discarded now that it's been unpacked.
      */
-    ((char *) m->pbody)[m->head.length] = '\0';
-    /*
-     *  If an error message was returned, copy it into the message metadata.
-     */
-    m->errnum = m1->error_num;
-    if (m1->error_str) {
-        assert (m1->error_len > 0);
-        assert (m->errstr == NULL);
-        m->errstr = strdup (m1->error_str);
-    }
+    free (m->pkt);
+    m->pkt = NULL;
+    m->pkt_len = 0;
     return (EMUNGE_SUCCESS);
 }
 
@@ -319,24 +339,21 @@ int
 m_msg_set_err (m_msg_t m, munge_err_t e, char *s)
 {
 /*  Set an error code [e] and string [s] if an error condition
- *    does not already exist (ie, m->errnum == EMUNGE_SUCCESS).
+ *    does not already exist (ie, m->error_num == EMUNGE_SUCCESS).
  *    Thus, if multiple errors are set, only the first one is reported.
  *  If [s] is not NULL, that string (and _not_ a copy) will be stored
  *    and later free()'d by the message destructor; if [s] is NULL,
  *    munge_strerror() will be used to obtain a descriptive string.
  *  Always returns -1 and consumes [s].
- *
- *  Note that the error condition (status code and message string) is stored
- *    within the msg 'errnum' & 'errmsg' variables.  When the message
- *    is transmitted over the socket from server to client, these are passed
- *    via the version-specific message format as appropriate.
  */
     assert (m != NULL);
 
-    if ((m->errnum == EMUNGE_SUCCESS) && (e != EMUNGE_SUCCESS)) {
-        m->errnum = e;
-        assert (m->errstr == NULL);
-        m->errstr = (s != NULL) ? s : strdup (munge_strerror (e));;
+    if ((m->error_num == EMUNGE_SUCCESS) && (e != EMUNGE_SUCCESS)) {
+        m->error_num = e;
+        assert (m->error_str == NULL);
+        assert (m->error_len == 0);
+        m->error_str = (s != NULL) ? s : strdup (munge_strerror (e));
+        m->error_len = strlen (m->error_str) + 1;
     }
     else if (s) {
         free (s);
@@ -344,4 +361,414 @@ m_msg_set_err (m_msg_t m, munge_err_t e, char *s)
     /*  "Screw you guys, I'm goin' home." -ecartman
      */
     return (-1);
+}
+
+
+/*****************************************************************************
+ *  Private Functions
+ *****************************************************************************/
+
+static int
+_msg_length (m_msg_t m, m_msg_type_t type)
+{
+/*  Returns the length needed to pack the message [m] of type [type].
+ */
+    int n = 0;
+
+    assert (m != NULL);
+
+    switch (type) {
+        case MUNGE_MSG_HDR:
+            n += sizeof (m_msg_magic_t);
+            n += sizeof (m_msg_version_t);
+            n += sizeof (m->type);
+            n += sizeof (m->retry);
+            n += sizeof (m->pkt_len);
+            break;
+        case MUNGE_MSG_ENC_REQ:
+            n += sizeof (m->cipher);
+            n += sizeof (m->mac);
+            n += sizeof (m->zip);
+            n += sizeof (m->realm_len);
+            n += m->realm_len;
+            n += sizeof (m->ttl);
+            n += sizeof (m->auth_uid);
+            n += sizeof (m->auth_gid);
+            n += sizeof (m->data_len);
+            n += m->data_len;
+            break;
+        case MUNGE_MSG_ENC_RSP:
+            n += sizeof (m->error_num);
+            n += sizeof (m->error_len);
+            n += m->error_len;
+            n += sizeof (m->data_len);
+            n += m->data_len;
+            break;
+        case MUNGE_MSG_DEC_REQ:
+            n += sizeof (m->data_len);
+            n += m->data_len;
+            break;
+        case MUNGE_MSG_DEC_RSP:
+            n += sizeof (m->error_num);
+            n += sizeof (m->error_len);
+            n += m->error_len;
+            n += sizeof (m->cipher);
+            n += sizeof (m->mac);
+            n += sizeof (m->zip);
+            n += sizeof (m->realm_len);
+            n += m->realm_len;
+            n += sizeof (m->ttl);
+            n += sizeof (m->addr_len);
+            n += m->addr_len;
+            n += sizeof (m->time0);
+            n += sizeof (m->time1);
+            n += sizeof (m->cred_uid);
+            n += sizeof (m->cred_gid);
+            n += sizeof (m->auth_uid);
+            n += sizeof (m->auth_gid);
+            n += sizeof (m->data_len);
+            n += m->data_len;
+            break;
+        case MUNGE_MSG_AUTH_FD_REQ:
+            n += sizeof (m->data_len);
+            n += m->data_len;
+            break;
+        default:
+            return (-1);
+            break;
+    }
+    return (n);
+}
+
+
+static munge_err_t
+_msg_pack (m_msg_t m, m_msg_type_t type, void *dst, int dstlen)
+{
+/*  Packs the message [m] of type [type] into the buffer [dst]
+ *    of length [dstlen] for transport across the munge socket.
+ */
+    m_msg_magic_t    magic = MUNGE_MSG_MAGIC;
+    m_msg_version_t  version = MUNGE_MSG_VERSION;
+    void            *p = dst;
+    void            *q = (unsigned char *) dst + dstlen;
+
+    assert (m != NULL);
+
+    switch (type) {
+        case MUNGE_MSG_HDR:
+            if      (!_pack (&p, &magic, sizeof (magic), q)) ;
+            else if (!_pack (&p, &version, sizeof (version), q)) ;
+            else if (!_pack (&p, &(m->type), sizeof (m->type), q)) ;
+            else if (!_pack (&p, &(m->retry), sizeof (m->retry), q)) ;
+            else if (!_pack (&p, &(m->pkt_len), sizeof (m->pkt_len), q)) ;
+            else break;
+            goto err;
+        case MUNGE_MSG_ENC_REQ:
+            if      (!_pack (&p, &(m->cipher), sizeof (m->cipher), q)) ;
+            else if (!_pack (&p, &(m->mac), sizeof (m->mac), q)) ;
+            else if (!_pack (&p, &(m->zip), sizeof (m->zip), q)) ;
+            else if (!_pack (&p, &(m->realm_len), sizeof (m->realm_len), q)) ;
+            else if ( _copy (p, m->realm_str, m->realm_len, p, q, &p) < 0) ;
+            else if (!_pack (&p, &(m->ttl), sizeof (m->ttl), q)) ;
+            else if (!_pack (&p, &(m->auth_uid), sizeof (m->auth_uid), q)) ;
+            else if (!_pack (&p, &(m->auth_gid), sizeof (m->auth_gid), q)) ;
+            else if (!_pack (&p, &(m->data_len), sizeof (m->data_len), q)) ;
+            else if ( _copy (p, m->data, m->data_len, p, q, &p) < 0) ;
+            else break;
+            goto err;
+        case MUNGE_MSG_ENC_RSP:
+            if      (!_pack (&p, &(m->error_num), sizeof (m->error_num), q)) ;
+            else if (!_pack (&p, &(m->error_len), sizeof (m->error_len), q)) ;
+            else if ( _copy (p, m->error_str, m->error_len, p, q, &p) < 0) ;
+            else if (!_pack (&p, &(m->data_len), sizeof (m->data_len), q)) ;
+            else if ( _copy (p, m->data, m->data_len, p, q, &p) < 0) ;
+            else break;
+            goto err;
+        case MUNGE_MSG_DEC_REQ:
+            if      (!_pack (&p, &(m->data_len), sizeof (m->data_len), q)) ;
+            else if ( _copy (p, m->data, m->data_len, p, q, &p) < 0) ;
+            else break;
+            goto err;
+        case MUNGE_MSG_DEC_RSP:
+            if      (!_pack (&p, &(m->error_num), sizeof (m->error_num), q)) ;
+            else if (!_pack (&p, &(m->error_len), sizeof (m->error_len), q)) ;
+            else if ( _copy (p, m->error_str, m->error_len, p, q, &p) < 0) ;
+            else if (!_pack (&p, &(m->cipher), sizeof (m->cipher), q)) ;
+            else if (!_pack (&p, &(m->mac), sizeof (m->mac), q)) ;
+            else if (!_pack (&p, &(m->zip), sizeof (m->zip), q)) ;
+            else if (!_pack (&p, &(m->realm_len), sizeof (m->realm_len), q)) ;
+            else if ( _copy (p, m->realm_str, m->realm_len, p, q, &p) < 0) ;
+            else if (!_pack (&p, &(m->ttl), sizeof (m->ttl), q)) ;
+            else if (!_pack (&p, &(m->addr_len), sizeof (m->addr_len), q)) ;
+            else if ( _copy (p, &(m->addr), m->addr_len, p, q, &p) < 0) ;
+            else if (!_pack (&p, &(m->time0), sizeof (m->time0), q)) ;
+            else if (!_pack (&p, &(m->time1), sizeof (m->time1), q)) ;
+            else if (!_pack (&p, &(m->cred_uid), sizeof (m->cred_uid), q)) ;
+            else if (!_pack (&p, &(m->cred_gid), sizeof (m->cred_gid), q)) ;
+            else if (!_pack (&p, &(m->auth_uid), sizeof (m->auth_uid), q)) ;
+            else if (!_pack (&p, &(m->auth_gid), sizeof (m->auth_gid), q)) ;
+            else if (!_pack (&p, &(m->data_len), sizeof (m->data_len), q)) ;
+            else if ( _copy (p, m->data, m->data_len, p, q, &p) < 0) ;
+            else break;
+            goto err;
+        case MUNGE_MSG_AUTH_FD_REQ:
+            if      (!_pack (&p, &(m->data_len), sizeof (m->data_len), q)) ;
+            else if ( _copy (p, m->data, m->data_len, p, q, &p) < 0) ;
+            else break;
+            goto err;
+        default:
+            goto err;
+    }
+    return (EMUNGE_SUCCESS);
+
+err:
+    m_msg_set_err (m, EMUNGE_SNAFU,
+        strdupf ("Unable to pack message type %d", type));
+    return (EMUNGE_SNAFU);
+}
+
+
+static munge_err_t
+_msg_unpack (m_msg_t m, m_msg_type_t type, const void *src, int srclen)
+{
+/*  Unpacks the message [m] from transport across the munge socket.
+ *  Checks to ensure the message is of the expected type [type].
+ */
+    m_msg_magic_t    magic;
+    m_msg_version_t  version;
+    void            *p = src;
+    void            *q = (unsigned char *) src + srclen;
+
+    assert (m != NULL);
+
+    switch (type) {
+        case MUNGE_MSG_HDR:
+            if      (!_unpack (&magic, &p, sizeof (magic), q)) ;
+            else if (!_unpack (&version, &p, sizeof (version), q)) ;
+            else if (!_unpack (&(m->type), &p, sizeof (m->type), q)) ;
+            else if (!_unpack (&(m->retry), &p, sizeof (m->retry), q)) ;
+            else if (!_unpack (&(m->pkt_len), &p, sizeof (m->pkt_len), q)) ;
+            else break;
+            goto err;
+        case MUNGE_MSG_ENC_REQ:
+            if      (!_unpack (&(m->cipher), &p, sizeof (m->cipher), q)) ;
+            else if (!_unpack (&(m->mac), &p, sizeof (m->mac), q)) ;
+            else if (!_unpack (&(m->zip), &p, sizeof (m->zip), q)) ;
+            else if (!_unpack (&(m->realm_len), &p, sizeof (m->realm_len), q));
+            else if (!_alloc ((vpp) &(m->realm_str), m->realm_len)) goto nomem;
+            else if ( _copy (m->realm_str, p, m->realm_len, p, q, &p) < 0) ;
+            else if (!_unpack (&(m->ttl), &p, sizeof (m->ttl), q)) ;
+            else if (!_unpack (&(m->auth_uid), &p, sizeof (m->auth_uid), q)) ;
+            else if (!_unpack (&(m->auth_gid), &p, sizeof (m->auth_gid), q)) ;
+            else if (!_unpack (&(m->data_len), &p, sizeof (m->data_len), q)) ;
+            else if (!_alloc (&(m->data), m->data_len)) goto nomem;
+            else if ( _copy (m->data, p, m->data_len, p, q, &p) < 0) ;
+            else break;
+            goto err;
+        case MUNGE_MSG_ENC_RSP:
+            if      (!_unpack (&(m->error_num), &p, sizeof (m->error_num), q));
+            else if (!_unpack (&(m->error_len), &p, sizeof (m->error_len), q));
+            else if (!_alloc ((vpp) &(m->error_str), m->error_len)) goto nomem;
+            else if ( _copy (m->error_str, p, m->error_len, p, q, &p) < 0) ;
+            else if (!_unpack (&(m->data_len), &p, sizeof (m->data_len), q)) ;
+            else if (!_alloc (&(m->data), m->data_len)) goto nomem;
+            else if ( _copy (m->data, p, m->data_len, p, q, &p) < 0) ;
+            else break;
+            goto err;
+        case MUNGE_MSG_DEC_REQ:
+            if      (!_unpack (&(m->data_len), &p, sizeof (m->data_len), q)) ;
+            else if (!_alloc (&(m->data), m->data_len)) goto nomem;
+            else if ( _copy (m->data, p, m->data_len, p, q, &p) < 0) ;
+            else break;
+            goto err;
+        case MUNGE_MSG_DEC_RSP:
+            if      (!_unpack (&(m->error_num), &p, sizeof (m->error_num), q));
+            else if (!_unpack (&(m->error_len), &p, sizeof (m->error_len), q));
+            else if (!_alloc ((vpp) &(m->error_str), m->error_len)) goto nomem;
+            else if ( _copy (m->error_str, p, m->error_len, p, q, &p) < 0) ;
+            else if (!_unpack (&(m->cipher), &p, sizeof (m->cipher), q)) ;
+            else if (!_unpack (&(m->mac), &p, sizeof (m->mac), q)) ;
+            else if (!_unpack (&(m->zip), &p, sizeof (m->zip), q)) ;
+            else if (!_unpack (&(m->realm_len), &p, sizeof (m->realm_len), q));
+            else if (!_alloc ((vpp) &(m->realm_str), m->realm_len)) goto nomem;
+            else if ( _copy (m->realm_str, p, m->realm_len, p, q, &p) < 0) ;
+            else if (!_unpack (&(m->ttl), &p, sizeof (m->ttl), q)) ;
+            else if (!_unpack (&(m->addr_len), &p, sizeof (m->addr_len), q)) ;
+            else if ( _copy (&(m->addr), p, m->addr_len, p, q, &p) < 0) ;
+            else if (!_unpack (&(m->time0), &p, sizeof (m->time0), q)) ;
+            else if (!_unpack (&(m->time1), &p, sizeof (m->time1), q)) ;
+            else if (!_unpack (&(m->cred_uid), &p, sizeof (m->cred_uid), q)) ;
+            else if (!_unpack (&(m->cred_gid), &p, sizeof (m->cred_gid), q)) ;
+            else if (!_unpack (&(m->auth_uid), &p, sizeof (m->auth_uid), q)) ;
+            else if (!_unpack (&(m->auth_gid), &p, sizeof (m->auth_gid), q)) ;
+            else if (!_unpack (&(m->data_len), &p, sizeof (m->data_len), q)) ;
+            else if (!_alloc (&(m->data), m->data_len)) goto nomem;
+            else if ( _copy (m->data, p, m->data_len, p, q, &p) < 0) ;
+            else break;
+            goto err;
+        case MUNGE_MSG_AUTH_FD_REQ:
+            if      (!_unpack (&(m->data_len), &p, sizeof (m->data_len), q)) ;
+            else if (!_alloc (&(m->data), m->data_len)) goto nomem;
+            else if ( _copy (m->data, p, m->data_len, p, q, &p) < 0) ;
+            else break;
+            goto err;
+        default:
+            goto err;
+    }
+    assert (p == (unsigned char *) src + srclen);
+
+    if (type == MUNGE_MSG_HDR) {
+        if (magic != MUNGE_MSG_MAGIC) {
+            m_msg_set_err (m, EMUNGE_SOCKET,
+                strdupf ("Received invalid message magic %d", magic));
+            return (EMUNGE_SOCKET);
+        }
+        else if (version != MUNGE_MSG_VERSION) {
+            m_msg_set_err (m, EMUNGE_SOCKET,
+                strdupf ("Received invalid message version %d", version));
+            return (EMUNGE_SOCKET);
+        }
+    }
+    return (EMUNGE_SUCCESS);
+
+err:
+    m_msg_set_err (m, EMUNGE_SNAFU,
+        strdupf ("Unable to unpack message type %d", type));
+    return (EMUNGE_SNAFU);
+
+nomem:
+    m_msg_set_err (m, EMUNGE_NO_MEMORY, NULL);
+    return (EMUNGE_NO_MEMORY);
+}
+
+
+static int
+_alloc (void **pdst, int len)
+{
+/*  Allocates memory for [pdst] of length [len].
+ *  Returns non-zero on success; o/w, returns 0.
+ */
+    assert (pdst != NULL);
+    assert (*pdst == NULL);
+
+    if (len == 0) {                     /* valid no-op */
+        return (1);
+    }
+    if (len < 0) {                      /* invalid length */
+        return (0);
+    }
+    if ((*pdst = malloc (len))) {
+        return (1);
+    }
+    return (0);
+}
+
+
+static int
+_copy (void *dst, void *src, int len,
+       const void *first, const void *last, void **pinc)
+{
+/*  Copies [len] bytes of data from [src] to [dst].
+ *    If [first] and [last] are both non-NULL, checks to ensure
+ *    [len] bytes of data resides between [first] and [last].
+ *  Returns the number of bytes copied into [dst], or -1 on error.
+ *    On success, an optional [inc] ptr is advanced by [len].
+ */
+    if (len < 0) {
+        return (-1);
+    }
+    if (len == 0) {
+        return (0);
+    }
+    if ((first != NULL) && (last != NULL)
+            && ((unsigned char *) first + len > (unsigned char *) last)) {
+        return (-1);
+    }
+    if (len > 0) {
+        memcpy (dst, src, len);
+    }
+    if (pinc != NULL) {
+        *pinc = (unsigned char *) *pinc + len;
+    }
+    return (len);
+}
+
+
+static int
+_pack (void **pdst, void *src, int len, const void *last)
+{
+/*  Packs the [src] data of [len] bytes into [dst] using MSBF.
+ *    If [last] is non-NULL, checks to ensure [len] bytes
+ *    of [dst] data resides prior to the [last] valid byte.
+ *  Returns the number of bytes copied into [dst].
+ *    On success, the [dst] ptr is advanced by [len].
+ */
+    void     *dst;
+    uint16_t  u16;
+    uint32_t  u32;
+
+    assert (pdst != NULL);
+    assert (src != NULL);
+
+    dst = *pdst;
+    if (last && ((unsigned char *) dst + len > (unsigned char *) last)) {
+        return (0);
+    }
+    switch (len) {
+        case (sizeof (uint8_t)):
+            * (uint8_t *) dst = * (uint8_t *) src;
+            break;
+        case (sizeof (uint16_t)):
+            u16 = htons (* (uint16_t *) src);
+            memcpy (dst, &u16, len);
+            break;
+        case (sizeof (uint32_t)):
+            u32 = htonl (* (uint32_t *) src);
+            memcpy (dst, &u32, len);
+            break;
+        default:
+            return (0);
+    }
+    *pdst = (unsigned char *) dst + len;
+    return (len);
+}
+
+
+static int
+_unpack (void *dst, void **psrc, int len, const void *last)
+{
+/*  Unpacks the MSBF [src] data of [len] bytes into [dst].
+ *    If [last] is non-NULL, checks to ensure [len] bytes
+ *    of [src] data resides prior to the [last] valid byte.
+ *  Returns the number of bytes copied into [dst].
+ *    On success, the [src] ptr is advanced by [len].
+ */
+    void     *src;
+    uint16_t  u16;
+    uint32_t  u32;
+
+    assert (dst != NULL);
+    assert (psrc != NULL);
+
+    src = *psrc;
+    if (last && ((unsigned char *) src + len > (unsigned char *) last)) {
+        return (0);
+    }
+    switch (len) {
+        case (sizeof (uint8_t)):
+            * (uint8_t *) dst = * (uint8_t *) src;
+            break;
+        case (sizeof (uint16_t)):
+            memcpy (&u16, src, len);
+            * (uint16_t *) dst = ntohs (u16);
+            break;
+        case (sizeof (uint32_t)):
+            memcpy (&u32, src, len);
+            * (uint32_t *) dst = ntohl (u32);
+            break;
+        default:
+            return (0);
+    }
+    *psrc = (unsigned char *) src + len;
+    return (len);
 }

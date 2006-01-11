@@ -4,7 +4,7 @@
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
  *
- *  Copyright (C) 2003-2005 The Regents of the University of California.
+ *  Copyright (C) 2003-2006 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
  *  Written by Chris Dunlap <cdunlap@llnl.gov>.
  *  UCRL-CODE-155910.
@@ -36,8 +36,8 @@
 #include <sys/socket.h>
 #include <unistd.h>
 #include "conf.h"
-#include "dec_v1.h"
-#include "enc_v1.h"
+#include "dec.h"
+#include "enc.h"
 #include "log.h"
 #include "m_msg.h"
 #include "munge_defs.h"
@@ -101,9 +101,13 @@ job_accept (conf_t conf)
                     break;
             }
         }
-        if (m_msg_create (&m, sd) != EMUNGE_SUCCESS) {
+        if (m_msg_create (&m) != EMUNGE_SUCCESS) {
             close (sd);
             log_msg (LOG_WARNING, "Unable to create client request");
+        }
+        else if (m_msg_bind (m, sd) != EMUNGE_SUCCESS) {
+            close (sd);
+            log_msg (LOG_WARNING, "Unable to bind socket for client request");
         }
         else if (work_queue (w, m) < 0) {
             m_msg_destroy (m);
@@ -111,27 +115,6 @@ job_accept (conf_t conf)
         }
     }
     work_fini (w, 1);
-    return;
-}
-
-
-void
-job_error (m_msg_t m)
-{
-/*  If an error condition has been set for the message [m], copy it to the
- *    version-specific message format for transport over the domain socket.
- */
-    struct m_msg_v1 *m1;
-
-    assert (m != NULL);
-
-    if (m->errnum != EMUNGE_SUCCESS) {
-        m1 = m->pbody;
-        m1->error_num = m->errnum;
-        m1->error_str =
-            strdup (m->errstr ? m->errstr : munge_strerror (m->errnum));
-        m1->error_len = strlen (m1->error_str) + 1;
-    }
     return;
 }
 
@@ -150,29 +133,25 @@ _job_exec (m_msg_t m)
 
     assert (m != NULL);
 
-    if ((e = m_msg_recv (m, MUNGE_MAXIMUM_REQ_LEN)) != EMUNGE_SUCCESS) {
-        ; /* fall out of if clause, log error, and drop request */
-    }
-    else if (m->head.version != MUNGE_MSG_VERSION) {
-        m_msg_set_err (m, EMUNGE_SNAFU,
-            strdupf ("Invalid message version %d", m->head.version));
-    }
-    else {
-        switch (m->head.type) {
+    e = m_msg_recv (m, MUNGE_MSG_UNDEF, MUNGE_MAXIMUM_REQ_LEN);
+    if (e == EMUNGE_SUCCESS) {
+        switch (m->type) {
             case MUNGE_MSG_ENC_REQ:
-                enc_v1_process_msg (m);
+                enc_process_msg (m);
                 break;
             case MUNGE_MSG_DEC_REQ:
-                dec_v1_process_msg (m);
+                dec_process_msg (m);
                 break;
             default:
                 m_msg_set_err (m, EMUNGE_SNAFU,
-                    strdupf ("Invalid message type %d", m->head.type));
+                    strdupf ("Invalid message type %d", m->type));
                 break;
         }
     }
-    if (m->errnum != EMUNGE_SUCCESS) {
-        p = (m->errstr != NULL) ? m->errstr : munge_strerror (m->errnum);
+    if (m->error_num != EMUNGE_SUCCESS) {
+        p = (m->error_str != NULL)
+            ? m->error_str
+            : munge_strerror (m->error_num);
         log_msg (LOG_INFO, "%s", p);
     }
     m_msg_destroy (m);

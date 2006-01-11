@@ -4,7 +4,7 @@
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
  *
- *  Copyright (C) 2002-2005 The Regents of the University of California.
+ *  Copyright (C) 2002-2006 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
  *  Written by Chris Dunlap <cdunlap@llnl.gov>.
  *  UCRL-CODE-155910.
@@ -105,10 +105,6 @@
  *    of expired credentials.
  */
 #define MUNGE_REPLAY_PURGE_TIMER        60
-
-/*  Integer (uint32_t) sentinel for valid munge message.
- */
-#define MUNGE_MSG_MAGIC                 0x00606D4B
 
 /*  Socket backlog for the server listening on the unix domain socket.
  */

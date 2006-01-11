@@ -75,8 +75,8 @@ base64_test_LDADD = $(LDADD)
 am_munged_OBJECTS = munged-auth_recv.$(OBJEXT) munged-base64.$(OBJEXT) \
 	munged-cipher.$(OBJEXT) munged-conf.$(OBJEXT) \
 	munged-cred.$(OBJEXT) munged-crypto_log.$(OBJEXT) \
-	munged-crypto_thread.$(OBJEXT) munged-dec_v1.$(OBJEXT) \
-	munged-enc_v1.$(OBJEXT) munged-gids.$(OBJEXT) \
+	munged-crypto_thread.$(OBJEXT) munged-dec.$(OBJEXT) \
+	munged-enc.$(OBJEXT) munged-gids.$(OBJEXT) \
 	munged-hash.$(OBJEXT) munged-job.$(OBJEXT) \
 	munged-lookup.$(OBJEXT) munged-mac.$(OBJEXT) \
 	munged-md.$(OBJEXT) munged-random.$(OBJEXT) \
@@ -250,10 +250,10 @@ munged_SOURCES = \
 	crypto_log.h \
 	crypto_thread.c \
 	crypto_thread.h \
-	dec_v1.c \
-	dec_v1.h \
-	enc_v1.c \
-	enc_v1.h \
+	dec.c \
+	dec.h \
+	enc.c \
+	enc.h \
 	gids.c \
 	gids.h \
 	hash.c \
@@ -383,8 +383,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/munged-cred.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/munged-crypto_log.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/munged-crypto_thread.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/munged-dec_v1.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/munged-enc_v1.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/munged-dec.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/munged-enc.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/munged-gids.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/munged-hash.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/munged-job.Po@am__quote@
@@ -518,33 +518,33 @@ munged-crypto_thread.obj: crypto_thread.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -c -o munged-crypto_thread.obj `if test -f 'crypto_thread.c'; then $(CYGPATH_W) 'crypto_thread.c'; else $(CYGPATH_W) '$(srcdir)/crypto_thread.c'; fi`
 
-munged-dec_v1.o: dec_v1.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -MT munged-dec_v1.o -MD -MP -MF "$(DEPDIR)/munged-dec_v1.Tpo" -c -o munged-dec_v1.o `test -f 'dec_v1.c' || echo '$(srcdir)/'`dec_v1.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/munged-dec_v1.Tpo" "$(DEPDIR)/munged-dec_v1.Po"; else rm -f "$(DEPDIR)/munged-dec_v1.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='dec_v1.c' object='munged-dec_v1.o' libtool=no @AMDEPBACKSLASH@
+munged-dec.o: dec.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -MT munged-dec.o -MD -MP -MF "$(DEPDIR)/munged-dec.Tpo" -c -o munged-dec.o `test -f 'dec.c' || echo '$(srcdir)/'`dec.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/munged-dec.Tpo" "$(DEPDIR)/munged-dec.Po"; else rm -f "$(DEPDIR)/munged-dec.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='dec.c' object='munged-dec.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -c -o munged-dec_v1.o `test -f 'dec_v1.c' || echo '$(srcdir)/'`dec_v1.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -c -o munged-dec.o `test -f 'dec.c' || echo '$(srcdir)/'`dec.c
 
-munged-dec_v1.obj: dec_v1.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -MT munged-dec_v1.obj -MD -MP -MF "$(DEPDIR)/munged-dec_v1.Tpo" -c -o munged-dec_v1.obj `if test -f 'dec_v1.c'; then $(CYGPATH_W) 'dec_v1.c'; else $(CYGPATH_W) '$(srcdir)/dec_v1.c'; fi`; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/munged-dec_v1.Tpo" "$(DEPDIR)/munged-dec_v1.Po"; else rm -f "$(DEPDIR)/munged-dec_v1.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='dec_v1.c' object='munged-dec_v1.obj' libtool=no @AMDEPBACKSLASH@
+munged-dec.obj: dec.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -MT munged-dec.obj -MD -MP -MF "$(DEPDIR)/munged-dec.Tpo" -c -o munged-dec.obj `if test -f 'dec.c'; then $(CYGPATH_W) 'dec.c'; else $(CYGPATH_W) '$(srcdir)/dec.c'; fi`; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/munged-dec.Tpo" "$(DEPDIR)/munged-dec.Po"; else rm -f "$(DEPDIR)/munged-dec.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='dec.c' object='munged-dec.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -c -o munged-dec_v1.obj `if test -f 'dec_v1.c'; then $(CYGPATH_W) 'dec_v1.c'; else $(CYGPATH_W) '$(srcdir)/dec_v1.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -c -o munged-dec.obj `if test -f 'dec.c'; then $(CYGPATH_W) 'dec.c'; else $(CYGPATH_W) '$(srcdir)/dec.c'; fi`
 
-munged-enc_v1.o: enc_v1.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -MT munged-enc_v1.o -MD -MP -MF "$(DEPDIR)/munged-enc_v1.Tpo" -c -o munged-enc_v1.o `test -f 'enc_v1.c' || echo '$(srcdir)/'`enc_v1.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/munged-enc_v1.Tpo" "$(DEPDIR)/munged-enc_v1.Po"; else rm -f "$(DEPDIR)/munged-enc_v1.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='enc_v1.c' object='munged-enc_v1.o' libtool=no @AMDEPBACKSLASH@
+munged-enc.o: enc.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -MT munged-enc.o -MD -MP -MF "$(DEPDIR)/munged-enc.Tpo" -c -o munged-enc.o `test -f 'enc.c' || echo '$(srcdir)/'`enc.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/munged-enc.Tpo" "$(DEPDIR)/munged-enc.Po"; else rm -f "$(DEPDIR)/munged-enc.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='enc.c' object='munged-enc.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -c -o munged-enc_v1.o `test -f 'enc_v1.c' || echo '$(srcdir)/'`enc_v1.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -c -o munged-enc.o `test -f 'enc.c' || echo '$(srcdir)/'`enc.c
 
-munged-enc_v1.obj: enc_v1.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -MT munged-enc_v1.obj -MD -MP -MF "$(DEPDIR)/munged-enc_v1.Tpo" -c -o munged-enc_v1.obj `if test -f 'enc_v1.c'; then $(CYGPATH_W) 'enc_v1.c'; else $(CYGPATH_W) '$(srcdir)/enc_v1.c'; fi`; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/munged-enc_v1.Tpo" "$(DEPDIR)/munged-enc_v1.Po"; else rm -f "$(DEPDIR)/munged-enc_v1.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='enc_v1.c' object='munged-enc_v1.obj' libtool=no @AMDEPBACKSLASH@
+munged-enc.obj: enc.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -MT munged-enc.obj -MD -MP -MF "$(DEPDIR)/munged-enc.Tpo" -c -o munged-enc.obj `if test -f 'enc.c'; then $(CYGPATH_W) 'enc.c'; else $(CYGPATH_W) '$(srcdir)/enc.c'; fi`; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/munged-enc.Tpo" "$(DEPDIR)/munged-enc.Po"; else rm -f "$(DEPDIR)/munged-enc.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='enc.c' object='munged-enc.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -c -o munged-enc_v1.obj `if test -f 'enc_v1.c'; then $(CYGPATH_W) 'enc_v1.c'; else $(CYGPATH_W) '$(srcdir)/enc_v1.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -c -o munged-enc.obj `if test -f 'enc.c'; then $(CYGPATH_W) 'enc.c'; else $(CYGPATH_W) '$(srcdir)/enc.c'; fi`
 
 munged-gids.o: gids.c
 @am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -MT munged-gids.o -MD -MP -MF "$(DEPDIR)/munged-gids.Tpo" -c -o munged-gids.o `test -f 'gids.c' || echo '$(srcdir)/'`gids.c; \

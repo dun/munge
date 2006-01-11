@@ -4,7 +4,7 @@
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
  *
- *  Copyright (C) 2003-2005 The Regents of the University of California.
+ *  Copyright (C) 2003-2006 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
  *  Written by Chris Dunlap <cdunlap@llnl.gov>.
  *  UCRL-CODE-155910.
@@ -45,7 +45,7 @@ cred_create (m_msg_t m)
 
     assert (m != NULL);
 
-    if (!(c = malloc (sizeof (struct munge_cred)))) {
+    if (!(c = malloc (sizeof (*c)))) {
         m_msg_set_err (m, EMUNGE_NO_MEMORY, NULL);
         return (NULL);
     }

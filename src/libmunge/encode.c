@@ -4,7 +4,7 @@
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
  *
- *  Copyright (C) 2002-2005 The Regents of the University of California.
+ *  Copyright (C) 2002-2006 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
  *  Written by Chris Dunlap <cdunlap@llnl.gov>.
  *  UCRL-CODE-155910.
@@ -39,7 +39,7 @@
 #include "m_msg.h"
 #include "m_msg_client.h"
 #include "munge_defs.h"
-#include "str.h"
+#include "str.h" 
 
 
 /*****************************************************************************
@@ -48,10 +48,10 @@
 
 static void _encode_init (char **cred, munge_ctx_t ctx);
 
-static munge_err_t _encode_req_v1 (m_msg_t m, munge_ctx_t ctx,
+static munge_err_t _encode_req (m_msg_t m, munge_ctx_t ctx,
     const void *buf, int len);
 
-static munge_err_t _encode_rsp_v1 (m_msg_t m, char **cred);
+static munge_err_t _encode_rsp (m_msg_t m, char **cred);
 
 
 /*****************************************************************************
@@ -61,8 +61,8 @@ static munge_err_t _encode_rsp_v1 (m_msg_t m, char **cred);
 munge_err_t
 munge_encode (char **cred, munge_ctx_t ctx, const void *buf, int len)
 {
-    munge_err_t   e;
-    m_msg_t       m;
+    munge_err_t  e;
+    m_msg_t      m;
 
     /*  Init output parms in case of early return.
      */
@@ -76,19 +76,20 @@ munge_encode (char **cred, munge_ctx_t ctx, const void *buf, int len)
     }
     /*  Ask the daemon to encode a credential.
      */
-    if ((e = m_msg_create (&m, -1)) != EMUNGE_SUCCESS)
+    if ((e = m_msg_create (&m)) != EMUNGE_SUCCESS)
         ;
-    else if ((e = _encode_req_v1 (m, ctx, buf, len)) != EMUNGE_SUCCESS)
+    else if ((e = _encode_req (m, ctx, buf, len)) != EMUNGE_SUCCESS)
         ;
-    else if ((e = m_msg_client_xfer (&m, ctx)) != EMUNGE_SUCCESS)
+    else if ((e = m_msg_client_xfer (&m, MUNGE_MSG_ENC_REQ, ctx))
+            != EMUNGE_SUCCESS)
         ;
-    else if ((e = _encode_rsp_v1 (m, cred)) != EMUNGE_SUCCESS)
+    else if ((e = _encode_rsp (m, cred)) != EMUNGE_SUCCESS)
         ;
     /*  Clean up and return.
      */
     if (ctx) {
-        _munge_ctx_set_err (ctx, e, m->errstr);
-        m->errstr = NULL;
+        _munge_ctx_set_err (ctx, e, m->error_str);
+        m->error_is_copy = 1;
     }
     m_msg_destroy (m);
     return (e);
@@ -108,10 +109,10 @@ _encode_init (char **cred, munge_ctx_t ctx)
         *cred = NULL;
     }
     if (ctx) {
-        ctx->errnum = EMUNGE_SUCCESS;
-        if (ctx->errstr) {
-            free (ctx->errstr);
-            ctx->errstr = NULL;
+        ctx->error_num = EMUNGE_SUCCESS;
+        if (ctx->error_str) {
+            free (ctx->error_str);
+            ctx->error_str = NULL;
         }
     }
     return;
@@ -119,102 +120,79 @@ _encode_init (char **cred, munge_ctx_t ctx)
 
 
 static munge_err_t
-_encode_req_v1 (m_msg_t m, munge_ctx_t ctx, const void *buf, int len)
+_encode_req (m_msg_t m, munge_ctx_t ctx, const void *buf, int len)
 {
 /*  Creates an Encode Request message to be sent to the local munge daemon.
  *  The inputs to this message are as follows:
- *    cipher, zip, mac, realm_len, realm, ttl, auth_uid, auth_gid,
+ *    cipher, mac, zip, realm_len, realm_str, ttl, auth_uid, auth_gid,
  *    data_len, data.
- *  Note that the security realm string here is NUL-terminated.
  */
-    struct m_msg_v1 *m1;
-
     assert (m != NULL);
-    assert (m->pbody == NULL);
 
-    m->head.type = MUNGE_MSG_ENC_REQ;
-
-    m->pbody_len = sizeof (struct m_msg_v1);
-    if (!(m->pbody = malloc (m->pbody_len))) {
-        return (EMUNGE_NO_MEMORY);
-    }
-    /*  Init ints to 0, ptrs to NULL.
-     */
-    memset (m->pbody, 0, m->pbody_len);
-    m1 = m->pbody;
-    /*
-     *  Set opts from ctx (if present); o/w, use defaults.
+    /*  Set opts from ctx (if present); o/w, use defaults.
      */
     if (ctx) {
-        m1->cipher = ctx->cipher;
-        m1->zip = ctx->zip;
-        m1->mac = ctx->mac;
-        if (ctx->realm) {
-            m1->realm_len = strlen (ctx->realm) + 1;
-            m1->realm = ctx->realm;
+        m->cipher = ctx->cipher;
+        m->mac = ctx->mac;
+        m->zip = ctx->zip;
+        if (ctx->realm_str) {
+            m->realm_len = strlen (ctx->realm_str) + 1;
+            m->realm_str = ctx->realm_str;
+            m->realm_is_copy = 1;
         }
         else {
-            m1->realm_len = 0;
-            m1->realm = NULL;
+            m->realm_len = 0;
+            m->realm_str = NULL;
         }
-        m1->ttl = ctx->ttl;
-        m1->auth_uid = ctx->auth_uid;
-        m1->auth_gid = ctx->auth_gid;
+        m->ttl = ctx->ttl;
+        m->auth_uid = ctx->auth_uid;
+        m->auth_gid = ctx->auth_gid;
     }
     else {
-        m1->cipher = MUNGE_CIPHER_DEFAULT;
-        m1->zip = MUNGE_ZIP_DEFAULT;
-        m1->mac = MUNGE_MAC_DEFAULT;
-        m1->realm_len = 0;
-        m1->realm = NULL;
-        m1->ttl = MUNGE_TTL_DEFAULT;
-        m1->auth_uid = MUNGE_UID_ANY;
-        m1->auth_gid = MUNGE_GID_ANY;
+        m->cipher = MUNGE_CIPHER_DEFAULT;
+        m->zip = MUNGE_ZIP_DEFAULT;
+        m->mac = MUNGE_MAC_DEFAULT;
+        m->realm_len = 0;
+        m->realm_str = NULL;
+        m->ttl = MUNGE_TTL_DEFAULT;
+        m->auth_uid = MUNGE_UID_ANY;
+        m->auth_gid = MUNGE_GID_ANY;
     }
     /*  Pass optional data to be encoded into the credential.
      */
-    m1->data_len = len;
-    m1->data = (void *) buf;
+    m->data_len = len;
+    m->data = (void *) buf;
+    m->data_is_copy = 1;
     return (EMUNGE_SUCCESS);
 }
 
 
 static munge_err_t
-_encode_rsp_v1 (m_msg_t m, char **cred)
+_encode_rsp (m_msg_t m, char **cred)
 {
 /*  Extracts an Encode Response message received from the local munge daemon.
- *  The relevant outputs from this message are as follows:
- *    data_len, data, error_num, error_str.
+ *  The outputs from this message are as follows:
+ *    error_num, error_len, error_str, data_len, data.
  *  Note that error_num and error_str are set by _munge_ctx_set_err()
  *    called from munge_encode() (ie, the parent of this stack frame).
- *  The ignored outputs from this message are as follows:
- *    cipher, zip, mac, realm_len, realm, time0, ttl, uid, gid,
- *    auth_uid, auth_gid.
- *  These are ignored because the encode() ctx is considered read-only
- *    (with the exception of using it to pass detailed error messages).
- *    This allows the same ctx to be used to encode multiple credentials
- *    with the same options.
  *  Note that the [cred] is NUL-terminated.
  */
-    struct m_msg_v1 *m1;
     unsigned char   *p;
     int              n;
 
     assert (m != NULL);
     assert (cred != NULL);
 
-    m1 = (struct m_msg_v1 *) m->pbody;
-    /*
-     *  Perform sanity checks.
+    /*  Perform sanity checks.
      */
-    if (m->head.type != MUNGE_MSG_ENC_RSP) {
+    if (m->type != MUNGE_MSG_ENC_RSP) {
         m_msg_set_err (m, EMUNGE_SNAFU,
-            strdupf ("Client received invalid message type %d", m->head.type));
+            strdupf ("Client received invalid message type %d", m->type));
         return (EMUNGE_SNAFU);
     }
-    if (m1->data_len <= 0) {
+    if (m->data_len <= 0) {
         m_msg_set_err (m, EMUNGE_SNAFU,
-            strdupf ("Client received invalid data length %d", m1->data_len));
+            strdupf ("Client received invalid data length %d", m->data_len));
         return (EMUNGE_SNAFU);
     }
     /*  Allocate memory for the credential string
@@ -222,23 +200,20 @@ _encode_rsp_v1 (m_msg_t m, char **cred)
      *  We can't simply return the 'data' field here as it
      *    lies in the middle of the message's memory allocation.
      */
-    n = m1->data_len + 1;
+    n = m->data_len + 1;
     if (!(p = malloc (n))) {
         m_msg_set_err (m, EMUNGE_NO_MEMORY,
             strdupf ("Client unable to allocate %d bytes for data", n));
         return (EMUNGE_NO_MEMORY);
     }
-    /*  Copy the credential.
+    /*  Copy & NUL-terminate the credential.
      */
-    assert (m1->data != NULL);
-    memcpy (p, m1->data, m1->data_len);
-    /*
-     *  NUL-terminate the credential string.
-     */
-    p[m1->data_len] = '\0';
+    assert (m->data != NULL);
+    memcpy (p, m->data, m->data_len);
+    p[m->data_len] = '\0';
     /*
      *  Return the credential to the caller.
      */
     *cred = (char *) p;
-    return (m1->error_num);
+    return (m->error_num);
 }

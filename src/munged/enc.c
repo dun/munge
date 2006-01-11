@@ -4,7 +4,7 @@
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
  *
- *  Copyright (C) 2003-2005 The Regents of the University of California.
+ *  Copyright (C) 2003-2006 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
  *  Written by Chris Dunlap <cdunlap@llnl.gov>.
  *  UCRL-CODE-155910.
@@ -40,7 +40,7 @@
 #include "cipher.h"
 #include "conf.h"
 #include "cred.h"
-#include "enc_v1.h"
+#include "enc.h"
 #include "job.h"
 #include "log.h"
 #include "lookup.h"
@@ -57,18 +57,18 @@
  *  Static Prototypes
  *****************************************************************************/
 
-static int enc_v1_validate_msg (m_msg_t m);
-static int enc_v1_init (munge_cred_t c);
-static int enc_v1_authenticate (munge_cred_t c);
-static int enc_v1_check_retry (munge_cred_t c);
-static int enc_v1_timestamp (munge_cred_t c);
-static int enc_v1_pack_outer (munge_cred_t c);
-static int enc_v1_pack_inner (munge_cred_t c);
-static int enc_v1_compress (munge_cred_t c);
-static int enc_v1_mac (munge_cred_t c);
-static int enc_v1_encrypt (munge_cred_t c);
-static int enc_v1_armor (munge_cred_t c);
-static int enc_v1_fini (munge_cred_t c);
+static int enc_validate_msg (m_msg_t m);
+static int enc_init (munge_cred_t c);
+static int enc_authenticate (munge_cred_t c);
+static int enc_check_retry (munge_cred_t c);
+static int enc_timestamp (munge_cred_t c);
+static int enc_pack_outer (munge_cred_t c);
+static int enc_pack_inner (munge_cred_t c);
+static int enc_compress (munge_cred_t c);
+static int enc_mac (munge_cred_t c);
+static int enc_encrypt (munge_cred_t c);
+static int enc_armor (munge_cred_t c);
+static int enc_fini (munge_cred_t c);
 
 
 /*****************************************************************************
@@ -76,44 +76,41 @@ static int enc_v1_fini (munge_cred_t c);
  *****************************************************************************/
 
 int
-enc_v1_process_msg (m_msg_t m)
+enc_process_msg (m_msg_t m)
 {
     munge_cred_t c = NULL;              /* aux data for processing this cred */
     int          rc = -1;               /* return code                       */
 
-    if (enc_v1_validate_msg (m) < 0)
+    if (enc_validate_msg (m) < 0)
         ;
     else if (!(c = cred_create (m)))
         ;
-    else if (enc_v1_init (c) < 0)
+    else if (enc_init (c) < 0)
         ;
-    else if (enc_v1_authenticate (c) < 0)
+    else if (enc_authenticate (c) < 0)
         ;
-    else if (enc_v1_check_retry (c) < 0)
+    else if (enc_check_retry (c) < 0)
         ;
-    else if (enc_v1_timestamp (c) < 0)
+    else if (enc_timestamp (c) < 0)
         ;
-    else if (enc_v1_pack_outer (c) < 0)
+    else if (enc_pack_outer (c) < 0)
         ;
-    else if (enc_v1_pack_inner (c) < 0)
+    else if (enc_pack_inner (c) < 0)
         ;
-    else if (enc_v1_compress (c) < 0)
+    else if (enc_compress (c) < 0)
         ;
-    else if (enc_v1_mac (c) < 0)
+    else if (enc_mac (c) < 0)
         ;
-    else if (enc_v1_encrypt (c) < 0)
+    else if (enc_encrypt (c) < 0)
         ;
-    else if (enc_v1_armor (c) < 0)
+    else if (enc_armor (c) < 0)
         ;
-    else if (enc_v1_fini (c) < 0)
+    else if (enc_fini (c) < 0)
         ;
     else /* success */
         rc = 0;
 
-    if (rc < 0) {
-        job_error (m);
-    }
-    if (m_msg_send (m, 0) != EMUNGE_SUCCESS) {
+    if (m_msg_send (m, MUNGE_MSG_ENC_RSP, 0) != EMUNGE_SUCCESS) {
         rc = -1;
     }
     cred_destroy (c);
@@ -126,95 +123,80 @@ enc_v1_process_msg (m_msg_t m)
  *****************************************************************************/
 
 static int
-enc_v1_validate_msg (m_msg_t m)
+enc_validate_msg (m_msg_t m)
 {
 /*  Validates message types, setting defaults and limits as needed.
  */
-    struct m_msg_v1 *m1;
-
     assert (m != NULL);
-    assert (m->head.type == MUNGE_MSG_ENC_REQ);
+    assert (m->type == MUNGE_MSG_ENC_REQ);
 
-    m1 = m->pbody;
-
-    /*  Reset message type for the response.
-     *  From this point on, now that the return message type is set,
-     *    errors are returned to the client instead of being silently dropped.
+    /*  Validate cipher type.
      */
-    m->head.type = MUNGE_MSG_ENC_RSP;
-    /*
-     *  Validate cipher type.
-     */
-    if (m1->cipher == MUNGE_CIPHER_DEFAULT) {
-        m1->cipher = conf->def_cipher;
+    if (m->cipher == MUNGE_CIPHER_DEFAULT) {
+        m->cipher = conf->def_cipher;
     }
-    else if (m1->cipher == MUNGE_CIPHER_NONE) {
+    else if (m->cipher == MUNGE_CIPHER_NONE) {
         ; /* disable encryption */
     }
-    else if (!(lookup_cipher (m1->cipher))) {
+    else if (!(lookup_cipher (m->cipher))) {
         return (m_msg_set_err (m, EMUNGE_BAD_CIPHER,
-            strdupf ("Invalid cipher type %d", m1->cipher)));
+            strdupf ("Invalid cipher type %d", m->cipher)));
     }
     /*  Validate message authentication code type.
      *  Note that MUNGE_MAC_NONE is not valid -- MACs are REQUIRED!
      */
-    if (m1->mac == MUNGE_MAC_DEFAULT) {
-        m1->mac = conf->def_mac;
+    if (m->mac == MUNGE_MAC_DEFAULT) {
+        m->mac = conf->def_mac;
     }
-    else if (!(lookup_mac (m1->mac))) {
+    else if (!(lookup_mac (m->mac))) {
         return (m_msg_set_err (m, EMUNGE_BAD_MAC,
-            strdupf ("Invalid mac type %d", m1->mac)));
+            strdupf ("Invalid mac type %d", m->mac)));
     }
-    assert (m1->mac != MUNGE_MAC_NONE);
+    assert (m->mac != MUNGE_MAC_NONE);
     /*
      *  Validate compression type.
      *  Disable compression if no optional data was specified.
      */
-    if (m1->zip == MUNGE_ZIP_DEFAULT) {
-        m1->zip = conf->def_zip;
+    if (m->zip == MUNGE_ZIP_DEFAULT) {
+        m->zip = conf->def_zip;
     }
-    else if (m1->zip == MUNGE_ZIP_NONE) {
+    else if (m->zip == MUNGE_ZIP_NONE) {
         ; /* disable compression */
     }
-    else if (!zip_is_valid_type (m1->zip)) {
+    else if (!zip_is_valid_type (m->zip)) {
         return (m_msg_set_err (m, EMUNGE_BAD_ZIP,
-            strdupf ("Invalid compression type %d", m1->zip)));
+            strdupf ("Invalid compression type %d", m->zip)));
     }
-    if (m1->data_len == 0) {
-        m1->zip = MUNGE_ZIP_NONE;
+    if (m->data_len == 0) {
+        m->zip = MUNGE_ZIP_NONE;
     }
     /*  Validate realm.
      *
      *  FIXME: Validate realm and set default string if needed.
      *         Validate that the realm string is NUL-terminated.
-     *         The realm string may need to be stored in the
-     *         aux cred struct in order to be de-allocated.
      */
+    ;
     /*  Validate time-to-live.
      *  Ensure it is bounded by the configuration's max ttl.
      *    A sensible ttl is needed to allow a validated cred's
      *    state to be flushed from the replay hash at some point.
      */
-    if (m1->ttl == 0) {
-        m1->ttl = conf->def_ttl;
+    if (m->ttl == 0) {
+        m->ttl = conf->def_ttl;
     }
-    else if (m1->ttl > conf->max_ttl) {
-        m1->ttl = conf->max_ttl;
+    else if (m->ttl > conf->max_ttl) {
+        m->ttl = conf->max_ttl;
     }
     return (0);
 }
 
 
 static int
-enc_v1_init (munge_cred_t c)
+enc_init (munge_cred_t c)
 {
 /*  Initializes state necessary for encoding a credential.
  */
-    struct m_msg_v1 *m1;
-
-    assert (c != NULL);
-
-    m1 = c->msg->pbody;
+    m_msg_t  m = c->msg;
 
     /*  Generate salt.
      */
@@ -223,9 +205,9 @@ enc_v1_init (munge_cred_t c)
 
     /*  Generate cipher initialization vector (if needed).
      */
-    c->iv_len = cipher_iv_size (lookup_cipher (m1->cipher));
+    c->iv_len = cipher_iv_size (lookup_cipher (m->cipher));
     if (c->iv_len > 0) {
-        c->iv_len = cipher_iv_size (lookup_cipher (m1->cipher));
+        c->iv_len = cipher_iv_size (lookup_cipher (m->cipher));
         assert (c->iv_len <= sizeof (c->iv));
         random_pseudo_bytes (c->iv, c->iv_len);
     }
@@ -234,25 +216,21 @@ enc_v1_init (munge_cred_t c)
 
 
 static int
-enc_v1_authenticate (munge_cred_t c)
+enc_authenticate (munge_cred_t c)
 {
 /*  Ascertains the UID/GID of the client process.
  */
-    struct m_msg_v1 *m1;
-    uid_t           *p_uid;
-    gid_t           *p_gid;
+    m_msg_t  m = c->msg;
+    uid_t   *p_uid;
+    gid_t   *p_gid;
 
-    assert (c != NULL);
-    assert (c->msg);
-
-    m1 = c->msg->pbody;
-    p_uid = (uid_t *) &(m1->client_uid);
-    p_gid = (gid_t *) &(m1->client_gid);
+    p_uid = (uid_t *) &(m->client_uid);
+    p_gid = (gid_t *) &(m->client_gid);
 
     /*  Determine identity of client process.
      */
-    if (auth_recv (c->msg, p_uid, p_gid) != EMUNGE_SUCCESS) {
-        return (m_msg_set_err (c->msg, EMUNGE_SNAFU,
+    if (auth_recv (m, p_uid, p_gid) != EMUNGE_SUCCESS) {
+        return (m_msg_set_err (m, EMUNGE_SNAFU,
             strdup ("Unable to determine identity of client")));
     }
     return (0);
@@ -260,26 +238,19 @@ enc_v1_authenticate (munge_cred_t c)
 
 
 static int
-enc_v1_check_retry (munge_cred_t c)
+enc_check_retry (munge_cred_t c)
 {
 /*  Checks whether the transaction is being retried.
  */
-    struct m_msg_head  mh;
-    struct m_msg_v1   *m1;
+    m_msg_t  m = c->msg;
 
-    assert (c != NULL);
-    assert (c->msg != NULL);
-
-    mh = c->msg->head;
-    m1 = c->msg->pbody;
-
-    if (mh.retry > 0) {
+    if (m->retry > 0) {
         log_msg (LOG_INFO,
             "Encode retry #%d for client uid=%d gid=%d",
-            mh.retry, m1->client_uid, m1->client_gid);
+            m->retry, m->client_uid, m->client_gid);
     }
-    if (mh.retry > MUNGE_SOCKET_XFER_ATTEMPTS) {
-        return (m_msg_set_err (c->msg, EMUNGE_SOCKET,
+    if (m->retry > MUNGE_SOCKET_XFER_ATTEMPTS) {
+        return (m_msg_set_err (m, EMUNGE_SOCKET,
             strdupf ("Exceeded maximum transaction retry attempts")));
     }
     return (0);
@@ -287,32 +258,27 @@ enc_v1_check_retry (munge_cred_t c)
 
 
 static int
-enc_v1_timestamp (munge_cred_t c)
+enc_timestamp (munge_cred_t c)
 {
 /*  Queries the current time.
  */
-    struct m_msg_v1 *m1;
-    time_t           now;
-
-    assert (c != NULL);
-    assert (c->msg != NULL);
-
-    m1 = c->msg->pbody;
+    m_msg_t  m = c->msg;
+    time_t   now;
 
     /*  Set the "encode" time.
      */
     if (time (&now) == ((time_t) -1)) {
-        return (m_msg_set_err (c->msg, EMUNGE_SNAFU,
+        return (m_msg_set_err (m, EMUNGE_SNAFU,
             strdup ("Unable to query current time")));
     }
-    m1->time0 = now;                    /* potential 64b value for 32b var */
-    m1->time1 = 0;
+    m->time0 = now;                     /* potential 64b value for 32b var */
+    m->time1 = 0;
     return (0);
 }
 
 
 static int
-enc_v1_pack_outer (munge_cred_t c)
+enc_pack_outer (munge_cred_t c)
 {
 /*  Packs the "outer" credential data into MSBF (ie, big endian) format.
  *  The "outer" part of the credential does not undergo cryptographic
@@ -321,24 +287,20 @@ enc_v1_pack_outer (munge_cred_t c)
  *    unterminated realm string (if realm_len > 0), and the cipher's
  *    initialization vector (if encrypted).
  */
-    struct m_msg_v1 *m1;
-    unsigned char   *p;                 /* ptr into packed data              */
+    m_msg_t        m = c->msg;
+    unsigned char *p;                   /* ptr into packed data              */
 
-    assert (c != NULL);
     assert (c->outer_mem == NULL);
-    assert (c->msg != NULL);
-
-    m1 = c->msg->pbody;
 
     c->outer_mem_len += sizeof (c->version);
-    c->outer_mem_len += sizeof (m1->cipher);
-    c->outer_mem_len += sizeof (m1->mac);
-    c->outer_mem_len += sizeof (m1->zip);
-    c->outer_mem_len += sizeof (m1->realm_len);
-    c->outer_mem_len += m1->realm_len;
+    c->outer_mem_len += sizeof (m->cipher);
+    c->outer_mem_len += sizeof (m->mac);
+    c->outer_mem_len += sizeof (m->zip);
+    c->outer_mem_len += sizeof (m->realm_len);
+    c->outer_mem_len += m->realm_len;
     c->outer_mem_len += c->iv_len;
     if (!(c->outer_mem = malloc (c->outer_mem_len))) {
-        return (m_msg_set_err (c->msg, EMUNGE_NO_MEMORY, NULL));
+        return (m_msg_set_err (m, EMUNGE_NO_MEMORY, NULL));
     }
     p = c->outer = c->outer_mem;
     c->outer_len = c->outer_mem_len;
@@ -347,26 +309,26 @@ enc_v1_pack_outer (munge_cred_t c)
     *p = c->version;
     p += sizeof (c->version);
 
-    assert (sizeof (m1->cipher) == 1);
-    *p = m1->cipher;
-    p += sizeof (m1->cipher);
+    assert (sizeof (m->cipher) == 1);
+    *p = m->cipher;
+    p += sizeof (m->cipher);
 
-    assert (sizeof (m1->mac) == 1);
-    *p = m1->mac;
-    p += sizeof (m1->mac);
+    assert (sizeof (m->mac) == 1);
+    *p = m->mac;
+    p += sizeof (m->mac);
 
-    assert (sizeof (m1->zip) == 1);
+    assert (sizeof (m->zip) == 1);
     c->outer_zip_ref = p;
-    *p = m1->zip;
-    p += sizeof (m1->zip);
+    *p = m->zip;
+    p += sizeof (m->zip);
 
-    assert (sizeof (m1->realm_len) == 1);
-    *p = m1->realm_len;
-    p += sizeof (m1->realm_len);
+    assert (sizeof (m->realm_len) == 1);
+    *p = m->realm_len;
+    p += sizeof (m->realm_len);
 
-    if (m1->realm_len > 0) {
-        memcpy (p, m1->realm, m1->realm_len);
-        p += m1->realm_len;
+    if (m->realm_len > 0) {
+        memcpy (p, m->realm_str, m->realm_len);
+        p += m->realm_len;
     }
     if (c->iv_len > 0) {
         memcpy (p, c->iv, c->iv_len);
@@ -378,7 +340,7 @@ enc_v1_pack_outer (munge_cred_t c)
 
 
 static int
-enc_v1_pack_inner (munge_cred_t c)
+enc_pack_inner (munge_cred_t c)
 {
 /*  Packs the "inner" credential data into MSBF (ie, big endian) format.
  *  The "inner" part of the credential may be subjected to cryptographic
@@ -386,30 +348,25 @@ enc_v1_pack_inner (munge_cred_t c)
  *    salt, ip addr len, origin ip addr, encode time, ttl, uid, gid,
  *    data length, and data (if present).
  */
-    struct m_msg_v1 *m1;
-    unsigned char   *p;                 /* ptr into packed data              */
-    uint8_t          u8;                /* tmp for packing single octet      */
-    uint32_t         u32;               /* tmp for packing into into MSBF    */
+    m_msg_t        m = c->msg;
+    unsigned char *p;                   /* ptr into packed data              */
+    uint32_t       u32;                 /* tmp for packing into MSBF         */
 
-    assert (c != NULL);
     assert (c->inner_mem == NULL);
-    assert (c->msg != NULL);
-
-    m1 = c->msg->pbody;
 
     c->inner_mem_len += c->salt_len;
-    c->inner_mem_len += sizeof (m1->addr_len);
-    c->inner_mem_len += sizeof (m1->addr);
-    c->inner_mem_len += sizeof (m1->time0);
-    c->inner_mem_len += sizeof (m1->ttl);
-    c->inner_mem_len += sizeof (m1->client_uid);
-    c->inner_mem_len += sizeof (m1->client_gid);
-    c->inner_mem_len += sizeof (m1->auth_uid);
-    c->inner_mem_len += sizeof (m1->auth_gid);
-    c->inner_mem_len += sizeof (m1->data_len);
-    c->inner_mem_len += m1->data_len;
+    c->inner_mem_len += sizeof (m->addr_len);
+    c->inner_mem_len += sizeof (m->addr);
+    c->inner_mem_len += sizeof (m->time0);
+    c->inner_mem_len += sizeof (m->ttl);
+    c->inner_mem_len += sizeof (m->client_uid);
+    c->inner_mem_len += sizeof (m->client_gid);
+    c->inner_mem_len += sizeof (m->auth_uid);
+    c->inner_mem_len += sizeof (m->auth_gid);
+    c->inner_mem_len += sizeof (m->data_len);
+    c->inner_mem_len += m->data_len;
     if (!(c->inner_mem = malloc (c->inner_mem_len))) {
-        return (m_msg_set_err (c->msg, EMUNGE_NO_MEMORY, NULL));
+        return (m_msg_set_err (m, EMUNGE_NO_MEMORY, NULL));
     }
     p = c->inner = c->inner_mem;
     c->inner_len = c->inner_mem_len;
@@ -418,53 +375,52 @@ enc_v1_pack_inner (munge_cred_t c)
     memcpy (p, c->salt, c->salt_len);
     p += c->salt_len;
 
-    assert (sizeof (m1->addr_len) == 1);
-    assert (sizeof (conf->addr) == sizeof (m1->addr));
+    assert (sizeof (m->addr_len) == 1);
+    assert (sizeof (conf->addr) == sizeof (m->addr));
     assert (sizeof (conf->addr) < 256);
-    u8 = sizeof (conf->addr);
-    memcpy (p, &u8, sizeof (m1->addr_len));
-    p += sizeof (m1->addr_len);
-    memcpy (p, &conf->addr, sizeof (m1->addr));
-    p += sizeof (m1->addr);
+    *p = m->addr_len = sizeof (m->addr);
+    p += sizeof (m->addr_len);
+    memcpy (p, &conf->addr, sizeof (m->addr));
+    p += sizeof (m->addr);
 
-    assert (sizeof (m1->time0) == 4);
-    u32 = htonl (m1->time0);
-    memcpy (p, &u32, sizeof (m1->time0));
-    p += sizeof (m1->time0);
+    assert (sizeof (m->time0) == 4);
+    u32 = htonl (m->time0);
+    memcpy (p, &u32, sizeof (m->time0));
+    p += sizeof (m->time0);
 
-    assert (sizeof (m1->ttl) == 4);
-    u32 = htonl (m1->ttl);
-    memcpy (p, &u32, sizeof (m1->ttl));
-    p += sizeof (m1->ttl);
+    assert (sizeof (m->ttl) == 4);
+    u32 = htonl (m->ttl);
+    memcpy (p, &u32, sizeof (m->ttl));
+    p += sizeof (m->ttl);
 
-    assert (sizeof (m1->client_uid) == 4);
-    u32 = htonl (m1->client_uid);
-    memcpy (p, &u32, sizeof (m1->client_uid));
-    p += sizeof (m1->client_uid);
+    assert (sizeof (m->client_uid) == 4);
+    u32 = htonl (m->client_uid);
+    memcpy (p, &u32, sizeof (m->client_uid));
+    p += sizeof (m->client_uid);
 
-    assert (sizeof (m1->client_gid) == 4);
-    u32 = htonl (m1->client_gid);
-    memcpy (p, &u32, sizeof (m1->client_gid));
-    p += sizeof (m1->client_gid);
+    assert (sizeof (m->client_gid) == 4);
+    u32 = htonl (m->client_gid);
+    memcpy (p, &u32, sizeof (m->client_gid));
+    p += sizeof (m->client_gid);
 
-    assert (sizeof (m1->auth_uid) == 4);
-    u32 = htonl (m1->auth_uid);
-    memcpy (p, &u32, sizeof (m1->auth_uid));
-    p += sizeof (m1->auth_uid);
+    assert (sizeof (m->auth_uid) == 4);
+    u32 = htonl (m->auth_uid);
+    memcpy (p, &u32, sizeof (m->auth_uid));
+    p += sizeof (m->auth_uid);
 
-    assert (sizeof (m1->auth_gid) == 4);
-    u32 = htonl (m1->auth_gid);
-    memcpy (p, &u32, sizeof (m1->auth_gid));
-    p += sizeof (m1->auth_gid);
+    assert (sizeof (m->auth_gid) == 4);
+    u32 = htonl (m->auth_gid);
+    memcpy (p, &u32, sizeof (m->auth_gid));
+    p += sizeof (m->auth_gid);
 
-    assert (sizeof (m1->data_len) == 4);
-    u32 = htonl (m1->data_len);
-    memcpy (p, &u32, sizeof (m1->data_len));
-    p += sizeof (m1->data_len);
+    assert (sizeof (m->data_len) == 4);
+    u32 = htonl (m->data_len);
+    memcpy (p, &u32, sizeof (m->data_len));
+    p += sizeof (m->data_len);
 
-    if (m1->data_len > 0) {
-        memcpy (p, m1->data, m1->data_len);
-        p += m1->data_len;
+    if (m->data_len > 0) {
+        memcpy (p, m->data, m->data_len);
+        p += m->data_len;
     }
     assert (p == (c->inner + c->inner_len));
     return (0);
@@ -472,7 +428,7 @@ enc_v1_pack_inner (munge_cred_t c)
 
 
 static int
-enc_v1_compress (munge_cred_t c)
+enc_compress (munge_cred_t c)
 {
 /*  Compresses the "inner" credential data.
  *  If the compressed data is larger than the original data, the
@@ -481,44 +437,39 @@ enc_v1_compress (munge_cred_t c)
  *    "outer" data header.  And since that field is included in the MAC,
  *    compression must be attempted before the MAC is computed.
  */
-    struct m_msg_v1 *m1;
-    unsigned char   *buf;               /* compression buffer                */
-    int              buf_len;           /* length of compression buffer      */
-    int              n;                 /* length of compressed data         */
-
-    assert (c != NULL);
-    assert (c->msg != NULL);
-
-    m1 = c->msg->pbody;
+    m_msg_t        m = c->msg;
+    unsigned char *buf;                 /* compression buffer                */
+    int            buf_len;             /* length of compression buffer      */
+    int            n;                   /* length of compressed data         */
 
     /*  Is compression disabled?
      */
-    if (m1->zip == MUNGE_ZIP_NONE) {
+    if (m->zip == MUNGE_ZIP_NONE) {
         return (0);
     }
     /*  Allocate memory for compressed "inner" data.
      */
     buf = NULL;
-    buf_len = zip_compress_length (m1->zip, c->inner, c->inner_len);
+    buf_len = zip_compress_length (m->zip, c->inner, c->inner_len);
     if (buf_len < 0) {
         goto err;
     }
     if (!(buf = malloc (buf_len))) {
-        m_msg_set_err (c->msg, EMUNGE_NO_MEMORY, NULL);
+        m_msg_set_err (m, EMUNGE_NO_MEMORY, NULL);
         goto err;
     }
     /*  Compress "inner" data.
      */
     n = buf_len;
-    if (zip_compress_block (m1->zip, buf, &n, c->inner, c->inner_len) < 0) {
+    if (zip_compress_block (m->zip, buf, &n, c->inner, c->inner_len) < 0) {
         goto err;
     }
     /*  Disable compression and discard compressed data if it's larger.
      *    Replace "inner" data with compressed data if it's not.
      */
     if (n >= c->inner_len) {
-        m1->zip = MUNGE_ZIP_NONE;
-        *c->outer_zip_ref = m1->zip;
+        m->zip = MUNGE_ZIP_NONE;
+        *c->outer_zip_ref = m->zip;
         memset (buf, 0, buf_len);
         free (buf);
     }
@@ -539,30 +490,25 @@ err:
         memset (buf, 0, buf_len);
         free (buf);
     }
-    return (m_msg_set_err (c->msg, EMUNGE_SNAFU,
+    return (m_msg_set_err (m, EMUNGE_SNAFU,
         strdup ("Unable to compress credential")));
 }
 
 
 static int
-enc_v1_mac (munge_cred_t c)
+enc_mac (munge_cred_t c)
 {
 /*  Computes the Message Authentication Code (MAC) over the entire message
  *    (ie, both "outer" and "inner" data).
  */
-    struct m_msg_v1 *m1;
-    const EVP_MD    *md;                /* message digest algorithm          */
-    mac_ctx          x;                 /* message auth code context         */
-    int              n;                 /* all-purpose int                   */
+    m_msg_t       m = c->msg;
+    const EVP_MD *md;                   /* message digest algorithm          */
+    mac_ctx       x;                    /* message auth code context         */
+    int           n;                    /* all-purpose int                   */
 
-    assert (c != NULL);
-    assert (c->msg != NULL);
-
-    m1 = c->msg->pbody;
-
-    /*  MAC type already checked by enc_v1_validate().
+    /*  MAC type already checked by enc_validate().
      */
-    md = lookup_mac (m1->mac);
+    md = lookup_mac (m->mac);
     assert (md != NULL);
 
     /*  Init MAC.
@@ -594,40 +540,35 @@ enc_v1_mac (munge_cred_t c)
 err_cleanup:
     mac_cleanup (&x);
 err:
-    return (m_msg_set_err (c->msg, EMUNGE_SNAFU,
+    return (m_msg_set_err (m, EMUNGE_SNAFU,
         strdup ("Unable to mac credential")));
 }
 
 
 static int
-enc_v1_encrypt (munge_cred_t c)
+enc_encrypt (munge_cred_t c)
 {
 /*  Encrypts the "inner" credential data.
  */
-    struct m_msg_v1    *m1;
-    const EVP_MD       *md;             /* message digest algorithm          */
-    const EVP_CIPHER   *ci;             /* symmetric cipher algorithm        */
-    int                 buf_len;        /* length of ciphertext buffer       */
-    unsigned char      *buf;            /* ciphertext buffer                 */
-    unsigned char      *buf_ptr;        /* ptr into ciphertext buffer        */
-    cipher_ctx          x;              /* cipher context                    */
-    int                 n, m;           /* all-purpose ints                  */
-
-    assert (c != NULL);
-    assert (c->msg != NULL);
-
-    m1 = c->msg->pbody;
+    m_msg_t           m = c->msg;
+    const EVP_MD     *md;               /* message digest algorithm          */
+    const EVP_CIPHER *ci;               /* symmetric cipher algorithm        */
+    int               buf_len;          /* length of ciphertext buffer       */
+    unsigned char    *buf;              /* ciphertext buffer                 */
+    unsigned char    *buf_ptr;          /* ptr into ciphertext buffer        */
+    cipher_ctx        x;                /* cipher context                    */
+    int               n, n2;            /* all-purpose ints                  */
 
     /*  Is encryption disabled?
      */
-    if (m1->cipher == MUNGE_CIPHER_NONE) {
+    if (m->cipher == MUNGE_CIPHER_NONE) {
         return (0);
     }
-    /*  MAC/Cipher types already checked by enc_v1_validate().
+    /*  MAC/Cipher types already checked by enc_validate().
      */
-    md = lookup_mac (m1->mac);
+    md = lookup_mac (m->mac);
     assert (md != NULL);
-    ci = lookup_cipher (m1->cipher);
+    ci = lookup_cipher (m->cipher);
     assert (ci != NULL);
 
     /*  Compute DEK.
@@ -639,7 +580,7 @@ enc_v1_encrypt (munge_cred_t c)
 
     if (mac_block (md, conf->dek_key, conf->dek_key_len,
                        c->dek, &n, c->mac, c->mac_len) < 0) {
-        return (m_msg_set_err (c->msg, EMUNGE_SNAFU,
+        return (m_msg_set_err (m, EMUNGE_SNAFU,
             strdup ("Unable to compute dek")));
     }
     assert (n == c->dek_len);
@@ -649,7 +590,7 @@ enc_v1_encrypt (munge_cred_t c)
      */
     buf_len = c->inner_len + cipher_block_size (ci);
     if (!(buf = malloc (buf_len))) {
-        return (m_msg_set_err (c->msg, EMUNGE_NO_MEMORY, NULL));
+        return (m_msg_set_err (m, EMUNGE_NO_MEMORY, NULL));
     }
     /*  Encrypt "inner" data.
      */
@@ -658,16 +599,16 @@ enc_v1_encrypt (munge_cred_t c)
     }
     buf_ptr = buf;
     n = 0;
-    if (cipher_update (&x, buf_ptr, &m, c->inner, c->inner_len) < 0) {
+    if (cipher_update (&x, buf_ptr, &n2, c->inner, c->inner_len) < 0) {
         goto err_cleanup;
     }
-    buf_ptr += m;
-    n += m;
-    if (cipher_final (&x, buf_ptr, &m) < 0) {
+    buf_ptr += n2;
+    n += n2;
+    if (cipher_final (&x, buf_ptr, &n2) < 0) {
         goto err_cleanup;
     }
-    buf_ptr += m;
-    n += m;
+    buf_ptr += n2;
+    n += n2;
     if (cipher_cleanup (&x) < 0) {
         goto err;
     }
@@ -690,30 +631,25 @@ err_cleanup:
 err:
     memset (buf, 0, buf_len);
     free (buf);
-    return (m_msg_set_err (c->msg, EMUNGE_SNAFU,
+    return (m_msg_set_err (m, EMUNGE_SNAFU,
         strdup ("Unable to encrypt credential")));
 }
 
 
 static int
-enc_v1_armor (munge_cred_t c)
+enc_armor (munge_cred_t c)
 {
 /*  Armors the credential allowing it to be sent over virtually any transport.
  *  The armor consists of PREFIX + BASE64 [ OUTER + MAC + INNER ] + SUFFIX.
  */
-    struct m_msg_v1 *m1;
-    int              prefix_len;        /* prefix string length              */
-    int              suffix_len;        /* prefix string length              */
-    int              buf_len;           /* length of armor'd data buffer     */
-    unsigned char   *buf;               /* armor'd data buffer               */
-    unsigned char   *buf_ptr;           /* ptr into armor'd data buffer      */
-    base64_ctx       x;                 /* base64 context                    */
-    int              n, m;              /* all-purpose ints                  */
-
-    assert (c != NULL);
-    assert (c->msg != NULL);
-
-    m1 = c->msg->pbody;
+    m_msg_t        m = c->msg;
+    int            prefix_len;          /* prefix string length              */
+    int            suffix_len;          /* prefix string length              */
+    int            buf_len;             /* length of armor'd data buffer     */
+    unsigned char *buf;                 /* armor'd data buffer               */
+    unsigned char *buf_ptr;             /* ptr into armor'd data buffer      */
+    base64_ctx     x;                   /* base64 context                    */
+    int            n, n2;               /* all-purpose ints                  */
 
     prefix_len = strlen (MUNGE_CRED_PREFIX);
     suffix_len = strlen (MUNGE_CRED_SUFFIX);
@@ -724,7 +660,7 @@ enc_v1_armor (munge_cred_t c)
     buf_len = prefix_len + base64_encode_length (n) + suffix_len;
 
     if (!(buf = malloc (buf_len))) {
-        return (m_msg_set_err (c->msg, EMUNGE_NO_MEMORY, NULL));
+        return (m_msg_set_err (m, EMUNGE_NO_MEMORY, NULL));
     }
     buf_ptr = buf;
 
@@ -741,26 +677,26 @@ enc_v1_armor (munge_cred_t c)
         goto err;
     }
     n = 0;
-    if (base64_encode_update (&x, buf_ptr, &m, c->outer, c->outer_len) < 0) {
+    if (base64_encode_update (&x, buf_ptr, &n2, c->outer, c->outer_len) < 0) {
         goto err_cleanup;
     }
-    buf_ptr += m;
-    n += m;
-    if (base64_encode_update (&x, buf_ptr, &m, c->mac, c->mac_len) < 0) {
+    buf_ptr += n2;
+    n += n2;
+    if (base64_encode_update (&x, buf_ptr, &n2, c->mac, c->mac_len) < 0) {
         goto err_cleanup;
     }
-    buf_ptr += m;
-    n += m;
-    if (base64_encode_update (&x, buf_ptr, &m, c->inner, c->inner_len) < 0) {
+    buf_ptr += n2;
+    n += n2;
+    if (base64_encode_update (&x, buf_ptr, &n2, c->inner, c->inner_len) < 0) {
         goto err_cleanup;
     }
-    buf_ptr += m;
-    n += m;
-    if (base64_encode_final (&x, buf_ptr, &m) < 0) {
+    buf_ptr += n2;
+    n += n2;
+    if (base64_encode_final (&x, buf_ptr, &n2) < 0) {
         goto err_cleanup;
     }
-    buf_ptr += m;
-    n += m;
+    buf_ptr += n2;
+    n += n2;
     if (base64_cleanup (&x) < 0) {
         goto err;
     }
@@ -798,31 +734,24 @@ err_cleanup:
 err:
     memset (buf, 0, buf_len);
     free (buf);
-    return (m_msg_set_err (c->msg, EMUNGE_SNAFU,
+    return (m_msg_set_err (m, EMUNGE_SNAFU,
         strdup ("Unable to base64-encode credential")));
 }
 
 
 static int
-enc_v1_fini (munge_cred_t c)
+enc_fini (munge_cred_t c)
 {
 /*  Finalizes encoding a credential, ensuring it is ready for transit.
  */
-    struct m_msg_v1 *m1;
-
-    assert (c != NULL);
-    assert (c->msg != NULL);
-
-    m1 = c->msg->pbody;
+    m_msg_t  m = c->msg;
 
     /*  Place credential in message "data" payload for transit.
-     *  Note that the old m1->data lies within m->pbody's malloc region,
-     *    so it will be free()d by the msg destructor when pbody is free()d
-     *    by m_msg_destroy() called from job_accept() or _job_exec().
-     *  Also note that by keeping the c->outer ref valid, this cred memory
-     *    will be free()d by cred_destroy() called from enc_v1_process_msg().
+     *  This memory is still owned by the cred struct, so it will be
+     *    free()d by cred_destroy() called from enc_process_msg().
      */
-    m1->data = c->outer;
-    m1->data_len = c->outer_len;
+    m->data = c->outer;
+    m->data_len = c->outer_len;
+    m->data_is_copy = 1;
     return (0);
 }

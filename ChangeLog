@@ -1,3 +1,31 @@
+2006-01-11  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/libcommon/m_msg.c: Revamped to support msg packing & unpacking.
+	* src/libcommon/m_msg.h: Incremented MUNGE_MSG_VERSION to 4.
+	  Removed struct m_msg_head & struct m_msg_v1.  Expanded struct m_msg.
+	  Added m_msg_type_t, m_msg_magic_t, & m_msg_version_t.
+	* src/libcommon/m_msg.h(m_msg_create): Changed prototype.
+	* src/libcommon/m_msg.h(m_msg_bind): Added.
+	* src/libcommon/m_msg.h(m_msg_send): Changed prototype.
+	* src/libcommon/m_msg.h(m_msg_recv): Changed prototype.
+	* src/libcommon/munge_defs.h: Moved MUNGE_MSG_MAGIC to m_msg.h.
+	* src/munged/enc_v1.c: Renamed to src/munged/enc.c.
+	* src/munged/enc_v1.h: Renamed to src/munged/enc.h.
+	* src/munged/dec_v1.c: Renamed to src/munged/dec.c.
+	* src/munged/dec_v1.h: Renamed to src/munged/dec.h.
+	* src/munged/enc.c, src/munged/enc.h, src/munged/dec.c,
+	  src/munged/dec.h, src/munged/job.c, src/munged/replay.c:
+	  Updated for new munge message layer.
+	* src/munged/job.h: Removed job_error().
+	* src/munged/cred.c: Tweaked syntax.
+	* src/libmunge/ctx.c, src/libmunge/ctx.h:
+	  Renamed fields of struct munge_ctx: realm/realm_str,
+	  socket/socket_str, errnum/error_num, errstr/error_str.
+	* src/libmunge/m_msg_client.c: Updated for new munge message layer.
+	* src/libmunge/m_msg_client.h(m_msg_client_xfer): Changed prototype.
+	* src/libmunge/decode.c, src/libmunge/encode.c:
+	  Updated for new munge message layer and struct munge_ctx.
+
 2005-12-06  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/libcommon/m_msg.h, src/munged/enc_v1.c, src/munged/dec_v1.c,

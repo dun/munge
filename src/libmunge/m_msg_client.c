@@ -4,7 +4,7 @@
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
  *
- *  Copyright (C) 2003-2005 The Regents of the University of California.
+ *  Copyright (C) 2003-2006 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
  *  Written by Chris Dunlap <cdunlap@llnl.gov>.
  *  UCRL-CODE-155910.
@@ -60,39 +60,53 @@ static munge_err_t _m_msg_client_disconnect (m_msg_t m);
  *****************************************************************************/
 
 munge_err_t
-m_msg_client_xfer (m_msg_t *pm, munge_ctx_t ctx)
+m_msg_client_xfer (m_msg_t *pm, m_msg_type_t mreq_type, munge_ctx_t ctx)
 {
-    char          *socket;
-    int            i;
-    munge_err_t    e;
-    m_msg_t        mreq, mrsp;
+    char         *socket;
+    int           i;
+    munge_err_t   e;
+    m_msg_t       mreq, mrsp;
+    m_msg_type_t  mrsp_type;
 
     assert (MUNGE_SOCKET_XFER_ATTEMPTS * MUNGE_SOCKET_XFER_USLEEP < 1000000);
 
     if (!pm || !*pm) {
         return (EMUNGE_SNAFU);
     }
-    if (!ctx || !(socket = ctx->socket)) {
+    if (!ctx || !(socket = ctx->socket_str)) {
         socket = MUNGE_SOCKET_NAME;
     }
     mreq = *pm;
     mrsp = NULL;
+    if (mreq_type == MUNGE_MSG_ENC_REQ) {
+        mrsp_type = MUNGE_MSG_ENC_RSP;
+    }
+    else if (mreq_type == MUNGE_MSG_DEC_REQ) {
+        mrsp_type = MUNGE_MSG_DEC_RSP;
+    }
+    else {
+        return (EMUNGE_SNAFU);
+    }
+
     i = 1;
     while (1) {
         if ((e = _m_msg_client_connect (mreq, socket)) != EMUNGE_SUCCESS) {
             break;
         }
-        else if ((e = m_msg_send (mreq, MUNGE_MAXIMUM_REQ_LEN))
+        else if ((e = m_msg_send (mreq, mreq_type, MUNGE_MAXIMUM_REQ_LEN))
                 != EMUNGE_SUCCESS) {
             ; /* empty */
         }
         else if (auth_send (mreq) < 0) {
             e = EMUNGE_SOCKET;
         }
-        else if ((e = m_msg_create (&mrsp, mreq->sd)) != EMUNGE_SUCCESS) {
+        else if ((e = m_msg_create (&mrsp)) != EMUNGE_SUCCESS) {
             break;
         }
-        else if ((e = m_msg_recv (mrsp, 0)) != EMUNGE_SUCCESS) {
+        else if ((e = m_msg_bind (mrsp, mreq->sd)) != EMUNGE_SUCCESS) {
+            break;
+        }
+        else if ((e = m_msg_recv (mrsp, mrsp_type, 0)) != EMUNGE_SUCCESS) {
             ; /* empty */
         }
         else if ((e = _m_msg_client_disconnect (mrsp)) != EMUNGE_SUCCESS) {
@@ -117,7 +131,7 @@ m_msg_client_xfer (m_msg_t *pm, munge_ctx_t ctx)
             (void) close (mreq->sd);
             mreq->sd = -1;
         }
-        mreq->head.retry = i;
+        mreq->retry = i;
         usleep (i * MUNGE_SOCKET_XFER_USLEEP);
         i++;
     }

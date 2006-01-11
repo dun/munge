@@ -4,7 +4,7 @@
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
  *
- *  Copyright (C) 2003-2005 The Regents of the University of California.
+ *  Copyright (C) 2003-2006 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
  *  Written by Chris Dunlap <cdunlap@llnl.gov>.
  *  UCRL-CODE-155910.
@@ -25,14 +25,14 @@
  *****************************************************************************/
 
 
-#ifndef MUNGE_ENC_V1_H
-#define MUNGE_ENC_V1_H
+#ifndef MUNGE_DEC_H
+#define MUNGE_DEC_H
 
 
 #include "m_msg.h"
 
 
-int enc_v1_process_msg (m_msg_t m);
+int dec_process_msg (m_msg_t m);
 
 
-#endif /* !MUNGE_ENC_V1_H */
+#endif /* !MUNGE_DEC_H */

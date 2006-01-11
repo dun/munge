@@ -4,7 +4,7 @@
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
  *
- *  Copyright (C) 2002-2005 The Regents of the University of California.
+ *  Copyright (C) 2002-2006 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
  *  Written by Chris Dunlap <cdunlap@llnl.gov>.
  *  UCRL-CODE-155910.
@@ -42,40 +42,29 @@
  *  Constants
  *****************************************************************************/
 
+/*  Length of the munge message header (in bytes):
+ *    magic + version + type + retry + pkt_len.
+ */
+#define MUNGE_MSG_HDR_SIZE              11
+
+/*  Sentinel for a valid munge message.
+ */
+#define MUNGE_MSG_MAGIC                 0x00606D4B
+
 /*  Current version of the munge client-server message format.
- *
  *  This must be incremented whenever the client/server msg format changes;
  *    otherwise, the message may be parsed incorrectly when decoded.
- *  In retrospect, the struct m_msg_v1 type name was poorly chosen.
  */
-#define MUNGE_MSG_VERSION               3
+#define MUNGE_MSG_VERSION               4
 
 
 /*****************************************************************************
  *  Data Types
  *****************************************************************************/
 
-/*  The m_msg_v1 struct is used to handle data passed over the domain socket
- *    between client (libmunge) and server (munged), as well as data for the
- *    credential itself.  This seemed like a good idea at the time, but has
- *    caused some confusion since the data representation differs slightly
- *    in both cases.
- *  In particular, the realm string and error string passed over the domain
- *    socket are both NUL-terminated in addition to carrying a string length
- *    (which includes the NUL character).
- *  In contrast, the realm string packed inside the credential is not
- *    NUL-terminated; instead, it is represented as a length followed by an
- *    unterminated string.  This saved space in the credential (since the
- *    NUL would have been redundant) and allowed for quicker unpacking.  
- *  The MUNGE_MSG_AUTH_FD_REQ type uses the same v1 msg format, even though
- *    all it needs to do is pass a single string across.  It's really an
- *    inefficient use of the struct.  Mea culpa.
- *
- *  FIXME: The msg layer between client & server should be revamped.
- */
-
 enum m_msg_type {                       /* message type                      */
-    MUNGE_MSG_UNKNOWN,                  /*  uninitialized message            */
+    MUNGE_MSG_UNDEF,                    /*  undefined (new) message          */
+    MUNGE_MSG_HDR,                      /*  message header                   */
     MUNGE_MSG_ENC_REQ,                  /*  encode request message           */
     MUNGE_MSG_ENC_RSP,                  /*  encode response message          */
     MUNGE_MSG_DEC_REQ,                  /*  decode request message           */
@@ -83,20 +72,17 @@ enum m_msg_type {                       /* message type                      */
     MUNGE_MSG_AUTH_FD_REQ               /*  auth via fd request message      */
 };
 
-struct m_msg_head {
-    uint32_t           magic;           /* eye of newt and toe of frog       */
-    uint8_t            version;         /* message version                   */
+struct m_msg {
+    int                sd;              /* munge socket descriptor           */
     uint8_t            type;            /* enum m_msg_type                   */
     uint8_t            retry;           /* retry count for this transaction  */
-    uint32_t           length;          /* length of msg body                */
-};
-
-struct m_msg_v1 {
+    uint32_t           pkt_len;         /* length of msg pkt mem allocation  */
+    void              *pkt;             /* ptr to msg for xfer over socket   */
     uint8_t            cipher;          /* munge_cipher_t enum               */
     uint8_t            mac;             /* munge_mac_t enum                  */
     uint8_t            zip;             /* munge_zip_t enum                  */
-    uint8_t            realm_len;       /* length of realm string            */
-    char              *realm;           /* security realm string             */
+    uint8_t            realm_len;       /* length of realm string with NUL   */
+    char              *realm_str;       /* security realm string with NUL    */
     uint32_t           ttl;             /* time-to-live                      */
     uint8_t            addr_len;        /* length of IP address              */
     struct in_addr     addr;            /* IP addr where cred was encoded    */
@@ -112,32 +98,32 @@ struct m_msg_v1 {
     void              *data;            /* ptr to data munged into cred      */
     uint8_t            error_num;       /* munge_err_t for encode/decode op  */
     uint8_t            error_len;       /* length of err msg str with NUL    */
-    char              *error_str;       /* NUL-term'd descriptive errmsg str */
+    char              *error_str;       /* descriptive err msg str with NUL  */
+    unsigned           pkt_is_copy:1;   /* true if mem for pkt is a copy     */
+    unsigned           realm_is_copy:1; /* true if mem for realm is a copy   */
+    unsigned           data_is_copy:1;  /* true if mem for data is a copy    */
+    unsigned           error_is_copy:1; /* true if mem for err str is a copy */
 };
 
-struct m_msg {
-    int                sd;              /* munge socket descriptor           */
-    struct m_msg_head  head;            /* message header                    */
-    int                pbody_len;       /* length of msg body mem allocation */
-    void              *pbody;           /* ptr to msg body based on version  */
-    munge_err_t        errnum;          /* munge error status code           */
-    char              *errstr;          /* munge NUL-term'd error string     */
-};
-
-typedef struct m_msg * m_msg_t;
+typedef struct m_msg *  m_msg_t;
+typedef enum m_msg_type m_msg_type_t;
+typedef uint32_t        m_msg_magic_t;
+typedef uint8_t         m_msg_version_t;
 
 
 /*****************************************************************************
  *  Prototypes
  *****************************************************************************/
 
-munge_err_t m_msg_create (m_msg_t *pm, int sd);
+munge_err_t m_msg_create (m_msg_t *pm);
 
 void m_msg_destroy (m_msg_t m);
 
-munge_err_t m_msg_send (m_msg_t m, int maxlen);
+munge_err_t m_msg_bind (m_msg_t m, int sd);
 
-munge_err_t m_msg_recv (m_msg_t m, int maxlen);
+munge_err_t m_msg_send (m_msg_t m, m_msg_type_t type, int maxlen);
+
+munge_err_t m_msg_recv (m_msg_t m, m_msg_type_t type, int maxlen);
 
 int m_msg_set_err (m_msg_t m, munge_err_t e, char *s);
 
