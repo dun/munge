@@ -127,10 +127,10 @@ log_open_syslog (char *identity, int facility)
 {
     char *p;
 
-    if ((p = strrchr (identity, '/'))) {
-        identity = p + 1;
-    }
     if (identity) {
+        if ((p = strrchr (identity, '/'))) {
+            identity = p + 1;
+        }
         openlog (identity, LOG_NDELAY | LOG_PID, facility);
         log_ctx.got_syslog = 1;
     }

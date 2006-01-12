@@ -1,5 +1,8 @@
 2006-01-12  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/libcommon/log.c(log_open_syslog):
+	  Fixed 'identity' dereference before NULL check.
+
 	* src/libcommon/log.c: Added void cast to ignore return code on error.
 
 2006-01-11  Chris Dunlap  <cdunlap@llnl.gov>
