@@ -1,5 +1,8 @@
 2006-01-12  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/munge/remunge.c(parse_cmdline):
+	  Fixed NUL termination of payload data.
+
 	* src/libcommon/log.c(log_open_syslog):
 	  Fixed 'identity' dereference before NULL check.
 

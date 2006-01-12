@@ -635,7 +635,7 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                 c = 'A';
             }
         }
-        *p = '\0';
+        conf->payload[conf->num_payload] = '\0';
     }
     return;
 }
