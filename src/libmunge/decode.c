@@ -205,6 +205,7 @@ _decode_rsp (m_msg_t m, munge_ctx_t ctx,
         if (!(p = malloc (n))) {
             m_msg_set_err (m, EMUNGE_NO_MEMORY,
                 strdupf ("Client unable to allocate %d bytes for data", n));
+            return (EMUNGE_NO_MEMORY);
         }
         memcpy (p, m->data, m->data_len);
         p[m->data_len] = '\0';
