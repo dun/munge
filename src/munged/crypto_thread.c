@@ -169,7 +169,9 @@ crypto_thread_init (void)
         return (0);
     }
     for (i=0; i<n; i++) {
-        pthread_mutex_init (&crypto_mutex_buf[i], NULL);
+        if (pthread_mutex_init (&crypto_mutex_buf[i], NULL) != 0) {
+            abort ();
+        }
     }
     CRYPTO_set_id_callback (_crypto_thread_id);
     CRYPTO_set_locking_callback (_crypto_thread_locking);
@@ -204,7 +206,9 @@ crypto_thread_fini (void)
 
     n = CRYPTO_num_locks ();
     for (i=0; i<n; i++) {
-        pthread_mutex_destroy (&crypto_mutex_buf[i]);
+        if (pthread_mutex_destroy (&crypto_mutex_buf[i]) != 0) {
+            abort ();
+        }
     }
     free (crypto_mutex_buf);
     crypto_mutex_buf = NULL;
