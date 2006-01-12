@@ -332,9 +332,12 @@ _munge_ctx_set_err (munge_ctx_t ctx, munge_err_t e, char *s)
             ctx->error_str = s;
             s = NULL;
         }
+        else {
+            e = ctx->error_num;
+        }
     }
     if (s) {
         free (s);
     }
-    return (ctx->error_num);
+    return (e);
 }
