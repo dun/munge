@@ -698,10 +698,6 @@ dec_decompress (munge_cred_t c)
     return (0);
 
 err:
-    if ((buf_len > 0) && (buf != NULL)) {
-        memset (buf, 0, buf_len);
-        free (buf);
-    }
     return (m_msg_set_err (m, EMUNGE_SNAFU,
         strdup ("Unable to decompress credential")));
 }
