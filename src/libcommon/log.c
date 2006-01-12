@@ -4,7 +4,7 @@
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
  *
- *  Copyright (C) 2001-2005 The Regents of the University of California.
+ *  Copyright (C) 2001-2006 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
  *  Written by Chris Dunlap <cdunlap@llnl.gov>.
  *  UCRL-CODE-155910.
@@ -94,8 +94,9 @@ log_open_file (FILE *fp, char *identity, int priority, int options)
     char *p;
 
     if (!fp) {
-        if (log_ctx.fp)
-            fclose (log_ctx.fp);                /* ignore errors on close */
+        if (log_ctx.fp) {
+            (void) fclose (log_ctx.fp);
+        }
         log_ctx.fp = NULL;
         log_ctx.got_init = 1;
         return (0);
@@ -110,8 +111,9 @@ log_open_file (FILE *fp, char *identity, int priority, int options)
     memset (log_ctx.id, 0, sizeof (log_ctx.id));
     if (identity) {
         p = (p = strrchr (identity, '/')) ? p + 1 : identity;
-        if (strlen (p) < sizeof (log_ctx.id))
+        if (strlen (p) < sizeof (log_ctx.id)) {
             strcpy (log_ctx.id, p);
+        }
     }
     log_ctx.priority = (priority > 0) ? priority : 0;
     log_ctx.options = options;
@@ -257,8 +259,9 @@ _log_aux (int errnum, int priority, const char *format, va_list vargs)
         if ((prefix = _log_prefix (priority))) {
             int m = 1;
             if (log_ctx.options & LOG_OPT_JUSTIFY) {
-                if ((m = LOG_PREFIX_MAXLEN + 1 - strlen (prefix)) < 0)
+                if ((m = LOG_PREFIX_MAXLEN + 1 - strlen (prefix)) < 0) {
                     m = 1;
+                }
             }
             n = snprintf (p, len, "%s:%*c", prefix, m, 0x20);
             if ((n < 0) || (n >= len)) {
@@ -313,8 +316,9 @@ _log_aux (int errnum, int priority, const char *format, va_list vargs)
     }
     /*  Terminate buffer with trailing newline and terminating NUL.
      */
-    if (append_nl)
+    if (append_nl) {
         *p++ = '\n';
+    }
     *p = '\0';
 
     /*  Log this!
