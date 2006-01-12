@@ -106,7 +106,7 @@ job_accept (conf_t conf)
             log_msg (LOG_WARNING, "Unable to create client request");
         }
         else if (m_msg_bind (m, sd) != EMUNGE_SUCCESS) {
-            close (sd);
+            m_msg_destroy (m);
             log_msg (LOG_WARNING, "Unable to bind socket for client request");
         }
         else if (work_queue (w, m) < 0) {

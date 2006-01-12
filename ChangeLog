@@ -1,5 +1,7 @@
 2006-01-12  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/munged/job.c(job_accept): Destroy msg if m_msg_bind() fails.
+
 	* src/munged/dec.c(dec_decompress): Removed dead code in 'err' label.
 
 	* src/munged/crypto_thread.c: Added checks to abort on error.
