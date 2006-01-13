@@ -298,6 +298,13 @@ dec_unarmor (munge_cred_t c)
     }
     assert (n < c->outer_mem_len);
 
+    /*  Now that the "request data" has been unarmored, it can be free()d.
+     */
+    free (m->data);
+    m->data = NULL;
+    m->data_len = 0;
+    assert (m->data_is_copy == 0);
+
     /*  Note outer_len is an upper bound which will be refined when unpacked.
      *  It currently includes OUTER + MAC + INNER.
      */
@@ -450,6 +457,7 @@ dec_unpack_outer (munge_cred_t c)
          */
         m->realm_str = (char *) c->realm_mem;
         m->realm_len = c->realm_mem_len;
+        m->realm_is_copy = 1;
     }
     /*  Unpack the cipher initialization vector (if needed).
      *    The length of the IV was derived from the cipher type.

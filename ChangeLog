@@ -1,5 +1,10 @@
 2006-01-12  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/munged/dec.c(dec_unarmor):
+	  Free()d data after unarmoring to prevent leak in dec_unpack_inner().
+	* src/munged/dec.c(dec_unpack_outer):
+	  Set realm_is_copy flag to prevent double free of realm_str.
+
 	* src/munged/job.c(job_accept): Destroy msg if m_msg_bind() fails.
 
 	* src/munged/dec.c(dec_decompress): Removed dead code in 'err' label.
