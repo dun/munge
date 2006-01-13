@@ -1,11 +1,18 @@
 2006-01-12  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/libcommon/m_msg.c(m_msg_send):
+	  Added check for pkt_is_copy before free()ing pkt.
+	* src/libcommon/m_msg.c(m_msg_send):
+	  Added check for negative length returned from _msg_length().
+	* src/libcommon/m_msg.c: Tweaked function documentation.
+
 	* src/munged/dec.c(dec_unarmor):
 	  Free()d data after unarmoring to prevent leak in dec_unpack_inner().
 	* src/munged/dec.c(dec_unpack_outer):
 	  Set realm_is_copy flag to prevent double free of realm_str.
 
-	* src/munged/job.c(job_accept): Destroy msg if m_msg_bind() fails.
+	* src/munged/job.c(job_accept):
+	  Added call to destroy msg if m_msg_bind() fails.
 
 	* src/munged/dec.c(dec_decompress): Removed dead code in 'err' label.
 

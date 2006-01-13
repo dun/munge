@@ -106,7 +106,6 @@ m_msg_destroy (m_msg_t m)
 
     if (m->sd >= 0) {
         (void) close (m->sd);
-        m->sd = -1;
     }
     if (m->pkt && !m->pkt_is_copy) {
         assert (m->pkt_len > 0);
@@ -168,32 +167,41 @@ m_msg_send (m_msg_t m, m_msg_type_t type, int maxlen)
     if (m->type != type) {
         if (m->pkt) {
             assert (m->pkt_len > 0);
-            free (m->pkt);
+            if (!m->pkt_is_copy) {
+                free (m->pkt);
+            }
             m->pkt = NULL;
             m->pkt_len = 0;
+            m->pkt_is_copy = 0;
         }
     }
     /*  If a previously packed message body does not already exist,
      *    create & pack the message body.
      */
-    if (m->pkt == NULL) {
+    if (!m->pkt) {
         assert (m->pkt_len == 0);
-        n = _msg_length (m, type);
+        assert (m->pkt_is_copy == 0);
+        if ((n = _msg_length (m, type)) <= 0) {
+            m_msg_set_err (m, EMUNGE_NO_MEMORY,
+                strdupf ("Invalid length of %d returned for message type %d",
+                    n, type));
+            return (EMUNGE_SNAFU);
+        }
         if (!(m->pkt = malloc (n))) {
             m_msg_set_err (m, EMUNGE_NO_MEMORY,
                 strdupf ("Unable to malloc %d bytes for message send", n));
             return (EMUNGE_NO_MEMORY);
         }
         m->pkt_len = n;
+        m->type = type;
         e = _msg_pack (m, type, m->pkt, m->pkt_len);
         if (e != EMUNGE_SUCCESS) {
             m_msg_set_err (m, e,
                 strdup ("Unable to pack message body"));
             return (e);
         }
-        m->type = type;
     }
-    /*  Always recompute the message header.
+    /*  Always repack the message header.
      */
     e = _msg_pack (m, MUNGE_MSG_HDR, hdr, sizeof (hdr));
     if (e != EMUNGE_SUCCESS) {
@@ -257,14 +265,11 @@ m_msg_recv (m_msg_t m, m_msg_type_t type, int maxlen)
 
     assert (m != NULL);
     assert (m->type != MUNGE_MSG_HDR);
+    assert (m->pkt == NULL);
+    assert (m->pkt_len == 0);
+    assert (m->pkt_is_copy == 0);
     assert (_msg_length (m, MUNGE_MSG_HDR) == MUNGE_MSG_HDR_SIZE);
 
-    if (m->pkt != NULL) {
-        assert (m->pkt_len > 0);
-        free (m->pkt);
-        m->pkt = NULL;
-        m->pkt_len = 0;
-    }
     /*  Read and validate the message header.
      */
     nrecv = sizeof (hdr);
@@ -304,14 +309,13 @@ m_msg_recv (m_msg_t m, m_msg_type_t type, int maxlen)
         return (EMUNGE_BAD_LENGTH);
     }
     else if (!(m->pkt = malloc (m->pkt_len))) {
-            m_msg_set_err (m, EMUNGE_NO_MEMORY,
-                strdupf ("Unable to malloc %d bytes for message recv", n));
-            return (EMUNGE_NO_MEMORY);
+        m_msg_set_err (m, EMUNGE_NO_MEMORY,
+            strdupf ("Unable to malloc %d bytes for message recv", n));
+        return (EMUNGE_NO_MEMORY);
     }
     else if ((n = fd_read_n (m->sd, m->pkt, m->pkt_len)) < 0) {
         m_msg_set_err (m, EMUNGE_SOCKET,
-            strdupf ("Unable to receive message body: %s",
-                strerror (errno)));
+            strdupf ("Unable to receive message body: %s", strerror (errno)));
         return (EMUNGE_SOCKET);
     }
     else if (n != m->pkt_len) {
@@ -320,8 +324,7 @@ m_msg_recv (m_msg_t m, m_msg_type_t type, int maxlen)
             n, nrecv));
         return (EMUNGE_SOCKET);
     }
-    else if (_msg_unpack (m, m->type, m->pkt, m->pkt_len)
-            != EMUNGE_SUCCESS) {
+    else if (_msg_unpack (m, m->type, m->pkt, m->pkt_len) != EMUNGE_SUCCESS) {
         m_msg_set_err (m, EMUNGE_SOCKET,
             strdup ("Unable to unpack message body"));
         return (EMUNGE_SOCKET);
@@ -331,6 +334,7 @@ m_msg_recv (m_msg_t m, m_msg_type_t type, int maxlen)
     free (m->pkt);
     m->pkt = NULL;
     m->pkt_len = 0;
+    assert (m->pkt_is_copy == 0);
     return (EMUNGE_SUCCESS);
 }
 
@@ -352,6 +356,7 @@ m_msg_set_err (m_msg_t m, munge_err_t e, char *s)
         m->error_num = e;
         assert (m->error_str == NULL);
         assert (m->error_len == 0);
+        assert (m->error_is_copy == 0);
         m->error_str = (s != NULL) ? s : strdup (munge_strerror (e));
         m->error_len = strlen (m->error_str) + 1;
     }
@@ -672,7 +677,7 @@ _copy (void *dst, void *src, int len,
  *    If [first] and [last] are both non-NULL, checks to ensure
  *    [len] bytes of data resides between [first] and [last].
  *  Returns the number of bytes copied into [dst], or -1 on error.
- *    On success, an optional [inc] ptr is advanced by [len].
+ *    On success (ie, >= 0), an optional [inc] ptr is advanced by [len].
  */
     if (len < 0) {
         return (-1);
@@ -701,7 +706,7 @@ _pack (void **pdst, void *src, int len, const void *last)
  *    If [last] is non-NULL, checks to ensure [len] bytes
  *    of [dst] data resides prior to the [last] valid byte.
  *  Returns the number of bytes copied into [dst].
- *    On success, the [dst] ptr is advanced by [len].
+ *    On success (ie, > 0), the [dst] ptr is advanced by [len].
  */
     void     *dst;
     uint16_t  u16;
@@ -741,7 +746,7 @@ _unpack (void *dst, void **psrc, int len, const void *last)
  *    If [last] is non-NULL, checks to ensure [len] bytes
  *    of [src] data resides prior to the [last] valid byte.
  *  Returns the number of bytes copied into [dst].
- *    On success, the [src] ptr is advanced by [len].
+ *    On success (ie, > 0), the [src] ptr is advanced by [len].
  */
     void     *src;
     uint16_t  u16;
