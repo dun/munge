@@ -1,3 +1,8 @@
+2006-01-17  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/munged/enc.c(enc_fini):
+	  Free()d req data before overwriting data ptr with rsp data.
+
 2006-01-12  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/libcommon/m_msg.c(m_msg_send):

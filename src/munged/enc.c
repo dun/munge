@@ -746,6 +746,13 @@ enc_fini (munge_cred_t c)
  */
     m_msg_t  m = c->msg;
 
+    /*  Free any "request data".
+     */
+    if (m->data) {
+        assert (m->data_len > 0);
+        assert (m->data_is_copy == 0);
+        free (m->data);
+    }
     /*  Place credential in message "data" payload for transit.
      *  This memory is still owned by the cred struct, so it will be
      *    free()d by cred_destroy() called from enc_process_msg().
