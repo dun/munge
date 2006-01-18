@@ -177,9 +177,6 @@ _encode_rsp (m_msg_t m, char **cred)
  *    called from munge_encode() (ie, the parent of this stack frame).
  *  Note that the [cred] is NUL-terminated.
  */
-    unsigned char   *p;
-    int              n;
-
     assert (m != NULL);
     assert (cred != NULL);
 
@@ -195,25 +192,10 @@ _encode_rsp (m_msg_t m, char **cred)
             strdupf ("Client received invalid data length %d", m->data_len));
         return (EMUNGE_SNAFU);
     }
-    /*  Allocate memory for the credential string
-     *    (including space for the terminating NUL).
-     *  We can't simply return the 'data' field here as it
-     *    lies in the middle of the message's memory allocation.
+    /*  Return the credential to the caller.
      */
-    n = m->data_len + 1;
-    if (!(p = malloc (n))) {
-        m_msg_set_err (m, EMUNGE_NO_MEMORY,
-            strdupf ("Client unable to allocate %d bytes for data", n));
-        return (EMUNGE_NO_MEMORY);
-    }
-    /*  Copy & NUL-terminate the credential.
-     */
-    assert (m->data != NULL);
-    memcpy (p, m->data, m->data_len);
-    p[m->data_len] = '\0';
-    /*
-     *  Return the credential to the caller.
-     */
-    *cred = (char *) p;
+    assert (* ((unsigned char *) m->data + m->data_len) == '\0');
+    *cred = m->data;
+    m->data_is_copy = 1;
     return (m->error_num);
 }

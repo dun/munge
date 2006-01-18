@@ -1,5 +1,12 @@
 2006-01-17  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/libcommon/m_msg.c(_alloc):
+	  Added NUL-termination byte to end of memory allocation.
+	* src/libmunge/encode.c(_encode_rsp):
+	  Removed unnecessary dup of rsp data.
+	* src/libmunge/decode.c(_decode_rsp):
+	  Removed unnecessary dup of rsp data & realm_str.
+
 	* src/munged/enc.c(enc_fini):
 	  Free()d req data before overwriting data ptr with rsp data.
 

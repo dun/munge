@@ -174,9 +174,6 @@ _decode_rsp (m_msg_t m, munge_ctx_t ctx,
  *  Note that error_num and error_str are set by _munge_ctx_set_err()
  *    called from munge_decode() (ie, the parent of this stack frame).
  */
-    unsigned char   *p;
-    int              n;
-
     assert (m != NULL);
 
     /*  Perform sanity checks.
@@ -192,7 +189,9 @@ _decode_rsp (m_msg_t m, munge_ctx_t ctx,
         ctx->cipher = m->cipher;
         ctx->mac = m->mac;
         ctx->zip = m->zip;
-        ctx->realm_str = (m->realm_str ? strdup (m->realm_str) : NULL);
+        if ((ctx->realm_str = m->realm_str) != NULL) {
+            m->realm_is_copy = 1;
+        }
         ctx->ttl = m->ttl;
         ctx->addr.s_addr = m->addr.s_addr;;
         ctx->time0 = m->time0;
@@ -201,15 +200,9 @@ _decode_rsp (m_msg_t m, munge_ctx_t ctx,
         ctx->auth_gid = m->auth_gid;
     }
     if (buf && len && (m->data_len > 0)) {
-        n = m->data_len + 1;
-        if (!(p = malloc (n))) {
-            m_msg_set_err (m, EMUNGE_NO_MEMORY,
-                strdupf ("Client unable to allocate %d bytes for data", n));
-            return (EMUNGE_NO_MEMORY);
-        }
-        memcpy (p, m->data, m->data_len);
-        p[m->data_len] = '\0';
-        *buf = p;
+        assert (* ((unsigned char *) m->data + m->data_len) == '\0');
+        *buf = m->data;
+        m->data_is_copy = 1;
     }
     if (len) {
         *len = m->data_len;

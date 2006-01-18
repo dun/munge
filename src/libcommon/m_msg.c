@@ -650,9 +650,12 @@ nomem:
 static int
 _alloc (void **pdst, int len)
 {
-/*  Allocates memory for [pdst] of length [len].
+/*  Allocates memory for [pdst] of length [len + 1],
+ *    NUL-terminating the last byte.
  *  Returns non-zero on success; o/w, returns 0.
  */
+    unsigned char *p;
+
     assert (pdst != NULL);
     assert (*pdst == NULL);
 
@@ -662,10 +665,14 @@ _alloc (void **pdst, int len)
     if (len < 0) {                      /* invalid length */
         return (0);
     }
-    if ((*pdst = malloc (len))) {
-        return (1);
+    /*  Allocate an extra byte to NUL-terminate the memory allocation.
+     */
+    if (!(p = malloc (len + 1))) {
+        return (0);
     }
-    return (0);
+    p[len] = '\0';
+    *pdst = p;
+    return (1);
 }
 
 
