@@ -1,5 +1,7 @@
 2006-01-19  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* munge.spec: Moved libmunge.so from devel to libs subpackage.
+
 	* src/libcommon/munge_defs.h:
 	  Appended interface version number to MUNGE_SOCKET_NAME.
 
