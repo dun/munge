@@ -1,5 +1,7 @@
 2006-01-19  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/libcommon/license.c: Updated copyright date range.
+
 	* src/libcommon/m_msg.c(_msg_unpack):
 	  Added cast to discard const qualifier from ptr type.
 	* src/munged/zip.c(zip_decompress_length):
