@@ -112,7 +112,7 @@
 
 /*  String specifying the unix domain socket pathname for client-server comms.
  */
-#define MUNGE_SOCKET_NAME               "/var/run/munge.socket"
+#define MUNGE_SOCKET_NAME               "/var/run/munge.socket.2"
 
 /*  Number of attempts a client makes connecting to the server before failing.
  */

@@ -1,5 +1,8 @@
 2006-01-19  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/libcommon/munge_defs.h:
+	  Appended interface version number to MUNGE_SOCKET_NAME.
+
 	* src/libcommon/license.c: Updated copyright date range.
 
 	* src/libcommon/m_msg.c(_msg_unpack):
