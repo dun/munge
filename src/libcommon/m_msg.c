@@ -541,7 +541,7 @@ _msg_unpack (m_msg_t m, m_msg_type_t type, const void *src, int srclen)
  */
     m_msg_magic_t    magic;
     m_msg_version_t  version;
-    void            *p = src;
+    void            *p = (void *) src;
     void            *q = (unsigned char *) src + srclen;
 
     assert (m != NULL);

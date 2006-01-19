@@ -1,5 +1,10 @@
 2006-01-19  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/libcommon/m_msg.c(_msg_unpack):
+	  Added cast to discard const qualifier from ptr type.
+	* src/munged/zip.c(zip_decompress_length):
+	  Added cast to discard const qualifier from ptr type.
+
 	* HISTORY, META, NEWS: Updated for 0.5 release.
 
 2006-01-18  Chris Dunlap  <cdunlap@llnl.gov>

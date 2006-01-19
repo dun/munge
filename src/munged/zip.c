@@ -4,7 +4,7 @@
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
  *
- *  Copyright (C) 2004-2005 The Regents of the University of California.
+ *  Copyright (C) 2004-2006 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
  *  Written by Chris Dunlap <cdunlap@llnl.gov>.
  *  UCRL-CODE-155910.
@@ -256,7 +256,7 @@ zip_decompress_length (munge_zip_t type, const void *src, int len)
     if (len < sizeof (zip_meta_t)) {
         return (-1);
     }
-    pmeta = src;
+    pmeta = (void *) src;
     if (ntohl (pmeta->magic) != ZIP_MAGIC) {
         return (-1);
     }
