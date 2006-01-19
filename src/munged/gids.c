@@ -4,7 +4,7 @@
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
  *
- *  Copyright (C) 2004-2005 The Regents of the University of California.
+ *  Copyright (C) 2004-2006 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
  *  Written by Chris Dunlap <cdunlap@llnl.gov>.
  *  UCRL-CODE-155910.
@@ -298,7 +298,6 @@ _gids_hash_create (void)
             if (errno == EINTR)
                 continue;
             log_msg (LOG_ERR, "Unable to parse group information");
-            endgrent ();
             goto err;
         }
         for (pp = gr_ptr->gr_mem; *pp; pp++) {
@@ -313,6 +312,7 @@ _gids_hash_create (void)
     return (hash);
 
 err:
+    endgrent ();
     hash_destroy (hash);
     return (NULL);
 }
