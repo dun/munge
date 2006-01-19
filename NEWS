@@ -1,7 +1,10 @@
-Version ? (????-??-??):
+Version 0.5 (2006-01-19):
   - Fixed bug with credential's compression header not being protected by mac.
   - Changed credential format.
-  - Changed default cipher to aes128.
+  - Added multilib support.
+  - Changed protocol between client & server (apps will need to relink).
+  - Fixed miscellaneous bugs (now coverity clean).
+  - Changed default cipher to aes128 if present.
 
 Version 0.4.3 (2005-10-31):
   - Fixed init script to work with RedHat's RHEL4-U1 chkconfig.
@@ -33,7 +36,7 @@ Version 0.4 (2004-12-07):
   - Optimized memory usage.
   - Optimized performance.
   - Changed libmunge.so to only export public symbols.
-  - Changed protocol between client & server.
+  - Changed protocol between client & server (apps will need to relink).
 
 Version 0.3 (2004-04-30):
   - Added support for AIX, FreeBSD, Solaris.

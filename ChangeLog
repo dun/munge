@@ -1,4 +1,8 @@
-2006-01-17  Chris Dunlap  <cdunlap@llnl.gov>
+2006-01-19  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* HISTORY, META, NEWS: Updated for 0.5 release.
+
+2006-01-18  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/munged/gids.c(_gids_hash_create):
 	  Ensured endgrent() is called on error.
