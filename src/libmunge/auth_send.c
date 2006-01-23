@@ -4,7 +4,7 @@
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
  *
- *  Copyright (C) 2004-2005 The Regents of the University of California.
+ *  Copyright (C) 2004-2006 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
  *  Written by Chris Dunlap <cdunlap@llnl.gov>.
  *  UCRL-CODE-155910.
@@ -128,16 +128,16 @@ auth_send (m_msg_t m)
 
 err:
     if (pipe_fd >= 0) {
-        close (pipe_fd);
+        (void) close (pipe_fd);
     }
     if (pipe_name != NULL) {
         free (pipe_name);
     }
     if (file_fd >= 0) {
-        close (file_fd);
+        (void) close (file_fd);
     }
     if (file_name != NULL) {
-        unlink (file_name);
+        (void) unlink (file_name);
         free (file_name);
     }
     return (m_msg_set_err (m, EMUNGE_SNAFU, estr));
@@ -152,49 +152,34 @@ _recv_auth_req (int sd, char **dst_p)
  *  The caller is responsible for freeing the string returned by [dst_p].
  *  Returns 0 on success, -1 on error.
  */
-    m_msg_t          m;
-    munge_err_t      e;
-    struct m_msg_v1 *m1;
+    m_msg_t      m;
+    munge_err_t  e;
 
     *dst_p = NULL;
 
-    if ((e = m_msg_create (&m, sd)) != EMUNGE_SUCCESS) {
+    if ((e = m_msg_create (&m)) != EMUNGE_SUCCESS) {
         goto end;
     }
-    if ((e = m_msg_recv (m, 0)) != EMUNGE_SUCCESS) {
+    if ((e = m_msg_bind (m, sd)) != EMUNGE_SUCCESS) {
         goto end;
     }
-    /*  Note that errstr will be set if the received message is an error
+    if ((e = m_msg_recv (m, MUNGE_MSG_AUTH_FD_REQ, 0)) != EMUNGE_SUCCESS) {
+        goto end;
+    }
+    /*  Note that error_str will be set if the received message is an error
      *    message, whereas m_msg_recv()'s return code (e) will be set
      *    according to how that message is received.
      */
-    if (m->errstr != NULL) {
+    if (m->error_str != NULL) {
         e = EMUNGE_SOCKET;
         goto end;
     }
-    if (m->head.version > MUNGE_MSG_VERSION) {
-        e = EMUNGE_SOCKET;
-        goto end;
-    }
-    if (m->head.type != MUNGE_MSG_AUTH_FD_REQ) {
-        e = EMUNGE_SOCKET;
-        goto end;
-    }
-    m1 = m->pbody;
-    /*
-     *  The string must be copied since m_msg_destroy() will free the
-     *    msg body, and the msg data here resides within that memory.
-     */
-    if (!(*dst_p = strdup (m1->data))) {
-        e = EMUNGE_NO_MEMORY;
-        goto end;
-    }
+    *dst_p = m->data;
+    m->data_is_copy = 1;
 
 end:
-    /*  Clear the msg sd to prevent closing the socket by m_msg_destroy().
-     */
     if (m) {
-        m->sd = -1;
+        m->sd = -1;                     /* prevent close by m_msg_destroy() */
         m_msg_destroy (m);
     }
     return (e == EMUNGE_SUCCESS ? 0 : -1);

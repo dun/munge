@@ -4,7 +4,7 @@
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
  *
- *  Copyright (C) 2003-2005 The Regents of the University of California.
+ *  Copyright (C) 2003-2006 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
  *  Written by Chris Dunlap <cdunlap@llnl.gov>.
  *  UCRL-CODE-155910.
@@ -135,7 +135,7 @@ auth_recv (m_msg_t m, uid_t *uid, gid_t *gid)
         goto err;
     }
     assert (pipe_name != NULL);
-    unlink (pipe_name);                 /* in case it already exists */
+    (void) unlink (pipe_name);                  /* in case it already exists */
     /*
      *  The auth pipe must be created in the filesystem before the auth req
      *    is sent to the client in order to prevent a race condition.
@@ -185,10 +185,10 @@ auth_recv (m_msg_t m, uid_t *uid, gid_t *gid)
 
 err:
     if (pipe_fd >= 0) {
-        close (pipe_fd);
+        (void) close (pipe_fd);
     }
     if (pipe_name != NULL) {
-        unlink (pipe_name);
+        (void) unlink (pipe_name);
         free (pipe_name);
     }
     return (-1);
@@ -276,13 +276,13 @@ auth_recv (m_msg_t m, uid_t *uid, gid_t *gid)
 
 err:
     if (pipe_fds[0] >= 0) {
-        close (pipe_fds[0]);
+        (void) close (pipe_fds[0]);
     }
     if (pipe_fds[1] >= 0) {
-        close (pipe_fds[1]);
+        (void) close (pipe_fds[1]);
     }
     if (pipe_name != NULL) {
-        unlink (pipe_name);
+        (void) unlink (pipe_name);
         free (pipe_name);
     }
     return (-1);
@@ -314,21 +314,21 @@ _ns_pipe (const char *name, int fd[2])
     /*
      *  Unlink this name in case it already exists.
      */
-    unlink (name);
+    (void) unlink (name);
     /*
      *  Determine the major/minor device numbers of one end of the pipe.
      */
     if (fstat (fd[1], &stbuf) < 0) {
-        close (fd[0]);
-        close (fd[1]);
+        (void) close (fd[0]);
+        (void) close (fd[1]);
         return (-1);
     }
     /*  Create the filesystem entry by assigning the [name] to one end
      *    of the pipe.  This requires root privileges.
      */
     if (mknod (name, S_IFCHR | 0666, stbuf.st_rdev) < 0) {
-        close (fd[0]);
-        close (fd[1]);
+        (void) close (fd[0]);
+        (void) close (fd[1]);
         umask (omask);
         return (-1);
     }
@@ -351,7 +351,7 @@ _s_pipe (int fd[2])
         return (-1);
     }
     if ((fd[1] = open ("/dev/spx", O_RDWR)) < 0) {
-        close (fd[0]);
+        (void) close (fd[0]);
         return (-1);
     }
     /*  Link these two streams together with an I_FDINSERT ioctl.
@@ -369,8 +369,8 @@ _s_pipe (int fd[2])
     ins.offset = 0;                     /* offset of pointer in ctlbuf */
 
     if (ioctl (fd[0], I_FDINSERT, (char *) &ins) < 0) {
-        close (fd[0]);
-        close (fd[1]);
+        (void) close (fd[0]);
+        (void) close (fd[1]);
         return (-1);
     }
     return (0);
@@ -466,42 +466,25 @@ _send_auth_req (int sd, const char *pipe_name)
  *
  *  The authentication request message needs to contain the name of the
  *    authentication pipe for the client to use for sending an fd across.
- *
- *  FIXME: Use of the m_msg_v1 struct is overkill here, but all of the
- *         existing msg routines currently expect to work with that struct.
  */
-    m_msg_t          m;
-    munge_err_t      e;
-    struct m_msg_v1 *m1;
+    m_msg_t      m;
+    munge_err_t  e;
 
-    if ((e = m_msg_create (&m, sd)) != EMUNGE_SUCCESS) {
+    if ((e = m_msg_create (&m)) != EMUNGE_SUCCESS) {
         goto end;
     }
-    m->head.type = MUNGE_MSG_AUTH_FD_REQ;
-
-    m->pbody_len = sizeof (struct m_msg_v1);
-    if (!(m->pbody = malloc (m->pbody_len))) {
-        e = EMUNGE_NO_MEMORY;
+    if ((e = m_msg_bind (m, sd)) != EMUNGE_SUCCESS) {
         goto end;
     }
-    memset (m->pbody, 0, m->pbody_len);
-    m1 = m->pbody;
-    /*
-     *  Note that the actual string reference (not a copy) is used here
-     *    since m_msg_destroy() does not free any m1 fields.
-     */
-    m1->data_len = strlen ((char *) pipe_name) + 1;
-    m1->data = (char *) pipe_name;
+    m->data_len = strlen ((char *) pipe_name) + 1;
+    m->data = (char *) pipe_name;
+    m->data_is_copy = 1;
 
-    if ((e = m_msg_send (m, 0)) != EMUNGE_SUCCESS) {
-        goto end;
-    }
+    e = m_msg_send (m, MUNGE_MSG_AUTH_FD_REQ, 0);
 
 end:
-    /*  Clear the msg sd to prevent closing the socket by m_msg_destroy().
-     */
     if (m) {
-        m->sd = -1;
+        m->sd = -1;                     /* prevent close by m_msg_destroy() */
         m_msg_destroy (m);
     }
     return (e == EMUNGE_SUCCESS ? 0 : -1);
