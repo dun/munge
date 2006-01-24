@@ -1,0 +1,43 @@
+Multilib allows you to have both 32-bit and 64-bit versions of libmunge
+installed at the same time, capable of communicating with either a 32-bit
+or 64-bit version of munged.
+
+On Linux, at least, 32-bit libraries usually reside in /usr/lib, and
+64-bit libraries usually reside in /usr/lib64.  But on ia64, for example,
+64-bit libraries reside in /usr/lib since everything is 64-bit there.
+
+If you are building from source, you can pass a command-line option to
+the configure script:
+
+  $ ./configure --enable-arch=32
+  $ ./configure --enable-arch=64
+
+If you are building RPMs, you can pass a command-line option to rpmbuild:
+
+  $ rpmbuild -ta --with arch32 munge-x.y.z.tar.bz2
+  $ rpmbuild -ta --with arch64 munge-x.y.z.tar.bz2
+
+You might also have to specify the --target command-line option:
+
+  $ rpmbuild -ta --target i386 --with arch32 munge-x.y.z.tar.bz2
+  $ rpmbuild -ta --target x86_64 --with arch64 munge-x.y.z.tar.bz2
+
+For each platform, you will have one source RPM and three binary RPMs
+(munge, munge-devel, and munge-libs).
+
+If you wanted to install both 32-bit and 64-bit MUNGE libraries on an
+RPM-based x86_64 system, for example, you would need to install either
+the 32-bit or 64-bit version of the main munge RPM (containing munged),
+and both 32-bit and 64-bit versions of the munge-devel and munge-libs RPMs:
+
+  $ rpm -ivh RPMS/x86_64/munge-0.5-1.x86_64.rpm \
+             RPMS/x86_64/munge-devel-0.5-1.x86_64.rpm \
+             RPMS/x86_64/munge-libs-0.5-1.x86_64.rpm \
+             RPMS/i386/munge-devel-0.5-1.i386.rpm \
+             RPMS/i386/munge-libs-0.5-1.i386.rpm
+
+You can then link your application against either the 32-bit or 64-bit library:
+
+  $ gcc -o foo foo.c -m32 -lmunge
+  $ gcc -o foo foo.c -m64 -lmunge
+
