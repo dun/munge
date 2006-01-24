@@ -1,5 +1,7 @@
 2006-01-24  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* munge.spec: Updated %files to include new documentation.
+
 	* README.MULTILIB: Added.
 
 	* QUICKSTART: Added.

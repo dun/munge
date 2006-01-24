@@ -4,7 +4,7 @@ Name:		munge
 Version:	0
 Release:	1
 
-Summary:	Munge Uid 'N' Gid Emporium
+Summary:	MUNGE Uid 'N' Gid Emporium
 Group:		System Environment/Daemons
 License:	GPL
 URL:		http://www.llnl.gov/linux/munge/
@@ -22,7 +22,7 @@ Summary:	Libraries for applications using MUNGE
 Group:		System Environment/Libraries
 
 %description
-MUNGE (Munge Uid 'N' Gid Emporium) is a service for creating and validating
+MUNGE (MUNGE Uid 'N' Gid Emporium) is a service for creating and validating
 credentials in order to allow a process to securely authenticate the UID and
 GID of another local or remote process within a security realm.  Clients can
 create and validate these credentials without the use of root privileges,
@@ -96,7 +96,8 @@ fi
 %doc JARGON
 %doc NEWS
 %doc PLATFORMS
-%doc README
+%doc QUICKSTART
+%doc README*
 %doc TODO
 %doc doc/*
 %dir %attr(0700,root,root) %config /etc/munge
