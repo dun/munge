@@ -109,7 +109,8 @@ fi
 %{_includedir}/*
 %{_libdir}/*.a
 %{_libdir}/*.la
+%{_libdir}/*.so
 %{_mandir}/*3/*
 
 %files libs
-%{_libdir}/*.so*
+%{_libdir}/*.so.*

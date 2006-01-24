@@ -1,5 +1,7 @@
 2006-01-23  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* munge.spec: Moved libmunge.so from libs back to devel subpackage.
+
 	* src/munged/auth_recv.c: Updated for new munge message layer.
 	* src/libmunge/auth_send.c: Updated for new munge message layer.
 
