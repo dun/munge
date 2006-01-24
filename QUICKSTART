@@ -3,7 +3,7 @@ A Quick & Dirty Guide to MUNGE
 
   1. Install the software.
 
-     A. Building an RPM.
+     A. Building RPMs.
 
         $ rpmbuild -ta munge-x.y.z.tar.bz2
 
