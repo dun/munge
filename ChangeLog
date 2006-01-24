@@ -1,3 +1,7 @@
+2006-01-24  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* QUICKSTART: Added.
+
 2006-01-23  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* munge.spec: Moved libmunge.so from libs back to devel subpackage.

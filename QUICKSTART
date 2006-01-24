@@ -1,0 +1,100 @@
+A Quick & Dirty Guide to MUNGE
+
+
+  1. Install the software.
+
+     A. Building an RPM.
+
+        $ rpmbuild -ta munge-x.y.z.tar.bz2
+
+        This should generate a single source RPM and three binary RPMs
+        (munge, munge-devel, and munge-libs).  The munge RPM contains the
+        daemon and client binaries.  The munge-devel RPM contains a header
+        file and static library for developing applications using MUNGE.
+        The munge-libs RPM contains a shared library for applications
+        using MUNGE.
+  
+     B. Building from source.
+
+        Edit src/libcommon/munge_defs.h to customize values if necessary.
+        Configuration file support is planned for future development.
+
+        The default for MUNGED_SECRET_KEY is "/etc/munge/munge.key".
+        The "/etc/munge/" directory will need to be created, and the
+        "munge.key" file will need to be generated and distributed as
+        detailed below.  This setting can be overridden on the munged
+        command-line (munged --key-file /path/to/file).
+
+        The default for MUNGED_RANDOM_SEED is "/var/lib/munge/munge.seed".
+        The "/var/lib/munge/" directory will need to be created.
+        The "munge.seed" file will be automatically generated.
+
+        The default for MUNGED_LOGFILE is "/var/log/munge.log".
+
+        $ ./configure && make && make install.
+
+
+  2. Create a secret key file.
+
+     A. Wait around for some random data (recommended for the paranoid):
+        dd if=/dev/random bs=1 count=1024 >munge.key
+
+     B. Grab some pseudo random data (recommended for the impatient):
+        dd if=/dev/urandom bs=1 count=1024 >munge.key
+
+     C. Enter the hash of a password:
+        echo -n "foo" | sha1sum | cut -d' ' -f1 >munge.key
+
+     D. Enter a password (not recommended):
+        echo "foo" >munge.key
+
+     Ensure this file is permissioned 0400 and owned by the same user that
+     the munged daemon will run as.  On most platforms, root privileges are
+     not required for the daemon.
+
+     Securely propagate the secret key file (eg, via ssh) to other hosts
+     within the same security realm.  Credentials are valid only within a
+     security realm (ie, on hosts sharing the same secret key).  All munged
+     daemons exchanging credentials need to share the same secret key.
+
+
+  3. Start the munged daemon on each host within the security realm.
+
+     Invoke the daemon directly (/usr/sbin/munged) or use the init script
+     (/etc/init.d/munge).  The init script sources /etc/sysconfig/munge
+     (if present) to set the ${OPTIONS} variable in order to pass additional
+     command-line options to the daemon.  For example, this can be used to
+     override the location of the secret key file (--key-file) or set the
+     number of worker threads (--num-threads).
+
+
+  4. Test the installation.
+
+     A. Generate a credential on stdout.
+
+        $ munge -n
+
+     B. Check if a credential can be locally decoded.
+
+        $ munge -n | unmunge
+
+     C. Check if a credential can be remotely decoded.
+
+        $ munge -n | ssh somehost unmunge
+
+     D. Run a quick benchmark.
+
+        $ remunge
+
+     If you encounter problems, ensure the munged process is running.
+     Also check the munged logfile (/var/log/munge.log) or try running
+     munged in the foreground (munged -F).
+
+
+  5. Munge credentials.
+
+     Applications written in C/C++ can use the interface provided by
+     <libmunge.h>.  Scripts can use the interface provided by the "munge" and
+     "unmunge" executables -- specify "-h" or "--help" for usage information,
+     or Read The Fine Manpages.
+
