@@ -1,5 +1,7 @@
 2006-01-24  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* HISTORY, META, NEWS, PLATFORMS: Updated for 0.5 release.
+
 	* README: Updated.
 
 	* munge.spec: Updated %files to include new documentation.
