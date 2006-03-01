@@ -1,5 +1,7 @@
 2006-02-28  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* : Released 0.5.1.
+
 	* HISTORY, META, NEWS: Updated for 0.5.1 release.
 
 	* src/libcommon/license.c: Changed Munge to MUNGE.
