@@ -105,10 +105,14 @@ main (int argc, char *argv[])
     /*  FIXME: Parse config file.  */
 
     if (!conf->got_foreground) {
-        /*
-         *  FIXME: Revamp logfile kludge.
-         */
-        FILE *fp = fopen (MUNGED_LOGFILE, "a");
+
+        mode_t mask;
+        FILE *fp;
+
+        mask = umask (0);
+        umask (mask | 027);
+        fp = fopen (MUNGED_LOGFILE, "a");
+        umask (mask);
         log_open_file (fp, NULL, priority,
             LOG_OPT_JUSTIFY | LOG_OPT_PRIORITY | LOG_OPT_TIMESTAMP);
         daemonize_fini (fd);
@@ -334,17 +338,16 @@ sock_create (conf_t conf)
         log_err (EMUNGE_SNAFU, LOG_ERR,
             "Exceeded maximum length of socket pathname");
     }
-    mask = umask (0);                   /* ensure sock access perms of 0777 */
+    mask = umask (0);
 
     if (conf->got_force) {
-        unlink (conf->socket_name);     /* ignoring errors */
+        (void) unlink (conf->socket_name);
     }
     if (bind (sd, (struct sockaddr *) &addr, sizeof (addr)) < 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR,
             "Unable to bind to \"%s\"", conf->socket_name);
     }
-
-    umask (mask);                       /* restore umask */
+    umask (mask);
 
     if (listen (sd, MUNGE_SOCKET_BACKLOG) < 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR,

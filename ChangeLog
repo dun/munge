@@ -1,3 +1,7 @@
+2006-02-28  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/munged/munged.c(main): Changed new logfile perms from 666 to 640.
+
 2006-01-24  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* : Released 0.5.
