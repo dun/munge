@@ -1,3 +1,6 @@
+Version 0.5.1 (2006-02-28):
+  - Set created logfile permissions to 640.
+
 Version 0.5 (2006-01-24):
   - Fixed bug with credential's compression header not being protected by mac.
   - Changed credential format.
