@@ -1,3 +1,6 @@
+Version 0.5.2 (2006-03-07):
+  - Fixed spec file so munge-devel & munge-libs files are perm'd properly.
+
 Version 0.5.1 (2006-02-28):
   - Set created logfile permissions to 640.
 
