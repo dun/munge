@@ -107,6 +107,7 @@ fi
 %{_mandir}/*[^3]/*
 
 %files devel
+%defattr(-,root,root,0755)
 %{_includedir}/*
 %{_libdir}/*.a
 %{_libdir}/*.la
@@ -114,4 +115,5 @@ fi
 %{_mandir}/*3/*
 
 %files libs
+%defattr(-,root,root,0755)
 %{_libdir}/*.so.*

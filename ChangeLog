@@ -1,3 +1,8 @@
+2006-03-07  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* munge.spec: Fixed so the files in the munge-devel & munge-libs RPMs
+	  are permissioned properly.
+
 2006-02-28  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* : Released 0.5.1.
