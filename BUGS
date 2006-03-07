@@ -1,4 +1,5 @@
 - libcrypto (openssl) license is incompatible with gpl; replace with libgcrypt
+  <http://www.gnome.org/~markmc/openssl-and-the-gpl.html>
 - munged does not terminate on sigint or sigterm on many platforms
 - munged needs support for a configuration file; configuration is currently
   set by src/libcommon/munge_defs.h at compile-time
