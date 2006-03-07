@@ -1,5 +1,7 @@
 2006-03-07  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* : Released 0.5.2.
+
 	* HISTORY, META, NEWS: Updated for 0.5.2 release.
 
 	* munge.spec: Fixed so the files in the munge-devel & munge-libs RPMs
