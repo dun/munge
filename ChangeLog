@@ -1,5 +1,10 @@
 2006-04-03  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/etc/munge.init: Added Should-Start & Should-Stop LSB headers.
+	  Changed return code for invalid or excess args to match LSB spec.
+	  Changed return code for unimplemented feature to match LSB spec.
+	  Tweaked comments & syntax.  Tweaked SuSE try-restart behavior.
+
 	* munge.spec: Tweaked %post.
 
 2006-03-07  Chris Dunlap  <cdunlap@llnl.gov>
