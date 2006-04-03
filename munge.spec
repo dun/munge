@@ -63,21 +63,19 @@ ls -d "$RPM_BUILD_ROOT"/%{_sysconfdir}/init.d/* \
 rm -rf "$RPM_BUILD_ROOT"
 
 %post
-if [ $1 = 1 ]; then
-  /sbin/chkconfig --add munge
-fi
+/sbin/chkconfig --add munge
 
 %post libs
 /sbin/ldconfig %{_libdir}
 
 %preun
-if [ $1 = 0 ]; then
+if [ "$1" = 0 ]; then
   /sbin/service munge stop >/dev/null 2>&1 || :
   /sbin/chkconfig --del munge
 fi
 
 %postun
-if [ $1 -ge 1 ]; then
+if [ "$1" -ge 1 ]; then
   /sbin/service munge condrestart >/dev/null 2>&1 || :
 fi
 
@@ -88,8 +86,8 @@ fi
 %defattr(-,root,root,0755)
 %doc AUTHORS
 %doc BUGS
-%doc COPYING
 %doc ChangeLog
+%doc COPYING
 %doc DISCLAIMER
 %doc HISTORY
 %doc INSTALL
