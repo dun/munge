@@ -1,3 +1,7 @@
+2006-05-02  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/etc/munge.init, src/etc/munge.sysconfig: Revamped.
+
 2006-04-03  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/etc/munge.init: Added Should-Start & Should-Stop LSB headers.
