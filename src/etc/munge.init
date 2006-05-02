@@ -110,10 +110,10 @@ service_start ()
 ##
   local pids rc
 
-  echo -n "Starting $DESC: "
+  printf "Starting $DESC: "
   case $SYSTEM in
     DEBIAN)
-      echo -n "$DAEMON_NAME"
+      printf "$DAEMON_NAME"
       start-stop-daemon --start --quiet \
         ${PIDFILE:+"--pidfile"} ${PIDFILE:+"$PIDFILE"} \
         --exec "$DAEMON" -- $OPTIONS
@@ -166,10 +166,10 @@ service_stop ()
 ##
   local rc
 
-  echo -n "Stopping $DESC: "
+  printf "Stopping $DESC: "
   case $SYSTEM in
     DEBIAN)
-      echo -n "$DAEMON_NAME"
+      printf "$DAEMON_NAME"
       start-stop-daemon --stop --quiet \
         ${PIDFILE:+"--pidfile"} ${PIDFILE:+"$PIDFILE"} --name "$DAEMON_NAME" \
         ${SIGTERM_TIMEOUT:+"--retry"} ${SIGTERM_TIMEOUT:+"$SIGTERM_TIMEOUT"}
@@ -261,10 +261,10 @@ service_reload ()
 ##
   [ -z "$RELOAD" ] && STATUS=3          # unimplemented feature
 
-  echo -n "Reloading $DESC: "
+  printf "Reloading $DESC: "
   case $SYSTEM in
     DEBIAN)
-      echo -n "$DAEMON_NAME"
+      printf "$DAEMON_NAME"
       if [ -n "$RELOAD" ]; then
         start-stop-daemon --stop --quiet --signal HUP \
           ${PIDFILE:+"--pidfile"} ${PIDFILE:+"$PIDFILE"} --name "$DAEMON_NAME"
@@ -348,7 +348,7 @@ service_status ()
       STATUS=$?
       ;;
     SUSE)
-      echo -n "Checking for $DESC: "
+      printf "Checking for $DESC: "
       checkproc ${PIDFILE:+"-p"} ${PIDFILE:+"$PIDFILE"} "$DAEMON"
       rc_status -v
       ;;
@@ -399,7 +399,7 @@ query_pids ()
   else
     pids=`(ps awx -o pid= -o args= || ps -e -f -o pid= -o args=) 2>/dev/null \
       | egrep "( |/)$PROCNAME( |$)" | grep -v egrep \
-      | awk '{print $1}' | sort -n | tr '\012' ' ' | sed 's/ $/\n/'`
+      | awk '{print $1}' | sort -n | tr '\012' ' '`
     [ -n "$pids" ] && rc=0 || rc=1
   fi
 
