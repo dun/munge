@@ -2,9 +2,9 @@
 
 	* src/etc/munge.init: Removed use of "local" keyword for Solaris.
 
-	* src/etc/munge.init: Added tests for distro release files in
-	  service_init() to prevent SuSE from being recognized as DEBIAN
-	  due to /sbin/start-stop-daemon.
+	* src/etc/munge.init: Added tests for distro release/version files in
+	  service_init() to prevent SuSE from being recognized as Debian due to
+	  existence of /sbin/start-stop-daemon.
 
 	* PLATFORMS: Updated.
 
