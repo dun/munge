@@ -48,16 +48,8 @@ make
 rm -rf "$RPM_BUILD_ROOT"
 mkdir -p "$RPM_BUILD_ROOT"
 DESTDIR="$RPM_BUILD_ROOT" make install
-
 mkdir -p "$RPM_BUILD_ROOT"/etc/munge
 mkdir -p "$RPM_BUILD_ROOT"/var/lib/munge
-
-#Check for the following %files:
-#  %config(noreplace) %{_sysconfdir}/init.d/*
-#  %config(noreplace) %{_sysconfdir}/sysconfig/*
-ls -d "$RPM_BUILD_ROOT"/%{_sysconfdir}/init.d/* \
-  "$RPM_BUILD_ROOT"/%{_sysconfdir}/sysconfig/* 2>/dev/null \
-| perl -pe "s#^$RPM_BUILD_ROOT/#%config(noreplace) #" | sort >munge-files-aux
 
 %clean
 rm -rf "$RPM_BUILD_ROOT"
@@ -82,7 +74,7 @@ fi
 %postun libs
 /sbin/ldconfig %{_libdir}
 
-%files -f munge-files-aux
+%files
 %defattr(-,root,root,0755)
 %doc AUTHORS
 %doc BUGS
@@ -100,6 +92,7 @@ fi
 %doc doc/*
 %dir %attr(0700,root,root) %config /etc/munge
 %dir %attr(0755,root,root) /var/lib/munge
+%config(noreplace) %{_sysconfdir}/*/*
 %{_bindir}/*
 %{_sbindir}/*
 %{_mandir}/*[^3]/*
