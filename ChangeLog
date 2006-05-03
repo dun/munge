@@ -1,5 +1,7 @@
 2006-05-03  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/etc/Makefile.am: Removed tests for init.d & sysconfig files.
+
 	* munge.spec: Removed used of munge-files-aux list.
 	* src/etc/Makefile.am: Removed tests for init.d & sysconfig dirs.
 
