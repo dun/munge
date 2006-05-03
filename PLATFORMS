@@ -1,6 +1,6 @@
 MUNGE has been tested on the following platforms:
 
   AIX 5.1, 5.2 ML4, 5.3
-  FreeBSD 4.11-RELEASE-p2
+  FreeBSD 6.1-BETA1
   Linux 2.4, 2.6 (RedHat, SuSE) (x86, x86_64, ia64)
   Solaris 2.8 (last tested at v0.4)
