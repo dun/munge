@@ -1,5 +1,7 @@
 2006-05-02  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/etc/munge.init: Added fixes for SuSE.
+
 	* PLATFORMS: Updated.
 
 	* src/etc/munge.init: Added fixes for AIX.

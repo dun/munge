@@ -62,16 +62,16 @@ service_init ()
   [ -n "$ENABLE_SIGHUP_RELOAD" -a "$ENABLE_SIGHUP_RELOAD" != 0 ] \
     && RELOAD=1 || unset RELOAD
 
-  if [ -x /sbin/start-stop-daemon ]; then
-    SYSTEM="DEBIAN"                     # also check for /etc/debian_version ?
-  elif [ -r /etc/init.d/functions ]; then
-    SYSTEM="REDHAT"                     # also check for /etc/redhat-release ?
+  if [ -f /etc/debian_version -a -x /sbin/start-stop-daemon ]; then
+    SYSTEM="DEBIAN"
+  elif [ -f /etc/redhat-release -a -r /etc/init.d/functions ]; then
+    SYSTEM="REDHAT"
     source /etc/init.d/functions
     RH_SUBSYS_BASENAME="`echo $0 | perl -pe 's,(.*/)?([SK][0-9]{2})?(.*),$3,'`"
     RH_SUBSYS="/var/lock/subsys/$RH_SUBSYS_BASENAME"
     INITLOG_ARGS=""                     # disable RH suppression of stderr msgs
-  elif [ -r /etc/rc.status ]; then
-    SYSTEM="SUSE"                       # also check for /etc/SuSE-release ?
+  elif [ -f /etc/SuSE-release -a -r /etc/rc.status ]; then
+    SYSTEM="SUSE"
     source /etc/rc.status
     rc_reset
   elif [ -r /lib/lsb/init-functions ]; then
