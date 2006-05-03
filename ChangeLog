@@ -1,10 +1,14 @@
 2006-05-02  Chris Dunlap  <cdunlap@llnl.gov>
 
-	* src/etc/munge.init: Added fixes for SuSE.
+	* src/etc/munge.init: Removed use of "local" keyword for Solaris.
+
+	* src/etc/munge.init: Added tests for distro release files in
+	  service_init() to prevent SuSE from being recognized as DEBIAN
+	  due to /sbin/start-stop-daemon.
 
 	* PLATFORMS: Updated.
 
-	* src/etc/munge.init: Added fixes for AIX.
+	* src/etc/munge.init: Replaced "echo -n" with "printf" for AIX.
 
 	* src/etc/munge.init, src/etc/munge.sysconfig: Revamped.
 

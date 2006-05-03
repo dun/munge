@@ -56,8 +56,6 @@ service_init ()
 # Note that the shell positional parameters must be preserved when calling
 #   this function in order for SuSE to initialize its environment properly.
 ##
-  local RH_SUBSYS_BASENAME
-
   STATUS=0
   [ -n "$ENABLE_SIGHUP_RELOAD" -a "$ENABLE_SIGHUP_RELOAD" != 0 ] \
     && RELOAD=1 || unset RELOAD
@@ -108,8 +106,6 @@ service_start ()
 # According to LSB, running "start" on a service already running should be
 #   considered successful.
 ##
-  local pids rc
-
   printf "Starting $DESC: "
   case $SYSTEM in
     DEBIAN)
@@ -164,8 +160,6 @@ service_stop ()
 # According to LSB, running "stop" on a service already stopped or not running
 #   should be considered successful.
 ##
-  local rc
-
   printf "Stopping $DESC: "
   case $SYSTEM in
     DEBIAN)
@@ -340,8 +334,6 @@ service_status ()
 # Print the current status of the service.
 # Required by LSB.
 ##
-  local pids rc
-
   case $SYSTEM in
     REDHAT)
       status "$DAEMON"
@@ -386,9 +378,8 @@ query_pids ()
 # Writes the matching PIDs to stdout.
 # Returns 0 on success (ie, pids found).
 ##
-  local PROCNAME="$1"
-  local PIDFILE="$2"
-  local pids pids_running pid_line pid rc
+  PROCNAME="$1"
+  PIDFILE="$2"
 
   if which pgrep >/dev/null 2>&1; then
     pids=`pgrep -d ' ' -x "\`basename \"$PROCNAME\"\`" 2>/dev/null`
@@ -403,6 +394,7 @@ query_pids ()
     [ -n "$pids" ] && rc=0 || rc=1
   fi
 
+  unset pids_running
   if [ -n "$pids" -a -r "$PIDFILE" ]; then
     read pid_line < "$PIDFILE"
     for pid in $pid_line; do
@@ -421,9 +413,8 @@ signal_process ()
 {
 # Returns 0 on success, 1 if kill failed, 2 if PROCNAME is not running.
 ##
-  local PROCNAME="$1"
-  local SIGNUM="$2"
-  local pids
+  PROCNAME="$1"
+  SIGNUM="$2"
 
   pids=`query_pids "$DAEMON" "$PIDFILE"`
   [ $? -ne 0 -o -z "$pids" ] && return 2
