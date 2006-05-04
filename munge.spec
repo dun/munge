@@ -48,8 +48,6 @@ make
 rm -rf "$RPM_BUILD_ROOT"
 mkdir -p "$RPM_BUILD_ROOT"
 DESTDIR="$RPM_BUILD_ROOT" make install
-mkdir -p "$RPM_BUILD_ROOT"/etc/munge
-mkdir -p "$RPM_BUILD_ROOT"/var/lib/munge
 
 %clean
 rm -rf "$RPM_BUILD_ROOT"
@@ -91,8 +89,8 @@ fi
 %doc TODO
 %doc doc/*
 %dir %attr(0700,root,root) %config /etc/munge
-%dir %attr(0755,root,root) /var/lib/munge
-%config(noreplace) %{_sysconfdir}/*/*
+%config(noreplace) /etc/*/*
+/var/*/*
 %{_bindir}/*
 %{_sbindir}/*
 %{_mandir}/*[^3]/*

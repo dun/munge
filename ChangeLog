@@ -1,3 +1,10 @@
+2006-05-04  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* munge.spec: Added "/var/*/*" to %files.
+	* src/etc/Makefile.am: Removed use of $(sysconfdir).  Created dirs for
+	  /etc/munge, /var/lib/munge, and /var/run/munge.
+	* src/libcommon/munge_defs.h: Changed MUNGE_SOCKET_NAME.
+
 2006-05-03  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/etc/Makefile.am: Removed tests for init.d & sysconfig files.
