@@ -1,5 +1,7 @@
 2006-05-04  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/etc/Makefile.am: Preserved existing config files on install.
+
 	* munge.spec: Explicitly set localstatedir & sysconfdir for configure.
 	* src/etc/Makefile.am: Added use of $(localstatedir) & $(sysconfdir).
 
