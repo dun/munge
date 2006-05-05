@@ -1,5 +1,10 @@
 2006-05-04  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/etc/munge.init: Added support for NICE & USER.
+	  Changed ENABLE_SIGHUP_RELOAD to ENABLE_RELOAD.
+	  Replaced use of "source" keyword with "." for AIX.
+	* src/etc/munge.sysconfig: Added NICE & USER.  Updated comments.
+
 	* src/etc/Makefile.am: Preserved existing config files on install.
 
 	* munge.spec: Explicitly set localstatedir & sysconfdir for configure.
