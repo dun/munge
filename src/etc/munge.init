@@ -63,7 +63,7 @@ service_init ()
 ##
   STATUS=0
   [ -n "$ENABLE_RELOAD" -a "$ENABLE_RELOAD" != 0 ] \
-    && DO_RELOAD=1 || unset DO_RELOAD
+    && RELOAD=1 || unset RELOAD
   expr "$NICE" : '[0-9]*$' >/dev/null 2>&1 && NICE="+$NICE"
   [ -n "$USER" -a "`id -u 2>/dev/null`" -ne 0 ] && unset USER
 
@@ -276,13 +276,13 @@ service_reload ()
 # Reload the configuration without stopping and restarting the service.
 # Optional for LSB.
 ##
-  [ -z "$DO_RELOAD" ] && STATUS=3       # unimplemented feature
+  [ -z "$RELOAD" ] && STATUS=3          # unimplemented feature
 
   printf "Reloading $DESC: "
   case $SYSTEM in
     DEBIAN)
       printf "$DAEMON_NAME"
-      if [ -n "$DO_RELOAD" ]; then
+      if [ -n "$RELOAD" ]; then
         start-stop-daemon --stop --quiet --signal HUP \
           ${PIDFILE:+"--pidfile"} ${PIDFILE:+"$PIDFILE"} --name "$DAEMON_NAME"
         STATUS=$?
@@ -290,7 +290,7 @@ service_reload ()
       [ $STATUS -eq 0 ] && echo "." || echo " (failed)."
       ;;
     REDHAT)
-      if [ -n "$DO_RELOAD" ]; then
+      if [ -n "$RELOAD" ]; then
         killproc "$DAEMON" -HUP
         STATUS=$?
       else
@@ -299,7 +299,7 @@ service_reload ()
       echo
       ;;
     SUSE)
-      if [ -n "$DO_RELOAD" ]; then
+      if [ -n "$RELOAD" ]; then
         killproc -HUP ${PIDFILE:+"-p"} ${PIDFILE:+"$PIDFILE"} "$DAEMON"
       else
         rc_failed $STATUS
@@ -307,14 +307,14 @@ service_reload ()
       rc_status -v
       ;;
     LSB)
-      if [ -n "$DO_RELOAD" ]; then
+      if [ -n "$RELOAD" ]; then
         killproc ${PIDFILE:+"-p"} ${PIDFILE:+"$PIDFILE"} "$DAEMON" -HUP
         STATUS=$?
       fi
       [ $STATUS -eq 0 ] && log_success_msg || log_failure_msg
       ;;
     *)
-      if [ -n "$DO_RELOAD" ]; then
+      if [ -n "$RELOAD" ]; then
         signal_process "$DAEMON" "HUP"
         STATUS=$?
       fi
@@ -334,7 +334,7 @@ service_force_reload ()
 # According to LSB, running "force-reload" on a service already stopped or not
 #   running should be considered successful.
 ##
-  if [ -n "$DO_RELOAD" ]; then
+  if [ -n "$RELOAD" ]; then
     $0 reload
   else
     $0 try-restart
