@@ -21,16 +21,16 @@
 ### END INIT INFO
 ###############################################################################
 
-unset DESC DAEMON CONFIG OPTIONS PIDFILE USER NICE ENABLE_RELOAD
+unset DESC DAEMON CONFIG OPTIONS PIDFILE NICE USER ENABLE_RELOAD
 
 DESC="MUNGE"
 DAEMON="/usr/sbin/munged"
-#CONFIG=                                # not supported by munged
+#CONFIG=NOT_SUPPORTED
 OPTIONS="--force"
-#PIDFILE=                               # not supported by munged
+#PIDFILE=NOT_SUPPORTED
 #NICE=
 #USER=
-#ENABLE_RELOAD=                         # not supported by munged
+#ENABLE_RELOAD=NOT_SUPPORTED
 
 PATH=/sbin:/usr/sbin:/usr/local/sbin:/bin:/usr/bin:/usr/local/bin
 DAEMON_NAME="`basename \"$DAEMON\"`"
@@ -83,7 +83,7 @@ service_init ()
     SYSTEM="LSB"
     . /lib/lsb/init-functions
   else
-    SYSTEM="UNKNOWN"
+    SYSTEM="OTHER"
   fi
 }
 

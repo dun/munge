@@ -1,3 +1,7 @@
+2006-05-05  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/etc/munge.init, src/etc/munge.sysconfig: Tweaked defs.
+
 2006-05-04  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/etc/munge.init: Added support for NICE & USER.

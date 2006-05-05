@@ -6,16 +6,13 @@
 # Pass additional command-line options to the daemon.
 ##
 # OPTIONS="--force --key-file /etc/munge/munged.key --num-threads 1"
-##
 
 ##
 # Adjust the scheduling priority of the daemon.
 ##
 # NICE=
-##
 
 ##
 # Execute the daemon under another username.
 ##
-# USER=
-##
+# USER="daemon"
