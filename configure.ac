@@ -36,6 +36,7 @@ AC_CONFIG_SRCDIR([src/libmunge/munge.h])
 X_AC_CANONICAL
 X_AC_GPL_LICENSED
 X_AC_HUMOR
+X_AC_EXPAND_INSTALL_DIRS
 
 ##
 # Automake support.

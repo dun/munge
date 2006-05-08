@@ -57,6 +57,7 @@ am__aclocal_m4_deps = $(top_srcdir)/config/libtool.m4 \
 	$(top_srcdir)/config/x_ac_check_pthreads.m4 \
 	$(top_srcdir)/config/x_ac_check_ssl.m4 \
 	$(top_srcdir)/config/x_ac_debug.m4 \
+	$(top_srcdir)/config/x_ac_expand_install_dirs.m4 \
 	$(top_srcdir)/config/x_ac_gpl_licensed.m4 \
 	$(top_srcdir)/config/x_ac_humor.m4 \
 	$(top_srcdir)/config/x_ac_meta.m4 $(top_srcdir)/configure.ac
@@ -171,6 +172,20 @@ SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
 VERSION = @VERSION@
+X_BINDIR = @X_BINDIR@
+X_DATADIR = @X_DATADIR@
+X_EXEC_PREFIX = @X_EXEC_PREFIX@
+X_INCLUDEDIR = @X_INCLUDEDIR@
+X_INFODIR = @X_INFODIR@
+X_LIBDIR = @X_LIBDIR@
+X_LIBEXECDIR = @X_LIBEXECDIR@
+X_LOCALSTATEDIR = @X_LOCALSTATEDIR@
+X_MANDIR = @X_MANDIR@
+X_OLDINCLUDEDIR = @X_OLDINCLUDEDIR@
+X_PREFIX = @X_PREFIX@
+X_SBINDIR = @X_SBINDIR@
+X_SHAREDSTATEDIR = @X_SHAREDSTATEDIR@
+X_SYSCONFDIR = @X_SYSCONFDIR@
 ac_ct_AR = @ac_ct_AR@
 ac_ct_CC = @ac_ct_CC@
 ac_ct_RANLIB = @ac_ct_RANLIB@

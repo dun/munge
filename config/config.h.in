@@ -173,6 +173,48 @@
    first (like Motorola and SPARC, unlike Intel and VAX). */
 #undef WORDS_BIGENDIAN
 
+/* Expansion of the "bindir" installation directory. */
+#undef X_BINDIR
+
+/* Expansion of the "datadir" installation directory. */
+#undef X_DATADIR
+
+/* Expansion of the "exec_prefix" installation directory. */
+#undef X_EXEC_PREFIX
+
+/* Expansion of the "includedir" installation directory. */
+#undef X_INCLUDEDIR
+
+/* Expansion of the "infodir" installation directory. */
+#undef X_INFODIR
+
+/* Expansion of the "libdir" installation directory. */
+#undef X_LIBDIR
+
+/* Expansion of the "libexecdir" installation directory. */
+#undef X_LIBEXECDIR
+
+/* Expansion of the "localstatedir" installation directory. */
+#undef X_LOCALSTATEDIR
+
+/* Expansion of the "mandir" installation directory. */
+#undef X_MANDIR
+
+/* Expansion of the "oldincludedir" installation directory. */
+#undef X_OLDINCLUDEDIR
+
+/* Expansion of the "prefix" installation directory. */
+#undef X_PREFIX
+
+/* Expansion of the "sbindir" installation directory. */
+#undef X_SBINDIR
+
+/* Expansion of the "sharedstatedir" installation directory. */
+#undef X_SHAREDSTATEDIR
+
+/* Expansion of the "sysconfdir" installation directory. */
+#undef X_SYSCONFDIR
+
 /* Define to 1 if you plan to link against multithreaded code. */
 #undef _REENTRANT
 

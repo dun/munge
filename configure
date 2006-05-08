@@ -458,7 +458,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS META_NAME META_VERSION META_RELEASE META_ALIAS META_DATE META_AUTHOR META_LT_CURRENT META_LT_REVISION META_LT_AGE build build_cpu build_vendor build_os host host_cpu host_vendor host_os INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM mkdir_p AWK SET_MAKE am__leading_dot AMTAR am__tar am__untar MAINTAINER_MODE_TRUE MAINTAINER_MODE_FALSE MAINT CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CCDEPMODE am__fastdepCC_TRUE am__fastdepCC_FALSE LIBTOOL SED EGREP FGREP GREP LD NM LN_S AR ac_ct_AR RANLIB ac_ct_RANLIB lt_ECHO CPP LIBPTHREAD LIBNSL LIBSOCKET LIBBZ2 LIBZ LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS META_NAME META_VERSION META_RELEASE META_ALIAS META_DATE META_AUTHOR META_LT_CURRENT META_LT_REVISION META_LT_AGE build build_cpu build_vendor build_os host host_cpu host_vendor host_os X_PREFIX X_EXEC_PREFIX X_BINDIR X_SBINDIR X_LIBEXECDIR X_DATADIR X_SYSCONFDIR X_SHAREDSTATEDIR X_LOCALSTATEDIR X_LIBDIR X_INCLUDEDIR X_OLDINCLUDEDIR X_INFODIR X_MANDIR INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM mkdir_p AWK SET_MAKE am__leading_dot AMTAR am__tar am__untar MAINTAINER_MODE_TRUE MAINTAINER_MODE_FALSE MAINT CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CCDEPMODE am__fastdepCC_TRUE am__fastdepCC_FALSE LIBTOOL SED EGREP FGREP GREP LD NM LN_S AR ac_ct_AR RANLIB ac_ct_RANLIB lt_ECHO CPP LIBPTHREAD LIBNSL LIBSOCKET LIBBZ2 LIBZ LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -1777,6 +1777,133 @@ fi
 fi
 echo "$as_me:$LINENO: result: $x_ac_cv_humor" >&5
 echo "${ECHO_T}$x_ac_cv_humor" >&6
+
+
+  echo "$as_me:$LINENO: checking installation directory variables" >&5
+echo $ECHO_N "checking installation directory variables... $ECHO_C" >&6
+
+  _x_ac_expand_install_dirs_prefix="$prefix"
+  test "$prefix" = NONE && prefix="$ac_default_prefix"
+  _x_ac_expand_install_dirs_exec_prefix="$exec_prefix"
+  test "$exec_prefix" = NONE && exec_prefix="$prefix"
+
+  eval X_PREFIX="$prefix"
+
+cat >>confdefs.h <<_ACEOF
+#define X_PREFIX "$X_PREFIX"
+_ACEOF
+
+
+
+  eval X_EXEC_PREFIX="$exec_prefix"
+
+cat >>confdefs.h <<_ACEOF
+#define X_EXEC_PREFIX "$X_EXEC_PREFIX"
+_ACEOF
+
+
+
+  eval X_BINDIR="$bindir"
+
+cat >>confdefs.h <<_ACEOF
+#define X_BINDIR "$X_BINDIR"
+_ACEOF
+
+
+
+  eval X_SBINDIR="$sbindir"
+
+cat >>confdefs.h <<_ACEOF
+#define X_SBINDIR "$X_SBINDIR"
+_ACEOF
+
+
+
+  eval X_LIBEXECDIR="$libexecdir"
+
+cat >>confdefs.h <<_ACEOF
+#define X_LIBEXECDIR "$X_LIBEXECDIR"
+_ACEOF
+
+
+
+  eval X_DATADIR="$datadir"
+
+cat >>confdefs.h <<_ACEOF
+#define X_DATADIR "$X_DATADIR"
+_ACEOF
+
+
+
+  eval X_SYSCONFDIR="$sysconfdir"
+
+cat >>confdefs.h <<_ACEOF
+#define X_SYSCONFDIR "$X_SYSCONFDIR"
+_ACEOF
+
+
+
+  eval X_SHAREDSTATEDIR="$sharedstatedir"
+
+cat >>confdefs.h <<_ACEOF
+#define X_SHAREDSTATEDIR "$X_SHAREDSTATEDIR"
+_ACEOF
+
+
+
+  eval X_LOCALSTATEDIR="$localstatedir"
+
+cat >>confdefs.h <<_ACEOF
+#define X_LOCALSTATEDIR "$X_LOCALSTATEDIR"
+_ACEOF
+
+
+
+  eval X_LIBDIR="$libdir"
+
+cat >>confdefs.h <<_ACEOF
+#define X_LIBDIR "$X_LIBDIR"
+_ACEOF
+
+
+
+  eval X_INCLUDEDIR="$includedir"
+
+cat >>confdefs.h <<_ACEOF
+#define X_INCLUDEDIR "$X_INCLUDEDIR"
+_ACEOF
+
+
+
+  eval X_OLDINCLUDEDIR="$oldincludedir"
+
+cat >>confdefs.h <<_ACEOF
+#define X_OLDINCLUDEDIR "$X_OLDINCLUDEDIR"
+_ACEOF
+
+
+
+  eval X_INFODIR="$infodir"
+
+cat >>confdefs.h <<_ACEOF
+#define X_INFODIR "$X_INFODIR"
+_ACEOF
+
+
+
+  eval X_MANDIR="$mandir"
+
+cat >>confdefs.h <<_ACEOF
+#define X_MANDIR "$X_MANDIR"
+_ACEOF
+
+
+
+  prefix="$_x_ac_expand_install_dirs_prefix"
+  exec_prefix="$_x_ac_expand_install_dirs_exec_prefix"
+
+  echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6
 
 
 ##
@@ -5775,7 +5902,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 5778 "configure"
+#line 5905 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -5873,7 +6000,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 5876 "configure"
+#line 6003 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -6022,7 +6149,7 @@ ia64-*-hpux*)
   ;;
 *-*-irix6*)
   # Find out which ABI we are using.
-  echo '#line 6025 "configure"' > conftest.$ac_ext
+  echo '#line 6152 "configure"' > conftest.$ac_ext
   if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -6710,11 +6837,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:6713: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:6840: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:6717: \$? = $ac_status" >&5
+   echo "$as_me:6844: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -7004,11 +7131,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:7007: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:7134: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:7011: \$? = $ac_status" >&5
+   echo "$as_me:7138: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -7108,11 +7235,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:7111: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:7238: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:7115: \$? = $ac_status" >&5
+   echo "$as_me:7242: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -7164,11 +7291,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:7167: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:7294: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:7171: \$? = $ac_status" >&5
+   echo "$as_me:7298: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -12712,6 +12839,20 @@ s,@host@,$host,;t t
 s,@host_cpu@,$host_cpu,;t t
 s,@host_vendor@,$host_vendor,;t t
 s,@host_os@,$host_os,;t t
+s,@X_PREFIX@,$X_PREFIX,;t t
+s,@X_EXEC_PREFIX@,$X_EXEC_PREFIX,;t t
+s,@X_BINDIR@,$X_BINDIR,;t t
+s,@X_SBINDIR@,$X_SBINDIR,;t t
+s,@X_LIBEXECDIR@,$X_LIBEXECDIR,;t t
+s,@X_DATADIR@,$X_DATADIR,;t t
+s,@X_SYSCONFDIR@,$X_SYSCONFDIR,;t t
+s,@X_SHAREDSTATEDIR@,$X_SHAREDSTATEDIR,;t t
+s,@X_LOCALSTATEDIR@,$X_LOCALSTATEDIR,;t t
+s,@X_LIBDIR@,$X_LIBDIR,;t t
+s,@X_INCLUDEDIR@,$X_INCLUDEDIR,;t t
+s,@X_OLDINCLUDEDIR@,$X_OLDINCLUDEDIR,;t t
+s,@X_INFODIR@,$X_INFODIR,;t t
+s,@X_MANDIR@,$X_MANDIR,;t t
 s,@INSTALL_PROGRAM@,$INSTALL_PROGRAM,;t t
 s,@INSTALL_SCRIPT@,$INSTALL_SCRIPT,;t t
 s,@INSTALL_DATA@,$INSTALL_DATA,;t t

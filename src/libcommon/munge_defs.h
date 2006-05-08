@@ -112,7 +112,7 @@
 
 /*  String specifying the unix domain socket pathname for client-server comms.
  */
-#define MUNGE_SOCKET_NAME               "/var/run/munge/munge.socket.2"
+#define MUNGE_SOCKET_NAME               X_LOCALSTATEDIR "/run/munge/munge.socket.2"
 
 /*  Number of attempts a client makes connecting to the server before failing.
  */
@@ -141,7 +141,7 @@
 /*  The directory in which the pipe used to authenticate a particular client
  *    via fd-passing will be created.
  */
-#define MUNGE_AUTH_PIPE_DIR             "/var/lib/munge"
+#define MUNGE_AUTH_PIPE_DIR             X_LOCALSTATEDIR "/lib/munge"
 
 /*  The amount of entropy (in bytes) to place in the filename of the pipe used
  *    to authenticate a particular client via fd-passing.
@@ -150,15 +150,15 @@
 
 /*  String specifying the pathname of the daemon's logfile.
  */
-#define MUNGED_LOGFILE                  "/var/log/munge.log"
+#define MUNGED_LOGFILE                  X_LOCALSTATEDIR "/log/munge.log"
 
 /*  String specifying the pathname of the random seed file.
  */
-#define MUNGED_RANDOM_SEED              "/var/lib/munge/munge.seed"
+#define MUNGED_RANDOM_SEED              X_LOCALSTATEDIR "/lib/munge/munge.seed"
 
 /*  String specifying the pathname of the secret key file.
  */
-#define MUNGED_SECRET_KEY               "/etc/munge/munge.key"
+#define MUNGED_SECRET_KEY               X_SYSCONFDIR "/munge/munge.key"
 
 /*  String specifying the pathname of the random number source device to use
  *    in case the MUNGED_RANDOM_SEED file contains insufficient entropy.
