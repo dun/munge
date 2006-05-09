@@ -1,6 +1,6 @@
 2006-05-09  Chris Dunlap  <cdunlap@llnl.gov>
 
-	* src/etc/Makefile.am: Created $(localstatedir)/log/munge dir.
+	* src/etc/Makefile.am: Created $(localstatedir)/log dir.
 
 	* src/etc/munge.init.in: Renamed from src/etc/munge.init.
 	  Added prefix, exec_prefix, sbindir, and sysconfdir.
