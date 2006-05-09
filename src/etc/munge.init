@@ -87,8 +87,6 @@ service_init ()
   fi
 }
 
-###############################################################################
-
 service_fini ()
 {
 # Return the exit status.
@@ -102,8 +100,6 @@ service_fini ()
       ;;
   esac
 }
-
-###############################################################################
 
 service_start ()
 {
@@ -173,8 +169,6 @@ service_start ()
   esac
 }
 
-###############################################################################
-
 service_stop ()
 {
 # Stop the service.
@@ -219,8 +213,6 @@ service_stop ()
   esac
 }
 
-###############################################################################
-
 service_restart ()
 {
 # Stop and restart the service if it is already running;
@@ -242,8 +234,6 @@ service_restart ()
       ;;
   esac
 }
-
-###############################################################################
 
 service_try_restart ()
 {
@@ -268,8 +258,6 @@ service_try_restart ()
       ;;
   esac
 }
-
-###############################################################################
 
 service_reload ()
 {
@@ -323,16 +311,14 @@ service_reload ()
   esac
 }
 
-###############################################################################
-
 service_force_reload ()
 {
 # Reload the configuration if the service supports this;
 #   otherwise, restart the service if it is already running.
 # Required by LSB.
 # 
-# According to LSB, running "force-reload" on a service already stopped or not
-#   running should be considered successful.
+# According to LSB, running "force-reload" on a service already stopped or
+#   not running should be considered successful.
 ##
   if [ -n "$RELOAD" ]; then
     $0 reload
@@ -349,8 +335,6 @@ service_force_reload ()
       ;;
   esac
 }
-
-###############################################################################
 
 service_status ()
 {
@@ -394,8 +378,6 @@ service_status ()
   esac
 }
 
-###############################################################################
-
 query_pids ()
 {
 # Writes the matching PIDs to stdout.
@@ -404,10 +386,10 @@ query_pids ()
   PROCNAME="$1"
   PIDFILE="$2"
 
-  if which pgrep >/dev/null 2>&1; then
+  if query_exec pgrep; then
     pids=`pgrep -d ' ' -x "\`basename \"$PROCNAME\"\`" 2>/dev/null`
     rc=$?
-  elif which pidof >/dev/null 2>&1; then
+  elif query_exec pidof; then
     pids=`pidof -o $$ -x "$PROCNAME" 2>/dev/null`
     rc=$?
   else
@@ -429,6 +411,25 @@ query_pids ()
   fi
 
   echo $pids
+  return $rc
+}
+
+query_exec ()
+{
+# Returns 0 if EXECNAME is an executable file within the PATH.
+##
+  EXECNAME="$1"
+  IFS_BAK="$IFS"
+  rc=1
+
+  IFS=:
+  for dir in $PATH; do
+    [ -x "$dir/$EXECNAME" ] || continue
+    rc=0
+    break
+  done
+
+  IFS="$IFS_BAK"
   return $rc
 }
 

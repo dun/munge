@@ -1,3 +1,7 @@
+2006-05-09  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/etc/munge.init: Replaced use of "which" with query_exec (Tru64).
+
 2006-05-08  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* configure.ac: Added X_AC_EXPAND_INSTALL_DIRS.
@@ -14,7 +18,7 @@
 
 	* src/etc/munge.init: Added support for NICE & USER.
 	  Changed ENABLE_SIGHUP_RELOAD to ENABLE_RELOAD.
-	  Replaced use of "source" keyword with "." for AIX.
+	  Replaced use of "source" keyword with "." (AIX).
 	* src/etc/munge.sysconfig: Added NICE & USER.  Updated comments.
 
 	* src/etc/Makefile.am: Preserved existing config files on install.
@@ -36,7 +40,7 @@
 
 2006-05-02  Chris Dunlap  <cdunlap@llnl.gov>
 
-	* src/etc/munge.init: Removed use of "local" keyword for Solaris.
+	* src/etc/munge.init: Removed use of "local" keyword (Solaris).
 
 	* src/etc/munge.init: Added tests for distro release/version files in
 	  service_init() to prevent SuSE from being recognized as Debian due to
@@ -44,7 +48,7 @@
 
 	* PLATFORMS: Updated.
 
-	* src/etc/munge.init: Replaced "echo -n" with "printf" for AIX.
+	* src/etc/munge.init: Replaced "echo -n" with "printf" (AIX).
 
 	* src/etc/munge.init, src/etc/munge.sysconfig: Revamped.
 
