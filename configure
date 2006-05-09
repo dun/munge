@@ -11928,7 +11928,7 @@ done
 ##
 # Epilogue.
 ##
-                                                                                                                                                                ac_config_files="$ac_config_files Makefile src/Makefile src/etc/Makefile src/libcommon/Makefile src/libcommon/munge.7 src/libmissing/Makefile src/libmunge/Makefile src/libmunge/munge.3 src/libmunge/munge_ctx.3 src/libmunge/munge_enum.3 src/munge/Makefile src/munge/munge.1 src/munge/remunge.1 src/munge/unmunge.1 src/munged/Makefile src/munged/munged.8"
+                                                                                                                                                                          ac_config_files="$ac_config_files Makefile src/Makefile src/etc/Makefile src/etc/munge.init src/libcommon/Makefile src/libcommon/munge.7 src/libmissing/Makefile src/libmunge/Makefile src/libmunge/munge.3 src/libmunge/munge_ctx.3 src/libmunge/munge_enum.3 src/munge/Makefile src/munge/munge.1 src/munge/remunge.1 src/munge/unmunge.1 src/munged/Makefile src/munged/munged.8"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -12721,6 +12721,7 @@ do
   "Makefile" ) CONFIG_FILES="$CONFIG_FILES Makefile" ;;
   "src/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/Makefile" ;;
   "src/etc/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/etc/Makefile" ;;
+  "src/etc/munge.init" ) CONFIG_FILES="$CONFIG_FILES src/etc/munge.init" ;;
   "src/libcommon/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/libcommon/Makefile" ;;
   "src/libcommon/munge.7" ) CONFIG_FILES="$CONFIG_FILES src/libcommon/munge.7" ;;
   "src/libmissing/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/libmissing/Makefile" ;;

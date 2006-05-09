@@ -21,16 +21,22 @@
 ### END INIT INFO
 ###############################################################################
 
-unset DESC DAEMON CONFIG OPTIONS PIDFILE NICE USER ENABLE_RELOAD
+unset DESC DAEMON CONFIG OPTIONS PIDFILE NICE USER SIGHUP_RELOAD
+prefix="@prefix@"
+exec_prefix="@exec_prefix@"
+sbindir="@sbindir@"
+sysconfdir="@sysconfdir@"
 
 DESC="MUNGE"
-DAEMON="/usr/sbin/munged"
-#CONFIG=NOT_SUPPORTED
+DAEMON="$sbindir/munged"
+#CONFIG=#_NOT_SUPPORTED_#
 OPTIONS="--force"
-#PIDFILE=NOT_SUPPORTED
+#PIDFILE=#_NOT_SUPPORTED_#
 #NICE=
 #USER=
-#ENABLE_RELOAD=NOT_SUPPORTED
+#SIGHUP_RELOAD=#_NOT_SUPPORTED_#
+
+###############################################################################
 
 PATH=/sbin:/usr/sbin:/usr/local/sbin:/bin:/usr/bin:/usr/local/bin
 DAEMON_NAME="`basename \"$DAEMON\"`"
@@ -38,10 +44,10 @@ SERVICE_NAME="`echo $0 | perl -pe 's,(.*/)?(.*?)(\.init)?$,$2,'`"
 SIGTERM_TIMEOUT="3"
 
 # Read configuration defaults to override variables:
-#   $CONFIG, $OPTIONS, $PIDFILE, $USER, $NICE, $ENABLE_RELOAD
+#   $CONFIG, $OPTIONS, $PIDFILE, $USER, $NICE, $SIGHUP_RELOAD
 ##
-for DEFAULTS in "/etc/default/$SERVICE_NAME" "/etc/sysconfig/$SERVICE_NAME"; do
-  [ -r "$DEFAULTS" ] && . "$DEFAULTS"
+for dir in "$sysconfdir/default" "$sysconfdir/sysconfig"; do
+  [ -r "$dir/$SERVICE_NAME" ] && . "$dir/$SERVICE_NAME"
 done
 
 # Exit if the package has been removed.
@@ -62,7 +68,7 @@ service_init ()
 #   this function in order for SuSE to initialize its environment properly.
 ##
   STATUS=0
-  [ -n "$ENABLE_RELOAD" -a "$ENABLE_RELOAD" != 0 ] \
+  [ -n "$SIGHUP_RELOAD" -a "$SIGHUP_RELOAD" != 0 ] \
     && RELOAD=1 || unset RELOAD
   expr "$NICE" : '[0-9]*$' >/dev/null 2>&1 && NICE="+$NICE"
   [ -n "$USER" -a "`id -u 2>/dev/null`" -ne 0 ] && unset USER

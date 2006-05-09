@@ -1,5 +1,10 @@
 2006-05-09  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/etc/munge.init.in: Renamed from src/etc/munge.init.
+	  Added prefix, exec_prefix, sbindir, and sysconfdir.
+	  Renamed ENABLE_RELOAD to SIGHUP_RELOAD.
+	* configure.ac: Added src/etc/munge.init to AC_CONFIG_FILES.
+
 	* src/etc/munge.init: Replaced use of "which" with query_exec (Tru64).
 
 2006-05-08  Chris Dunlap  <cdunlap@llnl.gov>

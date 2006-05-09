@@ -417,7 +417,7 @@ distclean-tags:
 distdir: $(DISTFILES)
 	$(am__remove_distdir)
 	mkdir $(distdir)
-	$(mkdir_p) $(distdir)/config $(distdir)/src/libcommon $(distdir)/src/libmunge $(distdir)/src/munge $(distdir)/src/munged
+	$(mkdir_p) $(distdir)/config $(distdir)/src/etc $(distdir)/src/libcommon $(distdir)/src/libmunge $(distdir)/src/munge $(distdir)/src/munged
 	@srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`; \
 	topsrcdirstrip=`echo "$(top_srcdir)" | sed 's|.|.|g'`; \
 	list='$(DISTFILES)'; for file in $$list; do \
