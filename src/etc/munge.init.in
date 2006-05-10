@@ -399,8 +399,8 @@ query_pids ()
     pids=`pidof -o $$ -x "$PROCNAME" 2>/dev/null`
     rc=$?
   else
-    pids=`(ps awx -o pid -o command || ps -e -f -o pid -o args) \
-      2>/dev/null | tail +2 | egrep "( |/)$PROCNAME( |$)" | grep -v egrep \
+    pids=`(ps awx -o pid -o command || ps -e -f -o pid -o args) 2>/dev/null \
+      | tail +2 | egrep "( |/)$PROCNAME( |$)" | grep -v egrep \
       | awk '{print $1}' | sort -n | tr '\012' ' '`
     [ -n "$pids" ] && rc=0 || rc=1
   fi
