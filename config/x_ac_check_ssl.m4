@@ -5,7 +5,7 @@
 #    Chris Dunlap <cdunlap@llnl.gov>
 #
 #  SYNOPSIS:
-#    X_AC_CHECK_SSL()
+#    X_AC_CHECK_SSL
 #
 #  DESCRIPTION:
 #    Check the usual suspects for an OpenSSL installation,
