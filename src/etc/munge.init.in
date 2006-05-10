@@ -425,13 +425,17 @@ query_exec ()
 # Returns 0 if EXECNAME is an executable file within the PATH.
 ##
   EXECNAME="$1"
+  IFS_BAK="$IFS"
   rc=1
 
-  for dir in `IFS=:; echo $PATH`; do
+  IFS=:
+  for dir in $PATH; do
     [ -x "$dir/$EXECNAME" ] || continue
     rc=0
     break
   done
+
+  IFS="$IFS_BAK"
   return $rc
 }
 
