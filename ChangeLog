@@ -1,5 +1,9 @@
 2006-05-10  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/etc/munge.init.in: Changed query_pids ps format specifier
+	  from "args" to "command" for OS X.  Replaced query_pids ps format
+	  specifier for empty column headers (=) with "| tail +2" for OS X.
+
 	* config/x_ac_arch.m4: Added support for AIX.
 
 2006-05-09  Chris Dunlap  <cdunlap@llnl.gov>
