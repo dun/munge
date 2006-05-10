@@ -13,7 +13,8 @@
 #    code should be generated for a 32-bit or 64-bit architecture.
 #
 #  WARNINGS:
-#    This macro must be placed before AC_PROG_CC or equivalent.
+#    This macro must be placed after AC_CANONICAL_HOST and before
+#    AC_PROG_CC or equivalent.
 #
 #  LIMITATIONS:
 #    This macro doesn't begin to handle all of the various multiarch
