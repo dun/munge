@@ -16,8 +16,9 @@
 #    This macro must be placed before AC_PROG_CC or equivalent.
 #
 #  LIMITATIONS:
-#    This macro doesn't begin to handle the various multiarch permutations
-#    found in the wild.
+#    This macro doesn't begin to handle all of the various multiarch
+#    permutations found in the wild.  So far, it's only been tested
+#    on AIX & x86-64 Linux.
 ##*****************************************************************************
 
 AC_DEFUN([X_AC_ARCH], [
@@ -33,13 +34,32 @@ AC_DEFUN([X_AC_ARCH], [
       esac
     ]
   )
-  if test "$x_ac_arch" == "32"; then
-    CFLAGS="$CFLAGS -m32"
-    LDFLAGS="-L/lib -L/usr/lib $LDFLAGS"
-  elif test "$x_ac_arch" == "64"; then
-    CFLAGS="$CFLAGS -m64"
-    LDFLAGS="-L/lib64 -L/usr/lib64 $LDFLAGS"
-  fi
   AC_MSG_RESULT([${x_ac_arch=no}])
+
+  AC_MSG_CHECKING([whether $CC accepts -m${x_ac_arch}])
+  _x_ac_arch_cflags_save="$CFLAGS"
+  CFLAGS="$CFLAGS -m${x_ac_arch}"
+  AC_COMPILE_IFELSE([AC_LANG_PROGRAM()],
+    [AS_VAR_SET(x_ac_arch_prog_cc_m, yes)],
+    [AS_VAR_SET(x_ac_arch_prog_cc_m, no); CFLAGS="$_x_ac_arch_cflags_save"])
+  AC_MSG_RESULT([${x_ac_arch_prog_cc_m=no}])
+
+  if test "$x_ac_arch" == "32"; then
+    if expr "$host_os" : "aix" >/dev/null 2>&1; then
+      OBJECT_MODE=32
+      AC_SUBST([OBJECT_MODE])
+    else
+      test -d /lib -o -d /usr/lib \
+        && LDFLAGS="-L/lib -L/usr/lib $LDFLAGS"
+    fi
+  elif test "$x_ac_arch" == "64"; then
+    if expr "$host_os" : "aix" >/dev/null 2>&1; then
+      OBJECT_MODE=64
+      AC_SUBST([OBJECT_MODE])
+    else
+      test -d /lib64 -o -d /usr/lib64 \
+        && LDFLAGS="-L/lib64 -L/usr/lib64 $LDFLAGS"
+    fi
+  fi
   ]
 )
