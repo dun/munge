@@ -4,7 +4,7 @@
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
  *
- *  Copyright (C) 2003-2005 The Regents of the University of California.
+ *  Copyright (C) 2003-2006 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
  *  Written by Chris Dunlap <cdunlap@llnl.gov>.
  *  UCRL-CODE-155910.
@@ -67,6 +67,7 @@ static void exit_handler (int signum);
 static void segv_handler (int signum);
 static int  daemonize_init (void);
 static void daemonize_fini (int fd);
+static void write_pidfile (const char *pidfile);
 static void sock_create (conf_t conf);
 static void sock_destroy (conf_t conf);
 
@@ -103,6 +104,8 @@ main (int argc, char *argv[])
         fd = daemonize_init ();
     }
     /*  FIXME: Parse config file.  */
+
+    write_pidfile (conf->pidfile_name);
 
     if (!conf->got_foreground) {
 
@@ -312,6 +315,60 @@ daemonize_fini (int fd)
             "Unable to close write-pipe in grandchild");
     }
     return;
+}
+
+
+static void
+write_pidfile (const char *pidfile)
+{
+/*  Creates the specified pidfile.
+ *  The pidfile must be created after the daemon has finished forking.
+ */
+    mode_t  mask;
+    FILE   *fp;
+
+    assert (pidfile != NULL);
+
+    /*  The pidfile must be specified with an absolute pathname; o/w, the
+     *    unlink() call in destroy_conf() will fail because the daemon has
+     *    chdir()'d.
+     */
+    if (pidfile[0] != '/') {
+        log_msg (LOG_ERR,
+            "The pidfile \"%s\" must be specified via an absolute path.");
+        return;
+    }
+    (void) unlink (pidfile);
+    /*
+     *  Protect pidfile against unauthorized writes by removing group+other
+     *    write-access from the current umask.
+     */
+    mask = umask (0);
+    umask (mask | 022);
+    fp = fopen (pidfile, "w");
+    umask (mask);
+
+    if (!fp) {
+        log_msg (LOG_WARNING, "Unable to open pidfile \"%s\": %s",
+            pidfile, strerror (errno));
+    }
+    else if (fprintf (fp, "%d\n", (int) getpid ()) == EOF) {
+        log_msg (LOG_WARNING, "Unable to write to pidfile \"%s\": %s",
+            pidfile, strerror (errno));
+    }
+    else if (fclose (fp) == EOF) {
+        log_msg (LOG_WARNING, "Unable to close pidfile \"%s\": %s",
+            pidfile, strerror (errno));
+    }
+    else {
+        return;                         /* success */
+    }
+
+    if (fp) {
+        (void) fclose (fp);
+        (void) unlink (pidfile);
+    }
+    return;                             /* failure */
 }
 
 

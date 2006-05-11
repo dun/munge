@@ -4,7 +4,7 @@
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
  *
- *  Copyright (C) 2003-2005 The Regents of the University of California.
+ *  Copyright (C) 2003-2006 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
  *  Written by Chris Dunlap <cdunlap@llnl.gov>.
  *  UCRL-CODE-155910.
@@ -52,6 +52,7 @@ struct conf {
     munge_ttl_t     def_ttl;            /* default time-to-live              */
     munge_ttl_t     max_ttl;            /* default time-to-live              */
     char           *config_name;        /* configuration filename            */
+    char           *pidfile_name;       /* pid filename                      */
     char           *socket_name;        /* unix domain socket filename       */
     char           *seed_name;          /* random seed filename              */
     char           *key_name;           /* symmetric key filename            */

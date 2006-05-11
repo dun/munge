@@ -26,12 +26,13 @@ prefix="@prefix@"
 exec_prefix="@exec_prefix@"
 sbindir="@sbindir@"
 sysconfdir="@sysconfdir@"
+localstatedir="@localstatedir@"
 
 DESC="MUNGE"
 DAEMON="$sbindir/munged"
 #CONFIG=#_NOT_SUPPORTED_#
 OPTIONS="--force"
-#PIDFILE=#_NOT_SUPPORTED_#
+PIDFILE="$localstatedir/run/munged.pid"
 #NICE=
 #USER=
 #SIGHUP_RELOAD=#_NOT_SUPPORTED_#

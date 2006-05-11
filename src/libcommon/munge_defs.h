@@ -152,6 +152,10 @@
  */
 #define MUNGED_LOGFILE                  X_LOCALSTATEDIR "/log/munge.log"
 
+/*  String specifying the pathname of the daemon's pidfile.
+ */
+#define MUNGED_PIDFILE                  X_LOCALSTATEDIR "/run/munged.pid"
+
 /*  String specifying the pathname of the random seed file.
  */
 #define MUNGED_RANDOM_SEED              X_LOCALSTATEDIR "/lib/munge/munge.seed"

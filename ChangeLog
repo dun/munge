@@ -1,5 +1,11 @@
 2006-05-11  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/etc/munge.init.in: Added PIDFILE and localstatedir.
+	* src/etc/munge.sysconfig: Added PIDFILE.
+	* src/libcommon/munge_defs.h: Added MUNGED_PIDFILE.
+	* src/munged/conf.c, src/munged/conf.h, src/munged/munged.c:
+	  Added support for pidfile_name.
+
 	* config/x_ac_arch.m4: Added error message if OBJECT_MODE is not
 	  exported to the shell for AIX.
 

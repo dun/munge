@@ -4,7 +4,7 @@
  *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://www.llnl.gov/linux/munge/>.
  *
- *  Copyright (C) 2003-2005 The Regents of the University of California.
+ *  Copyright (C) 2003-2006 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
  *  Written by Chris Dunlap <cdunlap@llnl.gov>.
  *  UCRL-CODE-155910.
@@ -115,16 +115,16 @@ create_conf (void)
      *  FIXME: Get file lock on configuration filename?
      */
     conf->config_name = NULL;
+    if (!(conf->pidfile_name = strdup (MUNGED_PIDFILE))) {
+        log_errno (EMUNGE_NO_MEMORY, LOG_ERR,
+            "Cannot dup pidfile name string");
+    }
     if (!(conf->socket_name = strdup (MUNGE_SOCKET_NAME))) {
         log_errno (EMUNGE_NO_MEMORY, LOG_ERR, "Cannot dup socket name string");
     }
-    /*  FIXME: Add support for random seed filename.
-     */
     if (!(conf->seed_name = strdup (MUNGED_RANDOM_SEED))) {
         log_errno (EMUNGE_NO_MEMORY, LOG_ERR, "Cannot dup seed name string");
     }
-    /*  FIXME: Add support for configuring key filename.
-     */
     if (!(conf->key_name = strdup (MUNGED_SECRET_KEY))) {
         log_errno (EMUNGE_NO_MEMORY, LOG_ERR, "Cannot dup key name string");
     }
@@ -153,6 +153,11 @@ destroy_conf (conf_t conf)
     if (conf->config_name) {
         free (conf->config_name);
         conf->config_name = NULL;
+    }
+    if (conf->pidfile_name) {
+        (void) unlink (conf->pidfile_name);
+        free (conf->pidfile_name);
+        conf->pidfile_name = NULL;
     }
     if (conf->socket_name) {
         free (conf->socket_name);

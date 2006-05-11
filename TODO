@@ -1,7 +1,6 @@
 -fix signal handlers
 -ensure safe permissions on sensitive files/dirs
 -add configuration file support
--add munged pidfile support
 -add munged 'k' cmdline opt to kill daemon
 -periodically stat keyfile and look for changed inode/mtime
 -add debian support
