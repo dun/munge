@@ -47,7 +47,7 @@ AC_DEFUN([X_AC_ARCH], [
 
   if test "$x_ac_arch" == "32"; then
     if expr "$host_os" : "aix" >/dev/null 2>&1; then
-      OBJECT_MODE=32
+      export OBJECT_MODE=32
       AC_SUBST([OBJECT_MODE])
     else
       test -d /lib -o -d /usr/lib \
@@ -55,7 +55,7 @@ AC_DEFUN([X_AC_ARCH], [
     fi
   elif test "$x_ac_arch" == "64"; then
     if expr "$host_os" : "aix" >/dev/null 2>&1; then
-      OBJECT_MODE=64
+      export OBJECT_MODE=64
       AC_SUBST([OBJECT_MODE])
     else
       test -d /lib64 -o -d /usr/lib64 \
