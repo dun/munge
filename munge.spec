@@ -11,7 +11,7 @@ URL:		http://www.llnl.gov/linux/munge/
 
 BuildRoot:	%{_tmppath}/%{name}-%{version}
 
-Source0:	%{name}-%{version}.tar.gz
+Source0:	%{name}-%{version}.tar
 
 %package devel
 Summary:	Headers and libraries for developing applications using MUNGE
@@ -41,8 +41,7 @@ A shared library for applications using MUNGE.
 %configure \
   %{?_with_arch32: --enable-arch=32} \
   %{?_with_arch64: --enable-arch=64} \
-  --program-prefix=%{?_program_prefix:%{_program_prefix}} \
-  --localstatedir=/var --sysconfdir=/etc
+  --program-prefix=%{?_program_prefix:%{_program_prefix}}
 make
 
 %install
@@ -61,13 +60,13 @@ rm -rf "$RPM_BUILD_ROOT"
 
 %preun
 if [ "$1" = 0 ]; then
-  /sbin/service munge stop >/dev/null 2>&1 || :
+  %{_sysconfdir}/init.d/munge stop >/dev/null 2>&1 || :
   /sbin/chkconfig --del munge
 fi
 
 %postun
 if [ "$1" -ge 1 ]; then
-  /sbin/service munge condrestart >/dev/null 2>&1 || :
+  %{_sysconfdir}/init.d/munge condrestart >/dev/null 2>&1 || :
 fi
 
 %postun libs
@@ -89,9 +88,9 @@ fi
 %doc README*
 %doc TODO
 %doc doc/*
-%dir %attr(0700,root,root) %config /etc/munge
-%config(noreplace) /etc/*/*
-/var/*/*
+%dir %attr(0700,root,root) %config %{_sysconfdir}/munge
+%config(noreplace) %{_sysconfdir}/*/*
+%{_localstatedir}/*/*
 %{_bindir}/*
 %{_sbindir}/*
 %{_mandir}/*[^3]/*
