@@ -1,3 +1,8 @@
+2006-05-15  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* config/x_ac_arch.m4: Unset x_ac_cv_check_ssl_dir to allow a
+	  multiarch reconfigure to succeed when the config cache is enabled.
+
 2006-05-11  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/etc/munge.init.in: Added PIDFILE and localstatedir.
