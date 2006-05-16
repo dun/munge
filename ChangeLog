@@ -1,3 +1,7 @@
+2006-05-16  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* munge.spec: Added support for AIX (32b, 64b, and 32_64 multiarch).
+
 2006-05-15  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* munge.spec: Replaced /etc with %{_sysconfdir}, and /var with

@@ -35,33 +35,85 @@ A header file and static library for developing applications using MUNGE.
 A shared library for applications using MUNGE.
 
 %prep
-%setup
+%setup -n munge
+
+%ifnos aix
 
 %build
+##
+# Add one of the following to the rpm command line to specify 32b/64b builds:
+#   --with arch32               (build 32b executables and library)
+#   --with arch64               (build 64b executables and library)
+##
 %configure \
   %{?_with_arch32: --enable-arch=32} \
   %{?_with_arch64: --enable-arch=64} \
   --program-prefix=%{?_program_prefix:%{_program_prefix}}
 make
 
+%else
+
+%build
+##
+# Add --target ppc-aix to the rpm command line to force AIX builds.
+#
+# Add one of the following to the rpm command line to specify 32b/64b builds:
+#   --define 'arch 32'          (build 32b executables and library)
+#   --define 'arch 64'          (build 64b executables and library)
+#   --define 'arch 32_64'       (build 32b executables and multiarch library)
+##
+%{?arch:ARCH="%{arch}"}
+if test "$ARCH" = "32_64"; then
+  export OBJECT_MODE=64
+  %configure -C --enable-arch=64 \
+    --program-prefix=%{?_program_prefix:%{_program_prefix}} 
+  ( cd src/libmunge && make install DESTDIR="`pwd`/../../tmp-$$/64" )
+  make clean
+  export OBJECT_MODE=32
+  %configure -C --enable-arch=32 \
+    --program-prefix=%{?_program_prefix:%{_program_prefix}}
+  ( cd src/libmunge && make install DESTDIR="`pwd`/../../tmp-$$/32" )
+  mkdir -p tmp-$$/64-lib
+  ( cd tmp-$$/64-lib && ar -X64 -x ../64%{_libdir}/libmunge.a )
+  mkdir -p tmp-$$/32-lib
+  ( cd tmp-$$/32-lib && ar -X32 -x ../32%{_libdir}/libmunge.a )
+  ar -X32_64 -c -q libmunge-32_64.a tmp-$$/*-lib/*
+  rm -rf tmp-$$
+elif test "$ARCH" = "32"; then
+  export OBJECT_MODE=32
+  %configure -C --enable-arch=32 \
+    --program-prefix=%{?_program_prefix:%{_program_prefix}}
+elif test "$ARCH" = "64"; then
+  export OBJECT_MODE=64
+  %configure -C --enable-arch=64 \
+    --program-prefix=%{?_program_prefix:%{_program_prefix}} 
+else
+  %configure -C --program-prefix=%{?_program_prefix:%{_program_prefix}} 
+fi
+make
+
+%endif
+  
 %install
 rm -rf "$RPM_BUILD_ROOT"
 mkdir -p "$RPM_BUILD_ROOT"
 DESTDIR="$RPM_BUILD_ROOT" make install
+test -f libmunge-32_64.a \
+  && cp libmunge-32_64.a "$RPM_BUILD_ROOT"%{_libdir}/libmunge.a
 
 %clean
 rm -rf "$RPM_BUILD_ROOT"
 
 %post
-/sbin/chkconfig --add munge
+[ -x /sbin/chkconfig ] && /sbin/chkconfig --add munge
 
 %post libs
-/sbin/ldconfig %{_libdir}
+[ -x /sbin/ldconfig ] && /sbin/ldconfig %{_libdir}
 
 %preun
 if [ "$1" = 0 ]; then
   %{_sysconfdir}/init.d/munge stop >/dev/null 2>&1 || :
-  /sbin/chkconfig --del munge
+  [ -x /sbin/chkconfig ] && /sbin/chkconfig --del munge
 fi
 
 %postun
@@ -70,7 +122,7 @@ if [ "$1" -ge 1 ]; then
 fi
 
 %postun libs
-/sbin/ldconfig %{_libdir}
+[ -x /sbin/ldconfig ] && /sbin/ldconfig %{_libdir}
 
 %files
 %defattr(-,root,root,0755)
@@ -98,11 +150,17 @@ fi
 %files devel
 %defattr(-,root,root,0755)
 %{_includedir}/*
-%{_libdir}/*.a
 %{_libdir}/*.la
-%{_libdir}/*.so
 %{_mandir}/*3/*
+%ifnos aix
+%{_libdir}/*.a
+%{_libdir}/*.so
+%endif
 
 %files libs
 %defattr(-,root,root,0755)
+%ifnos aix
 %{_libdir}/*.so.*
+%else
+%{_libdir}/*.a
+%endif
