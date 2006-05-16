@@ -1,5 +1,8 @@
 2006-05-16  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* munge.spec: Fixed %post, %preun, and %postun scripts to succeed
+	  when the executable is not executable (as in the case for AIX).
+
 	* munge.spec: Added support for AIX (32b, 64b, and 32_64 multiarch).
 
 2006-05-15  Chris Dunlap  <cdunlap@llnl.gov>

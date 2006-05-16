@@ -56,6 +56,8 @@ make
 %build
 ##
 # Add --target ppc-aix to the rpm command line to force AIX builds.
+#   You will have to override the platform information at install time
+#   with --ignoreos.
 #
 # Add one of the following to the rpm command line to specify 32b/64b builds:
 #   --define 'arch 32'          (build 32b executables and library)
@@ -105,15 +107,15 @@ test -f libmunge-32_64.a \
 rm -rf "$RPM_BUILD_ROOT"
 
 %post
-[ -x /sbin/chkconfig ] && /sbin/chkconfig --add munge
+if [ -x /sbin/chkconfig ]; then /sbin/chkconfig --add munge; fi
 
 %post libs
-[ -x /sbin/ldconfig ] && /sbin/ldconfig %{_libdir}
+if [ -x /sbin/ldconfig ]; then /sbin/ldconfig %{_libdir}; fi
 
 %preun
 if [ "$1" = 0 ]; then
   %{_sysconfdir}/init.d/munge stop >/dev/null 2>&1 || :
-  [ -x /sbin/chkconfig ] && /sbin/chkconfig --del munge
+  if [ -x /sbin/chkconfig ]; then /sbin/chkconfig --del munge; fi
 fi
 
 %postun
@@ -122,7 +124,7 @@ if [ "$1" -ge 1 ]; then
 fi
 
 %postun libs
-[ -x /sbin/ldconfig ] && /sbin/ldconfig %{_libdir}
+if [ -x /sbin/ldconfig ]; then /sbin/ldconfig %{_libdir}; fi
 
 %files
 %defattr(-,root,root,0755)
