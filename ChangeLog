@@ -1,5 +1,7 @@
 2006-05-16  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* munge.spec: Moved %build keyword outside of os conditional.
+
 	* munge.spec: Fixed %post, %preun, and %postun scripts to succeed
 	  when the executable is not executable (as in the case for AIX).
 

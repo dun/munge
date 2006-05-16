@@ -37,9 +37,8 @@ A shared library for applications using MUNGE.
 %prep
 %setup -n munge
 
-%ifnos aix
-
 %build
+%ifnos aix
 ##
 # Add one of the following to the rpm command line to specify 32b/64b builds:
 #   --with arch32               (build 32b executables and library)
@@ -50,10 +49,7 @@ A shared library for applications using MUNGE.
   %{?_with_arch64: --enable-arch=64} \
   --program-prefix=%{?_program_prefix:%{_program_prefix}}
 make
-
 %else
-
-%build
 ##
 # Add --target ppc-aix to the rpm command line to force AIX builds.
 #   You will have to override the platform information at install time
@@ -93,7 +89,6 @@ else
   %configure -C --program-prefix=%{?_program_prefix:%{_program_prefix}} 
 fi
 make
-
 %endif
   
 %install
