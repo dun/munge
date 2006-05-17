@@ -1,5 +1,12 @@
+Version 0.5.3 (2006-05-17):
+  - Added support for pidfile.
+  - Improved multilib support for AIX.
+  - Added support for AIX (32b, 64b, and multiarch) to RPM spec file.
+  - Added support for configure installation dir vars to alter defaults.
+  - Added support for Debian, FreeBSD, Solaris, and AIX to init script.
+
 Version 0.5.2 (2006-03-07):
-  - Fixed spec file so munge-devel & munge-libs files are perm'd properly.
+  - Fixed RPM spec file so munge-devel & munge-libs files are perm'd properly.
 
 Version 0.5.1 (2006-02-28):
   - Set created logfile permissions to 640.
