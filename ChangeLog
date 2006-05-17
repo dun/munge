@@ -1,5 +1,7 @@
 2006-05-17  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* munge.spec: Ensured "libmunge-32_64.a" is removed at top of %build.
+
 	* README.MULTILIB: Updated for AIX.
 
 2006-05-16  Chris Dunlap  <cdunlap@llnl.gov>

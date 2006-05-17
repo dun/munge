@@ -38,6 +38,7 @@ A shared library for applications using MUNGE.
 %setup -n munge
 
 %build
+rm -f libmunge-32_64.a
 %ifnos aix
 ##
 # Add one of the following to the rpm command line to specify 32b/64b builds:
