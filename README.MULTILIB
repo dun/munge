@@ -10,17 +10,20 @@ If you are building from source, you can pass a command-line option to
 the configure script:
 
   $ ./configure --enable-arch=32
+
   $ ./configure --enable-arch=64
 
 If you are building RPMs, you can pass a command-line option to rpmbuild:
 
-  $ rpmbuild -ta --with arch32 munge-x.y.z.tar.bz2
-  $ rpmbuild -ta --with arch64 munge-x.y.z.tar.bz2
+  $ rpmbuild -ta --clean --with arch32 munge-x.y.z.tar.bz2
+
+  $ rpmbuild -ta --clean --with arch64 munge-x.y.z.tar.bz2
 
 You might also have to specify the --target command-line option:
 
-  $ rpmbuild -ta --target i386 --with arch32 munge-x.y.z.tar.bz2
-  $ rpmbuild -ta --target x86_64 --with arch64 munge-x.y.z.tar.bz2
+  $ rpmbuild -ta --clean --with arch32 --target i386 munge-x.y.z.tar.bz2
+
+  $ rpmbuild -ta --clean --with arch64 --target x86_64 munge-x.y.z.tar.bz2
 
 For each platform, you will have one source RPM and three binary RPMs
 (munge, munge-devel, and munge-libs).
@@ -39,5 +42,35 @@ and both 32-bit and 64-bit versions of the munge-devel and munge-libs RPMs:
 You can then link your application against either the 32-bit or 64-bit library:
 
   $ gcc -o foo foo.c -m32 -lmunge
+
   $ gcc -o foo foo.c -m64 -lmunge
 
+
+AIX uses RPM 3.x which does not recognize the "--with" command-line option.
+The 'arch 32_64' define builds a single multiarch library where both 32-bit
+and 64-bit objects reside in libmunge.a.  Note that the 'arch 32_64' string
+must be quoted to appear as a single command-line argument.  Export the
+OBJECT_MODE variable to the environment.
+
+The OS detection in RPM 3.x appends the OS version and release to the name
+(eg, "aix5.3").  Since I didn't want to pin the spec file to a particular
+set of AIX versions, I used the generic OS string "aix".  Consequently,
+you must specify "--target ppc-aix" when building the RPM, and "--ignoreos"
+when installing the RPM.
+
+  $ export OBJECT_MODE=32
+  $ rpm -ta --clean --define 'arch 32' --target ppc-aix munge-x.y.z.tar.bz2
+
+  $ export OBJECT_MODE=64
+  $ rpm -ta --clean --define 'arch 64' --target ppc-aix munge-x.y.z.tar.bz2
+
+  $ export OBJECT_MODE=32
+  $ rpm -ta --clean --define 'arch 32_64' --target ppc-aix munge-x.y.z.tar.bz2
+
+You can then link your application against either the 32-bit or 64-bit library:
+
+  $ export OBJECT_MODE=32
+  $ gcc -o foo foo.c -lmunge
+
+  $ export OBJECT_MODE=64
+  $ gcc -o foo foo.c -lmunge
