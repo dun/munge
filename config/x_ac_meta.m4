@@ -45,7 +45,8 @@ AC_DEFUN([X_AC_META], [
 
     if test -n "$META_NAME" -a -n "$META_VERSION"; then
         META_ALIAS="$META_NAME-$META_VERSION"
-        test -n "$META_RELEASE" && META_ALIAS="$META_ALIAS-$META_RELEASE"
+        test -n "$META_RELEASE" -a "$META_RELEASE" != "1" \
+          && META_ALIAS="$META_ALIAS-$META_RELEASE"
         AC_DEFINE_UNQUOTED([META_ALIAS], ["$META_ALIAS"],
           [Define the project alias string (name-ver or name-ver-rel).]
         )

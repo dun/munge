@@ -1,5 +1,7 @@
 2006-05-17  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* config/x_ac_meta.m4: Changed META_ALIAS to not include release if 1.
+
 	* : Released 0.5.3.
 
 	* HISTORY, META, NEWS: Updated for 0.5.3 release.
