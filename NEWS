@@ -1,72 +1,72 @@
-Version 0.5.3 (2006-05-17):
-  - Added support for pidfile.
-  - Improved multilib support for AIX.
-  - Added support for AIX (32b, 64b, and multiarch) to RPM spec file.
-  - Added support for configure installation dir vars to alter defaults.
-  - Added support for Debian, FreeBSD, Solaris, and AIX to init script.
+munge-0.5.3 (2006-05-17):
+- Added support for pidfile.
+- Improved multilib support for AIX.
+- Added support for AIX (32b, 64b, and multiarch) to RPM spec file.
+- Added support for configure installation dir vars to alter defaults.
+- Added support for Debian, FreeBSD, Solaris, and AIX to init script.
 
-Version 0.5.2 (2006-03-07):
-  - Fixed RPM spec file so munge-devel & munge-libs files are perm'd properly.
+munge-0.5.2 (2006-03-07):
+- Fixed RPM spec file so munge-devel & munge-libs files are perm'd properly.
 
-Version 0.5.1 (2006-02-28):
-  - Set created logfile permissions to 640.
+munge-0.5.1 (2006-02-28):
+- Set created logfile permissions to 640.
 
-Version 0.5 (2006-01-24):
-  - Fixed bug with credential's compression header not being protected by mac.
-  - Changed credential format.
-  - Added multilib support.
-  - Changed protocol between client & server (apps will need to relink).
-  - Fixed miscellaneous bugs (now coverity clean).
-  - Changed default cipher to aes128 if present.
+munge-0.5 (2006-01-24):
+- Fixed bug with credential's compression header not being protected by mac.
+- Changed credential format.
+- Added multilib support.
+- Changed protocol between client & server (apps will need to relink).
+- Fixed miscellaneous bugs (now coverity clean).
+- Changed default cipher to aes128 if present.
 
-Version 0.4.3 (2005-10-31):
-  - Fixed init script to work with RedHat's RHEL4-U1 chkconfig.
+munge-0.4.3 (2005-10-31):
+- Fixed init script to work with RedHat's RHEL4-U1 chkconfig.
 
-Version 0.4.2 (2005-07-20):
-  - Updated default paths to comply with the Filesystem Hierarchy Standard.
-  - Fixed libtool bug causing libmunge to be linked incorrectly on AIX.
-  - Fixed init script start behavior under RedHat.
-  - Added devel & libs rpm subpackages.
+munge-0.4.2 (2005-07-20):
+- Updated default paths to comply with the Filesystem Hierarchy Standard.
+- Fixed libtool bug causing libmunge to be linked incorrectly on AIX.
+- Fixed init script start behavior under RedHat.
+- Added devel & libs rpm subpackages.
 
-Version 0.4.1 (2004-12-21):
-  - Fixed bug in init script preventing chkconfig from setting priorities.
+munge-0.4.1 (2004-12-21):
+- Fixed bug in init script preventing chkconfig from setting priorities.
 
-Version 0.4 (2004-12-07):
-  - Added persistent pool of threads.
-  - Added retry for failed requests.
-  - Added libtool version-info.
-  - Added key-file, num-threads, and auth-pipe-dir munged cmdline opts.
-  - Added munge_ctx opt to limit maximum request length.
-  - Added timer to periodically re-parse group info.
-  - Added remunge benchmark/stress-test utility.
-  - Added munge enums (munge_enum).
-  - Added manpages.
-  - Added support for configure to locate OpenSSL installation.
-  - Added support for fd-passing over ramdisks.
-  - Added support for SuSE/LSB to init script.
-  - Added support for C++.
-  - Improved support for AIX.
-  - Optimized memory usage.
-  - Optimized performance.
-  - Changed libmunge.so to only export public symbols.
-  - Changed protocol between client & server (apps will need to relink).
+munge-0.4 (2004-12-07):
+- Added persistent pool of threads.
+- Added retry for failed requests.
+- Added libtool version-info.
+- Added key-file, num-threads, and auth-pipe-dir munged cmdline opts.
+- Added munge_ctx opt to limit maximum request length.
+- Added timer to periodically re-parse group info.
+- Added remunge benchmark/stress-test utility.
+- Added munge enums (munge_enum).
+- Added manpages.
+- Added support for configure to locate OpenSSL installation.
+- Added support for fd-passing over ramdisks.
+- Added support for SuSE/LSB to init script.
+- Added support for C++.
+- Improved support for AIX.
+- Optimized memory usage.
+- Optimized performance.
+- Changed libmunge.so to only export public symbols.
+- Changed protocol between client & server (apps will need to relink).
 
-Version 0.3 (2004-04-30):
-  - Added support for AIX, FreeBSD, Solaris.
-  - Added compression (bzlib & zlib).
-  - Added replay detection/prevention.
-  - Added ability to restrict decoding based on uid/gid.
-  - Changed credential format to v2.
-  - Changed protocol between client & server.
+munge-0.3 (2004-04-30):
+- Added support for AIX, FreeBSD, Solaris.
+- Added compression (bzlib & zlib).
+- Added replay detection/prevention.
+- Added ability to restrict decoding based on uid/gid.
+- Changed credential format to v2.
+- Changed protocol between client & server.
 
-Version 0.2 (2003-10-24):
-  - Added support for ia64.
-  - Added ttl and origin IP addr to credential header.
+munge-0.2 (2003-10-24):
+- Added support for ia64.
+- Added ttl and origin IP addr to credential header.
 
-Version 0.1 (2003-04-30):
-  - Added full client/server support (via munged).
-  - Added full cryptographic support.
-  - Support for munge contexts (munge_ctx).
+munge-0.1 (2003-04-30):
+- Added full client/server support (via munged).
+- Added full cryptographic support.
+- Support for munge contexts (munge_ctx).
 
-Version 0.0 (2002-12-20):
-  - Initial support for munge_encode, munge_decode, munge_strerror.
+munge-0.0 (2002-12-20):
+- Initial support for munge_encode, munge_decode, munge_strerror.
