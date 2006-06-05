@@ -355,6 +355,7 @@ write_pidfile (const char *pidfile)
     else if (fprintf (fp, "%d\n", (int) getpid ()) == EOF) {
         log_msg (LOG_WARNING, "Unable to write to pidfile \"%s\": %s",
             pidfile, strerror (errno));
+        (void) fclose (fp);
     }
     else if (fclose (fp) == EOF) {
         log_msg (LOG_WARNING, "Unable to close pidfile \"%s\": %s",
@@ -363,11 +364,7 @@ write_pidfile (const char *pidfile)
     else {
         return;                         /* success */
     }
-
-    if (fp) {
-        (void) fclose (fp);
-        (void) unlink (pidfile);
-    }
+    (void) unlink (pidfile);
     return;                             /* failure */
 }
 
