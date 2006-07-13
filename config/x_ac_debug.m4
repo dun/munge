@@ -30,7 +30,7 @@ AC_DEFUN([X_AC_DEBUG], [
     ]
   )
   if test "$x_ac_debug" = yes; then
-    test "$ac_save_CFLAGS" && CFLAGS="$ac_save_CFLAGS" || CFLAGS=""
+    test "$ac_env_CFLAGS_set" || CFLAGS=""
     test "$ac_cv_prog_cc_g" = yes && CFLAGS="-g $CFLAGS"
     test "$GCC" = yes && CFLAGS="-Wall -Werror -pedantic $CFLAGS"
   else
