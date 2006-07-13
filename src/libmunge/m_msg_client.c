@@ -1,13 +1,13 @@
 /*****************************************************************************
  *  $Id$
  *****************************************************************************
- *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
- *  For details, see <http://www.llnl.gov/linux/munge/>.
- *
  *  Copyright (C) 2003-2006 The Regents of the University of California.
- *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
+ *  Produced at Lawrence Livermore National Laboratory.
  *  Written by Chris Dunlap <cdunlap@llnl.gov>.
  *  UCRL-CODE-155910.
+ *
+ *  This file is part of the MUNGE Uid 'N' Gid Emporium (MUNGE).
+ *  For details, see <http://home.gna.org/munge/>.
  *
  *  This is free software; you can redistribute it and/or modify it
  *  under the terms of the GNU General Public License as published by
@@ -163,7 +163,7 @@ _m_msg_client_connect (m_msg_t m, char *path)
 
     if ((path == NULL) || (*path == '\0')) {
         m_msg_set_err (m, EMUNGE_SOCKET,
-            strdup ("Munge socket has no name"));
+            strdup ("MUNGE socket has no name"));
         return (EMUNGE_SOCKET);
     }
     if (stat (path, &st) < 0) {

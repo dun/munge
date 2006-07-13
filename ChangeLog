@@ -1,3 +1,7 @@
+2006-07-13  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* : Updated URL.  Tweaked caps & spacing.
+
 2006-06-05  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/munged/munged.c(write_pidfile): Fixed double-free of file ptr.

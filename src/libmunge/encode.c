@@ -1,13 +1,13 @@
 /*****************************************************************************
  *  $Id$
  *****************************************************************************
- *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
- *  For details, see <http://www.llnl.gov/linux/munge/>.
- *
  *  Copyright (C) 2002-2006 The Regents of the University of California.
- *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
+ *  Produced at Lawrence Livermore National Laboratory.
  *  Written by Chris Dunlap <cdunlap@llnl.gov>.
  *  UCRL-CODE-155910.
+ *
+ *  This file is part of the MUNGE Uid 'N' Gid Emporium (MUNGE).
+ *  For details, see <http://home.gna.org/munge/>.
  *
  *  This is free software; you can redistribute it and/or modify it
  *  under the terms of the GNU General Public License as published by
@@ -39,7 +39,7 @@
 #include "m_msg.h"
 #include "m_msg_client.h"
 #include "munge_defs.h"
-#include "str.h" 
+#include "str.h"
 
 
 /*****************************************************************************

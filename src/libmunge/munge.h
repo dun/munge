@@ -1,13 +1,13 @@
 /*****************************************************************************
  *  $Id$
  *****************************************************************************
- *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
- *  For details, see <http://www.llnl.gov/linux/munge/>.
- *
- *  Copyright (C) 2002-2005 The Regents of the University of California.
- *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
+ *  Copyright (C) 2002-2006 The Regents of the University of California.
+ *  Produced at Lawrence Livermore National Laboratory.
  *  Written by Chris Dunlap <cdunlap@llnl.gov>.
  *  UCRL-CODE-155910.
+ *
+ *  This file is part of the MUNGE Uid 'N' Gid Emporium (MUNGE).
+ *  For details, see <http://home.gna.org/munge/>.
  *
  *  This is free software; you can redistribute it and/or modify it
  *  under the terms of the GNU General Public License as published by
@@ -219,7 +219,7 @@ END_C_DECLS
 
 /*****************************************************************************
  *  Context Functions
- ***************************************************************************** 
+ *****************************************************************************
  *  The context passed to munge_encode() is treated read-only except for the
  *    error message that is set when an error is returned.
  *  The context passed to munge_decode() is set according to the context used

@@ -1,13 +1,13 @@
 /*****************************************************************************
  *  $Id$
  *****************************************************************************
- *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
- *  For details, see <http://www.llnl.gov/linux/munge/>.
- *
- *  Copyright (C) 2003-2005 The Regents of the University of California.
- *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
+ *  Copyright (C) 2003-2006 The Regents of the University of California.
+ *  Produced at Lawrence Livermore National Laboratory.
  *  Written by Chris Dunlap <cdunlap@llnl.gov>.
  *  UCRL-CODE-155910.
+ *
+ *  This file is part of the MUNGE Uid 'N' Gid Emporium (MUNGE).
+ *  For details, see <http://home.gna.org/munge/>.
  *
  *  This is free software; you can redistribute it and/or modify it
  *  under the terms of the GNU General Public License as published by
@@ -32,7 +32,7 @@
 #if HAVE_CONFIG_H
 #  include <config.h>
 #endif /* HAVE_CONFIG_H */
-                                                                                
+
 #include "auth_policy.h"
 #include "fd.h"
 #include "license.h"
@@ -46,11 +46,11 @@
 #if HAVE_BZLIB_H && HAVE_LIBBZ2
 #  define HAVE_PKG_BZLIB 1
 #endif
-                                                                                
+
 #if HAVE_ZLIB_H && HAVE_LIBZ
 #  define HAVE_PKG_ZLIB 1
 #endif
-                                                                                
+
 #ifndef MAX
 #  define MAX(a,b) ((a >= b) ? (a) : (b))
 #endif /* !MAX */

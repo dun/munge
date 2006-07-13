@@ -13,7 +13,7 @@ A Quick & Dirty Guide to MUNGE
         file and static library for developing applications using MUNGE.
         The munge-libs RPM contains a shared library for applications
         using MUNGE.
-  
+
      B. Building from source.
 
         Edit src/libcommon/munge_defs.h to customize values if necessary.

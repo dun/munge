@@ -2,13 +2,13 @@
  *  $Id$
  *  LSD-Id: hash.h,v 1.3 2003/10/28 17:49:02 dun Exp
  *****************************************************************************
- *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
- *  For details, see <http://www.llnl.gov/linux/munge/>.
- *
- *  Copyright (C) 2003-2005 The Regents of the University of California.
- *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
+ *  Copyright (C) 2003-2006 The Regents of the University of California.
+ *  Produced at Lawrence Livermore National Laboratory.
  *  Written by Chris Dunlap <cdunlap@llnl.gov>.
  *  UCRL-CODE-155910.
+ *
+ *  This file is part of the MUNGE Uid 'N' Gid Emporium (MUNGE).
+ *  For details, see <http://home.gna.org/munge/>.
  *
  *  This is free software; you can redistribute it and/or modify it
  *  under the terms of the GNU General Public License as published by

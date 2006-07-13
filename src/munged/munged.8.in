@@ -1,6 +1,6 @@
 .\" $Id$
 
-.TH MUNGED 8 "@META_DATE@" "@META_ALIAS@" "Munge Uid 'N' Gid Emporium"
+.TH MUNGED 8 "@META_DATE@" "@META_ALIAS@" "MUNGE Uid 'N' Gid Emporium"
 
 .SH NAME
 munged \- MUNGE daemon
@@ -84,7 +84,7 @@ another host within the security realm before it expires.
 @META_AUTHOR@
 
 .SH COPYRIGHT
-Copyright (C) 2003-2005 The Regents of the University of California.
+Copyright (C) 2003-2006 The Regents of the University of California.
 Produced at Lawrence Livermore National Laboratory.  UCRL-CODE-155910.
 
 MUNGE is free software; you can redistribute it and/or modify it under the
@@ -100,8 +100,4 @@ Foundation.
 .BR munge_enum (3),
 .BR munge (7).
 .PP
-The MUNGE Web page:
-  \fB<http://www.llnl.gov/linux/munge/>\fR
-.PP
-The MUNGE FTP site:
-  \fB<ftp://ftp.llnl.gov/pub/linux/munge/>\fR
+\fBhttp://home.gna.org/munge/\fR

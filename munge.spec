@@ -2,12 +2,12 @@
 
 Name:		munge
 Version:	0
-Release:	1
+Release:	0
 
 Summary:	MUNGE Uid 'N' Gid Emporium
 Group:		System Environment/Daemons
 License:	GPL
-URL:		http://www.llnl.gov/linux/munge/
+URL:		http://home.gna.org/munge/
 
 BuildRoot:	%{_tmppath}/%{name}-%{version}
 
@@ -65,7 +65,7 @@ make
 if test "$ARCH" = "32_64"; then
   export OBJECT_MODE=64
   %configure -C --enable-arch=64 \
-    --program-prefix=%{?_program_prefix:%{_program_prefix}} 
+    --program-prefix=%{?_program_prefix:%{_program_prefix}}
   ( cd src/libmunge && make install DESTDIR="`pwd`/../../tmp-$$/64" )
   make clean
   export OBJECT_MODE=32
@@ -85,13 +85,13 @@ elif test "$ARCH" = "32"; then
 elif test "$ARCH" = "64"; then
   export OBJECT_MODE=64
   %configure -C --enable-arch=64 \
-    --program-prefix=%{?_program_prefix:%{_program_prefix}} 
+    --program-prefix=%{?_program_prefix:%{_program_prefix}}
 else
-  %configure -C --program-prefix=%{?_program_prefix:%{_program_prefix}} 
+  %configure -C --program-prefix=%{?_program_prefix:%{_program_prefix}}
 fi
 make
 %endif
-  
+
 %install
 rm -rf "$RPM_BUILD_ROOT"
 mkdir -p "$RPM_BUILD_ROOT"

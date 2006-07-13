@@ -629,7 +629,7 @@ $(top_builddir)/src/libmunge/libmunge.la \
 force-dependency-check:
 
 # Generic 'distclean' hook.
-# 
+#
 # The double-colon allows this target to be defined multiple times,
 #   thereby allowing a Makefile.am to include its own distclean-local hook.
 #

@@ -39,7 +39,7 @@ char *basename = "fifo";
 int fd;
 struct strrecvfd recvfd;
 int rc = 1;
-                                                                            
+
 if (!(tmpdir = getenv ("TMPDIR")))
     tmpdir = "/tmp";
 snprintf (name, sizeof (name), "%s/.%s.%d", tmpdir, basename, getpid ());

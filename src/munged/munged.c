@@ -1,13 +1,13 @@
 /*****************************************************************************
  *  $Id$
  *****************************************************************************
- *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
- *  For details, see <http://www.llnl.gov/linux/munge/>.
- *
  *  Copyright (C) 2003-2006 The Regents of the University of California.
- *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
+ *  Produced at Lawrence Livermore National Laboratory.
  *  Written by Chris Dunlap <cdunlap@llnl.gov>.
  *  UCRL-CODE-155910.
+ *
+ *  This file is part of the MUNGE Uid 'N' Gid Emporium (MUNGE).
+ *  For details, see <http://home.gna.org/munge/>.
  *
  *  This is free software; you can redistribute it and/or modify it
  *  under the terms of the GNU General Public License as published by
@@ -380,7 +380,7 @@ sock_create (conf_t conf)
     assert (conf != NULL);
 
     if ((conf->socket_name == NULL) || (*conf->socket_name == '\0')) {
-        log_err (EMUNGE_SNAFU, LOG_ERR, "Munge socket has no name");
+        log_err (EMUNGE_SNAFU, LOG_ERR, "MUNGE socket has no name");
     }
     if ((sd = socket (PF_UNIX, SOCK_STREAM, 0)) < 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to create socket");

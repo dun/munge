@@ -56,7 +56,7 @@ AC_DEFUN([X_AC_META], [
     META_DATE=_X_AC_META_GETVAL([DATE]);
     if test -n "$META_DATE"; then
       AC_DEFINE_UNQUOTED([META_DATE], ["$META_DATE"],
-        [Define the project release date.] 
+        [Define the project release date.]
       )
       AC_SUBST([META_DATE])
     fi
@@ -98,7 +98,7 @@ AC_DEFUN([X_AC_META], [
   ]
 )
 
-AC_DEFUN([_X_AC_META_GETVAL], 
+AC_DEFUN([_X_AC_META_GETVAL],
   [`perl -n\
     -e "BEGIN { \\$key=shift @ARGV; }"\
     -e "next unless s/^\s*\\$key@<:@:=@:>@//i;"\

@@ -1,13 +1,13 @@
 /*****************************************************************************
  *  $Id$
  *****************************************************************************
- *  This file is part of the Munge Uid 'N' Gid Emporium (MUNGE).
- *  For details, see <http://www.llnl.gov/linux/munge/>.
- *
- *  Copyright (C) 2003-2005 The Regents of the University of California.
- *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
+ *  Copyright (C) 2003-2006 The Regents of the University of California.
+ *  Produced at Lawrence Livermore National Laboratory.
  *  Written by Chris Dunlap <cdunlap@llnl.gov>.
  *  UCRL-CODE-155910.
+ *
+ *  This file is part of the MUNGE Uid 'N' Gid Emporium (MUNGE).
+ *  For details, see <http://home.gna.org/munge/>.
  *
  *  This is free software; you can redistribute it and/or modify it
  *  under the terms of the GNU General Public License as published by
@@ -22,11 +22,11 @@
  *  You should have received a copy of the GNU General Public License along
  *  with this program; if not, write to the Free Software Foundation, Inc.,
  *  51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA.
- ***************************************************************************** 
+ *****************************************************************************
  *  Based on ideas from:
  *  - David R. Butenhof's "Programming with POSIX Threads" (Section 3.3.4)
  *  - Jon C. Snader's "Effective TCP/IP Programming" (Tip #20)
- ***************************************************************************** 
+ *****************************************************************************
  *  Refer to "timer.h" for documentation on public functions.
  *****************************************************************************/
 

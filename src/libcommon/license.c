@@ -1,13 +1,13 @@
 /*****************************************************************************
  *  $Id$
  *****************************************************************************
- *  This file is part of the MUNGE Uid 'N' Gid Emporium (MUNGE).
- *  For details, see <http://www.llnl.gov/linux/munge/>.
- *
  *  Copyright (C) 2003-2006 The Regents of the University of California.
- *  Produced at Lawrence Livermore National Laboratory (cf, DISCLAIMER).
+ *  Produced at Lawrence Livermore National Laboratory.
  *  Written by Chris Dunlap <cdunlap@llnl.gov>.
  *  UCRL-CODE-155910.
+ *
+ *  This file is part of the MUNGE Uid 'N' Gid Emporium (MUNGE).
+ *  For details, see <http://home.gna.org/munge/>.
  *
  *  This is free software; you can redistribute it and/or modify it
  *  under the terms of the GNU General Public License as published by
@@ -38,7 +38,7 @@ static const char *license_string = \
     "Copyright (C) 2002-2006 The Regents of the University of California.\n"  \
     "Produced at Lawrence Livermore National Laboratory.\n"                   \
     "Written by Chris Dunlap <cdunlap@llnl.gov>.\n"                           \
-    "http://www.llnl.gov/linux/munge/\n"                                      \
+    "http://home.gna.org/munge/\n"                                            \
     "UCRL-CODE-155910\n\n"                                                    \
     "MUNGE is free software; you can redistribute it and/or modify it\n"      \
     "under the terms of the GNU General Public License as published by\n"     \
