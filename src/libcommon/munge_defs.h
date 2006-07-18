@@ -154,7 +154,7 @@
 
 /*  String specifying the pathname of the daemon's pidfile.
  */
-#define MUNGED_PIDFILE                  X_LOCALSTATEDIR "/run/munged.pid"
+#define MUNGED_PIDFILE                  X_LOCALSTATEDIR "/run/munge/munged.pid"
 
 /*  String specifying the pathname of the random seed file.
  */

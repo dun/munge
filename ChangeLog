@@ -1,3 +1,7 @@
+2006-07-18  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/libcommon/munge_defs.h: Moved MUNGED_PIDFILE to /var/run/munge/.
+
 2006-07-13  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* config/x_ac_debug.m4: Replaced use of $ac_save_CFLAGS with
