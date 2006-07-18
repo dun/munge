@@ -115,6 +115,17 @@ dec_process_msg (m_msg_t m)
     else /* success */
         rc = 0;
 
+    /*  Since the same m_msg struct is used for both the request and response,
+     *    the response message data must be sanitized for most errors.
+     *  The exception to this is for a credential that has been successfully
+     *    decoded but is invalid due to being expired, rewound, or replayed.
+     */
+    if ((rc != 0)
+            && (m->error_num != EMUNGE_CRED_EXPIRED)
+            && (m->error_num != EMUNGE_CRED_REWOUND)
+            && (m->error_num != EMUNGE_CRED_REPLAYED) ) {
+        m_msg_reset (m);
+    }
     /*  If the successfully decoded credential isn't successfully returned to
      *    the client, remove it from the replay hash.
      *

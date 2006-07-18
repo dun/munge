@@ -110,6 +110,12 @@ enc_process_msg (m_msg_t m)
     else /* success */
         rc = 0;
 
+    /*  Since the same m_msg struct is used for both the request and response,
+     *    the response message data must be sanitized for most errors.
+     */
+    if (rc != 0) {
+        m_msg_reset (m);
+    }
     if (m_msg_send (m, MUNGE_MSG_ENC_RSP, 0) != EMUNGE_SUCCESS) {
         rc = -1;
     }

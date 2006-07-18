@@ -119,6 +119,8 @@ munge_err_t m_msg_create (m_msg_t *pm);
 
 void m_msg_destroy (m_msg_t m);
 
+void m_msg_reset (m_msg_t m);
+
 munge_err_t m_msg_bind (m_msg_t m, int sd);
 
 munge_err_t m_msg_send (m_msg_t m, m_msg_type_t type, int maxlen);

@@ -128,6 +128,42 @@ m_msg_destroy (m_msg_t m)
 }
 
 
+void
+m_msg_reset (m_msg_t m)
+{
+/*  Reset sensitive fields in the message [m] that could leak information.
+ */
+    assert (m != NULL);
+
+    m->cipher = MUNGE_CIPHER_NONE;
+    m->mac = MUNGE_MAC_NONE;
+    m->zip = MUNGE_ZIP_NONE;
+    m->realm_len = 0;
+    if (m->realm_str) {
+        if (!m->realm_is_copy) {
+            free (m->realm_str);
+        }
+        m->realm_str = NULL;
+    }
+    m->ttl = MUNGE_TTL_DEFAULT;
+    m->addr_len = 0;
+    m->time0 = 0;
+    m->time1 = 0;
+    m->cred_uid = MUNGE_UID_ANY;
+    m->cred_gid = MUNGE_GID_ANY;
+    m->auth_uid = MUNGE_UID_ANY;
+    m->auth_gid = MUNGE_GID_ANY;
+    m->data_len = 0;
+    if (m->data) {
+        if (!m->data_is_copy) {
+            free (m->data);
+        }
+        m->data = NULL;
+    }
+    return;
+}
+
+
 munge_err_t
 m_msg_bind (m_msg_t m, int sd)
 {
@@ -158,6 +194,7 @@ m_msg_send (m_msg_t m, m_msg_type_t type, int maxlen)
     struct iovec  iov [2];
 
     assert (m != NULL);
+    assert (m->sd >= 0);
     assert (type != MUNGE_MSG_UNDEF);
     assert (type != MUNGE_MSG_HDR);
 
@@ -264,6 +301,7 @@ m_msg_recv (m_msg_t m, m_msg_type_t type, int maxlen)
     uint8_t  hdr [MUNGE_MSG_HDR_SIZE];
 
     assert (m != NULL);
+    assert (m->sd >= 0);
     assert (m->type != MUNGE_MSG_HDR);
     assert (m->pkt == NULL);
     assert (m->pkt_len == 0);
