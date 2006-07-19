@@ -1,5 +1,7 @@
 2006-07-19  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/etc/munge.sysconfig: Updated comments.
+
 	* src/libcommon/auth_policy.h: Tweaked documentation.
 
 	* src/etc/munge.init.in: Removed dependency on perl.
