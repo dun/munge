@@ -5,8 +5,8 @@
 
 	* src/etc/munge.init.in: Updated PIDFILE to match munge_defs.h.
 
-	* src/munged/dec.c(dec_process_msg): Sanitize rsp msg data on error.
-	* src/munged/enc.c(enc_process_msg): Sanitize rsp msg data on error.
+	* src/munged/dec.c(dec_process_msg): Sanitized rsp msg data on error.
+	* src/munged/enc.c(enc_process_msg): Sanitized rsp msg data on error.
 	* src/libcommon/m_msg.c, src/libcommon/m_msg.h: Added m_msg_reset().
 
 	* src/libcommon/munge_defs.h: Moved MUNGED_PIDFILE to /var/run/munge/.
