@@ -150,7 +150,7 @@
 
 /*  String specifying the pathname of the daemon's logfile.
  */
-#define MUNGED_LOGFILE                  X_LOCALSTATEDIR "/log/munge.log"
+#define MUNGED_LOGFILE                  X_LOCALSTATEDIR "/log/munge/munged.log"
 
 /*  String specifying the pathname of the daemon's pidfile.
  */
