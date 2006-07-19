@@ -1,5 +1,7 @@
 2006-07-19  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/etc/munge.init.in: Removed dependency on perl.
+
 	* src/libcommon/munge_defs.h: Moved MUNGED_LOGFILE to /var/log/munge/.
 	* src/etc/Makefile.am: Created /var/log/munge directory.
 

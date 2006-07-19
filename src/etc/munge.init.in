@@ -41,7 +41,7 @@ PIDFILE="$localstatedir/run/munge/munged.pid"
 
 PATH=/sbin:/usr/sbin:/usr/local/sbin:/bin:/usr/bin:/usr/local/bin
 DAEMON_NAME="`basename \"$DAEMON\"`"
-SERVICE_NAME="`echo $0 | perl -pe 's,(.*/)?(.*?)(\.init)?$,$2,'`"
+SERVICE_NAME="`basename \"$0\" .init`"
 SIGTERM_TIMEOUT="3"
 
 # Read configuration defaults to override variables:
@@ -79,8 +79,8 @@ service_init ()
   elif [ -f /etc/redhat-release -a -r /etc/init.d/functions ]; then
     SYSTEM="REDHAT"
     . /etc/init.d/functions
-    RH_SUBSYS_BASENAME="`echo $0 | perl -pe 's,(.*/)?([SK][0-9]{2})?(.*),$3,'`"
-    RH_SUBSYS="/var/lock/subsys/$RH_SUBSYS_BASENAME"
+    RH_SUBSYS_BASE="`basename \"$0\" | sed 's/^[SK][0-9][0-9]*//'`"
+    RH_SUBSYS="/var/lock/subsys/$RH_SUBSYS_BASE"
     INITLOG_ARGS=""                     # disable RH suppression of stderr msgs
   elif [ -f /etc/SuSE-release -a -r /etc/rc.status ]; then
     SYSTEM="SUSE"
