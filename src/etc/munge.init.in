@@ -120,7 +120,7 @@ service_start ()
   case $SYSTEM in
     DEBIAN)
       printf "$DAEMON_NAME"
-      start-stop-daemon --start --quiet \
+      start-stop-daemon --start --quiet --oknodo \
         ${NICE:+"--nicelevel"} ${NICE:+"$NICE"} \
         ${USER:+"--chuid"} ${USER:+"$USER"} \
         ${PIDFILE:+"--pidfile"} ${PIDFILE:+"$PIDFILE"} \
@@ -188,7 +188,7 @@ service_stop ()
   case $SYSTEM in
     DEBIAN)
       printf "$DAEMON_NAME"
-      start-stop-daemon --stop --quiet \
+      start-stop-daemon --stop --quiet --oknodo \
         ${PIDFILE:+"--pidfile"} ${PIDFILE:+"$PIDFILE"} --name "$DAEMON_NAME" \
         ${SIGTERM_TIMEOUT:+"--retry"} ${SIGTERM_TIMEOUT:+"$SIGTERM_TIMEOUT"}
       STATUS=$?

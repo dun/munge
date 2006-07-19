@@ -1,5 +1,8 @@
 2006-07-18  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/etc/munge.init.in: Added "--oknodo" option to Debian's
+	  start-stop-daemon for service_start() and service_stop().
+
 	* src/etc/munge.init.in: Updated PIDFILE to match munge_defs.h.
 
 	* src/munged/dec.c(dec_process_msg): Sanitize rsp msg data on error.
