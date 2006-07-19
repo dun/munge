@@ -1,7 +1,9 @@
-2006-07-18  Chris Dunlap  <cdunlap@llnl.gov>
+2006-07-19  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/libcommon/munge_defs.h: Moved MUNGED_LOGFILE to /var/log/munge/.
 	* src/etc/Makefile.am: Created /var/log/munge directory.
+
+2006-07-18  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/etc/munge.init.in: Added "--oknodo" option to Debian's
 	  start-stop-daemon for service_start() and service_stop().
