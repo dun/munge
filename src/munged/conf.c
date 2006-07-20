@@ -42,6 +42,7 @@
 #include <sys/param.h>                  /* for MAXHOSTNAMELEN */
 #include <sys/socket.h>                 /* for AF_INET */
 #include <unistd.h>
+#include "auth_policy.h"
 #include "conf.h"
 #include "license.h"
 #include "log.h"
@@ -68,8 +69,10 @@ struct option opt_table[] = {
     { "advice",     0, NULL, 'A' },
     { "key-file",      1, NULL, '0' },  /* deprecated cmdline opt */
     { "num-threads",   1, NULL, '1' },  /* deprecated cmdline opt */
+#ifdef MUNGE_AUTH_RECVFD
     { "auth-pipe-dir", 1, NULL, '2' },  /* deprecated cmdline opt */
     { "auth-file-dir", 1, NULL, '3' },  /* deprecated cmdline opt */
+#endif /* MUNGE_AUTH_RECVFD */
     {  NULL,        0, NULL,  0  }
 };
 
@@ -135,6 +138,8 @@ create_conf (void)
     conf->mac_key_len = 0;
     conf->nthreads = MUNGE_THREADS;
 
+#ifdef MUNGE_AUTH_RECVFD
+
     if (!(conf->auth_pipe_dir = strdup (MUNGE_AUTH_PIPE_DIR))) {
         log_errno (EMUNGE_NO_MEMORY, LOG_ERR,
             "Cannot dup auth-pipe-dir default string");
@@ -143,6 +148,8 @@ create_conf (void)
         log_errno (EMUNGE_NO_MEMORY, LOG_ERR,
             "Cannot dup auth-file-dir default string");
     }
+#endif /* MUNGE_AUTH_RECVFD */
+
     conf->auth_rnd_bytes = MUNGE_AUTH_RND_BYTES;
 
     return (conf);
@@ -258,6 +265,7 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                 if ((c = atoi (optarg)) > 0)
                     conf->nthreads = c;
                 break;
+#ifdef MUNGE_AUTH_RECVFD
             case '2':
                 if (conf->auth_pipe_dir)
                     free (conf->auth_pipe_dir);
@@ -272,6 +280,7 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                     log_errno (EMUNGE_NO_MEMORY, LOG_ERR,
                         "Cannot dup auth-file-dir cmdline string");
                 break;
+#endif /* MUNGE_AUTH_RECVFD */
             /* End deprecated cmdline opts */
             case '?':
                 if (optopt > 0)
@@ -330,11 +339,14 @@ display_help (char *prog)
     printf ("\n");
 
     /* Begin deprecated cmdline opts */
+
+#ifdef MUNGE_AUTH_RECVFD
     printf ("  %*s %s\n", w, "--auth-pipe-dir=DIR",
             "Specify alternate auth-pipe directory");
 
     printf ("  %*s %s\n", w, "--auth-file-dir=DIR",
             "Specify alternate auth-file directory");
+#endif /* MUNGE_AUTH_RECVFD */
 
     printf ("  %*s %s\n", w, "--key-file=FILE",
             "Specify alternate secret key file");

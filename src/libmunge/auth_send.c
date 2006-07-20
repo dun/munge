@@ -38,7 +38,7 @@
  *  null client
  *****************************************************************************/
 
-#ifndef MUNGE_AUTH_RECVFD_COMMON
+#ifndef MUNGE_AUTH_RECVFD
 
 int
 auth_send (m_msg_t m)
@@ -46,14 +46,14 @@ auth_send (m_msg_t m)
     return (EMUNGE_SUCCESS);
 }
 
-#endif /* !MUNGE_AUTH_RECVFD_COMMON */
+#endif /* !MUNGE_AUTH_RECVFD */
 
 
 /*****************************************************************************
  *  strrecvfd struct (common)
  *****************************************************************************/
 
-#ifdef MUNGE_AUTH_RECVFD_COMMON
+#ifdef MUNGE_AUTH_RECVFD
 
 #include <assert.h>
 #include <errno.h>
@@ -243,4 +243,4 @@ err:
     return (-1);
 }
 
-#endif /* MUNGE_AUTH_RECVFD_COMMON */
+#endif /* MUNGE_AUTH_RECVFD */

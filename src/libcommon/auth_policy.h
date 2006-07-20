@@ -83,8 +83,8 @@
 #endif
 
 #if defined (MUNGE_AUTH_RECVFD_MKFIFO) || defined (MUNGE_AUTH_RECVFD_MKNOD)
-#  define MUNGE_AUTH_RECVFD_COMMON
-#endif /* MUNGE_AUTH_RECVFD_COMMON */
+#  define MUNGE_AUTH_RECVFD
+#endif
 
 
 #endif /* !MUNGE_AUTH_POLICY_H */

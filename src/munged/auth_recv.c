@@ -383,7 +383,7 @@ _s_pipe (int fd[2])
  *  strrecvfd struct (common)
  *****************************************************************************/
 
-#ifdef MUNGE_AUTH_RECVFD_COMMON
+#ifdef MUNGE_AUTH_RECVFD
 
 #include <assert.h>
 #include <stdio.h>                      /* snprintf */
@@ -495,4 +495,4 @@ end:
     return (e == EMUNGE_SUCCESS ? 0 : -1);
 }
 
-#endif /* MUNGE_AUTH_RECVFD_COMMON */
+#endif /* MUNGE_AUTH_RECVFD */

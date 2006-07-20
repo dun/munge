@@ -1,5 +1,11 @@
 2006-07-20  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/munged/conf.c: Disabled "--auth-pipe-dir" & "--auth-file-dir"
+	  unless MUNGE_AUTH_RECVFD is defined.
+	* src/munged/auth_recv.c, src/libmunge/auth_send.c,
+	  src/libcommon/auth_policy.h: Renamed MUNGE_AUTH_RECVFD_COMMON
+	  to MUNGE_AUTH_RECVFD.
+
 	* src/munged/munged.8.in: Tweaked verbage.
 
 2006-07-19  Chris Dunlap  <cdunlap@llnl.gov>
