@@ -34,7 +34,7 @@ DAEMON="$sbindir/munged"
 OPTIONS="--force"
 PIDFILE="$localstatedir/run/munge/munged.pid"
 #NICE=
-#USER=
+USER="daemon"
 #SIGHUP_RELOAD=#_NOT_SUPPORTED_#
 
 ###############################################################################

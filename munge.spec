@@ -138,9 +138,11 @@ if [ -x /sbin/ldconfig ]; then /sbin/ldconfig %{_libdir}; fi
 %doc README*
 %doc TODO
 %doc doc/*
-%dir %attr(0700,root,root) %config %{_sysconfdir}/munge
+%dir %attr(0700,daemon,daemon) %config %{_sysconfdir}/munge
 %config(noreplace) %{_sysconfdir}/*/*
-%{_localstatedir}/*/*
+%dir %attr(0711,daemon,daemon) %config %{_localstatedir}/lib/munge
+%dir %attr(0700,daemon,daemon) %config %{_localstatedir}/log/munge
+%dir %attr(0755,daemon,daemon) %config %{_localstatedir}/run/munge
 %{_bindir}/*
 %{_sbindir}/*
 %{_mandir}/*[^3]/*

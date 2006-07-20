@@ -16,7 +16,7 @@ install-data-local:
 	$(INSTALL) -m 755 -d "$(DESTDIR)$(sysconfdir)/$$d"; \
 	$(INSTALL) -m 755 $(srcdir)/munge.sysconfig \
 	  "$(DESTDIR)$(sysconfdir)/$$d/munge$${new}"; \
-	$(INSTALL) -m 755 -d "$(DESTDIR)$(localstatedir)/lib/munge"; \
-	$(INSTALL) -m 755 -d "$(DESTDIR)$(localstatedir)/log/munge"; \
+	$(INSTALL) -m 711 -d "$(DESTDIR)$(localstatedir)/lib/munge"; \
+	$(INSTALL) -m 700 -d "$(DESTDIR)$(localstatedir)/log/munge"; \
 	$(INSTALL) -m 755 -d "$(DESTDIR)$(localstatedir)/run/munge"; \
 	$(INSTALL) -m 700 -d "$(DESTDIR)$(sysconfdir)/munge"

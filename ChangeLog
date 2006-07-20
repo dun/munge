@@ -1,5 +1,9 @@
 2006-07-20  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* munge.spec: Specified perms & daemon-ownership for munge-owned dirs.
+	* src/etc/Makefile.am: Changed /var/lib/munge and /var/log/munge perms.
+	* src/etc/munge.init.in: Changed to run as the "daemon" user.
+
 	* src/munged/conf.c(display_help): Added defaults to help message.
 
 	* src/munged/conf.c: Disabled "--auth-pipe-dir" & "--auth-file-dir"
