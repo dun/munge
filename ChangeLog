@@ -1,5 +1,8 @@
 2006-07-20  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/munged/munged.c(main): Moved root privs test (if needed) to
+	  after parse_cmdline().
+
 	* munge.spec: Specified perms & daemon-ownership for munge-owned dirs.
 	* src/etc/Makefile.am: Changed /var/lib/munge and /var/log/munge perms.
 	* src/etc/munge.init.in: Changed to run as the "daemon" user.

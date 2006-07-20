@@ -96,9 +96,9 @@ main (int argc, char *argv[])
 
     handle_signals ();
 
-    auth_recv_init ();
     conf = create_conf ();
     parse_cmdline (conf, argc, argv);
+    auth_recv_init ();
 
     if (!conf->got_foreground) {
         fd = daemonize_init ();
