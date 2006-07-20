@@ -64,7 +64,8 @@ struct conf {
     gids_t          gids;               /* supplementary group information   */
     int             nthreads;           /* num threads for processing creds  */
     char           *auth_pipe_dir;      /* dir in which to create auth pipe  */
-    int             auth_pipe_rnd_bytes;/* num rnd bytes in auth pipe name   */
+    char           *auth_file_dir;      /* dir in which to create auth file  */
+    int             auth_rnd_bytes;     /* num rnd bytes in auth pipe name   */
 };
 
 typedef struct conf * conf_t;

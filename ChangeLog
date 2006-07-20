@@ -1,5 +1,27 @@
 2006-07-19  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/libcommon/munge_defs.h: Added MUNGE_AUTH_FILE_DIR.
+	  Renamed MUNGE_AUTH_PIPE_RND_BYTES to MUNGE_AUTH_RND_BYTES.
+	  Updated documentation.
+	* src/libcommon/m_msg.h: Added a_pipe_len, a_pipe_str, a_pipe_is_copy,
+	  a_file_len, a_file_str, a_file_is_copy to m_msg struct.
+	* src/libcommon/m_msg.c: Added new m_msg struct variables to
+	  m_msg_destroy(), _msg_length(), _msg_pack(), _msg_unpack().
+	* src/munged/auth_recv.c(_send_auth_req): Changed auth request message
+	  format to include a_pipe_str and a_file_str.
+	* src/libmunge/auth_send.c(auth_send): Added use of file dir string.
+	* src/libmunge/auth_send.c(_recv_auth_req): Added file dir parm.
+	  Changed to extract a_pipe_str and a_file_str from request message.
+	* src/libmunge/auth_send.c(_name_auth_file): Added file dir parm.
+	  Changed auth file path so it is no longer in same dir as auth pipe.
+	* src/munged/conf.h: Renamed auth_pipe_rnd_bytes to auth_rnd_bytes.
+	  Added auth_file_dir.
+	* src/munged/conf.c: Added "--auth-file-dir" command-line option.
+	* src/munged/munged.8.in: Added documentation for "--auth-file-dir".
+	  Updated documentation for "--auth-pipe-dir".
+	* README.AIX: Updated documentation for use of "--auth-file-dir" and
+	  "--auth-pipe-dir".
+
 	* src/etc/munge.sysconfig: Updated comments.
 
 	* src/libcommon/auth_policy.h: Tweaked documentation.

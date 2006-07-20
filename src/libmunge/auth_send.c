@@ -58,6 +58,7 @@ auth_send (m_msg_t m)
 #include <assert.h>
 #include <errno.h>
 #include <fcntl.h>                      /* open, O_RDONLY, etc. */
+#include <stdio.h>                      /* snprintf */
 #include <stdlib.h>
 #include <string.h>                     /* strdup, strerror, strrchr */
 #include <stropts.h>                    /* I_SENDFD */
@@ -68,24 +69,26 @@ auth_send (m_msg_t m)
 #include "munge_defs.h"
 #include "str.h"
 
-static int _recv_auth_req (int sd, char **dst_p);
-static int _name_auth_file (const char *src, char **dst_p);
+static int _recv_auth_req (int sd, char **pipe_name_p, char **file_dir_p);
+static int _name_auth_file (const char *pipe_name, const char *file_dir,
+        char **file_name_p);
 
 int
 auth_send (m_msg_t m)
 {
     char *pipe_name = NULL;
-    int   pipe_fd = -1;
+    char *file_dir = NULL;
     char *file_name = NULL;
     int   file_fd = -1;
+    int   pipe_fd = -1;
     char *estr;
 
-    if (_recv_auth_req (m->sd, &pipe_name) < 0) {
+    if (_recv_auth_req (m->sd, &pipe_name, &file_dir) < 0) {
         estr = strdup ("Unable to receive auth request");
         goto err;
     }
     assert (pipe_name != NULL);
-    if (_name_auth_file (pipe_name, &file_name) < 0) {
+    if (_name_auth_file (pipe_name, file_dir, &file_name) < 0) {
         estr = strdup ("Unable to name auth file");
         goto err;
     }
@@ -123,6 +126,7 @@ auth_send (m_msg_t m)
         goto err;
     }
     free (pipe_name);
+    free (file_dir);
     free (file_name);
     return (0);
 
@@ -140,22 +144,28 @@ err:
         (void) unlink (file_name);
         free (file_name);
     }
+    if (file_dir != NULL) {
+        free (file_dir);
+    }
     return (m_msg_set_err (m, EMUNGE_SNAFU, estr));
 }
 
 static int
-_recv_auth_req (int sd, char **dst_p)
+_recv_auth_req (int sd, char **pipe_name_p, char **file_dir_p)
 {
 /*  Receives an authentication request from the server on the established
- *    socket [sd], storing the name of the authentication pipe to use for
- *    sending an fd across in a newly-allocated string referenced by [dst_p].
- *  The caller is responsible for freeing the string returned by [dst_p].
+ *    socket [sd], storing the path name of the authentication pipe to use for
+ *    sending an fd across in a newly-allocated string referenced by
+ *    [pipe_name_p], as well as the directory name in which to create the
+ *    authentication file [file_dir_p] corresponding to the fd to be sent.
+ *  The caller is responsible for freeing these strings.
  *  Returns 0 on success, -1 on error.
  */
     m_msg_t      m;
     munge_err_t  e;
 
-    *dst_p = NULL;
+    *pipe_name_p = NULL;
+    *file_dir_p = NULL;
 
     if ((e = m_msg_create (&m)) != EMUNGE_SUCCESS) {
         goto end;
@@ -174,8 +184,10 @@ _recv_auth_req (int sd, char **dst_p)
         e = EMUNGE_SOCKET;
         goto end;
     }
-    *dst_p = m->data;
-    m->data_is_copy = 1;
+    *pipe_name_p = m->a_pipe_str;
+    m->a_pipe_is_copy = 1;
+    *file_dir_p = m->a_file_str;
+    m->a_file_is_copy = 1;
 
 end:
     if (m) {
@@ -186,24 +198,34 @@ end:
 }
 
 static int
-_name_auth_file (const char *src, char **dst_p)
+_name_auth_file (const char *pipe_name, const char *file_dir,
+        char **file_name_p)
 {
 /*  Creates a unique filename based on the name of authentication pipe [src],
  *    storing the result in a newly-allocated string referenced by [dst_p].
  *  The caller is responsible for freeing the string returned by [dst_p].
+ *  The auth file name is of the form "AUTH_FILE_DIR/.munge-RANDOM.file".
  *  Returns 0 on success, -1 on error.
  */
-    char *dst = NULL;
-    int   dst_len;
     char *p;
+    int   dst_len;
+    char *dst = NULL;
+    int   n;
 
-    *dst_p = NULL;
+    *file_name_p = NULL;
 
-    if (!(dst = strdup (src))) {
+    if (!pipe_name || !file_dir) {
         goto err;
     }
-    dst_len = strlen (dst) + 1;
-
+    p = (p = strrchr (pipe_name, '/')) ? p + 1 : (char *) pipe_name;
+    dst_len = strlen (file_dir) + 1 /* '/' */ + strlen (p) + 1 /* '\0' */;
+    if (!(dst = malloc (dst_len))) {
+        goto err;
+    }
+    n = snprintf (dst, dst_len, "%s/%s", file_dir, p);
+    if ((n < 0) || (n >= dst_len)) {
+        goto err;
+    }
     if (!(p = strrchr (dst, '.'))) {
         goto err;
     }
@@ -211,7 +233,7 @@ _name_auth_file (const char *src, char **dst_p)
     if (strlcat (dst, ".file", dst_len) >= dst_len) {
         goto err;
     }
-    *dst_p = dst;
+    *file_name_p = dst;
     return (0);
 
 err:

@@ -139,14 +139,22 @@
 #define MUNGE_AUTH_ROOT_ALLOW_FLAG      0
 
 /*  The directory in which the pipe used to authenticate a particular client
- *    via fd-passing will be created.
+ *    via fd-passing will be created.  The server must be able to create files
+ *    in this directory, but the client only needs to be able to read a file
+ *    from within it.  Recommended permissions for this directory are 0711.
  */
 #define MUNGE_AUTH_PIPE_DIR             X_LOCALSTATEDIR "/lib/munge"
 
-/*  The amount of entropy (in bytes) to place in the filename of the pipe used
- *    to authenticate a particular client via fd-passing.
+/*  The directory in which the file used to authenticate a particular client
+ *    via fd-passing will be created.  The client must be able to create files
+ *    in this directory.  Recommended permissions for this directory are 1733.
  */
-#define MUNGE_AUTH_PIPE_RND_BYTES       16
+#define MUNGE_AUTH_FILE_DIR             "/tmp"
+
+/*  The amount of entropy (in bytes) to place in the filename of the pipe and
+ *    file used to authenticate a particular client via fd-passing.
+ */
+#define MUNGE_AUTH_RND_BYTES            16
 
 /*  String specifying the pathname of the daemon's logfile.
  */

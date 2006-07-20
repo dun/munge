@@ -69,6 +69,7 @@ struct option opt_table[] = {
     { "key-file",      1, NULL, '0' },  /* deprecated cmdline opt */
     { "num-threads",   1, NULL, '1' },  /* deprecated cmdline opt */
     { "auth-pipe-dir", 1, NULL, '2' },  /* deprecated cmdline opt */
+    { "auth-file-dir", 1, NULL, '3' },  /* deprecated cmdline opt */
     {  NULL,        0, NULL,  0  }
 };
 
@@ -136,9 +137,13 @@ create_conf (void)
 
     if (!(conf->auth_pipe_dir = strdup (MUNGE_AUTH_PIPE_DIR))) {
         log_errno (EMUNGE_NO_MEMORY, LOG_ERR,
-            "Cannot dup auth pipe name prefix string");
+            "Cannot dup auth-pipe-dir default string");
     }
-    conf->auth_pipe_rnd_bytes = MUNGE_AUTH_PIPE_RND_BYTES;
+    if (!(conf->auth_file_dir = strdup (MUNGE_AUTH_FILE_DIR))) {
+        log_errno (EMUNGE_NO_MEMORY, LOG_ERR,
+            "Cannot dup auth-file-dir default string");
+    }
+    conf->auth_rnd_bytes = MUNGE_AUTH_RND_BYTES;
 
     return (conf);
 }
@@ -184,6 +189,10 @@ destroy_conf (conf_t conf)
     if (conf->auth_pipe_dir) {
         free (conf->auth_pipe_dir);
         conf->auth_pipe_dir = NULL;
+    }
+    if (conf->auth_file_dir) {
+        free (conf->auth_file_dir);
+        conf->auth_file_dir = NULL;
     }
     free (conf);
 
@@ -254,7 +263,14 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                     free (conf->auth_pipe_dir);
                 if (!(conf->auth_pipe_dir = strdup (optarg)))
                     log_errno (EMUNGE_NO_MEMORY, LOG_ERR,
-                        "Cannot dup auth-pipe-dir name string");
+                        "Cannot dup auth-pipe-dir cmdline string");
+                break;
+            case '3':
+                if (conf->auth_file_dir)
+                    free (conf->auth_file_dir);
+                if (!(conf->auth_file_dir = strdup (optarg)))
+                    log_errno (EMUNGE_NO_MEMORY, LOG_ERR,
+                        "Cannot dup auth-file-dir cmdline string");
                 break;
             /* End deprecated cmdline opts */
             case '?':
@@ -316,6 +332,9 @@ display_help (char *prog)
     /* Begin deprecated cmdline opts */
     printf ("  %*s %s\n", w, "--auth-pipe-dir=DIR",
             "Specify alternate auth-pipe directory");
+
+    printf ("  %*s %s\n", w, "--auth-file-dir=DIR",
+            "Specify alternate auth-file directory");
 
     printf ("  %*s %s\n", w, "--key-file=FILE",
             "Specify alternate secret key file");

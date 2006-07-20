@@ -388,7 +388,7 @@ _s_pipe (int fd[2])
 #include <assert.h>
 #include <stdio.h>                      /* snprintf */
 #include <stdlib.h>                     /* malloc, free */
-#include <string.h>                     /* memset, strlen */
+#include <string.h>                     /* memset, strlen, strdup */
 #include "conf.h"
 #include "random.h"                     /* random_pseudo_bytes */
 #include "str.h"                        /* strhex */
@@ -399,7 +399,7 @@ _name_auth_pipe (char **dst_p)
 /*  Creates a unique filename for the authentication pipe,
  *    storing the result in a newly-allocated string referenced by [dst_p].
  *  The caller is responsible for freeing the string returned by [dst_p].
- *  The auth pipe name is of the form "PREFIX/.munge-RANDOM.pipe".
+ *  The auth pipe name is of the form "AUTH_PIPE_DIR/.munge-RANDOM.pipe".
  *  Returns 0 on success, -1 on error.
  */
     unsigned char *nonce_bin = NULL;
@@ -411,10 +411,10 @@ _name_auth_pipe (char **dst_p)
     int            n;
 
     *dst_p = NULL;
-    assert (conf->auth_pipe_rnd_bytes > 0);
+    assert (conf->auth_rnd_bytes > 0);
     assert (conf->auth_pipe_dir != NULL);
 
-    nonce_bin_len = conf->auth_pipe_rnd_bytes;
+    nonce_bin_len = conf->auth_rnd_bytes;
     if (!(nonce_bin = malloc (nonce_bin_len))) {
         goto err;
     }
@@ -424,7 +424,7 @@ _name_auth_pipe (char **dst_p)
     }
     dst_len = strlen (conf->auth_pipe_dir)
         + 8                             /* strlen ("/.munge-") */
-        + (2 * conf->auth_pipe_rnd_bytes)
+        + (2 * conf->auth_rnd_bytes)
         + 6;                            /* strlen (".pipe") + "\0" */
     if (!(dst = malloc (dst_len))) {
         goto err;
@@ -464,8 +464,10 @@ _send_auth_req (int sd, const char *pipe_name)
  *    for sending an fd across.
  *  Returns 0 on success, -1 on error.
  *
- *  The authentication request message needs to contain the name of the
- *    authentication pipe for the client to use for sending an fd across.
+ *  The authentication request message contains the authentication pipe name
+ *    for the client to send a file descriptor across, as well as the directory
+ *    name in which to create the authentication file corresponding to the file
+ *    descriptor being sent.
  */
     m_msg_t      m;
     munge_err_t  e;
@@ -476,9 +478,12 @@ _send_auth_req (int sd, const char *pipe_name)
     if ((e = m_msg_bind (m, sd)) != EMUNGE_SUCCESS) {
         goto end;
     }
-    m->data_len = strlen ((char *) pipe_name) + 1;
-    m->data = (char *) pipe_name;
-    m->data_is_copy = 1;
+    m->a_pipe_str = (char *) pipe_name;
+    m->a_pipe_len = strlen (m->a_pipe_str) + 1;
+    m->a_pipe_is_copy = 1;
+    m->a_file_str = conf->auth_file_dir;
+    m->a_file_len = strlen (m->a_file_str) + 1;
+    m->a_file_is_copy = 1;
 
     e = m_msg_send (m, MUNGE_MSG_AUTH_FD_REQ, 0);
 

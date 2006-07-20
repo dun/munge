@@ -14,11 +14,10 @@ of the jfs filesystem makes this quite slow.  To increase performance,
 the authentication pipe needs to be created in a ramdisk.
 
 The following steps create a 5MB ramdisk and mount it as "/tmp/munge".
-A small ramdisk will do just fine.  The recommended permissions for this
-directory are 1333 -- write & execute permissions for all, read permissions
-for none, and the sticky bit set so files can only be renamed or deleted
-by the owner (or root, of course).  Note that execute permissions for all
-need to be set on all of the parent directories as well.
+A small ramdisk will do just fine.  You should then create two directories:
+/tmp/munge/client (permissioned 1733) & /tmp/munge/server (permissioned 0711).
+These directories can be named whatever you like, but these names will be used
+in the following example.
 
   # mkramdisk 10000
   /dev/rramdisk0
@@ -34,22 +33,29 @@ need to be set on all of the parent directories as well.
 
   # mount -V jfs -o nointegrity /dev/ramdisk0 /tmp/munge
 
-  # chmod 1333 /tmp/munge
+  # chmod 0755 /tmp/munge
+
+  # mkdir /tmp/munge/client
+  # chmod 1733 /tmp/munge/client
+
+  # mkdir /tmp/munge/server
+  # chmod 0711 /tmp/munge/server
 
   # mount
     node       mounted        mounted over    vfs       date        options
   -------- ---------------  ---------------  ------ ------------ ---------------
            /dev/ramdisk0    /tmp/munge       jfs    Oct 01 10:01 rw,nointegrity
 
-The MUNGE_AUTH_PIPE_DIR define in src/libcommon/munge_defs.h also needs to
-be modified to specify the location of this ramdisk, and the source then
+The MUNGE_AUTH_FILE_DIR and MUNGE_AUTH_PIPE_DIR defines in
+src/libcommon/munge_defs.h need to be modified, and then the source
 needs to be recompiled.
 
-  #define MUNGE_AUTH_PIPE_DIR             "/tmp/munge"
+  #define MUNGE_AUTH_FILE_DIR             "/tmp/munge/client"
+  #define MUNGE_AUTH_PIPE_DIR             "/tmp/munge/server"
 
-Alternatively, you can override this setting with the "--auth-pipe-dir"
-munged command-line option.
+Alternatively, you can override these settings with the munged
+"--auth-file-dir" and "--auth-pipe-dir" command-line options.
 
-  munged --auth-pipe-dir /tmp/munge
+  munged --auth-file-dir /tmp/munge/client --auth-pipe-dir /tmp/munge/server
 
-This option will be moved into the configuration file once one exists.
+These options will be moved into the configuration file once one exists.

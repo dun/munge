@@ -123,6 +123,14 @@ m_msg_destroy (m_msg_t m)
         assert (m->error_len > 0);
         free (m->error_str);
     }
+    if (m->a_pipe_str && !m->a_pipe_is_copy) {
+        assert (m->a_pipe_len > 0);
+        free (m->a_pipe_str);
+    }
+    if (m->a_file_str && !m->a_file_is_copy) {
+        assert (m->a_file_len > 0);
+        free (m->a_file_str);
+    }
     free (m);
     return;
 }
@@ -473,8 +481,10 @@ _msg_length (m_msg_t m, m_msg_type_t type)
             n += m->data_len;
             break;
         case MUNGE_MSG_AUTH_FD_REQ:
-            n += sizeof (m->data_len);
-            n += m->data_len;
+            n += sizeof (m->a_pipe_len);
+            n += m->a_pipe_len;
+            n += sizeof (m->a_file_len);
+            n += m->a_file_len;
             break;
         default:
             return (-1);
@@ -555,8 +565,10 @@ _msg_pack (m_msg_t m, m_msg_type_t type, void *dst, int dstlen)
             else break;
             goto err;
         case MUNGE_MSG_AUTH_FD_REQ:
-            if      (!_pack (&p, &(m->data_len), sizeof (m->data_len), q)) ;
-            else if ( _copy (p, m->data, m->data_len, p, q, &p) < 0) ;
+            if      (!_pack (&p, &(m->a_pipe_len), sizeof (m->a_pipe_len), q));
+            else if ( _copy (p, m->a_pipe_str, m->a_pipe_len, p, q, &p) < 0) ;
+            else if (!_pack (&p, &(m->a_file_len), sizeof (m->a_file_len), q));
+            else if ( _copy (p, m->a_file_str, m->a_file_len, p, q, &p) < 0) ;
             else break;
             goto err;
         default:
@@ -650,9 +662,17 @@ _msg_unpack (m_msg_t m, m_msg_type_t type, const void *src, int srclen)
             else break;
             goto err;
         case MUNGE_MSG_AUTH_FD_REQ:
-            if      (!_unpack (&(m->data_len), &p, sizeof (m->data_len), q)) ;
-            else if (!_alloc (&(m->data), m->data_len)) goto nomem;
-            else if ( _copy (m->data, p, m->data_len, p, q, &p) < 0) ;
+            if      (!_unpack (&(m->a_pipe_len), &p,
+                        sizeof (m->a_pipe_len), q)) ;
+            else if (!_alloc ((vpp) &(m->a_pipe_str), m->a_pipe_len))
+                goto nomem ;
+            else if ( _copy (m->a_pipe_str, p, m->a_pipe_len, p, q, &p) < 0) ;
+
+            else if (!_unpack (&(m->a_file_len), &p,
+                        sizeof (m->a_file_len), q)) ;
+            else if (!_alloc ((vpp) &(m->a_file_str), m->a_file_len))
+                goto nomem ;
+            else if ( _copy (m->a_file_str, p, m->a_file_len, p, q, &p) < 0) ;
             else break;
             goto err;
         default:

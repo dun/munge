@@ -53,8 +53,18 @@ Run the process in the foreground.
 Specify the local domain socket for communicating with clients.
 .TP
 .BI "--auth-pipe-dir " directory
-Specify an alternate directory in which to create the pipe used to authenticate
-clients on certain platforms.
+This option is only valid on platforms where client authentication is performed
+via a file-descriptor passing mechanism.  Specify an alternate directory in
+which the daemon will create the pipe used to authenticate clients.  The
+recommended permissions for this directory are 0711.
+This option is \fBdeprecated\fR and will be removed once configuration file
+support is added.
+.TP
+.BI "--auth-file-dir " directory
+This option is only valid on platforms where client authentication is performed
+via a file-descriptor passing mechanism.  Specify an alternate directory in
+which clients will create the file used to authenticate themselves to the
+daemon.  The recommended permissions for this directory are 1733.
 This option is \fBdeprecated\fR and will be removed once configuration file
 support is added.
 .TP
