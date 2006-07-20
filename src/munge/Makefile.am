@@ -48,3 +48,8 @@ man_MANS = \
 	munge.1 \
 	unmunge.1 \
 	remunge.1
+
+install-data-local:
+	$(INSTALL) -d -m 0755 $(DESTDIR)$(bindir)
+	$(INSTALL) -d -m 0755 $(DESTDIR)$(mandir)
+	$(INSTALL) -d -m 0755 $(DESTDIR)$(mandir)/man1

@@ -505,7 +505,7 @@ info: info-am
 
 info-am:
 
-install-data-am: install-man
+install-data-am: install-data-local install-man
 
 install-exec-am:
 
@@ -542,9 +542,9 @@ uninstall-man: uninstall-man7
 	distclean-compile distclean-generic distclean-libtool \
 	distclean-local distclean-tags distdir dvi dvi-am html html-am \
 	info info-am install install-am install-data install-data-am \
-	install-exec install-exec-am install-info install-info-am \
-	install-man install-man7 install-strip installcheck \
-	installcheck-am installdirs maintainer-clean \
+	install-data-local install-exec install-exec-am install-info \
+	install-info-am install-man install-man7 install-strip \
+	installcheck installcheck-am installdirs maintainer-clean \
 	maintainer-clean-generic mostlyclean mostlyclean-compile \
 	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
 	tags uninstall uninstall-am uninstall-info-am uninstall-man \
@@ -568,6 +568,10 @@ force-dependency-check:
 #
 distclean-local::
 	-rm -f *~ \#* .\#* cscope*.out core core.* tags TAGS
+
+install-data-local:
+	$(INSTALL) -d -m 0755 $(DESTDIR)$(mandir)
+	$(INSTALL) -d -m 0755 $(DESTDIR)$(mandir)/man7
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

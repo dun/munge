@@ -380,8 +380,11 @@ install-data-local:
 	$(INSTALL) -m 0755 -d "$(DESTDIR)$(sysconfdir)/$$d"; \
 	$(INSTALL) -m 0755 $(srcdir)/munge.sysconfig \
 	  "$(DESTDIR)$(sysconfdir)/$$d/munge$${new}"; \
+	$(INSTALL) -m 0755 -d "$(DESTDIR)$(localstatedir)/lib"; \
 	$(INSTALL) -m 0711 -d "$(DESTDIR)$(localstatedir)/lib/munge"; \
+	$(INSTALL) -m 0755 -d "$(DESTDIR)$(localstatedir)/log"; \
 	$(INSTALL) -m 0700 -d "$(DESTDIR)$(localstatedir)/log/munge"; \
+	$(INSTALL) -m 0755 -d "$(DESTDIR)$(localstatedir)/run"; \
 	$(INSTALL) -m 0755 -d "$(DESTDIR)$(localstatedir)/run/munge"; \
 	$(INSTALL) -m 0700 -d "$(DESTDIR)$(sysconfdir)/munge"
 # Tell versions [3.59,3.63) of GNU make to not export all variables.

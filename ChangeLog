@@ -1,5 +1,9 @@
 2006-07-20  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/etc/Makefile.am, src/libcommon/Makefile.am,
+	  src/libmunge/Makefile.am, src/munge/Makefile.am,
+	  src/munged/Makefile.am: Tweaked dir perms via install-data-local.
+
 	* src/etc/Makefile.am, src/libmunge/Makefile.am: Tweaked dir perms.
 
 	* src/munged/munged.c(main): Moved root privs test (if needed) to
