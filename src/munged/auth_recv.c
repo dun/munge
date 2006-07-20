@@ -48,7 +48,7 @@ auth_recv_init (void)
 #ifdef MUNGE_AUTH_RECVFD_MKNOD
     if (geteuid () != 0) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
-            "The munge daemon requires root privileges");
+            "MUNGE daemon requires root privileges");
     }
 #endif /* MUNGE_AUTH_RECVFD_MKNOD */
 

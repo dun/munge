@@ -1,5 +1,7 @@
 2006-07-20  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/munged/auth_recv.c(auth_recv_init): Tweaked err msg verbage.
+
 	* src/etc/Makefile.am, src/libcommon/Makefile.am,
 	  src/libmunge/Makefile.am, src/munge/Makefile.am,
 	  src/munged/Makefile.am: Tweaked dir perms via install-data-local.
