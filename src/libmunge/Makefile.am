@@ -44,7 +44,7 @@ man_MANS = \
 	munge_enum.3
 
 install-data-local:
-	$(INSTALL) -d $(DESTDIR)$(mandir)/man3/
+	$(INSTALL) -d -m 0755 $(DESTDIR)$(mandir)/man3/
 	for man in encode decode strerror; do \
 	  ln -f -s munge.3 $(DESTDIR)$(mandir)/man3/munge_$$man.3; \
 	done
