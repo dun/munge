@@ -1,3 +1,7 @@
+2006-07-20  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/munged/munged.8.in: Tweaked verbage.
+
 2006-07-19  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/libcommon/munge_defs.h: Added MUNGE_AUTH_FILE_DIR.
