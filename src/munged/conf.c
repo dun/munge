@@ -333,26 +333,26 @@ display_help (char *prog)
     printf ("  %*s %s\n", w, "-F, --foreground",
             "Run process in the foreground (do not fork)");
 
-    printf ("  %*s %s\n", w, "-S, --socket=STRING",
-            "Specify local domain socket for daemon");
+    printf ("  %*s %s [%s]\n", w, "-S, --socket=STRING",
+            "Specify local socket", MUNGE_SOCKET_NAME);
 
     printf ("\n");
 
     /* Begin deprecated cmdline opts */
 
 #ifdef MUNGE_AUTH_RECVFD
-    printf ("  %*s %s\n", w, "--auth-pipe-dir=DIR",
-            "Specify alternate auth-pipe directory");
+    printf ("  %*s %s [%s]\n", w, "--auth-pipe-dir=DIR",
+            "Specify auth-pipe directory", MUNGE_AUTH_PIPE_DIR);
 
-    printf ("  %*s %s\n", w, "--auth-file-dir=DIR",
-            "Specify alternate auth-file directory");
+    printf ("  %*s %s [%s]\n", w, "--auth-file-dir=DIR",
+            "Specify auth-file directory", MUNGE_AUTH_FILE_DIR);
 #endif /* MUNGE_AUTH_RECVFD */
 
-    printf ("  %*s %s\n", w, "--key-file=FILE",
-            "Specify alternate secret key file");
+    printf ("  %*s %s [%s]\n", w, "--key-file=FILE",
+            "Specify secret key file", MUNGED_SECRET_KEY);
 
-    printf ("  %*s %s\n", w, "--num-threads=INT",
-            "Specify number of threads to spawn");
+    printf ("  %*s %s [%d]\n", w, "--num-threads=INT",
+            "Specify number of threads to spawn", MUNGE_THREADS);
     /* End deprecated cmdline opts */
 
     printf ("\n");

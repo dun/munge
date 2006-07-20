@@ -1,5 +1,7 @@
 2006-07-20  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/munged/conf.c(display_help): Added defaults to help message.
+
 	* src/munged/conf.c: Disabled "--auth-pipe-dir" & "--auth-file-dir"
 	  unless MUNGE_AUTH_RECVFD is defined.
 	* src/munged/auth_recv.c, src/libmunge/auth_send.c,
