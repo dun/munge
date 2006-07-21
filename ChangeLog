@@ -1,3 +1,7 @@
+2006-07-21  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/etc/munge.init.in: Removed "--force" from OPTIONS var.
+
 2006-07-20  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* config/x_ac_debug.m4: Changed behavior to only alter CFLAGS if they
