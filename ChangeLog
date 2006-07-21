@@ -1,5 +1,8 @@
 2006-07-20  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* config/x_ac_debug.m4: Changed behavior to only alter CFLAGS if they
+	  are not explicitly set.
+
 	* src/munged/munged.c(main): Prevented PRNG seed from being written on
 	  exit if an error was encountered while reading it during startup.
 	* src/munged/random.c(random_init): Changed to ignore PRNG seed unless
