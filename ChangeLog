@@ -1,5 +1,8 @@
 2006-07-21  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/libmunge/auth_send.c(_name_auth_file): Updated function comment.
+	* src/munged/auth_recv.c(_name_auth_pipe): Updated function comment.
+
 	* BUGS, README.AIX, src/libcommon/munge_defs.h, src/munged/auth_recv.c,
 	  src/munged/conf.c, src/munged/conf.h, src/munged/munged.8.in:
 	  Changed MUNGE_AUTH_PIPE_DIR to MUNGE_AUTH_SERVER_DIR.

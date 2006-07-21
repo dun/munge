@@ -120,7 +120,7 @@ auth_recv (m_msg_t m, uid_t *uid, gid_t *gid)
 #include <sys/ioctl.h>                  /* ioctl */
 #include <sys/stat.h>                   /* mkfifo, S_IWUSR, etc. */
 
-static int _name_auth_pipe (char **dst);
+static int _name_auth_pipe (char **pipe_name_p);
 static int _send_auth_req (int sd, const char *pipe_name);
 
 int
@@ -394,11 +394,11 @@ _s_pipe (int fd[2])
 #include "str.h"                        /* strhex */
 
 static int
-_name_auth_pipe (char **dst_p)
+_name_auth_pipe (char **pipe_name_p)
 {
-/*  Creates a unique filename for the authentication pipe,
- *    storing the result in a newly-allocated string referenced by [dst_p].
- *  The caller is responsible for freeing the string returned by [dst_p].
+/*  Creates a unique filename for the authentication pipe, storing the result
+ *    in a newly-allocated string referenced by [pipe_name_p].
+ *  The caller is responsible for freeing the string returned by [pipe_name_p].
  *  The auth pipe name is of the form "AUTH_PIPE_DIR/.munge-RANDOM.pipe".
  *  Returns 0 on success, -1 on error.
  */

@@ -201,9 +201,10 @@ static int
 _name_auth_file (const char *pipe_name, const char *file_dir,
         char **file_name_p)
 {
-/*  Creates a unique filename based on the name of authentication pipe [src],
- *    storing the result in a newly-allocated string referenced by [dst_p].
- *  The caller is responsible for freeing the string returned by [dst_p].
+/*  Creates a unique filename based on the name of authentication pipe
+ *    [pipe_name] and authentication file directory [file_dir], storing the
+ *    result in a newly-allocated string referenced by [file_name_p].
+ *  The caller is responsible for freeing the string returned by [file_name_p].
  *  The auth file name is of the form "AUTH_FILE_DIR/.munge-RANDOM.file".
  *  Returns 0 on success, -1 on error.
  */
