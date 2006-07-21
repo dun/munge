@@ -122,7 +122,12 @@ main (int argc, char *argv[])
     }
 
     lookup_ip_addr (conf);
-    random_init (conf->seed_name);
+    if (random_init (conf->seed_name) < 0) {
+        if (conf->seed_name) {
+            free (conf->seed_name);
+            conf->seed_name = NULL;
+        }
+    }
     crypto_thread_init ();
     create_subkeys (conf);
     conf->gids = gids_create ();

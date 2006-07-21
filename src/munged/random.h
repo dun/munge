@@ -29,11 +29,13 @@
 #define RANDOM_H
 
 
-void random_init (const char *seed);
+int random_init (const char *seed);
 /*
  *  Initializes the PRNG from the [seed] file.
- *  If [seed] does not exist or provide adequate entropy,
+ *  If [seed] does not exist or provide sufficient entropy,
  *    the PRNG will be seeded from a secure source (/dev/random).
+ *  Returns 1 if [seed] provided sufficient entropy, 0 if it provided
+ *    insufficient entropy but no errors were detected, or -1 on error.
  */
 
 void random_fini (const char *seed);

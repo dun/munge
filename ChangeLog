@@ -1,5 +1,11 @@
 2006-07-20  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/munged/munged.c(main): Prevented PRNG seed from being written on
+	  exit if an error was encountered while reading it during startup.
+	* src/munged/random.c(random_init): Changed to ignore PRNG seed unless
+	  it has proper mode, ownership, and permissions.
+	* src/munged/random.h(random_init): Changed prototype to return int.
+
 	* src/munged/auth_recv.c(auth_recv_init): Tweaked err msg verbage.
 
 	* src/etc/Makefile.am, src/libcommon/Makefile.am,
