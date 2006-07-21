@@ -1,5 +1,15 @@
 2006-07-21  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* BUGS, README.AIX, src/libcommon/munge_defs.h, src/munged/auth_recv.c,
+	  src/munged/conf.c, src/munged/conf.h, src/munged/munged.8.in:
+	  Changed MUNGE_AUTH_PIPE_DIR to MUNGE_AUTH_SERVER_DIR.
+	  Changed MUNGE_AUTH_FILE_DIR to MUNGE_AUTH_CLIENT_DIR.
+	  Changed "--auth-pipe-dir" to "--auth-server-dir".
+	  Changed "--auth-file-dir" to "--auth-client-dir".
+	* src/libcommon/m_msg.c, src/libcommon/m_msg.h,
+	  src/libmunge/auth_send.c, src/munged/auth_recv.c:
+	  Changed a_pipe_* to auth_s_*, a_file_* to auth_c_*.
+
 	* src/etc/munge.init.in: Removed "--force" from OPTIONS var.
 
 2006-07-20  Chris Dunlap  <cdunlap@llnl.gov>

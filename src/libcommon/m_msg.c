@@ -123,13 +123,13 @@ m_msg_destroy (m_msg_t m)
         assert (m->error_len > 0);
         free (m->error_str);
     }
-    if (m->a_pipe_str && !m->a_pipe_is_copy) {
-        assert (m->a_pipe_len > 0);
-        free (m->a_pipe_str);
+    if (m->auth_s_str && !m->auth_s_is_copy) {
+        assert (m->auth_s_len > 0);
+        free (m->auth_s_str);
     }
-    if (m->a_file_str && !m->a_file_is_copy) {
-        assert (m->a_file_len > 0);
-        free (m->a_file_str);
+    if (m->auth_c_str && !m->auth_c_is_copy) {
+        assert (m->auth_c_len > 0);
+        free (m->auth_c_str);
     }
     free (m);
     return;
@@ -481,10 +481,10 @@ _msg_length (m_msg_t m, m_msg_type_t type)
             n += m->data_len;
             break;
         case MUNGE_MSG_AUTH_FD_REQ:
-            n += sizeof (m->a_pipe_len);
-            n += m->a_pipe_len;
-            n += sizeof (m->a_file_len);
-            n += m->a_file_len;
+            n += sizeof (m->auth_s_len);
+            n += m->auth_s_len;
+            n += sizeof (m->auth_c_len);
+            n += m->auth_c_len;
             break;
         default:
             return (-1);
@@ -565,10 +565,10 @@ _msg_pack (m_msg_t m, m_msg_type_t type, void *dst, int dstlen)
             else break;
             goto err;
         case MUNGE_MSG_AUTH_FD_REQ:
-            if      (!_pack (&p, &(m->a_pipe_len), sizeof (m->a_pipe_len), q));
-            else if ( _copy (p, m->a_pipe_str, m->a_pipe_len, p, q, &p) < 0) ;
-            else if (!_pack (&p, &(m->a_file_len), sizeof (m->a_file_len), q));
-            else if ( _copy (p, m->a_file_str, m->a_file_len, p, q, &p) < 0) ;
+            if      (!_pack (&p, &(m->auth_s_len), sizeof (m->auth_s_len), q));
+            else if ( _copy (p, m->auth_s_str, m->auth_s_len, p, q, &p) < 0) ;
+            else if (!_pack (&p, &(m->auth_c_len), sizeof (m->auth_c_len), q));
+            else if ( _copy (p, m->auth_c_str, m->auth_c_len, p, q, &p) < 0) ;
             else break;
             goto err;
         default:
@@ -662,17 +662,12 @@ _msg_unpack (m_msg_t m, m_msg_type_t type, const void *src, int srclen)
             else break;
             goto err;
         case MUNGE_MSG_AUTH_FD_REQ:
-            if      (!_unpack (&(m->a_pipe_len), &p,
-                        sizeof (m->a_pipe_len), q)) ;
-            else if (!_alloc ((vpp) &(m->a_pipe_str), m->a_pipe_len))
-                goto nomem ;
-            else if ( _copy (m->a_pipe_str, p, m->a_pipe_len, p, q, &p) < 0) ;
-
-            else if (!_unpack (&(m->a_file_len), &p,
-                        sizeof (m->a_file_len), q)) ;
-            else if (!_alloc ((vpp) &(m->a_file_str), m->a_file_len))
-                goto nomem ;
-            else if ( _copy (m->a_file_str, p, m->a_file_len, p, q, &p) < 0) ;
+            if      (!_unpack(&(m->auth_s_len), &p, sizeof(m->auth_s_len), q));
+            else if (!_alloc((vpp)&(m->auth_s_str), m->auth_s_len)) goto nomem;
+            else if ( _copy (m->auth_s_str, p, m->auth_s_len, p, q, &p) < 0) ;
+            else if (!_unpack(&(m->auth_c_len), &p, sizeof(m->auth_c_len), q));
+            else if (!_alloc((vpp)&(m->auth_c_str), m->auth_c_len)) goto nomem;
+            else if ( _copy (m->auth_c_str, p, m->auth_c_len, p, q, &p) < 0) ;
             else break;
             goto err;
         default:

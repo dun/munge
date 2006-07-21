@@ -67,11 +67,11 @@ struct option opt_table[] = {
     { "foreground", 0, NULL, 'F' },
     { "socket",     1, NULL, 'S' },
     { "advice",     0, NULL, 'A' },
-    { "key-file",      1, NULL, '0' },  /* deprecated cmdline opt */
-    { "num-threads",   1, NULL, '1' },  /* deprecated cmdline opt */
+    { "key-file",        1, NULL, '0' },
+    { "num-threads",     1, NULL, '1' },
 #ifdef MUNGE_AUTH_RECVFD
-    { "auth-pipe-dir", 1, NULL, '2' },  /* deprecated cmdline opt */
-    { "auth-file-dir", 1, NULL, '3' },  /* deprecated cmdline opt */
+    { "auth-server-dir", 1, NULL, '2' },
+    { "auth-client-dir", 1, NULL, '3' },
 #endif /* MUNGE_AUTH_RECVFD */
     {  NULL,        0, NULL,  0  }
 };
@@ -140,13 +140,13 @@ create_conf (void)
 
 #ifdef MUNGE_AUTH_RECVFD
 
-    if (!(conf->auth_pipe_dir = strdup (MUNGE_AUTH_PIPE_DIR))) {
+    if (!(conf->auth_server_dir = strdup (MUNGE_AUTH_SERVER_DIR))) {
         log_errno (EMUNGE_NO_MEMORY, LOG_ERR,
-            "Cannot dup auth-pipe-dir default string");
+            "Cannot dup auth-server-dir default string");
     }
-    if (!(conf->auth_file_dir = strdup (MUNGE_AUTH_FILE_DIR))) {
+    if (!(conf->auth_client_dir = strdup (MUNGE_AUTH_CLIENT_DIR))) {
         log_errno (EMUNGE_NO_MEMORY, LOG_ERR,
-            "Cannot dup auth-file-dir default string");
+            "Cannot dup auth-client-dir default string");
     }
 #endif /* MUNGE_AUTH_RECVFD */
 
@@ -193,13 +193,13 @@ destroy_conf (conf_t conf)
         free (conf->mac_key);
         conf->mac_key = NULL;
     }
-    if (conf->auth_pipe_dir) {
-        free (conf->auth_pipe_dir);
-        conf->auth_pipe_dir = NULL;
+    if (conf->auth_server_dir) {
+        free (conf->auth_server_dir);
+        conf->auth_server_dir = NULL;
     }
-    if (conf->auth_file_dir) {
-        free (conf->auth_file_dir);
-        conf->auth_file_dir = NULL;
+    if (conf->auth_client_dir) {
+        free (conf->auth_client_dir);
+        conf->auth_client_dir = NULL;
     }
     free (conf);
 
@@ -267,18 +267,18 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                 break;
 #ifdef MUNGE_AUTH_RECVFD
             case '2':
-                if (conf->auth_pipe_dir)
-                    free (conf->auth_pipe_dir);
-                if (!(conf->auth_pipe_dir = strdup (optarg)))
+                if (conf->auth_server_dir)
+                    free (conf->auth_server_dir);
+                if (!(conf->auth_server_dir = strdup (optarg)))
                     log_errno (EMUNGE_NO_MEMORY, LOG_ERR,
-                        "Cannot dup auth-pipe-dir cmdline string");
+                        "Cannot dup auth-server-dir cmdline string");
                 break;
             case '3':
-                if (conf->auth_file_dir)
-                    free (conf->auth_file_dir);
-                if (!(conf->auth_file_dir = strdup (optarg)))
+                if (conf->auth_client_dir)
+                    free (conf->auth_client_dir);
+                if (!(conf->auth_client_dir = strdup (optarg)))
                     log_errno (EMUNGE_NO_MEMORY, LOG_ERR,
-                        "Cannot dup auth-file-dir cmdline string");
+                        "Cannot dup auth-client-dir cmdline string");
                 break;
 #endif /* MUNGE_AUTH_RECVFD */
             /* End deprecated cmdline opts */
@@ -341,11 +341,11 @@ display_help (char *prog)
     /* Begin deprecated cmdline opts */
 
 #ifdef MUNGE_AUTH_RECVFD
-    printf ("  %*s %s [%s]\n", w, "--auth-pipe-dir=DIR",
-            "Specify auth-pipe directory", MUNGE_AUTH_PIPE_DIR);
+    printf ("  %*s %s [%s]\n", w, "--auth-server-dir=DIR",
+            "Specify auth-server directory", MUNGE_AUTH_SERVER_DIR);
 
-    printf ("  %*s %s [%s]\n", w, "--auth-file-dir=DIR",
-            "Specify auth-file directory", MUNGE_AUTH_FILE_DIR);
+    printf ("  %*s %s [%s]\n", w, "--auth-client-dir=DIR",
+            "Specify auth-client directory", MUNGE_AUTH_CLIENT_DIR);
 #endif /* MUNGE_AUTH_RECVFD */
 
     printf ("  %*s %s [%s]\n", w, "--key-file=FILE",

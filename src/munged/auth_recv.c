@@ -412,7 +412,7 @@ _name_auth_pipe (char **dst_p)
 
     *dst_p = NULL;
     assert (conf->auth_rnd_bytes > 0);
-    assert (conf->auth_pipe_dir != NULL);
+    assert (conf->auth_server_dir != NULL);
 
     nonce_bin_len = conf->auth_rnd_bytes;
     if (!(nonce_bin = malloc (nonce_bin_len))) {
@@ -422,7 +422,7 @@ _name_auth_pipe (char **dst_p)
     if (!(nonce_asc = malloc (nonce_asc_len))) {
         goto err;
     }
-    dst_len = strlen (conf->auth_pipe_dir)
+    dst_len = strlen (conf->auth_server_dir)
         + 8                             /* strlen ("/.munge-") */
         + (2 * conf->auth_rnd_bytes)
         + 6;                            /* strlen (".pipe") + "\0" */
@@ -434,7 +434,7 @@ _name_auth_pipe (char **dst_p)
         goto err;
     }
     n = snprintf (dst, dst_len, "%s/.munge-%s.pipe",
-        conf->auth_pipe_dir, nonce_asc);
+        conf->auth_server_dir, nonce_asc);
     if ((n < 0) || (n >= dst_len)) {
         goto err;
     }
@@ -478,12 +478,12 @@ _send_auth_req (int sd, const char *pipe_name)
     if ((e = m_msg_bind (m, sd)) != EMUNGE_SUCCESS) {
         goto end;
     }
-    m->a_pipe_str = (char *) pipe_name;
-    m->a_pipe_len = strlen (m->a_pipe_str) + 1;
-    m->a_pipe_is_copy = 1;
-    m->a_file_str = conf->auth_file_dir;
-    m->a_file_len = strlen (m->a_file_str) + 1;
-    m->a_file_is_copy = 1;
+    m->auth_s_str = (char *) pipe_name;
+    m->auth_s_len = strlen (m->auth_s_str) + 1;
+    m->auth_s_is_copy = 1;
+    m->auth_c_str = conf->auth_client_dir;
+    m->auth_c_len = strlen (m->auth_c_str) + 1;
+    m->auth_c_is_copy = 1;
 
     e = m_msg_send (m, MUNGE_MSG_AUTH_FD_REQ, 0);
 

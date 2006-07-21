@@ -143,13 +143,13 @@
  *    in this directory, but the client only needs to be able to read a file
  *    from within it.  Recommended permissions for this directory are 0711.
  */
-#define MUNGE_AUTH_PIPE_DIR             X_LOCALSTATEDIR "/lib/munge"
+#define MUNGE_AUTH_SERVER_DIR           X_LOCALSTATEDIR "/lib/munge"
 
 /*  The directory in which the file used to authenticate a particular client
  *    via fd-passing will be created.  The client must be able to create files
  *    in this directory.  Recommended permissions for this directory are 1733.
  */
-#define MUNGE_AUTH_FILE_DIR             "/tmp"
+#define MUNGE_AUTH_CLIENT_DIR           "/tmp"
 
 /*  The amount of entropy (in bytes) to place in the filename of the pipe and
  *    file used to authenticate a particular client via fd-passing.

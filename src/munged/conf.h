@@ -63,8 +63,8 @@ struct conf {
     struct in_addr  addr;               /* IPv4 addr in n/w byte order       */
     gids_t          gids;               /* supplementary group information   */
     int             nthreads;           /* num threads for processing creds  */
-    char           *auth_pipe_dir;      /* dir in which to create auth pipe  */
-    char           *auth_file_dir;      /* dir in which to create auth file  */
+    char           *auth_server_dir;    /* dir in which to create auth pipe  */
+    char           *auth_client_dir;    /* dir in which to create auth file  */
     int             auth_rnd_bytes;     /* num rnd bytes in auth pipe name   */
 };
 

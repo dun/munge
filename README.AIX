@@ -46,16 +46,17 @@ in the following example.
   -------- ---------------  ---------------  ------ ------------ ---------------
            /dev/ramdisk0    /tmp/munge       jfs    Oct 01 10:01 rw,nointegrity
 
-The MUNGE_AUTH_FILE_DIR and MUNGE_AUTH_PIPE_DIR defines in
+The MUNGE_AUTH_SERVER_DIR and MUNGE_AUTH_CLIENT_DIR defines in
 src/libcommon/munge_defs.h need to be modified, and then the source
 needs to be recompiled.
 
-  #define MUNGE_AUTH_FILE_DIR             "/tmp/munge/client"
-  #define MUNGE_AUTH_PIPE_DIR             "/tmp/munge/server"
+  #define MUNGE_AUTH_SERVER_DIR           "/tmp/munge/server"
+  #define MUNGE_AUTH_CLIENT_DIR           "/tmp/munge/client"
 
 Alternatively, you can override these settings with the munged
-"--auth-file-dir" and "--auth-pipe-dir" command-line options.
+"--auth-server-dir" and "--auth-client-dir" command-line options.
 
-  munged --auth-file-dir /tmp/munge/client --auth-pipe-dir /tmp/munge/server
+  munged --auth-server-dir /tmp/munge/server \
+         --auth-client-dir /tmp/munge/client
 
 These options will be moved into the configuration file once one exists.

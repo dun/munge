@@ -184,10 +184,10 @@ _recv_auth_req (int sd, char **pipe_name_p, char **file_dir_p)
         e = EMUNGE_SOCKET;
         goto end;
     }
-    *pipe_name_p = m->a_pipe_str;
-    m->a_pipe_is_copy = 1;
-    *file_dir_p = m->a_file_str;
-    m->a_file_is_copy = 1;
+    *pipe_name_p = m->auth_s_str;
+    m->auth_s_is_copy = 1;
+    *file_dir_p = m->auth_c_str;
+    m->auth_c_is_copy = 1;
 
 end:
     if (m) {

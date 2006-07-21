@@ -9,4 +9,4 @@
 - credentials cannot be restricted based on where they can be decoded
   (eg, hostname/hostrange/regex or ip-addr/netmask)
 - munged hangs if client does not respond to auth req (auth via fd passing)
-- client hangs if auth-pipe-dir is permissioned wrong (auth via fd passing)
+- client hangs if auth-server-dir is permissioned wrong (auth via fd passing)

@@ -96,10 +96,10 @@ struct m_msg {
     uint32_t           auth_gid;        /* GID of client allowed to decode   */
     uint32_t           data_len;        /* length of data                    */
     void              *data;            /* ptr to data munged into cred      */
-    uint32_t           a_pipe_len;      /* length of auth pipe string w/ NUL */
-    char              *a_pipe_str;      /* auth pipe path name string w/ NUL */
-    uint32_t           a_file_len;      /* length of auth file string w/ NUL */
-    char              *a_file_str;      /* auth file dir name string w/ NUL  */
+    uint32_t           auth_s_len;      /* length of auth srvr string w/ NUL */
+    char              *auth_s_str;      /* auth srvr path name string w/ NUL */
+    uint32_t           auth_c_len;      /* length of auth clnt string w/ NUL */
+    char              *auth_c_str;      /* auth clnt dir name string w/ NUL  */
     uint8_t            error_num;       /* munge_err_t for encode/decode op  */
     uint8_t            error_len;       /* length of err msg str with NUL    */
     char              *error_str;       /* descriptive err msg str with NUL  */
@@ -107,8 +107,8 @@ struct m_msg {
     unsigned           realm_is_copy:1; /* true if mem for realm is a copy   */
     unsigned           data_is_copy:1;  /* true if mem for data is a copy    */
     unsigned           error_is_copy:1; /* true if mem for err str is a copy */
-    unsigned           a_pipe_is_copy:1;/* true if mem for auth pipe is copy */
-    unsigned           a_file_is_copy:1;/* true if mem for auth file is copy */
+    unsigned           auth_s_is_copy:1;/* true if mem for auth srvr is copy */
+    unsigned           auth_c_is_copy:1;/* true if mem for auth clnt is copy */
 };
 
 typedef struct m_msg *  m_msg_t;
