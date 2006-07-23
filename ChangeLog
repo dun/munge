@@ -2,10 +2,10 @@
 
 	* src/libcommon/str.c, src/libcommon/str.h: Added strhex2bin().
 	  Renamed strhex() to strbin2hex() and changed prototype.
-	* src/libmunge/auth_send.c: Renamed strhex() to strbin2hex().
-	* src/munged/auth_recv.c(_name_auth_file): Changed behavior to name
+	* src/libmunge/auth_send.c(_name_auth_file): Changed behavior to name
 	  auth file by XORing the first half of the random component of the
 	  auth pipe with the second half.
+	* src/munged/auth_recv.c: Renamed strhex() to strbin2hex().
 
 2006-07-21  Chris Dunlap  <cdunlap@llnl.gov>
 
