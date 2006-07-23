@@ -1,5 +1,7 @@
 2006-07-22  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/munged/conf.c(display_help): Tweaked verbage.
+
 	* src/libcommon/str.c, src/libcommon/str.h: Added strhex2bin().
 	  Renamed strhex() to strbin2hex() and changed prototype.
 	* src/libmunge/auth_send.c(_name_auth_file): Changed behavior to name

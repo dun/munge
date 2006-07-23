@@ -333,7 +333,7 @@ display_help (char *prog)
     printf ("  %*s %s\n", w, "-F, --foreground",
             "Run process in the foreground (do not fork)");
 
-    printf ("  %*s %s [%s]\n", w, "-S, --socket=STRING",
+    printf ("  %*s %s [%s]\n", w, "-S, --socket=PATH",
             "Specify local socket", MUNGE_SOCKET_NAME);
 
     printf ("\n");
@@ -348,7 +348,7 @@ display_help (char *prog)
             "Specify auth-client directory", MUNGE_AUTH_CLIENT_DIR);
 #endif /* MUNGE_AUTH_RECVFD */
 
-    printf ("  %*s %s [%s]\n", w, "--key-file=FILE",
+    printf ("  %*s %s [%s]\n", w, "--key-file=PATH",
             "Specify secret key file", MUNGED_SECRET_KEY);
 
     printf ("  %*s %s [%d]\n", w, "--num-threads=INT",
