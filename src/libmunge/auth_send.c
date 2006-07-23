@@ -205,10 +205,27 @@ _name_auth_file (const char *pipe_name, const char *file_dir,
  *    [pipe_name] and authentication file directory [file_dir], storing the
  *    result in a newly-allocated string referenced by [file_name_p].
  *  The caller is responsible for freeing the string returned by [file_name_p].
+ *  The auth pipe name is of the form "AUTH_PIPE_DIR/.munge-RANDOM.pipe".
  *  The auth file name is of the form "AUTH_FILE_DIR/.munge-RANDOM.file".
  *  Returns 0 on success, -1 on error.
+ *
+ *  The random component of the authentication file is computed by XORing the
+ *    first half of the random component of the authentication pipe with the
+ *    second half.  Consequently, it is half the length.
+ *  The random component of the client is based off that of the server because
+ *    the client does not have access to the PRNG.  At the same time, we don't
+ *    want to allow an attacker to derive the name of the authentication pipe
+ *    from that of the authentication file (assuming the directory containing
+ *    the authentication pipe is unreadable).
  */
     char *p;
+    char *q;
+    int   rnd_bin_len;
+    char *rnd_bin = NULL;
+    int   rnd_asc_len;
+    char *rnd_asc = NULL;
+    int   m;
+    int   i;
     int   dst_len;
     char *dst = NULL;
     int   n;
@@ -218,26 +235,52 @@ _name_auth_file (const char *pipe_name, const char *file_dir,
     if (!pipe_name || !file_dir) {
         goto err;
     }
-    p = (p = strrchr (pipe_name, '/')) ? p + 1 : (char *) pipe_name;
-    dst_len = strlen (file_dir) + 1 /* '/' */ + strlen (p) + 1 /* '\0' */;
+    p = (p = strrchr (pipe_name, '-')) ? p + 1 : NULL;
+    q = strrchr (pipe_name, '.');
+    if (!p || !q) {
+        goto err;
+    }
+    rnd_bin_len = (q - p) / 2;
+    if (!(rnd_bin = malloc (rnd_bin_len))) {
+        goto err;
+    }
+    rnd_asc_len = rnd_bin_len + 1;
+    if (!(rnd_asc = malloc (rnd_asc_len))) {
+        goto err;
+    }
+    if (!(strhex2bin (rnd_bin, rnd_bin_len, p, q - p))) {
+        goto err;
+    }
+    m = rnd_bin_len / 2;
+    for (i = 0; i < m; i++) {
+        rnd_bin [i] ^= rnd_bin [i + m];
+    }
+    if (!(strbin2hex (rnd_asc, rnd_asc_len, rnd_bin, m))) {
+        goto err;
+    }
+    dst_len = strlen (file_dir)
+        + 8                             /* strlen ("/.munge-") */
+        + strlen (rnd_asc)
+        + 6;                            /* strlen (".file") + "\0" */
     if (!(dst = malloc (dst_len))) {
         goto err;
     }
-    n = snprintf (dst, dst_len, "%s/%s", file_dir, p);
+    n = snprintf (dst, dst_len, "%s/.munge-%s.file", file_dir, rnd_asc);
     if ((n < 0) || (n >= dst_len)) {
         goto err;
     }
-    if (!(p = strrchr (dst, '.'))) {
-        goto err;
-    }
-    *p = '\0';
-    if (strlcat (dst, ".file", dst_len) >= dst_len) {
-        goto err;
-    }
+    free (rnd_bin);
+    free (rnd_asc);
     *file_name_p = dst;
     return (0);
 
 err:
+    if (rnd_bin) {
+        free (rnd_bin);
+    }
+    if (rnd_asc) {
+        free (rnd_asc);
+    }
     if (dst) {
         free (dst);
     }

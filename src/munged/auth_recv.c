@@ -391,7 +391,7 @@ _s_pipe (int fd[2])
 #include <string.h>                     /* memset, strlen, strdup */
 #include "conf.h"
 #include "random.h"                     /* random_pseudo_bytes */
-#include "str.h"                        /* strhex */
+#include "str.h"                        /* strbin2hex */
 
 static int
 _name_auth_pipe (char **pipe_name_p)
@@ -410,7 +410,7 @@ _name_auth_pipe (char **pipe_name_p)
     int            dst_len;
     int            n;
 
-    *dst_p = NULL;
+    *pipe_name_p = NULL;
     assert (conf->auth_rnd_bytes > 0);
     assert (conf->auth_server_dir != NULL);
 
@@ -430,7 +430,7 @@ _name_auth_pipe (char **pipe_name_p)
         goto err;
     }
     random_pseudo_bytes (nonce_bin, nonce_bin_len);
-    if (!(strhex (nonce_asc, nonce_asc_len, nonce_bin, nonce_bin_len))) {
+    if (!(strbin2hex (nonce_asc, nonce_asc_len, nonce_bin, nonce_bin_len))) {
         goto err;
     }
     n = snprintf (dst, dst_len, "%s/.munge-%s.pipe",
@@ -440,7 +440,7 @@ _name_auth_pipe (char **pipe_name_p)
     }
     free (nonce_bin);
     free (nonce_asc);
-    *dst_p = dst;
+    *pipe_name_p = dst;
     return (0);
 
 err:

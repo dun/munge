@@ -53,12 +53,22 @@ size_t strcatf (char *dst, size_t size, const char *fmt, ...);
  *    guaranteed to be NUL-terminated.
  */
 
-char * strhex (void *dst, size_t dstlen, const void *src, size_t srclen);
+int strbin2hex (char *dst, size_t dstlen, const void *src, size_t srclen);
 /*
- *  Converts the buf [src] of length [srclen] to hexadecimal notation, storing
- *    the resulting NUL-terminated string in buf [dst] of length [dstlen].
- *  Returns a ptr to [dst], or NULL if the [dst] buffer is too small
+ *  Converts the buf [src] of length [srclen] into a NUL-terminated
+ *    hexadecimal string, storing the result in buf [dst] of length [dstlen].
+ *  Returns the strlen of [dst], or 0 if the buf [dst] is too small
  *    (ie, less than ((srclen * 2) + 1) bytes).
+ */
+
+int strhex2bin (void *dst, size_t dstlen, const char *src, size_t srclen);
+/*
+ *  Converts the first [srclen] characters of the hexadecimal string [src]
+ *    into a binary representation, storing the result in buf [dst] of
+ *    length [dstlen].
+ *  Returns the number of bytes of binary data in [dst], or 0 on error --
+ *    if the buf [dst] is too small (ie, less than ((srclen + 1) / 2) bytes)
+ *    or contains non-hexadecimal digits.
  */
 
 void * memburn (void *v, int c, size_t n);

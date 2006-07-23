@@ -113,24 +113,63 @@ strcatf (char *dst, size_t size, const char *fmt, ...)
 }
 
 
-char *
-strhex (void *dst, size_t dstlen, const void *src, size_t srclen)
+int
+strbin2hex (char *dst, size_t dstlen, const void *src, size_t srclen)
 {
-    const unsigned char  bin2hex[] = "0123456789ABCDEF";
-    unsigned char       *pdst = dst;
-    const unsigned char *psrc = src;
-    int                  i;
+    const char  bin2hex[] = "0123456789ABCDEF";
+    char       *pdst = dst;
+    const char *psrc = src;
+    int         i;
 
     if (dstlen < ((srclen * 2) + 1)) {
         errno = EINVAL;
-        return (NULL);
+        return (0);
     }
-    for (i=0; i<srclen; i++) {
+    for (i = 0; i < srclen; i++) {
         *pdst++ = bin2hex[(psrc[i] >> 4) & 0x0f];
         *pdst++ = bin2hex[(psrc[i]     ) & 0x0f];
     }
     *pdst = '\0';
-    return (dst);
+    return (pdst - (char *) dst);
+}
+
+
+int
+strhex2bin (void *dst, size_t dstlen, const char *src, size_t srclen)
+{
+    char       *pdst = dst;
+    const char *psrc = src;
+    int         i;
+    int         c;
+    int         n;
+
+    if (dstlen < (srclen + 1) / 2) {
+        errno = EINVAL;
+        return (0);
+    }
+    for (i = 0; i < srclen; i++) {
+        c = psrc[i];
+        if ((c >= '0') && (c <= '9')) {
+            n = c - '0';
+        }
+        else if ((c >= 'A') && (c <= 'F')) {
+            n = c - 'A' + 10;
+        }
+        else if ((c >= 'a') && (c <= 'f')) {
+            n = c - 'a' + 10;
+        }
+        else {
+            errno = EINVAL;
+            return (0);
+        }
+        if (i % 2) {
+            *pdst++ |= n & 0x0f;
+        }
+        else {
+            *pdst = (n & 0x0f) << 4;
+        }
+    }
+    return ((srclen + 1) / 2);
 }
 
 
