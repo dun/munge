@@ -38,6 +38,7 @@
 #include <assert.h>
 #include <errno.h>
 #include <pthread.h>
+#include <signal.h>
 #include <stdlib.h>
 #include <sys/time.h>
 #include <time.h>
@@ -337,10 +338,17 @@ timer_thread (void *arg)
 /*  The timer thread.  It waits until the next active timer expires,
  *    at which point it invokes the timer's callback function.
  */
+    sigset_t            sigset;
     int                 cancel_state;
     struct timespec     ts_now;
     _timer_t            t;
 
+    if (sigfillset (&sigset)) {
+        log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to init timer sigset");
+    }
+    if (pthread_sigmask (SIG_SETMASK, &sigset, NULL) != 0) {
+        log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to set timer sigset");
+    }
     if ((errno = pthread_mutex_lock (&timer_mutex)) != 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to lock timer mutex");
     }

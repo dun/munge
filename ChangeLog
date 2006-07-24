@@ -1,3 +1,10 @@
+2006-07-24  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/munged/timer.c(timer_thread): Added pthread_sigmask() to new
+	  thread to force signals to interrupt accept() in job_accept().
+	* src/munged/work.c(_work_exec):  Added pthread_sigmask() to new
+	  threads to force signals to interrupt accept() in job_accept().
+
 2006-07-22  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/munged/conf.c(display_help): Tweaked verbage.

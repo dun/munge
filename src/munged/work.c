@@ -34,6 +34,7 @@
 #include <assert.h>
 #include <errno.h>
 #include <pthread.h>
+#include <signal.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <munge.h>
@@ -321,13 +322,20 @@ _work_exec (void *arg)
 /*  The worker thread.  It continually removes the next element
  *    from the work queue and processes it -- until it's canceled.
  */
-    work_p wp;
-    int cancel_state;
-    void *work;
+    work_p    wp;
+    sigset_t  sigset;
+    int       cancel_state;
+    void     *work;
 
     assert (arg != NULL);
     wp = arg;
 
+    if (sigfillset (&sigset)) {
+        log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to init work thread sigset");
+    }
+    if (pthread_sigmask (SIG_SETMASK, &sigset, NULL) != 0) {
+        log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to set work thread sigset");
+    }
     if ((errno = pthread_mutex_lock (&wp->lock)) != 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR,
             "Unable to lock work thread mutex");
