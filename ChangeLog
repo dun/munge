@@ -1,5 +1,7 @@
 2006-07-24  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* munge.spec: Tweaked %post test to create munge.key.
+
 	* src/libcommon/auth_policy.h: Tweaked documentation.
 
 	* munge.spec: Added munge requires tag to munge-devel & munge-libs.

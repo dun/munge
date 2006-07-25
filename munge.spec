@@ -105,7 +105,7 @@ test -f libmunge-32_64.a \
 rm -rf "$RPM_BUILD_ROOT"
 
 %post
-if [ ! -e %{_sysconfdir}/munge/munge.key ]; then
+if [ ! -e %{_sysconfdir}/munge/munge.key -a -c /dev/urandom ]; then
   /bin/dd if=/dev/urandom bs=1 count=1024 \
     >%{_sysconfdir}/munge/munge.key 2>/dev/null
   /bin/chown daemon:daemon %{_sysconfdir}/munge/munge.key
