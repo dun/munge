@@ -63,6 +63,7 @@ struct log_ctx {
     int   got_syslog;
     int   priority;
     int   options;
+    int   fd_daemonize;
     char  id [LOG_IDENTITY_MAXLEN];
 };
 
@@ -71,7 +72,7 @@ struct log_ctx {
  *  Static Variables
  *****************************************************************************/
 
-static struct log_ctx log_ctx = { NULL, 0, 0, 0, 0 };
+static struct log_ctx log_ctx = { NULL, 0, 0, 0, 0, -1 };
 
 
 /*****************************************************************************
@@ -140,6 +141,14 @@ log_open_syslog (char *identity, int facility)
     }
     log_ctx.got_init = 1;
     return (log_ctx.got_syslog);
+}
+
+
+void
+log_set_err_pipe (int fd)
+{
+    log_ctx.fd_daemonize = (fd >= 0) ? fd : -1;
+    return;
 }
 
 
@@ -339,13 +348,20 @@ _log_aux (int errnum, int priority, const char *format, va_list vargs)
 static void
 _log_die (int status)
 {
-    /*  Add support for generating backtrace.
-     */
 #ifndef NDEBUG
+    /*  Generate core for debugging.
+     */
     if ((status != EXIT_SUCCESS) && getenv ("DEBUG")) {
-        abort ();                       /* generate core for debugging */
+        abort ();
     }
 #endif /* !NDEBUG */
+    /*
+     *  Returns error status across "daemonize" pipe.
+     */
+    if (log_ctx.fd_daemonize >= 0) {
+        unsigned char c = 1;
+        (void) write (log_ctx.fd_daemonize, &c, sizeof (c));
+    }
     exit (status);
 }
 

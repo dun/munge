@@ -1,5 +1,12 @@
 2006-07-25  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/munged/munged.c: Changed daemonize_init() and daemonize_fini()
+	  so grandchild process can return error status to original parent
+	  process via "daemonize" pipe.
+	* src/libcommon/log.c(_log_die): Added check to return error status
+	  across "daemonize" pipe.
+	* src/libcommon/log.c, src/libcommon/log.h: Added log_set_err_pipe().
+
 	* QUICKSTART: Updated.
 
 	* src/etc/munge.sysconfig: Removed PIDFILE since the MUNGED_PIDFILE

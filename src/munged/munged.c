@@ -208,7 +208,8 @@ daemonize_init (void)
     struct rlimit limit;
     int           fds[2];
     pid_t         pid;
-    char          c;
+    int           n;
+    unsigned char c;
 
     /*  Clear file mode creation mask.
      */
@@ -230,6 +231,10 @@ daemonize_init (void)
     if (pipe (fds) < 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to create daemon pipe");
     }
+    /*  Set the fd used by log_err() to return status back to the parent.
+     */
+    log_set_err_pipe (fds[1]);
+
     /*  Automatically background the process and
      *    ensure child is not a process group leader.
      */
@@ -239,17 +244,17 @@ daemonize_init (void)
     else if (pid > 0) {
         if (close (fds[1]) < 0) {
             log_errno (EMUNGE_SNAFU, LOG_ERR,
-                "Unable to close write-pipe in parent");
+                "Unable to close write-pipe in parent process");
         }
-        if (read (fds[0], &c, 1) < 0) {
+        if ((n = read (fds[0], &c, sizeof (c))) < 0) {
             log_errno (EMUNGE_SNAFU, LOG_ERR,
-                "Read failed while awaiting EOF from grandchild");
+                "Unable to read status from grandchild process");
         }
-        exit (0);
+        exit (((n == 1) && (c != 0)) ? 1 : 0);
     }
     if (close (fds[0]) < 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR,
-            "Unable to close read-pipe in child");
+            "Unable to close read-pipe in child process");
     }
     /*  Become a session leader and process group leader
      *    with no controlling tty.
@@ -313,7 +318,11 @@ daemonize_fini (int fd)
     if (close (dev_null) < 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to close \"/dev/null\"");
     }
-    /*  Signal grandparent process to terminate.
+    /*  Clear the fd used by log_err() to return status back to the parent.
+     */
+    log_set_err_pipe (-1);
+    /*
+     *  Signal grandparent process to terminate.
      */
     if ((fd >= 0) && (close (fd) < 0)) {
         log_errno (EMUNGE_SNAFU, LOG_ERR,
@@ -339,9 +348,8 @@ write_pidfile (const char *pidfile)
      *    chdir()'d.
      */
     if (pidfile[0] != '/') {
-        log_msg (LOG_ERR,
-            "The pidfile \"%s\" must be specified via an absolute path.");
-        return;
+        log_err (EMUNGE_SNAFU, LOG_ERR,
+            "Pidfile \"%s\" requires an absolute path", pidfile);
     }
     (void) unlink (pidfile);
     /*

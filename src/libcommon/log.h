@@ -65,6 +65,15 @@ int log_open_syslog (char *identity, int facility);
  *  Returns 1 if the syslog is opened, or 0 if closed.
  */
 
+void log_set_err_pipe (int fd);
+/*
+ *  Sets the file-descriptor for the write-half of the daemonize pipe
+ *    connecting the original parent process to the forked grandchild process
+ *    under which the daemon will continue running.
+ *  If set (ie, fd >= 0), log_err() & log_errno() will return an error status
+ *    back to the original parent process.
+ */
+
 void log_err (int status, int priority, const char *format, ...);
 /*
  *  Logs a fatal message at the specified [priority] level according to
