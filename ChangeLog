@@ -1,3 +1,8 @@
+2006-07-25  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/etc/munge.sysconfig: Removed PIDFILE since the MUNGED_PIDFILE
+	  define in src/libcommon/munge_defs.h needs to be modified as well.
+
 2006-07-24  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* munge.spec: Tweaked %post test to create munge.key.

@@ -8,11 +8,6 @@
 # OPTIONS="--force --key-file /etc/munge/munge.key --num-threads 1"
 
 ##
-# Specify where the daemon's PID is written.
-##
-# PIDFILE="/var/run/munge/munged.pid"
-
-##
 # Adjust the scheduling priority of the daemon.
 ##
 # NICE=
