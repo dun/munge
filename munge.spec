@@ -14,10 +14,12 @@ BuildRoot:	%{_tmppath}/%{name}-%{version}
 Source0:	%{name}-%{version}.tar
 
 %package devel
+Requires:	%{name} = %{version}-%{release}
 Summary:	Headers and libraries for developing applications using MUNGE
 Group:		Development/Libraries
 
 %package libs
+Requires:	%{name} = %{version}-%{release}
 Summary:	Libraries for applications using MUNGE
 Group:		System Environment/Libraries
 
@@ -103,13 +105,13 @@ test -f libmunge-32_64.a \
 rm -rf "$RPM_BUILD_ROOT"
 
 %post
-if [ -x /sbin/chkconfig ]; then /sbin/chkconfig --add munge; fi
 if [ ! -e %{_sysconfdir}/munge/munge.key ]; then
   /bin/dd if=/dev/urandom bs=1 count=1024 \
     >%{_sysconfdir}/munge/munge.key 2>/dev/null
   /bin/chown daemon:daemon %{_sysconfdir}/munge/munge.key
   /bin/chmod 0400 %{_sysconfdir}/munge/munge.key
 fi
+if [ -x /sbin/chkconfig ]; then /sbin/chkconfig --add munge; fi
 
 %post libs
 if [ -x /sbin/ldconfig ]; then /sbin/ldconfig %{_libdir}; fi
