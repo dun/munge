@@ -104,6 +104,12 @@ rm -rf "$RPM_BUILD_ROOT"
 
 %post
 if [ -x /sbin/chkconfig ]; then /sbin/chkconfig --add munge; fi
+if [ ! -e %{_sysconfdir}/munge/munge.key ]; then
+  /bin/dd if=/dev/urandom bs=1 count=1024 \
+    >%{_sysconfdir}/munge/munge.key 2>/dev/null
+  /bin/chown daemon:daemon %{_sysconfdir}/munge/munge.key
+  /bin/chmod 0400 %{_sysconfdir}/munge/munge.key
+fi
 
 %post libs
 if [ -x /sbin/ldconfig ]; then /sbin/ldconfig %{_libdir}; fi

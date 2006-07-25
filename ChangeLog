@@ -1,5 +1,7 @@
 2006-07-24  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* munge.spec: Added %post to create munge.key if it does not exist.
+
 	* src/munged/timer.c(timer_thread): Added pthread_sigmask() to new
 	  thread to force signals to interrupt accept() in job_accept().
 	* src/munged/work.c(_work_exec):  Added pthread_sigmask() to new
