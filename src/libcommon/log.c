@@ -356,7 +356,7 @@ _log_die (int status)
     }
 #endif /* !NDEBUG */
     /*
-     *  Returns error status across "daemonize" pipe.
+     *  Return error status across "daemonize" pipe.
      */
     if (log_ctx.fd_daemonize >= 0) {
         unsigned char c = 1;
