@@ -28,7 +28,7 @@
 /*****************************************************************************
  *  Munge supports the following types of client authentication:
  *
- *  MUNGE_AUTH_GETPEEREID (FreeBSD, AIX post-5.2-ML4)
+ *  MUNGE_AUTH_GETPEEREID (FreeBSD, AIX >= 5.2-ML4)
  *  - The server uses the getpeereid() call to determine the identity of the
  *    client connected to the unix domain socket.
  *
@@ -43,7 +43,7 @@
  *    server using the I_RECVFD ioctl().  The identity of the client is then
  *    obtained from the strrecvfd struct used to receive the fd.
  *
- *  MUNGE_AUTH_RECVFD_MKNOD (AIX pre-5.2-ML4)
+ *  MUNGE_AUTH_RECVFD_MKNOD (AIX < 5.2-ML4)
  *  - The server creates a unique STREAMS-based pipe and sends a request to
  *    the client to use it for sending a file descriptor back across.  The fd
  *    is sent by the client using the I_SENDFD ioctl(), and received by the
