@@ -65,9 +65,10 @@
 static void handle_signals (void);
 static void exit_handler (int signum);
 static void segv_handler (int signum);
-static int  daemonize_init (void);
+static int  daemonize_init (char *progname);
 static void daemonize_fini (int fd);
 static void write_pidfile (const char *pidfile);
+static void open_logfile (const char *logfile, int priority);
 static void sock_create (conf_t conf);
 static void sock_destroy (conf_t conf);
 
@@ -101,27 +102,12 @@ main (int argc, char *argv[])
     auth_recv_init ();
 
     if (!conf->got_foreground) {
-        fd = daemonize_init ();
+        fd = daemonize_init (argv[0]);
+        open_logfile (conf->logfile_name, priority);
     }
-    /*  FIXME: Parse config file.  */
-
+    lookup_ip_addr (conf);
     write_pidfile (conf->pidfile_name);
 
-    if (!conf->got_foreground) {
-
-        mode_t mask;
-        FILE *fp;
-
-        mask = umask (0);
-        umask (mask | 027);
-        fp = fopen (MUNGED_LOGFILE, "a");
-        umask (mask);
-        log_open_file (fp, NULL, priority,
-            LOG_OPT_JUSTIFY | LOG_OPT_PRIORITY | LOG_OPT_TIMESTAMP);
-        daemonize_fini (fd);
-    }
-
-    lookup_ip_addr (conf);
     if (random_init (conf->seed_name) < 0) {
         if (conf->seed_name) {
             free (conf->seed_name);
@@ -133,14 +119,17 @@ main (int argc, char *argv[])
     conf->gids = gids_create ();
     replay_init ();
     timer_init ();
+    sock_create (conf);
 
+    if (!conf->got_foreground) {
+        daemonize_fini (fd);
+    }
     log_msg (LOG_NOTICE, "Starting %s daemon (pid %d)",
         META_ALIAS, (int) getpid ());
 
-    sock_create (conf);
     job_accept (conf);
-    sock_destroy (conf);
 
+    sock_destroy (conf);
     timer_fini ();
     replay_fini ();
     gids_destroy (conf->gids);
@@ -198,7 +187,7 @@ segv_handler (int signum)
 
 
 static int
-daemonize_init (void)
+daemonize_init (char *progname)
 {
 /*  Begins the daemonization of the process.
  *  Despite the fact that this routine backgrounds the process, control
@@ -209,7 +198,8 @@ daemonize_init (void)
     int           fds[2];
     pid_t         pid;
     int           n;
-    unsigned char c;
+    char          priority;
+    char          ebuf[1024];
 
     /*  Clear file mode creation mask.
      */
@@ -246,11 +236,22 @@ daemonize_init (void)
             log_errno (EMUNGE_SNAFU, LOG_ERR,
                 "Unable to close write-pipe in parent process");
         }
-        if ((n = read (fds[0], &c, sizeof (c))) < 0) {
+        if ((n = read (fds[0], &priority, sizeof (priority))) < 0) {
             log_errno (EMUNGE_SNAFU, LOG_ERR,
                 "Unable to read status from grandchild process");
         }
-        exit (((n == 1) && (c != 0)) ? 1 : 0);
+        if ((n > 0) && (priority >= 0)) {
+            if ((n = read (fds[0], ebuf, sizeof (ebuf))) < 0) {
+                log_errno (EMUNGE_SNAFU, LOG_ERR,
+                    "Unable to read err msg from grandchild process");
+            }
+            if ((n > 0) && (ebuf[0] != '\0')) {
+                log_open_file (stderr, progname, priority, LOG_OPT_PRIORITY);
+                log_msg (priority, "%s", ebuf);
+            }
+            exit (1);
+        }
+        exit (0);
     }
     if (close (fds[0]) < 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR,
@@ -326,7 +327,7 @@ daemonize_fini (int fd)
      */
     if ((fd >= 0) && (close (fd) < 0)) {
         log_errno (EMUNGE_SNAFU, LOG_ERR,
-            "Unable to close write-pipe in grandchild");
+            "Unable to close write-pipe in grandchild process");
     }
     return;
 }
@@ -379,6 +380,27 @@ write_pidfile (const char *pidfile)
     }
     (void) unlink (pidfile);
     return;                             /* failure */
+}
+
+
+static void
+open_logfile (const char *logfile, int priority)
+{
+    mode_t  mask;
+    FILE   *fp;
+
+    mask = umask (0);
+    umask (mask | 027);
+    fp = fopen (logfile, "a");
+    umask (mask);
+
+    if (!fp) {
+        log_errno (EMUNGE_SNAFU, LOG_ERR,
+            "Unable to open logfile \"%s\"", logfile);
+    }
+    log_open_file (fp, NULL, priority,
+        LOG_OPT_JUSTIFY | LOG_OPT_PRIORITY | LOG_OPT_TIMESTAMP);
+    return;
 }
 
 

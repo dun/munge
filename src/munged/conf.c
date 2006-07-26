@@ -119,6 +119,10 @@ create_conf (void)
      *  FIXME: Get file lock on configuration filename?
      */
     conf->config_name = NULL;
+    if (!(conf->logfile_name = strdup (MUNGED_LOGFILE))) {
+        log_errno (EMUNGE_NO_MEMORY, LOG_ERR,
+            "Cannot dup logfile name string");
+    }
     if (!(conf->pidfile_name = strdup (MUNGED_PIDFILE))) {
         log_errno (EMUNGE_NO_MEMORY, LOG_ERR,
             "Cannot dup pidfile name string");
@@ -165,6 +169,10 @@ destroy_conf (conf_t conf)
     if (conf->config_name) {
         free (conf->config_name);
         conf->config_name = NULL;
+    }
+    if (conf->logfile_name) {
+        free (conf->logfile_name);
+        conf->logfile_name = NULL;
     }
     if (conf->pidfile_name) {
         (void) unlink (conf->pidfile_name);
@@ -478,6 +486,6 @@ lookup_ip_addr (conf_t conf)
     if (!inet_ntop (AF_INET, &conf->addr, ip_buf, sizeof (ip_buf))) {
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to determine ip address");
     }
-    log_msg (LOG_NOTICE, "Running on host \"%s\" (%s)", hptr->h_name, ip_buf);
+    log_msg (LOG_NOTICE, "Running on \"%s\" (%s)", hptr->h_name, ip_buf);
     return;
 }

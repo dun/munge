@@ -52,7 +52,8 @@ struct conf {
     munge_ttl_t     def_ttl;            /* default time-to-live              */
     munge_ttl_t     max_ttl;            /* default time-to-live              */
     char           *config_name;        /* configuration filename            */
-    char           *pidfile_name;       /* pid filename                      */
+    char           *logfile_name;       /* daemon log file name              */
+    char           *pidfile_name;       /* daemon pid file name              */
     char           *socket_name;        /* unix domain socket filename       */
     char           *seed_name;          /* random seed filename              */
     char           *key_name;           /* symmetric key filename            */

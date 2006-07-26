@@ -71,7 +71,7 @@ void log_set_err_pipe (int fd);
  *    connecting the original parent process to the forked grandchild process
  *    under which the daemon will continue running.
  *  If set (ie, fd >= 0), log_err() & log_errno() will return an error status
- *    back to the original parent process.
+ *    and error message string back to the original parent process.
  */
 
 void log_err (int status, int priority, const char *format, ...);

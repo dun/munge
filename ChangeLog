@@ -1,3 +1,18 @@
+2006-07-26  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/munged/munged.c(main): Moved daemonize_fini() to just before
+	  job_accept() in order to return more fatal error conditions to shell.
+	* src/munged/munged.c(daemonize_init): Changed behavior for original
+	  parent process to read error priority & message via "daemonize" pipe
+	  and write error message to stderr before exiting.
+	* src/munged/munged.c(open_logfile): Added.
+	* src/munged/conf.c, src/munged/conf.h: Added logfile_name to conf.
+	* src/libcommon/log.c(_log_aux): Added msgbuf & msgbuflen to prototype.
+	  Changed behavior to return error message string via msgbuf.
+	* src/libcommon/log.c(_log_die): Added priority & msg to prototype.
+	  Changed behavior to return priority and msg across "daemonize" pipe.
+	* src/libcommon/log.h(log_set_err_pipe): Updated documentation.
+
 2006-07-25  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/munged/munged.c: Changed daemonize_init() and daemonize_fini()

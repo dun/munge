@@ -79,9 +79,9 @@ static struct log_ctx log_ctx = { NULL, 0, 0, 0, 0, -1 };
  *  Static Prototypes
  *****************************************************************************/
 
-static void _log_aux (int errnum, int priority,
-                      const char *format, va_list vargs);
-static void _log_die (int status);
+static void _log_aux (int errnum, int priority, char *msgbuf, int msgbuflen,
+        const char *format, va_list vargs);
+static void _log_die (int status, int priority, char *msg);
 static char * _log_prefix (int priority);
 
 
@@ -156,12 +156,13 @@ void
 log_err (int status, int priority, const char *format, ...)
 {
     va_list vargs;
+    char    msg[1024];
 
     va_start (vargs, format);
-    _log_aux (0, priority, format, vargs);
+    _log_aux (0, priority, msg, sizeof (msg), format, vargs);
     va_end (vargs);
 
-    _log_die (status);
+    _log_die (status, priority, msg);
     assert (1);                         /* not reached */
 }
 
@@ -170,12 +171,13 @@ void
 log_errno (int status, int priority, const char *format, ...)
 {
     va_list vargs;
+    char    msg[1024];
 
     va_start (vargs, format);
-    _log_aux (errno, priority, format, vargs);
+    _log_aux (errno, priority, msg, sizeof (msg), format, vargs);
     va_end (vargs);
 
-    _log_die (status);
+    _log_die (status, priority, msg);
     assert (1);                         /* not reached */
 }
 
@@ -186,7 +188,7 @@ log_msg (int priority, const char *format, ...)
     va_list vargs;
 
     va_start (vargs, format);
-    _log_aux (0, priority, format, vargs);
+    _log_aux (0, priority, NULL, 0, format, vargs);
     va_end (vargs);
 
     return;
@@ -198,7 +200,8 @@ log_msg (int priority, const char *format, ...)
  *****************************************************************************/
 
 static void
-_log_aux (int errnum, int priority, const char *format, va_list vargs)
+_log_aux (int errnum, int priority, char *msgbuf, int msgbuflen,
+        const char *format, va_list vargs)
 {
     char  buf [LOG_BUFFER_MAXLEN];      /* message buffer                    */
     char *p;                            /* current position in msg buf       */
@@ -330,6 +333,17 @@ _log_aux (int errnum, int priority, const char *format, va_list vargs)
     }
     *p = '\0';
 
+    /*  Return error message string.
+     */
+    if (msgbuf && (msgbuflen > 0)) {
+        if (sbuf) {
+            strncpy (msgbuf, sbuf, msgbuflen);
+            msgbuf[msgbuflen - 1] = '\0';
+        }
+        else {
+            msgbuf[0] = '\0';
+        }
+    }
     /*  Log this!
      */
     if (log_ctx.got_syslog && sbuf) {
@@ -346,8 +360,24 @@ _log_aux (int errnum, int priority, const char *format, va_list vargs)
 
 
 static void
-_log_die (int status)
+_log_die (int status, int priority, char *msg)
 {
+    char *p;
+    char c;
+    int n;
+
+    /*  Write error status and message to "daemonize" pipe.
+     */
+    if (log_ctx.fd_daemonize >= 0) {
+        if ((p = strchr (msg, '\n'))) {
+            *p = '\0';
+        }
+        c = (char) priority;
+        n = write (log_ctx.fd_daemonize, &c, sizeof (c));
+        if ((n > 0) && msg) {
+            (void) write (log_ctx.fd_daemonize, msg, strlen (msg) + 1);
+        }
+    }
 #ifndef NDEBUG
     /*  Generate core for debugging.
      */
@@ -355,13 +385,6 @@ _log_die (int status)
         abort ();
     }
 #endif /* !NDEBUG */
-    /*
-     *  Return error status across "daemonize" pipe.
-     */
-    if (log_ctx.fd_daemonize >= 0) {
-        unsigned char c = 1;
-        (void) write (log_ctx.fd_daemonize, &c, sizeof (c));
-    }
     exit (status);
 }
 
