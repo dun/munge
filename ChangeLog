@@ -1,3 +1,10 @@
+2006-07-27  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/etc/munge.init.in: Changed behavior to capture stderr on start
+	  and output it on error.
+	* src/etc/munge.init.in: Changed behavior on RedHat to not return an
+	  error when stopping a service that is already stopped.
+
 2006-07-26  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/munged/munged.c(main): Moved daemonize_fini() to just before

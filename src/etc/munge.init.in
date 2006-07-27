@@ -81,7 +81,6 @@ service_init ()
     . /etc/init.d/functions
     RH_SUBSYS_BASE="`basename \"$0\" | sed 's/^[SK][0-9][0-9]*//'`"
     RH_SUBSYS="/var/lock/subsys/$RH_SUBSYS_BASE"
-    INITLOG_ARGS=""                     # disable RH suppression of stderr msgs
   elif [ -f /etc/SuSE-release -a -r /etc/rc.status ]; then
     SYSTEM="SUSE"
     . /etc/rc.status
@@ -120,17 +119,18 @@ service_start ()
   case $SYSTEM in
     DEBIAN)
       printf "$DAEMON_NAME"
-      start-stop-daemon --start --quiet --oknodo \
+      ERROR=`start-stop-daemon --start --quiet --oknodo \
         ${NICE:+"--nicelevel"} ${NICE:+"$NICE"} \
         ${USER:+"--chuid"} ${USER:+"$USER"} \
         ${PIDFILE:+"--pidfile"} ${PIDFILE:+"$PIDFILE"} \
-        --exec "$DAEMON" -- $OPTIONS
+        --exec "$DAEMON" -- $OPTIONS 2>&1`
       STATUS=$?
       [ $STATUS -eq 0 ] && echo "." || echo " (failed)."
+      [ $STATUS -ne 0 -a -n "$ERROR" ] && echo "$ERROR"
       ;;
     REDHAT)
       if [ "$PIDFILE" == "/var/run/$DAEMON_NAME.pid" -a -r "$PIDFILE" ] \
-          || ! status "$DAEMON" >/dev/null; then
+          || ! status "$DAEMON" >/dev/null 2>&1; then
         daemon ${NICE:+"$NICE"} ${USER:+"--user"} ${USER:+"$USER"} \
           "$DAEMON" $OPTIONS
         STATUS=$?
@@ -138,24 +138,30 @@ service_start ()
         STATUS=0
       fi
       echo
-      [ $STATUS -eq 0 ] && touch "$RH_SUBSYS" 2>/dev/null
+      [ $STATUS -eq 0 ] && touch "$RH_SUBSYS" >/dev/null 2>&1
       ;;
     SUSE)
-      startproc ${NICE:+"-n"} ${NICE:+"$NICE"} ${USER:+"-u"} ${USER:+"$USER"} \
-        ${PIDFILE:+"-p"} ${PIDFILE:+"$PIDFILE"} "$DAEMON" $OPTIONS
+      ERROR=`startproc ${NICE:+"-n"} ${NICE:+"$NICE"} \
+        ${USER:+"-u"} ${USER:+"$USER"} \
+        ${PIDFILE:+"-p"} ${PIDFILE:+"$PIDFILE"} \
+        "$DAEMON" $OPTIONS 2>&1`
       rc_status -v
+      STATUS=$?
+      [ $STATUS -ne 0 -a -n "$ERROR" ] && echo "$ERROR"
       ;;
     LSB)
       if [ -n "$USER" ]; then
-        su "$USER" -c "/sbin/start_daemon ${NICE:+\"-n\"} ${NICE:+\"$NICE\"} \
-          ${PIDFILE:+\"-p\"} ${PIDFILE:+\"$PIDFILE\"} \"$DAEMON\" $OPTIONS" \
-          2>/dev/null
+        ERROR=`su "$USER" -c "/sbin/start_daemon \
+          ${NICE:+\"-n\"} ${NICE:+\"$NICE\"} \
+          ${PIDFILE:+\"-p\"} ${PIDFILE:+\"$PIDFILE\"} \
+          \"$DAEMON\" $OPTIONS" 2>&1`
       else
-        start_daemon ${NICE:+"-n"} ${NICE:+"$NICE"} \
-          ${PIDFILE:+"-p"} ${PIDFILE:+"$PIDFILE"} "$DAEMON" $OPTIONS
+        ERROR=`start_daemon ${NICE:+"-n"} ${NICE:+"$NICE"} \
+          ${PIDFILE:+"-p"} ${PIDFILE:+"$PIDFILE"} "$DAEMON" $OPTIONS 2>&1`
       fi
       STATUS=$?
       [ $STATUS -eq 0 ] && log_success_msg || log_failure_msg
+      [ $STATUS -ne 0 -a -n "$ERROR" ] && echo "$ERROR"
       ;;
     *)
       pids=`query_pids "$DAEMON" "$PIDFILE"`
@@ -165,13 +171,14 @@ service_start ()
       else
         [ -n "$NICE" ] && nice="nice -n $NICE"
         if [ -n "$USER" ]; then
-          su "$USER" -c "$nice \"$DAEMON\" $OPTIONS" 2>/dev/null
+          ERROR=`su "$USER" -c "$nice \"$DAEMON\" $OPTIONS" 2>&1`
         else
-          $nice "$DAEMON" $OPTIONS 2>/dev/null
+          ERROR=`$nice "$DAEMON" $OPTIONS 2>&1`
         fi
         STATUS=$?
       fi
       [ $STATUS -eq 0 ] && echo "success" || echo "failed"
+      [ $STATUS -ne 0 -a -n "$ERROR" ] && echo "$ERROR"
       ;;
   esac
 }
@@ -190,15 +197,20 @@ service_stop ()
       printf "$DAEMON_NAME"
       start-stop-daemon --stop --quiet --oknodo \
         ${PIDFILE:+"--pidfile"} ${PIDFILE:+"$PIDFILE"} --name "$DAEMON_NAME" \
-        ${SIGTERM_TIMEOUT:+"--retry"} ${SIGTERM_TIMEOUT:+"$SIGTERM_TIMEOUT"}
+        ${SIGTERM_TIMEOUT:+"--retry"} ${SIGTERM_TIMEOUT:+"$SIGTERM_TIMEOUT"} \
+        >/dev/null 2>&1
       STATUS=$?
       [ $STATUS -eq 0 ] && echo "." || echo " (failed)."
       ;;
     REDHAT)
-      killproc "$DAEMON"
-      STATUS=$?
+      if status "$DAEMON" >/dev/null 2>&1; then
+        killproc "$DAEMON"
+        STATUS=$?
+      else
+        STATUS=0
+      fi
       echo
-      [ $STATUS -eq 0 ] && rm -f "$RH_SUBSYS" 2>/dev/null
+      [ $STATUS -eq 0 ] && rm -f "$RH_SUBSYS" >/dev/null 2>&1
       ;;
     SUSE)
       killproc ${PIDFILE:+"-p"} ${PIDFILE:+"$PIDFILE"} \
@@ -229,7 +241,7 @@ service_restart ()
 # According to LSB, running "restart" on a service already stopped or not
 #   running should be considered successful.
 ##
-  $0 status >/dev/null && $0 stop
+  $0 status >/dev/null 2>&1 && $0 stop
   $0 start
 
   case $SYSTEM in
@@ -256,11 +268,11 @@ service_try_restart ()
       STATUS=$?
       ;;
     SUSE)
-      $0 status >/dev/null && $0 restart || rc_reset
+      $0 status >/dev/null 2>&1 && $0 restart || rc_reset
       rc_status
       ;;
     DEBIAN|LSB|*)
-      $0 status >/dev/null && $0 restart || :
+      $0 status >/dev/null 2>&1 && $0 restart || :
       STATUS=$?
       ;;
   esac
@@ -279,7 +291,8 @@ service_reload ()
       printf "$DAEMON_NAME"
       if [ -n "$RELOAD" ]; then
         start-stop-daemon --stop --quiet --signal HUP \
-          ${PIDFILE:+"--pidfile"} ${PIDFILE:+"$PIDFILE"} --name "$DAEMON_NAME"
+          ${PIDFILE:+"--pidfile"} ${PIDFILE:+"$PIDFILE"} \
+          --name "$DAEMON_NAME" >/dev/null 2>&1
         STATUS=$?
       fi
       [ $STATUS -eq 0 ] && echo "." || echo " (failed)."
@@ -450,7 +463,7 @@ signal_process ()
   pids=`query_pids "$DAEMON" "$PIDFILE"`
   [ $? -ne 0 -o -z "$pids" ] && return 2
 
-  kill ${SIGNUM:+"-$SIGNUM"} $pids 2>/dev/null
+  kill ${SIGNUM:+"-$SIGNUM"} $pids >/dev/null 2>&1
   [ $? -ne 0 ] && return 1
   [ -n "$SIGNUM" ] && return 0
 
@@ -459,7 +472,7 @@ signal_process ()
   [ -z "$SIGTERM_TIMEOUT" ] && return 1
 
   sleep "$SIGTERM_TIMEOUT"
-  kill -KILL $pids 2>/dev/null
+  kill -KILL $pids >/dev/null 2>&1
   [ $? -ne 0 ] && return 1 || return 0
 }
 
