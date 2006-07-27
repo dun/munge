@@ -369,12 +369,12 @@ _log_die (int status, int priority, char *msg)
     /*  Write error status and message to "daemonize" pipe.
      */
     if (log_ctx.fd_daemonize >= 0) {
-        if ((p = strchr (msg, '\n'))) {
-            *p = '\0';
-        }
         c = (char) priority;
         n = write (log_ctx.fd_daemonize, &c, sizeof (c));
-        if ((n > 0) && msg) {
+        if ((n > 0) && (msg != NULL) && (log_ctx.fp != stderr)) {
+            if ((p = strchr (msg, '\n'))) {
+                *p = '\0';
+            }
             (void) write (log_ctx.fd_daemonize, msg, strlen (msg) + 1);
         }
     }

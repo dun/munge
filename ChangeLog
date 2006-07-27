@@ -1,5 +1,10 @@
 2006-07-27  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/libcommon/log.c(_log_die): Changed behavior to only return error
+	  message across "daemonize" pipe if the logging fp is not set to
+	  stderr in order to avoid having the message written to stderr first
+	  by the grandchild process and again by the original parent process.
+
 	* src/etc/munge.init.in: Changed behavior to capture stderr on start
 	  and output it on error.
 	* src/etc/munge.init.in: Changed behavior on RedHat to not return an
