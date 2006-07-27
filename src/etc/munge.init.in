@@ -129,8 +129,7 @@ service_start ()
       [ $STATUS -ne 0 -a -n "$ERROR" ] && echo "$ERROR"
       ;;
     REDHAT)
-      if [ "$PIDFILE" == "/var/run/$DAEMON_NAME.pid" -a -r "$PIDFILE" ] \
-          || ! status "$DAEMON" >/dev/null 2>&1; then
+      if ! status "$DAEMON" >/dev/null 2>&1; then
         daemon ${NICE:+"$NICE"} ${USER:+"--user"} ${USER:+"$USER"} \
           "$DAEMON" $OPTIONS
         STATUS=$?
