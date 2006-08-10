@@ -6,6 +6,9 @@
 
 include $(top_srcdir)/config/Make-inc.mk
 
+noinst_DATA = \
+	munge.init
+
 install-data-local:
 	$(INSTALL) -m 0755 -d "$(DESTDIR)$(sysconfdir)/init.d"; \
 	test -f "$(DESTDIR)$(sysconfdir)/init.d/munge" && new=".new"; \

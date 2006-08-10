@@ -1,5 +1,7 @@
 2006-08-10  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/etc/Makefile.am: Added munge.init to noinst_DATA.
+
 	* src/libcommon/log.c(_log_prefix): Changed priorities to mixed-case.
 
 	* README, munge.spec: Updated description.
