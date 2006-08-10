@@ -1,8 +1,9 @@
-MUNGE (MUNGE Uid 'N' Gid Emporium) is a service for creating and validating
-credentials in order to allow a process to securely authenticate the
-UID and GID of another local or remote process within a security realm.
-Clients can create and validate these credentials without the use of root
-privileges, reserved ports, or platform-specific methods.
+MUNGE (MUNGE Uid 'N' Gid Emporium) is an authentication service for
+creating and validating credentials in order to allow a process to securely
+authenticate the UID and GID of another local or remote process within a
+security realm (defined by a shared key). Clients can create and validate
+these credentials without the use of root privileges, reserved ports,
+cryptographic libraries, or platform-specific methods.
 
 A credential is created and validated by the local munged daemon running
 on each host within a security realm.  A security realm is defined by
