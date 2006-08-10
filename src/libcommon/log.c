@@ -394,23 +394,23 @@ _log_prefix (int priority)
 {
     switch (priority) {
         case LOG_EMERG:
-            return ("EMERGENCY");
+            return ("Emergency");
         case LOG_ALERT:
-            return ("ALERT");
+            return ("Alert");
         case LOG_CRIT:
-            return ("CRITICAL");
+            return ("Critical");
         case LOG_ERR:
-            return ("ERROR");
+            return ("Error");
         case LOG_WARNING:
-            return ("WARNING");
+            return ("Warning");
         case LOG_NOTICE:
-            return ("NOTICE");
+            return ("Notice");
         case LOG_INFO:
-            return ("INFO");
+            return ("Info");
         case LOG_DEBUG:
-            return ("DEBUG");
+            return ("Debug");
         default:
-            return ("UNKNOWN");
+            return ("Unknown");
     }
     assert (1);                         /* not reached */
 }

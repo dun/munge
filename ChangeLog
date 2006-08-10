@@ -1,5 +1,7 @@
 2006-08-10  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/libcommon/log.c(_log_prefix): Changed priorities to mixed-case.
+
 	* README, munge.spec: Updated description.
 
 2006-07-27  Chris Dunlap  <cdunlap@llnl.gov>
