@@ -192,8 +192,7 @@ service_stop ()
 # Stop the service.
 # Required by LSB.
 #
-# According to LSB, running "stop" on a service already stopped or not running
-#   should be considered successful.
+# According to LSB, running "stop" on a service already stopped or not running #   should be considered successful.
 ##
   printf "Stopping $DESC: "
   case $SYSTEM in
@@ -343,7 +342,7 @@ service_force_reload ()
 # Reload the configuration if the service supports this;
 #   otherwise, restart the service if it is already running.
 # Required by LSB.
-# 
+#
 # According to LSB, running "force-reload" on a service already stopped or
 #   not running should be considered successful.
 ##
