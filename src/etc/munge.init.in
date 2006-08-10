@@ -22,6 +22,7 @@
 ###############################################################################
 
 unset DESC DAEMON CONFIG OPTIONS PIDFILE NICE USER SIGHUP_RELOAD
+
 prefix="@prefix@"
 exec_prefix="@exec_prefix@"
 sbindir="@sbindir@"
