@@ -6,12 +6,10 @@
 
 include $(top_srcdir)/config/Make-inc.mk
 
-ACLOCAL_AMFLAGS =               -I config
-CONFIG_STATUS_DEPENDENCIES =    META
-EXTRA_DIST =                    AUTHORS COPYING ChangeLog DISCLAIMER \
-                                INSTALL JARGON NEWS README munge.spec
-SUBDIRS =                       src
-
-distclean-local::
-	-rm -fr autom4te*.cache autoscan.*
-	-rm -fr $(META_NAME)-*
+ACLOCAL_AMFLAGS =		-I config
+CONFIG_STATUS_DEPENDENCIES =	META
+DISTCLEANFILES =		$(META_NAME)-*
+EXTRA_DIST =			AUTHORS BUGS ChangeLog COPYING DISCLAIMER \
+				HISTORY INSTALL JARGON NEWS PLATFORMS README \
+				TODO munge.spec
+SUBDIRS =			src

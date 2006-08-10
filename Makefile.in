@@ -215,8 +215,10 @@ sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 ACLOCAL_AMFLAGS = -I config
 CONFIG_STATUS_DEPENDENCIES = META
-EXTRA_DIST = AUTHORS COPYING ChangeLog DISCLAIMER \
-                                INSTALL JARGON NEWS README munge.spec
+DISTCLEANFILES = $(META_NAME)-*
+EXTRA_DIST = AUTHORS BUGS ChangeLog COPYING DISCLAIMER \
+				HISTORY INSTALL JARGON NEWS PLATFORMS README \
+				TODO munge.spec
 
 SUBDIRS = src
 all: all-recursive
@@ -582,6 +584,7 @@ clean-generic:
 
 distclean-generic:
 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
+	-test -z "$(DISTCLEANFILES)" || rm -f $(DISTCLEANFILES)
 
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
@@ -672,10 +675,6 @@ force-dependency-check:
 #
 distclean-local::
 	-rm -f *~ \#* .\#* cscope*.out core core.* tags TAGS
-
-distclean-local::
-	-rm -fr autom4te*.cache autoscan.*
-	-rm -fr $(META_NAME)-*
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:
