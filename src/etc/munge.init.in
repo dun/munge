@@ -119,22 +119,26 @@ service_start ()
   case $SYSTEM in
     DEBIAN)
       printf "$DAEMON_NAME"
-      ERROR=`start-stop-daemon --start --quiet --oknodo \
-        ${NICE:+"--nicelevel"} ${NICE:+"$NICE"} \
-        ${USER:+"--chuid"} ${USER:+"$USER"} \
-        ${PIDFILE:+"--pidfile"} ${PIDFILE:+"$PIDFILE"} \
-        --exec "$DAEMON" -- $OPTIONS 2>&1`
-      STATUS=$?
+      if $0 status >/dev/null 2>&1; then
+        STATUS=0
+      else
+        ERROR=`start-stop-daemon --start --quiet \
+          ${NICE:+"--nicelevel"} ${NICE:+"$NICE"} \
+          ${USER:+"--chuid"} ${USER:+"$USER"} \
+          ${PIDFILE:+"--pidfile"} ${PIDFILE:+"$PIDFILE"} \
+          --exec "$DAEMON" -- $OPTIONS 2>&1`
+        STATUS=$?
+      fi
       [ $STATUS -eq 0 ] && echo "." || echo " (failed)."
       [ $STATUS -ne 0 -a -n "$ERROR" ] && echo "$ERROR"
       ;;
     REDHAT)
-      if ! status "$DAEMON" >/dev/null 2>&1; then
+      if $0 status >/dev/null 2>&1; then
+        STATUS=0
+      else
         daemon ${NICE:+"$NICE"} ${USER:+"--user"} ${USER:+"$USER"} \
           "$DAEMON" $OPTIONS
         STATUS=$?
-      else
-        STATUS=0
       fi
       echo
       [ $STATUS -eq 0 ] && touch "$RH_SUBSYS" >/dev/null 2>&1
@@ -194,19 +198,23 @@ service_stop ()
   case $SYSTEM in
     DEBIAN)
       printf "$DAEMON_NAME"
-      start-stop-daemon --stop --quiet --oknodo \
-        ${PIDFILE:+"--pidfile"} ${PIDFILE:+"$PIDFILE"} --name "$DAEMON_NAME" \
-        ${SIGTERM_TIMEOUT:+"--retry"} ${SIGTERM_TIMEOUT:+"$SIGTERM_TIMEOUT"} \
-        >/dev/null 2>&1
-      STATUS=$?
+      if ! $0 status >/dev/null 2>&1; then
+        STATUS=0
+      else
+        start-stop-daemon --stop --quiet \
+          ${PIDFILE:+"--pidfile"} ${PIDFILE:+"$PIDFILE"} \
+          --name "$DAEMON_NAME" ${SIGTERM_TIMEOUT:+"--retry"} \
+          ${SIGTERM_TIMEOUT:+"$SIGTERM_TIMEOUT"} >/dev/null 2>&1
+        STATUS=$?
+      fi
       [ $STATUS -eq 0 ] && echo "." || echo " (failed)."
       ;;
     REDHAT)
-      if status "$DAEMON" >/dev/null 2>&1; then
+      if ! $0 status >/dev/null 2>&1; then
+        STATUS=0
+      else
         killproc "$DAEMON"
         STATUS=$?
-      else
-        STATUS=0
       fi
       echo
       [ $STATUS -eq 0 ] && rm -f "$RH_SUBSYS" >/dev/null 2>&1
