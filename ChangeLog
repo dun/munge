@@ -1,5 +1,8 @@
 2006-08-10  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/etc/munge.init.in(service_restart): Changed so start would not
+	  be attempted if preceding stop failed.
+
 	* src/etc/munge.init.in: Replaced Debian's "--oknodo" with test
 	  for "$0 status" since --oknodo would also mask errors such as
 	  "operation not permitted".

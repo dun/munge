@@ -248,8 +248,7 @@ service_restart ()
 # According to LSB, running "restart" on a service already stopped or not
 #   running should be considered successful.
 ##
-  $0 status >/dev/null 2>&1 && $0 stop
-  $0 start
+  ! $0 status >/dev/null 2>&1 || $0 stop && $0 start
 
   case $SYSTEM in
     SUSE)
