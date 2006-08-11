@@ -5,9 +5,9 @@
 	* src/etc/munge.init.in(service_restart): Changed so start would not
 	  be attempted if preceding stop failed.
 
-	* src/etc/munge.init.in: Replaced Debian's "--oknodo" with test
-	  for "$0 status" since --oknodo would also mask errors such as
-	  "operation not permitted".
+	* src/etc/munge.init.in(service_start,service_stop): Replaced Debian's
+	  "--oknodo" with test for "$0 status" since --oknodo would also mask
+	  errors such as "operation not permitted".
 
 	* Makefile.am: Replaced distclean-local target with DISTCLEANFILES.
 
