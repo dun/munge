@@ -126,7 +126,7 @@
 	* src/etc/Makefile.am, src/libmunge/Makefile.am: Tweaked dir perms.
 
 	* src/munged/munged.c(main): Moved root privs test (if needed) to
-	  after parse_cmdline().
+	  after parse_cmdline() so root privs are not needed to get "--help".
 
 	* munge.spec: Specified perms & daemon-ownership for munge-owned dirs.
 	* src/etc/Makefile.am: Changed /var/lib/munge and /var/log/munge perms.
