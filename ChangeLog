@@ -11,9 +11,11 @@
 
 	* Makefile.am: Replaced distclean-local target with DISTCLEANFILES.
 
-	* src/etc/Makefile.am: Added munge.init to noinst_DATA.
+	* src/etc/Makefile.am: Added munge.init to noinst_DATA, thereby adding
+	  its dependency to the "all" target.
 
-	* src/libcommon/log.c(_log_prefix): Changed priorities to mixed-case.
+	* src/libcommon/log.c(_log_prefix): Changed priority prefixes to
+	  mixed-case strings.
 
 	* README, munge.spec: Updated description.
 
