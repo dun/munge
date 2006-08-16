@@ -2,7 +2,7 @@
  *  $Id$
  *  LSD-Id: thread.h,v 1.3 2003/11/26 23:01:18 dun Exp
  *****************************************************************************
- *  Copyright (C) 2003-2006 The Regents of the University of California.
+ *  Copyright (C) 2002-2006 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory.
  *  Written by Chris Dunlap <cdunlap@llnl.gov>.
  *  UCRL-CODE-155910.

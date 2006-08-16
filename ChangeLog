@@ -1,3 +1,7 @@
+2006-08-16  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* : Updated copyright date range.
+
 2006-08-10  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/etc/munge.init.in: Tweaked spacing.

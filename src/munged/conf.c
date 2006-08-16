@@ -1,7 +1,7 @@
 /*****************************************************************************
  *  $Id$
  *****************************************************************************
- *  Copyright (C) 2003-2006 The Regents of the University of California.
+ *  Copyright (C) 2002-2006 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory.
  *  Written by Chris Dunlap <cdunlap@llnl.gov>.
  *  UCRL-CODE-155910.
@@ -95,8 +95,6 @@ create_conf (void)
 {
     conf_t conf;
 
-    /*  FIXME: On ENOMEM, log which malloc op failed.
-     */
     if (!(conf = malloc (sizeof (struct conf)))) {
         log_errno (EMUNGE_NO_MEMORY, LOG_ERR, "Unable to create conf");
     }
