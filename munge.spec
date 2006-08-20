@@ -27,9 +27,9 @@ Group:		System Environment/Libraries
 MUNGE (MUNGE Uid 'N' Gid Emporium) is an authentication service for
 creating and validating credentials in order to allow a process to securely
 authenticate the UID and GID of another local or remote process within a
-security realm (defined by a shared key). Clients can create and validate
-these credentials without the use of root privileges, reserved ports,
-cryptographic libraries, or platform-specific methods.
+security realm.  Clients can create and validate these credentials without
+the use of root privileges, reserved ports, cryptographic libraries, or
+platform-specific methods.
 
 %description devel
 A header file and static library for developing applications using MUNGE.
