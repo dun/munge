@@ -1,102 +1,143 @@
-A Quick & Dirty Guide to Installing MUNGE
+MUNGE Installation Guide
 
 
-  1. Install the software.
+1. Installing the Software
 
-     A. Building RPMs.
+   A. From RPMs:
 
-        $ rpmbuild -ta munge-x.y.z.tar.bz2
+      You can build binary RPMs from either the tarball or the source RPM:
 
-        This should generate a single source RPM and three binary RPMs
-        (munge, munge-devel, and munge-libs).  The munge RPM contains the
-        daemon and client binaries.  The munge-devel RPM contains a header
-        file and static library for developing applications using MUNGE.
-        The munge-libs RPM contains a shared library for running applications
-        using MUNGE.
+      $ rpmbuild -tb --clean munge-x.y.z.tar.bz2
+      $ rpmbuild --rebuild --clean munge-x.y.z-1.src.rpm
 
-     B. Building from source.
+      This will generate three binary RPMs: munge, munge-devel, and
+      munge-libs.  The munge RPM contains the daemon and client binaries.
+      The munge-devel RPM contains a header file and static library for
+      developing applications using MUNGE.  The munge-libs RPM contains a
+      shared library for running applications using MUNGE.
 
-        Edit src/libcommon/munge_defs.h to customize values if necessary.
-        Configuration file support is planned for future development.
+      To install the binary RPMs, you will need to su to root and execute
+      the following command:
 
-        The MUNGED_SECRET_KEY default is "$sysconfdir/munge/munge.key".
-        The "munge.key" file will need to be generated and distributed
-        as detailed below.  This setting can be overridden on the munged
-        command-line (munged --key-file /path/to/file).
+      # rpm -ivh munge-x.y.z-1.i386.rpm \
+        munge-devel-x.y.z-1.i386.rpm munge-libs-x.y.z-1.i386.rpm
 
-        The MUNGED_RANDOM_SEED default is "$localstatedir/lib/munge/munge.seed".
-        The "munge.seed" file will be automatically generated.
+   B. From source:
 
-        The MUNGED_LOGFILE default is "$localstatedir/log/munge/munged.log".
+      Edit src/libcommon/munge_defs.h to customize values if necessary.
+      To compile the software, execute the following command; you may
+      need to su to root in order to perform the "make install":
 
-        $ ./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var \
-          && make && make install
-
-
-  2. Create a secret key file.
-
-     A. Wait around for some random data (recommended for the paranoid):
-        dd if=/dev/random bs=1 count=1024 >munge.key
-
-     B. Grab some pseudo random data (recommended for the impatient):
-        dd if=/dev/urandom bs=1 count=1024 >munge.key
-
-     C. Enter the hash of a password:
-        echo -n "foo" | sha1sum | cut -d' ' -f1 >munge.key
-
-     D. Enter a password (not recommended):
-        echo "foo" >munge.key
-
-     Ensure this file is permissioned 0400 and owned by the same user that
-     the munged daemon will run as.  On most platforms, root privileges are
-     not required for the daemon.
-
-     Securely propagate the secret key file (e.g., via ssh) to other hosts
-     within the same security realm.  Credentials are valid only within a
-     security realm (i.e., on hosts sharing the same secret key).  All munged
-     daemons exchanging credentials need to share the same secret key.
+      $ ./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var \
+        && make && make install
 
 
-  3. Start the munged daemon on each host within the security realm.
+2. Securing the Installation
 
-     Invoke the daemon directly (/usr/sbin/munged) or use the init script
-     (/etc/init.d/munge start).  The init script sources /etc/default/munge
-     (found on Debian-based systems) and /etc/sysconfig/munge (found on
-     RedHat-based systems), if present, to set variables recognized by the
-     init script.  The $OPTIONS variable passes additional command-line
-     options to the daemon; for example, this can be used to override the
-     location of the secret key file (--key-file) or set the number of
-     worker threads (--num-threads).  The $USER variable runs the daemon
-     under the specified username; the "daemon" user is recommended.
+   On most platforms, the munged daemon does not require root privileges;
+   currently, the one exception to this is AIX prior to 5.2-ML4.  On all other
+   platforms, you should run the daemon as a non-privileged user.  This can
+   be controlled by the init script as detailed in the "Starting the Daemon"
+   section below.
+
+   By default, the munged daemon uses the following system directories.  These
+   directories must be owned by the user that the munged daemon will run as.
+   They cannot be writable by other processes.
+
+   A. /etc/munge/
+      This directory contains the daemon's secret key.  The recommended
+      permissions for it are 0700.
+
+   B. /var/lib/munge/
+      This directory contains the daemon's PRNG seed file.  It is also
+      where the daemon creates pipes for authenticating clients via
+      file-descriptor-passing.  If the file-descriptor-passing authentication
+      method is used, this directory must allow execute permissions for
+      other processes; however, it should not expose read permissions.
+      The recommended permissions for it are 0711.
+
+   C. /var/log/munge/
+      This directory contains the daemon's log file.  The recommended
+      permissions for it are 0700.
+
+   D. /var/run/munge/
+      This directory contains the Unix domain socket for clients to
+      communicate with the daemon.  It also contains the daemon's PID file.
+      This directory must allow execute permissions for other processes.
+      The recommended permissions for it are 0755.
 
 
-  4. Test the installation.
+3. Creating a Secret Key
 
-     A. Generate a credential on stdout.
+   A security realm is defined by a shared key.  Credentials are valid only
+   within a security realm.  All munged daemons within a security realm
+   must possess the same secret key.
 
-        $ munge -n
+   By default, the secret key resides in "/etc/munge/munge.key".  This
+   location can be overridden on the munged command-line or via the init
+   script as detailed in the "Starting the Daemon" section below.
 
-     B. Check if a credential can be locally decoded.
+   You can create a secret key using a variety of methods:
 
-        $ munge -n | unmunge
+   A. Wait around for some random data (recommended for the paranoid):
+      $ dd if=/dev/random bs=1 count=1024 >/etc/munge/munge.key
 
-     C. Check if a credential can be remotely decoded.
+   B. Grab some pseudorandom data (recommended for the impatient):
+      $ dd if=/dev/urandom bs=1 count=1024 >/etc/munge/munge.key
 
-        $ munge -n | ssh somehost unmunge
+   C. Enter the hash of a password:
+      $ echo -n "foo" | sha1sum | cut -d' ' -f1 >/etc/munge/munge.key
 
-     D. Run a quick benchmark.
+   D. Enter a password directly (not recommended):
+      $ echo "foo" >/etc/munge/munge.key
 
-        $ remunge
-
-     If you encounter problems, ensure the munged process is running.
-     Also check the munged logfile (/var/log/munge/munged.log) or try
-     running munged in the foreground (/usr/sbin/munged --foreground).
+   This file should be permissioned 0400 and owned by the user that the
+   munged daemon will run as.  Securely propagate this file (e.g., via scp)
+   to all other hosts within the same security realm.
 
 
-  5. Munge credentials.
+4. Starting the Daemon
 
-     Applications written in C/C++ can use the interface provided by
-     <libmunge.h>.  Scripts can use the interface provided by the "munge" and
-     "unmunge" executables -- specify "-h" or "--help" for usage information,
-     or Read The Fine Manpages.
+   On each host within the security realm, invoke the daemon directly
+   (/usr/sbin/munged) or use the init script (/etc/init.d/munge start).
+   The init script sources /etc/default/munge (found on Debian-based systems)
+   and /etc/sysconfig/munge (found on RedHat-based systems), if present,
+   to set variables recognized by the script.
 
+   The OPTIONS variable passes additional command-line options to the daemon;
+   for example, this can be used to override the location of the secret
+   key (--key-file) or set the number of worker threads (--num-threads).
+   The USER variable runs the daemon under the specified username; the
+   "daemon" user is recommended.
+
+
+5. Testing the Installation
+
+   The following steps can be performed to verify that the software has been
+   properly installed and configured:
+
+   A. Generate a credential on stdout:
+      $ munge -n
+
+   B. Check if a credential can be locally decoded:
+      $ munge -n | unmunge
+
+   C. Check if a credential can be remotely decoded:
+      $ munge -n | ssh somehost unmunge
+
+   D. Run a quick benchmark:
+      $ remunge
+
+   If you encounter problems, check if the munged daemon is
+   running (/etc/init.d/munge status).  Also, check the logfile
+   (/var/log/munge/munged.log) or try running the daemon in the foreground
+   (/usr/sbin/munged --foreground).  Some error conditions can be overridden
+   by "forcing" the daemon (/usr/sbin/munged --force).
+
+
+6. Using MUNGE
+
+   Applications written in C/C++ can use the interface provided by
+   <libmunge.h>.  Scripts can invoke the /usr/bin/munge and /usr/bin/unmunge
+   executables -- specify "-h" or "--help" for usage information, or
+   Read The Fine Manpages.
