@@ -1,5 +1,7 @@
 2006-08-21  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/libcommon/munge.7.in: Updated description.
+
 	* QUICKSTART: Updated.
 
 2006-08-20  Chris Dunlap  <cdunlap@llnl.gov>
