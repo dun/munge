@@ -52,7 +52,7 @@ MUNGE Installation Guide
       This directory contains the daemon's PRNG seed file.  It is also
       where the daemon creates pipes for authenticating clients via
       file-descriptor-passing.  If the file-descriptor-passing authentication
-      method is used, this directory must allow execute permissions for
+      method is being used, this directory must allow execute permissions for
       other processes; however, it should not expose read permissions.
       The recommended permissions for it are 0711.
 
@@ -62,7 +62,7 @@ MUNGE Installation Guide
 
    D. /var/run/munge/
       This directory contains the Unix domain socket for clients to
-      communicate with the daemon.  It also contains the daemon's PID file.
+      communicate with the daemon.  It also contains the daemon's pid file.
       This directory must allow execute permissions for other processes.
       The recommended permissions for it are 0755.
 
