@@ -1,4 +1,28 @@
+.\"****************************************************************************
 .\" $Id$
+.\"****************************************************************************
+.\" Copyright (C) 2002-2006 The Regents of the University of California.
+.\" Produced at Lawrence Livermore National Laboratory.
+.\" Written by Chris Dunlap <cdunlap@llnl.gov>.
+.\" UCRL-CODE-155910.
+.\"
+.\" This file is part of the MUNGE Uid 'N' Gid Emporium (MUNGE).
+.\" For details, see <http://home.gna.org/munge/>.
+.\"
+.\" This is free software; you can redistribute it and/or modify it
+.\" under the terms of the GNU General Public License as published by
+.\" the Free Software Foundation; either version 2 of the License, or
+.\" (at your option) any later version.
+.\"
+.\" This is distributed in the hope that it will be useful, but WITHOUT
+.\" ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+.\" FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+.\" for more details.
+.\"
+.\" You should have received a copy of the GNU General Public License along
+.\" with this program; if not, write to the Free Software Foundation, Inc.,
+.\" 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA.
+.\"****************************************************************************
 
 .TH MUNGE_CTX 3 "@META_DATE@" "@META_ALIAS@" "MUNGE Uid 'N' Gid Emporium"
 
@@ -9,19 +33,19 @@ munge_ctx_create, munge_ctx_copy, munge_ctx_destroy, munge_ctx_strerror, munge_c
 .nf
 .B #define GPL_LICENSED 1
 .B #include <munge.h>
-.PP
+.sp
 .BI "munge_ctx_t munge_ctx_create (void);"
-.PP
+.sp
 .BI "munge_ctx_t munge_ctx_copy (munge_ctx_t " ctx );
-.PP
+.sp
 .BI "void munge_ctx_destroy (munge_ctx_t " ctx );
-.PP
+.sp
 .BI "const char * munge_ctx_strerror (munge_ctx_t " ctx );
-.PP
+.sp
 .BI "munge_err_t munge_ctx_get (munge_ctx_t " ctx ", munge_opt_t " opt ", ...);"
-.PP
+.sp
 .BI "munge_err_t munge_ctx_set (munge_ctx_t " ctx ", munge_opt_t " opt ", ...);"
-.PP
+.sp
 .B cc ... -lmunge
 .fi
 
@@ -231,24 +255,24 @@ query the location of the \fBmunged\fR domain socket.
 .PP
 .nf
 #define GPL_LICENSED 1
-
+.sp
 #include <stdio.h>                      /* for printf() */
 #include <stdlib.h>                     /* for exit() */
 #include <munge.h>
-
+.sp
 int
 main (int argc, char *argv[])
 {
     munge_ctx_t  ctx;
     munge_err_t  err;
     char        *str;
-
+.sp
     if (!(ctx = munge_ctx_create ())) {
         fprintf (stderr, "ERROR: Unable to create munge context\\n");
         exit (1);
     }
     err = munge_ctx_get (ctx, MUNGE_OPT_SOCKET, &str);
-
+.sp
     if (err != EMUNGE_SUCCESS) {
         fprintf (stderr, "ERROR: %s\\n", munge_ctx_strerror (ctx));
         exit (1);

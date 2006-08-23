@@ -1,4 +1,28 @@
+.\"****************************************************************************
 .\" $Id$
+.\"****************************************************************************
+.\" Copyright (C) 2002-2006 The Regents of the University of California.
+.\" Produced at Lawrence Livermore National Laboratory.
+.\" Written by Chris Dunlap <cdunlap@llnl.gov>.
+.\" UCRL-CODE-155910.
+.\"
+.\" This file is part of the MUNGE Uid 'N' Gid Emporium (MUNGE).
+.\" For details, see <http://home.gna.org/munge/>.
+.\"
+.\" This is free software; you can redistribute it and/or modify it
+.\" under the terms of the GNU General Public License as published by
+.\" the Free Software Foundation; either version 2 of the License, or
+.\" (at your option) any later version.
+.\"
+.\" This is distributed in the hope that it will be useful, but WITHOUT
+.\" ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+.\" FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+.\" for more details.
+.\"
+.\" You should have received a copy of the GNU General Public License along
+.\" with this program; if not, write to the Free Software Foundation, Inc.,
+.\" 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA.
+.\"****************************************************************************
 
 .TH MUNGE 3 "@META_DATE@" "@META_ALIAS@" "MUNGE Uid 'N' Gid Emporium"
 
@@ -9,16 +33,16 @@ munge_encode, munge_decode, munge_strerror \- MUNGE primary functions
 .nf
 .B #define GPL_LICENSED 1
 .B #include <munge.h>
-.PP
+.sp
 .BI "munge_err_t munge_encode (char **" cred ", munge_ctx_t " ctx ,
 .BI "                          const void *" buf ", int " len );
-.PP
+.sp
 .BI "munge_err_t munge_decode (const char *" cred ", munge_ctx_t " ctx ,
 .BI "                          void **" buf ", int *" len ,
 .BI "                          uid_t *" uid ", gid_t *" gid );
-.PP
+.sp
 .BI "const char * munge_strerror (munge_err_t " e );
-.PP
+.sp
 .B cc ... -lmunge
 .fi
 
@@ -79,9 +103,6 @@ Unable to allocate the requisite memory.
 .TP
 .B EMUNGE_SOCKET
 Unable to communicate with the daemon on the domain socket.
-.\" .TP
-.\" .B EMUNGE_TIMEOUT
-.\" NOT YET USED
 .TP
 .B EMUNGE_BAD_CRED
 The credential does not match the specified format.
@@ -131,12 +152,12 @@ ascertain the effective user and group ID of the encoding process.
 .PP
 .nf
 #define GPL_LICENSED 1
-
+.sp
 #include <stdio.h>                      /* for printf() */
 #include <stdlib.h>                     /* for exit() & free() */
 #include <unistd.h>                     /* for uid_t & gid_t */
 #include <munge.h>
-
+.sp
 int
 main (int argc, char *argv[])
 {
@@ -144,15 +165,15 @@ main (int argc, char *argv[])
     munge_err_t  err;
     uid_t        uid;
     gid_t        gid;
-
+.sp
     err = munge_encode (&cred, NULL, NULL, 0);
-
+.sp
     if (err != EMUNGE_SUCCESS) {
         fprintf (stderr, "ERROR: %s\\n", munge_strerror (err));
         exit (1);
     }
     err = munge_decode (cred, NULL, NULL, NULL, &uid, &gid);
-
+.sp
     if (err != EMUNGE_SUCCESS) {
         fprintf (stderr, "ERROR: %s\\n", munge_strerror (err));
         exit (1);

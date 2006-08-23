@@ -1,3 +1,10 @@
+2006-08-22  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/munge/munge.1.in, src/munge/remunge.1.in, src/munge/unmunge.1.in,
+	  src/libmunge/munge.3.in, src/libmunge/munge_ctx.3.in,
+	  src/libmunge/munge_enum.3.in, src/libcommon/munge.7.in,
+	  src/munged/munged.8.in: Added copyright boilerplate.
+
 2006-08-21  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/libcommon/munge.7.in: Updated description.
