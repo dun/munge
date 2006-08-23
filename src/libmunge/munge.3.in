@@ -38,8 +38,7 @@ munge_encode, munge_decode, munge_strerror \- MUNGE primary functions
 .BI "                          const void *" buf ", int " len );
 .sp
 .BI "munge_err_t munge_decode (const char *" cred ", munge_ctx_t " ctx ,
-.BI "                          void **" buf ", int *" len ,
-.BI "                          uid_t *" uid ", gid_t *" gid );
+.BI "                          void **" buf ", int *" len ", uid_t *" uid ", gid_t *" gid );
 .sp
 .BI "const char * munge_strerror (munge_err_t " e );
 .sp

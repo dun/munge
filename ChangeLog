@@ -1,3 +1,7 @@
+2006-08-23  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/libmunge/munge.3.in: Tweaked synopsis formatting.
+
 2006-08-22  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/munge/munge.1.in, src/munge/remunge.1.in, src/munge/unmunge.1.in,
