@@ -22,7 +22,6 @@ munged_LDADD = \
 	$(top_builddir)/src/libmissing/libmissing.la \
 	$(top_builddir)/src/libmunge/libmunge.la \
 	$(LIBPTHREAD) \
-	$(LIBNSL) \
 	-lcrypto \
 	$(LIBBZ2) \
 	$(LIBZ)

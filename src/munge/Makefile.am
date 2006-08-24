@@ -28,8 +28,7 @@ munge_SOURCES = \
 unmunge_LDADD = \
 	$(top_builddir)/src/libcommon/libcommon.la \
 	$(top_builddir)/src/libmissing/libmissing.la \
-	$(top_builddir)/src/libmunge/libmunge.la \
-	$(LIBNSL)
+	$(top_builddir)/src/libmunge/libmunge.la
 
 unmunge_SOURCES = \
 	unmunge.c \

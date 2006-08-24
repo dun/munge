@@ -22,8 +22,7 @@ libmunge_la_LDFLAGS = \
 
 libmunge_la_LIBADD = \
 	$(top_builddir)/src/libcommon/libcommon.la \
-	$(top_builddir)/src/libmissing/libmissing.la \
-	$(LIBSOCKET)
+	$(top_builddir)/src/libmissing/libmissing.la
 
 libmunge_la_SOURCES = \
 	auth_send.c \

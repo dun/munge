@@ -77,10 +77,8 @@ am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(man3dir)" \
 	"$(DESTDIR)$(includedir)"
 libLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(lib_LTLIBRARIES)
-am__DEPENDENCIES_1 =
 libmunge_la_DEPENDENCIES = $(top_builddir)/src/libcommon/libcommon.la \
-	$(top_builddir)/src/libmissing/libmissing.la \
-	$(am__DEPENDENCIES_1)
+	$(top_builddir)/src/libmissing/libmissing.la
 am_libmunge_la_OBJECTS = auth_send.lo ctx.lo decode.lo encode.lo \
 	enum.lo m_msg_client.lo strerror.lo
 libmunge_la_OBJECTS = $(am_libmunge_la_OBJECTS)
@@ -136,11 +134,9 @@ INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
 LD = @LD@
 LDFLAGS = @LDFLAGS@
 LIBBZ2 = @LIBBZ2@
-LIBNSL = @LIBNSL@
 LIBOBJS = @LIBOBJS@
 LIBPTHREAD = @LIBPTHREAD@
 LIBS = @LIBS@
-LIBSOCKET = @LIBSOCKET@
 LIBTOOL = @LIBTOOL@
 LIBZ = @LIBZ@
 LN_S = @LN_S@
@@ -244,8 +240,7 @@ libmunge_la_LDFLAGS = \
 
 libmunge_la_LIBADD = \
 	$(top_builddir)/src/libcommon/libcommon.la \
-	$(top_builddir)/src/libmissing/libmissing.la \
-	$(LIBSOCKET)
+	$(top_builddir)/src/libmissing/libmissing.la
 
 libmunge_la_SOURCES = \
 	auth_send.c \

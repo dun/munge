@@ -1,3 +1,12 @@
+2006-08-24  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* configure.ac: Replaced nsl & socket X_AC_CHECK_COND_LIB with
+	  AC_SEARCH_LIBS.  Moved X_AC_CHECK_SSL to after this check so LIBS
+	  would include -lsocket & -lnsl if needed (eg, on Solaris).  Merged
+	  check for inet_ntop with the rest of AC_REPLACE_FUNCS.
+	* src/libmunge/Makefile.am, src/munge/Makefile.am,
+	  src/munged/Makefile.am: Removed use of LIBNSL & LIBSOCKET.
+
 2006-08-23  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/libmunge/munge.3.in: Tweaked synopsis formatting.

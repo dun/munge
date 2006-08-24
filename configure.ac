@@ -50,7 +50,6 @@ AM_MAINTAINER_MODE
 ##
 X_AC_ARCH
 AC_PROG_CC
-X_AC_CHECK_SSL
 LT_INIT
 AC_PROG_MAKE_SET
 X_AC_DEBUG
@@ -59,10 +58,11 @@ X_AC_DEBUG
 # Checks for libraries.
 ##
 X_AC_CHECK_PTHREADS
-X_AC_CHECK_COND_LIB(nsl, gethostbyname)
-X_AC_CHECK_COND_LIB(socket, socket)
 X_AC_CHECK_COND_LIB(bz2, BZ2_bzBuffToBuffCompress)
 X_AC_CHECK_COND_LIB(z, compress)
+AC_SEARCH_LIBS(gethostbyname, nsl)
+AC_SEARCH_LIBS(socket, socket)
+X_AC_CHECK_SSL
 
 ##
 # Checks for header files.
@@ -108,21 +108,13 @@ LIBS="$ac_save_LIBS"
 AC_CHECK_TYPES(CRYPTO_dynlock, [], [], [#include <openssl/crypto.h>])
 
 ##
-# Check for inet_ntop replacement.
-#   Solaris needs libnsl here in order to perform this check.
-##
-ac_save_LIBS="$LIBS"
-AC_CHECK_LIB(nsl, inet_ntop)
-AC_REPLACE_FUNCS(inet_ntop)
-LIBS="$ac_save_LIBS"
-
-##
 # Checks for library functions.
 ##
 AC_CHECK_FUNCS( \
   localtime_r \
 )
 AC_REPLACE_FUNCS( \
+  inet_ntop \
   strlcat \
   strlcpy \
 )
