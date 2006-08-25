@@ -82,11 +82,12 @@ AC_C_CONST
 AC_TYPE_UID_T
 AC_CHECK_TYPES(socklen_t, [], [], [#include <sys/socket.h>])
 
-
 ##
-# Checks for how to authenticate a non-parent process.
+# Checks for how to authenticate a client process.
 ##
 AC_CHECK_FUNCS(getpeereid)
+AC_CHECK_FUNCS(getpeerucred)
+AC_CHECK_HEADERS(ucred.h)
 X_AC_CHECK_PEERCRED
 AC_CHECK_FILES(/dev/spx)
 X_AC_CHECK_FIFO_RECVFD

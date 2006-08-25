@@ -30,6 +30,9 @@
 /* Define to 1 if you have the `getpeereid' function. */
 #undef HAVE_GETPEEREID
 
+/* Define to 1 if you have the `getpeerucred' function. */
+#undef HAVE_GETPEERUCRED
+
 /* Define to 1 if you have the `HMAC_Init_ex' function. */
 #undef HAVE_HMAC_INIT_EX
 
@@ -89,6 +92,9 @@
 
 /* Define to 1 if you have the <sys/types.h> header file. */
 #undef HAVE_SYS_TYPES_H
+
+/* Define to 1 if you have the <ucred.h> header file. */
+#undef HAVE_UCRED_H
 
 /* Define to 1 if you have the <unistd.h> header file. */
 #undef HAVE_UNISTD_H

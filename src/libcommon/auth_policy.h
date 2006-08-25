@@ -26,30 +26,39 @@
 
 
 /*****************************************************************************
- *  Munge supports the following types of client authentication:
+ *  MUNGE supports the following methods for authenticating the UID and GID
+ *    of a client:
  *
  *  MUNGE_AUTH_GETPEEREID (FreeBSD, AIX >= 5.2-ML4)
- *  - The server uses the getpeereid() call to determine the identity of the
- *    client connected to the unix domain socket.
+ *    The server uses getpeereid() to determine the identity of the client
+ *    connected across the Unix domain socket.
+ *
+ *  MUNGE_AUTH_GETPEERUCRED (Solaris >= 10)
+ *    The server uses getpeerucred() to determine the identity of the client
+ *    connected across the Unix domain socket.  The client's UID and GID are
+ *    then obtained via ucred_geteuid() and ucred_getegid().
  *
  *  MUNGE_AUTH_PEERCRED (Linux)
- *  - The server uses the SO_PEERCRED socket option to determine the identity
- *    of the client connected to the unix domain socket.
+ *    The server uses the SO_PEERCRED socket option to determine the identity
+ *    of the client connected across the Unix domain socket.  The client's UID
+ *    and GID are then obtained from the ucred struct returned by getsockopt().
  *
  *  MUNGE_AUTH_RECVFD_MKFIFO (Irix, Solaris)
- *  - The server creates a unique FIFO special file and sends a request to
- *    the client to use it for sending a file descriptor back across.  The fd
- *    is sent by the client using the I_SENDFD ioctl(), and received by the
- *    server using the I_RECVFD ioctl().  The identity of the client is then
- *    obtained from the strrecvfd struct used to receive the fd.
+ *    The server creates a unique FIFO special file via mkfifo() and sends a
+ *    request to the client for it to pass an open file descriptor back across
+ *    this FIFO.  The client creates a unique file and sends the open
+ *    descriptor using the I_SENDFD ioctl(), whereby the server receives it
+ *    using the I_RECVFD ioctl(). The identity of the client is then obtained
+ *    from the strrecvfd struct used to receive the file descriptor.
  *
- *  MUNGE_AUTH_RECVFD_MKNOD (AIX < 5.2-ML4)
- *  - The server creates a unique STREAMS-based pipe and sends a request to
- *    the client to use it for sending a file descriptor back across.  The fd
- *    is sent by the client using the I_SENDFD ioctl(), and received by the
- *    server using the I_RECVFD ioctl().  The identity of the client is then
- *    obtained from the strrecvfd struct used to receive the fd.  Root
- *    privileges are required by the server to create the pipe.
+ *  MUNGE_AUTH_RECVFD_MKNOD (AIX)
+ *    The server creates a unique STREAMS-based pipe via mknod() and sends a
+ *    request to the client for it to pass an open file descriptor back across
+ *    this pipe.  The client creates a unique file and sends the open
+ *    descriptor using the I_SENDFD ioctl(), whereby the server receives it
+ *    using the I_RECVFD ioctl(). The identity of the client is then obtained
+ *    from the strrecvfd struct used to receive the file descriptor. The server
+ *    requires root privileges in order to create this pipe.
  *
  *****************************************************************************/
 
@@ -69,21 +78,22 @@
 #if   HAVE_GETPEEREID
 #  define MUNGE_AUTH_GETPEEREID
 
+#elif HAVE_GETPEERUCRED && HAVE_UCRED_H
+#  define MUNGE_AUTH_GETPEERUCRED
+
 #elif HAVE_SO_PEERCRED
 #  define MUNGE_AUTH_PEERCRED
 
 #elif HAVE_STRUCT_STRRECVFD && HAVE_FIFO_RECVFD
 #  define MUNGE_AUTH_RECVFD_MKFIFO
+#  define MUNGE_AUTH_RECVFD
 
 #elif HAVE_STRUCT_STRRECVFD && HAVE__DEV_SPX
 #  define MUNGE_AUTH_RECVFD_MKNOD
+#  define MUNGE_AUTH_RECVFD
 
 #else
 #  error "No support for authenticating the client process."
-#endif
-
-#if defined (MUNGE_AUTH_RECVFD_MKFIFO) || defined (MUNGE_AUTH_RECVFD_MKNOD)
-#  define MUNGE_AUTH_RECVFD
 #endif
 
 

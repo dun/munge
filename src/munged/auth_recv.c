@@ -78,6 +78,46 @@ auth_recv (m_msg_t m, uid_t *uid, gid_t *gid)
 
 
 /*****************************************************************************
+ *  getpeerucred
+ *****************************************************************************/
+
+#ifdef MUNGE_AUTH_GETPEERUCRED
+
+#include <ucred.h>
+
+int
+auth_recv (m_msg_t m, uid_t *uid, gid_t *gid)
+{
+    ucred_t *ucred = NULL;
+    uid_t    uid_tmp;
+    gid_t    gid_tmp;
+    int      rc = -1;
+
+    if (getpeerucred (m->sd, &ucred) < 0) {
+        log_msg (LOG_ERR, "Unable to get peer ucred: %s", strerror (errno));
+    }
+    else if ((uid_tmp = ucred_geteuid (ucred)) < 0) {
+        log_msg (LOG_ERR, "Unable to get peer uid: %s", strerror (errno));
+    }
+    else if ((gid_tmp = ucred_getegid (ucred)) < 0) {
+        log_msg (LOG_ERR, "Unable to get peer gid: %s", strerror (errno));
+    }
+    else {
+        *uid = uid_tmp;
+        *gid = gid_tmp;
+        rc = 0;
+    }
+
+    if (ucred) {
+        ucred_free (ucred);
+    }
+    return (rc);
+}
+
+#endif /* MUNGE_AUTH_GETPEERUCRED */
+
+
+/*****************************************************************************
  *  peercred sockopt
  *****************************************************************************/
 

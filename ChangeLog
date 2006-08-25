@@ -1,5 +1,8 @@
 2006-08-24  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* configure.ac, src/libcommon/auth_policy.h, src/munged/auth_recv.c:
+	  Added support for MUNGE_AUTH_GETPEERUCRED (Solaris 10).
+
 	* configure.ac: Replaced nsl & socket X_AC_CHECK_COND_LIB with
 	  AC_SEARCH_LIBS.  Moved X_AC_CHECK_SSL to after this check so LIBS
 	  would include -lsocket & -lnsl if needed (eg, on Solaris).  Merged
