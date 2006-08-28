@@ -1,5 +1,9 @@
 2006-08-28  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* munge.spec: Fixed so shared libs are built on AIX (ie, changed rpm
+	  os define from "aix" to "aix5.3" so configure script would detect
+	  support for building shared libs).
+
 	* src/etc/munge.init.in: Replaced 'id -u' with 'id|sed' (for Solaris).
 
 2006-08-24  Chris Dunlap  <cdunlap@llnl.gov>

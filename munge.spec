@@ -42,7 +42,7 @@ A shared library for applications using MUNGE.
 
 %build
 rm -f libmunge-32_64.a
-%ifnos aix
+%ifnos aix5.3
 ##
 # Add one of the following to the rpm command line to specify 32b/64b builds:
 #   --with arch32               (build 32b executables and library)
@@ -55,10 +55,6 @@ rm -f libmunge-32_64.a
 make
 %else
 ##
-# Add "--target ppc-aix" to the rpm command line to force AIX builds.
-#   You will have to override the platform information at install time
-#   with "--ignoreos".
-#
 # Add one of the following to the rpm command line to specify 32b/64b builds:
 #   --define 'arch 32'          (build 32b executables and library)
 #   --define 'arch 64'          (build 64b executables and library)
@@ -161,14 +157,14 @@ if [ -x /sbin/ldconfig ]; then /sbin/ldconfig %{_libdir}; fi
 %{_includedir}/*
 %{_libdir}/*.la
 %{_mandir}/*3/*
-%ifnos aix
+%ifnos aix5.3
 %{_libdir}/*.a
 %{_libdir}/*.so
 %endif
 
 %files libs
 %defattr(-,root,root,0755)
-%ifnos aix
+%ifnos aix5.3
 %{_libdir}/*.so.*
 %else
 %{_libdir}/*.a
