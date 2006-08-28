@@ -1,3 +1,7 @@
+2006-08-28  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/etc/munge.init.in: Replaced 'id -u' with 'id|sed' (for Solaris).
+
 2006-08-24  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* configure.ac, src/libcommon/auth_policy.h, src/munged/auth_recv.c:
