@@ -41,7 +41,7 @@ A shared library for applications using MUNGE.
 %setup -n munge
 
 %build
-%ifos aix5.3
+%ifos aix5.3 aix5.2 aix5.1 aix5.0 aix4.3
 ##
 # Add the following to the rpm command line to specify 32-bit/64-bit builds:
 #   --define 'bitarch all'      (build 32-bit executables & multiarch library)
@@ -107,7 +107,7 @@ make
 rm -rf "$RPM_BUILD_ROOT"
 mkdir -p "$RPM_BUILD_ROOT"
 DESTDIR="$RPM_BUILD_ROOT" make install
-%ifos aix5.3
+%ifos aix5.3 aix5.2 aix5.1 aix5.0 aix4.3
 [ -f "libmunge.a" ] && cp "libmunge.a" "$RPM_BUILD_ROOT"%{_libdir}
 %endif
 
@@ -170,14 +170,14 @@ if [ -x /sbin/ldconfig ]; then /sbin/ldconfig %{_libdir}; fi
 %{_includedir}/*
 %{_libdir}/*.la
 %{_mandir}/*3/*
-%ifnos aix5.3
+%ifnos aix5.3 aix5.2 aix5.1 aix5.0 aix4.3
 %{_libdir}/*.a
 %{_libdir}/*.so
 %endif
 
 %files libs
 %defattr(-,root,root,0755)
-%ifnos aix5.3
+%ifnos aix5.3 aix5.2 aix5.1 aix5.0 aix4.3
 %{_libdir}/*.so.*
 %else
 %{_libdir}/*.a
