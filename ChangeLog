@@ -1,3 +1,7 @@
+2006-08-29  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* munge.spec: Tweaked error messages.
+
 2006-08-28  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* munge.spec: Fixed aix5.3 %ifos/%ifnos lines to include os_compats.

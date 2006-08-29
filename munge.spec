@@ -58,14 +58,14 @@ case "$BITARCH" in
   32) BITARCH="32" ;;
   64) BITARCH="64" ;;
   32_64|all|any|both|"") BITARCH="64 32" ;;
-  *) echo "bitarch must be [ all | 32 | 64 ]" 1>&2; exit 1 ;;
+  *) echo "bitarch must be one of [ all | 32 | 64 ]" 1>&2; exit 1 ;;
 esac
 %{?linkage:LINKAGE="%{linkage}"}
 case "$LINKAGE" in
   shared|dynamic) LINKAGE="shared" ;;
   static) LINKAGE="static" ;;
   all|any|both|"") LINKAGE="static shared" ;;
-  *) echo "linkage must be [ all | shared | static ]" 1>&2; exit 1 ;;
+  *) echo "linkage must be one of [ all | shared | static ]" 1>&2; exit 1 ;;
 esac
 TOP="`pwd`"
 TMP="$TOP/tmp-$$"
