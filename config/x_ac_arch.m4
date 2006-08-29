@@ -85,10 +85,6 @@ AC_DEFUN([X_AC_ARCH], [
         && LDFLAGS="-L/lib64 -L/usr/lib64 $LDFLAGS"
     fi
     unset x_ac_cv_check_ssl_dir
-  else
-    if expr "$host_os" : "aix" >/dev/null 2>&1; then
-      OBJECT_MODE="$_x_ac_arch_objmode_save"
-    fi
   fi
   ]
 )

@@ -1,5 +1,7 @@
 2006-08-29  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* config/x_ac_arch.m4: Removed leftover code from previous commit.
+
 	* README.AIX, munge.spec, config/x_ac_arch.m4: Fixed so 32-bit &
 	  64-bit builds work on AIX without a gcc wrapper script setting either
 	  "-maix32" or "-maix64".
