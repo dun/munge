@@ -28,7 +28,6 @@
 ##*****************************************************************************
 
 AC_DEFUN([X_AC_ARCH], [
-
   AC_MSG_CHECKING([for specified code architecture])
   AC_ARG_ENABLE(
     [arch],
