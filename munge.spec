@@ -69,10 +69,11 @@ case "$LINKAGE" in
 esac
 TOP="`pwd`"
 TMP="$TOP/tmp-$$"
+OBJECT_MODE="32"
+export OBJECT_MODE
 for linkage in $LINKAGE; do
   [ "$linkage" = "static" ] && nonlinkage="shared" || nonlinkage="static"
   for bitarch in $BITARCH; do
-    export OBJECT_MODE="$bitarch"
     %configure -C --enable-arch="$bitarch" \
       --enable-"$linkage" --disable-"$nonlinkage" \
       --program-prefix=%{?_program_prefix:%{_program_prefix}}

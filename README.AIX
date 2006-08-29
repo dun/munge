@@ -1,3 +1,29 @@
+If you're building MUNGE from source on AIX, you need to export the
+OBJECT_MODE environment variable to your environment.  It should be set to
+either "32" or "64" depending on whether you want code to be generated for
+a 32-bit or 64-bit architecture.  If you are using gcc, you also need to
+set CFLAGS to either "-maix32" or "-maix64".  Finally, you should set the
+"--enable-arch" option as well:
+
+  $ CFLAGS="-maix32" OBJECT_MODE=32 ./configure --enable-arch=32
+
+  $ CFLAGS="-maix64" OBJECT_MODE=64 ./configure --enable-arch=64
+
+In the configure script, AC_INIT is called before anything else and performs
+some basic compiler checks.  The "-maix" gcc compiler flag must agree
+with the OBJECT_MODE environment variable recognized by the AIX linker.
+One alternative is to always set OBJECT_MODE=32.  The gcc compiler
+will default to "-maix32" which allows the AC_INIT checks to succeed.
+The "--enable-arch" option can then be used to control whether code is
+generated for a 32-bit or 64-bit architecture.  For example:
+
+  $ export OBJECT_MODE=32
+  $ ./configure --enable-arch=64
+
+This is the trick that is used in the RPM spec file.
+
+--
+
 MUNGE supports two different types of client authentication under AIX.
 The getpeereid() method is supported by AIX 5.2 ML4 and later.  The configure
 script tests for this when "checking for getpeereid".  The recvfd-mknod

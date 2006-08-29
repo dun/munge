@@ -1,5 +1,9 @@
 2006-08-29  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* README.AIX, munge.spec, config/x_ac_arch.m4: Fixed so 32-bit &
+	  64-bit builds work on AIX without a gcc wrapper script setting either
+	  "-maix32" or "-maix64".
+
 	* munge.spec: Tweaked error messages.
 
 2006-08-28  Chris Dunlap  <cdunlap@llnl.gov>

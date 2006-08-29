@@ -28,6 +28,7 @@
 ##*****************************************************************************
 
 AC_DEFUN([X_AC_ARCH], [
+
   AC_MSG_CHECKING([for specified code architecture])
   AC_ARG_ENABLE(
     [arch],
@@ -42,13 +43,25 @@ AC_DEFUN([X_AC_ARCH], [
   )
   AC_MSG_RESULT([${x_ac_arch=no}])
 
-  AC_MSG_CHECKING([whether $CC accepts -m${x_ac_arch}])
-  _x_ac_arch_cflags_save="$CFLAGS"
-  CFLAGS="$CFLAGS -m${x_ac_arch}"
-  AC_COMPILE_IFELSE([AC_LANG_PROGRAM()],
-    [AS_VAR_SET(x_ac_arch_prog_cc_m, yes)],
-    [AS_VAR_SET(x_ac_arch_prog_cc_m, no); CFLAGS="$_x_ac_arch_cflags_save"])
-  AC_MSG_RESULT([${x_ac_arch_prog_cc_m=no}])
+  if test "$x_ac_arch" != "no"; then
+    AC_MSG_CHECKING([whether $CC accepts -m${x_ac_arch}])
+    _x_ac_arch_cflags_save="$CFLAGS"
+    CFLAGS="$CFLAGS -m${x_ac_arch}"
+    AC_COMPILE_IFELSE([AC_LANG_PROGRAM()],
+      [AS_VAR_SET(x_ac_arch_prog_cc_m, yes)],
+      [AS_VAR_SET(x_ac_arch_prog_cc_m, no); CFLAGS="$_x_ac_arch_cflags_save"])
+    AC_MSG_RESULT([${x_ac_arch_prog_cc_m=no}])
+
+    if expr "$host_os" : "aix" >/dev/null 2>&1; then
+      AC_MSG_CHECKING([whether $CC accepts -maix${x_ac_arch}])
+      _x_ac_arch_cflags_save="$CFLAGS"
+      CFLAGS="$CFLAGS -maix${x_ac_arch}"
+      AC_COMPILE_IFELSE([AC_LANG_PROGRAM()],
+        [AS_VAR_SET(x_ac_arch_prog_cc_maix, yes)],
+        [AS_VAR_SET(x_ac_arch_prog_cc_maix, no); CFLAGS="$_x_ac_arch_cflags_save"])
+      AC_MSG_RESULT([${x_ac_arch_prog_cc_maix=no}])
+    fi
+  fi
 
   if test "$x_ac_arch" == "32"; then
     if expr "$host_os" : "aix" >/dev/null 2>&1; then
@@ -72,6 +85,10 @@ AC_DEFUN([X_AC_ARCH], [
         && LDFLAGS="-L/lib64 -L/usr/lib64 $LDFLAGS"
     fi
     unset x_ac_cv_check_ssl_dir
+  else
+    if expr "$host_os" : "aix" >/dev/null 2>&1; then
+      OBJECT_MODE="$_x_ac_arch_objmode_save"
+    fi
   fi
   ]
 )
