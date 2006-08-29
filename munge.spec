@@ -41,53 +41,65 @@ A shared library for applications using MUNGE.
 %setup -n munge
 
 %build
-rm -f libmunge-32_64.a
-%ifnos aix5.3
+%ifos aix5.3
 ##
-# Add one of the following to the rpm command line to specify 32b/64b builds:
-#   --with arch32               (build 32b executables and library)
-#   --with arch64               (build 64b executables and library)
+# Add the following to the rpm command line to specify 32-bit/64-bit builds:
+#   --define 'bitarch all'      (build 32-bit executables & multiarch library)
+#   --define 'bitarch 32'       (build 32-bit executables & library)
+#   --define 'bitarch 64'       (build 64-bit executables & library)
+#
+# Add the following to the rpm command line to specify shared/static libraries:
+#   --define 'linkage all'      (build both shared & static libraries)
+#   --define 'linkage shared'   (build shared libraries only)
+#   --define 'linkage static'   (build static libraries only)
+##
+%{?bitarch:BITARCH="%{bitarch}"}
+case "$BITARCH" in
+  32) BITARCH="32" ;;
+  64) BITARCH="64" ;;
+  32_64|all|any|both|"") BITARCH="64 32" ;;
+  *) echo "bitarch must be [ all | 32 | 64 ]" 1>&2; exit 1 ;;
+esac
+%{?linkage:LINKAGE="%{linkage}"}
+case "$LINKAGE" in
+  shared|dynamic) LINKAGE="shared" ;;
+  static) LINKAGE="static" ;;
+  all|any|both|"") LINKAGE="static shared" ;;
+  *) echo "linkage must be [ all | shared | static ]" 1>&2; exit 1 ;;
+esac
+TOP="`pwd`"
+TMP="$TOP/tmp-$$"
+for linkage in $LINKAGE; do
+  [ "$linkage" = "static" ] && nonlinkage="shared" || nonlinkage="static"
+  for bitarch in $BITARCH; do
+    export OBJECT_MODE="$bitarch"
+    %configure -C --enable-arch="$bitarch" \
+      --enable-"$linkage" --disable-"$nonlinkage" \
+      --program-prefix=%{?_program_prefix:%{_program_prefix}}
+    rm -rf "$TMP/$linkage-$bitarch"
+    mkdir -p "$TMP/$linkage-$bitarch"
+    ( cd src/libmunge && make install DESTDIR="$TMP/$linkage-$bitarch" )
+    make clean
+    rm -rf "$TMP/$linkage-$bitarch-lib"
+    mkdir -p "$TMP/$linkage-$bitarch-lib"
+    ( cd "$TMP/$linkage-$bitarch-lib" && \
+      ar -X"$bitarch" x "$TMP/$linkage-$bitarch%{_libdir}/libmunge.a" )
+  done
+done
+rm -f "libmunge.a"
+( cd "$TMP" && ar -Xany cr "$TOP/libmunge.a" *-lib/* )
+rm -rf "$TMP"
+make
+%else
+##
+# Add the following to the rpm command line to specify 32-bit/64-bit builds:
+#   --with arch32               (build 32-bit executables & library)
+#   --with arch64               (build 64-bit executables & library)
 ##
 %configure \
   %{?_with_arch32: --enable-arch=32} \
   %{?_with_arch64: --enable-arch=64} \
   --program-prefix=%{?_program_prefix:%{_program_prefix}}
-make
-%else
-##
-# Add one of the following to the rpm command line to specify 32b/64b builds:
-#   --define 'arch 32'          (build 32b executables and library)
-#   --define 'arch 64'          (build 64b executables and library)
-#   --define 'arch 32_64'       (build 32b executables and multiarch library)
-##
-%{?arch:ARCH="%{arch}"}
-if test "$ARCH" = "32_64"; then
-  export OBJECT_MODE=64
-  %configure -C --enable-arch=64 \
-    --program-prefix=%{?_program_prefix:%{_program_prefix}}
-  ( cd src/libmunge && make install DESTDIR="`pwd`/../../tmp-$$/64" )
-  make clean
-  export OBJECT_MODE=32
-  %configure -C --enable-arch=32 \
-    --program-prefix=%{?_program_prefix:%{_program_prefix}}
-  ( cd src/libmunge && make install DESTDIR="`pwd`/../../tmp-$$/32" )
-  mkdir -p tmp-$$/64-lib
-  ( cd tmp-$$/64-lib && ar -X64 -x ../64%{_libdir}/libmunge.a )
-  mkdir -p tmp-$$/32-lib
-  ( cd tmp-$$/32-lib && ar -X32 -x ../32%{_libdir}/libmunge.a )
-  ar -X32_64 -c -q libmunge-32_64.a tmp-$$/*-lib/*
-  rm -rf tmp-$$
-elif test "$ARCH" = "32"; then
-  export OBJECT_MODE=32
-  %configure -C --enable-arch=32 \
-    --program-prefix=%{?_program_prefix:%{_program_prefix}}
-elif test "$ARCH" = "64"; then
-  export OBJECT_MODE=64
-  %configure -C --enable-arch=64 \
-    --program-prefix=%{?_program_prefix:%{_program_prefix}}
-else
-  %configure -C --program-prefix=%{?_program_prefix:%{_program_prefix}}
-fi
 make
 %endif
 
@@ -95,8 +107,9 @@ make
 rm -rf "$RPM_BUILD_ROOT"
 mkdir -p "$RPM_BUILD_ROOT"
 DESTDIR="$RPM_BUILD_ROOT" make install
-test -f libmunge-32_64.a \
-  && cp libmunge-32_64.a "$RPM_BUILD_ROOT"%{_libdir}/libmunge.a
+%ifos aix5.3
+[ -f "libmunge.a" ] && cp "libmunge.a" "$RPM_BUILD_ROOT"%{_libdir}
+%endif
 
 %clean
 rm -rf "$RPM_BUILD_ROOT"
