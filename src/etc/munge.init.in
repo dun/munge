@@ -73,8 +73,7 @@ service_init ()
   [ -n "$SIGHUP_RELOAD" -a "$SIGHUP_RELOAD" != 0 ] \
     && RELOAD=1 || unset RELOAD
   expr "$NICE" : '[0-9]*$' >/dev/null 2>&1 && NICE="+$NICE"
-  UID=`id | sed 's/^uid=\([0-9]*\).*/\1/'`
-  [ "$UID" -ne 0 ] && unset USER
+  [ "`id | sed 's/^uid=\([0-9]*\).*/\1/'`" -ne 0 ] && unset USER
 
   if [ -f /etc/debian_version -a -x /sbin/start-stop-daemon ]; then
     SYSTEM="DEBIAN"

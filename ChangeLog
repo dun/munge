@@ -1,5 +1,8 @@
 2006-08-30  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/etc/munge.init.in: Removed use of UID variable since RedHat
+	  returns the error "UID: readonly variable".
+
 	* munge.spec: Replaced use of "daemon" group with "root" group since
 	  the daemon group does not exist on AIX by default.
 
