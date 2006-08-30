@@ -4,7 +4,8 @@
 	  returns the error "UID: readonly variable".
 
 	* munge.spec: Replaced use of "daemon" group with "root" group since
-	  the daemon group does not exist on AIX by default.
+	  the daemon group does not exist on AIX by default.  The root group
+	  does not exist there either, but RPM seems to quietly deal with it.
 
 2006-08-29  Chris Dunlap  <cdunlap@llnl.gov>
 
