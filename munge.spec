@@ -119,7 +119,7 @@ rm -rf "$RPM_BUILD_ROOT"
 if [ ! -e %{_sysconfdir}/munge/munge.key -a -c /dev/urandom ]; then
   /bin/dd if=/dev/urandom bs=1 count=1024 \
     >%{_sysconfdir}/munge/munge.key 2>/dev/null
-  /bin/chown daemon:daemon %{_sysconfdir}/munge/munge.key
+  /bin/chown daemon %{_sysconfdir}/munge/munge.key
   /bin/chmod 0400 %{_sysconfdir}/munge/munge.key
 fi
 if [ -x /sbin/chkconfig ]; then /sbin/chkconfig --add munge; fi
@@ -157,11 +157,11 @@ if [ -x /sbin/ldconfig ]; then /sbin/ldconfig %{_libdir}; fi
 %doc README*
 %doc TODO
 %doc doc/*
-%dir %attr(0700,daemon,daemon) %config %{_sysconfdir}/munge
+%dir %attr(0700,daemon,root) %config %{_sysconfdir}/munge
 %config(noreplace) %{_sysconfdir}/*/*
-%dir %attr(0711,daemon,daemon) %config %{_localstatedir}/lib/munge
-%dir %attr(0700,daemon,daemon) %config %{_localstatedir}/log/munge
-%dir %attr(0755,daemon,daemon) %config %{_localstatedir}/run/munge
+%dir %attr(0711,daemon,root) %config %{_localstatedir}/lib/munge
+%dir %attr(0700,daemon,root) %config %{_localstatedir}/log/munge
+%dir %attr(0755,daemon,root) %config %{_localstatedir}/run/munge
 %{_bindir}/*
 %{_sbindir}/*
 %{_mandir}/*[^3]/*
