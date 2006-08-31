@@ -29,7 +29,7 @@
  *  MUNGE supports the following methods for authenticating the UID and GID
  *    of a client:
  *
- *  MUNGE_AUTH_GETPEEREID (AIX >= 5.2-ML4, FreeBSD >= 4.6)
+ *  MUNGE_AUTH_GETPEEREID (AIX >= 5.2-ML4, Darwin, FreeBSD >= 4.6)
  *    The server uses getpeereid() to determine the identity of the client
  *    connected across the Unix domain socket.
  *

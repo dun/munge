@@ -1,5 +1,8 @@
 2006-08-31  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/libcommon/auth_policy.h: Updated comment to add Darwin to the
+	  list of platforms supporting getpeereid().
+
 	* configure.ac, config/x_ac_darwin.m4: Added support for Darwin.
 	  By defining _APPLE_C_SOURCE via configure, a different version of
 	  certain pthread routines is used.  Without it, pthread_cond_wait()
