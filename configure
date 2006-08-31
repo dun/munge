@@ -12899,6 +12899,20 @@ done
 
 
 
+  case "$host" in
+    *-*-darwin*)
+
+cat >>confdefs.h <<\_ACEOF
+#define _APPLE_C_SOURCE 1
+_ACEOF
+
+      ;;
+    *)
+      ;;
+  esac
+
+
+
 ##
 # Epilogue.
 ##

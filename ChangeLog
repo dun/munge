@@ -1,3 +1,12 @@
+2006-08-31  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* configure.ac, config/x_ac_darwin.m4: Added support for Darwin.
+	  By defining _APPLE_C_SOURCE via configure, a different version of
+	  certain pthread routines is used.  Without it, pthread_cond_wait()
+	  is not recognized as a cancellation point; consequently, work_fini()
+	  is unable to cancel the worker threads, and munged hangs on
+	  pthread_join() at exit as a result.
+
 2006-08-30  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* munge.spec: Tweaked formatting.

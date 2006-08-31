@@ -124,6 +124,7 @@ AC_REPLACE_FUNCS( \
 # Check for platform-specific issues.
 ##
 X_AC_AIX
+X_AC_DARWIN
 
 ##
 # Epilogue.

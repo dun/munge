@@ -215,6 +215,9 @@
 /* Expansion of the "sysconfdir" installation directory. */
 #undef X_SYSCONFDIR
 
+/* Define to 1 if you are building on Darwin (Mac OS X). */
+#undef _APPLE_C_SOURCE
+
 /* Define to 1 if you plan to link against multithreaded code. */
 #undef _REENTRANT
 
