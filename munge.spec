@@ -10,7 +10,6 @@ License:	GPL
 URL:		http://home.gna.org/munge/
 
 BuildRoot:	%{_tmppath}/%{name}-%{version}
-
 Source0:	%{name}-%{version}.tar
 
 %package devel

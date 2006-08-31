@@ -1,5 +1,7 @@
 2006-08-30  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* munge.spec: Tweaked formatting.
+
 	* src/libcommon/auth_policy.h: Updated comment regarding when
 	  getpeereid() first appeared in FreeBSD.
 
