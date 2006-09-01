@@ -1,5 +1,7 @@
 2006-09-01  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* README, munge.spec, src/libcommon/munge.7.in: Updated description.
+
 	* src/etc/munge.init.in: Removed dependency on awk.
 
 	* src/etc/Makefile.am: Changed the install-data-local target so the
