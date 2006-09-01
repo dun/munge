@@ -422,7 +422,7 @@ query_pids ()
   else
     pids=`(ps awx -o pid -o command || ps -e -f -o pid -o args) 2>/dev/null \
       | tail +2 | egrep "( |/)$PROCNAME( |$)" | grep -v egrep \
-      | awk '{print $1}' | sort -n | tr '\012' ' '`
+      | sed 's/ *\([0-9]*\).*/\1/' | sort -n | tr '\012' ' '`
     [ -n "$pids" ] && rc=0 || rc=1
   fi
 
@@ -446,16 +446,15 @@ query_exec ()
 # Returns 0 if EXECNAME is an executable file within the PATH.
 ##
   EXECNAME="$1"
-  IFS_BAK="$IFS"
   rc=1
 
+  IFS_BAK="$IFS"
   IFS=:
   for dir in $PATH; do
     [ -x "$dir/$EXECNAME" ] || continue
     rc=0
     break
   done
-
   IFS="$IFS_BAK"
   return $rc
 }

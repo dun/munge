@@ -1,5 +1,7 @@
 2006-09-01  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/etc/munge.init.in: Removed dependency on awk.
+
 	* src/etc/Makefile.am: Changed the install-data-local target so the
 	  installed munge.init and munge.sysconfig files would only be given
 	  the ".new" suffix if the files already existed at the destination
