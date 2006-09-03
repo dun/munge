@@ -10,6 +10,7 @@ noinst_DATA = \
 	munge.init
 
 install-data-local:
+	expr "`id`" : 'uid=0(' >/dev/null && OWNER="-o daemon" || OWNER= \
 	$(INSTALL) -m 0755 -d "$(DESTDIR)$(sysconfdir)/init.d"; \
 	test ! -f "$(DESTDIR)$(sysconfdir)/init.d/munge" \
 	  || cmp $(srcdir)/munge.init "$(DESTDIR)$(sysconfdir)/init.d/munge" \
@@ -23,10 +24,10 @@ install-data-local:
 	$(INSTALL) -m 0755 -d "$(DESTDIR)$(sysconfdir)/$$d"; \
 	$(INSTALL) -m 0755 $(srcdir)/munge.sysconfig \
 	  "$(DESTDIR)$(sysconfdir)/$$d/munge$${new}"; \
+	$(INSTALL) $$OWNER -m 0700 -d "$(DESTDIR)$(sysconfdir)/munge"; \
 	$(INSTALL) -m 0755 -d "$(DESTDIR)$(localstatedir)/lib"; \
-	$(INSTALL) -m 0711 -d "$(DESTDIR)$(localstatedir)/lib/munge"; \
+	$(INSTALL) $$OWNER -m 0711 -d "$(DESTDIR)$(localstatedir)/lib/munge"; \
 	$(INSTALL) -m 0755 -d "$(DESTDIR)$(localstatedir)/log"; \
-	$(INSTALL) -m 0700 -d "$(DESTDIR)$(localstatedir)/log/munge"; \
+	$(INSTALL) $$OWNER -m 0700 -d "$(DESTDIR)$(localstatedir)/log/munge"; \
 	$(INSTALL) -m 0755 -d "$(DESTDIR)$(localstatedir)/run"; \
-	$(INSTALL) -m 0755 -d "$(DESTDIR)$(localstatedir)/run/munge"; \
-	$(INSTALL) -m 0700 -d "$(DESTDIR)$(sysconfdir)/munge"
+	$(INSTALL) $$OWNER -m 0755 -d "$(DESTDIR)$(localstatedir)/run/munge"

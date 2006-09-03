@@ -1,3 +1,9 @@
+2006-09-02  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/etc/Makefile.am: Changed the install-data-local target so the
+	  /etc/munge, /var/lib/munge, /var/log/munge, and /var/run/munge dirs
+	  would be owned by "daemon" if the "make install" was done by root.
+
 2006-09-01  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* README, munge.spec, src/libcommon/munge.7.in: Updated description.
