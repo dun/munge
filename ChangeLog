@@ -1,3 +1,8 @@
+2006-09-04  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/etc/Makefile.am: Fixed bug with unterminated line (ie, missing
+	  semicolon) from previous commit.
+
 2006-09-02  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/etc/Makefile.am: Changed the install-data-local target so the
