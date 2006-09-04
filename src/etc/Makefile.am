@@ -10,7 +10,7 @@ noinst_DATA = \
 	munge.init
 
 install-data-local:
-	expr "`id`" : 'uid=0(' >/dev/null && OWNER="-o daemon" || OWNER=; \
+	expr "`id`" : 'uid=0(' >/dev/null && OWNER="-o daemon" || OWNER=""; \
 	$(INSTALL) -m 0755 -d "$(DESTDIR)$(sysconfdir)/init.d"; \
 	test ! -f "$(DESTDIR)$(sysconfdir)/init.d/munge" \
 	  || cmp $(srcdir)/munge.init "$(DESTDIR)$(sysconfdir)/init.d/munge" \
