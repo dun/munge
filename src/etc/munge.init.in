@@ -72,7 +72,7 @@ service_init ()
   STATUS=0
   [ -n "$SIGHUP_RELOAD" -a "$SIGHUP_RELOAD" != 0 ] \
     && RELOAD=1 || unset RELOAD
-  expr "$NICE" : '[0-9]*$' >/dev/null 2>&1 && NICE="+$NICE"
+  expr -- "$NICE" : '[0-9]*$' >/dev/null 2>&1 && NICE="+$NICE"
   [ "`id | sed 's/^uid=\([0-9]*\).*/\1/'`" -ne 0 ] && unset USER
 
   if [ -f /etc/debian_version -a -x /sbin/start-stop-daemon ]; then
@@ -430,8 +430,8 @@ query_pids ()
   if [ -n "$pids" -a -r "$PIDFILE" ]; then
     read pid_line < "$PIDFILE"
     for pid in $pid_line; do
-      expr "$pid" : '[0-9]*$' >/dev/null 2>&1 \
-        && expr " $pids " : ".* $pid .*" >/dev/null 2>&1 \
+      expr -- "$pid" : '[0-9]*$' >/dev/null 2>&1 \
+        && expr -- " $pids " : ".* $pid .*" >/dev/null 2>&1 \
         && pids_running="$pids_running $pid"
     done
     [ -n "$pids_running" ] && pids=$pids_running

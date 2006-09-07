@@ -1,3 +1,8 @@
+2006-09-07  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/etc/munge.init.in: Changed use of "expr" to "expr --" to prevent
+	  next arg from potentially being treated as a cmdline option.
+
 2006-09-04  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/etc/Makefile.am: Fixed bug with unterminated line (ie, missing
