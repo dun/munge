@@ -99,7 +99,7 @@ user ID of that process is a member.
 .BI "-t, --ttl " integer
 Specify the time-to-live (in seconds).  This controls how long the credential
 is valid once it has been encoded.  A value of 0 selects the default ttl.
-A value of -1 selects the maximum allowed ttl.
+A value of \-1 selects the maximum allowed ttl.
 .TP
 .BI "-S, --socket " string
 Specify the local domain socket for connecting with \fBmunged\fR.

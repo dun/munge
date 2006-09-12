@@ -65,7 +65,7 @@ text string, or NULL on error; this string should not be freed or modified by
 the caller.
 .PP
 The \fBmunge_enum_str_to_int()\fR function returns a MUNGE enumeration on
-success (i.e., >= 0), or -1 on error.
+success (i.e., >= 0), or \-1 on error.
 
 .SH "ENUM TYPES"
 The following enumeration types can be specified.

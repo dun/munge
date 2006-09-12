@@ -1,3 +1,9 @@
+2006-09-12  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/libmunge/munge_enum.3.in, src/munge/munge.1.in,
+	  src/munge/remunge.1.in: Fixed Lintian warning about
+	  hyphen-used-as-minus-sign (Thanks to Gennaro Oliva).
+
 2006-09-07  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/etc/munge.init.in: Changed use of "expr" to "expr --" to prevent
@@ -637,7 +643,7 @@
 
 	* src/etc/munge.init: Fixed bug with RHEL4-U1's chkconfig where it
 	  doesn't handle the existence of a 'Required-Start' without a
-	  'Required-Stop' (Thanx to Christopher Holmes).
+	  'Required-Stop' (Thanks to Christopher Holmes).
 
 2005-07-20  Chris Dunlap  <cdunlap@llnl.gov>
 
@@ -701,7 +707,7 @@
 2005-07-07  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/etc/munge.init: Fixed 'start' behavior under RedHat so daemon is
-	  not started if it is already running (Thanx to Christopher Holmes).
+	  not started if it is already running (Thanks to Christopher Holmes).
 
 	* Makefile.am, config/Make-rpm.mk: Removed deprecated Make-rpm.
 

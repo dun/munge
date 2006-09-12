@@ -95,14 +95,14 @@ user ID of that process is a member.
 .TP
 .BI "-t, --ttl " integer
 Specify the time-to-live (in seconds).  A value of 0 selects the default ttl.
-A value of -1 selects the maximum allowed ttl.
+A value of \-1 selects the maximum allowed ttl.
 .TP
 .BI "-S, --socket " string
 Specify the local domain socket for connecting with \fBmunged\fR.
 .TP
 .BI "-D, --duration " integer
 Specify the test duration (in seconds).  The default duration is one second.
-A value of -1 selects the maximum duration.  The integer may be followed by
+A value of \-1 selects the maximum duration.  The integer may be followed by
 a single-character modifier: s=seconds, m=minutes, h=hours, d=days.
 .TP
 .BI "-N, --num-creds " integer
