@@ -31,19 +31,24 @@
 
 #include <errno.h>
 #include <string.h>
+#include <sys/stat.h>
 #include <unistd.h>
 #include <munge.h>
 #include "auth_policy.h"
 #include "log.h"
 #include "m_msg.h"
+#include "path.h"
 
 
 /*****************************************************************************
  *  initialization
  *****************************************************************************/
 
+static void _check_auth_server_dir (const char *dir, int got_force);
+static void _check_auth_client_dir (const char *dir, int got_force);
+
 void
-auth_recv_init (void)
+auth_recv_init (const char *srvrdir, const char *clntdir, int got_force)
 {
 #ifdef MUNGE_AUTH_RECVFD_MKNOD
     if (geteuid () != 0) {
@@ -52,6 +57,173 @@ auth_recv_init (void)
     }
 #endif /* MUNGE_AUTH_RECVFD_MKNOD */
 
+    _check_auth_server_dir (srvrdir, got_force);
+    _check_auth_client_dir (clntdir, got_force);
+
+    return;
+}
+
+static void
+_check_auth_server_dir (const char *dir, int got_force)
+{
+#ifdef MUNGE_AUTH_RECVFD
+    int          got_symlink;
+    struct stat  st;
+    int          n;
+    char         ebuf [1024];
+
+    if ((dir == NULL) || (*dir == '\0')) {
+        log_err (EMUNGE_SNAFU, LOG_ERR, "The auth server dir has no name");
+    }
+    /*  Check directory permissions and whatnot.
+     */
+    got_symlink = (lstat (dir, &st) == 0) ? S_ISLNK (st.st_mode) : 0;
+
+    if (stat (dir, &st) < 0) {
+        log_errno (EMUNGE_SNAFU, LOG_ERR,
+            "Cannot check auth server dir \"%s\"", dir);
+    }
+    if (!S_ISDIR (st.st_mode) || got_symlink) {
+        if (!got_force || !got_symlink)
+            log_err (EMUNGE_SNAFU, LOG_ERR,
+                "The auth server dir is insecure: "
+                "\"%s\" must be a directory", dir);
+        else
+            log_msg (LOG_WARNING,
+                "The auth server dir is insecure: "
+                "\"%s\" should not be a symlink", dir);
+    }
+    if (st.st_uid != geteuid ()) {
+        log_err (EMUNGE_SNAFU, LOG_ERR,
+            "The auth server dir is insecure: "
+            "\"%s\" must be owned by uid=%u", dir, (unsigned) geteuid ());
+    }
+    if (!(st.st_mode & S_IWUSR)) {
+        log_err (EMUNGE_SNAFU, LOG_ERR,
+            "The auth server dir is insecure: "
+            "\"%s\" must be writable by user", dir);
+    }
+    if (st.st_mode & (S_IRGRP | S_IROTH)) {
+        if (!got_force)
+            log_err (EMUNGE_SNAFU, LOG_ERR,
+                "The auth server dir is insecure: "
+                "\"%s\" should not be readable by group or world", dir);
+        else
+            log_msg (LOG_WARNING,
+                "The auth server dir is insecure: "
+                "\"%s\" should not be readable by group or world", dir);
+    }
+    /*  Ensure auth server dir is secure against modification by others.
+     */
+    n = path_is_secure (dir, ebuf, sizeof (ebuf));
+    if (n < 0) {
+        log_err (EMUNGE_SNAFU, LOG_ERR,
+            "Cannot check auth server dir \"%s\": %s", dir, ebuf);
+    }
+    else if ((n == 0) && (!got_force)) {
+        log_err (EMUNGE_SNAFU, LOG_ERR,
+            "The auth server dir is insecure: %s", ebuf);
+    }
+    else if (n == 0) {
+        log_msg (LOG_WARNING,
+            "The auth server dir is insecure: %s", ebuf);
+    }
+    /*  Ensure auth server dir is accessible by all.
+     */
+    n = path_is_accessible (dir, ebuf, sizeof (ebuf));
+    if (n < 0) {
+        log_err (EMUNGE_SNAFU, LOG_ERR,
+            "Cannot check auth server dir \"%s\": %s", dir, ebuf);
+    }
+    else if ((n == 0) && (!got_force)) {
+        log_err (EMUNGE_SNAFU, LOG_ERR,
+            "The auth server dir is inaccessible: %s", ebuf);
+    }
+    else if (n == 0) {
+        log_msg (LOG_WARNING,
+            "The auth server dir is inaccessible: %s", ebuf);
+    }
+#endif /* MUNGE_AUTH_RECVFD */
+    return;
+}
+
+static void
+_check_auth_client_dir (const char *dir, int got_force)
+{
+#ifdef MUNGE_AUTH_RECVFD
+    int          got_symlink;
+    struct stat  st;
+    int          n;
+    char         dirdir [PATH_MAX];
+    char         ebuf [1024];
+
+    if ((dir == NULL) || (*dir == '\0')) {
+        log_err (EMUNGE_SNAFU, LOG_ERR, "The auth client dir has no name");
+    }
+    /*  Check directory permissions and whatnot.
+     */
+    got_symlink = (lstat (dir, &st) == 0) ? S_ISLNK (st.st_mode) : 0;
+
+    if (stat (dir, &st) < 0) {
+        log_errno (EMUNGE_SNAFU, LOG_ERR,
+            "Cannot check auth client dir \"%s\"", dir);
+    }
+    if (!S_ISDIR (st.st_mode) || got_symlink) {
+        if (!got_force || !got_symlink)
+            log_err (EMUNGE_SNAFU, LOG_ERR,
+                "The auth client dir is insecure: "
+                "\"%s\" must be a directory", dir);
+        else
+            log_msg (LOG_WARNING,
+                "The auth client dir is insecure: "
+                "\"%s\" should not be a symlink", dir);
+    }
+    if ((st.st_mode & (S_IWUSR | S_IWGRP | S_IWOTH))
+            != (S_IWUSR | S_IWGRP | S_IWOTH)) {
+        log_err (EMUNGE_SNAFU, LOG_ERR,
+            "The auth client dir is insecure: "
+            "\"%s\" must be writable by all", dir);
+    }
+    if (!(st.st_mode & S_ISVTX)) {
+        log_err (EMUNGE_SNAFU, LOG_ERR,
+            "The auth client dir is insecure: "
+            "\"%s\" must have the sticky bit set", dir);
+    }
+    /*  Ensure auth client parent dir is secure against modification by others.
+     */
+    if (path_dirname (dir, dirdir, sizeof (dirdir)) < 0) {
+        log_err (EMUNGE_SNAFU, LOG_ERR,
+            "Cannot determine dirname of auth client dir \"%s\"", dir);
+    }
+    n = path_is_secure (dirdir, ebuf, sizeof (ebuf));
+    if (n < 0) {
+        log_err (EMUNGE_SNAFU, LOG_ERR,
+            "Cannot check auth client parent dir \"%s\": %s", dirdir, ebuf);
+    }
+    else if ((n == 0) && (!got_force)) {
+        log_err (EMUNGE_SNAFU, LOG_ERR,
+            "The auth client dir is insecure: %s", ebuf);
+    }
+    else if (n == 0) {
+        log_msg (LOG_WARNING,
+            "The auth client dir is insecure: %s", ebuf);
+    }
+    /*  Ensure auth client dir is accessible by all.
+     */
+    n = path_is_accessible (dir, ebuf, sizeof (ebuf));
+    if (n < 0) {
+        log_err (EMUNGE_SNAFU, LOG_ERR,
+            "Cannot check auth client dir \"%s\": %s", dir, ebuf);
+    }
+    else if ((n == 0) && (!got_force)) {
+        log_err (EMUNGE_SNAFU, LOG_ERR,
+            "The auth client dir is inaccessible: %s", ebuf);
+    }
+    else if (n == 0) {
+        log_msg (LOG_WARNING,
+            "The auth client dir is inaccessible: %s", ebuf);
+    }
+#endif /* MUNGE_AUTH_RECVFD */
     return;
 }
 

@@ -32,7 +32,7 @@
 #include "m_msg.h"
 
 
-void auth_recv_init (void);
+void auth_recv_init (const char *srvrdir, const char *clntdir, int got_force);
 /*
  *  Checks for required privileges needed to perform client authentication.
  */

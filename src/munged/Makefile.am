@@ -57,6 +57,8 @@ munged_SOURCES = \
 	mac.h \
 	md.c \
 	md.h \
+	path.c \
+	path.h \
 	random.c \
 	random.h \
 	replay.c \

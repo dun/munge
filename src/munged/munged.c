@@ -51,6 +51,7 @@
 #include "log.h"
 #include "missing.h"
 #include "munge_defs.h"
+#include "path.h"
 #include "posignal.h"
 #include "random.h"
 #include "replay.h"
@@ -67,8 +68,8 @@ static void exit_handler (int signum);
 static void segv_handler (int signum);
 static int  daemonize_init (char *progname);
 static void daemonize_fini (int fd);
-static void write_pidfile (const char *pidfile);
-static void open_logfile (const char *logfile, int priority);
+static void write_pidfile (const char *pidfile, int got_force);
+static void open_logfile (const char *logfile, int priority, int got_force);
 static void sock_create (conf_t conf);
 static void sock_destroy (conf_t conf);
 
@@ -99,14 +100,15 @@ main (int argc, char *argv[])
 
     conf = create_conf ();
     parse_cmdline (conf, argc, argv);
-    auth_recv_init ();
+    auth_recv_init (conf->auth_server_dir, conf->auth_client_dir,
+        conf->got_force);
 
     if (!conf->got_foreground) {
         fd = daemonize_init (argv[0]);
-        open_logfile (conf->logfile_name, priority);
+        open_logfile (conf->logfile_name, priority, conf->got_force);
     }
     lookup_ip_addr (conf);
-    write_pidfile (conf->pidfile_name);
+    write_pidfile (conf->pidfile_name, conf->got_force);
 
     if (random_init (conf->seed_name) < 0) {
         if (conf->seed_name) {
@@ -183,6 +185,7 @@ segv_handler (int signum)
     log_err (EMUNGE_SNAFU, LOG_CRIT,
         "Exiting on signal=%d (segmentation violation)", signum);
     assert (1);                         /* not reached */
+    return;
 }
 
 
@@ -195,11 +198,11 @@ daemonize_init (char *progname)
  *  Returns an 'fd' to pass to daemonize_fini() to complete the daemonization.
  */
     struct rlimit limit;
-    int           fds[2];
+    int           fds [2];
     pid_t         pid;
     int           n;
     char          priority;
-    char          ebuf[1024];
+    char          ebuf [1024];
 
     /*  Clear file mode creation mask.
      */
@@ -293,7 +296,7 @@ daemonize_fini (int fd)
     int dev_null;
 
     /*  Ensure process does not keep a directory in use.
-     *  XXX: Avoid relative pathnames from this point on!
+     *    Avoid relative pathnames from this point on!
      */
     if (chdir ("/") < 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR,
@@ -334,11 +337,14 @@ daemonize_fini (int fd)
 
 
 static void
-write_pidfile (const char *pidfile)
+write_pidfile (const char *pidfile, int got_force)
 {
 /*  Creates the specified pidfile.
  *  The pidfile must be created after the daemon has finished forking.
  */
+    char    piddir [PATH_MAX];
+    char    ebuf [1024];
+    int     n;
     mode_t  mask;
     FILE   *fp;
 
@@ -352,16 +358,34 @@ write_pidfile (const char *pidfile)
         log_err (EMUNGE_SNAFU, LOG_ERR,
             "Pidfile \"%s\" requires an absolute path", pidfile);
     }
-    (void) unlink (pidfile);
-    /*
-     *  Protect pidfile against unauthorized writes by removing group+other
-     *    write-access from the current umask.
+    /*  Ensure pidfile dir is secure against modification by others.
+     */
+    if (path_dirname (pidfile, piddir, sizeof (piddir)) < 0) {
+        log_err (EMUNGE_SNAFU, LOG_ERR,
+            "Cannot determine dirname of pidfile \"%s\"", pidfile);
+    }
+    n = path_is_secure (piddir, ebuf, sizeof (ebuf));
+    if (n < 0) {
+        log_err (EMUNGE_SNAFU, LOG_ERR,
+            "Cannot check pidfile dir \"%s\": %s", piddir, ebuf);
+    }
+    else if ((n == 0) && (!got_force)) {
+        log_err (EMUNGE_SNAFU, LOG_ERR, "Pidfile is insecure: %s", ebuf);
+    }
+    else if (n == 0) {
+        log_msg (LOG_WARNING, "Pidfile is insecure: %s", ebuf);
+    }
+    /*  Protect pidfile against unauthorized access by removing write-access
+     *    from group and other.
      */
     mask = umask (0);
     umask (mask | 022);
+    (void) unlink (pidfile);
     fp = fopen (pidfile, "w");
     umask (mask);
-
+    /*
+     *  An error in creating the pidfile is not considered fatal.
+     */
     if (!fp) {
         log_msg (LOG_WARNING, "Unable to open pidfile \"%s\": %s",
             pidfile, strerror (errno));
@@ -384,11 +408,91 @@ write_pidfile (const char *pidfile)
 
 
 static void
-open_logfile (const char *logfile, int priority)
+open_logfile (const char *logfile, int priority, int got_force)
 {
-    mode_t  mask;
-    FILE   *fp;
+    int          got_symlink;
+    struct stat  st;
+    int          n;
+    char         logdir [PATH_MAX];
+    char         ebuf [1024];
+    mode_t       mask;
+    FILE        *fp;
 
+    /*  Check file permissions and whatnot.
+     */
+    got_symlink = (lstat (logfile, &st) == 0) ? S_ISLNK (st.st_mode) : 0;
+
+    if (((n = stat (logfile, &st)) < 0) && (errno == ENOENT)) {
+        if (!got_symlink) {
+            ; /* A missing logfile is not considered an error. */
+        }
+        else if (!got_force) {
+            log_err (EMUNGE_SNAFU, LOG_ERR,
+                "Logfile is insecure: \"%s\" should be a regular file",
+                logfile);
+        }
+        else {
+            log_msg (LOG_WARNING,
+                "Logfile is insecure: \"%s\" should not be a symlink",
+                logfile);
+        }
+    }
+    else {
+        if (n < 0) {
+            log_errno (EMUNGE_SNAFU, LOG_ERR,
+                "Cannot check logfile \"%s\"", logfile);
+        }
+        if (!S_ISREG (st.st_mode) || got_symlink) {
+            if (!got_force || !got_symlink)
+                log_err (EMUNGE_SNAFU, LOG_ERR,
+                    "Logfile is insecure: \"%s\" should be a regular file",
+                    logfile);
+            else
+                log_msg (LOG_WARNING,
+                    "Logfile is insecure: \"%s\" should not be a symlink",
+                    logfile);
+        }
+        if (st.st_uid != geteuid ()) {
+            if (!got_force)
+                log_err (EMUNGE_SNAFU, LOG_ERR,
+                    "Logfile is insecure: \"%s\" should be owned by uid=%u",
+                    logfile, (unsigned) geteuid ());
+            else
+                log_msg (LOG_WARNING,
+                    "Logfile is insecure: \"%s\" should be owned by uid=%u",
+                    logfile, (unsigned) geteuid ());
+        }
+        if (st.st_mode & (S_IWGRP | S_IWOTH)) {
+            if (!got_force)
+                log_err (EMUNGE_SNAFU, LOG_ERR,
+                    "Logfile is insecure: \"%s\" should not be writable "
+                    "by group or world", logfile);
+            else
+                log_msg (LOG_WARNING,
+                    "Logfile is insecure: \"%s\" should not be writable "
+                    "by group or world", logfile);
+        }
+    }
+    /*  Ensure logfile dir is secure against modification by others.
+     */
+    if (path_dirname (logfile, logdir, sizeof (logdir)) < 0) {
+        log_err (EMUNGE_SNAFU, LOG_ERR,
+            "Cannot determine dirname of logfile \"%s\"", logfile);
+    }
+    n = path_is_secure (logdir, ebuf, sizeof (ebuf));
+    if (n < 0) {
+        log_err (EMUNGE_SNAFU, LOG_ERR,
+            "Cannot check logfile dir \"%s\": %s", logdir, ebuf);
+    }
+    else if ((n == 0) && (!got_force)) {
+        log_err (EMUNGE_SNAFU, LOG_ERR, "Logfile is insecure: %s", ebuf);
+    }
+    else if (n == 0) {
+        log_msg (LOG_WARNING, "Logfile is insecure: %s", ebuf);
+    }
+    /*  Protect logfile against unauthorized access by removing write-access
+     *    from group and all access from other.
+     */
     mask = umask (0);
     umask (mask | 027);
     fp = fopen (logfile, "a");
@@ -407,18 +511,76 @@ open_logfile (const char *logfile, int priority)
 static void
 sock_create (conf_t conf)
 {
-    struct sockaddr_un  addr;
-    int                 sd;
+    char                sockdir [PATH_MAX];
+    char                ebuf [1024];
     int                 n;
+    int                 got_symlink;
+    struct stat         st;
     mode_t              mask;
+    int                 sd;
+    struct sockaddr_un  addr;
 
     assert (conf != NULL);
 
     if ((conf->socket_name == NULL) || (*conf->socket_name == '\0')) {
         log_err (EMUNGE_SNAFU, LOG_ERR, "MUNGE socket has no name");
     }
+    /*  Ensure socket dir is secure against modification by others.
+     */
+    if (path_dirname (conf->socket_name, sockdir, sizeof (sockdir)) < 0) {
+        log_err (EMUNGE_SNAFU, LOG_ERR,
+            "Cannot determine dirname of socket \"%s\"", conf->socket_name);
+    }
+    n = path_is_secure (sockdir, ebuf, sizeof (ebuf));
+    if (n < 0) {
+        log_err (EMUNGE_SNAFU, LOG_ERR,
+            "Cannot check socket dir \"%s\": %s", sockdir, ebuf);
+    }
+    else if ((n == 0) && (!conf->got_force)) {
+        log_err (EMUNGE_SNAFU, LOG_ERR, "Socket is insecure: %s", ebuf);
+    }
+    else if (n == 0) {
+        log_msg (LOG_WARNING, "Socket is insecure: %s", ebuf);
+    }
+    /*  Ensure socket dir is accessible by all.
+     */
+    n = path_is_accessible (sockdir, ebuf, sizeof (ebuf));
+    if (n < 0) {
+        log_err (EMUNGE_SNAFU, LOG_ERR,
+            "Cannot check socket dir \"%s\": %s", sockdir, ebuf);
+    }
+    else if ((n == 0) && (!conf->got_force)) {
+        log_err (EMUNGE_SNAFU, LOG_ERR, "Socket is inaccessible: %s", ebuf);
+    }
+    else if (n == 0) {
+        log_msg (LOG_WARNING, "Socket is inaccessible: %s", ebuf);
+    }
+    /*  Check for an existing socket.
+     */
+    if (conf->got_force) {
+        (void) unlink (conf->socket_name);
+    }
+    got_symlink = (lstat (conf->socket_name, &st) == 0)
+        ? S_ISLNK (st.st_mode) : 0;
+    n = stat (conf->socket_name, &st);
+    if ((n < 0) && (errno != ENOENT)) {
+        log_errno (EMUNGE_SNAFU, LOG_ERR,
+            "Cannot check existing socket \"%s\"", conf->socket_name);
+    }
+    else if (n == 0) {
+        log_err (EMUNGE_SNAFU, LOG_ERR,
+            "Found existing socket \"%s\"", conf->socket_name);
+    }
+    else if (got_symlink) {
+        log_err (EMUNGE_SNAFU, LOG_ERR,
+            "Found dangling symlink to socket \"%s\"", conf->socket_name);
+    }
+    /*  Create the socket, ensuring everyone has access to it.
+     */
+    mask = umask (0);
+
     if ((sd = socket (PF_UNIX, SOCK_STREAM, 0)) < 0) {
-        log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to create socket");
+        log_errno (EMUNGE_SNAFU, LOG_ERR, "Cannot create socket");
     }
     memset (&addr, 0, sizeof (addr));
     addr.sun_family = AF_UNIX;
@@ -427,20 +589,15 @@ sock_create (conf_t conf)
         log_err (EMUNGE_SNAFU, LOG_ERR,
             "Exceeded maximum length of socket pathname");
     }
-    mask = umask (0);
-
-    if (conf->got_force) {
-        (void) unlink (conf->socket_name);
-    }
     if (bind (sd, (struct sockaddr *) &addr, sizeof (addr)) < 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR,
-            "Unable to bind to \"%s\"", conf->socket_name);
+            "Cannot bind to \"%s\"", conf->socket_name);
     }
     umask (mask);
 
     if (listen (sd, MUNGE_SOCKET_BACKLOG) < 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR,
-            "Unable to listen to \"%s\"", conf->socket_name);
+            "Cannot listen to \"%s\"", conf->socket_name);
     }
     conf->ld = sd;
     return;

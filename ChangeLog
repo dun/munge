@@ -1,3 +1,20 @@
+2006-09-25  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/munged/munged.8.in: Updated info on --force cmdline opt.
+	* src/munged/munged.c(write_pidfile): Added pidfile_name path checks.
+	* src/munged/munged.c(open_logfile): Added logfile_name path checks.
+	* src/munged/munged.c(sock_create): Added socket_name path checks.
+	* src/munged/auth_recv.c(auth_recv_init):
+	  Added auth_server_dir & auth_client_dir path checks via
+	  _check_auth_server_dir() & _check_auth_client_dir().
+	* src/munged/auth_recv.h: Updated prototype for auth_recv_init().
+	* src/munged/conf.c(create_subkeys): Added key_name path checks
+	  via _conf_open_keyfile().
+	* src/munged/random.c(random_init): Added seed_name path checks.
+	* src/munged/random.c(random_fini): Set restricted umask as precaution.
+	* src/munged/Makefile.am: Added path.c & path.h.
+	* src/munged/path.c, src/munged/path.h: Added.
+
 2006-09-12  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/libmunge/munge_enum.3.in, src/munge/munge.1.in,

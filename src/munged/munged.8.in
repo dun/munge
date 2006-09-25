@@ -67,11 +67,12 @@ Display license information.
 Display version information.
 .TP
 .BI "-f, --force"
-Force the process to run if at all possible.  This overrides warnings such
-as an existing local domain socket or a lack of entropy for the PRNG.
+Force the daemon to run if at all possible.  This overrides warnings for an
+existing local domain socket, a lack of entropy for the PRNG, and insecure
+file/directory permissions.
 .TP
 .BI "-F, --foreground"
-Run the process in the foreground.
+Run the daemon in the foreground.
 .TP
 .BI "-S, --socket " string
 Specify the local domain socket for communicating with clients.

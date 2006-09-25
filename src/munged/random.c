@@ -39,6 +39,7 @@
 #include "crypto_log.h"
 #include "log.h"
 #include "munge_defs.h"
+#include "path.h"
 #include "random.h"
 
 
@@ -54,73 +55,102 @@
 int
 random_init (const char *seed)
 {
-    struct stat stat;
-    int n = 0;
-    int rc = 0;
+    int          rnd_bytes_needed       = RANDOM_SEED_BYTES;
+    int          rc                     = 0;
+    int          do_unlink              = 1;
+    int          got_symlink;
+    struct stat  st;
+    int          n;
+    char         seed_dir [PATH_MAX];
+    char         ebuf [1024];
 
-    /*  FIXME: Check parent dirs of [seed] to ensure they have appropriate
-     *    ownership and permissions.
-     */
-    if (seed != NULL) {
-        if ((access (seed, R_OK | W_OK) < 0) && (errno != ENOENT)) {
+    if ((rnd_bytes_needed > 0) && (seed != NULL) && (*seed != '\0')) {
+        /*
+         *  Check file permissions and whatnot.
+         */
+        got_symlink = (lstat (seed, &st) == 0) ? S_ISLNK (st.st_mode) : 0;
+
+        if (((n = stat (seed, &st)) < 0) && (errno == ENOENT)) {
+            if (!got_symlink) {
+                do_unlink = 0; /* A missing seed is not considered an error. */
+            }
+        }
+        else if (n < 0) {
             log_msg (LOG_WARNING,
                 "Ignoring PRNG seed \"%s\": %s", seed, strerror (errno));
-            rc = -1;
         }
-        else if (errno == ENOENT) {
-            ; /* A missing seed is not considered an error. */
-        }
-        else if (lstat (seed, &stat) < 0) {
-            log_msg (LOG_WARNING, "Unable to stat PRNG seed \"%s\": %s",
-                seed, strerror (errno));
-            rc = -1;
-        }
-        else if (!S_ISREG (stat.st_mode)) {
+        else if (!S_ISREG (st.st_mode) || got_symlink) {
             log_msg (LOG_WARNING,
-                "Ignoring PRNG seed \"%s\": Not a regular file", seed);
-            rc = -1;
+                "Ignoring PRNG seed \"%s\": not a regular file", seed);
         }
-        else if ((stat.st_uid != 0) && (stat.st_uid != geteuid ())) {
+        else if (st.st_uid != geteuid ()) {
             log_msg (LOG_WARNING,
-                "Ignoring PRNG seed \"%s\": Owned by uid=%d",
-                seed, stat.st_uid);
-            rc = -1;
+                "Ignoring PRNG seed \"%s\": not owned by uid=%u",
+                seed, (unsigned) geteuid ());
         }
-        else if (stat.st_mode & S_IWOTH) {
+        else if (st.st_mode & (S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH)) {
             log_msg (LOG_WARNING,
-                "Ignoring PRNG seed \"%s\": World-writable", seed);
-            rc = -1;
+                "Ignoring PRNG seed \"%s\": "
+                "cannot be readable or writable by group or world", seed);
         }
-        else if (stat.st_mode & S_IROTH) {
+        else {
+            do_unlink = 0;
+        }
+        /*  Ensure seed dir is secure against modification by others.
+         */
+        if (path_dirname (seed, seed_dir, sizeof (seed_dir)) < 0) {
+            log_err (EMUNGE_SNAFU, LOG_ERR,
+                "Cannot determine dirname of PRNG seed \"%s\"", seed);
+        }
+        n = path_is_secure (seed_dir, ebuf, sizeof (ebuf));
+        if (n < 0) {
+            log_err (EMUNGE_SNAFU, LOG_ERR,
+                "Cannot check PRNG seed dir \"%s\": %s", seed_dir, ebuf);
+        }
+        else if ((n == 0) && (!conf->got_force)) {
+            log_err (EMUNGE_SNAFU, LOG_ERR,
+                "PRNG seed dir is insecure: %s", ebuf);
+        }
+        else if (n == 0) {
             log_msg (LOG_WARNING,
-                "Ignoring PRNG seed \"%s\": World-readable", seed);
+                "PRNG seed dir is insecure: %s", ebuf);
+        }
+        /*  Remove the existing seed if it is insecure; o/w, load it.
+         */
+        if (do_unlink && (unlink (seed) < 0)) {
+            log_msg (LOG_WARNING,
+                "Unable to remove insecure PRNG seed \"%s\"", seed);
             rc = -1;
         }
-        else if ((n = RAND_load_file (seed, RANDOM_SEED_BYTES)) > 0) {
-            log_msg (LOG_INFO, "PRNG seeded with %d bytes from \"%s\"",
-                n, seed);
+        else if (do_unlink) {
+            log_msg (LOG_INFO,
+                "Removed insecure PRNG seed \"%s\"", seed);
+        }
+        else if ((n = RAND_load_file (seed, rnd_bytes_needed)) > 0) {
+            log_msg (LOG_INFO,
+                "PRNG seeded with %d bytes from \"%s\"", n, seed);
+            rnd_bytes_needed -= n;
         }
     }
-    if (n < RANDOM_SEED_BYTES) {
-        log_msg (LOG_INFO, "PRNG seeding from \"%s\" in progress ...",
-            RANDOM_SEED_DEFAULT);
-        if ((n = RAND_load_file (RANDOM_SEED_DEFAULT, RANDOM_SEED_BYTES)) >0) {
+    /*  Load entropy from default source if more is needed.
+     */
+    if (rnd_bytes_needed > 0) {
+        if ((n = RAND_load_file (RANDOM_SEED_DEFAULT, rnd_bytes_needed)) > 0) {
             log_msg (LOG_INFO, "PRNG seeded with %d bytes from \"%s\"",
                 n, RANDOM_SEED_DEFAULT);
+            rnd_bytes_needed -= n;
         }
+    }
+    if (rnd_bytes_needed > 0) {
+        if (!conf->got_force)
+            log_err (EMUNGE_SNAFU, LOG_ERR,
+                "Unable to seed PRNG with sufficient entropy");
+        else
+            log_msg (LOG_WARNING,
+                "Unable to seed PRNG with sufficient entropy");
     }
     else {
         rc = 1;
-    }
-    if (n < RANDOM_SEED_BYTES) {
-        if (!conf->got_force) {
-            log_err (EMUNGE_SNAFU, LOG_ERR,
-                    "Unable to seed PRNG with sufficient entropy");
-        }
-        else {
-            log_msg (LOG_WARNING,
-                    "Unable to seed PRNG with sufficient entropy");
-        }
     }
     return (rc);
 }
@@ -129,10 +159,15 @@ random_init (const char *seed)
 void
 random_fini (const char *seed)
 {
-    int n;
+    mode_t  mask;
+    int     n;
 
     if (seed != NULL) {
+        mask = umask (0);
+        umask (mask | 077);
         n = RAND_write_file (seed);
+        umask (mask);
+
         if (n < 0) {
             log_msg (LOG_WARNING,
                 "Generated PRNG seed \"%s\" without adequate entropy", seed);

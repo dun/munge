@@ -41,6 +41,7 @@
 #include <string.h>
 #include <sys/param.h>                  /* for MAXHOSTNAMELEN */
 #include <sys/socket.h>                 /* for AF_INET */
+#include <sys/stat.h>
 #include <unistd.h>
 #include "auth_policy.h"
 #include "conf.h"
@@ -49,6 +50,7 @@
 #include "md.h"
 #include "missing.h"
 #include "munge_defs.h"
+#include "path.h"
 #include "str.h"
 #include "version.h"
 #include "zip.h"
@@ -80,6 +82,13 @@ const char * const opt_string = "hLVfFS:";
 
 
 /*****************************************************************************
+ *  Internal Prototypes
+ *****************************************************************************/
+
+static int _conf_open_keyfile (const char *keyfile, int got_force);
+
+
+/*****************************************************************************
  *  Global Variables
  *****************************************************************************/
 
@@ -87,7 +96,7 @@ conf_t conf = NULL;                     /* global configuration struct       */
 
 
 /*****************************************************************************
- *  Extern Functions
+ *  External Functions
  *****************************************************************************/
 
 conf_t
@@ -342,9 +351,9 @@ display_help (char *prog)
     printf ("  %*s %s [%s]\n", w, "-S, --socket=PATH",
             "Specify local socket", MUNGE_SOCKET_NAME);
 
+    /* Begin deprecated cmdline opts
+     */
     printf ("\n");
-
-    /* Begin deprecated cmdline opts */
 
 #ifdef MUNGE_AUTH_RECVFD
     printf ("  %*s %s [%s]\n", w, "--auth-server-dir=DIR",
@@ -359,8 +368,8 @@ display_help (char *prog)
 
     printf ("  %*s %s [%d]\n", w, "--num-threads=INT",
             "Specify number of threads to spawn", MUNGE_THREADS);
-    /* End deprecated cmdline opts */
-
+    /* End deprecated cmdline opts
+     */
     printf ("\n");
     return;
 }
@@ -398,19 +407,11 @@ create_subkeys (conf_t conf)
         log_err (EMUNGE_SNAFU, LOG_ERR,
             "Unable to compute subkeys: Cannot init md ctx");
     }
-    /*  Open key-file.
+    /*  Compute keyfile's message digest.
      */
-    if ((conf->key_name == NULL) || (*conf->key_name == '\0')) {
-        log_err (EMUNGE_SNAFU, LOG_ERR, "No key-file was specified");
-    }
-    /*  FIXME: Ignore key-file if it does not have sane permissions.
-     */
-    if ((fd = open (conf->key_name, O_RDONLY)) < 0) {
-        log_errno (EMUNGE_SNAFU, LOG_ERR,
-            "Unable to open key-file \"%s\"", conf->key_name);
-    }
-    /*  Compute key-file's message digest.
-     */
+    fd = _conf_open_keyfile (conf->key_name, conf->got_force);
+    assert (fd >= 0);
+
     for (;;) {
         n = read (fd, buf, sizeof (buf));
         if (n == 0)
@@ -419,19 +420,19 @@ create_subkeys (conf_t conf)
             continue;
         if (n < 0)
             log_errno (EMUNGE_SNAFU, LOG_ERR,
-                "Unable to read key-file \"%s\"", conf->key_name);
+                "Unable to read keyfile \"%s\"", conf->key_name);
         if (md_update (&dek_ctx, buf, n) < 0)
             log_err (EMUNGE_SNAFU, LOG_ERR, "Unable to compute subkeys");
     }
     if (close (fd) < 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR,
-            "Unable to close key-file \"%s\"", conf->key_name);
+            "Unable to close keyfile \"%s\"", conf->key_name);
     }
     if (md_copy (&mac_ctx, &dek_ctx) < 0) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
             "Unable to compute subkeys: Cannot copy md ctx");
     }
-    /*  Append "1" to key-file in order to compute cipher subkey.
+    /*  Append "1" to keyfile in order to compute cipher subkey.
      */
     if ( (md_update (&dek_ctx, "1", 1) < 0)
       || (md_final (&dek_ctx, conf->dek_key, &n) < 0)
@@ -440,7 +441,7 @@ create_subkeys (conf_t conf)
     }
     assert (n == conf->dek_key_len);
 
-    /*  Append "2" to key-file in order to compute mac subkey.
+    /*  Append "2" to keyfile in order to compute mac subkey.
      */
     if ( (md_update (&mac_ctx, "2", 1) < 0)
       || (md_final (&mac_ctx, conf->mac_key, &n) < 0)
@@ -486,4 +487,88 @@ lookup_ip_addr (conf_t conf)
     }
     log_msg (LOG_NOTICE, "Running on \"%s\" (%s)", hptr->h_name, ip_buf);
     return;
+}
+
+
+/*****************************************************************************
+ *  Internal Functions
+ *****************************************************************************/
+
+static int
+_conf_open_keyfile (const char *keyfile, int got_force)
+{
+/*  Returns a valid file-descriptor to the opened [keyfile], or dies trying.
+ */
+    int          got_symlink;
+    struct stat  st;
+    int          n;
+    char         keydir [PATH_MAX];
+    char         ebuf [1024];
+    int          fd;
+
+    /*  Check file permissions and whatnot.
+     */
+    if ((keyfile == NULL) || (*keyfile == '\0')) {
+        log_err (EMUNGE_SNAFU, LOG_ERR, "Key not specified");
+    }
+    got_symlink = (lstat (keyfile, &st) == 0) ? S_ISLNK (st.st_mode) : 0;
+
+    if (stat (keyfile, &st) < 0) {
+        log_errno (EMUNGE_SNAFU, LOG_ERR,
+            "Cannot check keyfile \"%s\"", keyfile);
+    }
+    if (!S_ISREG (st.st_mode) || got_symlink) {
+        if (!got_force)
+            log_err (EMUNGE_SNAFU, LOG_ERR,
+                "Keyfile is insecure: \"%s\" should be a regular file",
+                keyfile);
+        else
+            log_msg (LOG_WARNING,
+                "Keyfile is insecure: \"%s\" should not be a symlink",
+                keyfile);
+    }
+    if (st.st_uid != geteuid ()) {
+        if (!got_force)
+            log_err (EMUNGE_SNAFU, LOG_ERR,
+                "Keyfile is insecure: \"%s\" should be owned by uid=%u",
+                keyfile, (unsigned) geteuid ());
+        else
+            log_msg (LOG_WARNING,
+                "Keyfile is insecure: \"%s\" should be owned by uid=%u",
+                keyfile, (unsigned) geteuid ());
+    }
+    if (st.st_mode & (S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH)) {
+        if (!got_force)
+            log_err (EMUNGE_SNAFU, LOG_ERR,
+                "Keyfile is insecure: \"%s\" should not be "
+                "readable or writable by group or world", keyfile);
+        else
+            log_msg (LOG_WARNING,
+                "Keyfile is insecure: \"%s\" should not be "
+                "readable or writable by group or world", keyfile);
+    }
+    /*  Ensure keyfile dir is secure against modification by others.
+     */
+    if (path_dirname (keyfile, keydir, sizeof (keydir)) < 0) {
+        log_err (EMUNGE_SNAFU, LOG_ERR,
+            "Cannot determine dirname of keyfile \"%s\"", keyfile);
+    }
+    n = path_is_secure (keydir, ebuf, sizeof (ebuf));
+    if (n < 0) {
+        log_err (EMUNGE_SNAFU, LOG_ERR,
+            "Cannot check keyfile dir \"%s\": %s", keydir, ebuf);
+    }
+    else if ((n == 0) && (!got_force)) {
+        log_err (EMUNGE_SNAFU, LOG_ERR, "Keyfile is insecure: %s", ebuf);
+    }
+    else if (n == 0) {
+        log_msg (LOG_WARNING, "Keyfile is insecure: %s", ebuf);
+    }
+    /*  Open keyfile for reading.
+     */
+    if ((fd = open (keyfile, O_RDONLY)) < 0) {
+        log_errno (EMUNGE_SNAFU, LOG_ERR,
+            "Unable to open keyfile \"%s\"", keyfile);
+    }
+    return (fd);
 }
