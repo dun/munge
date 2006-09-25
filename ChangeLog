@@ -1,5 +1,7 @@
 2006-09-25  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* QUICKSTART: Updated.
+
 	* src/munged/munged.8.in: Updated info on --force cmdline opt.
 	* src/munged/munged.c(write_pidfile): Added pidfile_name path checks.
 	* src/munged/munged.c(open_logfile): Added logfile_name path checks.

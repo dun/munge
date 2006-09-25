@@ -16,8 +16,7 @@ MUNGE Installation Guide
       developing applications using MUNGE.  The munge-libs RPM contains a
       shared library for running applications using MUNGE.
 
-      To install the binary RPMs, you will need to su to root and execute
-      the following command:
+      The binary RPMs can be installed with rpm:
 
       # rpm -ivh munge-x.y.z-1.i386.rpm \
         munge-devel-x.y.z-1.i386.rpm munge-libs-x.y.z-1.i386.rpm
@@ -25,8 +24,8 @@ MUNGE Installation Guide
    B. From source:
 
       Edit src/libcommon/munge_defs.h to customize values if necessary.
-      To compile the software, execute the following command; you may
-      need to su to root in order to perform the "make install":
+      To compile the software, execute the following command; you may need
+      to su to root in order to perform the "make install":
 
       $ ./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var \
         && make && make install
@@ -34,15 +33,12 @@ MUNGE Installation Guide
 
 2. Securing the Installation
 
-   On most platforms, the munged daemon does not require root privileges;
-   currently, the one exception to this is AIX prior to 5.2-ML4.  On all other
-   platforms, you should run the daemon as a non-privileged user.  This can
+   On most platforms, the munged daemon does not require root privileges.
+   If possible, you should run the daemon as a non-privileged user.  This can
    be controlled by the init script as detailed in the "Starting the Daemon"
    section below.
 
-   By default, the munged daemon uses the following system directories.  These
-   directories must be owned by the user that the munged daemon will run as.
-   They cannot be writable by other processes.
+   By default, the munged daemon uses the following system directories:
 
    A. /etc/munge/
       This directory contains the daemon's secret key.  The recommended
@@ -53,8 +49,8 @@ MUNGE Installation Guide
       where the daemon creates pipes for authenticating clients via
       file-descriptor-passing.  If the file-descriptor-passing authentication
       method is being used, this directory must allow execute permissions for
-      other processes; however, it should not expose read permissions.
-      The recommended permissions for it are 0711.
+      all; however, it should not expose read permissions.  The recommended
+      permissions for it are 0711.
 
    C. /var/log/munge/
       This directory contains the daemon's log file.  The recommended
@@ -63,15 +59,23 @@ MUNGE Installation Guide
    D. /var/run/munge/
       This directory contains the Unix domain socket for clients to
       communicate with the daemon.  It also contains the daemon's pid file.
-      This directory must allow execute permissions for other processes.
-      The recommended permissions for it are 0755.
+      This directory must allow execute permissions for all.  The recommended
+      permissions for it are 0755.
+
+   These directories must be owned by the user that the munged daemon will
+   run as.  They cannot allow write permissions for group or other (unless
+   the sticky-bit is set).  In addition, all of their parent directories in
+   the path on up to the root directory must be owned by either root or the
+   user that the munged daemon will run as.  None of them can allow write
+   permissions for group or other (unless the sticky-bit is set).
 
 
 3. Creating a Secret Key
 
-   A security realm is defined by a shared key.  Credentials are valid only
-   within a security realm.  All munged daemons within a security realm
-   must possess the same secret key.
+   A security realm encompasses a group of hosts having common users and
+   groups.  It is defined by a shared cryptographic key.  Credentials are
+   valid only within a security realm.  All munged daemons within a security
+   realm must possess the same secret key.
 
    By default, the secret key resides in "/etc/munge/munge.key".  This
    location can be overridden on the munged command-line or via the init
@@ -92,7 +96,7 @@ MUNGE Installation Guide
       $ echo "foo" >/etc/munge/munge.key
 
    This file should be permissioned 0400 and owned by the user that the
-   munged daemon will run as.  Securely propagate this file (e.g., via scp)
+   munged daemon will run as.  Securely propagate this file (e.g., via ssh)
    to all other hosts within the same security realm.
 
 
@@ -105,16 +109,16 @@ MUNGE Installation Guide
    to set variables recognized by the script.
 
    The OPTIONS variable passes additional command-line options to the daemon;
-   for example, this can be used to override the location of the secret
-   key (--key-file) or set the number of worker threads (--num-threads).
-   The USER variable runs the daemon under the specified username; the
-   "daemon" user is recommended.
+   for example, this can be used to override the location of the secret key
+   (--key-file) or set the number of worker threads (--num-threads).  If the
+   init script is invoked by root, the USER variable causes the daemon to
+   execute under the specified username; the "daemon" user is used by default.
 
 
 5. Testing the Installation
 
-   The following steps can be performed to verify that the software has been
-   properly installed and configured:
+   The following steps can be performed to verify that the software has
+   been properly installed and configured:
 
    A. Generate a credential on stdout:
       $ munge -n
