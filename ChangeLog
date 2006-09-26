@@ -1,5 +1,7 @@
 2006-09-25  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* BUGS, PLATFORMS, TODO: Updated.
+
 	* README, munge.spec, src/libcommon/munge.7.in: Updated description.
 
 	* QUICKSTART: Updated.

@@ -1,13 +1,11 @@
--fix signal handlers
--ensure safe permissions on sensitive files/dirs
+-add libgcrypt support
+-add pam support
 -add configuration file support
+-save/restore replay state at munged shutdown/startup
 -add munged 'k' cmdline opt to kill daemon
 -periodically stat keyfile and look for changed inode/mtime
--add debian support
--add pam support
--add libgcrypt support
--fix remunge to exit on persistent errors
 -restrict decode to host/ip/range
 -add realm (multi-key) support
--save/restore replay state at munged shutdown/startup
 -add server timeout for unresponsive clients
+-change remunge to exit on persistent errors
+-change remunge to stop and output results on sigint
