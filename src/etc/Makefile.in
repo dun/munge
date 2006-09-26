@@ -393,10 +393,13 @@ install-data-local:
 	  "$(DESTDIR)$(sysconfdir)/$${d}/munge$${new}"; \
 	$(INSTALL) $${OWNER} -m 0700 -d \
 	  "$(DESTDIR)$(sysconfdir)/munge"; \
+	$(INSTALL) -m 0711 -d "$(DESTDIR)$(localstatedir)/lib"; \
 	$(INSTALL) $${OWNER} -m 0711 -d \
 	  "$(DESTDIR)$(localstatedir)/lib/munge"; \
+	$(INSTALL) -m 0711 -d "$(DESTDIR)$(localstatedir)/log"; \
 	$(INSTALL) $${OWNER} -m 0700 -d \
 	  "$(DESTDIR)$(localstatedir)/log/munge"; \
+	$(INSTALL) -m 0711 -d "$(DESTDIR)$(localstatedir)/run"; \
 	$(INSTALL) $${OWNER} -m 0755 -d \
 	  "$(DESTDIR)$(localstatedir)/run/munge"
 	chmod 755 "$(DESTDIR)$(sysconfdir)"

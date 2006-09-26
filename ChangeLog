@@ -1,3 +1,8 @@
+2006-09-26  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/etc/Makefile.am: Fixed installed directory ownership on
+	  $(localstatedir) & $(localstatedir)/*.
+
 2006-09-25  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/etc/Makefile.am, src/libcommon/Makefile.am,
