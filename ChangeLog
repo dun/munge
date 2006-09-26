@@ -1,5 +1,8 @@
 2006-09-26  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/munged/path.c, src/munged/path.h: Fixed bug on FreeBSD where
+	  PATH_MAX was not being defined by "path.h".
+
 	* src/etc/Makefile.am: Fixed installed directory ownership on
 	  $(localstatedir) & $(localstatedir)/*.
 

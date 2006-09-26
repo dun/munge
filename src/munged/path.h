@@ -33,6 +33,12 @@
 #  include "config.h"
 #endif /* HAVE_CONFIG_H */
 
+#include <limits.h>
+
+#ifndef PATH_MAX
+#  define PATH_MAX 4096
+#endif /* !PATH_MAX */
+
 
 int path_canonicalize (const char *src, char *dst, int dstlen);
 /*

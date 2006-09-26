@@ -42,10 +42,6 @@
 #include "path.h"
 #include "strlcpy.h"
 
-#ifndef PATH_MAX
-#  define PATH_MAX 4096
-#endif /* !PATH_MAX */
-
 
 /*****************************************************************************
  *  Internal Prototypes
