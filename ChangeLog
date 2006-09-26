@@ -1,5 +1,7 @@
 2006-09-25  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* README, munge.spec, src/libcommon/munge.7.in: Updated description.
+
 	* QUICKSTART: Updated.
 
 	* src/munged/munged.8.in: Updated info on --force cmdline opt.

@@ -30,29 +30,53 @@
 munge \- MUNGE Uid 'N' Gid Emporium
 
 .SH DESCRIPTION
-MUNGE (MUNGE Uid 'N' Gid Emporium) is an authentication service for
-creating and validating credentials in order to allow a process to securely
-authenticate the UID and GID of another local or remote process within a
-security realm.  Clients can create and validate these credentials without
-the use of root privileges, reserved ports, or platform-specific methods.
+MUNGE (MUNGE Uid 'N' Gid Emporium) is an authentication service for creating
+and validating credentials.  It is designed to be highly scalable for use
+in an HPC cluster environment.  It allows a process to authenticate the
+UID and GID of another local or remote process within a group of hosts
+having common users and groups.  These hosts form a security realm that is
+defined by a shared cryptographic key.  Clients within this security realm
+can create and validate credentials without the use of root privileges,
+reserved ports, or platform-specific methods.
+
+.SH RATIONALE
+The need for MUNGE arose out of the HPC cluster environment.  Consider the
+scenario in which a local daemon running on a login node receives a client
+request and forwards it on to remote daemons running on compute nodes within
+the cluster.  Since the user has already logged on to the login node, the
+local daemon just needs a reliable means of ascertaining the UID and GID
+of the client process.  Furthermore, the remote daemons need a mechanism
+to ensure the forwarded authentication data has not been subsequently altered.
 .PP
-A credential is created and validated by the local \fBmunged\fR daemon
-running on each host within a security realm.  A security realm is
-defined by the secret key; \fBmunged\fR daemons running on different hosts
-are in the same realm if they share the same key.  A client creates or
-validates a given credential through the use of the \fBlibmunge\fR library or
-\fBmunge\fR/\fBunmunge\fR executables; these are responsible for communicating
-with the local daemon on behalf of the client.
+A common solution to this problem is to use Unix domain sockets to determine
+the identity of the local client, and then forward this information on to
+remote hosts via trusted rsh connections.  But this presents several new
+problems.  First, there is no portable API for determining the identity of
+a client over a Unix domain socket.  Second, rsh connections must originate
+from a reserved port; the limited number of reserved ports available on a
+given host directly limits scalability.  Third, root privileges are required
+in order to bind to a reserved port.  Finally, the remote daemons have no
+means of determining whether the client identity is authentic.
+
+.SH OVERVIEW
+A process creates a credential by requesting one from the local MUNGE service.
+The encoded credential contains the UID and GID of the originating process.
+This process sends the credential to another process within the security
+realm as a means of proving its identity.  The receiving process validates the
+credential with the use of its local MUNGE service.  The decoded credential
+provides the receiving process with a reliable means of ascertaining the
+UID and GID of the originating process.  This information can be used for
+accounting or access control decisions.
 .PP
 The contents of the credential (including any optional payload data)
 are encrypted with a key shared by all \fBmunged\fR daemons within the
 security realm.  The integrity of the credential is ensured by a message
 authentication code (MAC).  The credential is valid for a limited time defined
-by its time-to-live (TTL).  The daemon ensures unexpired credentials are
-not being replayed on a particular host.  Decoding of a credential can be
-restricted to a particular user and/or group ID.  The payload data can be
-used for purposes such as embedding the destination's address to ensure the
-credential is valid on only that host.  The internal format of the credential
+by its time-to-live (TTL).  The daemon ensures unexpired credentials are not
+replayed on a particular host.  Decoding of a credential can be restricted
+to a particular user and/or group ID.  The payload data can be used for
+purposes such as embedding the destination's address to ensure the credential
+is only valid on a specific host.  The internal format of the credential
 is encoded in a platform-independent manner.  And the credential itself is
 base64 encoded to allow it to be transmitted over virtually any transport.
 
