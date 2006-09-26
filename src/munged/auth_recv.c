@@ -188,16 +188,11 @@ _check_auth_client_dir (const char *dir, int got_force)
                 "The auth client dir is insecure: "
                 "invalid ownership of \"%s\"", dir);
     }
-    if ((st.st_mode & (S_IWUSR | S_IWGRP | S_IWOTH))
-            != (S_IWUSR | S_IWGRP | S_IWOTH)) {
+    if ((st.st_mode & (S_IWUSR | S_IWGRP | S_IWOTH | S_ISVTX))
+            != (S_IWUSR | S_IWGRP | S_IWOTH | S_ISVTX)) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
             "The auth client dir is insecure: "
-            "\"%s\" must be writable by all", dir);
-    }
-    if (!(st.st_mode & S_ISVTX)) {
-        log_err (EMUNGE_SNAFU, LOG_ERR,
-            "The auth client dir is insecure: "
-            "\"%s\" must have the sticky bit set", dir);
+            "\"%s\" must be writable by all with the sticky bit set", dir);
     }
     /*  Ensure auth client parent dir is secure against modification by others.
      */
