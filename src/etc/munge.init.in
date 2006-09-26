@@ -480,8 +480,8 @@ signal_process ()
   pids=`query_pids "$DAEMON" "$PIDFILE"`
   [ $? -ne 0 -o -z "$pids" ] && return 0
   [ -z "$SIGTERM_TIMEOUT" ] && return 1
-  sleep "$SIGTERM_TIMEOUT"
 
+  sleep "$SIGTERM_TIMEOUT"
   kill -KILL $pids >/dev/null 2>&1
   pids=`query_pids "$DAEMON" "$PIDFILE"`
   [ $? -ne 0 -o -z "$pids" ] && return 0
