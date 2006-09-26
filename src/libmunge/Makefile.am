@@ -43,16 +43,21 @@ man_MANS = \
 	munge_enum.3
 
 install-data-local:
-	$(INSTALL) -d -m 0755 $(DESTDIR)$(includedir)
-	$(INSTALL) -d -m 0755 $(DESTDIR)$(libdir)
-	$(INSTALL) -d -m 0755 $(DESTDIR)$(mandir)
-	$(INSTALL) -d -m 0755 $(DESTDIR)$(mandir)/man3
+	$(INSTALL) -d -m 0755 "$(DESTDIR)$(includedir)"
+	$(INSTALL) -d -m 0755 "$(DESTDIR)$(libdir)"
+	$(INSTALL) -d -m 0755 "$(DESTDIR)$(mandir)/man3"
 	for man in encode decode strerror; do \
-	  ln -f -s munge.3 $(DESTDIR)$(mandir)/man3/munge_$$man.3; \
+	  ln -f -s munge.3 \
+	    "$(DESTDIR)$(mandir)/man3/munge_$${man}.3"; \
 	done
 	for man in create copy destroy strerror get set; do \
-	  ln -f -s munge_ctx.3 $(DESTDIR)$(mandir)/man3/munge_ctx_$$man.3; \
+	  ln -f -s munge_ctx.3 \
+	    "$(DESTDIR)$(mandir)/man3/munge_ctx_$${man}.3"; \
 	done
 	for man in is_valid int_to_str str_to_int; do \
-	  ln -f -s munge_enum.3 $(DESTDIR)$(mandir)/man3/munge_enum_$$man.3; \
+	  ln -f -s munge_enum.3 \
+	    "$(DESTDIR)$(mandir)/man3/munge_enum_$${man}.3"; \
 	done
+	chmod 755 "$(DESTDIR)$(includedir)"
+	chmod 755 "$(DESTDIR)$(libdir)"
+	chmod 755 "$(DESTDIR)$(mandir)"

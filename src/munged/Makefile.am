@@ -87,6 +87,7 @@ base64_test_SOURCES = \
 	base64_test.c
 
 install-data-local:
-	$(INSTALL) -d -m 0755 $(DESTDIR)$(sbindir)
-	$(INSTALL) -d -m 0755 $(DESTDIR)$(mandir)
-	$(INSTALL) -d -m 0755 $(DESTDIR)$(mandir)/man8
+	$(INSTALL) -d -m 0755 "$(DESTDIR)$(sbindir)"
+	$(INSTALL) -d -m 0755 "$(DESTDIR)$(mandir)/man8"
+	chmod 755 "$(DESTDIR)$(sbindir)"
+	chmod 755 "$(DESTDIR)$(mandir)"

@@ -569,8 +569,8 @@ distclean-local::
 	-rm -f *~ \#* .\#* cscope*.out core core.* tags TAGS
 
 install-data-local:
-	$(INSTALL) -d -m 0755 $(DESTDIR)$(mandir)
-	$(INSTALL) -d -m 0755 $(DESTDIR)$(mandir)/man7
+	$(INSTALL) -d -m 0755 "$(DESTDIR)$(mandir)/man7"
+	chmod 755 "$(DESTDIR)$(mandir)"
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

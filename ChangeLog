@@ -1,5 +1,10 @@
 2006-09-25  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/etc/Makefile.am, src/libcommon/Makefile.am,
+	  src/libmunge/Makefile.am, src/munge/Makefile.am,
+	  src/munged/Makefile.am: Fixed bug on AIX causing directories created
+	  during "make install" to have wrong permissions inherited from umask.
+
 	* src/munged/auth_recv.c(_check_auth_client_dir):
 	  Added auth client dir ownership check.
 

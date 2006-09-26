@@ -35,5 +35,5 @@ man_MANS = \
 	munge.7
 
 install-data-local:
-	$(INSTALL) -d -m 0755 $(DESTDIR)$(mandir)
-	$(INSTALL) -d -m 0755 $(DESTDIR)$(mandir)/man7
+	$(INSTALL) -d -m 0755 "$(DESTDIR)$(mandir)/man7"
+	chmod 755 "$(DESTDIR)$(mandir)"

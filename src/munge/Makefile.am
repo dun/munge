@@ -49,6 +49,7 @@ man_MANS = \
 	remunge.1
 
 install-data-local:
-	$(INSTALL) -d -m 0755 $(DESTDIR)$(bindir)
-	$(INSTALL) -d -m 0755 $(DESTDIR)$(mandir)
-	$(INSTALL) -d -m 0755 $(DESTDIR)$(mandir)/man1
+	$(INSTALL) -d -m 0755 "$(DESTDIR)$(bindir)"
+	$(INSTALL) -d -m 0755 "$(DESTDIR)$(mandir)/man1"
+	chmod 755 "$(DESTDIR)$(bindir)"
+	chmod 755 "$(DESTDIR)$(mandir)"
