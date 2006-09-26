@@ -1,5 +1,8 @@
 2006-09-25  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/munged/auth_recv.c(_check_auth_client_dir):
+	  Added auth client dir ownership check.
+
 	* BUGS, PLATFORMS, TODO: Updated.
 
 	* README, munge.spec, src/libcommon/munge.7.in: Updated description.

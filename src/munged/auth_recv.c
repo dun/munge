@@ -178,6 +178,16 @@ _check_auth_client_dir (const char *dir, int got_force)
                 "The auth client dir is insecure: "
                 "\"%s\" should not be a symlink", dir);
     }
+    if ((st.st_uid != 0) && (st.st_uid != geteuid ())) {
+        if (!got_force)
+            log_err (EMUNGE_SNAFU, LOG_ERR,
+                "The auth client dir is insecure: "
+                "invalid ownership of \"%s\"", dir);
+        else
+            log_msg (LOG_WARNING,
+                "The auth client dir is insecure: "
+                "invalid ownership of \"%s\"", dir);
+    }
     if ((st.st_mode & (S_IWUSR | S_IWGRP | S_IWOTH))
             != (S_IWUSR | S_IWGRP | S_IWOTH)) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
