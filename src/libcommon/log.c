@@ -362,14 +362,14 @@ _log_aux (int errnum, int priority, char *msgbuf, int msgbuflen,
 static void
 _log_die (int status, int priority, char *msg)
 {
-    char *p;
-    char c;
-    int n;
+    signed char  c;
+    int          n;
+    char        *p;
 
     /*  Write error status and message to "daemonize" pipe.
      */
     if (log_ctx.fd_daemonize >= 0) {
-        c = (char) priority;
+        c = (signed char) priority;
         n = write (log_ctx.fd_daemonize, &c, sizeof (c));
         if ((n > 0) && (msg != NULL) && (log_ctx.fp != stderr)) {
             if ((p = strchr (msg, '\n'))) {

@@ -1,5 +1,10 @@
 2006-09-26  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/libcommon/log.c(_log_die): Changed "c" var type to "signed char"
+	  since a char is unsigned on AIX.
+	* src/munged/munged.c(daemonize_init): Changed "priority" var type to
+	  "signed char" since a char is unsigned on AIX.
+
 	* src/munged/auth_recv.c(_check_auth_client_dir):
 	  Combined tests for write permissions and the sticky bit being set.
 

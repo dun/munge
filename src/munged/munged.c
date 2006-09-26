@@ -201,7 +201,7 @@ daemonize_init (char *progname)
     int           fds [2];
     pid_t         pid;
     int           n;
-    char          priority;
+    signed char   priority;
     char          ebuf [1024];
 
     /*  Clear file mode creation mask.
