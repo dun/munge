@@ -1,5 +1,7 @@
 2006-09-26  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* HISTORY, META, NEWS: Updated for 0.5.4 release.
+
 	* src/etc/munge.init.in(signal_process): Replaced use of return code
 	  from second kill with another query_pids.  This protects against the
 	  first kill taking slightly too long and the second kill not finding
