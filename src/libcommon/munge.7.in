@@ -29,7 +29,7 @@
 .SH NAME
 munge \- MUNGE Uid 'N' Gid Emporium
 
-.SH DESCRIPTION
+.SH INTRODUCTION
 MUNGE (MUNGE Uid 'N' Gid Emporium) is an authentication service for creating
 and validating credentials.  It is designed to be highly scalable for use
 in an HPC cluster environment.  It allows a process to authenticate the

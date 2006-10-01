@@ -1,3 +1,7 @@
+2006-10-01  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* README, src/libcommon/munge.7.in: Tweaked headers.
+
 2006-09-26  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* : Released 0.5.4.

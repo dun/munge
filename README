@@ -1,4 +1,4 @@
-DESCRIPTION
+INTRODUCTION
 
   MUNGE (MUNGE Uid 'N' Gid Emporium) is an authentication service for creating
   and validating credentials.  It is designed to be highly scalable for use
