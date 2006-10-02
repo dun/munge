@@ -1,6 +1,10 @@
+2006-10-02  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/etc/munge.sysconfig: Tweaked commented OPTIONS var.
+
 2006-10-01  Chris Dunlap  <cdunlap@llnl.gov>
 
-	* README, src/libcommon/munge.7.in: Tweaked headers.
+	* README, src/libcommon/munge.7.in: Changed header name.
 
 2006-09-26  Chris Dunlap  <cdunlap@llnl.gov>
 
