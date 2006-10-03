@@ -12,20 +12,20 @@
 
 	* HISTORY, META, NEWS: Updated for 0.5.4 release.
 
-	* src/etc/munge.init.in(signal_process): Replaced use of return code
+	* src/etc/munge.init.in (signal_process): Replaced use of return code
 	  from second kill with another query_pids.  This protects against the
 	  first kill taking slightly too long and the second kill not finding
 	  the process.
 
-	* src/libcommon/log.c(_log_die): Changed "c" var type to "signed char"
+	* src/libcommon/log.c (_log_die): Changed "c" var type to "signed char"
 	  since a char is unsigned on AIX.
-	* src/munged/munged.c(daemonize_init): Changed "priority" var type to
+	* src/munged/munged.c (daemonize_init): Changed "priority" var type to
 	  "signed char" since a char is unsigned on AIX.
 
-	* src/munged/auth_recv.c(_check_auth_client_dir):
+	* src/munged/auth_recv.c (_check_auth_client_dir):
 	  Combined tests for write permissions and the sticky bit being set.
 
-	* src/etc/munge.init.in(service_restart): Replaced negated conditional
+	* src/etc/munge.init.in (service_restart): Replaced negated conditional
 	  with if/else since Solaris shell complains about commands starting
 	  with "!".
 
@@ -42,7 +42,7 @@
 	  src/munged/Makefile.am: Fixed bug on AIX causing directories created
 	  during "make install" to have wrong permissions inherited from umask.
 
-	* src/munged/auth_recv.c(_check_auth_client_dir):
+	* src/munged/auth_recv.c (_check_auth_client_dir):
 	  Added auth client dir ownership check.
 
 	* BUGS, PLATFORMS, TODO: Updated.
@@ -52,17 +52,17 @@
 	* QUICKSTART: Updated.
 
 	* src/munged/munged.8.in: Updated info on --force cmdline opt.
-	* src/munged/munged.c(write_pidfile): Added pidfile_name path checks.
-	* src/munged/munged.c(open_logfile): Added logfile_name path checks.
-	* src/munged/munged.c(sock_create): Added socket_name path checks.
-	* src/munged/auth_recv.c(auth_recv_init):
+	* src/munged/munged.c (write_pidfile): Added pidfile_name path checks.
+	* src/munged/munged.c (open_logfile): Added logfile_name path checks.
+	* src/munged/munged.c (sock_create): Added socket_name path checks.
+	* src/munged/auth_recv.c (auth_recv_init):
 	  Added auth_server_dir & auth_client_dir path checks via
 	  _check_auth_server_dir() & _check_auth_client_dir().
 	* src/munged/auth_recv.h: Updated prototype for auth_recv_init().
-	* src/munged/conf.c(create_subkeys): Added key_name path checks
+	* src/munged/conf.c (create_subkeys): Added key_name path checks
 	  via _conf_open_keyfile().
-	* src/munged/random.c(random_init): Added seed_name path checks.
-	* src/munged/random.c(random_fini): Set restricted umask as precaution.
+	* src/munged/random.c (random_init): Added seed_name path checks.
+	* src/munged/random.c (random_fini): Restricted umask as a precaution.
 	* src/munged/Makefile.am: Added path.c & path.h.
 	* src/munged/path.c, src/munged/path.h: Added.
 
@@ -190,10 +190,10 @@
 
 	* src/etc/munge.init.in: Tweaked spacing.
 
-	* src/etc/munge.init.in(service_restart): Changed so start would not
+	* src/etc/munge.init.in (service_restart): Changed so start would not
 	  be attempted if preceding stop had failed.
 
-	* src/etc/munge.init.in(service_start,service_stop): Replaced Debian's
+	* src/etc/munge.init.in (service_start,service_stop): Replaced Debian's
 	  "--oknodo" with test for "$0 status" since --oknodo would also mask
 	  errors such as "operation not permitted".
 
@@ -202,7 +202,7 @@
 	* src/etc/Makefile.am: Added munge.init to noinst_DATA, thereby adding
 	  its dependency to the "all" target.
 
-	* src/libcommon/log.c(_log_prefix): Changed priority prefixes to
+	* src/libcommon/log.c (_log_prefix): Changed priority prefixes to
 	  mixed-case strings.
 
 	* README, munge.spec: Updated description.
@@ -212,7 +212,7 @@
 	* src/etc/munge.init.in: Changed the test for starting a service on
 	  RedHat to mirror the test for stopping a service there.
 
-	* src/libcommon/log.c(_log_die): Changed behavior to only return error
+	* src/libcommon/log.c (_log_die): Changed behavior to only return error
 	  message across "daemonize" pipe if the logging fp is not set to
 	  stderr in order to avoid having the message written to stderr first
 	  by the grandchild process and again by the original parent process.
@@ -224,25 +224,25 @@
 
 2006-07-26  Chris Dunlap  <cdunlap@llnl.gov>
 
-	* src/munged/munged.c(main): Moved daemonize_fini() to just before
+	* src/munged/munged.c (main): Moved daemonize_fini() to just before
 	  job_accept() in order to return more fatal error conditions to shell.
-	* src/munged/munged.c(daemonize_init): Changed behavior for original
+	* src/munged/munged.c (daemonize_init): Changed behavior for original
 	  parent process to read error priority & message via "daemonize" pipe
 	  and write error message to stderr before exiting.
-	* src/munged/munged.c(open_logfile): Added.
+	* src/munged/munged.c (open_logfile): Added.
 	* src/munged/conf.c, src/munged/conf.h: Added logfile_name to conf.
-	* src/libcommon/log.c(_log_aux): Added msgbuf & msgbuflen to prototype.
+	* src/libcommon/log.c (_log_aux): Added msgbuf/msgbuflen to prototype.
 	  Changed behavior to return error message string via msgbuf.
-	* src/libcommon/log.c(_log_die): Added priority & msg to prototype.
+	* src/libcommon/log.c (_log_die): Added priority & msg to prototype.
 	  Changed behavior to return priority and msg across "daemonize" pipe.
-	* src/libcommon/log.h(log_set_err_pipe): Updated documentation.
+	* src/libcommon/log.h (log_set_err_pipe): Updated documentation.
 
 2006-07-25  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/munged/munged.c: Changed daemonize_init() and daemonize_fini()
 	  so grandchild process can return error status to original parent
 	  process via "daemonize" pipe.
-	* src/libcommon/log.c(_log_die): Added check to return error status
+	* src/libcommon/log.c (_log_die): Added check to return error status
 	  across "daemonize" pipe.
 	* src/libcommon/log.c, src/libcommon/log.h: Added log_set_err_pipe().
 
@@ -261,26 +261,26 @@
 
 	* munge.spec: Added %post to create munge.key if it does not exist.
 
-	* src/munged/timer.c(timer_thread): Added pthread_sigmask() to new
+	* src/munged/timer.c (timer_thread): Added pthread_sigmask() to new
 	  thread to force signals to interrupt accept() in job_accept().
-	* src/munged/work.c(_work_exec):  Added pthread_sigmask() to new
+	* src/munged/work.c (_work_exec):  Added pthread_sigmask() to new
 	  threads to force signals to interrupt accept() in job_accept().
 
 2006-07-22  Chris Dunlap  <cdunlap@llnl.gov>
 
-	* src/munged/conf.c(display_help): Tweaked verbage.
+	* src/munged/conf.c (display_help): Tweaked verbage.
 
 	* src/libcommon/str.c, src/libcommon/str.h: Added strhex2bin().
 	  Renamed strhex() to strbin2hex() and changed prototype.
-	* src/libmunge/auth_send.c(_name_auth_file): Changed behavior to name
+	* src/libmunge/auth_send.c (_name_auth_file): Changed behavior to name
 	  auth file by XORing the first half of the random component of the
 	  auth pipe with the second half.
 	* src/munged/auth_recv.c: Renamed strhex() to strbin2hex().
 
 2006-07-21  Chris Dunlap  <cdunlap@llnl.gov>
 
-	* src/libmunge/auth_send.c(_name_auth_file): Updated function comment.
-	* src/munged/auth_recv.c(_name_auth_pipe): Updated function comment.
+	* src/libmunge/auth_send.c (_name_auth_file): Updated function comment.
+	* src/munged/auth_recv.c (_name_auth_pipe): Updated function comment.
 
 	* BUGS, README.AIX, src/libcommon/munge_defs.h, src/munged/auth_recv.c,
 	  src/munged/conf.c, src/munged/conf.h, src/munged/munged.8.in:
@@ -299,13 +299,13 @@
 	* config/x_ac_debug.m4: Changed behavior to only alter CFLAGS if they
 	  are not explicitly set.
 
-	* src/munged/munged.c(main): Prevented PRNG seed from being written on
+	* src/munged/munged.c (main): Prevented PRNG seed from being written on
 	  exit if an error was encountered while reading it during startup.
-	* src/munged/random.c(random_init): Changed to ignore PRNG seed unless
+	* src/munged/random.c (random_init): Changed to ignore PRNG seed unless
 	  it has proper mode, ownership, and permissions.
-	* src/munged/random.h(random_init): Changed prototype to return int.
+	* src/munged/random.h (random_init): Changed prototype to return int.
 
-	* src/munged/auth_recv.c(auth_recv_init): Tweaked err msg verbage.
+	* src/munged/auth_recv.c (auth_recv_init): Tweaked err msg verbage.
 
 	* src/etc/Makefile.am, src/libcommon/Makefile.am,
 	  src/libmunge/Makefile.am, src/munge/Makefile.am,
@@ -313,14 +313,14 @@
 
 	* src/etc/Makefile.am, src/libmunge/Makefile.am: Tweaked dir perms.
 
-	* src/munged/munged.c(main): Moved root privs test (if needed) to
+	* src/munged/munged.c (main): Moved root privs test (if needed) to
 	  after parse_cmdline() so root privs are not needed to get "--help".
 
 	* munge.spec: Specified perms & daemon-ownership for munge-owned dirs.
 	* src/etc/Makefile.am: Changed /var/lib/munge and /var/log/munge perms.
 	* src/etc/munge.init.in: Changed to run as the "daemon" user.
 
-	* src/munged/conf.c(display_help): Added defaults to help message.
+	* src/munged/conf.c (display_help): Added defaults to help message.
 
 	* src/munged/conf.c: Disabled "--auth-pipe-dir" & "--auth-file-dir"
 	  unless MUNGE_AUTH_RECVFD is defined.
@@ -339,12 +339,12 @@
 	  a_file_len, a_file_str, a_file_is_copy to m_msg struct.
 	* src/libcommon/m_msg.c: Added new m_msg struct variables to
 	  m_msg_destroy(), _msg_length(), _msg_pack(), _msg_unpack().
-	* src/munged/auth_recv.c(_send_auth_req): Changed auth request message
+	* src/munged/auth_recv.c (_send_auth_req): Changed auth request message
 	  format to include a_pipe_str and a_file_str.
-	* src/libmunge/auth_send.c(auth_send): Added use of file dir string.
-	* src/libmunge/auth_send.c(_recv_auth_req): Added file dir parm.
+	* src/libmunge/auth_send.c (auth_send): Added use of file dir string.
+	* src/libmunge/auth_send.c (_recv_auth_req): Added file dir parm.
 	  Changed to extract a_pipe_str and a_file_str from request message.
-	* src/libmunge/auth_send.c(_name_auth_file): Added file dir parm.
+	* src/libmunge/auth_send.c (_name_auth_file): Added file dir parm.
 	  Changed auth file path so it is no longer in same dir as auth pipe.
 	* src/munged/conf.h: Renamed auth_pipe_rnd_bytes to auth_rnd_bytes.
 	  Added auth_file_dir.
@@ -370,8 +370,8 @@
 
 	* src/etc/munge.init.in: Updated PIDFILE to match munge_defs.h.
 
-	* src/munged/dec.c(dec_process_msg): Sanitized rsp msg data on error.
-	* src/munged/enc.c(enc_process_msg): Sanitized rsp msg data on error.
+	* src/munged/dec.c (dec_process_msg): Sanitized rsp msg data on error.
+	* src/munged/enc.c (enc_process_msg): Sanitized rsp msg data on error.
 	* src/libcommon/m_msg.c, src/libcommon/m_msg.h: Added m_msg_reset().
 
 	* src/libcommon/munge_defs.h: Moved MUNGED_PIDFILE to /var/run/munge/.
@@ -385,7 +385,7 @@
 
 2006-06-05  Chris Dunlap  <cdunlap@llnl.gov>
 
-	* src/munged/munged.c(write_pidfile): Fixed double-free of file ptr.
+	* src/munged/munged.c (write_pidfile): Fixed double-free of file ptr.
 
 2006-05-25  Chris Dunlap  <cdunlap@llnl.gov>
 
@@ -528,7 +528,7 @@
 
 	* src/libcommon/license.c: Changed Munge to MUNGE.
 
-	* src/munged/munged.c(main): Changed new logfile perms from 666 to 640.
+	* src/munged/munged.c (main): Changed new logfile perms to 640.
 
 2006-01-24  Chris Dunlap  <cdunlap@llnl.gov>
 
@@ -560,77 +560,77 @@
 
 	* src/libcommon/license.c: Updated copyright date range.
 
-	* src/libcommon/m_msg.c(_msg_unpack):
+	* src/libcommon/m_msg.c (_msg_unpack):
 	  Added cast to discard const qualifier from ptr type.
-	* src/munged/zip.c(zip_decompress_length):
+	* src/munged/zip.c (zip_decompress_length):
 	  Added cast to discard const qualifier from ptr type.
 
 	* HISTORY, META, NEWS: Updated for 0.5 release.
 
 2006-01-18  Chris Dunlap  <cdunlap@llnl.gov>
 
-	* src/munged/gids.c(_gids_hash_create):
+	* src/munged/gids.c (_gids_hash_create):
 	  Ensured endgrent() is called on error.
 
 2006-01-17  Chris Dunlap  <cdunlap@llnl.gov>
 
-	* src/libcommon/m_msg.c(_alloc):
+	* src/libcommon/m_msg.c (_alloc):
 	  Added NUL-termination byte to end of memory allocation.
-	* src/libmunge/encode.c(_encode_rsp):
+	* src/libmunge/encode.c (_encode_rsp):
 	  Removed unnecessary dup of rsp data.
-	* src/libmunge/decode.c(_decode_rsp):
+	* src/libmunge/decode.c (_decode_rsp):
 	  Removed unnecessary dup of rsp data & realm_str.
 
-	* src/munged/enc.c(enc_fini):
+	* src/munged/enc.c (enc_fini):
 	  Free()d req data before overwriting data ptr with rsp data.
 
 2006-01-12  Chris Dunlap  <cdunlap@llnl.gov>
 
-	* src/libcommon/m_msg.c(m_msg_send):
+	* src/libcommon/m_msg.c (m_msg_send):
 	  Added check for pkt_is_copy before free()ing pkt.
-	* src/libcommon/m_msg.c(m_msg_send):
+	* src/libcommon/m_msg.c (m_msg_send):
 	  Added check for negative length returned from _msg_length().
 	* src/libcommon/m_msg.c: Tweaked function documentation.
 
-	* src/munged/dec.c(dec_unarmor):
+	* src/munged/dec.c (dec_unarmor):
 	  Free()d data after unarmoring to prevent leak in dec_unpack_inner().
-	* src/munged/dec.c(dec_unpack_outer):
+	* src/munged/dec.c (dec_unpack_outer):
 	  Set realm_is_copy flag to prevent double free of realm_str.
 
-	* src/munged/job.c(job_accept):
+	* src/munged/job.c (job_accept):
 	  Added call to destroy msg if m_msg_bind() fails.
 
-	* src/munged/dec.c(dec_decompress): Removed dead code in 'err' label.
+	* src/munged/dec.c (dec_decompress): Removed dead code in 'err' label.
 
 	* src/munged/crypto_thread.c: Added checks to abort on error.
 
-	* src/libmunge/decode.c(_decode_rsp):
+	* src/libmunge/decode.c (_decode_rsp):
 	  Fixed bug where routine not aborted after EMUNGE_NO_MEMORY set.
 
-	* src/libmunge/ctx.c(_munge_ctx_set_err):
+	* src/libmunge/ctx.c (_munge_ctx_set_err):
 	  Fixed potential NULL dereference of ctx in return value.
 
-	* src/munge/remunge.c(parse_cmdline):
+	* src/munge/remunge.c (parse_cmdline):
 	  Fixed NUL termination of payload data.
 
-	* src/libcommon/log.c(log_open_syslog):
+	* src/libcommon/log.c (log_open_syslog):
 	  Fixed 'identity' dereference before NULL check.
 
 	* src/libcommon/log.c: Added void cast to ignore return code on error.
 
 2006-01-11  Chris Dunlap  <cdunlap@llnl.gov>
 
-	* src/libmunge/decode.c(_decode_req):
+	* src/libmunge/decode.c (_decode_req):
 	  Set data_is_copy flag to prevent free() of caller-supplied cred.
 
 	* src/libcommon/m_msg.c: Revamped to support msg packing & unpacking.
 	* src/libcommon/m_msg.h: Incremented MUNGE_MSG_VERSION to 4.
 	  Removed struct m_msg_head & struct m_msg_v1.  Expanded struct m_msg.
 	  Added m_msg_type_t, m_msg_magic_t, & m_msg_version_t.
-	* src/libcommon/m_msg.h(m_msg_create): Changed prototype.
-	* src/libcommon/m_msg.h(m_msg_bind): Added.
-	* src/libcommon/m_msg.h(m_msg_send): Changed prototype.
-	* src/libcommon/m_msg.h(m_msg_recv): Changed prototype.
+	* src/libcommon/m_msg.h (m_msg_create): Changed prototype.
+	* src/libcommon/m_msg.h (m_msg_bind): Added.
+	* src/libcommon/m_msg.h (m_msg_send): Changed prototype.
+	* src/libcommon/m_msg.h (m_msg_recv): Changed prototype.
 	* src/libcommon/munge_defs.h: Moved MUNGE_MSG_MAGIC to m_msg.h.
 	* src/munged/enc_v1.c: Renamed to src/munged/enc.c.
 	* src/munged/enc_v1.h: Renamed to src/munged/enc.h.
@@ -645,7 +645,7 @@
 	  Renamed fields of struct munge_ctx: realm/realm_str,
 	  socket/socket_str, errnum/error_num, errstr/error_str.
 	* src/libmunge/m_msg_client.c: Updated for new munge message layer.
-	* src/libmunge/m_msg_client.h(m_msg_client_xfer): Changed prototype.
+	* src/libmunge/m_msg_client.h (m_msg_client_xfer): Changed prototype.
 	* src/libmunge/decode.c, src/libmunge/encode.c:
 	  Updated for new munge message layer and struct munge_ctx.
 
@@ -665,7 +665,7 @@
 	* src/libcommon/munge_defs.h: Changed default cipher to aes128.
 	* NEWS: Updated.
 
-	* src/libmunge/ctx.c(munge_ctx_set): Added test for MUNGE_OPT_REALM
+	* src/libmunge/ctx.c (munge_ctx_set): Added test for MUNGE_OPT_REALM
 	  to ensure realm strlen < 256.
 
 	* src/munged/enc_v1.c: Removed enc_v1_precompress().
@@ -683,12 +683,12 @@
 
 2005-11-17  Chris Dunlap  <cdunlap@llnl.gov>
 
-	* src/munged/dec_v1.c(dec_v1_decompress): Added test to abort
+	* src/munged/dec_v1.c (dec_v1_decompress): Added test to abort
 	  decompression if a block cipher padding error has already occurred.
 	* src/munged/dec_v1.c: Moved c->salt_len initialization from
 	  dec_v1_unpack_outer() to dec_v1_unpack_inner().
 
-	* src/munged/zip.c(zip_compress_block,zip_decompress_block):
+	* src/munged/zip.c (zip_compress_block, zip_decompress_block):
 	  Added check to ensure (srclen > 0).
 
 2005-11-16  Chris Dunlap  <cdunlap@llnl.gov>
@@ -697,7 +697,7 @@
 
 	* src/munged/zip.c: Added magic sentinel to beginning of zip_meta_t
 	  to check if embedded length of original uncompressed data is valid.
-	* src/munged/zip.h(zip_compress_block,zip_decompress_block):
+	* src/munged/zip.h (zip_compress_block, zip_decompress_block):
 	  Changed name of dstlen parm to pdstlen.
 
 	* config/x_ac_debug.m4: Changed behavior to allow existing CFLAGS to
@@ -757,7 +757,7 @@
 	  MUNGE_AUTH_PIPE_DIR, MUNGED_LOGFILE, MUNGED_RANDOM_SEED, and
 	  MUNGED_SECRET_KEY to comply with the Filesystem Hierarchy Standard.
 
-	* src/munged/conf.c(display_help): Documented deprecated cmdline opts.
+	* src/munged/conf.c (display_help): Documented deprecated cmdline opts.
 
 	* src/libcommon/munge_defs.h:
 	  Tweaked _X_AC_META_GETVAL to allow both key:val and key=val in META.
@@ -830,7 +830,7 @@
 
 2005-01-18  Chris Dunlap  <cdunlap@llnl.gov>
 
-	* src/munged/hash.c(hash_destroy): Fixed memory leak.
+	* src/munged/hash.c (hash_destroy): Fixed memory leak.
 
 2004-12-21  Chris Dunlap  <cdunlap@llnl.gov>
 
@@ -880,7 +880,7 @@
 	* munge.spec, src/etc/Makefile.am, src/etc/munge.sysconfig:
 	  Added /etc/sysconfig/munge.
 
-	* src/libmunge/enum.c(_munge_enum_lookup): Changed return type from
+	* src/libmunge/enum.c (_munge_enum_lookup): Changed return type from
 	  const munge_enum_table_t to munge_enum_table_t.
 
 2004-11-30  Chris Dunlap  <cdunlap@llnl.gov>
@@ -1049,7 +1049,7 @@
 
 2004-11-08  Chris Dunlap  <cdunlap@llnl.gov>
 
-	* src/munged/work.c(work_queue):
+	* src/munged/work.c (work_queue):
 	  Fixed bug where rc was used uninitialized.
 	  Do not signal condition if _work_enqueue() fails.
 
@@ -1088,11 +1088,11 @@
 	* src/libcommon/munge_msg.c, src/libcommon/munge_msg.h:
 	  Added maxlen parm to munge_msg_send() and munge_msg_recv().
 	  All callers changed.
-	* src/libmunge/msg_client.c(munge_msg_client_xfer):
+	* src/libmunge/msg_client.c (munge_msg_client_xfer):
 	  Abort retry attempts on EMUNGE_BAD_LENGTH.
 	* src/libmunge/munge.h, src/libmunge/strerror.c:
 	  Added EMUNGE_BAD_LENGTH.  Renumbered munge_err enum.
-	* src/munged/job.c(_job_exec): Limit msg len to MUNGE_MAXIMUM_REQ_LEN.
+	* src/munged/job.c (_job_exec): Limit msg len to MUNGE_MAXIMUM_REQ_LEN.
 
 	* src/libcommon/munge_msg.h: Incremented MUNGE_MSG_VERSION to 3
 	  since retry field was added to munge_msg_head struct.
@@ -1101,17 +1101,18 @@
 
 	* src/libcommon/munge_defs.h: Tweaked comments.
 
-	* src/munged/job.c(job_accept): Changed log msg for processing backlog.
+	* src/munged/job.c (job_accept):
+	  Changed log msg for processing backlog.
 
-	* src/munged/dec_v1.c(dec_v1_validate_replay):
+	* src/munged/dec_v1.c (dec_v1_validate_replay):
 	  Added log msg when allowing credential replay due to retry.
 
 	* src/libcommon/munge_defs.h:
 	  Added MUNGE_SOCKET_XFER_USLEEP.  Removed MUNGE_SOCKET_ACCEPT_USLEEP.
 	  Changed MUNGE_SOCKET_XFER_ATTEMPTS from 3 to 5.
-	* src/libmunge/msg_client.c(munge_msg_client_xfer):
+	* src/libmunge/msg_client.c (munge_msg_client_xfer):
 	  Added linear back-off to retry of failed credential transactions.
-	* src/munged/job.c(job_accept):
+	* src/munged/job.c (job_accept):
 	  Changed usleep() to work_wait() when accept() exceeds open fd limit.
 
 2004-09-23  Chris Dunlap  <cdunlap@llnl.gov>
@@ -1139,7 +1140,7 @@
 
 2004-09-21  Chris Dunlap  <cdunlap@llnl.gov>
 
-	* src/munged/gids.c(_gids_hash_add):
+	* src/munged/gids.c (_gids_hash_add):
 	  Removed warning for having detected duplicate uid for given gid.
 
 2004-09-18  Chris Dunlap  <cdunlap@llnl.gov>
@@ -1163,7 +1164,7 @@
 	* src/munged/timer.c:
 	  Moved pthread_cond_signal() outside of critical region.
 
-	* src/munged/gids.c(gids_destroy):
+	* src/munged/gids.c (gids_destroy):
 	  Moved hash_destroy() outside of critical region.
 
 2004-09-16  Chris Dunlap  <cdunlap@llnl.gov>
@@ -1193,7 +1194,7 @@
 	* src/munged/replay.c: Changed struct replay_key to union replay_key
 	  to reduce storage requirements for replay data.
 
-	* src/munged/cred.c(cred_create):
+	* src/munged/cred.c (cred_create):
 	  Fixed bug where error condition was not set on failure.
 
 2004-09-09  Chris Dunlap  <cdunlap@llnl.gov>
@@ -1219,18 +1220,18 @@
 
 	* src/munged/gids.c, src/munged/gids.h: Added GIDS_HASH_SIZE.
 
-	* src/munged/munged.c(main):
+	* src/munged/munged.c (main):
 	  Changed default log priority level from LOG_NOTICE to LOG_INFO.
 
-	* src/munged/conf.c(display_help): Added newline.
+	* src/munged/conf.c (display_help): Added newline.
 
-	* src/munge/munge.c(display_strings,str_to_int): Tweaked formatting.
+	* src/munge/munge.c (display_strings,str_to_int): Tweaked formatting.
 
 	* src/munge/Makefile.am, src/munge/remunge.c: Added.
 
 2004-08-26  Chris Dunlap  <cdunlap@llnl.gov>
 
-	* src/libcommon/munge_defs.h, src/munged/job.c(job_accept):
+	* src/libcommon/munge_defs.h, src/munged/job.c (job_accept):
 	  Fix bug causing the daemon to crash if accept() exceeded the
 	  open file descriptor limit for the process.
 
@@ -1244,15 +1245,15 @@
 
 2004-08-24  Chris Dunlap  <cdunlap@llnl.gov>
 
-	* src/munge/munge.c(destroy_conf): Removed unnecessary test for ctx.
-	* src/munge/unmunge.c(destroy_conf): Removed unnecessary test for ctx.
+	* src/munge/munge.c (destroy_conf): Removed unnecessary test for ctx.
+	* src/munge/unmunge.c (destroy_conf): Removed unnecessary test for ctx.
 
 2004-08-20  Chris Dunlap  <cdunlap@llnl.gov>
 
-	* src/munge/munge.c(parse_cmdline):
+	* src/munge/munge.c (parse_cmdline):
 	  Check for overflow of time-to-live "-t" cmdline option.
 
-	* src/munge/munge.c(parse_cmdline):
+	* src/munge/munge.c (parse_cmdline):
 	  Changed strtol() err msg from log_errno() to log_err().
 
 2004-08-19  Chris Dunlap  <cdunlap@llnl.gov>
@@ -1261,7 +1262,7 @@
 	  Reformatted code.  Changed help option string width.
 
 	* src/munge/munge.c: Tweaked use of strtol().
-	* src/munge/munge.c(str_to_int): Revamped.
+	* src/munge/munge.c (str_to_int): Revamped.
 
 2004-08-18  Chris Dunlap  <cdunlap@llnl.gov>
 
@@ -1275,7 +1276,7 @@
 	* src/munged/conf.c:
 	  Added temporary cmdline opts for 'keyfile' and 'nthreads'.
 
-	* src/munged/job.c(job_accept): Tweaked log messages.
+	* src/munged/job.c (job_accept): Tweaked log messages.
 
 	* src/libcommon/munge_defs.h: Changed MUNGE_THREADS from 4 to 2.
 
@@ -1283,12 +1284,12 @@
 
 	* : Re-bootstrap'd with automake-1.9.
 
-	* src/munged/work.c(work_fini):
+	* src/munged/work.c (work_fini):
 	  Fixed bug preventing the worker thread(s) from being canceled.
 
 2004-08-05  Chris Dunlap  <cdunlap@llnl.gov>
 
-	* src/munged/timer.c(timer_fini):
+	* src/munged/timer.c (timer_fini):
 	  Changed assert of pthread_join() rc to an explicit test.
 	  Reset timer_tid after timer thread has been joined.
 
@@ -1352,7 +1353,7 @@
 	* src/munged/conf.c, src/munged/munged.c: Moved auth_recv_init()
 	  before gids_create() to allow for quicker exit when !root on AIX.
 
-	* src/munged/gids.c(gids_create): Allow errno == ENOENT to denote
+	* src/munged/gids.c (gids_create): Allow errno == ENOENT to denote
 	  success after last entry is returned by getgrent() for glibc-2.2.5.
 
 2004-05-05  Chris Dunlap  <cdunlap@llnl.gov>
@@ -1398,7 +1399,7 @@
 
 2004-04-21  Chris Dunlap  <cdunlap@llnl.gov>
 
-	* src/munged/munged/gids.c(gids_create): Added log msg.
+	* src/munged/munged/gids.c (gids_create): Added log msg.
 
 2004-04-16  Chris Dunlap  <cdunlap@llnl.gov>
 
@@ -1450,7 +1451,7 @@
 
 2004-03-25  Chris Dunlap  <cdunlap@llnl.gov>
 
-	* src/munged/munged.c(main):
+	* src/munged/munged.c (main):
 	  Changed logfile priority from LOG_DEBUG to LOG_NOTICE (if NDEBUG).
 
 	* munge.spec, config/Make-rpm.mk:
@@ -1490,7 +1491,7 @@
 	* src/munge/munge.c, src/munge/unmunge.c, src/munged/conf.c,
 	  src/munged/cred.c: Added dead store removal protection (ie, memburn).
 
-	* src/munge/read.c(read_data_from_file): Removed unnecessary memset().
+	* src/munge/read.c (read_data_from_file): Removed unnecessary memset().
 
 2004-03-12  Chris Dunlap  <cdunlap@llnl.gov>
 
@@ -1519,7 +1520,7 @@
 	  src/munged/cred.h, src/munged/dec_v1.c, src/munged/enc_v1.c,
 	  src/munged/zip.c, src/munged/zip.h: Added support for compression.
 
-	* src/munged/replay.c(replay_insert): Changed return codes.
+	* src/munged/replay.c (replay_insert): Changed return codes.
 
 	* config/x_ac_meta.m4: Added test for META file existence.
 
@@ -1601,20 +1602,20 @@
 	  Changed protocol between client (libmunge) and server (munged)
 	  to allow credential data & metadata to be returned on error.
 
-	* src/munge/unmunge.c(display_meta):
+	* src/munge/unmunge.c (display_meta):
 	  Added check for errors on the file stream "fp_meta".
 
 2003-12-12  Chris Dunlap  <cdunlap@llnl.gov>
 
-	* src/munged/msg_server.c(munge_msg_server_thread):
+	* src/munged/msg_server.c (munge_msg_server_thread):
 	  Fixed _munge_msg_recv() error from getting logged twice.
 
-	* src/libcommon/munge_msg.c(_munge_msg_send, _munge_msg_recv):
+	* src/libcommon/munge_msg.c (_munge_msg_send, _munge_msg_recv):
 	  Fixed error conditions that were not errno conditions.
 
 2003-12-11  Chris Dunlap  <cdunlap@llnl.gov>
 
-	* src/libcommon/munge_msg.c(_munge_msg_send):
+	* src/libcommon/munge_msg.c (_munge_msg_send):
 	  Changed to use gather-writes.
 
 	* src/libcommon/munge_defs.h:
@@ -1646,7 +1647,7 @@
 	* src/libcommon/munge_defs.h, src/munged/random.c:
 	  Changed RANDOM_SEED_DEFAULT from "/dev/random" to "/dev/urandom".
 
-	* src/munged/dec_v1.c(dec_v1_unpack_inner):
+	* src/munged/dec_v1.c (dec_v1_unpack_inner):
 	  Fixed unaligned access on ia64 {gnats:303}.
 
 	* src/munged/dec_v1.c, src/munged/enc_v1.c:
@@ -1679,12 +1680,12 @@
 
 2003-06-12  Chris Dunlap  <cdunlap@llnl.gov>
 
-	* src/munged/conf.c(create_conf):
+	* src/munged/conf.c (create_conf):
 	  Changed default value for got_clock_skew flag to true.
 
 2003-06-03  Chris Dunlap  <cdunlap@llnl.gov>
 
-	* src/libcommon/munge_msg.c(_munge_msg_recv):
+	* src/libcommon/munge_msg.c (_munge_msg_recv):
 	  Fixed bug with unexpected message length assert.
 
 2003-05-30  Chris Dunlap  <cdunlap@llnl.gov>
@@ -1711,10 +1712,10 @@
 	* src/munge/munge.c, src/munge/unmunge.c:
 	  Changed manner in which strtol() is checked for error.
 
-	* src/libmunge/msg_client.c(_munge_msg_client_connect):
+	* src/libmunge/msg_client.c (_munge_msg_client_connect):
 	  Changed client's connect() retry backoff from exponential to linear.
 
-	* src/munged/munged.c(segv_handler): Added.
+	* src/munged/munged.c (segv_handler): Added.
 
 2003-05-16  Chris Dunlap  <cdunlap@llnl.gov>
 
@@ -1726,7 +1727,7 @@
 
 2003-05-07  Chris Dunlap  <cdunlap@llnl.gov>
 
-	* src/munged/dec_v1.c(dec_v1_validate_time):
+	* src/munged/dec_v1.c (dec_v1_validate_time):
 	  Added a minimum negative clock skew of 1 second, since we were
 	  encountering EMUNGE_CRED_REWOUND in spite of NTP's best efforts.
 
@@ -1737,13 +1738,13 @@
 	* src/etc/munge.init, src/libcommon/munge_defs.h, src/munged/conf.c,
 	  src/munged/munged.c: Added munged F cmdline opt and daemon support.
 
-	* src/munged/random.c(random_init): Added "seeding in progress" msg.
+	* src/munged/random.c (random_init): Added "seeding in progress" msg.
 
 2003-05-03  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* HISTORY: Added.
 
-	* src/munged/msg_server.c(err_v1_process_msg):
+	* src/munged/msg_server.c (err_v1_process_msg):
 	  Fixed sending err msg with no body, but need to revisit this routine.
 
 2003-05-02  Chris Dunlap  <cdunlap@llnl.gov>
@@ -1756,9 +1757,9 @@
 	* src/munge/munge.c, src/munge/unmunge.c, src/munged/conf.c:
 	  Added V cmdline opt.
 
-	* src/munge/unmunge.c(main): Fixed invalid read of free'd memory.
+	* src/munge/unmunge.c (main): Fixed invalid read of free'd memory.
 
-	* src/libmunge/decode.c(decode_rsp_v1):
+	* src/libmunge/decode.c (decode_rsp_v1):
 	  Fixed dataless cred decode to match header (ie, no data is malloc'd).
 	  Fixed overwrite of returned data buffer.
 
