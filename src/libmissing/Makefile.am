@@ -10,7 +10,7 @@ noinst_LTLIBRARIES = \
 	libmissing.la
 
 libmissing_la_LIBADD = \
-	@LTLIBOBJS@
+	$(LTLIBOBJS)
 
 libmissing_la_SOURCES = \
 	getopt.h \

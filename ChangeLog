@@ -1,5 +1,7 @@
 2006-10-30  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/libmissing/Makefile.am: Replaced @LTLIBOBJS@ with $(LTLIBOBJS).
+
 	* doc/credential_v3_format.txt: Added comment specifying encryption is
 	  performed in cipher block chaining mode.
 
