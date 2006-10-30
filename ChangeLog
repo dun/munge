@@ -1,3 +1,8 @@
+2006-10-30  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* doc/credential_v3_format.txt: Added comment specifying encryption is
+	  performed in cipher block chaining mode.
+
 2006-10-02  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/etc/munge.sysconfig: Tweaked commented OPTIONS var.
