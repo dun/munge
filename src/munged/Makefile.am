@@ -15,16 +15,17 @@ sbin_PROGRAMS = \
 	munged
 
 munged_CFLAGS = \
-	-DWITH_PTHREADS
+	-DWITH_PTHREADS \
+	$(CRYPTO_CFLAGS)
 
 munged_LDADD = \
 	$(top_builddir)/src/libcommon/libcommon.la \
 	$(top_builddir)/src/libmissing/libmissing.la \
 	$(top_builddir)/src/libmunge/libmunge.la \
 	$(LIBPTHREAD) \
-	-lcrypto \
 	$(LIBBZ2) \
-	$(LIBZ)
+	$(LIBZ) \
+	$(CRYPTO_LIBS)
 
 munged_SOURCES = \
 	auth_recv.c \
@@ -37,10 +38,8 @@ munged_SOURCES = \
 	conf.h \
 	cred.c \
 	cred.h \
-	crypto_log.c \
-	crypto_log.h \
-	crypto_thread.c \
-	crypto_thread.h \
+	crypto.c \
+	crypto.h \
 	dec.c \
 	dec.h \
 	enc.c \
@@ -51,8 +50,6 @@ munged_SOURCES = \
 	hash.h \
 	job.c \
 	job.h \
-	lookup.c \
-	lookup.h \
 	mac.c \
 	mac.h \
 	md.c \

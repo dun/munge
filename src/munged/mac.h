@@ -33,13 +33,32 @@
 #  include <config.h>
 #endif /* HAVE_CONFIG_H */
 
-#include <openssl/evp.h>
-#include <openssl/hmac.h>
+#include <munge.h>
 
 
 /*****************************************************************************
  *  Data Types
  *****************************************************************************/
+
+#if HAVE_LIBGCRYPT
+
+#include <gcrypt.h>
+
+typedef struct {
+    gcry_md_hd_t        ctx;
+#ifndef NDEBUG
+    int                 magic;
+    int                 finalized;
+#endif /* !NDEBUG */
+} mac_ctx;
+
+#endif /* HAVE_LIBGCRYPT */
+
+
+#if HAVE_OPENSSL
+
+#include <openssl/evp.h>
+#include <openssl/hmac.h>
 
 typedef struct {
     HMAC_CTX            ctx;
@@ -49,13 +68,14 @@ typedef struct {
 #endif /* !NDEBUG */
 } mac_ctx;
 
+#endif /* HAVE_OPENSSL */
+
 
 /*****************************************************************************
  *  Prototypes
  *****************************************************************************/
 
-int mac_init (mac_ctx *x, const EVP_MD *md,
-              const void *key, int keylen);
+int mac_init (mac_ctx *x, munge_mac_t md, const void *key, int keylen);
 /*
  *  Initializes the message authentication code (MAC) context [x]
  *    with the message digest [md] and key [key] of [keylen] bytes.
@@ -71,11 +91,12 @@ int mac_update (mac_ctx *x, const void *src, int srclen);
 
 int mac_final (mac_ctx *x, void *dst, int *dstlen);
 /*
- *  Finalizes the MAC context [x], placing the MAC in [dst] which must
- *    have sufficient space for the message digest output (mac_size).
- *    If [dstlen] is not NULL, it will be set to the output size.
- *  After this function, no further calls to mac_update() should be made.
- *  Returns 0 on success, or -1 on error.
+ *  Finalizes the MAC context [x], placing the MAC in [dst] of length [dstlen].
+ *    The [dst] buffer must have sufficient space for the MAC output
+ *    (mac_size).
+ *  After this function, no further calls to md_update() should be made.
+ *  Returns 0 on success, or -1 on error; in addition, [dstlen] will be set
+ *    to the number of bytes written to [dst].
  */
 
 int mac_cleanup (mac_ctx *x);
@@ -84,19 +105,29 @@ int mac_cleanup (mac_ctx *x);
  *  Returns 0 on success, or -1 on error.
  */
 
-int mac_size (const EVP_MD *md);
+int mac_size (munge_mac_t md);
 /*
- *  Returns the size (in bytes) of the message digest [md].
+ *  Returns the size (in bytes) of the message digest [md], or -1 on error.
  */
 
-int mac_block (const EVP_MD *md, const void *key, int keylen,
+int mac_block (munge_mac_t md, const void *key, int keylen,
                void *dst, int *dstlen, const void *src, int srclen);
 /*
  *  Computes the MAC without the need of a context; this requires
  *    the [src] to be contiguous.
  *  Uses the message digest [md] and key [key] of [keylen] bytes.
- *  Reads [srclen] bytes of data from [src], and writes the MAC to [dst].
- *    If [dstlen] is not NULL, it will be set to the output size.
+ *  Reads [srclen] bytes of data from [src], and writes the MAC to [dst]
+ *    of length [dstlen].
+ *  Returns 0 on success, or -1 on error; in addition, [dstlen] will be set
+ *    to the number of bytes written to [dst].
+ */
+
+int mac_map_enum (munge_mac_t mac, void *dst);
+/*
+ *  Map the specified [mac] algorithm to the internal representation used
+ *    by the underlying cryptographic library.
+ *  If [dst] is non-NULL, write the cryptographic library's internal
+ *    representation of the message digest algorithm to [dst].
  *  Returns 0 on success, or -1 on error.
  */
 

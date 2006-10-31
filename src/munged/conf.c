@@ -378,7 +378,6 @@ display_help (char *prog)
 void
 create_subkeys (conf_t conf)
 {
-    const EVP_MD *md = EVP_sha1();
     int fd;
     int n;
     unsigned char buf[1024];
@@ -391,19 +390,25 @@ create_subkeys (conf_t conf)
 
     /*  Allocate memory for subkeys.
      */
-    conf->dek_key_len = md_size (md);
+    if ((conf->dek_key_len = md_size (MUNGE_MAC_SHA1)) <= 0) {
+        log_err (EMUNGE_NO_MEMORY, LOG_ERR,
+            "Unable to determine dek key length");
+    }
     if (!(conf->dek_key = malloc (conf->dek_key_len))) {
         log_err (EMUNGE_NO_MEMORY, LOG_ERR,
             "Unable to allocate %d bytes for cipher subkey",
             conf->dek_key_len);
     }
-    conf->mac_key_len = md_size (md); {
-    if (!(conf->mac_key = malloc (conf->mac_key_len)))
+    if ((conf->mac_key_len = md_size (MUNGE_MAC_SHA1)) <= 0) {
+        log_err (EMUNGE_NO_MEMORY, LOG_ERR,
+            "Unable to determine mac key length");
+    }
+    if (!(conf->mac_key = malloc (conf->mac_key_len))) {
         log_err (EMUNGE_NO_MEMORY, LOG_ERR,
             "Unable to allocate %d bytes for mac subkey",
             conf->mac_key_len);
     }
-    if (md_init (&dek_ctx, md) < 0) {
+    if (md_init (&dek_ctx, MUNGE_MAC_SHA1) < 0) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
             "Unable to compute subkeys: Cannot init md ctx");
     }
@@ -434,21 +439,23 @@ create_subkeys (conf_t conf)
     }
     /*  Append "1" to keyfile in order to compute cipher subkey.
      */
+    n = conf->dek_key_len;
     if ( (md_update (&dek_ctx, "1", 1) < 0)
       || (md_final (&dek_ctx, conf->dek_key, &n) < 0)
       || (md_cleanup (&dek_ctx) < 0) ) {
         log_err (EMUNGE_SNAFU, LOG_ERR, "Unable to compute cipher subkey");
     }
-    assert (n == conf->dek_key_len);
+    assert (n <= conf->dek_key_len);
 
     /*  Append "2" to keyfile in order to compute mac subkey.
      */
+    n = conf->mac_key_len;
     if ( (md_update (&mac_ctx, "2", 1) < 0)
       || (md_final (&mac_ctx, conf->mac_key, &n) < 0)
       || (md_cleanup (&mac_ctx) < 0) ) {
         log_err (EMUNGE_SNAFU, LOG_ERR, "Unable to compute mac subkey");
     }
-    assert (n == conf->mac_key_len);
+    assert (n <= conf->mac_key_len);
 
     return;
 }

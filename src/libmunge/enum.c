@@ -40,11 +40,11 @@
  *  Constants
  *****************************************************************************/
 
-#if HAVE_EVP_AES_128_CBC
+#if HAVE_LIBGCRYPT || HAVE_EVP_AES_128_CBC
 #  define MUNGE_CIPHER_AES128_FLAG      1
-#else  /* !HAVE_EVP_AES_128_CBC */
+#else
 #  define MUNGE_CIPHER_AES128_FLAG      0
-#endif /* !HAVE_EVP_AES_128_CBC */
+#endif
 
 #if HAVE_PKG_BZLIB
 #  define MUNGE_ZIP_BZLIB_FLAG          1
@@ -56,7 +56,7 @@
 #  define MUNGE_ZIP_ZLIB_FLAG           1
 #else  /* !HAVE_PKG_ZLIB */
 #  define MUNGE_ZIP_ZLIB_FLAG           0
-#endif /* HAVE_PKG_ZLIB */
+#endif /* !HAVE_PKG_ZLIB */
 
 
 /*****************************************************************************

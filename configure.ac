@@ -62,7 +62,26 @@ X_AC_CHECK_COND_LIB(bz2, BZ2_bzBuffToBuffCompress)
 X_AC_CHECK_COND_LIB(z, compress)
 AC_SEARCH_LIBS(gethostbyname, nsl)
 AC_SEARCH_LIBS(socket, socket)
-X_AC_CHECK_SSL
+AM_PATH_LIBGCRYPT
+X_AC_PATH_OPENSSL
+X_AC_SELECT_CRYPTO_LIB
+
+##
+# Checks for OpenSSL.
+##
+if test "$CRYPTO_PKG" = "openssl"; then
+  ac_save_LIBS="$LIBS"
+  LIBS="$LIBS $OPENSSL_LIBS"
+  AC_CHECK_FUNCS( \
+    ERR_error_string_n \
+    EVP_CipherInit_ex \
+    EVP_DigestInit_ex \
+    EVP_aes_128_cbc \
+    HMAC_Init_ex \
+  )
+  LIBS="$ac_save_LIBS"
+  AC_CHECK_TYPES(CRYPTO_dynlock, [], [], [#include <openssl/crypto.h>])
+fi
 
 ##
 # Checks for header files.
@@ -91,22 +110,6 @@ AC_CHECK_HEADERS(ucred.h)
 X_AC_CHECK_PEERCRED
 AC_CHECK_FILES(/dev/spx)
 X_AC_CHECK_FIFO_RECVFD
-
-##
-# Checks for OpenSSL library functions.
-#   Prevent libcrypto from being linked into all binaries.
-##
-ac_save_LIBS="$LIBS"
-AC_CHECK_LIB(crypto, RAND_bytes)
-AC_CHECK_FUNCS( \
-  ERR_error_string_n \
-  EVP_CipherInit_ex \
-  EVP_DigestInit_ex \
-  EVP_aes_128_cbc \
-  HMAC_Init_ex \
-)
-LIBS="$ac_save_LIBS"
-AC_CHECK_TYPES(CRYPTO_dynlock, [], [], [#include <openssl/crypto.h>])
 
 ##
 # Checks for library functions.

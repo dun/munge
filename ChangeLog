@@ -1,5 +1,55 @@
 2006-10-30  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* : Added libgcrypt support.
+	* src/munged/dec.c, src/munged/enc.c, src/munged/conf.c:
+	  Updated calls from cipher.h, md.h, mac.h, and random.h.
+	* src/munged/cipher.c, src/munged/cipher.h: Refactored routines into
+	  static openssl routines.  Added static libgcrypt routines.  Added
+	  cipher_map_enum() to replace lookup.c:lookup_cipher().  Changed
+	  prototypes for cipher_init(), cipher_block_size(), cipher_iv_size(),
+	  and cipher_key_size() to replace use of EVP_CIPHER with
+	  munge_cipher_t.  Changed use of [dstlen] parm for cipher_update()
+	  and cipher_final().
+	* src/munged/md.c, src/munged/md.h: Refactored routines into static
+	  openssl routines.  Added static libgcrypt routines.  Added
+	  md_map_enum() to replace lookup.c:lookup_mac().  Changed prototypes
+	  for md_init() and md_size() to replace use of EVP_MD with
+	  munge_mac_t.  Changed use of [dstlen] parm for md_final().
+	* src/munged/mac.c, src/munged/mac.h: Refactored routines into static
+	  openssl routines.  Added static libgcrypt routines.  Added
+	  mac_map_enum() to replace lookup.c:lookup_mac().  Changed prototypes
+	  for mac_init(), mac_size(), and mac_block() to replace use of EVP_MD
+	  with munge_mac_t.  Changed use of [dstlen] parm for mac_final() and
+	  mac_block().
+	* src/munged/random.c: Refactored routines into static openssl
+	  routines.  Added static libgcrypt routines.
+	* src/munged/munged.c: Replaced crypto_thread_init() with
+	  crypto_init(), and crypto_thread_fini() with crypto_fini().
+	* src/munged/crypto.c, src/munged/crypto.h: Added crypto_init() and
+	  crypto_fini().  Refactored crypto_thread.c routines into static
+	  openssl routines.  Added crypto_log.c:crypto_log_msg() routine as
+	  openssl_log_msg().  Added static libgcrypt routines.
+	* src/munged/crypto_log.c, src/munged/crypto_log.h,
+	  src/munged/crypto_thread.c, src/munged/crypto_thread.h,
+	  src/munged/lookup.c, src/munged/lookup.h: Removed.
+	* src/libmunge/enum.c: Updated test for MUNGE_CIPHER_AES128_FLAG.
+	* src/libcommon/munge_defs.h: Updated MUNGE_DEFAULT_CIPHER test for 
+	  libgcrypt.  Added MUNGE_MAXIMUM_BLK_LEN, MUNGE_MAXIMUM_KEY_LEN, and
+	  MUNGE_MAXIMUM_MD_LEN.
+	* src/munged/cred.h: Updated MAX_DEK, MAX_IV, and MAX_MAC to use new
+	  munge_defs.h MUNGE_MAXIMUM_*_LEN defines.
+	* src/munged/Makefile.am: Added $(CRYPTO_CFLAGS) and $(CRYPTO_LIBS).
+	  Updated munged_SOURCES.
+	* configure.ac: Added AM_PATH_LIBGCRYPT, X_AC_PATH_OPENSSL, and
+	  X_AC_SELECT_CRYPTO_LIB.  Moved tests for OpenSSL into conditional
+	  based on $(CRYPTO_PKG).
+	* config/config.h.in: Added HAVE_LIBGCRYPT and HAVE_OPENSSL.
+	* config/x_ac_arch.m4: Removed x_ac_cv_check_ssl_dir unsets.
+	* config/x_ac_path_openssl.m4: Added to replace x_ac_check_ssl.m4.
+	* config/x_ac_check_ssl.m4: Replaced by x_ac_path_openssl.m4.
+	* config/x_ac_select_crypto_lib.m4: Added.
+	* BUGS, QUICKSTART, TODO: Updated.
+
 	* src/libmissing/Makefile.am: Replaced @LTLIBOBJS@ with $(LTLIBOBJS).
 
 	* doc/credential_v3_format.txt: Added comment specifying encryption is

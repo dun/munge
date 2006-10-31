@@ -3,7 +3,20 @@ MUNGE Installation Guide
 
 1. Installing the Software
 
-   A. From RPMs:
+   MUNGE requires either the Libgcrypt or OpenSSL cryptographic library.
+   Libgcrypt is licensed under the LGPL, whereas OpenSSL is licensed under
+   dual original-BSD-style licenses.  On some systems, the OpenSSL license
+   is incompatible with the GPL license used by MUNGE.  Consequently,
+   MUNGE uses Libgcrypt if possible, falling back on OpenSSL if needed.
+   The selection of the cryptographic library can be overridden at build
+   time with the configure script's "--with-crypto-lib" option.
+
+   MUNGE includes bzip2 and zlib compression support if these libraries
+   are found when the software is built.
+
+   MUNGE can be installed using one of the following methods:
+
+   A. RPMs:
 
       You can build binary RPMs from either the tarball or the source RPM:
 
@@ -21,7 +34,7 @@ MUNGE Installation Guide
       # rpm -ivh munge-x.y.z-1.i386.rpm \
         munge-devel-x.y.z-1.i386.rpm munge-libs-x.y.z-1.i386.rpm
 
-   B. From source:
+   B. Source:
 
       Edit src/libcommon/munge_defs.h to customize values if necessary.
       To compile the software, execute the following command; you may need

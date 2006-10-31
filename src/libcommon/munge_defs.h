@@ -49,11 +49,11 @@
 
 /*  Default munge_cipher_t for encrypting credentials.
  */
-#if HAVE_EVP_AES_128_CBC
-#  define MUNGE_DEFAULT_CIPHER          MUNGE_CIPHER_AES_128
-#else  /* !HAVE_EVP_AES_128_CBC */
+#if HAVE_OPENSSL && !HAVE_EVP_AES_128_CBC
 #  define MUNGE_DEFAULT_CIPHER          MUNGE_CIPHER_CAST5
-#endif /* !HAVE_EVP_AES_128_CBC */
+#else  /* !HAVE_OPENSSL || HAVE_EVP_AES_128_CBC */
+#  define MUNGE_DEFAULT_CIPHER          MUNGE_CIPHER_AES_128
+#endif /* !HAVE_OPENSSL || HAVE_EVP_AES_128_CBC */
 
 /*  Default munge_mac_t for validating credentials.
  *    This should NEVER be set to MUNGE_MAC_NONE.
@@ -74,7 +74,19 @@
  */
 #define MUNGE_MAXIMUM_TTL               3600
 
-/* Integer for the maximum size (in bytes) of a munge request message.
+/*  Integer for the maximum size (in bytes) of a cipher block.
+ */
+#define MUNGE_MAXIMUM_BLK_LEN           16
+
+/*  Integer for the maximum size (in bytes) of a cipher key.
+ */
+#define MUNGE_MAXIMUM_KEY_LEN           16
+
+/*  Integer for the maximum size (in bytes) of a message digest.
+ */
+#define MUNGE_MAXIMUM_MD_LEN            20
+
+/*  Integer for the maximum size (in bytes) of a munge request message.
  */
 #define MUNGE_MAXIMUM_REQ_LEN           1048576
 
@@ -133,8 +145,8 @@
  */
 #define MUNGE_THREADS                   2
 
-/* Flag to allow root to decode any credential regardless of its
- *   UID/GID restrictions.
+/*  Flag to allow root to decode any credential regardless of its
+ *    UID/GID restrictions.
  */
 #define MUNGE_AUTH_ROOT_ALLOW_FLAG      0
 

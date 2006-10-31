@@ -44,7 +44,6 @@
 #include "gids.h"
 #include "job.h"
 #include "log.h"
-#include "lookup.h"
 #include "m_msg.h"
 #include "mac.h"
 #include "md.h"
@@ -345,8 +344,6 @@ dec_unpack_outer (munge_cred_t c)
     unsigned char    *p;                /* ptr into packed data              */
     int               len;              /* length of packed data remaining   */
     int               n;                /* all-purpose int                   */
-    const EVP_CIPHER *ci;               /* symmetric cipher algorithm        */
-    const EVP_MD     *md;               /* message difest algorithm          */
 
     assert (c->outer != NULL);
 
@@ -384,15 +381,22 @@ dec_unpack_outer (munge_cred_t c)
             strdup ("Truncated credential cipher type")));
     }
     m->cipher = *p;
-    ci = lookup_cipher (m->cipher);
-    if ((m->cipher != MUNGE_CIPHER_NONE) && (!ci)) {
-        return (m_msg_set_err (m, EMUNGE_BAD_CIPHER,
-            strdupf ("Invalid cipher type %d", m->cipher)));
+    if (m->cipher == MUNGE_CIPHER_NONE) {
+        c->iv_len = 0;
     }
-    c->dek_len = cipher_key_size (ci);
-    assert (c->dek_len <= sizeof (c->dek));
-    c->iv_len = cipher_iv_size (ci);
-    assert (c->iv_len <= sizeof (c->iv));
+    else {
+        if (cipher_map_enum (m->cipher, NULL) < 0) {
+            return (m_msg_set_err (m, EMUNGE_BAD_CIPHER,
+                strdupf ("Invalid cipher type %d", m->cipher)));
+        }
+        c->iv_len = cipher_iv_size (m->cipher);
+        if (c->iv_len < 0) {
+            return (m_msg_set_err (m, EMUNGE_SNAFU,
+                strdupf ("Unable to determine iv length for cipher type %d",
+                m->cipher)));
+        }
+        assert (c->iv_len <= sizeof (c->iv));
+    }
     p += n;
     len -= n;
     /*
@@ -405,12 +409,16 @@ dec_unpack_outer (munge_cred_t c)
             strdup ("Truncated credential mac type")));
     }
     m->mac = *p;
-    md = lookup_mac (m->mac);
-    if (!md) {
+    if (mac_map_enum (m->mac, NULL) < 0) {
         return (m_msg_set_err (m, EMUNGE_BAD_MAC,
             strdupf ("Invalid mac type %d", m->mac)));
     }
-    c->mac_len = md_size (md);
+    c->mac_len = mac_size (m->mac);
+    if (c->mac_len <= 0) {
+        return (m_msg_set_err (m, EMUNGE_SNAFU,
+            strdupf ("Unable to determine digest length for mac type %d",
+            m->mac)));
+    }
     assert (c->mac_len <= sizeof (c->mac));
     p += n;
     len -= n;
@@ -424,9 +432,14 @@ dec_unpack_outer (munge_cred_t c)
             strdup ("Truncated credential compression type")));
     }
     m->zip = *p;
-    if ((m->zip != MUNGE_ZIP_NONE) && (!zip_is_valid_type (m->zip))) {
-        return (m_msg_set_err (m, EMUNGE_BAD_ZIP,
-            strdupf ("Invalid compression type %d", m->zip)));
+    if (m->zip == MUNGE_ZIP_NONE) {
+        ; /* not compressed */
+    }
+    else {
+        if (!zip_is_valid_type (m->zip)) {
+            return (m_msg_set_err (m, EMUNGE_BAD_ZIP,
+                strdupf ("Invalid compression type %d", m->zip)));
+        }
     }
     p += n;
     len -= n;
@@ -521,72 +534,75 @@ dec_decrypt (munge_cred_t c)
  *    regardless in order to minimize information leaked via timing.
  */
     m_msg_t           m = c->msg;
-    const EVP_MD     *md;               /* message digest algorithm          */
-    const EVP_CIPHER *ci;               /* cipher algorithm                  */
     int               buf_len;          /* length of plaintext buffer        */
     unsigned char    *buf;              /* plaintext buffer                  */
     unsigned char    *buf_ptr;          /* ptr into plaintext buffer         */
     cipher_ctx        x;                /* cipher context                    */
-    int               n, n2;            /* all-purpose ints                  */
+    int               n_written;        /* number of bytes written to buf    */
+    int               n;                /* all-purpose int                   */
 
     /*  Is this credential encrypted?
      */
     if (m->cipher == MUNGE_CIPHER_NONE) {
         return (0);
     }
-    /*  MAC/Cipher types already checked by dec_unpack_outer().
-     */
-    md = lookup_mac (m->mac);
-    assert (md != NULL);
-    ci = lookup_cipher (m->cipher);
-    assert (ci != NULL);
-
     /*  Compute DEK.
      *  msg-dek = MAC (msg-mac) using DEK subkey
      */
-    c->dek_len = md_size (md);
+    c->dek_len = mac_size (m->mac);
+    if (c->dek_len <= 0) {
+        return (m_msg_set_err (m, EMUNGE_SNAFU,
+            strdupf ("Unable to determine dek key length for mac type %d",
+                m->mac)));
+    }
     assert (c->dek_len <= sizeof (c->dek));
-    assert (c->dek_len >= cipher_key_size (ci));
 
-    if (mac_block (md, conf->dek_key, conf->dek_key_len,
-                       c->dek, &n, c->mac, c->mac_len) < 0) {
+    n = c->dek_len;
+    if (mac_block (m->mac, conf->dek_key, conf->dek_key_len,
+            c->dek, &n, c->mac, c->mac_len) < 0) {
         return (m_msg_set_err (m, EMUNGE_SNAFU,
             strdup ("Unable to compute dek")));
     }
-    assert (n == c->dek_len);
+    assert (n <= c->dek_len);
 
     /*  Allocate memory for plaintext.
      *  Ensure enough space by allocating an additional cipher block.
      */
-    buf_len = c->inner_len + cipher_block_size (ci);
+    n = cipher_block_size (m->cipher);
+    if (n <= 0) {
+        return (m_msg_set_err (m, EMUNGE_SNAFU,
+            strdupf ("Unable to determine block size for cipher type %d",
+                m->cipher)));
+    }
+    buf_len = c->inner_len + n;
     if (!(buf = malloc (buf_len))) {
         return (m_msg_set_err (m, EMUNGE_NO_MEMORY, NULL));
     }
     /*  Decrypt "inner" data.
      */
-    if (cipher_init (&x, ci, c->dek, c->iv, CIPHER_DECRYPT) < 0) {
+    if (cipher_init (&x, m->cipher, c->dek, c->iv, CIPHER_DECRYPT) < 0) {
         goto err;
     }
     buf_ptr = buf;
-    n = 0;
-    if (cipher_update (&x, buf_ptr, &n2, c->inner, c->inner_len) < 0) {
+    n_written = 0;
+    n = buf_len;
+    if (cipher_update (&x, buf_ptr, &n, c->inner, c->inner_len) < 0) {
         goto err_cleanup;
     }
-    buf_ptr += n2;
-    n += n2;
-    if (cipher_final (&x, buf_ptr, &n2) < 0) {
+    buf_ptr += n;
+    n_written += n;
+    n = buf_len - n_written;
+    if (cipher_final (&x, buf_ptr, &n) < 0) {
         /*  Set but defer error until dec_validate_mac().  */
         m_msg_set_err (m, EMUNGE_CRED_INVALID, NULL);
     }
-    else {
-        /*  Only assert invariant upon successful decryption.  */
-        assert (n + n2 <= buf_len);
-    }
-    buf_ptr += n2;
-    n += n2;
+    buf_ptr += n;
+    n_written += n;
     if (cipher_cleanup (&x) < 0) {
         goto err;
     }
+    assert (n_written <= buf_len);
+
     /*  Replace "inner" ciphertext with plaintext.
      */
     assert (c->inner_mem == NULL);
@@ -594,7 +610,7 @@ dec_decrypt (munge_cred_t c)
     c->inner_mem = buf;
     c->inner_mem_len = buf_len;
     c->inner = buf;
-    c->inner_len = n;
+    c->inner_len = n_written;
     return (0);
 
 err_cleanup:
@@ -614,20 +630,13 @@ dec_validate_mac (munge_cred_t c)
  *    (ie, both "outer" and "inner" data).
  */
     m_msg_t        m = c->msg;
-    const EVP_MD  *md;                  /* message digest algorithm          */
     mac_ctx        x;                   /* message auth code context         */
     unsigned char  mac[MAX_MAC];        /* message authentication code       */
     int            n;                   /* all-purpose int                   */
 
-    /*  MAC type already checked by dec_unpack_outer().
-     */
-    md = lookup_mac (m->mac);
-    assert (md != NULL);
-    assert (mac_size (md) <= sizeof (mac));
-
     /*  Compute MAC.
      */
-    if (mac_init (&x, md, conf->mac_key, conf->mac_key_len) < 0) {
+    if (mac_init (&x, m->mac, conf->mac_key, conf->mac_key_len) < 0) {
         goto err;
     }
     if (mac_update (&x, c->outer, c->outer_len) < 0) {
@@ -636,6 +645,7 @@ dec_validate_mac (munge_cred_t c)
     if (mac_update (&x, c->inner, c->inner_len) < 0) {
         goto err_cleanup;
     }
+    n = sizeof (mac);
     if (mac_final (&x, mac, &n) < 0) {
         goto err_cleanup;
     }

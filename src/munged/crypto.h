@@ -25,41 +25,40 @@
  *****************************************************************************/
 
 
+#ifndef CRYPTO_H
+#define CRYPTO_H
+
 #if HAVE_CONFIG_H
 #  include <config.h>
 #endif /* HAVE_CONFIG_H */
 
-#include <assert.h>
-#include <openssl/err.h>
-#include "crypto_log.h"
+#if HAVE_LIBGCRYPT && HAVE_OPENSSL
+#  error "Libgcrypt and OpenSSL are mutually-exclusive"
+#endif
+
+
+void crypto_init (void);
+/*
+ *  Initializes the cryptographic subsystem.
+ */
+
+void crypto_fini (void);
+/*
+ *  Shuts down the cryptographic subsystem.
+ */
+
+
+#if HAVE_OPENSSL
+
 #include "log.h"
-#include "str.h"
+
+void openssl_log_msg (int priority);
+/*
+ *  Logs all OpenSSL errors in this thread's error queue (should any exist)
+ *    at the specified [priority] level.
+ */
+
+#endif /* HAVE_OPENSSL */
 
 
-#define CRYPTO_LOG_MAX_ERR_LEN     1024
-
-
-void
-crypto_log_msg (int priority)
-{
-    int         e;
-    const char *data;
-    int         flags;
-    char        buf[CRYPTO_LOG_MAX_ERR_LEN];
-
-    ERR_load_crypto_strings ();
-    while ((e = ERR_get_error_line_data (NULL, NULL, &data, &flags)) != 0) {
-#if HAVE_ERR_ERROR_STRING_N
-        ERR_error_string_n (e, buf, sizeof (buf));
-#else  /* !HAVE_ERR_ERROR_STRING_N */
-        assert (sizeof (buf) >= 256);
-        ERR_error_string (e, buf);
-#endif /* !HAVE_ERR_ERROR_STRING_N */
-        if (data && (flags & ERR_TXT_STRING)) {
-            strcatf (buf, sizeof (buf), ":%s", data);
-        }
-        log_msg (priority, "%s", buf);
-    }
-    ERR_free_strings ();
-    return;
-}
+#endif /* !CRYPTO_H */

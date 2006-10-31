@@ -30,6 +30,7 @@
 
 
 #include <inttypes.h>
+#include <munge.h>
 #include <openssl/evp.h>
 #include "munge_defs.h"
 #include "m_msg.h"
@@ -43,16 +44,9 @@
  */
 #define MUNGE_CRED_VERSION              3
 
-/*  MAX_MAC is currently set to 20 (ie, 160 bits).  This handles the largest
- *    message digests supported by munge_mac_t.  Note, however, <openssl/evp.h>
- *    defines EVP_MAX_MD_SIZE which is currently set to (16+20) to handle the
- *    SSLv3 md5+sha1 type.  But since MUNGE doesn't support that type, setting
- *    MAX_MAC at 20 reduces the memory requirements for data structures such as
- *    the replay hash.
- */
-#define MAX_DEK                         EVP_MAX_KEY_LENGTH
-#define MAX_IV                          EVP_MAX_IV_LENGTH
-#define MAX_MAC                         20
+#define MAX_DEK                         MUNGE_MAXIMUM_MD_LEN
+#define MAX_IV                          MUNGE_MAXIMUM_BLK_LEN
+#define MAX_MAC                         MUNGE_MAXIMUM_MD_LEN
 #define MAX_SALT                        MUNGE_CRED_SALT_LEN
 
 

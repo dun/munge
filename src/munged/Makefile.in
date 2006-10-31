@@ -55,13 +55,15 @@ am__aclocal_m4_deps = $(top_srcdir)/config/libtool.m4 \
 	$(top_srcdir)/config/x_ac_check_fifo_recvfd.m4 \
 	$(top_srcdir)/config/x_ac_check_peercred.m4 \
 	$(top_srcdir)/config/x_ac_check_pthreads.m4 \
-	$(top_srcdir)/config/x_ac_check_ssl.m4 \
 	$(top_srcdir)/config/x_ac_darwin.m4 \
 	$(top_srcdir)/config/x_ac_debug.m4 \
 	$(top_srcdir)/config/x_ac_expand_install_dirs.m4 \
 	$(top_srcdir)/config/x_ac_gpl_licensed.m4 \
 	$(top_srcdir)/config/x_ac_humor.m4 \
-	$(top_srcdir)/config/x_ac_meta.m4 $(top_srcdir)/configure.ac
+	$(top_srcdir)/config/x_ac_meta.m4 \
+	$(top_srcdir)/config/x_ac_path_openssl.m4 \
+	$(top_srcdir)/config/x_ac_select_crypto_lib.m4 \
+	$(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(SHELL) $(top_srcdir)/config/mkinstalldirs
@@ -76,22 +78,21 @@ base64_test_OBJECTS = $(am_base64_test_OBJECTS)
 base64_test_LDADD = $(LDADD)
 am_munged_OBJECTS = munged-auth_recv.$(OBJEXT) munged-base64.$(OBJEXT) \
 	munged-cipher.$(OBJEXT) munged-conf.$(OBJEXT) \
-	munged-cred.$(OBJEXT) munged-crypto_log.$(OBJEXT) \
-	munged-crypto_thread.$(OBJEXT) munged-dec.$(OBJEXT) \
-	munged-enc.$(OBJEXT) munged-gids.$(OBJEXT) \
-	munged-hash.$(OBJEXT) munged-job.$(OBJEXT) \
-	munged-lookup.$(OBJEXT) munged-mac.$(OBJEXT) \
-	munged-md.$(OBJEXT) munged-path.$(OBJEXT) \
-	munged-random.$(OBJEXT) munged-replay.$(OBJEXT) \
-	munged-thread.$(OBJEXT) munged-timer.$(OBJEXT) \
-	munged-work.$(OBJEXT) munged-zip.$(OBJEXT) \
-	munged-munged.$(OBJEXT)
+	munged-cred.$(OBJEXT) munged-crypto.$(OBJEXT) \
+	munged-dec.$(OBJEXT) munged-enc.$(OBJEXT) \
+	munged-gids.$(OBJEXT) munged-hash.$(OBJEXT) \
+	munged-job.$(OBJEXT) munged-mac.$(OBJEXT) munged-md.$(OBJEXT) \
+	munged-path.$(OBJEXT) munged-random.$(OBJEXT) \
+	munged-replay.$(OBJEXT) munged-thread.$(OBJEXT) \
+	munged-timer.$(OBJEXT) munged-work.$(OBJEXT) \
+	munged-zip.$(OBJEXT) munged-munged.$(OBJEXT)
 munged_OBJECTS = $(am_munged_OBJECTS)
 am__DEPENDENCIES_1 =
 munged_DEPENDENCIES = $(top_builddir)/src/libcommon/libcommon.la \
 	$(top_builddir)/src/libmissing/libmissing.la \
 	$(top_builddir)/src/libmunge/libmunge.la $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1)
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)/config
 depcomp = $(SHELL) $(top_srcdir)/config/depcomp
 am__depfiles_maybe = depfiles
@@ -125,6 +126,9 @@ CCDEPMODE = @CCDEPMODE@
 CFLAGS = @CFLAGS@
 CPP = @CPP@
 CPPFLAGS = @CPPFLAGS@
+CRYPTO_CFLAGS = @CRYPTO_CFLAGS@
+CRYPTO_LIBS = @CRYPTO_LIBS@
+CRYPTO_PKG = @CRYPTO_PKG@
 CYGPATH_W = @CYGPATH_W@
 DEFS = @DEFS@
 DEPDIR = @DEPDIR@
@@ -142,6 +146,9 @@ INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
 LD = @LD@
 LDFLAGS = @LDFLAGS@
 LIBBZ2 = @LIBBZ2@
+LIBGCRYPT_CFLAGS = @LIBGCRYPT_CFLAGS@
+LIBGCRYPT_CONFIG = @LIBGCRYPT_CONFIG@
+LIBGCRYPT_LIBS = @LIBGCRYPT_LIBS@
 LIBOBJS = @LIBOBJS@
 LIBPTHREAD = @LIBPTHREAD@
 LIBS = @LIBS@
@@ -165,6 +172,8 @@ META_VERSION = @META_VERSION@
 NM = @NM@
 OBJECT_MODE = @OBJECT_MODE@
 OBJEXT = @OBJEXT@
+OPENSSL_CFLAGS = @OPENSSL_CFLAGS@
+OPENSSL_LIBS = @OPENSSL_LIBS@
 PACKAGE = @PACKAGE@
 PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
 PACKAGE_NAME = @PACKAGE_NAME@
@@ -238,16 +247,17 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/src/libmunge
 
 munged_CFLAGS = \
-	-DWITH_PTHREADS
+	-DWITH_PTHREADS \
+	$(CRYPTO_CFLAGS)
 
 munged_LDADD = \
 	$(top_builddir)/src/libcommon/libcommon.la \
 	$(top_builddir)/src/libmissing/libmissing.la \
 	$(top_builddir)/src/libmunge/libmunge.la \
 	$(LIBPTHREAD) \
-	-lcrypto \
 	$(LIBBZ2) \
-	$(LIBZ)
+	$(LIBZ) \
+	$(CRYPTO_LIBS)
 
 munged_SOURCES = \
 	auth_recv.c \
@@ -260,10 +270,8 @@ munged_SOURCES = \
 	conf.h \
 	cred.c \
 	cred.h \
-	crypto_log.c \
-	crypto_log.h \
-	crypto_thread.c \
-	crypto_thread.h \
+	crypto.c \
+	crypto.h \
 	dec.c \
 	dec.h \
 	enc.c \
@@ -274,8 +282,6 @@ munged_SOURCES = \
 	hash.h \
 	job.c \
 	job.h \
-	lookup.c \
-	lookup.h \
 	mac.c \
 	mac.h \
 	md.c \
@@ -397,14 +403,12 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/munged-cipher.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/munged-conf.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/munged-cred.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/munged-crypto_log.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/munged-crypto_thread.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/munged-crypto.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/munged-dec.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/munged-enc.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/munged-gids.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/munged-hash.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/munged-job.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/munged-lookup.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/munged-mac.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/munged-md.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/munged-munged.Po@am__quote@
@@ -507,33 +511,19 @@ munged-cred.obj: cred.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -c -o munged-cred.obj `if test -f 'cred.c'; then $(CYGPATH_W) 'cred.c'; else $(CYGPATH_W) '$(srcdir)/cred.c'; fi`
 
-munged-crypto_log.o: crypto_log.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -MT munged-crypto_log.o -MD -MP -MF "$(DEPDIR)/munged-crypto_log.Tpo" -c -o munged-crypto_log.o `test -f 'crypto_log.c' || echo '$(srcdir)/'`crypto_log.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/munged-crypto_log.Tpo" "$(DEPDIR)/munged-crypto_log.Po"; else rm -f "$(DEPDIR)/munged-crypto_log.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='crypto_log.c' object='munged-crypto_log.o' libtool=no @AMDEPBACKSLASH@
+munged-crypto.o: crypto.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -MT munged-crypto.o -MD -MP -MF "$(DEPDIR)/munged-crypto.Tpo" -c -o munged-crypto.o `test -f 'crypto.c' || echo '$(srcdir)/'`crypto.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/munged-crypto.Tpo" "$(DEPDIR)/munged-crypto.Po"; else rm -f "$(DEPDIR)/munged-crypto.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='crypto.c' object='munged-crypto.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -c -o munged-crypto_log.o `test -f 'crypto_log.c' || echo '$(srcdir)/'`crypto_log.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -c -o munged-crypto.o `test -f 'crypto.c' || echo '$(srcdir)/'`crypto.c
 
-munged-crypto_log.obj: crypto_log.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -MT munged-crypto_log.obj -MD -MP -MF "$(DEPDIR)/munged-crypto_log.Tpo" -c -o munged-crypto_log.obj `if test -f 'crypto_log.c'; then $(CYGPATH_W) 'crypto_log.c'; else $(CYGPATH_W) '$(srcdir)/crypto_log.c'; fi`; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/munged-crypto_log.Tpo" "$(DEPDIR)/munged-crypto_log.Po"; else rm -f "$(DEPDIR)/munged-crypto_log.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='crypto_log.c' object='munged-crypto_log.obj' libtool=no @AMDEPBACKSLASH@
+munged-crypto.obj: crypto.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -MT munged-crypto.obj -MD -MP -MF "$(DEPDIR)/munged-crypto.Tpo" -c -o munged-crypto.obj `if test -f 'crypto.c'; then $(CYGPATH_W) 'crypto.c'; else $(CYGPATH_W) '$(srcdir)/crypto.c'; fi`; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/munged-crypto.Tpo" "$(DEPDIR)/munged-crypto.Po"; else rm -f "$(DEPDIR)/munged-crypto.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='crypto.c' object='munged-crypto.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -c -o munged-crypto_log.obj `if test -f 'crypto_log.c'; then $(CYGPATH_W) 'crypto_log.c'; else $(CYGPATH_W) '$(srcdir)/crypto_log.c'; fi`
-
-munged-crypto_thread.o: crypto_thread.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -MT munged-crypto_thread.o -MD -MP -MF "$(DEPDIR)/munged-crypto_thread.Tpo" -c -o munged-crypto_thread.o `test -f 'crypto_thread.c' || echo '$(srcdir)/'`crypto_thread.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/munged-crypto_thread.Tpo" "$(DEPDIR)/munged-crypto_thread.Po"; else rm -f "$(DEPDIR)/munged-crypto_thread.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='crypto_thread.c' object='munged-crypto_thread.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -c -o munged-crypto_thread.o `test -f 'crypto_thread.c' || echo '$(srcdir)/'`crypto_thread.c
-
-munged-crypto_thread.obj: crypto_thread.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -MT munged-crypto_thread.obj -MD -MP -MF "$(DEPDIR)/munged-crypto_thread.Tpo" -c -o munged-crypto_thread.obj `if test -f 'crypto_thread.c'; then $(CYGPATH_W) 'crypto_thread.c'; else $(CYGPATH_W) '$(srcdir)/crypto_thread.c'; fi`; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/munged-crypto_thread.Tpo" "$(DEPDIR)/munged-crypto_thread.Po"; else rm -f "$(DEPDIR)/munged-crypto_thread.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='crypto_thread.c' object='munged-crypto_thread.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -c -o munged-crypto_thread.obj `if test -f 'crypto_thread.c'; then $(CYGPATH_W) 'crypto_thread.c'; else $(CYGPATH_W) '$(srcdir)/crypto_thread.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -c -o munged-crypto.obj `if test -f 'crypto.c'; then $(CYGPATH_W) 'crypto.c'; else $(CYGPATH_W) '$(srcdir)/crypto.c'; fi`
 
 munged-dec.o: dec.c
 @am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -MT munged-dec.o -MD -MP -MF "$(DEPDIR)/munged-dec.Tpo" -c -o munged-dec.o `test -f 'dec.c' || echo '$(srcdir)/'`dec.c; \
@@ -604,20 +594,6 @@ munged-job.obj: job.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='job.c' object='munged-job.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -c -o munged-job.obj `if test -f 'job.c'; then $(CYGPATH_W) 'job.c'; else $(CYGPATH_W) '$(srcdir)/job.c'; fi`
-
-munged-lookup.o: lookup.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -MT munged-lookup.o -MD -MP -MF "$(DEPDIR)/munged-lookup.Tpo" -c -o munged-lookup.o `test -f 'lookup.c' || echo '$(srcdir)/'`lookup.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/munged-lookup.Tpo" "$(DEPDIR)/munged-lookup.Po"; else rm -f "$(DEPDIR)/munged-lookup.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lookup.c' object='munged-lookup.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -c -o munged-lookup.o `test -f 'lookup.c' || echo '$(srcdir)/'`lookup.c
-
-munged-lookup.obj: lookup.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -MT munged-lookup.obj -MD -MP -MF "$(DEPDIR)/munged-lookup.Tpo" -c -o munged-lookup.obj `if test -f 'lookup.c'; then $(CYGPATH_W) 'lookup.c'; else $(CYGPATH_W) '$(srcdir)/lookup.c'; fi`; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/munged-lookup.Tpo" "$(DEPDIR)/munged-lookup.Po"; else rm -f "$(DEPDIR)/munged-lookup.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lookup.c' object='munged-lookup.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -c -o munged-lookup.obj `if test -f 'lookup.c'; then $(CYGPATH_W) 'lookup.c'; else $(CYGPATH_W) '$(srcdir)/lookup.c'; fi`
 
 munged-mac.o: mac.c
 @am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -MT munged-mac.o -MD -MP -MF "$(DEPDIR)/munged-mac.Tpo" -c -o munged-mac.o `test -f 'mac.c' || echo '$(srcdir)/'`mac.c; \

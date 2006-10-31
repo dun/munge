@@ -45,7 +45,7 @@
 #include "auth_recv.h"
 #include "common.h"
 #include "conf.h"
-#include "crypto_thread.h"
+#include "crypto.h"
 #include "gids.h"
 #include "job.h"
 #include "log.h"
@@ -110,13 +110,13 @@ main (int argc, char *argv[])
     lookup_ip_addr (conf);
     write_pidfile (conf->pidfile_name, conf->got_force);
 
+    crypto_init ();
     if (random_init (conf->seed_name) < 0) {
         if (conf->seed_name) {
             free (conf->seed_name);
             conf->seed_name = NULL;
         }
     }
-    crypto_thread_init ();
     create_subkeys (conf);
     conf->gids = gids_create ();
     replay_init ();
@@ -135,8 +135,8 @@ main (int argc, char *argv[])
     timer_fini ();
     replay_fini ();
     gids_destroy (conf->gids);
-    crypto_thread_fini ();
     random_fini (conf->seed_name);
+    crypto_fini ();
     destroy_conf (conf);
 
     log_msg (LOG_NOTICE, "Stopping %s daemon (pid %d)",

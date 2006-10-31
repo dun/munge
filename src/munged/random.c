@@ -31,26 +31,45 @@
 
 #include <errno.h>
 #include <munge.h>
-#include <openssl/rand.h>
 #include <string.h>
 #include <sys/stat.h>
 #include <unistd.h>
 #include "conf.h"
-#include "crypto_log.h"
+#include "crypto.h"
 #include "log.h"
 #include "munge_defs.h"
 #include "path.h"
 #include "random.h"
 
 
+/*****************************************************************************
+ *  Constants
+ *****************************************************************************/
+
 #ifndef RANDOM_SEED_BYTES
 #  define RANDOM_SEED_BYTES       1024
 #endif /* !RANDOM_SEED_BYTES */
 
 #ifndef RANDOM_SEED_DEFAULT
-#  define RANDOM_SEED_DEFAULT     "/dev/random"
+#  define RANDOM_SEED_DEFAULT     "/dev/urandom"
 #endif /* !RANDOM_SEED_DEFAULT */
 
+
+/*****************************************************************************
+ *  Private Prototypes
+ *****************************************************************************/
+
+int  _random_read_seed (const char *filename, int num_bytes);
+int  _random_write_seed (const char *filename, int num_bytes);
+void _random_cleanup (void);
+void _random_add (const void *buf, int n);
+void _random_bytes (unsigned char *buf, int n);
+void _random_pseudo_bytes (unsigned char *buf, int n);
+
+
+/*****************************************************************************
+ *  Public Functions
+ *****************************************************************************/
 
 int
 random_init (const char *seed)
@@ -64,6 +83,8 @@ random_init (const char *seed)
     char         seed_dir [PATH_MAX];
     char         ebuf [1024];
 
+    /*  Load entropy from seed file.
+     */
     if ((rnd_bytes_needed > 0) && (seed != NULL) && (*seed != '\0')) {
         /*
          *  Check file permissions and whatnot.
@@ -126,7 +147,7 @@ random_init (const char *seed)
             log_msg (LOG_INFO,
                 "Removed insecure PRNG seed \"%s\"", seed);
         }
-        else if ((n = RAND_load_file (seed, rnd_bytes_needed)) > 0) {
+        else if ((n = _random_read_seed (seed, rnd_bytes_needed)) > 0) {
             log_msg (LOG_INFO,
                 "PRNG seeded with %d bytes from \"%s\"", n, seed);
             rnd_bytes_needed -= n;
@@ -135,12 +156,15 @@ random_init (const char *seed)
     /*  Load entropy from default source if more is needed.
      */
     if (rnd_bytes_needed > 0) {
-        if ((n = RAND_load_file (RANDOM_SEED_DEFAULT, rnd_bytes_needed)) > 0) {
+        n = _random_read_seed (RANDOM_SEED_DEFAULT, rnd_bytes_needed);
+        if (n > 0) {
             log_msg (LOG_INFO, "PRNG seeded with %d bytes from \"%s\"",
                 n, RANDOM_SEED_DEFAULT);
             rnd_bytes_needed -= n;
         }
     }
+    /*  Warn if sufficient entropy is not available.
+     */
     if (rnd_bytes_needed > 0) {
         if (!conf->got_force)
             log_err (EMUNGE_SNAFU, LOG_ERR,
@@ -163,23 +187,17 @@ random_fini (const char *seed)
     int     n;
 
     if (seed != NULL) {
+
         mask = umask (0);
         umask (mask | 077);
-        n = RAND_write_file (seed);
+        n = _random_write_seed (seed, RANDOM_SEED_BYTES);
         umask (mask);
 
-        if (n < 0) {
-            log_msg (LOG_WARNING,
-                "Generated PRNG seed \"%s\" without adequate entropy", seed);
-        }
-        else if (n == 0) {
-            log_msg (LOG_WARNING, "Unable to write to PRNG seed \"%s\"", seed);
-        }
-        else {
+        if (n > 0) {
             log_msg (LOG_INFO, "Wrote %d bytes to PRNG seed \"%s\"", n, seed);
         }
     }
-    RAND_cleanup ();
+    _random_cleanup ();
     return;
 }
 
@@ -190,7 +208,7 @@ random_add (const void *buf, int n)
     if (!buf || (n <= 0)) {
         return;
     }
-    RAND_seed (buf, n);
+    _random_add (buf, n);
     return;
 }
 
@@ -198,18 +216,10 @@ random_add (const void *buf, int n)
 void
 random_bytes (unsigned char *buf, int n)
 {
-    int rc;
-
     if (!buf || (n <= 0)) {
         return;
     }
-    rc = RAND_bytes (buf, n);
-    if (rc == -1) {
-        log_msg (LOG_ERR, "RAND method does not support RAND_bytes()");
-    }
-    else if (rc == 0) {
-        crypto_log_msg (LOG_WARNING);
-    }
+    _random_bytes (buf, n);
     return;
 }
 
@@ -217,17 +227,253 @@ random_bytes (unsigned char *buf, int n)
 void
 random_pseudo_bytes (unsigned char *buf, int n)
 {
-    int rc;
-
     if (!buf || (n <= 0)) {
         return;
     }
-    rc = RAND_pseudo_bytes (buf, n);
+    _random_pseudo_bytes (buf, n);
+    return;
+}
+
+
+/*****************************************************************************
+ *  Private Functions (Libgcrypt)
+ *****************************************************************************/
+
+#if HAVE_LIBGCRYPT
+
+#include <assert.h>
+#include <fcntl.h>
+#include <gcrypt.h>
+#include "fd.h"
+
+int
+_random_read_seed (const char *filename, int num_bytes)
+{
+    int            fd;
+    int            num_left;
+    unsigned char  buf [RANDOM_SEED_BYTES];
+    int            n;
+    int            rc;
+    gcry_error_t   e;
+
+    assert (filename != NULL);
+    assert (num_bytes > 0);
+
+    if ((fd = open (filename, O_RDONLY)) < 0) {
+        log_msg (LOG_WARNING, "Unable to open PRNG seed \"%s\": %s",
+            filename, strerror (errno));
+        return (-1);
+    }
+    num_left = num_bytes;
+    while (num_left > 0) {
+        n = (num_left < sizeof (buf)) ? num_left : sizeof (buf);
+        rc = fd_read_n (fd, buf, n);
+        if (rc < 0) {
+            log_msg (LOG_WARNING, "Unable to read from PRNG seed \"%s\": %s",
+                filename, strerror (errno));
+            break;
+        }
+        e = gcry_random_add_bytes (buf, n, -1);
+        if (e) {
+            log_msg (LOG_WARNING,
+                "Unable to add %d byte%s to entropy pool: %s",
+                n, (n == 1 ? "" : "s"), gcry_strerror (e));
+            break;
+        }
+        num_left -= rc;
+    }
+    if (close (fd) < 0) {
+        log_msg (LOG_WARNING, "Unable to close PRNG seed \"%s\": %s",
+            filename, strerror (errno));
+    }
+    gcry_fast_random_poll ();
+    return (num_bytes - num_left);
+}
+
+
+int
+_random_write_seed (const char *filename, int num_bytes)
+{
+    int            fd;
+    int            num_left;
+    unsigned char  buf [RANDOM_SEED_BYTES];
+    int            n;
+    int            rc;
+
+    assert (filename != NULL);
+    assert (num_bytes > 0);
+
+    (void) unlink (filename);
+    if ((fd = open (filename, O_WRONLY | O_CREAT | O_TRUNC, 0600)) < 0) {
+        log_msg (LOG_WARNING, "Unable to create PRNG seed \"%s\": %s",
+            filename, strerror (errno));
+        return (-1);
+    }
+    num_left = num_bytes;
+    while (num_left > 0) {
+        n = (num_left < sizeof (buf)) ? num_left : sizeof (buf);
+        gcry_create_nonce (buf, n);
+        rc = fd_write_n (fd, buf, n);
+        if (rc < 0) {
+            log_msg (LOG_WARNING, "Unable to write to PRNG seed \"%s\": %s",
+                filename, strerror (errno));
+            break;
+        }
+        num_left -= rc;
+    }
+    if (close (fd) < 0) {
+        log_msg (LOG_WARNING, "Unable to close PRNG seed \"%s\": %s",
+            filename, strerror (errno));
+    }
+    return (num_bytes - num_left);
+}
+
+
+void
+_random_cleanup (void)
+{
+    return;
+}
+
+
+void
+_random_add (const void *buf, int n)
+{
+    gcry_error_t e;
+
+    assert (buf != NULL);
+    assert (n > 0);
+
+    e = gcry_random_add_bytes (buf, n, -1);
+    if (e) {
+        log_msg (LOG_WARNING, "Unable to add %d byte%s to entropy pool: %s",
+            n, (n == 1 ? "" : "s"), gcry_strerror (e));
+    }
+    gcry_fast_random_poll ();
+    return;
+}
+
+
+void
+_random_bytes (unsigned char *buf, int n)
+{
+    assert (buf != NULL);
+    assert (n > 0);
+
+    gcry_fast_random_poll ();
+    gcry_randomize (buf, n, GCRY_VERY_STRONG_RANDOM);
+    return;
+}
+
+
+void
+_random_pseudo_bytes (unsigned char *buf, int n)
+{
+    assert (buf != NULL);
+    assert (n > 0);
+
+    gcry_create_nonce (buf, n);
+    return;
+}
+
+#endif /* HAVE_LIBGCRYPT */
+
+
+/*****************************************************************************
+ *  Private Functions (OpenSSL)
+ *****************************************************************************/
+
+#if HAVE_OPENSSL
+
+#include <assert.h>
+#include <openssl/rand.h>
+
+int
+_random_read_seed (const char *filename, int num_bytes)
+{
+    assert (filename != NULL);
+    assert (num_bytes > 0);
+
+    return (RAND_load_file (filename, num_bytes));
+}
+
+
+int
+_random_write_seed (const char *filename, int num_bytes)
+{
+    int n;
+
+    assert (filename != NULL);
+    assert (num_bytes > 0);
+
+    n = RAND_write_file (filename);
+    if (n < 0) {
+        log_msg (LOG_WARNING,
+            "PRNG seed \"%s\" generated with insufficient entropy", filename);
+    }
+    else if (n == 0) {
+        log_msg (LOG_WARNING, "Unable to create PRNG seed \"%s\"", filename);
+    }
+    return (n);
+}
+
+
+void
+_random_cleanup (void)
+{
+    RAND_cleanup ();
+    return;
+}
+
+
+void
+_random_add (const void *buf, int n)
+{
+    assert (buf != NULL);
+    assert (n > 0);
+
+    RAND_seed (buf, n);
+    return;
+}
+
+
+void
+_random_bytes (unsigned char *buf, int n)
+{
+    int rc;
+
+    assert (buf != NULL);
+    assert (n > 0);
+
+    rc = RAND_bytes (buf, n);
     if (rc == -1) {
-        log_msg (LOG_ERR, "RAND method does not support RAND_pseudo_bytes()");
+        log_msg (LOG_ERR,
+            "RAND_bytes not supported by OpenSSL RAND method");
     }
     else if (rc == 0) {
-        crypto_log_msg (LOG_WARNING);
+        openssl_log_msg (LOG_WARNING);
     }
     return;
 }
+
+
+void
+_random_pseudo_bytes (unsigned char *buf, int n)
+{
+    int rc;
+
+    assert (buf != NULL);
+    assert (n > 0);
+
+    rc = RAND_pseudo_bytes (buf, n);
+    if (rc == -1) {
+        log_msg (LOG_ERR,
+            "RAND_pseudo_bytes not supported by OpenSSL RAND method");
+    }
+    else if (rc == 0) {
+        openssl_log_msg (LOG_WARNING);
+    }
+    return;
+}
+
+#endif /* HAVE_OPENSSL */

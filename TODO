@@ -1,4 +1,3 @@
--add libgcrypt support
 -add pam support
 -add configuration file support
 -save/restore replay state at munged shutdown/startup

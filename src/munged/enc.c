@@ -43,7 +43,6 @@
 #include "enc.h"
 #include "job.h"
 #include "log.h"
-#include "lookup.h"
 #include "m_msg.h"
 #include "mac.h"
 #include "md.h"
@@ -144,7 +143,7 @@ enc_validate_msg (m_msg_t m)
     else if (m->cipher == MUNGE_CIPHER_NONE) {
         ; /* disable encryption */
     }
-    else if (!(lookup_cipher (m->cipher))) {
+    else if (cipher_map_enum (m->cipher, NULL) < 0) {
         return (m_msg_set_err (m, EMUNGE_BAD_CIPHER,
             strdupf ("Invalid cipher type %d", m->cipher)));
     }
@@ -154,7 +153,7 @@ enc_validate_msg (m_msg_t m)
     if (m->mac == MUNGE_MAC_DEFAULT) {
         m->mac = conf->def_mac;
     }
-    else if (!(lookup_mac (m->mac))) {
+    else if (mac_map_enum (m->mac, NULL) < 0) {
         return (m_msg_set_err (m, EMUNGE_BAD_MAC,
             strdupf ("Invalid mac type %d", m->mac)));
     }
@@ -211,11 +210,20 @@ enc_init (munge_cred_t c)
 
     /*  Generate cipher initialization vector (if needed).
      */
-    c->iv_len = cipher_iv_size (lookup_cipher (m->cipher));
-    if (c->iv_len > 0) {
-        c->iv_len = cipher_iv_size (lookup_cipher (m->cipher));
-        assert (c->iv_len <= sizeof (c->iv));
-        random_pseudo_bytes (c->iv, c->iv_len);
+    if (m->cipher == MUNGE_CIPHER_NONE) {
+        c->iv_len = 0;
+    }
+    else {
+        c->iv_len = cipher_iv_size (m->cipher);
+        if (c->iv_len < 0) {
+            return (m_msg_set_err (m, EMUNGE_SNAFU,
+                strdupf ("Unable to determine iv length for cipher type %d",
+                m->cipher)));
+        }
+        if (c->iv_len > 0) {
+            assert (c->iv_len <= sizeof (c->iv));
+            random_pseudo_bytes (c->iv, c->iv_len);
+        }
     }
     return (0);
 }
@@ -508,24 +516,23 @@ enc_mac (munge_cred_t c)
  *    (ie, both "outer" and "inner" data).
  */
     m_msg_t       m = c->msg;
-    const EVP_MD *md;                   /* message digest algorithm          */
     mac_ctx       x;                    /* message auth code context         */
     int           n;                    /* all-purpose int                   */
 
-    /*  MAC type already checked by enc_validate().
-     */
-    md = lookup_mac (m->mac);
-    assert (md != NULL);
-
     /*  Init MAC.
      */
-    c->mac_len = mac_size (md);
+    c->mac_len = mac_size (m->mac);
+    if (c->mac_len <= 0) {
+        return (m_msg_set_err (m, EMUNGE_SNAFU,
+            strdupf ("Unable to determine digest length for mac type %d",
+                m->mac)));
+    }
     assert (c->mac_len <= sizeof (c->mac));
     memset (c->mac, 0, c->mac_len);
 
     /*  Compute MAC.
      */
-    if (mac_init (&x, md, conf->mac_key, conf->mac_key_len) < 0) {
+    if (mac_init (&x, m->mac, conf->mac_key, conf->mac_key_len) < 0) {
         goto err;
     }
     if (mac_update (&x, c->outer, c->outer_len) < 0) {
@@ -534,13 +541,14 @@ enc_mac (munge_cred_t c)
     if (mac_update (&x, c->inner, c->inner_len) < 0) {
         goto err_cleanup;
     }
+    n = c->mac_len;
     if (mac_final (&x, c->mac, &n) < 0) {
         goto err_cleanup;
     }
     if (mac_cleanup (&x) < 0) {
         goto err;
     }
-    assert (c->mac_len == n);
+    assert (c->mac_len <= n);
     return (0);
 
 err_cleanup:
@@ -557,68 +565,73 @@ enc_encrypt (munge_cred_t c)
 /*  Encrypts the "inner" credential data.
  */
     m_msg_t           m = c->msg;
-    const EVP_MD     *md;               /* message digest algorithm          */
-    const EVP_CIPHER *ci;               /* symmetric cipher algorithm        */
     int               buf_len;          /* length of ciphertext buffer       */
     unsigned char    *buf;              /* ciphertext buffer                 */
     unsigned char    *buf_ptr;          /* ptr into ciphertext buffer        */
     cipher_ctx        x;                /* cipher context                    */
-    int               n, n2;            /* all-purpose ints                  */
+    int               n_written;        /* number of bytes written to buf    */
+    int               n;                /* all-purpose int                   */
 
     /*  Is encryption disabled?
      */
     if (m->cipher == MUNGE_CIPHER_NONE) {
         return (0);
     }
-    /*  MAC/Cipher types already checked by enc_validate().
-     */
-    md = lookup_mac (m->mac);
-    assert (md != NULL);
-    ci = lookup_cipher (m->cipher);
-    assert (ci != NULL);
-
     /*  Compute DEK.
      *  msg-dek = MAC (msg-mac) using DEK subkey
      */
-    c->dek_len = md_size (md);
+    c->dek_len = mac_size (m->mac);
+    if (c->dek_len <= 0) {
+        return (m_msg_set_err (m, EMUNGE_SNAFU,
+            strdupf ("Unable to determine dek key length for mac type %d",
+                m->mac)));
+    }
     assert (c->dek_len <= sizeof (c->dek));
-    assert (c->dek_len >= cipher_key_size (ci));
 
-    if (mac_block (md, conf->dek_key, conf->dek_key_len,
-                       c->dek, &n, c->mac, c->mac_len) < 0) {
+    n = c->dek_len;
+    if (mac_block (m->mac, conf->dek_key, conf->dek_key_len,
+            c->dek, &n, c->mac, c->mac_len) < 0) {
         return (m_msg_set_err (m, EMUNGE_SNAFU,
             strdup ("Unable to compute dek")));
     }
-    assert (n == c->dek_len);
+    assert (n <= c->dek_len);
 
     /*  Allocate memory for ciphertext.
      *  Ensure enough space by allocating an additional cipher block.
      */
-    buf_len = c->inner_len + cipher_block_size (ci);
+    n = cipher_block_size (m->cipher);
+    if (n <= 0) {
+        return (m_msg_set_err (m, EMUNGE_SNAFU,
+            strdupf ("Unable to determine block size for cipher type %d",
+                m->cipher)));
+    }
+    buf_len = c->inner_len + n;
     if (!(buf = malloc (buf_len))) {
         return (m_msg_set_err (m, EMUNGE_NO_MEMORY, NULL));
     }
     /*  Encrypt "inner" data.
      */
-    if (cipher_init (&x, ci, c->dek, c->iv, CIPHER_ENCRYPT) < 0) {
+    if (cipher_init (&x, m->cipher, c->dek, c->iv, CIPHER_ENCRYPT) < 0) {
         goto err;
     }
     buf_ptr = buf;
-    n = 0;
-    if (cipher_update (&x, buf_ptr, &n2, c->inner, c->inner_len) < 0) {
+    n_written = 0;
+    n = buf_len;
+    if (cipher_update (&x, buf_ptr, &n, c->inner, c->inner_len) < 0) {
         goto err_cleanup;
     }
-    buf_ptr += n2;
-    n += n2;
-    if (cipher_final (&x, buf_ptr, &n2) < 0) {
+    buf_ptr += n;
+    n_written += n;
+    n = buf_len - n_written;
+    if (cipher_final (&x, buf_ptr, &n) < 0) {
         goto err_cleanup;
     }
-    buf_ptr += n2;
-    n += n2;
+    buf_ptr += n;
+    n_written += n;
     if (cipher_cleanup (&x) < 0) {
         goto err;
     }
-    assert (n <= buf_len);
+    assert (n_written <= buf_len);
 
     /*  Replace "inner" plaintext with ciphertext.
      */
@@ -629,7 +642,7 @@ enc_encrypt (munge_cred_t c)
     c->inner_mem = buf;
     c->inner_mem_len = buf_len;
     c->inner = buf;
-    c->inner_len = n;
+    c->inner_len = n_written;
     return (0);
 
 err_cleanup:

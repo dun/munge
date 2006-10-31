@@ -12,11 +12,6 @@
 #    This option can be set to either 32 or 64 in order to specify whether
 #    code should be generated for a 32-bit or 64-bit architecture.
 #
-#  NOTES:
-#    The cached variable x_ac_cv_check_ssl_dir is unset in order to force
-#    X_AC_CHECK_SSL to re-check the OpenSSL installation based on the
-#    specified architecture.
-#
 #  WARNINGS:
 #    This macro must be placed after AC_CANONICAL_HOST and before
 #    AC_PROG_CC or equivalent.
@@ -72,7 +67,6 @@ AC_DEFUN([X_AC_ARCH], [
       test -d /lib -o -d /usr/lib \
         && LDFLAGS="-L/lib -L/usr/lib $LDFLAGS"
     fi
-    unset x_ac_cv_check_ssl_dir
   elif test "$x_ac_arch" == "64"; then
     if expr "$host_os" : "aix" >/dev/null 2>&1; then
       test -z "$OBJECT_MODE" && AC_MSG_ERROR(
@@ -83,7 +77,6 @@ AC_DEFUN([X_AC_ARCH], [
       test -d /lib64 -o -d /usr/lib64 \
         && LDFLAGS="-L/lib64 -L/usr/lib64 $LDFLAGS"
     fi
-    unset x_ac_cv_check_ssl_dir
   fi
   ]
 )
