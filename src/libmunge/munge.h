@@ -89,8 +89,11 @@ typedef enum munge_cipher {
     MUNGE_CIPHER_DEFAULT        =  1,   /* default ciphr specified by daemon */
     MUNGE_CIPHER_BLOWFISH       =  2,   /* Blowfish CBC w/ 64b-blk/128b-key  */
     MUNGE_CIPHER_CAST5          =  3,   /* CAST5 CBC w/ 64b-blk/128b-key     */
-    MUNGE_CIPHER_AES_128        =  4    /* AES CBC w/ 128b-blk/128b-key      */
+    MUNGE_CIPHER_AES128         =  4,   /* AES CBC w/ 128b-blk/128b-key      */
+    MUNGE_CIPHER_AES256         =  5    /* AES CBC w/ 128b-blk/256b-key      */
 } munge_cipher_t;
+
+#define MUNGE_CIPHER_AES_128 MUNGE_CIPHER_AES128
 
 /*  Munge message authentication code types
  */
@@ -99,7 +102,8 @@ typedef enum munge_mac {
     MUNGE_MAC_DEFAULT           =  1,   /* default mac specified by daemon   */
     MUNGE_MAC_MD5               =  2,   /* MD5 w/ 128b-digest                */
     MUNGE_MAC_SHA1              =  3,   /* SHA-1 w/ 160b-digest              */
-    MUNGE_MAC_RIPEMD160         =  4    /* RIPEMD-160 w/ 160b-digest         */
+    MUNGE_MAC_RIPEMD160         =  4,   /* RIPEMD-160 w/ 160b-digest         */
+    MUNGE_MAC_SHA256            =  5    /* SHA-256 w/ 256b-digest            */
 } munge_mac_t;
 
 /*  Munge compression types

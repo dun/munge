@@ -46,17 +46,29 @@
 #  define MUNGE_CIPHER_AES128_FLAG      0
 #endif
 
+#if HAVE_LIBGCRYPT || HAVE_EVP_AES_256_CBC
+#  define MUNGE_CIPHER_AES256_FLAG      1
+#else
+#  define MUNGE_CIPHER_AES256_FLAG      0
+#endif
+
+#if HAVE_LIBGCRYPT || HAVE_EVP_SHA256
+#  define MUNGE_MAC_SHA256_FLAG         1
+#else
+#  define MUNGE_MAC_SHA256_FLAG         0
+#endif
+
 #if HAVE_PKG_BZLIB
 #  define MUNGE_ZIP_BZLIB_FLAG          1
-#else  /* !HAVE_PKG_BZLIB */
+#else
 #  define MUNGE_ZIP_BZLIB_FLAG          0
-#endif /* !HAVE_PKG_BZLIB */
+#endif
 
 #if HAVE_PKG_ZLIB
 #  define MUNGE_ZIP_ZLIB_FLAG           1
-#else  /* !HAVE_PKG_ZLIB */
+#else
 #  define MUNGE_ZIP_ZLIB_FLAG           0
-#endif /* !HAVE_PKG_ZLIB */
+#endif
 
 
 /*****************************************************************************
@@ -81,7 +93,8 @@ static struct munge_enum_table _munge_cipher_table[] = {
     { MUNGE_CIPHER_DEFAULT,     "default",      1                        },
     { MUNGE_CIPHER_BLOWFISH,    "blowfish",     1                        },
     { MUNGE_CIPHER_CAST5,       "cast5",        1                        },
-    { MUNGE_CIPHER_AES_128,     "aes128",       MUNGE_CIPHER_AES128_FLAG },
+    { MUNGE_CIPHER_AES128,      "aes128",       MUNGE_CIPHER_AES128_FLAG },
+    { MUNGE_CIPHER_AES256,      "aes256",       MUNGE_CIPHER_AES256_FLAG },
     { -1,                        NULL,         -1                        }
 };
 
@@ -91,6 +104,7 @@ static struct munge_enum_table _munge_mac_table[] = {
     { MUNGE_MAC_MD5,            "md5",          1                        },
     { MUNGE_MAC_SHA1,           "sha1",         1                        },
     { MUNGE_MAC_RIPEMD160,      "ripemd160",    1                        },
+    { MUNGE_MAC_SHA256,         "sha256",       MUNGE_MAC_SHA256_FLAG    },
     { -1,                        NULL,         -1                        }
 };
 

@@ -52,7 +52,7 @@
 #if HAVE_OPENSSL && !HAVE_EVP_AES_128_CBC
 #  define MUNGE_DEFAULT_CIPHER          MUNGE_CIPHER_CAST5
 #else  /* !HAVE_OPENSSL || HAVE_EVP_AES_128_CBC */
-#  define MUNGE_DEFAULT_CIPHER          MUNGE_CIPHER_AES_128
+#  define MUNGE_DEFAULT_CIPHER          MUNGE_CIPHER_AES128
 #endif /* !HAVE_OPENSSL || HAVE_EVP_AES_128_CBC */
 
 /*  Default munge_mac_t for validating credentials.
@@ -80,11 +80,11 @@
 
 /*  Integer for the maximum size (in bytes) of a cipher key.
  */
-#define MUNGE_MAXIMUM_KEY_LEN           16
+#define MUNGE_MAXIMUM_KEY_LEN           32
 
 /*  Integer for the maximum size (in bytes) of a message digest.
  */
-#define MUNGE_MAXIMUM_MD_LEN            20
+#define MUNGE_MAXIMUM_MD_LEN            32
 
 /*  Integer for the maximum size (in bytes) of a munge request message.
  */

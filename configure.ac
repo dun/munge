@@ -77,6 +77,8 @@ if test "$CRYPTO_PKG" = "openssl"; then
     EVP_CipherInit_ex \
     EVP_DigestInit_ex \
     EVP_aes_128_cbc \
+    EVP_aes_256_cbc \
+    EVP_sha256 \
     HMAC_Init_ex \
   )
   LIBS="$ac_save_LIBS"

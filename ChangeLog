@@ -1,6 +1,25 @@
 2006-10-30  Chris Dunlap  <cdunlap@llnl.gov>
 
-	* : Added libgcrypt support.
+	* : Added support for MUNGE_CIPHER_AES256 and MUNGE_MAC_SHA256.
+	* configure.ac, config/config.h.in: Added OpenSSL function checks for
+	  EVP_aes_256_cbc() and EVP_sha256().
+	* src/libcommon/munge_defs.h: Updated MUNGE_MAXIMUM_KEY_LEN and
+	  MUNGE_MAXIMUM_MD_LEN.
+	* src/libmunge/munge.h: Added enums for MUNGE_CIPHER_AES256 and
+	  MUNGE_MAC_SHA256.  Renamed enum for MUNGE_CIPHER_AES_128 to
+	  MUNGE_CIPHER_AES128.  Added MUNGE_CIPHER_AES_128 define for
+	  backwards-compatibility.
+	* src/libmunge/enum.c: Updated _munge_cipher_table[] and
+	  _munge_mac_table[].
+	* src/libmunge/munge_ctx.3.in: Documented MUNGE_CIPHER_AES256 and
+	  MUNGE_MAC_SHA256.  Updated documentation for MUNGE_MAC_MD5 and
+	  MUNGE_MAC_SHA1.
+	* src/munged/cipher.c: Added support for MUNGE_CIPHER_AES256.
+	* src/munged/md.c: Added support for MUNGE_MAC_SHA256.
+
+2006-10-30  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* : Added support for Libgcrypt.
 	* src/munged/dec.c, src/munged/enc.c, src/munged/conf.c:
 	  Updated calls from cipher.h, md.h, mac.h, and random.h.
 	* src/munged/cipher.c, src/munged/cipher.h: Refactored routines into

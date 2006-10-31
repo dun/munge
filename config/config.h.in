@@ -18,11 +18,17 @@
 /* Define to 1 if you have the `EVP_aes_128_cbc' function. */
 #undef HAVE_EVP_AES_128_CBC
 
+/* Define to 1 if you have the `EVP_aes_256_cbc' function. */
+#undef HAVE_EVP_AES_256_CBC
+
 /* Define to 1 if you have the `EVP_CipherInit_ex' function. */
 #undef HAVE_EVP_CIPHERINIT_EX
 
 /* Define to 1 if you have the `EVP_DigestInit_ex' function. */
 #undef HAVE_EVP_DIGESTINIT_EX
+
+/* Define to 1 if you have the `EVP_sha256' function. */
+#undef HAVE_EVP_SHA256
 
 /* Define to 1 if file descriptors can be passed over a fifo. */
 #undef HAVE_FIFO_RECVFD

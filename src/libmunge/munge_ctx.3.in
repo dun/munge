@@ -160,35 +160,42 @@ Specify the CAST5 cipher designed by Carlisle Adams and Stafford Tavares.
 This cipher has a 64-bit block-size and a variable key length.  MUNGE uses
 it with a 128-bit key in CBC mode.
 .TP
-.B MUNGE_CIPHER_AES_128
+.B MUNGE_CIPHER_AES128
 Specify the AES (Advanced Encryption Standard) cipher, also known as Rijndael.
-It was designed by Joan Daemen and Vincent Rijmen.  This cipher has a variable
-block and key length.  MUNGE uses it with a 128-bit block-size and 128-bit
-key in CBC mode.  It is available in OpenSSL versions 0.9.7 or later.
+It was designed by Joan Daemen and Vincent Rijmen.  This cipher has a 128-bit
+block-size and a key length of 128, 192, or 256 bits.  MUNGE uses it here with
+a 128-bit key in CBC mode.
+.TP
+.B MUNGE_CIPHER_AES256
+Specify the AES (Advanced Encryption Standard) cipher, also known as Rijndael.
+It was designed by Joan Daemen and Vincent Rijmen.  This cipher has a 128-bit
+block-size and a key length of 128, 192, or 256 bits.  MUNGE uses it here with
+a 256-bit key in CBC mode.
 
 .SH "MAC TYPES"
 The message authentication code (MAC), also known as a message integrity code
 (MIC), is a required component of the credental; consequently, it cannot
-be disabled.  MUNGE uses the HMAC implementation provided by OpenSSL.
+be disabled.
 .TP
 .B MUNGE_MAC_DEFAULT
 Specify the default according to the \fBmunged\fR configuration.
 .TP
 .B MUNGE_MAC_MD5
-Specify the MD5 algorithm designed by Ron Rivest and published in 1991.
-This algorithm has a 128-bit message digest.  In 2004, a successful collision
-attack was demonstrated against MD5.  But since a pre-image attack has
-not yet been demonstrated, MD5 should still be safe to use within MUNGE.
-However, use of SHA-1 or RIPEMD-160 is recommended in order to provide a
-better security margin.
+Specify the MD5 algorithm designed by Ron Rivest and published in 1991.  This
+algorithm has a 128-bit message digest.  In 2004, a successful collision attack
+was demonstrated against MD5.  But since a pre-image attack has not yet been
+demonstrated, MD5 should still be safe to use within MUNGE.  However, use of
+SHA-1, RIPEMD-160, or SHA-256 is recommended in order to provide a better
+security margin.
 .TP
 .B MUNGE_MAC_SHA1
-Specify the SHA-1 algorithm designed by the National Security Agency
-and published in 1995; this is the successor to the original Secure Hash
-Algorithm (now called SHA-0) published in 1993.  This algorithm has a 160-bit
-message digest.  SHA-1 has been closely examined by the public cryptographic
-community and no attacks have yet been found.  However, NIST has announced
-plans to phase out the use of SHA-1 by 2010 in favor of the SHA-2 variant.
+Specify the SHA-1 algorithm designed by the National Security Agency and
+published in 1995; this is the successor to the original Secure Hash Algorithm
+(now called SHA-0) published in 1993.  This algorithm has a 160-bit message
+digest.  In 2005, successful collision attacks were demonstrated against SHA-1.
+But since a pre-image attack has not yet been demonstrated, SHA-1 should still
+be safe to use within MUNGE.  NIST has announced plans to phase out the use of
+SHA-1 by 2010 in favor of the SHA-2 variants.
 .TP
 .B MUNGE_MAC_RIPEMD160
 Specify the RIPEMD-160 (RACE Integrity Primitives Evaluation Message Digest)
@@ -197,6 +204,14 @@ Preneel, and published in 1996.  This algorithm has a 160-bit message digest.
 It is somewhat less popular than SHA-1 and correspondingly less well studied.
 While slower than SHA-1, it is believed to have a slightly better security
 margin.
+.TP
+.B MUNGE_MAC_SHA256
+Specify the SHA-256 algorithm designed by the National Security Agency and
+published in 2002; this is one of the SHA-2 variants in the Secure Hash
+Algorithm family.  This algorithm has a 256-bit message digest.  It has not
+received as much scrutiny by the public cryptographic community as SHA-1 has,
+and so its cryptographic security is not yet as well-established.  However,
+no attacks have yet been reported against it.
 
 .SH "COMPRESSION TYPES"
 If a compression type is specified, a payload-bearing credential will be

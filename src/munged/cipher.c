@@ -441,8 +441,11 @@ _cipher_map_enum (munge_cipher_t cipher, void *dst)
         case MUNGE_CIPHER_CAST5:
             algo = GCRY_CIPHER_CAST5;
             break;
-        case MUNGE_CIPHER_AES_128:
+        case MUNGE_CIPHER_AES128:
             algo = GCRY_CIPHER_AES128;
+            break;
+        case MUNGE_CIPHER_AES256:
+            algo = GCRY_CIPHER_AES256;
             break;
         default:
             rc = -1;
@@ -597,10 +600,15 @@ _cipher_map_enum (munge_cipher_t cipher, void *dst)
             algo = EVP_cast5_cbc ();
             break;
 #if HAVE_EVP_AES_128_CBC
-        case MUNGE_CIPHER_AES_128:
+        case MUNGE_CIPHER_AES128:
             algo = EVP_aes_128_cbc ();
             break;
 #endif /* HAVE_EVP_AES_128_CBC */
+#if HAVE_EVP_AES_256_CBC
+        case MUNGE_CIPHER_AES256:
+            algo = EVP_aes_256_cbc ();
+            break;
+#endif /* HAVE_EVP_AES_256_CBC */
         default:
             rc = -1;
             break;
