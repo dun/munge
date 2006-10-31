@@ -8,3 +8,4 @@
 -add server timeout for unresponsive clients
 -change remunge to exit on persistent errors
 -change remunge to stop and output results on sigint
+-implement rfc2898 pkcs5 pbkdf2 key derivation procedure

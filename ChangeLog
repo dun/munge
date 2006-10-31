@@ -1,5 +1,7 @@
 2006-10-30  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* TODO: Updated.
+
 	* : Added support for MUNGE_CIPHER_AES256 and MUNGE_MAC_SHA256.
 	* configure.ac, config/config.h.in: Added OpenSSL function checks for
 	  EVP_aes_256_cbc() and EVP_sha256().
