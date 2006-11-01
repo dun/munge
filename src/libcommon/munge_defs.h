@@ -86,6 +86,10 @@
  */
 #define MUNGE_MAXIMUM_MD_LEN            32
 
+/*  Integer for the minimum size (in bytes) of a message digest.
+ */
+#define MUNGE_MINIMUM_MD_LEN            16
+
 /*  Integer for the maximum size (in bytes) of a munge request message.
  */
 #define MUNGE_MAXIMUM_REQ_LEN           1048576

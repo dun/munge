@@ -1,4 +1,12 @@
-2006-10-30  Chris Dunlap  <cdunlap@llnl.gov>
+2006-11-01  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* : Reduced memory requirements for replay cache.
+	* src/libcommon/munge_defs.h: Added MUNGE_MINIMUM_MD_LEN.
+	* src/munged/replay.c (replay_insert, replay_remove):
+	  Changed replay_key.data.mac[] to only store the first
+	  MUNGE_MINIMUM_MD_LEN bytes of the credential's MAC.
+
+2006-10-31  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* TODO: Updated.
 

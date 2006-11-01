@@ -61,7 +61,7 @@ union replay_key {
     }                    alloc;
     struct {
       time_t             t_expired;     /* time after which cred expires     */
-      unsigned char      mac[MAX_MAC];  /* message authentication code       */
+      unsigned char      mac[MUNGE_MINIMUM_MD_LEN];     /* msg auth code     */
     }                    data;
 };
 
@@ -144,6 +144,9 @@ int
 replay_insert (munge_cred_t c)
 {
 /*  Inserts the credential [c] into the replay hash.
+ *    The credential is identified by the first N bytes of the MAC, where N
+ *    is the minimum message digest length used by MUNGE.  Limiting the MAC
+ *    length here helps to reduce the replay cache memory requirements.
  *  Returns 0 if the credential is successfully inserted.
  *    Returns 1 if the credential is already present (ie, replay).
  *    Returns -1 on error with errno set.
@@ -156,18 +159,12 @@ replay_insert (munge_cred_t c)
         errno = EPERM;
         return (-1);
     }
-
     if (!(r = replay_alloc ())) {
         return (-1);
     }
-    /*  The mac_len was removed from the replay struct in order to keep
-     *    the struct small.  Instead, the mac[] is first zero'd so any
-     *    remaining bytes won't effect the replay comparison.
-     */
     r->data.t_expired = (time_t) (m->time0 + m->ttl);
-    memset (r->data.mac, 0, sizeof (r->data.mac));
-    assert (c->mac_len <= sizeof (r->data.mac));
-    memcpy (r->data.mac, c->mac, c->mac_len);
+    assert (c->mac_len >= sizeof (r->data.mac));
+    memcpy (r->data.mac, c->mac, sizeof (r->data.mac));
     /*
      *  The replay hash key is just the replay struct itself.
      */
@@ -205,9 +202,8 @@ replay_remove (munge_cred_t c)
     /*  Compute the cred's "hash key".
      */
     rkey->data.t_expired = (time_t) (m->time0 + m->ttl);
-    memset (rkey->data.mac, 0, sizeof (rkey->data.mac));
-    assert (c->mac_len <= sizeof (rkey->data.mac));
-    memcpy (rkey->data.mac, c->mac, c->mac_len);
+    assert (c->mac_len >= sizeof (rkey->data.mac));
+    memcpy (rkey->data.mac, c->mac, sizeof (rkey->data.mac));
 
     if ((r = hash_remove (replay_hash, rkey))) {
         replay_free (r);
