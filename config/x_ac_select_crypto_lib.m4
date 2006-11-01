@@ -37,20 +37,20 @@ AC_DEFUN([X_AC_SELECT_CRYPTO_LIB], [
       esac
     ])
 
-  if test -n "$LIBGCRYPT_LIBS" -a \
-      \( "$CRYPTO_PKG" = "libgcrypt" -o -z "$CRYPTO_PKG" \) ; then
-    CRYPTO_CFLAGS="$LIBGCRYPT_CFLAGS"
-    CRYPTO_LIBS="$LIBGCRYPT_LIBS"
-    CRYPTO_PKG="libgcrypt"
-    AC_DEFINE([HAVE_LIBGCRYPT], [1],
-      [Define to 1 if you want to use the Libgcrypt cryptographic library.])
-  elif test -n "$OPENSSL_LIBS" -a \
+  if test -n "$OPENSSL_LIBS" -a \
       \( "$CRYPTO_PKG" = "openssl" -o -z "$CRYPTO_PKG" \) ; then
     CRYPTO_CFLAGS="$OPENSSL_CFLAGS"
     CRYPTO_LIBS="$OPENSSL_LIBS"
     CRYPTO_PKG="openssl"
     AC_DEFINE([HAVE_OPENSSL], [1],
       [Define to 1 if you want to use the OpenSSL cryptographic library.])
+  elif test -n "$LIBGCRYPT_LIBS" -a \
+      \( "$CRYPTO_PKG" = "libgcrypt" -o -z "$CRYPTO_PKG" \) ; then
+    CRYPTO_CFLAGS="$LIBGCRYPT_CFLAGS"
+    CRYPTO_LIBS="$LIBGCRYPT_LIBS"
+    CRYPTO_PKG="libgcrypt"
+    AC_DEFINE([HAVE_LIBGCRYPT], [1],
+      [Define to 1 if you want to use the Libgcrypt cryptographic library.])
   else
     AC_MSG_RESULT([error])
     AC_MSG_ERROR([unable to locate cryptographic library])

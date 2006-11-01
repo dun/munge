@@ -11174,17 +11174,7 @@ echo "$as_me: error: bad value \"$withval\" for --with-crypto-lib" >&2;}
 
 fi;
 
-  if test -n "$LIBGCRYPT_LIBS" -a \
-      \( "$CRYPTO_PKG" = "libgcrypt" -o -z "$CRYPTO_PKG" \) ; then
-    CRYPTO_CFLAGS="$LIBGCRYPT_CFLAGS"
-    CRYPTO_LIBS="$LIBGCRYPT_LIBS"
-    CRYPTO_PKG="libgcrypt"
-
-cat >>confdefs.h <<\_ACEOF
-#define HAVE_LIBGCRYPT 1
-_ACEOF
-
-  elif test -n "$OPENSSL_LIBS" -a \
+  if test -n "$OPENSSL_LIBS" -a \
       \( "$CRYPTO_PKG" = "openssl" -o -z "$CRYPTO_PKG" \) ; then
     CRYPTO_CFLAGS="$OPENSSL_CFLAGS"
     CRYPTO_LIBS="$OPENSSL_LIBS"
@@ -11192,6 +11182,16 @@ _ACEOF
 
 cat >>confdefs.h <<\_ACEOF
 #define HAVE_OPENSSL 1
+_ACEOF
+
+  elif test -n "$LIBGCRYPT_LIBS" -a \
+      \( "$CRYPTO_PKG" = "libgcrypt" -o -z "$CRYPTO_PKG" \) ; then
+    CRYPTO_CFLAGS="$LIBGCRYPT_CFLAGS"
+    CRYPTO_LIBS="$LIBGCRYPT_LIBS"
+    CRYPTO_PKG="libgcrypt"
+
+cat >>confdefs.h <<\_ACEOF
+#define HAVE_LIBGCRYPT 1
 _ACEOF
 
   else

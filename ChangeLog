@@ -1,5 +1,9 @@
 2006-11-01  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* config/x_ac_select_crypto_lib.m4: Changed default crypto lib to
+	  OpenSSL due to better performance.
+	* QUICKSTART: Updated.
+
 	* : Reduced memory requirements for replay cache.
 	* src/libcommon/munge_defs.h: Added MUNGE_MINIMUM_MD_LEN.
 	* src/munged/replay.c (replay_insert, replay_remove):

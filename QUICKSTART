@@ -6,9 +6,9 @@ MUNGE Installation Guide
    MUNGE requires either the Libgcrypt or OpenSSL cryptographic library.
    Libgcrypt is licensed under the LGPL, whereas OpenSSL is licensed under
    dual original-BSD-style licenses.  On some systems, the OpenSSL license
-   is incompatible with the GPL license used by MUNGE.  Consequently,
-   MUNGE uses Libgcrypt if possible, falling back on OpenSSL if needed.
-   The selection of the cryptographic library can be overridden at build
+   is incompatible with the GPL license used by MUNGE.  While Libgcrypt
+   offers a more compatible license, OpenSSL offers better performance.
+   The selection of the cryptographic library can be specified at build
    time with the configure script's "--with-crypto-lib" option.
 
    MUNGE includes bzip2 and zlib compression support if these libraries
