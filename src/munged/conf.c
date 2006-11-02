@@ -122,9 +122,6 @@ create_conf (void)
     /*
      *  FIXME: Add support for default realm.
      */
-    /*
-     *  FIXME: Get file lock on configuration filename?
-     */
     conf->config_name = NULL;
     if (!(conf->logfile_name = strdup (MUNGED_LOGFILE))) {
         log_errno (EMUNGE_NO_MEMORY, LOG_ERR,
