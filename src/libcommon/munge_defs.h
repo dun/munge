@@ -94,6 +94,10 @@
  */
 #define MUNGE_MAXIMUM_REQ_LEN           1048576
 
+/*  Integer for the minimum size (in bytes) of the secret key file.
+ */
+#define MUNGE_MINIMUM_SECRET_KEY_LEN    32
+
 /*  Flag to denote that group information comes from "/etc/group".
  *  If set, group information will not be re-parsed unless this file
  *    modification time changes.  If not set, the file modification time

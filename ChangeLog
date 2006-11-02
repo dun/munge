@@ -1,3 +1,8 @@
+2006-11-02  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/munged/conf.c: Added check for minimum key length.
+	* src/libcommon/munge_defs.h: Added MUNGE_MINIMUM_SECRET_KEY_LEN.
+
 2006-11-01  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* config/x_ac_select_crypto_lib.m4: Changed default crypto lib to

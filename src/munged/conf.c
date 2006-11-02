@@ -571,6 +571,12 @@ _conf_open_keyfile (const char *keyfile, int got_force)
     else if (n == 0) {
         log_msg (LOG_WARNING, "Keyfile is insecure: %s", ebuf);
     }
+    /*  Ensure keyfile is of sufficient length.
+     */
+    if (st.st_size < MUNGE_MINIMUM_SECRET_KEY_LEN) {
+        log_err (EMUNGE_SNAFU, LOG_ERR,
+            "Keyfile must be at least %d bytes", MUNGE_MINIMUM_SECRET_KEY_LEN);
+    }
     /*  Open keyfile for reading.
      */
     if ((fd = open (keyfile, O_RDONLY)) < 0) {
