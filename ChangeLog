@@ -1,6 +1,10 @@
 2006-11-02  Chris Dunlap  <cdunlap@llnl.gov>
 
-	* src/munged/conf.c: Added check for minimum key length.
+	* src/munged/random.c (HAVE_LIBGCRYPT:_random_read_seed):
+	  Removed warning if seed does not exist.
+
+	* src/munged/conf.c (_conf_open_keyfile): Added check for minimum
+	  length of keyfile.
 	* src/libcommon/munge_defs.h: Added MUNGE_MINIMUM_SECRET_KEY_LEN.
 
 2006-11-01  Chris Dunlap  <cdunlap@llnl.gov>

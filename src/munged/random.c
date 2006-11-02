@@ -260,6 +260,9 @@ _random_read_seed (const char *filename, int num_bytes)
     assert (num_bytes > 0);
 
     if ((fd = open (filename, O_RDONLY)) < 0) {
+        if (errno == ENOENT) {
+            return (0);
+        }
         log_msg (LOG_WARNING, "Unable to open PRNG seed \"%s\": %s",
             filename, strerror (errno));
         return (-1);
