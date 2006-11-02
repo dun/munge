@@ -377,6 +377,7 @@ create_subkeys (conf_t conf)
 {
     int fd;
     int n;
+    int n_total;
     unsigned char buf[1024];
     md_ctx dek_ctx;
     md_ctx mac_ctx;
@@ -414,6 +415,7 @@ create_subkeys (conf_t conf)
     fd = _conf_open_keyfile (conf->key_name, conf->got_force);
     assert (fd >= 0);
 
+    n_total = 0;
     for (;;) {
         n = read (fd, buf, sizeof (buf));
         if (n == 0)
@@ -425,10 +427,15 @@ create_subkeys (conf_t conf)
                 "Unable to read keyfile \"%s\"", conf->key_name);
         if (md_update (&dek_ctx, buf, n) < 0)
             log_err (EMUNGE_SNAFU, LOG_ERR, "Unable to compute subkeys");
+        n_total += n;
     }
     if (close (fd) < 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR,
             "Unable to close keyfile \"%s\"", conf->key_name);
+    }
+    if (n_total < MUNGE_MINIMUM_SECRET_KEY_LEN) {
+        log_err (EMUNGE_SNAFU, LOG_ERR,
+            "Keyfile must be at least %d bytes", MUNGE_MINIMUM_SECRET_KEY_LEN);
     }
     if (md_copy (&mac_ctx, &dek_ctx) < 0) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
@@ -567,12 +574,6 @@ _conf_open_keyfile (const char *keyfile, int got_force)
     }
     else if (n == 0) {
         log_msg (LOG_WARNING, "Keyfile is insecure: %s", ebuf);
-    }
-    /*  Ensure keyfile is of sufficient length.
-     */
-    if (st.st_size < MUNGE_MINIMUM_SECRET_KEY_LEN) {
-        log_err (EMUNGE_SNAFU, LOG_ERR,
-            "Keyfile must be at least %d bytes", MUNGE_MINIMUM_SECRET_KEY_LEN);
     }
     /*  Open keyfile for reading.
      */
