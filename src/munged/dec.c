@@ -423,6 +423,16 @@ dec_unpack_outer (munge_cred_t c)
     p += n;
     len -= n;
     /*
+     *  Validate the message authentication code type against the cipher type
+     *    to ensure the HMAC will generate a DEK of sufficient length for the
+     *    cipher.
+     */
+    if (mac_size (m->mac) < cipher_key_size (m->cipher)) {
+        return (m_msg_set_err (m, EMUNGE_BAD_MAC,
+            strdupf ("Invalid mac type %d with cipher type %d",
+            m->mac, m->cipher)));
+    }
+    /*
      *  Unpack the compression type.
      */
     n = sizeof (m->zip);
@@ -564,6 +574,7 @@ dec_decrypt (munge_cred_t c)
             strdup ("Unable to compute dek")));
     }
     assert (n <= c->dek_len);
+    assert (n >= cipher_key_size (m->cipher));
 
     /*  Allocate memory for plaintext.
      *  Ensure enough space by allocating an additional cipher block.

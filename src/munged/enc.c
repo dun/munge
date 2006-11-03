@@ -159,7 +159,16 @@ enc_validate_msg (m_msg_t m)
     }
     assert (m->mac != MUNGE_MAC_NONE);
     /*
-     *  Validate compression type.
+     *  Validate the message authentication code type against the cipher type
+     *    to ensure the HMAC will generate a DEK of sufficient length for the
+     *    cipher.
+     */
+    if (mac_size (m->mac) < cipher_key_size (m->cipher)) {
+        return (m_msg_set_err (m, EMUNGE_BAD_MAC,
+            strdupf ("Invalid mac type %d with cipher type %d",
+            m->mac, m->cipher)));
+    }
+    /*  Validate compression type.
      *  Disable compression if no optional data was specified.
      */
     if (m->zip == MUNGE_ZIP_DEFAULT) {
@@ -180,7 +189,6 @@ enc_validate_msg (m_msg_t m)
      *  FIXME: Validate realm and set default string if needed.
      *         Validate that the realm string is NUL-terminated.
      */
-    ;
     /*  Validate time-to-live.
      *  Ensure it is bounded by the configuration's max ttl.
      *    A sensible ttl is needed to allow a validated cred's
@@ -595,6 +603,7 @@ enc_encrypt (munge_cred_t c)
             strdup ("Unable to compute dek")));
     }
     assert (n <= c->dek_len);
+    assert (n >= cipher_key_size (m->cipher));
 
     /*  Allocate memory for ciphertext.
      *  Ensure enough space by allocating an additional cipher block.

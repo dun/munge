@@ -170,7 +170,8 @@ a 128-bit key in CBC mode.
 Specify the AES (Advanced Encryption Standard) cipher, also known as Rijndael.
 It was designed by Joan Daemen and Vincent Rijmen.  This cipher has a 128-bit
 block-size and a key length of 128, 192, or 256 bits.  MUNGE uses it here with
-a 256-bit key in CBC mode.
+a 256-bit key in CBC mode.  Currently, MUNGE_CIPHER_AES256 requires the use of
+MUNGE_MAC_SHA256.
 
 .SH "MAC TYPES"
 The message authentication code (MAC), also known as a message integrity code

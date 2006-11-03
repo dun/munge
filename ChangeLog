@@ -1,5 +1,12 @@
 2006-11-02  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/munged/enc.c (enc_validate_msg): Added check to ensure the MAC
+	  would generate a DEK of sufficient length for the cipher.
+	* src/munged/dec.c (dec_unpack_outer): Added check to ensure the MAC
+	  would generate a DEK of sufficient length for the cipher.
+	* src/libmunge/munge_ctx.3.in: Updated documentation for
+	  MUNGE_CIPHER_AES256 to note that it requires MUNGE_MAC_SHA256.
+
 	* src/munged/conf.c (create_subkeys): Moved check for minimum length
 	  of keyfile from _conf_open_keyfile() in order for it to be performed
 	  on the number of bytes processed instead of the size of the file.
