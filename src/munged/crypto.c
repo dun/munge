@@ -143,7 +143,7 @@ crypto_init (void)
     }
     if (!(openssl_mutex_array = malloc (n * sizeof (pthread_mutex_t)))) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
-            "Unable to allocate OpenSSL locks");
+            "Unable to allocate %d OpenSSL locks", n);
     }
     for (i = 0; i < n; i++) {
         errno = pthread_mutex_init (&openssl_mutex_array[i], NULL);

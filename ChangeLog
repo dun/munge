@@ -1,3 +1,7 @@
+2006-11-08  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/munged/crypto.c (crypto_init): Tweaked err msg verbage.
+
 2006-11-07  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/munged/enc.c (enc_mac): Reverted assertion after mac_final().
