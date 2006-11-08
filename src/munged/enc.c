@@ -556,7 +556,7 @@ enc_mac (munge_cred_t c)
     if (mac_cleanup (&x) < 0) {
         goto err;
     }
-    assert (c->mac_len <= n);
+    assert (n == c->mac_len);
     return (0);
 
 err_cleanup:

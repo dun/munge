@@ -1,3 +1,7 @@
+2006-11-07  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/munged/enc.c (enc_mac): Reverted assertion after mac_final().
+
 2006-11-02  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/munged/enc.c (enc_validate_msg): Added check to ensure the MAC
