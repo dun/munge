@@ -111,7 +111,7 @@ md_final (md_ctx *x, void *dst, int *dstlen)
 int
 md_cleanup (md_ctx *x)
 {
-    int rc = 0;
+    int rc;
 
     assert (x != NULL);
     assert (x->magic == MD_MAGIC);
@@ -166,7 +166,7 @@ md_map_enum (munge_mac_t md, void *dst)
 static int
 _md_init (md_ctx *x, munge_mac_t md)
 {
-    int          algo;
+    int algo;
 
     if (_md_map_enum (md, &algo) < 0) {
         return (-1);

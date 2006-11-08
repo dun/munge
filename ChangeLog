@@ -1,5 +1,7 @@
 2006-11-08  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/munged/md.c (md_cleanup): Removed unnecessary var initialization.
+
 	* src/munged/crypto.c (crypto_init): Tweaked err msg verbage.
 
 2006-11-07  Chris Dunlap  <cdunlap@llnl.gov>
