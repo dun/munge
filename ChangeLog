@@ -1,5 +1,11 @@
 2006-11-09  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/munged/random.h: Updated documentation for random_init().
+	* src/munged/random.c (HAVE_LIBGCRYPT:_random_read_seed):
+	  Fixed inner loop to process number of bytes read and exit on EOF.
+	* src/munged/random.c (HAVE_LIBGCRYPT:_random_write_seed):
+	  Tweaked var names to match HAVE_LIBGCRYPT:_random_read_seed().
+
 	* src/munged/mac.h: Added len to struct mac_ctx.
 	* src/munged/mac.c (mac_final): Added check for valid dstlen.
 	* src/munged/mac.c (_mac_init): Set struct mac_ctx len var.

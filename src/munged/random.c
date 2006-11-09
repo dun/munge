@@ -251,9 +251,9 @@ _random_read_seed (const char *filename, int num_bytes)
 {
     int            fd;
     int            num_left;
-    unsigned char  buf [RANDOM_SEED_BYTES];
+    int            num_want;
     int            n;
-    int            rc;
+    unsigned char  buf [RANDOM_SEED_BYTES];
     gcry_error_t   e;
 
     assert (filename != NULL);
@@ -269,11 +269,14 @@ _random_read_seed (const char *filename, int num_bytes)
     }
     num_left = num_bytes;
     while (num_left > 0) {
-        n = (num_left < sizeof (buf)) ? num_left : sizeof (buf);
-        rc = fd_read_n (fd, buf, n);
-        if (rc < 0) {
+        num_want = (num_left < sizeof (buf)) ? num_left : sizeof (buf);
+        n = fd_read_n (fd, buf, num_want);
+        if (n < 0) {
             log_msg (LOG_WARNING, "Unable to read from PRNG seed \"%s\": %s",
                 filename, strerror (errno));
+            break;
+        }
+        if (n == 0) {
             break;
         }
         e = gcry_random_add_bytes (buf, n, -1);
@@ -283,7 +286,7 @@ _random_read_seed (const char *filename, int num_bytes)
                 n, (n == 1 ? "" : "s"), gcry_strerror (e));
             break;
         }
-        num_left -= rc;
+        num_left -= n;
     }
     if (close (fd) < 0) {
         log_msg (LOG_WARNING, "Unable to close PRNG seed \"%s\": %s",
@@ -299,9 +302,9 @@ _random_write_seed (const char *filename, int num_bytes)
 {
     int            fd;
     int            num_left;
-    unsigned char  buf [RANDOM_SEED_BYTES];
+    int            num_want;
     int            n;
-    int            rc;
+    unsigned char  buf [RANDOM_SEED_BYTES];
 
     assert (filename != NULL);
     assert (num_bytes > 0);
@@ -314,15 +317,15 @@ _random_write_seed (const char *filename, int num_bytes)
     }
     num_left = num_bytes;
     while (num_left > 0) {
-        n = (num_left < sizeof (buf)) ? num_left : sizeof (buf);
-        gcry_create_nonce (buf, n);
-        rc = fd_write_n (fd, buf, n);
-        if (rc < 0) {
+        num_want = (num_left < sizeof (buf)) ? num_left : sizeof (buf);
+        gcry_create_nonce (buf, num_want);
+        n = fd_write_n (fd, buf, num_want);
+        if (n < 0) {
             log_msg (LOG_WARNING, "Unable to write to PRNG seed \"%s\": %s",
                 filename, strerror (errno));
             break;
         }
-        num_left -= rc;
+        num_left -= n;
     }
     if (close (fd) < 0) {
         log_msg (LOG_WARNING, "Unable to close PRNG seed \"%s\": %s",

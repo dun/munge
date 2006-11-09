@@ -33,8 +33,8 @@ int random_init (const char *seed);
 /*
  *  Initializes the PRNG from the [seed] file.
  *  If [seed] does not exist or provide sufficient entropy,
- *    the PRNG will be seeded from a secure source (/dev/random).
- *  Returns 1 if [seed] provided sufficient entropy, 0 if it provided
+ *    the PRNG will be seeded from a secure source.
+ *  Returns 1 if [seed] provides sufficient entropy, 0 if it provides
  *    insufficient entropy but no errors were detected, or -1 on error.
  */
 
