@@ -1,10 +1,22 @@
+2006-11-09  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/munged/mac.h: Added len to struct mac_ctx.
+	* src/munged/mac.c (mac_final): Added check for valid dstlen.
+	* src/munged/mac.c (_mac_init): Set struct mac_ctx len var.
+	* src/munged/mac.c (_mac_final): Added dstlen check to ensure mac will
+	  not overflow dst buffer.
+	* src/munged/mac.c (HAVE_LIBGCRYPT:_mac_block): Memset ctx when done.
+	* src/munged/mac.c (HAVE_OPENSSL:_mac_block): Added dstlen check to
+	  ensure mac will not overflow dst buffer.
+
 2006-11-08  Chris Dunlap  <cdunlap@llnl.gov>
 
-	* src/munged/md.h: Added len to md_ctx struct.
-	* src/munged/md.c (md_final): Added check for valid [dstlen].
-	* src/munged/md.c (md_copy): Copied md_ctx struct len var.
-	* src/munged/md.c (_md_init): Saved md_ctx struct len var.
-	* src/munged/md.c (_md_final): Added check to ensure md len <= dstlen.
+	* src/munged/md.h: Added len to struct md_ctx.
+	* src/munged/md.c (md_final): Added check for valid dstlen.
+	* src/munged/md.c (md_copy): Copied struct md_ctx len var.
+	* src/munged/md.c (_md_init): Set struct md_ctx len var.
+	* src/munged/md.c (_md_final): Added dstlen check to ensure md will not
+	  overflow dst buffer.
 
 	* src/munged/md.c (md_cleanup): Removed unnecessary var initialization.
 
