@@ -102,6 +102,9 @@ md_final (md_ctx *x, void *dst, int *dstlen)
     assert (dst != NULL);
     assert (dstlen != NULL);
 
+    if ((dstlen == NULL) || (*dstlen <= 0)) {
+        return (-1);
+    }
     rc = _md_final (x, dst, dstlen);
     assert (x->finalized = 1);
     return (rc);
@@ -133,6 +136,7 @@ md_copy (md_ctx *xdst, md_ctx *xsrc)
     assert (xsrc->magic == MD_MAGIC);
     assert (xsrc->finalized != 1);
 
+    xdst->len = xsrc->len;
     rc = _md_copy (xdst, xsrc);
     assert (!(xdst->finalized = 0));
     assert (xdst->magic = MD_MAGIC);
@@ -174,6 +178,7 @@ _md_init (md_ctx *x, munge_mac_t md)
     if (gcry_md_open (&(x->ctx), algo, 0) != 0) {
         return (-1);
     }
+    x->len = gcry_md_get_algo_dlen (algo);
     return (0);
 }
 
@@ -190,19 +195,15 @@ static int
 _md_final (md_ctx *x, void *dst, int *dstlen)
 {
     unsigned char *digest;
-    int            algo;
-    int            len;
 
+    if (*dstlen < x->len) {
+        return (-1);
+    }
     if ((digest = gcry_md_read (x->ctx, 0)) == NULL) {
         return (-1);
     }
-    algo = gcry_md_get_algo (x->ctx);
-    len = gcry_md_get_algo_dlen (algo);
-    if (len > *dstlen) {
-        return (-1);
-    }
-    memcpy (dst, digest, len);
-    *dstlen = len;
+    memcpy (dst, digest, x->len);
+    *dstlen = x->len;
     return (0);
 }
 
@@ -301,6 +302,7 @@ _md_init (md_ctx *x, munge_mac_t md)
 #else  /* !HAVE_EVP_DIGESTINIT_EX */
     EVP_DigestInit (&(x->ctx), algo);
 #endif /* !HAVE_EVP_DIGESTINIT_EX */
+    x->len = EVP_MD_size (algo);
     return (0);
 }
 
@@ -308,6 +310,9 @@ _md_init (md_ctx *x, munge_mac_t md)
 static int
 _md_update (md_ctx *x, const void *src, int srclen)
 {
+/*  Since [srclen] will always be positive due to the check in md_update(),
+ *    the cast to unsigned int is safe.
+ */
 #if HAVE_EVP_DIGESTINIT_EX
     if (!(EVP_DigestUpdate (&(x->ctx), src, (unsigned int) srclen))) {
         return (-1);
@@ -322,6 +327,9 @@ _md_update (md_ctx *x, const void *src, int srclen)
 static int
 _md_final (md_ctx *x, void *dst, int *dstlen)
 {
+    if (*dstlen < x->len) {
+        return (-1);
+    }
 #if HAVE_EVP_DIGESTINIT_EX
     if (!(EVP_DigestFinal_ex (&(x->ctx), dst, (unsigned int *) dstlen))) {
         return (-1);

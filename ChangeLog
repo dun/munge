@@ -1,5 +1,11 @@
 2006-11-08  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/munged/md.h: Added len to md_ctx struct.
+	* src/munged/md.c (md_final): Added check for valid [dstlen].
+	* src/munged/md.c (md_copy): Copied md_ctx struct len var.
+	* src/munged/md.c (_md_init): Saved md_ctx struct len var.
+	* src/munged/md.c (_md_final): Added check to ensure md len <= dstlen.
+
 	* src/munged/md.c (md_cleanup): Removed unnecessary var initialization.
 
 	* src/munged/crypto.c (crypto_init): Tweaked err msg verbage.
