@@ -1,5 +1,10 @@
 2006-11-09  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/munged/mac.c (mac_init): Changed so assert assignments are only
+	  made if _mac_init() succeeds.
+	* src/munged/md.c (md_init): Changed so assert assignments are only
+	  made if _md_init() succeeds.
+
 	* src/munged/random.h: Updated documentation for random_init().
 	* src/munged/random.c (HAVE_LIBGCRYPT:_random_read_seed):
 	  Fixed inner loop to process number of bytes read and exit on EOF.

@@ -68,8 +68,10 @@ mac_init (mac_ctx *x, munge_mac_t md, const void *key, int keylen)
     assert (keylen > 0);
 
     rc = _mac_init (x, md, key, keylen);
-    assert (x->magic = MAC_MAGIC);
-    assert (!(x->finalized = 0));
+    if (rc >= 0) {
+        assert (x->magic = MAC_MAGIC);
+        assert (!(x->finalized = 0));
+    }
     return (rc);
 }
 

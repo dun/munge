@@ -67,8 +67,10 @@ md_init (md_ctx *x, munge_mac_t md)
     assert (x != NULL);
 
     rc = _md_init (x, md);
-    assert (x->magic = MD_MAGIC);
-    assert (!(x->finalized = 0));
+    if (rc >= 0) {
+        assert (x->magic = MD_MAGIC);
+        assert (!(x->finalized = 0));
+    }
     return (rc);
 }
 
