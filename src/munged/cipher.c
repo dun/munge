@@ -98,6 +98,9 @@ cipher_update (cipher_ctx *x, void *dst, int *dstlen,
     if (srclen <= 0) {
         return (0);
     }
+    if ((dstlen == NULL) || (*dstlen <= 0)) {
+        return (-1);
+    }
     rc = _cipher_update (x, dst, dstlen, src, srclen);
     return (rc);
 }
@@ -114,6 +117,9 @@ cipher_final (cipher_ctx *x, void *dst, int *dstlen)
     assert (dst != NULL);
     assert (dstlen != NULL);
 
+    if ((dstlen == NULL) || (*dstlen <= 0)) {
+        return (-1);
+    }
     rc = _cipher_final (x, dst, dstlen);
     assert (x->finalized = 1);
     return (rc);

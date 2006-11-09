@@ -1,5 +1,8 @@
 2006-11-09  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/munged/cipher.c (cipher_update, cipher_final):
+	  Added check for valid dstlen.
+
 	* src/munged/mac.c (mac_init): Changed so assert assignments are only
 	  made if _mac_init() succeeds.
 	* src/munged/md.c (md_init): Changed so assert assignments are only
