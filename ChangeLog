@@ -1,5 +1,10 @@
 2006-11-09  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/munged/cipher.c (HAVE_LIBGCRYPT:_cipher_update):
+	  Tweaked assertions.  Updated documentation.
+	* src/munged/cipher.c (HAVE_LIBGCRYPT:_cipher_final):
+	  Tweaked assertions.
+
 	* src/munged/cipher.c (cipher_update, cipher_final):
 	  Added check for valid dstlen.
 

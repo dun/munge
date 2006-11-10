@@ -234,21 +234,23 @@ _cipher_update (cipher_ctx *x, void *vdst, int *dstlen,
     unsigned char *dst = vdst;
     unsigned char *src = vsrc;
 
-    if (*dstlen < 0) {
-        goto err;
-    }
     n_written = 0;
     /*
      *  Continue processing a partial block if one exists.
      */
     if (x->len > 0) {
-        assert (x->len <= x->blklen);
+        assert (x->len < x->blklen);
         n_partial = MIN (srclen, x->blklen - x->len);
         memcpy (&(x->buf[x->len]), src, n_partial);
         x->len += n_partial;
         src += n_partial;
         srclen -= n_partial;
 
+        /*  If the partial block buffer is full, process the block unless
+         *    decryption is being performed and there is no more data.
+         *    This exception is to ensure _cipher_final() is able to
+         *    validate & remove the PKCS #5 padding.
+         */
         if (x->len == x->blklen) {
             if ((x->do_encrypt) || (srclen > 0)) {
                 n = *dstlen;
@@ -263,7 +265,9 @@ _cipher_update (cipher_ctx *x, void *vdst, int *dstlen,
         }
     }
     /*  Compute the number of bytes for complete blocks, and the remainder
-     *    that will be saved in the partial block buffer.
+     *    that will be saved in the partial block buffer.  During decryption,
+     *    the partial block buffer will always contain data to ensure
+     *    _cipher_final() is able to validate & remove the PKCS #5 padding.
      */
     n_partial = srclen % x->blklen;
     if ((!x->do_encrypt) && (n_partial == 0)) {
@@ -295,9 +299,8 @@ _cipher_update (cipher_ctx *x, void *vdst, int *dstlen,
     }
     /*  Ensure the partial block buffer is never empty during decryption.
      */
-    if (!x->do_encrypt) {
-        assert (x->len > 0);
-    }
+    assert ((x->do_encrypt) || (x->len > 0));
+
     /*  Set the number of bytes written.
      */
     *dstlen = n_written;
@@ -341,10 +344,10 @@ _cipher_final (cipher_ctx *x, void *dst, int *dstlen)
     int pad;
 
     if (x->do_encrypt) {
-        assert (x->len <= x->blklen);
-        n = x->blklen - x->len;
+        assert (x->len < x->blklen);
+        pad = x->blklen - x->len;
         for (i = x->len; i < x->blklen; i++) {
-            x->buf[i] = n;
+            x->buf[i] = pad;
         }
         if (_cipher_update_aux (x, dst, dstlen, x->buf, x->blklen) < 0) {
             return (-1);
@@ -362,7 +365,9 @@ _cipher_final (cipher_ctx *x, void *dst, int *dstlen)
         if (_cipher_update_aux (x, x->buf, &n, NULL, 0) < 0) {
             return (-1);
         }
-        /*  Validate block padding.
+        assert (n == x->blklen);
+        /*
+         *  Validate PKCS #5 block padding.
          */
         pad = x->buf[x->blklen - 1];
         if ((pad <= 0) || (pad > x->blklen)) {
@@ -373,10 +378,9 @@ _cipher_final (cipher_ctx *x, void *dst, int *dstlen)
                 return (-1);
             }
         }
-        n = x->blklen - pad;
-        /*
-         *  Copy decrypted plaintext to dst.
+        /*  Copy decrypted plaintext to dst.
          */
+        n = x->blklen - pad;
         if (*dstlen < n) {
             return (-1);
         }
@@ -543,16 +547,14 @@ _cipher_final (cipher_ctx *x, void *dst, int *dstlen)
 static int
 _cipher_cleanup (cipher_ctx *x)
 {
-    int rc = 0;
-
 #if HAVE_EVP_CIPHERINIT_EX
     if (!(EVP_CIPHER_CTX_cleanup (&(x->ctx)))) {
-        rc = -1;
+        return (-1);
     }
 #else  /* !HAVE_EVP_CIPHERINIT_EX */
     EVP_CIPHER_CTX_cleanup (&(x->ctx));
 #endif /* !HAVE_EVP_CIPHERINIT_EX */
-    return (rc);
+    return (0);
 }
 
 
