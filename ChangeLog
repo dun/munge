@@ -1,3 +1,10 @@
+2006-11-13  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/munged/mac.c, src/munged/mac.h:
+	  Renamed struct mac_ctx len var to diglen.
+	* src/munged/md.c, src/munged/md.h:
+	  Renamed struct md_ctx len var to diglen.
+
 2006-11-09  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/munged/cipher.c (HAVE_LIBGCRYPT:_cipher_update):

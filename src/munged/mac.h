@@ -46,7 +46,7 @@
 
 typedef struct {
     gcry_md_hd_t        ctx;
-    int                 len;
+    int                 diglen;
 #ifndef NDEBUG
     int                 magic;
     int                 finalized;
@@ -63,7 +63,7 @@ typedef struct {
 
 typedef struct {
     HMAC_CTX            ctx;
-    int                 len;
+    int                 diglen;
 #ifndef NDEBUG
     int                 magic;
     int                 finalized;

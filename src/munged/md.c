@@ -138,7 +138,7 @@ md_copy (md_ctx *xdst, md_ctx *xsrc)
     assert (xsrc->magic == MD_MAGIC);
     assert (xsrc->finalized != 1);
 
-    xdst->len = xsrc->len;
+    xdst->diglen = xsrc->diglen;
     rc = _md_copy (xdst, xsrc);
     assert (!(xdst->finalized = 0));
     assert (xdst->magic = MD_MAGIC);
@@ -180,7 +180,7 @@ _md_init (md_ctx *x, munge_mac_t md)
     if (gcry_md_open (&(x->ctx), algo, 0) != 0) {
         return (-1);
     }
-    x->len = gcry_md_get_algo_dlen (algo);
+    x->diglen = gcry_md_get_algo_dlen (algo);
     return (0);
 }
 
@@ -198,14 +198,14 @@ _md_final (md_ctx *x, void *dst, int *dstlen)
 {
     unsigned char *digest;
 
-    if (*dstlen < x->len) {
+    if (*dstlen < x->diglen) {
         return (-1);
     }
     if ((digest = gcry_md_read (x->ctx, 0)) == NULL) {
         return (-1);
     }
-    memcpy (dst, digest, x->len);
-    *dstlen = x->len;
+    memcpy (dst, digest, x->diglen);
+    *dstlen = x->diglen;
     return (0);
 }
 
@@ -304,7 +304,7 @@ _md_init (md_ctx *x, munge_mac_t md)
 #else  /* !HAVE_EVP_DIGESTINIT_EX */
     EVP_DigestInit (&(x->ctx), algo);
 #endif /* !HAVE_EVP_DIGESTINIT_EX */
-    x->len = EVP_MD_size (algo);
+    x->diglen = EVP_MD_size (algo);
     return (0);
 }
 
@@ -329,7 +329,7 @@ _md_update (md_ctx *x, const void *src, int srclen)
 static int
 _md_final (md_ctx *x, void *dst, int *dstlen)
 {
-    if (*dstlen < x->len) {
+    if (*dstlen < x->diglen) {
         return (-1);
     }
 #if HAVE_EVP_DIGESTINIT_EX

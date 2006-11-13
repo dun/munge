@@ -185,7 +185,7 @@ _mac_init (mac_ctx *x, munge_mac_t md, const void *key, int keylen)
     if (gcry_md_setkey (x->ctx, key, keylen) != 0) {
         return (-1);
     }
-    x->len = gcry_md_get_algo_dlen (algo);
+    x->diglen = gcry_md_get_algo_dlen (algo);
     return (0);
 }
 
@@ -203,14 +203,14 @@ _mac_final (mac_ctx *x, void *dst, int *dstlen)
 {
     unsigned char *digest;
 
-    if (*dstlen < x->len) {
+    if (*dstlen < x->diglen) {
         return (-1);
     }
     if ((digest = gcry_md_read (x->ctx, 0)) == NULL) {
         return (-1);
     }
-    memcpy (dst, digest, x->len);
-    *dstlen = x->len;
+    memcpy (dst, digest, x->diglen);
+    *dstlen = x->diglen;
     return (0);
 }
 
@@ -290,7 +290,7 @@ _mac_init (mac_ctx *x, munge_mac_t md, const void *key, int keylen)
 #else  /* !HAVE_HMAC_INIT_EX */
     HMAC_Init (&(x->ctx), key, keylen, algo);
 #endif /* !HAVE_HMAC_INIT_EX */
-    x->len = EVP_MD_size (algo);
+    x->diglen = EVP_MD_size (algo);
     return (0);
 }
 
@@ -306,7 +306,7 @@ _mac_update (mac_ctx *x, const void *src, int srclen)
 static int
 _mac_final (mac_ctx *x, void *dst, int *dstlen)
 {
-    if (*dstlen < x->len) {
+    if (*dstlen < x->diglen) {
         return (-1);
     }
     HMAC_Final (&(x->ctx), dst, (unsigned int *) dstlen);
