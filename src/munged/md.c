@@ -387,8 +387,8 @@ _md_size (munge_mac_t md)
 static int
 _md_map_enum (munge_mac_t md, void *dst)
 {
-    EVP_MD *algo;
-    int     rc = 0;
+    const EVP_MD *algo;
+    int           rc = 0;
 
     switch (md) {
         case MUNGE_MAC_MD5:
@@ -410,7 +410,7 @@ _md_map_enum (munge_mac_t md, void *dst)
             break;
     }
     if ((dst != NULL) && (rc == 0)) {
-        * (EVP_MD **) dst = algo;
+        * (const EVP_MD **) dst = algo;
     }
     return (rc);
 }

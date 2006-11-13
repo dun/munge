@@ -597,8 +597,8 @@ _cipher_key_size (munge_cipher_t cipher)
 static int
 _cipher_map_enum (munge_cipher_t cipher, void *dst)
 {
-    EVP_CIPHER *algo;
-    int         rc = 0;
+    const EVP_CIPHER *algo;
+    int               rc = 0;
 
     switch (cipher) {
         case MUNGE_CIPHER_BLOWFISH:
@@ -622,7 +622,7 @@ _cipher_map_enum (munge_cipher_t cipher, void *dst)
             break;
     }
     if ((dst != NULL) && (rc == 0)) {
-        * (EVP_CIPHER **) dst = algo;
+        * (const EVP_CIPHER **) dst = algo;
     }
     return (rc);
 }
