@@ -11214,7 +11214,9 @@ echo "${ECHO_T}$CRYPTO_PKG" >&6
 # Checks for OpenSSL.
 ##
 if test "$CRYPTO_PKG" = "openssl"; then
+  ac_save_CFLAGS="$CFLAGS"
   ac_save_LIBS="$LIBS"
+  CFLAGS="$CFLAGS $OPENSSL_CFLAGS"
   LIBS="$LIBS $OPENSSL_LIBS"
 
 
@@ -11331,7 +11333,6 @@ _ACEOF
 fi
 done
 
-  LIBS="$ac_save_LIBS"
   echo "$as_me:$LINENO: checking for CRYPTO_dynlock" >&5
 echo $ECHO_N "checking for CRYPTO_dynlock... $ECHO_C" >&6
 if test "${ac_cv_type_CRYPTO_dynlock+set}" = set; then
@@ -11397,6 +11398,8 @@ _ACEOF
 
 fi
 
+  CFLAGS="$ac_save_CFLAGS"
+  LIBS="$ac_save_LIBS"
 fi
 
 ##

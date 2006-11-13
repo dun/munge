@@ -70,7 +70,9 @@ X_AC_SELECT_CRYPTO_LIB
 # Checks for OpenSSL.
 ##
 if test "$CRYPTO_PKG" = "openssl"; then
+  ac_save_CFLAGS="$CFLAGS"
   ac_save_LIBS="$LIBS"
+  CFLAGS="$CFLAGS $OPENSSL_CFLAGS"
   LIBS="$LIBS $OPENSSL_LIBS"
   AC_CHECK_FUNCS( \
     ERR_error_string_n \
@@ -81,8 +83,9 @@ if test "$CRYPTO_PKG" = "openssl"; then
     EVP_sha256 \
     HMAC_Init_ex \
   )
-  LIBS="$ac_save_LIBS"
   AC_CHECK_TYPES(CRYPTO_dynlock, [], [], [#include <openssl/crypto.h>])
+  CFLAGS="$ac_save_CFLAGS"
+  LIBS="$ac_save_LIBS"
 fi
 
 ##

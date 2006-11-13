@@ -1,5 +1,8 @@
 2006-11-13  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* configure.ac: Fixed type check for CRYPTO_dynlock so OpenSSL-specific
+	  CFLAGS are included.
+
 	* src/munged/cipher.c (HAVE_OPENSSL:_cipher_map_enum): Fixed compiler
 	  warning "assignment discards qualifiers from pointer target type".
 	* src/munged/md.c (HAVE_OPENSSL:_md_map_enum): Fixed compiler warning
