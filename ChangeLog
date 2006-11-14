@@ -1,3 +1,10 @@
+2006-11-14  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/munged/cipher.c (HAVE_OPENSSL:_cipher_map_enum),
+	  src/libmunge/enum.c: Made AES-256 support dependent upon SHA-256
+	  since the 256-bit cipher key length can currently only be satisfied
+	  by a 256-bit message digest.
+
 2006-11-13  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/munged/cipher.c (HAVE_LIBGCRYPT:_cipher_final): Changed so

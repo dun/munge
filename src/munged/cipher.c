@@ -653,11 +653,11 @@ _cipher_map_enum (munge_cipher_t cipher, void *dst)
             algo = EVP_aes_128_cbc ();
             break;
 #endif /* HAVE_EVP_AES_128_CBC */
-#if HAVE_EVP_AES_256_CBC
+#if HAVE_EVP_AES_256_CBC && HAVE_EVP_SHA256
         case MUNGE_CIPHER_AES256:
             algo = EVP_aes_256_cbc ();
             break;
-#endif /* HAVE_EVP_AES_256_CBC */
+#endif /* HAVE_EVP_AES_256_CBC && HAVE_EVP_SHA256 */
         default:
             rc = -1;
             break;
