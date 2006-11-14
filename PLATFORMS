@@ -1,7 +1,16 @@
-The current version of MUNGE has been built on the following platforms:
+The current version of MUNGE has been built on the following platforms.
 
-  AIX 5.1, 5.2-ML4, 5.3
+  AIX 5.2, 5.3
   Darwin 8.7.0
-  FreeBSD 6.1-BETA1
+  FreeBSD 6.1
   Linux 2.6 (Debian, RedHat, SuSE) (x86, x86_64, ia64)
   Solaris 10
+
+
+Previous versions have also been built on the following platforms.
+The current version may build there as well, but I no longer have
+access to these platforms for testing.
+
+  AIX 5.1
+  FreeBSD 4.8, 4.10
+  Solaris 2.8

@@ -1,5 +1,7 @@
 2006-11-14  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* BUGS, HISTORY, META, NEWS, PLATFORMS: Updated for 0.5.5 release.
+
 	* src/libmunge/munge.h: Tweaked comments.
 
 	* src/munged/cipher.c (HAVE_OPENSSL:_cipher_map_enum),

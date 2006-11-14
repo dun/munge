@@ -1,3 +1,10 @@
+munge-0.5.5 (2006-11-14):
+- Added support for Libgcrypt.
+- Added support for AES-256 cipher.
+- Added support for SHA-256 message digest.
+- Added check for minimum key length.
+- Reduced replay cache memory usage.
+
 munge-0.5.4 (2006-09-26):
 - Changed project homepage to <http://home.gna.org/munge/>.
 - Fixed bug leaking credential information on decode error.
@@ -35,7 +42,7 @@ munge-0.5 (2006-01-24):
 - Changed credential format to v3.
 - Changed client/server protocol (apps will need to relink).
 - Fixed miscellaneous bugs (now coverity clean).
-- Changed default cipher to aes128 if present.
+- Changed default cipher to AES-128 if present.
 
 munge-0.4.3 (2005-10-31):
 - Fixed init script to work with RedHat's RHEL4-U1 chkconfig.

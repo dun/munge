@@ -1,6 +1,7 @@
   Name:         munge
-  Version:      0.5.4
-  Date:         2006-09-26
+  Version:      0.5.5
+  Release:      1
+  Date:         2006-11-14
   Author:       Chris Dunlap <cdunlap@llnl.gov>
   LT_Current:   2
   LT_Revision:  0
