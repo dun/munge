@@ -11061,7 +11061,7 @@ echo "${ECHO_T}does not match (want=$req_libgcrypt_api got=$tmp)" >&6
   echo "$as_me:$LINENO: checking for OpenSSL installation" >&5
 echo $ECHO_N "checking for OpenSSL installation... $ECHO_C" >&6
 
-  _x_ac_path_openssl_dirs="/usr /usr/local /usr/local/openssl* /opt /opt/openssl* /opt/freeware /opt/freeware/openssl*"
+  _x_ac_path_openssl_dirs="/usr /usr/local /usr/local/openssl* /usr/sfw /opt /opt/openssl* /opt/freeware /opt/freeware/openssl*"
 
 
 # Check whether --with-openssl-prefix or --without-openssl-prefix was given.

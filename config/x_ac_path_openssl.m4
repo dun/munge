@@ -23,7 +23,7 @@
 AC_DEFUN([X_AC_PATH_OPENSSL], [
   AC_MSG_CHECKING([for OpenSSL installation])
 
-  _x_ac_path_openssl_dirs="/usr /usr/local /usr/local/openssl* /opt /opt/openssl* /opt/freeware /opt/freeware/openssl*"
+  _x_ac_path_openssl_dirs="/usr /usr/local /usr/local/openssl* /usr/sfw /opt /opt/openssl* /opt/freeware /opt/freeware/openssl*"
 
   AC_ARG_WITH(
     [openssl-prefix],
