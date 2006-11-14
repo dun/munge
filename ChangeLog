@@ -1,5 +1,9 @@
 2006-11-13  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/munged/cipher.c (HAVE_LIBGCRYPT:_cipher_final): Changed so
+	  memcpy() of decrypted plaintext only occurs if data exists after
+	  PKCS #5 block padding has been removed.
+
 	* src/munged/cipher.c, src/munged/mac.c, src/munged/md.c:
 	  Added log_msg()s at LOG_DEBUG to investigate infrequent "Unable to
 	  encrypt credential" errors when using the blowfish cipher with

@@ -410,10 +410,12 @@ _cipher_final (cipher_ctx *x, void *dst, int *dstlen)
         /*  Copy decrypted plaintext to dst.
          */
         n = x->blklen - pad;
-        if (*dstlen < n) {
-            return (-1);
+        if (n > 0) {
+            if (*dstlen < n) {
+                return (-1);
+            }
+            memcpy (dst, x->buf, n);
         }
-        memcpy (dst, x->buf, n);
         *dstlen = n;
     }
     return (0);
