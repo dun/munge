@@ -178,6 +178,7 @@ cipher_map_enum (munge_cipher_t cipher, void *dst)
 #include <gcrypt.h>
 #include <string.h>
 #include "common.h"
+#include "log.h"
 
 static int _cipher_update_aux (cipher_ctx *x, void *dst, int *dstlen,
     const void *src, int srclen);
@@ -186,26 +187,44 @@ static int
 _cipher_init (cipher_ctx *x, munge_cipher_t cipher,
               unsigned char *key, unsigned char *iv, int enc)
 {
-    int     algo;
-    int     len;
-    size_t *len_ptr = (size_t *) &len;
+    gcry_error_t  e;
+    int           algo;
+    int           len;
+    size_t       *len_ptr = (size_t *) &len;
 
     if (_cipher_map_enum (cipher, &algo) < 0) {
         return (-1);
     }
-    if (gcry_cipher_open (&(x->ctx), algo, GCRY_CIPHER_MODE_CBC, 0) != 0) {
+    e = gcry_cipher_open (&(x->ctx), algo, GCRY_CIPHER_MODE_CBC, 0);
+    if (e != 0) {
+        log_msg (LOG_DEBUG, "gcry_cipher_open failed for cipher=%d: %s",
+            cipher, gcry_strerror (e));
         return (-1);
     }
-    if (gcry_cipher_algo_info (algo, GCRYCTL_GET_KEYLEN, NULL, len_ptr) != 0) {
+    e = gcry_cipher_algo_info (algo, GCRYCTL_GET_KEYLEN, NULL, len_ptr);
+    if (e != 0) {
+        log_msg (LOG_DEBUG,
+            "gcry_cipher_algo_info failed for cipher=%d key length: %s",
+            cipher, gcry_strerror (e));
         return (-1);
     }
-    if (gcry_cipher_setkey (x->ctx, key, len) != 0) {
+    e = gcry_cipher_setkey (x->ctx, key, len);
+    if (e != 0) {
+        log_msg (LOG_DEBUG, "gcry_cipher_setkey failed for cipher=%d: %s",
+            cipher, gcry_strerror (e));
         return (-1);
     }
-    if (gcry_cipher_algo_info (algo, GCRYCTL_GET_BLKLEN, NULL, len_ptr) != 0) {
+    e = gcry_cipher_algo_info (algo, GCRYCTL_GET_BLKLEN, NULL, len_ptr);
+    if (e != 0) {
+        log_msg (LOG_DEBUG,
+            "gcry_cipher_algo_info failed for cipher=%d block length: %s",
+            cipher, gcry_strerror (e));
         return (-1);
     }
-    if (gcry_cipher_setiv (x->ctx, iv, len) != 0) {
+    e = gcry_cipher_setiv (x->ctx, iv, len);
+    if (e != 0) {
+        log_msg (LOG_DEBUG, "gcry_cipher_setiv failed for cipher=%d: %s",
+            cipher, gcry_strerror (e));
         return (-1);
     }
     x->do_encrypt = enc;
@@ -326,6 +345,9 @@ _cipher_update_aux (cipher_ctx *x, void *dst, int *dstlen_ptr,
         e = gcry_cipher_decrypt (x->ctx, dst, dstlen, src, srclen);
     }
     if (e != 0) {
+        log_msg (LOG_DEBUG, "%s failed: %s",
+            (x->do_encrypt ? "gcry_cipher_encrypt" : "gcry_cipher_decrypt"),
+            gcry_strerror (e));
         *dstlen_ptr = 0;
         return (-1);
     }
@@ -357,6 +379,9 @@ _cipher_final (cipher_ctx *x, void *dst, int *dstlen)
         /*  Final cipher block should always be full due to padding.
          */
         if (x->len != x->blklen) {
+            log_msg (LOG_DEBUG,
+                "Final decryption block has only %d of %d bytes",
+                x->len, x->blklen);
             return (-1);
         }
         /*  Perform in-place decryption of final cipher block.
@@ -371,10 +396,14 @@ _cipher_final (cipher_ctx *x, void *dst, int *dstlen)
          */
         pad = x->buf[x->blklen - 1];
         if ((pad <= 0) || (pad > x->blklen)) {
+            log_msg (LOG_DEBUG,
+                "Final decryption block has invalid pad=%d", pad);
             return (-1);
         }
         for (i = x->blklen - pad; i < x->blklen; i++) {
             if (x->buf[i] != pad) {
+                log_msg (LOG_DEBUG,
+                    "Final decryption block has padding error at byte %d", i);
                 return (-1);
             }
         }
@@ -402,13 +431,18 @@ _cipher_cleanup (cipher_ctx *x)
 static int
 _cipher_block_size (munge_cipher_t cipher)
 {
-    int    algo;
-    size_t nbytes;
+    gcry_error_t e;
+    int          algo;
+    size_t       nbytes;
 
     if (_cipher_map_enum (cipher, &algo) < 0) {
         return (-1);
     }
-    if (gcry_cipher_algo_info (algo, GCRYCTL_GET_BLKLEN, NULL, &nbytes) != 0) {
+    e = gcry_cipher_algo_info (algo, GCRYCTL_GET_BLKLEN, NULL, &nbytes);
+    if (e != 0) {
+        log_msg (LOG_DEBUG,
+            "gcry_cipher_algo_info failed for cipher=%d block length: %s",
+            cipher, gcry_strerror (e));
         return (-1);
     }
     return (nbytes);
@@ -425,13 +459,18 @@ _cipher_iv_size (munge_cipher_t cipher)
 static int
 _cipher_key_size (munge_cipher_t cipher)
 {
-    int    algo;
-    size_t nbytes;
+    gcry_error_t e;
+    int          algo;
+    size_t       nbytes;
 
     if (_cipher_map_enum (cipher, &algo) < 0) {
         return (-1);
     }
-    if (gcry_cipher_algo_info (algo, GCRYCTL_GET_KEYLEN, NULL, &nbytes) != 0) {
+    e = gcry_cipher_algo_info (algo, GCRYCTL_GET_KEYLEN, NULL, &nbytes);
+    if (e != 0) {
+        log_msg (LOG_DEBUG,
+            "gcry_cipher_algo_info failed for cipher=%d key length: %s",
+            cipher, gcry_strerror (e));
         return (-1);
     }
     return (nbytes);

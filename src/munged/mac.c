@@ -170,19 +170,25 @@ mac_map_enum (munge_mac_t mac, void *dst)
 #if HAVE_LIBGCRYPT
 
 #include <gcrypt.h>
+#include "log.h"
 
 static int
 _mac_init (mac_ctx *x, munge_mac_t md, const void *key, int keylen)
 {
-    int algo;
+    gcry_error_t e;
+    int          algo;
 
     if (md_map_enum (md, &algo) < 0) {
         return (-1);
     }
-    if (gcry_md_open (&(x->ctx), algo, GCRY_MD_FLAG_HMAC) != 0) {
+    if ((e = gcry_md_open (&(x->ctx), algo, GCRY_MD_FLAG_HMAC)) != 0) {
+        log_msg (LOG_DEBUG, "gcry_md_open failed for mac=%d hmac: %s",
+            md, gcry_strerror (e));
         return (-1);
     }
-    if (gcry_md_setkey (x->ctx, key, keylen) != 0) {
+    if ((e = gcry_md_setkey (x->ctx, key, keylen)) != 0) {
+        log_msg (LOG_DEBUG, "gcry_md_setkey failed for mac=%d hmac: %s",
+            md, gcry_strerror (e));
         return (-1);
     }
     x->diglen = gcry_md_get_algo_dlen (algo);
@@ -227,6 +233,7 @@ static int
 _mac_block (munge_mac_t md, const void *key, int keylen,
             void *dst, int *dstlen, const void *src, int srclen)
 {
+    gcry_error_t   e;
     int            algo;
     int            len;
     gcry_md_hd_t   ctx;
@@ -239,10 +246,14 @@ _mac_block (munge_mac_t md, const void *key, int keylen,
     if (*dstlen < len) {
         return (-1);
     }
-    if (gcry_md_open (&ctx, algo, GCRY_MD_FLAG_HMAC) != 0) {
+    if ((e = gcry_md_open (&ctx, algo, GCRY_MD_FLAG_HMAC)) != 0) {
+        log_msg (LOG_DEBUG, "gcry_md_open failed for mac=%d hmac: %s",
+            md, gcry_strerror (e));
         return (-1);
     }
-    if (gcry_md_setkey (ctx, key, keylen) != 0) {
+    if ((e = gcry_md_setkey (ctx, key, keylen)) != 0) {
+        log_msg (LOG_DEBUG, "gcry_md_setkey failed for mac=%d hmac: %s",
+            md, gcry_strerror (e));
         gcry_md_close (ctx);
         return (-1);
     }

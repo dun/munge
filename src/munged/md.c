@@ -168,16 +168,20 @@ md_map_enum (munge_mac_t md, void *dst)
 
 #include <gcrypt.h>
 #include <string.h>
+#include "log.h"
 
 static int
 _md_init (md_ctx *x, munge_mac_t md)
 {
-    int algo;
+    gcry_error_t e;
+    int          algo;
 
     if (_md_map_enum (md, &algo) < 0) {
         return (-1);
     }
-    if (gcry_md_open (&(x->ctx), algo, 0) != 0) {
+    if ((e = gcry_md_open (&(x->ctx), algo, 0)) != 0) {
+        log_msg (LOG_DEBUG, "gcry_md_open failed for mac=%d: %s",
+            md, gcry_strerror (e));
         return (-1);
     }
     x->diglen = gcry_md_get_algo_dlen (algo);
@@ -221,7 +225,10 @@ _md_cleanup (md_ctx *x)
 static int
 _md_copy (md_ctx *xdst, md_ctx *xsrc)
 {
-    if (gcry_md_copy (&(xdst->ctx), xsrc->ctx) != 0) {
+    gcry_error_t e;
+
+    if ((e = gcry_md_copy (&(xdst->ctx), xsrc->ctx)) != 0) {
+        log_msg (LOG_DEBUG, "gcry_md_copy failed: %s", gcry_strerror (e));
         return (-1);
     }
     return (0);
