@@ -62,11 +62,11 @@
  *  Data Types
  *****************************************************************************/
 
-/*  Munge context opaque data type
+/*  MUNGE context opaque data type
  */
 typedef struct munge_ctx * munge_ctx_t;
 
-/*  Munge context options
+/*  MUNGE context options
  */
 typedef enum munge_opt {
     MUNGE_OPT_CIPHER_TYPE       =  0,   /* symmetric cipher type (int)       */
@@ -82,7 +82,7 @@ typedef enum munge_opt {
     MUNGE_OPT_GID_RESTRICTION   = 10    /* GID able to decode cred (gid_t)   */
 } munge_opt_t;
 
-/*  Munge symmetric cipher types
+/*  MUNGE symmetric cipher types
  */
 typedef enum munge_cipher {
     MUNGE_CIPHER_NONE           =  0,   /* encryption disabled               */
@@ -93,9 +93,7 @@ typedef enum munge_cipher {
     MUNGE_CIPHER_AES256         =  5    /* AES CBC w/ 128b-blk/256b-key      */
 } munge_cipher_t;
 
-#define MUNGE_CIPHER_AES_128 MUNGE_CIPHER_AES128
-
-/*  Munge message authentication code types
+/*  MUNGE message authentication code types
  */
 typedef enum munge_mac {
     MUNGE_MAC_NONE              =  0,   /* mac disabled -- invalid, btw      */
@@ -106,7 +104,7 @@ typedef enum munge_mac {
     MUNGE_MAC_SHA256            =  5    /* SHA-256 w/ 256b-digest            */
 } munge_mac_t;
 
-/*  Munge compression types
+/*  MUNGE compression types
  */
 typedef enum munge_zip {
     MUNGE_ZIP_NONE              =  0,   /* compression disabled              */
@@ -115,26 +113,26 @@ typedef enum munge_zip {
     MUNGE_ZIP_ZLIB              =  3    /* zlib "deflate" by Gailly & Adler  */
 } munge_zip_t;
 
-/*  Munge credential time-to-live (in seconds)
+/*  MUNGE credential time-to-live (in seconds)
  */
 typedef enum munge_ttl {
     MUNGE_TTL_MAXIMUM           = -1,   /* maximum ttl allowed by daemon     */
     MUNGE_TTL_DEFAULT           =  0    /* default ttl specified by daemon   */
 } munge_ttl_t;
 
-/*  Munge UID restrictions for credential decoding
+/*  MUNGE UID restrictions for credential decoding
  */
 typedef enum munge_uid {
     MUNGE_UID_ANY               = -1    /* do not restrict decode via uid    */
 } munge_uid_t;
 
-/*  Munge GID restrictions for credential decoding
+/*  MUNGE GID restrictions for credential decoding
  */
 typedef enum munge_gid {
     MUNGE_GID_ANY               = -1    /* do not restrict decode via gid    */
 } munge_gid_t;
 
-/*  Munge enum types for str/int conversions
+/*  MUNGE enum types for str/int conversions
  */
 typedef enum munge_enum {
     MUNGE_ENUM_CIPHER           =  0,   /* cipher enum type                  */
@@ -142,7 +140,7 @@ typedef enum munge_enum {
     MUNGE_ENUM_ZIP              =  2    /* zip enum type                     */
 } munge_enum_t;
 
-/*  Munge error codes
+/*  MUNGE error codes
  *
  *  Error codes are in the range [1..255] in order to provide
  *    a meaningful return status when returned via exit().
@@ -168,6 +166,10 @@ typedef enum munge_err {
     EMUNGE_CRED_REPLAYED        = 17,   /* Credential replayed               */
     EMUNGE_CRED_UNAUTHORIZED    = 18    /* Credential decode unauthorized    */
 } munge_err_t;
+
+/*  MUNGE defines for backwards-compatibility
+ */
+#define MUNGE_CIPHER_AES_128 MUNGE_CIPHER_AES128
 
 
 /*****************************************************************************
