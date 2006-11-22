@@ -1,3 +1,6 @@
+munge-0.5.6 (2006-11-22):
+- Fixed bug causing build to fail without OpenSSL development header files.
+
 munge-0.5.5 (2006-11-14):
 - Added support for Libgcrypt.
 - Added support for AES-256 cipher.

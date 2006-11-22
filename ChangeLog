@@ -1,10 +1,12 @@
 2006-11-22  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* HISTORY, META, NEWS: Updated for 0.5.6 release.
+
 	* src/munged/auth_recv.h, src/munged/conf.h, src/munged/crypto.h,
 	  src/munged/thread.h: Tweaked formatting.
 
-	* src/munged/cred.h: Removed evp.h include to fix bug when building
-	  without libssl-dev.
+	* src/munged/cred.h: Removed evp.h include to fix bug causing build to
+	  fail without libssl-dev.
 
 2006-11-14  Chris Dunlap  <cdunlap@llnl.gov>
 
