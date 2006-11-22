@@ -31,7 +31,6 @@
 
 #include <inttypes.h>
 #include <munge.h>
-#include <openssl/evp.h>
 #include "munge_defs.h"
 #include "m_msg.h"
 
