@@ -1,5 +1,8 @@
 2006-11-22  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/munged/auth_recv.h, src/munged/conf.h, src/munged/crypto.h,
+	  src/munged/thread.h: Tweaked formatting.
+
 	* src/munged/cred.h: Removed evp.h include.
 
 2006-11-14  Chris Dunlap  <cdunlap@llnl.gov>

@@ -28,6 +28,7 @@
 #ifndef MUNGE_CONF_H
 #define MUNGE_CONF_H
 
+
 #include <inttypes.h>
 #include <munge.h>
 #include <netinet/in.h>

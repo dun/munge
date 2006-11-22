@@ -28,6 +28,7 @@
 #ifndef MUNGE_AUTH_SERVER_H
 #define MUNGE_AUTH_SERVER_H
 
+
 #include <sys/types.h>
 #include "m_msg.h"
 
