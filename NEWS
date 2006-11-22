@@ -1,5 +1,5 @@
 munge-0.5.6 (2006-11-22):
-- Fixed bug causing build to fail without OpenSSL development header files.
+- Fixed bug causing build using Libgcrypt to fail without OpenSSL headers.
 
 munge-0.5.5 (2006-11-14):
 - Added support for Libgcrypt.
