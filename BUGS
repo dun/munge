@@ -1,7 +1,1 @@
-- munged needs support for a configuration file; configuration is currently
-  set by src/libcommon/munge_defs.h at compile-time
-- munged replay state is not saved across sessions, thereby allowing
-  unexpired creds to be replayed after the daemon has been restarted
-- credentials cannot be restricted based on where they can be decoded
-  (eg, hostname/hostrange/regex or ip-addr/netmask)
-- munged hangs if client does not respond to auth req (auth via fd passing)
+- daemon hangs if client does not respond to auth-via-fd-passing req

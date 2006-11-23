@@ -1,11 +1,11 @@
--add pam support
+-implement rfc2898 pkcs5 pbkdf2 key derivation
 -add configuration file support
--save/restore replay state at munged shutdown/startup
 -add munged 'k' cmdline opt to kill daemon
--periodically stat keyfile and look for changed inode/mtime
--restrict decode to host/ip/range
+-save/restore replay state at munged shutdown/startup
+-restrict decode to hostname/hostrange/regex & ip-addr/netmask
+-add pam support
 -add realm (multi-key) support
+-periodically stat keyfile and look for changed inode/mtime
 -add server timeout for unresponsive clients
 -change remunge to exit on persistent errors
 -change remunge to stop and output results on sigint
--implement rfc2898 pkcs5 pbkdf2 key derivation procedure
