@@ -1,3 +1,8 @@
+2006-12-01  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* doc/credential_v3_format.txt: Added comment specifying encryption
+	  uses PKCS #5 padding.
+
 2006-11-23  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* BUGS, TODO: Updated.
