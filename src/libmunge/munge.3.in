@@ -46,14 +46,14 @@ munge_encode, munge_decode, munge_strerror \- MUNGE primary functions
 .fi
 
 .SH DESCRIPTION
-The \fBmunge_encode()\fR function creates a credential contained in a
+The \fBmunge_encode\fR() function creates a credential contained in a
 NUL-terminated base64 string.  A payload specified by a buffer \fIbuf\fR
 of length \fIlen\fR can be encapsulated in as well.  If the munge context
 \fIctx\fR is NULL, the default context will be used.  A pointer to the
 resulting credential is returned via \fIcred\fR; on error, it is set to NULL.
 The caller is responsible for freeing the memory referenced by \fIcred\fR.
 .PP
-The \fBmunge_decode()\fR function validates the NUL-terminated credential
+The \fBmunge_decode\fR() function validates the NUL-terminated credential
 \fIcred\fR.  If the munge context \fIctx\fR is not NULL, it will be set to
 that used to encode the credential.  If \fIbuf\fR and \fIlen\fR are not NULL,
 memory will be allocated for the encapsulated payload, \fIbuf\fR will be set
@@ -66,16 +66,16 @@ still be allocated if necessary.  The caller is responsible for freeing
 the memory referenced by \fIbuf\fR.  If \fIuid\fR or \fIgid\fR is not NULL,
 they will be set to the UID/GID of the process that created the credential.
 .PP
-The \fBmunge_strerror()\fR function returns a descriptive text string
+The \fBmunge_strerror\fR() function returns a descriptive text string
 describing the munge error number \fIe\fR.
 
 .SH RETURN VALUE
-The \fBmunge_encode()\fR and \fBmunge_decode()\fR functions return
+The \fBmunge_encode\fR() and \fBmunge_decode\fR() functions return
 \fBEMUNGE_SUCCESS\fR on success; otherwise, a munge error number is returned.
 If a munge context was used, it may contain a more detailed error message
-accessible via \fBmunge_ctx_strerror\fR.
+accessible via \fBmunge_ctx_strerror\fR().
 .PP
-The \fBmunge_strerror()\fR function returns a pointer to a NUL-terminated
+The \fBmunge_strerror\fR() function returns a pointer to a NUL-terminated
 constant text string; this string should not be freed or modified by the
 caller.
 
@@ -128,7 +128,7 @@ and decoding hosts do not match.  Another possibility is that the credential
 has been altered since it was encoded.
 .TP
 .B EMUNGE_CRED_EXPIRED
-The credential has expired.  This means more than 'ttl' seconds have elapsed
+The credential has expired.  This means more than TTL seconds have elapsed
 sinced the credential was encoded.  Another possibility is that the clocks
 on the encoding and decoding hosts are out of sync.
 .TP
@@ -184,7 +184,7 @@ main (int argc, char *argv[])
 .fi
 
 .SH NOTES
-Both \fBmunge_encode()\fR and \fBmunge_decode()\fR may allocate memory that
+Both \fBmunge_encode\fR() and \fBmunge_decode\fR() may allocate memory that
 the caller is responsible for freeing.  Failure to do so will result in a
 memory leak.
 

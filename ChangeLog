@@ -1,3 +1,13 @@
+2006-12-06  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/munged/munged.8.in: Fixed Description section to reflect the
+	  changes introduced with the v3 credential format where compression
+	  now takes place before the MAC calculation.
+	* src/libcommon/munge.7.in, src/libmunge/munge.3.in,
+	  src/libmunge/munge_ctx.3.in, src/libmunge/munge_enum.3.in,
+	  src/munge/munge.1.in, src/munge/remunge.1.in, src/munged/munged.8.in:
+	  Minor formatting, grammar, and spelling tweaks.
+
 2006-12-01  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* doc/credential_v3_format.txt: Added comment specifying encryption

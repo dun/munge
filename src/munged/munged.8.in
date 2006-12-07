@@ -39,21 +39,22 @@ and servicing their credential encode & decode requests.  All \fBmunged\fR
 daemons within a security realm share a secret key.  This key is used to
 protect the contents of a credential.
 .PP
-When a credential is created, \fBmunged\fR embeds various metadata within it
-including the effective UID and GID of the requesting client (as determined by
-\fBmunged\fR) and the current time (as determined by the local clock).  Next,
-it computes a message authentication code over this data.  Then, it compresses,
-encrypts, and base64-encodes the result before returning it to the client.
+When a credential is created, \fBmunged\fR embeds metadata within it
+including the effective UID and GID of the requesting client (as determined
+by \fBmunged\fR) and the current time (as determined by the local clock).
+It then compresses the data, computes a message authentication code, encrypts
+the data, and base64-encodes the result before returning the credential to
+the client.
 .PP
 When a credential is validated, \fBmunged\fR first checks the message
-authentication code to ensure the credential has not been subquently altered.
+authentication code to ensure the credential has not been subsequently altered.
 Next, it checks the embedded UID/GID restrictions to determine whether the
 requesting client is allowed to decode it.  Then, it checks the embedded
 encode time against the current time; if this difference exceeds the embedded
 time-to-live, the credential has expired.  Finally, it checks whether this
 credential has been previously decoded on this host; if so, the credential
-has been replayed.  The resulting metadata and payload are then returned to
-the client.
+has been replayed.  If all checks pass, the credential metadata and payload
+are returned to the client.
 
 .SH OPTIONS
 .TP

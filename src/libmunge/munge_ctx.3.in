@@ -50,62 +50,62 @@ munge_ctx_create, munge_ctx_copy, munge_ctx_destroy, munge_ctx_strerror, munge_c
 .fi
 
 .SH DESCRIPTION
-The \fBmunge_ctx_create()\fR function creates and returns a new munge context
+The \fBmunge_ctx_create\fR() function creates and returns a new munge context
 or NULL or error.
 .PP
-The \fBmunge_ctx_copy()\fR function copies the context \fIctx\fR, returning
+The \fBmunge_ctx_copy\fR() function copies the context \fIctx\fR, returning
 a new munge context or NULL on error.
 .PP
-The \fBmunge_ctx_destroy()\fR function destroys the context \fIctx\fR.
+The \fBmunge_ctx_destroy\fR() function destroys the context \fIctx\fR.
 .PP
-The \fBmunge_ctx_strerror()\fR function returns a descriptive text string
+The \fBmunge_ctx_strerror\fR() function returns a descriptive text string
 describing the munge error number according to the context \fIctx\fR, or
 NULL if no error condition exists.  This may provide a more detailed error
-message than that returned by \fBmunge_strerror()\fR.
+message than that returned by \fBmunge_strerror\fR().
 .PP
-The \fBmunge_ctx_get()\fR function gets the value for the option \fIopt\fR
+The \fBmunge_ctx_get\fR() function gets the value for the option \fIopt\fR
 associated with the munge context \fIctx\fR, storing the result in the
 subsequent pointer argument.  If the result is a string, that string should
 not be freed or modified by the caller.
 .PP
-The \fBmunge_ctx_set()\fR function sets the value for the option \fIopt\fR
+The \fBmunge_ctx_set\fR() function sets the value for the option \fIopt\fR
 associated with the munge context \fIctx\fR, using the value of the subsequent
 argument.
 
 .SH RETURN VALUE
-The \fBmunge_ctx_create()\fR and \fBmunge_ctx_copy()\fR functions return a
+The \fBmunge_ctx_create\fR() and \fBmunge_ctx_copy\fR() functions return a
 newly allocated munge context, or NULL on error.
 .PP
-The \fBmunge_cxt_strerror()\fR function returns a pointer to a NUL-terminated
+The \fBmunge_cxt_strerror\fR() function returns a pointer to a NUL-terminated
 constant text string; this string should not be freed or modified by the
 caller.
 .PP
-The \fBmunge_ctx_get()\fR and \fBmunge_ctx_set()\fR functions return
+The \fBmunge_ctx_get\fR() and \fBmunge_ctx_set\fR() functions return
 \fBEMUNGE_SUCCESS\fR on success; otherwise, a munge error number is returned.
 
 .SH "CONTEXT OPTIONS"
-The following context options can be queried via \fBmunge_ctx_get()\fR or
-specified via \fBmunge_ctx_set()\fR.  The type following each enumeration is
-the variable type used for the subsequent argument in \fBmunge_ctx_set()\fR,
+The following context options can be queried via \fBmunge_ctx_get\fR() or
+specified via \fBmunge_ctx_set\fR().  The type following each enumeration is
+the variable type used for the subsequent argument in \fBmunge_ctx_set\fR(),
 or the variable type of a pointer used for the subsequent argument in
-\fBmunge_ctx_get()\fR.
+\fBmunge_ctx_get\fR().
 .TP
 \fBMUNGE_OPT_CIPHER_TYPE\fR , \fIint\fR
-Get or set the cipher type (cf, \fBCIPHER TYPES\fR).
+Get or set the cipher type (cf., \fBCIPHER TYPES\fR).
 .TP
 \fBMUNGE_OPT_MAC_TYPE\fR , \fIint\fR
-Get or set the MAC type (cf, \fBMAC TYPES\fR).
+Get or set the MAC type (cf., \fBMAC TYPES\fR).
 .TP
 \fBMUNGE_OPT_ZIP_TYPE\fR , \fIint\fR
-Get or set the compression type (cf, \fBZIP TYPES\fR).
+Get or set the compression type (cf., \fBZIP TYPES\fR).
 .TP
 \fBMUNGE_OPT_REALM\fR , \fIchar *\fR
 Get or set the security realm, where the \fIchar *\fR type is a
-NUL-terminated character string.  The string returned by \fBmunge_ctx_get()\fR
+NUL-terminated character string.  The string returned by \fBmunge_ctx_get\fR()
 should not be freed or modified by the caller.  \fBNOT YET SUPPORTED\fR.
 .TP
 \fBMUNGE_OPT_TTL\fR , \fIint\fR
-Get or set the time-to-live (in seconds) (cf, \fBTTL TYPES\fR).
+Get or set the time-to-live (in seconds) (cf., \fBTTL TYPES\fR).
 This value controls how long the credential is valid once it has been encoded.
 .TP
 \fBMUNGE_OPT_ADDR4\fR , \fIstruct in_addr\fR
@@ -123,16 +123,16 @@ This option cannot be explicitly set.
 \fBMUNGE_OPT_SOCKET\fR , \fIchar *\fR
 Get or set the local domain socket for connecting with \fBmunged\fR, where
 the \fIchar *\fR type is a NUL-terminated character string.  The string
-returned by \fBmunge_ctx_get()\fR should not be freed or modified by the
+returned by \fBmunge_ctx_get\fR() should not be freed or modified by the
 caller.
 .TP
 \fBMUNGE_OPT_UID_RESTRICTION\fR , \fIuid_t\fR
-Get or set the UID allowed to decode the credential (cf, \fBUID & GID
+Get or set the UID allowed to decode the credential (cf., \fBUID & GID
 TYPES\fR).  This value will be matched against the effective user ID of the
 process requesting the credential decode.
 .TP
 \fBMUNGE_OPT_GID_RESTRICTION\fR , \fIgid_t\fR
-Get or set the GID allowed to decode the credential (cf, \fBUID & GID
+Get or set the GID allowed to decode the credential (cf., \fBUID & GID
 TYPES\fR).  This value will be matched against the effective group ID of
 the process requesting the credential decode, as well as each supplementary
 group of which the effective user ID of that process is a memeber.
@@ -240,7 +240,7 @@ good compression nonetheless.
 .SH "TTL TYPES"
 The time-to-live value specifies the number of seconds the credential is
 considered valid from the time it was encoded according to the clock on the
-host on which it was encoded.  In addition to specifying a integer value,
+host on which it was encoded.  In addition to specifying an integer value,
 the following types are available.
 .TP
 .B MUNGE_TTL_MAXIMUM
@@ -307,17 +307,17 @@ main (int argc, char *argv[])
 Abandoning a new or copied munge context without destroying it will result
 in a memory leak.
 .PP
-The context passed to \fBmunge_encode()\fR is treated read-only except
+The context passed to \fBmunge_encode\fR() is treated read-only except
 for the error message that is set when an error is returned.  The context
-passed to \fBmunge_decode()\fR is set according to the context used to encode
+passed to \fBmunge_decode\fR() is set according to the context used to encode
 the credential; however, on error, its settings may be in a state which is
 invalid for encoding.  Consequently, separate contexts should be used for
 encoding and decoding.
 .PP
 A context should not be shared between threads unless it is protected by a
 mutex; however, a better alternative is to use a separate context (or two)
-for each thread, either by creating a new one via \fBmunge_ctx_create()\fR
-or copying an existing one via \fBmunge_ctx_copy()\fR.
+for each thread, either by creating a new one via \fBmunge_ctx_create\fR()
+or copying an existing one via \fBmunge_ctx_copy\fR().
 
 .SH AUTHOR
 @META_AUTHOR@

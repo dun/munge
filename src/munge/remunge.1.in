@@ -94,8 +94,9 @@ credential decode, as well as each supplementary group of which the effective
 user ID of that process is a member.
 .TP
 .BI "-t, --ttl " integer
-Specify the time-to-live (in seconds).  A value of 0 selects the default ttl.
-A value of \-1 selects the maximum allowed ttl.
+Specify the time-to-live (in seconds).  This controls how long the credential
+is valid once it has been encoded.  A value of 0 selects the default TTL.
+A value of \-1 selects the maximum allowed TTL.
 .TP
 .BI "-S, --socket " string
 Specify the local domain socket for connecting with \fBmunged\fR.
@@ -114,8 +115,9 @@ K=kibibytes, M=mebibytes, G=gibibytes.
 Specify the number of threads to spawn for processing credentials.
 .TP
 .BI "-W, --warn-time " integer
-Specify the maximum number of seconds to allow for a given munge_encode() or
-munge_decode() operation before issuing a warning.
+Specify the maximum number of seconds to allow for a given
+\fBmunge_encode\fR() or \fBmunge_decode\fR() operation before issuing a
+warning.
 
 .SH "EXIT STATUS"
 The \fBremunge\fR program returns a zero exit code if the benchmark completes.

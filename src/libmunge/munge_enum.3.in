@@ -44,27 +44,27 @@ munge_enum_is_valid, munge_enum_int_to_str, munge_enum_str_to_int \- MUNGE enume
 .fi
 
 .SH DESCRIPTION
-The \fBmunge_enum_is_valid()\fR function checks if the given value \fIval\fR
+The \fBmunge_enum_is_valid\fR() function checks if the given value \fIval\fR
 is a valid MUNGE enumeration of the specified type \fItype\fR in the software
 configuration as currently compiled.  Some enumerations correspond to options
 that can only be enabled at compile-time.
 .PP
-The \fBmunge_enum_int_to_str()\fR function converts the MUNGE enumeration
+The \fBmunge_enum_int_to_str\fR() function converts the MUNGE enumeration
 \fIval\fR of the specified type \fItype\fR into a text string.
 .PP
-The \fBmunge_enum_str_to_int()\fR function converts the NUL-terminated
+The \fBmunge_enum_str_to_int\fR() function converts the NUL-terminated
 case-insensitive string \fIstr\fR into the corresponding MUNGE enumeration
 of the specified type \fItype\fR.
 
 .SH RETURN VALUE
-The \fBmunge_enum_is_valid()\fR function returns non-zero if the given value
+The \fBmunge_enum_is_valid\fR() function returns non-zero if the given value
 \fIval\fR is a valid enumeration.
 .PP
-The \fBmunge_enum_int_to_str()\fR function returns a NUL-terminated constant
+The \fBmunge_enum_int_to_str\fR() function returns a NUL-terminated constant
 text string, or NULL on error; this string should not be freed or modified by
 the caller.
 .PP
-The \fBmunge_enum_str_to_int()\fR function returns a MUNGE enumeration on
+The \fBmunge_enum_str_to_int\fR() function returns a MUNGE enumeration on
 success (i.e., >= 0), or \-1 on error.
 
 .SH "ENUM TYPES"

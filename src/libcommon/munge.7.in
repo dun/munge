@@ -27,7 +27,7 @@
 .TH MUNGE 7 "@META_DATE@" "@META_ALIAS@" "MUNGE Uid 'N' Gid Emporium"
 
 .SH NAME
-munge \- MUNGE Uid 'N' Gid Emporium
+munge \- MUNGE overview
 
 .SH INTRODUCTION
 MUNGE (MUNGE Uid 'N' Gid Emporium) is an authentication service for creating
