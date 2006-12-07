@@ -214,7 +214,7 @@ received as much scrutiny by the public cryptographic community as SHA-1 has,
 and so its cryptographic security is not yet as well-established.  However,
 no attacks have yet been reported against it.
 
-.SH "COMPRESSION TYPES"
+.SH "ZIP TYPES"
 If a compression type is specified, a payload-bearing credential will be
 compressed accordingly.  However, if the resulting compressed data is larger
 than the original uncompressed data, the uncompressed data will be restored
