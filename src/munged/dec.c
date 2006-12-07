@@ -34,7 +34,9 @@
 #include <errno.h>
 #include <sys/types.h>                  /* include before in.h for bsd */
 #include <netinet/in.h>
+#include <stdlib.h>
 #include <string.h>
+#include <time.h>
 #include "auth_recv.h"
 #include "base64.h"
 #include "cipher.h"

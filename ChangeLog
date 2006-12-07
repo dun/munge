@@ -1,5 +1,7 @@
 2006-12-06  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/munged/dec.c: Added missing stdlib.h & time.h #includes.
+
 	* src/libmunge/munge_ctx.3.in: Renamed "COMPRESSION TYPES" section
 	  header to "ZIP TYPES".
 
