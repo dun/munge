@@ -156,7 +156,7 @@ void
 log_err (int status, int priority, const char *format, ...)
 {
     va_list vargs;
-    char    msg[1024];
+    char    msg [LOG_BUFFER_MAXLEN];
 
     va_start (vargs, format);
     _log_aux (0, priority, msg, sizeof (msg), format, vargs);
@@ -171,7 +171,7 @@ void
 log_errno (int status, int priority, const char *format, ...)
 {
     va_list vargs;
-    char    msg[1024];
+    char    msg [LOG_BUFFER_MAXLEN];
 
     va_start (vargs, format);
     _log_aux (errno, priority, msg, sizeof (msg), format, vargs);
