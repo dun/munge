@@ -235,6 +235,7 @@ daemonize_init (char *progname)
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to create child process");
     }
     else if (pid > 0) {
+        log_set_err_pipe (-1);
         if (close (fds[1]) < 0) {
             log_errno (EMUNGE_SNAFU, LOG_ERR,
                 "Unable to close write-pipe in parent process");
