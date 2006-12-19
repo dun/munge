@@ -121,6 +121,13 @@ gids_create (void)
 {
     gids_t gids;
 
+    assert (conf != NULL);
+
+    /*  If the GIDs update interval is -1, skip the GIDs mapping altogether.
+     */
+    if (conf->gids_interval < 0) {
+        return (NULL);
+    }
     if (!(gids = malloc (sizeof (*gids)))) {
         log_errno (EMUNGE_NO_MEMORY, LOG_ERR,
             "Unable to allocate gids struct");
@@ -183,7 +190,7 @@ gids_is_member (gids_t gids, uid_t uid, gid_t gid)
     if ((errno = pthread_mutex_lock (&gids->lock)) != 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to lock gids mutex");
     }
-    if ((g = hash_find (gids->hash, &uid)) != NULL) {
+    if ((gids->hash) && (g = hash_find (gids->hash, &uid))) {
         assert (g->gid == (gid_t) uid);
         for (g = g->next; g && g->gid <= gid; g = g->next) {
             if (g->gid == gid) {
@@ -260,9 +267,14 @@ _gids_update (gids_t gids)
         hash_destroy (hash_bak);
         t_last_update = t_now;
     }
-    if (timer_set_relative (
-      (callback_f) _gids_update, gids, MUNGE_GROUP_PARSE_TIMER * 1000) < 0) {
-        log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to set gids timer");
+    /*  Enable subsequent updating of the GIDs mapping only if the update
+     *    interval is positive.
+     */
+    if (conf->gids_interval > 0) {
+        if (timer_set_relative (
+          (callback_f) _gids_update, gids, conf->gids_interval * 1000) < 0) {
+            log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to set gids timer");
+        }
     }
     return;
 }

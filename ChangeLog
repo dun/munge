@@ -1,3 +1,15 @@
+2006-12-18  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* : Added support for supplemental group info to be computed only once
+	    or never.
+	* src/libcommon/munge_defs.h:
+	  Changed MUNGE_GROUP_PARSE_TIMER from 900 seconds to 3600 seconds.
+	* src/munged/conf.h: Added gids_interval to struct conf.
+	* src/munged/conf.c (create_conf): Initialized gids & gids_interval.
+	* src/munged/gids.h: Tweaked gids_create() documentation.
+	* src/munged/gids.c: Added support for GIDs mapping to be computed
+	  only once if interval=0, and skipped altogether if interval=-1.
+
 2006-12-12  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/libcommon/log.c (log_err, log_errno): Replaced magic number 1024

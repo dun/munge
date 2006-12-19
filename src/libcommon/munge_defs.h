@@ -107,8 +107,10 @@
 #define MUNGE_GROUP_STAT_FLAG           1
 
 /*  Integer for the number of seconds between updating group information.
+ *  If set to 0, the GIDs mapping will be computed initially but never updated.
+ *  If set to -1, the GIDs mapping will be skipped altogether.
  */
-#define MUNGE_GROUP_PARSE_TIMER         900
+#define MUNGE_GROUP_PARSE_TIMER         3600
 
 /*  Flag to allow previously-decoded credentials to be retried.
  *  If the client receives a socket error while communicating with the

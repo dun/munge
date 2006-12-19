@@ -144,6 +144,8 @@ create_conf (void)
     conf->dek_key_len = 0;
     conf->mac_key = NULL;
     conf->mac_key_len = 0;
+    conf->gids = NULL;
+    conf->gids_interval = MUNGE_GROUP_PARSE_TIMER;
     conf->nthreads = MUNGE_THREADS;
 
 #ifdef MUNGE_AUTH_RECVFD

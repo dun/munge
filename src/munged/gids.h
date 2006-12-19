@@ -53,8 +53,7 @@ typedef struct gids * gids_t;
 gids_t gids_create (void);
 /*
  *  Creates a list of supplementary GIDs for each UID based on information
- *    in /etc/group.  This information will be updated according to the
- *    time interval specified by MUNGE_GROUP_PARSE_TIMER.
+ *    from getgrent().
  *  Returns this GIDs mapping or dies trying.
  */
 
