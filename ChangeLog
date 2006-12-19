@@ -1,5 +1,8 @@
 2006-12-18  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/munged/gids.c: Added caching of uids from getpwnam().
+	* src/munged/gids.h: Added UIDS_HASH_SIZE define.
+
 	* : Added support for supplemental group info to be computed only once
 	    or never.
 	* src/libcommon/munge_defs.h:
