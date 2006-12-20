@@ -98,11 +98,11 @@
  */
 #define MUNGE_MINIMUM_SECRET_KEY_LEN    32
 
-/*  Flag to denote that group information comes from "/etc/group".
- *  If set, group information will not be re-parsed unless this file
+/*  Flag to denote whether group information comes from "/etc/group".
+ *  If set, group information will not be updated unless this file
  *    modification time changes.  If not set, the file modification time
- *    will be ignored and group information will be re-parsed via getgrent()
- *    every time the MUNGE_GROUP_PARSE_TIMER expires.
+ *    will be ignored and group information will be updated via getgrent()
+ *    every time the "gids map" update timer expires.
  */
 #define MUNGE_GROUP_STAT_FLAG           1
 

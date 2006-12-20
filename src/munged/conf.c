@@ -111,9 +111,9 @@ create_conf (void)
     conf->got_clock_skew = 1;
     conf->got_force = 0;
     conf->got_foreground = 0;
-    conf->got_group_stat = MUNGE_GROUP_STAT_FLAG;
-    conf->got_replay_retry = MUNGE_REPLAY_RETRY_FLAG;
-    conf->got_root_auth = MUNGE_AUTH_ROOT_ALLOW_FLAG;
+    conf->got_group_stat = !! MUNGE_GROUP_STAT_FLAG;
+    conf->got_replay_retry = !! MUNGE_REPLAY_RETRY_FLAG;
+    conf->got_root_auth = !! MUNGE_AUTH_ROOT_ALLOW_FLAG;
     conf->def_cipher = MUNGE_DEFAULT_CIPHER;
     conf->def_zip = zip_select_default_type (MUNGE_DEFAULT_ZIP);
     conf->def_mac = MUNGE_DEFAULT_MAC;

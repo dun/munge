@@ -1,3 +1,21 @@
+2006-12-19  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/munged/munged.c (main): Moved handle_signals() to after
+	  daemonize_init().
+	* src/munged/munged.c (hup_handler): Added to invoke gids_update().
+	* src/munged/gids.h: Changed prototype for gids_create().
+	  Added gids_update().
+	* src/munged/gids.c (gids_create): Initialized timer, interval, and
+	  do_group_stat vars that were added to struct gids.
+	* src/munged/gids.c (gids_update): Added public function to schedule
+	  an immediate update.
+	* src/munged/gids.c (_gids_update): Set do_group_stat flag to -1 on
+	  stat() error, and resurrect it in gids_update() if enabled.
+	* src/munged/conf.c (create_conf): Set conf flags via "!!" to ensure
+	  proper boolean coversions.
+	* src/munged/munged.8.in: Documented signals.
+	* src/libcommon/munge_defs.h: Tweaked MUNGE_GROUP_STAT_FLAG docs.
+
 2006-12-18  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/munged/gids.c: Added caching of uids from getpwnam().

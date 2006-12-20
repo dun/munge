@@ -64,6 +64,7 @@
  *****************************************************************************/
 
 static void handle_signals (void);
+static void hup_handler (int signum);
 static void exit_handler (int signum);
 static void segv_handler (int signum);
 static int  daemonize_init (char *progname);
@@ -96,10 +97,9 @@ main (int argc, char *argv[])
 #endif /* NDEBUG */
     log_open_file (stderr, argv[0], priority, LOG_OPT_PRIORITY);
 
-    handle_signals ();
-
     conf = create_conf ();
     parse_cmdline (conf, argc, argv);
+    conf->gids = gids_create (conf->gids_interval, conf->got_group_stat);
     auth_recv_init (conf->auth_server_dir, conf->auth_client_dir,
         conf->got_force);
 
@@ -107,6 +107,7 @@ main (int argc, char *argv[])
         fd = daemonize_init (argv[0]);
         open_logfile (conf->logfile_name, priority, conf->got_force);
     }
+    handle_signals ();
     lookup_ip_addr (conf);
     write_pidfile (conf->pidfile_name, conf->got_force);
 
@@ -118,7 +119,6 @@ main (int argc, char *argv[])
         }
     }
     create_subkeys (conf);
-    conf->gids = gids_create ();
     replay_init ();
     timer_init ();
     sock_create (conf);
@@ -149,8 +149,8 @@ main (int argc, char *argv[])
 static void
 handle_signals (void)
 {
-    if (posignal (SIGHUP, SIG_IGN) == SIG_ERR) {
-        log_err (EMUNGE_SNAFU, LOG_ERR, "Unable to ignore signal=%d", SIGHUP);
+    if (posignal (SIGHUP, hup_handler) == SIG_ERR) {
+        log_err (EMUNGE_SNAFU, LOG_ERR, "Unable to handle signal=%d", SIGHUP);
     }
     if (posignal (SIGINT, exit_handler) == SIG_ERR) {
         log_err (EMUNGE_SNAFU, LOG_ERR, "Unable to handle signal=%d", SIGINT);
@@ -163,6 +163,16 @@ handle_signals (void)
     }
     if (posignal (SIGPIPE, SIG_IGN) == SIG_ERR) {
         log_err (EMUNGE_SNAFU, LOG_ERR, "Unable to ignore signal=%d", SIGPIPE);
+    }
+    return;
+}
+
+
+static void
+hup_handler (int signum)
+{
+    if (conf) {
+        gids_update (conf->gids);
     }
     return;
 }

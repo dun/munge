@@ -41,7 +41,6 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <munge.h>
-#include "conf.h"
 #include "gids.h"
 #include "hash.h"
 #include "log.h"
@@ -84,6 +83,9 @@
 struct gids {
     pthread_mutex_t     lock;           /* mutex for accessing struct        */
     hash_t              hash;           /* hash of GIDs mappings             */
+    int                 timer;          /* timer ID for next GIDs map update */
+    int                 interval;       /* seconds between GIDs map updates  */
+    int                 do_group_stat;  /* true if updates stat group file   */
 };
 
 struct gids_node {
@@ -129,15 +131,13 @@ static void         _gids_dump_uid (gids_uid_t u, char *user, void *null);
  *****************************************************************************/
 
 gids_t
-gids_create (void)
+gids_create (int interval, int do_group_stat)
 {
     gids_t gids;
 
-    assert (conf != NULL);
-
     /*  If the GIDs update interval is -1, skip the GIDs mapping altogether.
      */
-    if (conf->gids_interval < 0) {
+    if (interval < 0) {
         return (NULL);
     }
     if (!(gids = malloc (sizeof (*gids)))) {
@@ -148,16 +148,10 @@ gids_create (void)
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to init gids mutex");
     }
     gids->hash = NULL;
-    /*
-     *  Compute the GIDs mapping in the background by setting an expired timer.
-     *  Normally, I'd like this mapping to exist before the daemon starts
-     *    accepting requests, but I've observed this processing to take a
-     *    while on certain platforms.  The daemon can still function without
-     *    a mapping -- gids_is_member() simply returns false until it exists.
-     */
-    if (timer_set_relative ((callback_f) _gids_update, gids, 0) < 0) {
-        log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to set gids timer");
-    }
+    gids->timer = 0;
+    gids->interval = interval;
+    gids->do_group_stat = do_group_stat;
+    gids_update (gids);
     return (gids);
 }
 
@@ -172,6 +166,10 @@ gids_destroy (gids_t gids)
     }
     if ((errno = pthread_mutex_lock (&gids->lock)) != 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to lock gids mutex");
+    }
+    if (gids->timer > 0) {
+        timer_cancel (gids->timer);
+        gids->timer = 0;
     }
     h = gids->hash;
     gids->hash = NULL;
@@ -189,6 +187,36 @@ gids_destroy (gids_t gids)
 }
 
 
+void
+gids_update (gids_t gids)
+{
+    if (!gids) {
+        return;
+    }
+    if ((errno = pthread_mutex_lock (&gids->lock)) != 0) {
+        log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to lock gids mutex");
+    }
+    if (gids->timer > 0) {
+        timer_cancel (gids->timer);
+    }
+    /*  Compute the GIDs mapping in the background by setting an expired timer.
+     */
+    gids->timer = timer_set_relative ((callback_f) _gids_update, gids, 0);
+    if (gids->timer < 0) {
+        log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to set gids update timer");
+    }
+    /*  Reset the do_group_stat flag in case it had been disabled on error
+     *    (ie, set to -1).
+     */
+    gids->do_group_stat = !! gids->do_group_stat;
+
+    if ((errno = pthread_mutex_unlock (&gids->lock)) != 0) {
+        log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to unlock gids mutex");
+    }
+    return;
+}
+
+
 int
 gids_is_member (gids_t gids, uid_t uid, gid_t gid)
 {
@@ -196,7 +224,6 @@ gids_is_member (gids_t gids, uid_t uid, gid_t gid)
     int         is_member = 0;
 
     if (!gids) {
-        errno = EINVAL;
         return (0);
     }
     if ((errno = pthread_mutex_lock (&gids->lock)) != 0) {
@@ -242,11 +269,13 @@ _gids_update (gids_t gids)
 
     assert (gids != NULL);
 
+    log_msg (LOG_DEBUG, "Performing gids update");
     if (time (&t_now) == (time_t) -1) {
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to query current time");
     }
-    if (conf->got_group_stat) {
+    if (gids->do_group_stat > 0) {
         if (stat (GIDS_GROUP_FILE, &st) < 0) {
+            gids->do_group_stat = -1;
             log_msg (LOG_ERR, "Unable to stat \"%s\": %s",
                 GIDS_GROUP_FILE, strerror (errno));
         }
@@ -282,11 +311,21 @@ _gids_update (gids_t gids)
     /*  Enable subsequent updating of the GIDs mapping only if the update
      *    interval is positive.
      */
-    if (conf->gids_interval > 0) {
-        if (timer_set_relative (
-          (callback_f) _gids_update, gids, conf->gids_interval * 1000) < 0) {
-            log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to set gids timer");
+    if ((errno = pthread_mutex_lock (&gids->lock)) != 0) {
+        log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to lock gids mutex");
+    }
+    gids->timer = 0;
+
+    if (gids->interval > 0) {
+        gids->timer = timer_set_relative (
+                (callback_f) _gids_update, gids, gids->interval * 1000);
+        if (gids->timer < 0) {
+            log_errno (EMUNGE_SNAFU, LOG_ERR,
+                "Unable to reset gids update timer");
         }
+    }
+    if ((errno = pthread_mutex_unlock (&gids->lock)) != 0) {
+        log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to unlock gids mutex");
     }
     return;
 }

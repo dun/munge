@@ -51,16 +51,24 @@ typedef struct gids * gids_t;
  *  Functions
  *****************************************************************************/
 
-gids_t gids_create (void);
+gids_t gids_create (int interval, int do_group_stat);
 /*
  *  Creates a list of supplementary GIDs for each UID based on information
  *    from getgrent().
- *  Returns this GIDs mapping or dies trying.
+ *  The [interval] is the number of seconds between updates.
+ *  The [do_group_stat] flag specifies whether the /etc/group mtime is
+ *    checked to determine if updates are needed.
+ *  Returns a GIDs mapping or dies trying.
  */
 
 void gids_destroy (gids_t gids);
 /*
  *  Destroys the GIDs mapping [gids].
+ */
+
+void gids_update (gids_t gids);
+/*
+ *  Updates the GIDs mapping [gids].
  */
 
 int gids_is_member (gids_t gids, uid_t uid, gid_t gid);

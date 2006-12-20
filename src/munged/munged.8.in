@@ -100,7 +100,15 @@ This option will be removed once configuration file support is added.
 Specify the number of threads to spawn for processing credential requests.
 This option will be removed once configuration file support is added.
 
-.\" .SH SIGNALS
+.SH SIGNALS
+.TP
+.B SIGHUP
+Immediately update the supplementary group membership mapping instead of
+waiting for the next scheduled update; this mapping is used when restricting
+credentials by GID.
+.TP
+.B SIGTERM
+Terminate the daemon.
 
 .\" .SH FILES
 
