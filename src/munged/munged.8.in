@@ -125,8 +125,8 @@ All clocks within a security realm must be kept in sync within the credential
 time-to-live setting.
 .PP
 While \fBmunged\fR prevents a given credential from being decoded on a
-particular host more than once, nothing prevents it from being decoded on
-another host within the security realm before it expires.
+particular host more than once, nothing prevents a credential from being
+decoded on multiple hosts within the security realm before it expires.
 
 .SH AUTHOR
 @META_AUTHOR@

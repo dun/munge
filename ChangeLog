@@ -1,3 +1,7 @@
+2006-12-20  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/munged/munged.8.in: Tweaked notes section.
+
 2006-12-19  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/munged/munged.8.in: Tweaked docs for --group-update-time.
