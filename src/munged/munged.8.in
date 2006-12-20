@@ -99,9 +99,8 @@ the file has been modified since the last update.
 .BI "--group-update-time " integer
 Specify the number of seconds between updates to the supplementary group
 membership mapping; this mapping is used when restricting credentials by GID.
-A value of 0 causes this mapping to be computed initially but never updated
-(unless by a \fBSIGHUP\fR).  A value of \-1 causes this mapping to be disabled
-altogether.
+A value of 0 causes it to be computed initially but never updated (unless
+triggered by a \fBSIGHUP\fR).  A value of \-1 causes it to be disabled.
 .TP
 .BI "--key-file " file
 Specify an alternate secret key file.
