@@ -108,7 +108,7 @@
 
 /*  Integer for the number of seconds between updating group information.
  *  If set to 0, the GIDs mapping will be computed initially but never updated.
- *  If set to -1, the GIDs mapping will be skipped altogether.
+ *  If set to -1, the GIDs mapping will be disabled altogether.
  */
 #define MUNGE_GROUP_UPDATE_TIMER        3600
 

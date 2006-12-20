@@ -1,5 +1,7 @@
 2006-12-19  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/libcommon/munge_defs.h: Tweaked comment.
+
 	* src/libcommon/munge_defs.h:
 	  Renamed MUNGE_GROUP_PARSE_TIMER to MUNGE_GROUP_UPDATE_TIMER.
 	* src/munged/conf.c (create_conf):
