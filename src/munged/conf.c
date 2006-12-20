@@ -69,12 +69,14 @@ struct option opt_table[] = {
     { "foreground", 0, NULL, 'F' },
     { "socket",     1, NULL, 'S' },
     { "advice",     0, NULL, 'A' },
-    { "key-file",        1, NULL, '0' },
-    { "num-threads",     1, NULL, '1' },
+    { "key-file",          1, NULL, '0' },
+    { "num-threads",       1, NULL, '1' },
 #ifdef MUNGE_AUTH_RECVFD
-    { "auth-server-dir", 1, NULL, '2' },
-    { "auth-client-dir", 1, NULL, '3' },
+    { "auth-server-dir",   1, NULL, '2' },
+    { "auth-client-dir",   1, NULL, '3' },
 #endif /* MUNGE_AUTH_RECVFD */
+    { "check-group-mtime", 1, NULL, '4' },
+    { "group-update-time", 1, NULL, '5' },
     {  NULL,        0, NULL,  0  }
 };
 
@@ -226,6 +228,8 @@ parse_cmdline (conf_t conf, int argc, char **argv)
 {
     char *prog;
     int   c;
+    long  l;
+    char *p;
 
     opterr = 0;                         /* suppress default getopt err msgs */
 
@@ -276,8 +280,13 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                         "Cannot dup key-file name string");
                 break;
             case '1':
-                if ((c = atoi (optarg)) > 0)
-                    conf->nthreads = c;
+                l = strtol (optarg, &p, 10);
+                if ((optarg == p) || (*p != '\0')
+                        || (l <= 0) || (l > INT_MAX)) {
+                    log_err (EMUNGE_SNAFU, LOG_ERR,
+                        "Invalid value \"%s\" for num-threads", optarg);
+                }
+                conf->nthreads = l;
                 break;
 #ifdef MUNGE_AUTH_RECVFD
             case '2':
@@ -295,6 +304,23 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                         "Cannot dup auth-client-dir cmdline string");
                 break;
 #endif /* MUNGE_AUTH_RECVFD */
+            case '4':
+                l = strtol (optarg, &p, 10);
+                if ((optarg == p) || (*p != '\0')) {
+                    log_err (EMUNGE_SNAFU, LOG_ERR,
+                        "Invalid value \"%s\" for check-group-mtime", optarg);
+                }
+                conf->got_group_stat = !! l;
+                break;
+            case '5':
+                l = strtol (optarg, &p, 10);
+                if ((optarg == p) || (*p != '\0')
+                        || (l < INT_MIN) || (l > INT_MAX)) {
+                    log_err (EMUNGE_SNAFU, LOG_ERR,
+                        "Invalid value \"%s\" for group-update-time", optarg);
+                }
+                conf->gids_interval = l;
+                break;
             /* End deprecated cmdline opts */
             case '?':
                 if (optopt > 0)
@@ -361,6 +387,14 @@ display_help (char *prog)
     printf ("  %*s %s [%s]\n", w, "--auth-client-dir=DIR",
             "Specify auth-client directory", MUNGE_AUTH_CLIENT_DIR);
 #endif /* MUNGE_AUTH_RECVFD */
+
+    printf ("  %*s Specify whether to check \"%s\" mtime [%d]\n",
+            w, "--check-group-mtime=BOOL", GIDS_GROUP_FILE,
+            MUNGE_GROUP_STAT_FLAG);
+
+    printf ("  %*s %s [%d]\n", w, "--group-update-time=INT",
+            "Specify seconds between group info updates",
+            MUNGE_GROUP_UPDATE_TIMER);
 
     printf ("  %*s %s [%s]\n", w, "--key-file=PATH",
             "Specify secret key file", MUNGED_SECRET_KEY);

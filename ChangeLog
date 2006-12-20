@@ -1,5 +1,13 @@
 2006-12-19  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/munged/conf.c:
+	  Added --check-group-mtime and --group-update-time.
+	* src/munged/munged.8.in:
+	  Documented --check-group-mtime and --group-update-time.
+	* src/munged/gids.c (gids_create): Added log messages.
+	* src/munged/gids.h: Added GIDS_GROUP_FILE from gids.c.
+	* src/munged/munged.c (main): Moved gids_create() lower.
+
 	* src/libcommon/munge_defs.h: Tweaked comment.
 
 	* src/libcommon/munge_defs.h:

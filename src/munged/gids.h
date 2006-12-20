@@ -33,6 +33,7 @@
  *  Constants
  *****************************************************************************/
 
+#define GIDS_GROUP_FILE         "/etc/group"
 #define GIDS_HASH_SIZE          2053
 #define UIDS_HASH_SIZE          4099
 

@@ -71,10 +71,6 @@
 #  define GIDS_DEBUG            0
 #endif /* !GIDS_DEBUG */
 
-#ifndef GIDS_GROUP_FILE
-#  define GIDS_GROUP_FILE       "/etc/group"
-#endif /* !GIDS_GROUP_FILE */
-
 
 /*****************************************************************************
  *  Data Types
@@ -135,9 +131,10 @@ gids_create (int interval, int do_group_stat)
 {
     gids_t gids;
 
-    /*  If the GIDs update interval is -1, skip the GIDs mapping altogether.
+    /*  If the GIDs update interval is negative, disable the GIDs mapping.
      */
     if (interval < 0) {
+        log_msg (LOG_INFO, "Disabled supplementary group mapping");
         return (NULL);
     }
     if (!(gids = malloc (sizeof (*gids)))) {
@@ -152,6 +149,17 @@ gids_create (int interval, int do_group_stat)
     gids->interval = interval;
     gids->do_group_stat = do_group_stat;
     gids_update (gids);
+
+    if (gids->interval == 0) {
+        log_msg (LOG_INFO, "Disabled updates to supplementary group mapping");
+    }
+    else {
+        log_msg (LOG_INFO,
+            "Updating supplementary group mapping every %d seconds", interval);
+    }
+    log_msg (LOG_INFO, "%s supplementary group mtime check of \"%s\"",
+        (do_group_stat ? "Enabled" : "Disabled"), GIDS_GROUP_FILE);
+
     return (gids);
 }
 
@@ -269,7 +277,7 @@ _gids_update (gids_t gids)
 
     assert (gids != NULL);
 
-    log_msg (LOG_DEBUG, "Performing gids update");
+    log_msg (LOG_DEBUG, "Updating supplementary group mapping");
     if (time (&t_now) == (time_t) -1) {
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to query current time");
     }

@@ -99,7 +99,6 @@ main (int argc, char *argv[])
 
     conf = create_conf ();
     parse_cmdline (conf, argc, argv);
-    conf->gids = gids_create (conf->gids_interval, conf->got_group_stat);
     auth_recv_init (conf->auth_server_dir, conf->auth_client_dir,
         conf->got_force);
 
@@ -119,6 +118,7 @@ main (int argc, char *argv[])
         }
     }
     create_subkeys (conf);
+    conf->gids = gids_create (conf->gids_interval, conf->got_group_stat);
     replay_init ();
     timer_init ();
     sock_create (conf);
