@@ -1,5 +1,10 @@
 2006-12-19  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/libcommon/munge_defs.h:
+	  Renamed MUNGE_GROUP_PARSE_TIMER to MUNGE_GROUP_UPDATE_TIMER.
+	* src/munged/conf.c (create_conf):
+	  Changed MUNGE_GROUP_PARSE_TIMER to MUNGE_GROUP_UPDATE_TIMER.
+
 	* src/munged/munged.c (main): Moved handle_signals() to after
 	  daemonize_init().
 	* src/munged/munged.c (hup_handler): Added to invoke gids_update().
