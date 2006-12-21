@@ -647,7 +647,7 @@ _gids_dump_uid_hash (hash_t uid_hash)
     int n;
 
     n = hash_count (uid_hash);
-    printf ("* UID Dump (%d UID%s):\n", n, ((n == 1) ? "" : "s"));
+    printf ("* UID Dump (%d user%s):\n", n, ((n == 1) ? "" : "s"));
     hash_for_each (uid_hash, (hash_arg_f) _gids_dump_uid_node, NULL);
     return;
 }
