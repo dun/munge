@@ -1,5 +1,9 @@
 2006-12-20  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/munged/gids.c: Removed the need for casting the gids hash key
+	  uid_t to a gid_t by making the gids hash return a struct gids_head
+	  that points to a singly-linked list of struct gids_nodes.
+
 	* src/munged/munged.8.in: Tweaked notes section.
 
 2006-12-19  Chris Dunlap  <cdunlap@llnl.gov>

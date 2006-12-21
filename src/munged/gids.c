@@ -52,10 +52,9 @@
  *  Notes
  *****************************************************************************/
 /*
- *  The gids hash contains a singly-linked list of gids_nodes for each UID
- *    having supplementary groups.  The GIDs in each list of gids_node are
- *    sorted in increasing order without duplicates.  The first gids_node in
- *    the list is special -- it contains the associated UID (cast to a gid_t).
+ *  The gids hash contains a gids_head pointing to a singly-linked list of
+ *    gids_nodes for each UID with supplementary groups.  The GIDs in each
+ *    list of gids_nodes are sorted in increasing order without duplicates.
  *
  *  The non-reentrant passwd/group functions are not an issue since this
  *    routine is the only place where they are used within the daemon.  There
@@ -89,13 +88,19 @@ struct gids_node {
     gid_t               gid;
 };
 
+struct gids_head {
+    struct gids_node   *next;
+    uid_t               uid;
+};
+
 struct gids_uid {
     char               *user;
     uid_t               uid;
 };
 
 typedef struct gids_node * gids_node_t;
-typedef struct gids_uid * gids_uid_t;
+typedef struct gids_head * gids_gid_t;
+typedef struct gids_uid  * gids_uid_t;
 
 
 /*****************************************************************************
@@ -106,19 +111,20 @@ static void         _gids_update (gids_t gids);
 static hash_t       _gids_hash_create (void);
 static int          _gids_user_to_uid (hash_t hash, char *user);
 static int          _gids_hash_add (hash_t hash, uid_t uid, gid_t gid);
+static gids_gid_t   _gids_head_alloc (uid_t uid);
+static void         _gids_head_del (gids_gid_t g);
 static gids_node_t  _gids_node_alloc (gid_t gid);
-static unsigned int _gids_node_key (uid_t *uid_p);
 static int          _gids_node_cmp (uid_t *uid1_p, uid_t *uid2_p);
-static void         _gids_node_del (gids_node_t g);
-static gids_uid_t   _gids_uid_alloc (char *user_name, uid_t uid);
+static unsigned int _gids_node_key (uid_t *uid_p);
+static gids_uid_t   _gids_uid_alloc (char *user, uid_t uid);
 static int          _gids_uid_cmp (char *user1, char *user2);
 static void         _gids_uid_del (gids_uid_t u);
 
 #if GIDS_DEBUG
-static void         _gids_dump_gid_hash (hash_t gid_hash);
-static void         _gids_dump_node (gids_node_t g, uid_t *uid_p, void *null);
-static void         _gids_dump_uid_hash (hash_t uid_hash);
-static void         _gids_dump_uid (gids_uid_t u, char *user, void *null);
+static void _gids_dump_gid_hash (hash_t gid_hash);
+static void _gids_dump_gid_node (gids_gid_t g, uid_t *uid_p, void *null);
+static void _gids_dump_uid_hash (hash_t uid_hash);
+static void _gids_dump_uid_node (gids_uid_t u, char *user, void *null);
 #endif /* GIDS_DEBUG */
 
 
@@ -155,7 +161,8 @@ gids_create (int interval, int do_group_stat)
     }
     else {
         log_msg (LOG_INFO,
-            "Updating supplementary group mapping every %d seconds", interval);
+            "Updating supplementary group mapping every %d second%s",
+            interval, (interval == 1) ? "" : "s");
     }
     log_msg (LOG_INFO, "%s supplementary group mtime check of \"%s\"",
         (do_group_stat ? "Enabled" : "Disabled"), GIDS_GROUP_FILE);
@@ -204,6 +211,8 @@ gids_update (gids_t gids)
     if ((errno = pthread_mutex_lock (&gids->lock)) != 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to lock gids mutex");
     }
+    /*  Cancel a pending update before scheduling a new one.
+     */
     if (gids->timer > 0) {
         timer_cancel (gids->timer);
     }
@@ -228,8 +237,9 @@ gids_update (gids_t gids)
 int
 gids_is_member (gids_t gids, uid_t uid, gid_t gid)
 {
-    gids_node_t g;
     int         is_member = 0;
+    gids_gid_t  g;
+    gids_node_t node;
 
     if (!gids) {
         return (0);
@@ -238,9 +248,9 @@ gids_is_member (gids_t gids, uid_t uid, gid_t gid)
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to lock gids mutex");
     }
     if ((gids->hash) && (g = hash_find (gids->hash, &uid))) {
-        assert (g->gid == (gid_t) uid);
-        for (g = g->next; g && g->gid <= gid; g = g->next) {
-            if (g->gid == gid) {
+        assert (g->uid == uid);
+        for (node = g->next; node && node->gid <= gid; node = node->next) {
+            if (node->gid == gid) {
                 is_member = 1;
                 break;
             }
@@ -351,7 +361,7 @@ _gids_hash_create (void)
     uid_t           uid;
 
     gid_hash = hash_create (GIDS_HASH_SIZE, (hash_key_f) _gids_node_key,
-            (hash_cmp_f) _gids_node_cmp, (hash_del_f) _gids_node_del);
+            (hash_cmp_f) _gids_node_cmp, (hash_del_f) _gids_head_del);
 
     if (!gid_hash) {
         log_msg (LOG_ERR, "Unable to allocate gids hash -- out of memory");
@@ -405,36 +415,35 @@ err:
 
 
 static int
-_gids_user_to_uid (hash_t uid_hash, char *user_name)
+_gids_user_to_uid (hash_t uid_hash, char *user)
 {
-/*  Returns the UID associated with [user_name], or -1 on error.
+/*  Returns the UID associated with [user], or -1 on error.
  */
     gids_uid_t     u;
     uid_t          uid;
     struct passwd *pw_ptr;
 
-    if ((u = hash_find (uid_hash, user_name))) {
+    if ((u = hash_find (uid_hash, user))) {
         uid = u->uid;
     }
-    else if ((pw_ptr = getpwnam (user_name))) {
+    else if ((pw_ptr = getpwnam (user))) {
         uid = pw_ptr->pw_uid;
-        if (!(u = _gids_uid_alloc (user_name, uid))) {
+        if (!(u = _gids_uid_alloc (user, uid))) {
             log_msg (LOG_ERR,
                 "Unable to allocate uid node for %s/%d -- out of memory",
-                user_name, uid);
+                user, uid);
             return (-1);
         }
         if (!hash_insert (uid_hash, u->user, u)) {
             log_msg (LOG_ERR,
-                "Unable to insert uid node for %s/%d into hash",
-                user_name, uid);
+                "Unable to insert uid node for %s/%d into hash", user, uid);
             _gids_uid_del (u);
             return (-1);
         }
     }
     else {
         log_msg (LOG_INFO,
-            "Unable to query password file entry for \"%s\"", user_name);
+            "Unable to query password file entry for \"%s\"", user);
         return (-1);
     }
     return (uid);
@@ -448,59 +457,90 @@ _gids_hash_add (hash_t hash, uid_t uid, gid_t gid)
  *  Returns 1 if the entry was added, 0 if the entry already exists,
  *    or -1 on error.
  */
-    gids_node_t  g;
-    gids_node_t *gp;
+    gids_gid_t   g;
+    gids_node_t  node;
+    gids_node_t *node_p;
 
     if (!(g = hash_find (hash, &uid))) {
-        if (!(g = _gids_node_alloc ((gid_t) uid))) {
+        if (!(g = _gids_head_alloc (uid))) {
             log_msg (LOG_ERR, "Unable to allocate gids node -- out of memory");
             return (-1);
         }
-        if (!hash_insert (hash, &g->gid, g)) {
+        if (!hash_insert (hash, &g->uid, g)) {
             log_msg (LOG_ERR, "Unable to insert gids node into hash");
-            _gids_node_del (g);
+            _gids_head_del (g);
             return (-1);
         }
     }
-    assert ((uid_t) g->gid == uid);
-    for (gp = &g->next; *gp && (*gp)->gid < gid; gp = &(*gp)->next) {
-        ; /* empty */
+    assert (g->uid == uid);
+
+    node_p = &g->next;
+    while ((*node_p) && ((*node_p)->gid < gid)) {
+        node_p = &(*node_p)->next;
     }
-    if (*gp && ((*gp)->gid == gid)) {
+    if ((*node_p) && ((*node_p)->gid == gid)) {
         return (0);
     }
-    if (!(g = _gids_node_alloc (gid))) {
+    if (!(node = _gids_node_alloc (gid))) {
         log_msg (LOG_ERR, "Unable to allocate gids node -- out of memory");
         return (-1);
     }
-    g->next = *gp;
-    *gp = g;
+    node->next = *node_p;
+    *node_p = node;
     return (1);
+}
+
+
+static gids_gid_t
+_gids_head_alloc (uid_t uid)
+{
+/*  Returns an allocated GIDs head for [uid], or NULL on error.
+ */
+    gids_gid_t g;
+
+    if (!(g = malloc (sizeof (*g)))) {
+        return (NULL);
+    }
+    g->next = NULL;
+    g->uid = uid;
+    return (g);
+}
+
+
+static void
+_gids_head_del (gids_gid_t g)
+{
+/*  De-allocates the GIDs head [g] and node chain.
+ */
+    gids_node_t node, node_tmp;
+
+    if (!g) {
+        return;
+    }
+    node = g->next;
+    free (g);
+    while (node) {
+        node_tmp = node;
+        node = node->next;
+        free (node_tmp);
+    }
+    return;
 }
 
 
 static gids_node_t
 _gids_node_alloc (gid_t gid)
 {
-/*  Returns an allocated GIDs node set to [gid], or NULL on error.
+/*  Returns an allocated GIDs node for [gid], or NULL on error.
  */
-    gids_node_t g;
+    gids_node_t node;
 
-    if (!(g = malloc (sizeof (*g)))) {
+    if (!(node = malloc (sizeof (*node)))) {
         return (NULL);
     }
-    g->next = NULL;
-    g->gid = gid;
-    return (g);
-}
-
-
-static unsigned int
-_gids_node_key (uid_t *uid_p)
-{
-/*  Used by the hash routines to convert [uid_p] into a hash key.
- */
-    return (*uid_p);
+    node->next = NULL;
+    node->gid = gid;
+    return (node);
 }
 
 
@@ -513,33 +553,26 @@ _gids_node_cmp (uid_t *uid1_p, uid_t *uid2_p)
 }
 
 
-static void
-_gids_node_del (gids_node_t g)
+static unsigned int
+_gids_node_key (uid_t *uid_p)
 {
-/*  De-allocates the GIDs node chain starting at [g].
+/*  Used by the hash routines to convert [uid_p] into a hash key.
  */
-    gids_node_t gtmp;
-
-    while (g) {
-        gtmp = g;
-        g = g->next;
-        free (gtmp);
-    }
-    return;
+    return (*uid_p);
 }
 
 
 static gids_uid_t
-_gids_uid_alloc (char *user_name, uid_t uid)
+_gids_uid_alloc (char *user, uid_t uid)
 {
-/*  Returns an allocated UID node mapping [user_name] to [uid].
+/*  Returns an allocated UID node mapping [user] to [uid].
  */
     gids_uid_t u;
 
     if (!(u = malloc (sizeof (*u)))) {
         return (NULL);
     }
-    if (!(u->user = strdup (user_name))) {
+    if (!(u->user = strdup (user))) {
         free (u);
         return (NULL);
     }
@@ -563,12 +596,13 @@ _gids_uid_del (gids_uid_t u)
 {
 /*  De-allocates the UID node [u].
  */
-    if (u) {
-        if (u->user) {
-            free (u->user);
-        }
-        free (u);
+    if (!u) {
+        return;
     }
+    if (u->user) {
+        free (u->user);
+    }
+    free (u);
     return;
 }
 
@@ -585,20 +619,22 @@ _gids_dump_gid_hash (hash_t gid_hash)
     int n;
 
     n = hash_count (gid_hash);
-    printf ("* GIDs Dump (%d UID%s):\n", n, (n == 1 ? "" : "s"));
-    hash_for_each (gid_hash, (hash_arg_f) _gids_dump_node, NULL);
+    printf ("* GIDs Dump (%d UID%s):\n", n, ((n == 1) ? "" : "s"));
+    hash_for_each (gid_hash, (hash_arg_f) _gids_dump_gid_node, NULL);
     return;
 }
 
 
 static void
-_gids_dump_node (gids_node_t g, uid_t *uid_p, void *null)
+_gids_dump_gid_node (gids_gid_t g, uid_t *uid_p, void *null)
 {
-    assert (g->gid == *uid_p);
+    gids_node_t node;
 
-    printf (" %5d:", *uid_p);
-    for (g = g->next; g; g = g->next) {
-        printf (" %d", g->gid);
+    assert (g->uid == *uid_p);
+
+    printf (" %5d:", g->uid);
+    for (node = g->next; node; node = node->next) {
+        printf (" %d", node->gid);
     }
     printf ("\n");
     return;
@@ -611,16 +647,16 @@ _gids_dump_uid_hash (hash_t uid_hash)
     int n;
 
     n = hash_count (uid_hash);
-    printf ("* UID Dump (%d UID%s):\n", n, (n == 1 ? "" : "s"));
-    hash_for_each (uid_hash, (hash_arg_f) _gids_dump_uid, NULL);
+    printf ("* UID Dump (%d UID%s):\n", n, ((n == 1) ? "" : "s"));
+    hash_for_each (uid_hash, (hash_arg_f) _gids_dump_uid_node, NULL);
     return;
 }
 
 
 static void
-_gids_dump_uid (gids_uid_t u, char *user, void *null)
+_gids_dump_uid_node (gids_uid_t u, char *user, void *null)
 {
-    assert (user == u->user);
+    assert (u->user == user);
 
     printf (" %5d: %s\n", u->uid, u->user);
     return;
