@@ -1,5 +1,5 @@
 munge-0.5.7 (2006-12-21):
-- Added --check-group-mtime and --group-update-time munged cmdline opts.
+- Added --group-check-mtime and --group-update-time munged cmdline opts.
 - Added munged sighup handler to update supplementary group info.
 - Improved performance of computing supplementary group info.
 

@@ -75,7 +75,7 @@ struct option opt_table[] = {
     { "auth-server-dir",   1, NULL, '2' },
     { "auth-client-dir",   1, NULL, '3' },
 #endif /* MUNGE_AUTH_RECVFD */
-    { "check-group-mtime", 1, NULL, '4' },
+    { "group-check-mtime", 1, NULL, '4' },
     { "group-update-time", 1, NULL, '5' },
     {  NULL,        0, NULL,  0  }
 };
@@ -308,7 +308,7 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                 l = strtol (optarg, &p, 10);
                 if ((optarg == p) || (*p != '\0')) {
                     log_err (EMUNGE_SNAFU, LOG_ERR,
-                        "Invalid value \"%s\" for check-group-mtime", optarg);
+                        "Invalid value \"%s\" for group-check-mtime", optarg);
                 }
                 conf->got_group_stat = !! l;
                 break;
@@ -389,7 +389,7 @@ display_help (char *prog)
 #endif /* MUNGE_AUTH_RECVFD */
 
     printf ("  %*s Specify whether to check \"%s\" mtime [%d]\n",
-            w, "--check-group-mtime=BOOL", GIDS_GROUP_FILE,
+            w, "--group-check-mtime=BOOL", GIDS_GROUP_FILE,
             MUNGE_GROUP_STAT_FLAG);
 
     printf ("  %*s %s [%d]\n", w, "--group-update-time=INT",
