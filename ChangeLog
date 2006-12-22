@@ -1,6 +1,10 @@
+2006-12-21  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* HISTORY, META, NEWS: Updated for 0.5.7 release.
+
 2006-12-20  Chris Dunlap  <cdunlap@llnl.gov>
 
-	* src/munged/gids.c (_gids_dump_uid_hash): Tweaked table output.
+	* src/munged/gids.c (_gids_dump_uid_hash): Tweaked debug table header.
 
 	* src/munged/gids.c: Removed the need for casting the gids hash key
 	  uid_t to a gid_t by making the gids hash return a struct gids_head
