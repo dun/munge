@@ -40,6 +40,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
+#include <sys/time.h>
 #include <munge.h>
 #include "gids.h"
 #include "hash.h"
@@ -283,11 +284,9 @@ _gids_update (gids_t gids)
     struct stat     st;
     int             do_update = 1;
     hash_t          hash, hash_bak;
-    int             n;
 
     assert (gids != NULL);
 
-    log_msg (LOG_DEBUG, "Updating supplementary group mapping");
     if (time (&t_now) == (time_t) -1) {
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to query current time");
     }
@@ -305,14 +304,6 @@ _gids_update (gids_t gids)
         }
     }
     if (do_update && (hash = _gids_hash_create ())) {
-
-        n = hash_count (hash);
-        log_msg (LOG_INFO, "Found %d user%s with supplementary groups",
-            n, ((n == 1) ? "" : "s"));
-
-#if GIDS_DEBUG
-        _gids_dump_gid_hash (hash);
-#endif /* GIDS_DEBUG */
 
         if ((errno = pthread_mutex_lock (&gids->lock)) != 0) {
             log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to lock gids mutex");
@@ -356,9 +347,13 @@ _gids_hash_create (void)
  */
     hash_t          gid_hash = NULL;
     hash_t          uid_hash = NULL;
+    struct timeval  t_start;
+    struct timeval  t_stop;
     struct group   *gr_ptr;
     char          **pp;
     uid_t           uid;
+    int             n_users;
+    double          n_seconds;
 
     gid_hash = hash_create (GIDS_HASH_SIZE, (hash_key_f) _gids_node_key,
             (hash_cmp_f) _gids_node_cmp, (hash_del_f) _gids_head_del);
@@ -372,6 +367,10 @@ _gids_hash_create (void)
 
     if (!uid_hash) {
         log_msg (LOG_ERR, "Unable to allocate uids hash -- out of memory");
+        goto err;
+    }
+    if (gettimeofday (&t_start, NULL) < 0) {
+        log_msg (LOG_ERR, "Unable to query current time");
         goto err;
     }
     setgrent ();
@@ -399,9 +398,22 @@ _gids_hash_create (void)
     }
     endgrent ();
 
+    if (gettimeofday (&t_stop, NULL) < 0) {
+        log_msg (LOG_ERR, "Unable to query current time");
+        goto err;
+    }
+
 #if GIDS_DEBUG
     _gids_dump_uid_hash (uid_hash);
+    _gids_dump_gid_hash (gid_hash);
 #endif /* GIDS_DEBUG */
+
+    n_users = hash_count (gid_hash);
+    n_seconds = (t_stop.tv_sec - t_start.tv_sec)
+        + ((t_stop.tv_usec - t_start.tv_usec) / 1e6);
+    log_msg (LOG_INFO,
+        "Found %d user%s with supplementary groups in %0.3f seconds",
+        n_users, ((n_users == 1) ? "" : "s"), n_seconds);
 
     hash_destroy (uid_hash);
     return (gid_hash);
