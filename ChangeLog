@@ -1,3 +1,12 @@
+2006-12-22  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/munged/crypto.c (crypto_fini, _openssl_thread_dynlock_destroy):
+	  Changed pthread_mutex_destroy() error to be nonfatal.
+	* src/munged/gids.c (gids_destroy): Changed pthread_mutex_destroy()
+	  error to be nonfatal.
+	* src/munged/work.c (work_fini): Changed pthread_cond_destroy() and
+	  pthread_mutex_destroy() errors to be nonfatal.
+
 2006-12-21  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* NEWS, src/munged/conf.c, src/munged/munged.8.in:

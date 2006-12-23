@@ -98,6 +98,7 @@ crypto_fini (void)
 #include <assert.h>
 #include <openssl/crypto.h>
 #include <openssl/err.h>
+#include <string.h>
 #include "str.h"
 
 
@@ -190,8 +191,8 @@ crypto_fini (void)
     for (i = 0; i < n; i++) {
         errno = pthread_mutex_destroy (&openssl_mutex_array[i]);
         if (errno != 0) {
-            log_errno (EMUNGE_SNAFU, LOG_ERR,
-                "Unable to destroy OpenSSL mutex %d", i);
+            log_msg (LOG_ERR,
+                "Unable to destroy OpenSSL mutex %d: %s", i, strerror (errno));
         }
     }
     free (openssl_mutex_array);
@@ -276,8 +277,8 @@ _openssl_thread_dynlock_destroy (struct CRYPTO_dynlock_value *lock,
 {
     errno = pthread_mutex_destroy (&lock->mutex);
     if (errno != 0) {
-        log_errno (EMUNGE_SNAFU, LOG_ERR,
-            "Unable to destroy OpenSSL dynamic mutex");
+        log_msg (LOG_ERR,
+            "Unable to destroy OpenSSL dynamic mutex: %s", strerror (errno));
     }
     free (lock);
     return;

@@ -196,7 +196,8 @@ gids_destroy (gids_t gids)
     hash_destroy (h);
 
     if ((errno = pthread_mutex_destroy (&gids->lock)) != 0) {
-        log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to destroy gids mutex");
+        log_msg (LOG_ERR, "Unable to destroy gids mutex: %s",
+            strerror (errno));
     }
     free (gids);
     return;

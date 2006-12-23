@@ -36,6 +36,7 @@
 #include <pthread.h>
 #include <signal.h>
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
 #include <munge.h>
 #include "log.h"
@@ -131,11 +132,11 @@ work_init (work_func_t f, int n_threads)
     }
     if ((errno = pthread_cond_init (&wp->received_work, NULL)) != 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR,
-            "Unable to init work thread received-work condition");
+            "Unable to init work thread condition for received-work");
     }
     if ((errno = pthread_cond_init (&wp->finished_work, NULL)) != 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR,
-            "Unable to init work thread finished-work condition");
+            "Unable to init work thread condition for finished-work");
     }
     wp->work_func = f;
     wp->work_head = wp->work_tail = NULL;
@@ -225,16 +226,18 @@ work_fini (work_p wp, int do_wait)
     /*  Reclaim allocated resources.
      */
     if ((errno = pthread_cond_destroy (&wp->finished_work)) != 0) {
-        log_errno (EMUNGE_SNAFU, LOG_ERR,
-            "Unable to destroy work thread finished-work condition");
+        log_msg (LOG_ERR,
+            "Unable to destroy work thread condition for finished-work: %s",
+            strerror (errno));
     }
     if ((errno = pthread_cond_destroy (&wp->received_work)) != 0) {
-        log_errno (EMUNGE_SNAFU, LOG_ERR,
-            "Unable to destroy work thread received-work condition");
+        log_msg (LOG_ERR,
+            "Unable to destroy work thread condition for received-work: %s",
+            strerror (errno));
     }
     if ((errno = pthread_mutex_destroy (&wp->lock)) != 0) {
-        log_errno (EMUNGE_SNAFU, LOG_ERR,
-            "Unable to destroy work thread mutex");
+        log_msg (LOG_ERR,
+            "Unable to destroy work thread mutex: %s", strerror (errno));
     }
     free (wp->workers);
     free (wp);
