@@ -2,7 +2,7 @@ munge-0.5.7 (2006-12-23):
 - Added --group-check-mtime and --group-update-time munged cmdline opts.
 - Added munged sighup handler to update supplementary group info.
 - Improved performance of computing supplementary group info.
-- Made errors at exit nonfatal to work around bug in Debian libc6 2.3.6.ds1-8.
+- Made errors at exit nonfatal to work around Debian libc6 bug #400960.
 
 munge-0.5.6 (2006-11-22):
 - Fixed bug causing build using Libgcrypt to fail without OpenSSL headers.
