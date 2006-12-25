@@ -95,7 +95,7 @@ munge-0.3 (2004-04-30):
 
 munge-0.2 (2003-10-24):
 - Added support for ia64.
-- Added ttl and origin IP address to credential header.
+- Added TTL and origin IP address to credential header.
 
 munge-0.1 (2003-04-30):
 - Added full client/server support.
