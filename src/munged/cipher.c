@@ -251,7 +251,7 @@ _cipher_update (cipher_ctx *x, void *vdst, int *dstlen,
     int            n_partial;
     int            n_complete;
     unsigned char *dst = vdst;
-    unsigned char *src = vsrc;
+    unsigned char *src = (void *) vsrc;
 
     n_written = 0;
     /*
