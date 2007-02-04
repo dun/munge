@@ -2,7 +2,7 @@
  *  $Id$
  *  LSD-Id: hash.h,v 1.3 2003/10/28 17:49:02 dun Exp
  *****************************************************************************
- *  Copyright (C) 2002-2006 The Regents of the University of California.
+ *  Copyright (C) 2002-2007 The Regents of the University of California.
  *  Produced at Lawrence Livermore National Laboratory.
  *  Written by Chris Dunlap <cdunlap@llnl.gov>.
  *  UCRL-CODE-155910.

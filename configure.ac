@@ -3,7 +3,7 @@
 ##*****************************************************************************
 ## Process this file with autoconf to produce a configure script.
 ##*****************************************************************************
-## Copyright (C) 2002-2006 The Regents of the University of California.
+## Copyright (C) 2002-2007 The Regents of the University of California.
 ## Produced at Lawrence Livermore National Laboratory.
 ## Written by Chris Dunlap <cdunlap@llnl.gov>.
 ## UCRL-CODE-155910.

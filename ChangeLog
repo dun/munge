@@ -1,5 +1,7 @@
 2007-02-03  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* : Updated copyright date range.
+
 	* src/munged/cipher.c (HAVE_LIBGCRYPT:_cipher_init): Fixed cast
 	  causing stack corruption and overwriting 'algo' on amd64.
 

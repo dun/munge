@@ -1,7 +1,7 @@
 .\"****************************************************************************
 .\" $Id$
 .\"****************************************************************************
-.\" Copyright (C) 2002-2006 The Regents of the University of California.
+.\" Copyright (C) 2002-2007 The Regents of the University of California.
 .\" Produced at Lawrence Livermore National Laboratory.
 .\" Written by Chris Dunlap <cdunlap@llnl.gov>.
 .\" UCRL-CODE-155910.
@@ -113,7 +113,7 @@ main (int argc, char *argv[])
 @META_AUTHOR@
 
 .SH COPYRIGHT
-Copyright (C) 2002-2006 The Regents of the University of California.
+Copyright (C) 2002-2007 The Regents of the University of California.
 Produced at Lawrence Livermore National Laboratory.  UCRL-CODE-155910.
 
 MUNGE is free software; you can redistribute it and/or modify it under the
