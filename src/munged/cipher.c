@@ -189,8 +189,7 @@ _cipher_init (cipher_ctx *x, munge_cipher_t cipher,
 {
     gcry_error_t  e;
     int           algo;
-    int           len;
-    size_t       *len_ptr = (size_t *) &len;
+    size_t        nbytes;
 
     if (_cipher_map_enum (cipher, &algo) < 0) {
         return (-1);
@@ -201,27 +200,27 @@ _cipher_init (cipher_ctx *x, munge_cipher_t cipher,
             cipher, gcry_strerror (e));
         return (-1);
     }
-    e = gcry_cipher_algo_info (algo, GCRYCTL_GET_KEYLEN, NULL, len_ptr);
+    e = gcry_cipher_algo_info (algo, GCRYCTL_GET_KEYLEN, NULL, &nbytes);
     if (e != 0) {
         log_msg (LOG_DEBUG,
             "gcry_cipher_algo_info failed for cipher=%d key length: %s",
             cipher, gcry_strerror (e));
         return (-1);
     }
-    e = gcry_cipher_setkey (x->ctx, key, len);
+    e = gcry_cipher_setkey (x->ctx, key, nbytes);
     if (e != 0) {
         log_msg (LOG_DEBUG, "gcry_cipher_setkey failed for cipher=%d: %s",
             cipher, gcry_strerror (e));
         return (-1);
     }
-    e = gcry_cipher_algo_info (algo, GCRYCTL_GET_BLKLEN, NULL, len_ptr);
+    e = gcry_cipher_algo_info (algo, GCRYCTL_GET_BLKLEN, NULL, &nbytes);
     if (e != 0) {
         log_msg (LOG_DEBUG,
             "gcry_cipher_algo_info failed for cipher=%d block length: %s",
             cipher, gcry_strerror (e));
         return (-1);
     }
-    e = gcry_cipher_setiv (x->ctx, iv, len);
+    e = gcry_cipher_setiv (x->ctx, iv, nbytes);
     if (e != 0) {
         log_msg (LOG_DEBUG, "gcry_cipher_setiv failed for cipher=%d: %s",
             cipher, gcry_strerror (e));
@@ -229,7 +228,7 @@ _cipher_init (cipher_ctx *x, munge_cipher_t cipher,
     }
     x->do_encrypt = enc;
     x->len = 0;
-    x->blklen = len;
+    x->blklen = (int) nbytes;
     return (0);
 }
 
