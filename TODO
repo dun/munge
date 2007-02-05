@@ -3,6 +3,7 @@
 -add munged 'k' cmdline opt to kill daemon
 -save/restore replay state at munged shutdown/startup
 -restrict decode to hostname/hostrange/regex or ip-addr/netmask
+-add config opt to specify n/w interface for determining ip
 -add pam support
 -add realm (multi-key) support
 -periodically stat keyfile and look for changed inode/mtime
