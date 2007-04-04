@@ -1,5 +1,9 @@
 2007-04-04  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/etc/Makefile.am: Fixed bug in install-data-local target that
+	  caused installation of munge.sysconfig to be considered new if
+	  munge.init had changed.
+
 	* src/etc/Makefile.am: Changed munge.sysconfig install perms to 0644.
 
 2007-02-05  Chris Dunlap  <cdunlap@llnl.gov>

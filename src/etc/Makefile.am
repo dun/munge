@@ -12,14 +12,14 @@ noinst_DATA = \
 install-data-local:
 	expr "`id`" : 'uid=0(' >/dev/null && OWNER="-o daemon" || OWNER=""; \
 	$(INSTALL) -m 0755 -d "$(DESTDIR)$(sysconfdir)/init.d"; \
-	test ! -f "$(DESTDIR)$(sysconfdir)/init.d/munge" \
+	new=""; test ! -f "$(DESTDIR)$(sysconfdir)/init.d/munge" \
 	  || cmp "$(srcdir)/munge.init" \
 	    "$(DESTDIR)$(sysconfdir)/init.d/munge" \
 	  1>/dev/null 2>&1 || new=".new"; \
 	$(INSTALL) -m 0755 "$(srcdir)/munge.init" \
 	  "$(DESTDIR)$(sysconfdir)/init.d/munge$${new}"; \
 	test -d "/etc/sysconfig" && d="sysconfig" || d="default"; \
-	test ! -f "$(DESTDIR)$(sysconfdir)/$${d}/munge" \
+	new=""; test ! -f "$(DESTDIR)$(sysconfdir)/$${d}/munge" \
 	  || cmp "$(srcdir)/munge.sysconfig" \
 	    "$(DESTDIR)$(sysconfdir)/$${d}/munge" \
 	  1>/dev/null 2>&1 || new=".new"; \
