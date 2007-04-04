@@ -24,7 +24,7 @@ install-data-local:
 	    "$(DESTDIR)$(sysconfdir)/$${d}/munge" \
 	  1>/dev/null 2>&1 || new=".new"; \
 	$(INSTALL) -m 0755 -d "$(DESTDIR)$(sysconfdir)/$${d}"; \
-	$(INSTALL) -m 0755 "$(srcdir)/munge.sysconfig" \
+	$(INSTALL) -m 0644 "$(srcdir)/munge.sysconfig" \
 	  "$(DESTDIR)$(sysconfdir)/$${d}/munge$${new}"; \
 	$(INSTALL) $${OWNER} -m 0700 -d \
 	  "$(DESTDIR)$(sysconfdir)/munge"; \
