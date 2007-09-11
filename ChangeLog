@@ -1,3 +1,9 @@
+2007-09-10  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/etc/munge.init.in: Fixed bug with SERVICE_NAME not removing the
+	  leading /[SK][0-9]+/, thereby causing the sysconfig file to be
+	  ignored at boot (when referenced via "/etc/rc5.d/S40munge").
+
 2007-04-04  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/etc/Makefile.am: Fixed bug in install-data-local target that

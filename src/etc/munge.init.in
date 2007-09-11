@@ -42,7 +42,7 @@ USER="daemon"
 
 PATH=/sbin:/usr/sbin:/usr/local/sbin:/bin:/usr/bin:/usr/local/bin
 DAEMON_NAME="`basename \"$DAEMON\"`"
-SERVICE_NAME="`basename \"$0\" .init`"
+SERVICE_NAME="`basename \"$0\" .init | sed 's/^[SK][0-9][0-9]*//'`"
 SIGTERM_TIMEOUT="3"
 
 # Read configuration defaults to override variables:
