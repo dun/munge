@@ -80,8 +80,7 @@ service_init ()
   elif [ -f /etc/redhat-release -a -r /etc/init.d/functions ]; then
     SYSTEM="REDHAT"
     . /etc/init.d/functions
-    RH_SUBSYS_BASE="`basename \"$0\" | sed 's/^[SK][0-9][0-9]*//'`"
-    RH_SUBSYS="/var/lock/subsys/$RH_SUBSYS_BASE"
+    RH_SUBSYS="/var/lock/subsys/$DAEMON_NAME"
   elif [ -f /etc/SuSE-release -a -r /etc/rc.status ]; then
     SYSTEM="SUSE"
     . /etc/rc.status
