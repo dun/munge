@@ -9,7 +9,11 @@ Group:		System Environment/Daemons
 License:	GPL
 URL:		http://home.gna.org/munge/
 
+BuildRequires:	openssl-devel
+BuildRequires:	bzip2-devel
+BuildRequires:	zlib-devel
 BuildRoot:	%{_tmppath}/%{name}-%{version}
+
 Source0:	%{name}-%{version}.tar
 
 %package devel
