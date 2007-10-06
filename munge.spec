@@ -152,7 +152,7 @@ if [ -x /sbin/ldconfig ]; then /sbin/ldconfig %{_libdir}; fi
 %doc BUGS
 %doc ChangeLog
 %doc COPYING
-%doc DISCLAIMER
+%doc DISCLAIMER*
 %doc HISTORY
 %doc INSTALL
 %doc JARGON
