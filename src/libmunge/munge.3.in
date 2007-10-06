@@ -1,9 +1,9 @@
 .\"****************************************************************************
 .\" $Id$
 .\"****************************************************************************
-.\" Copyright (C) 2002-2007 The Regents of the University of California.
-.\" Produced at Lawrence Livermore National Laboratory.
 .\" Written by Chris Dunlap <cdunlap@llnl.gov>.
+.\" Copyright (C) 2007 Lawrence Livermore National Security, LLC.
+.\" Copyright (C) 2002-2007 The Regents of the University of California.
 .\" UCRL-CODE-155910.
 .\"
 .\" This file is part of the MUNGE Uid 'N' Gid Emporium (MUNGE).
@@ -19,9 +19,8 @@
 .\" FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
 .\" for more details.
 .\"
-.\" You should have received a copy of the GNU General Public License along
-.\" with this program; if not, write to the Free Software Foundation, Inc.,
-.\" 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA.
+.\" You should have received a copy of the GNU General Public License
+.\" along with this program.  If not, see <http://www.gnu.org/licenses/>.
 .\"****************************************************************************
 
 .TH MUNGE 3 "@META_DATE@" "@META_ALIAS@" "MUNGE Uid 'N' Gid Emporium"
@@ -192,12 +191,14 @@ memory leak.
 @META_AUTHOR@
 
 .SH COPYRIGHT
+Copyright (C) 2007 Lawrence Livermore National Security, LLC.
+.br
 Copyright (C) 2002-2007 The Regents of the University of California.
-Produced at Lawrence Livermore National Laboratory.  UCRL-CODE-155910.
 
 MUNGE is free software; you can redistribute it and/or modify it under the
 terms of the GNU General Public License as published by the Free Software
-Foundation.
+Foundation; either version 2 of the License, or (at your option) any later
+version.
 
 .SH "SEE ALSO"
 .BR munge (1),

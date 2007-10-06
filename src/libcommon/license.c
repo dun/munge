@@ -1,9 +1,9 @@
 /*****************************************************************************
  *  $Id$
  *****************************************************************************
- *  Copyright (C) 2002-2007 The Regents of the University of California.
- *  Produced at Lawrence Livermore National Laboratory.
  *  Written by Chris Dunlap <cdunlap@llnl.gov>.
+ *  Copyright (C) 2007 Lawrence Livermore National Security, LLC.
+ *  Copyright (C) 2002-2007 The Regents of the University of California.
  *  UCRL-CODE-155910.
  *
  *  This file is part of the MUNGE Uid 'N' Gid Emporium (MUNGE).
@@ -19,9 +19,8 @@
  *  FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
  *  for more details.
  *
- *  You should have received a copy of the GNU General Public License along
- *  with this program; if not, write to the Free Software Foundation, Inc.,
- *  51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA.
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 
 
@@ -34,15 +33,18 @@
 
 
 static const char *license_string = \
-    "Welcome to the MUNGE Uid 'N' Gid Emporium (MUNGE).\n\n"                  \
-    "Copyright (C) 2002-2007 The Regents of the University of California.\n"  \
-    "Produced at Lawrence Livermore National Laboratory.\n"                   \
-    "Written by Chris Dunlap <cdunlap@llnl.gov>.\n"                           \
+    "Welcome to the MUNGE Uid 'N' Gid Emporium (MUNGE).\n"                    \
     "http://home.gna.org/munge/\n"                                            \
-    "UCRL-CODE-155910\n\n"                                                    \
+    "\n"                                                                      \
+    "Written by Chris Dunlap <cdunlap@llnl.gov>.\n"                           \
+    "Copyright (C) 2007 Lawrence Livermore National Security, LLC.\n"         \
+    "Copyright (C) 2002-2007 The Regents of the University of California.\n"  \
+    "\n"                                                                      \
     "MUNGE is free software; you can redistribute it and/or modify it\n"      \
     "under the terms of the GNU General Public License as published by\n"     \
-    "the Free Software Foundation.\n\n";
+    "the Free Software Foundation; either version 2 of the License, or\n"     \
+    "(at your option) any later version.\n"                                   \
+    "\n";
 
 
 void

@@ -1,3 +1,7 @@
+2007-10-05  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* : Updated copyright info for LLNS.
+
 2007-10-03  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* munge.spec: Added openssl-devel, bzip2-devel, and zlib-devel

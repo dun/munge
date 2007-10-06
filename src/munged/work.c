@@ -1,9 +1,9 @@
 /*****************************************************************************
  *  $Id$
  *****************************************************************************
- *  Copyright (C) 2002-2007 The Regents of the University of California.
- *  Produced at Lawrence Livermore National Laboratory.
  *  Written by Chris Dunlap <cdunlap@llnl.gov>.
+ *  Copyright (C) 2007 Lawrence Livermore National Security, LLC.
+ *  Copyright (C) 2002-2007 The Regents of the University of California.
  *  UCRL-CODE-155910.
  *
  *  This file is part of the MUNGE Uid 'N' Gid Emporium (MUNGE).
@@ -19,9 +19,8 @@
  *  FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
  *  for more details.
  *
- *  You should have received a copy of the GNU General Public License along
- *  with this program; if not, write to the Free Software Foundation, Inc.,
- *  51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA.
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************
  *  Refer to "work.h" for documentation on public functions.
  *****************************************************************************/
