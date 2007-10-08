@@ -1,3 +1,13 @@
+2007-10-08  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/etc/munge.init.in: Updated to conman r806.
+	  Added support for Debian Etch & Ubuntu Edgy.
+	  Renamed OPTIONS to DAEMON_ARGS.  Renamed SERVICE_NAME to SCRIPT_NAME.
+	  Redirected ERRMSG to stderr.  Forced removal of PIDFILE on stop.
+	  Replaced query_exec() with type.  Added log_init() and log_fini().
+	  Added check for "dead" status if process not found & pidfile exists.
+	* src/etc/munge.sysconfig: Renamed OPTIONS to DAEMON_ARGS.
+
 2007-10-05  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* : Updated copyright info for LLNS.

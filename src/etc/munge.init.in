@@ -7,21 +7,22 @@
 # Copyright (C) 2002-2007 The Regents of the University of California.
 # UCRL-CODE-155910.
 ###############################################################################
-# chkconfig:      345 40 60
+# chkconfig:          2345 40 60
+# Description:        Start/Stop the MUNGE authentication service.
 ###############################################################################
 ### BEGIN INIT INFO
-# Provides:       munge
-# Required-Start: $named $time
-# Required-Stop:  $named $time
-# Should-Start:   $local_fs $syslog
-# Should-Stop:    $local_fs $syslog
-# Default-Start:  3 4 5
-# Default-Stop:   0 1 2 6
-# Description:    Start/Stop the MUNGE authentication service.
+# Provides:           munge
+# Required-Start:     $named $time
+# Required-Stop:      $named $time
+# Should-Start:       $local_fs $syslog
+# Should-Stop:        $local_fs $syslog
+# Default-Start:      2 3 4 5
+# Default-Stop:       0 1 6
+# Short-Description:  Start/Stop the MUNGE authentication service.
 ### END INIT INFO
 ###############################################################################
 
-unset DESC DAEMON CONFIG OPTIONS PIDFILE NICE USER SIGHUP_RELOAD
+unset DESC DAEMON DAEMON_ARGS CONFIG PIDFILE NICE USER SIGHUP_RELOAD
 
 prefix="@prefix@"
 exec_prefix="@exec_prefix@"
@@ -31,34 +32,12 @@ localstatedir="@localstatedir@"
 
 DESC="MUNGE"
 DAEMON="$sbindir/munged"
+#DAEMON_ARGS=
 #CONFIG=#_NOT_SUPPORTED_#
-#OPTIONS=
 PIDFILE="$localstatedir/run/munge/munged.pid"
 #NICE=
 USER="daemon"
 #SIGHUP_RELOAD=#_NOT_SUPPORTED_#
-
-###############################################################################
-
-PATH=/sbin:/usr/sbin:/usr/local/sbin:/bin:/usr/bin:/usr/local/bin
-DAEMON_NAME="`basename \"$DAEMON\"`"
-SERVICE_NAME="`basename \"$0\" .init | sed 's/^[SK][0-9][0-9]*//'`"
-SIGTERM_TIMEOUT="3"
-
-# Read configuration defaults to override variables:
-#   $CONFIG, $OPTIONS, $PIDFILE, $USER, $NICE, $SIGHUP_RELOAD
-##
-for dir in "$sysconfdir/default" "$sysconfdir/sysconfig"; do
-  [ -r "$dir/$SERVICE_NAME" ] && . "$dir/$SERVICE_NAME"
-done
-
-# Exit if the package has been removed.
-##
-[ -x "$DAEMON" ] || exit 5                      # program not installed
-
-# Exit if the configuration has been removed.
-##
-[ -z "$CONFIG" -o -r "$CONFIG" ] || exit 6      # program not configured
 
 ###############################################################################
 
@@ -69,14 +48,30 @@ service_init ()
 # Note that the shell positional parameters must be preserved when calling
 #   this function in order for SuSE to initialize its environment properly.
 ##
+  PATH=/sbin:/usr/sbin:/bin:/usr/bin
+  DAEMON_NAME="`basename \"$DAEMON\"`"
+  SCRIPT_NAME="`basename \"$0\" .init | sed 's/^[SK][0-9][0-9]*//'`"
+  SIGTERM_TIMEOUT="3"
   STATUS=0
+
+  # Read configuration defaults to override variables:
+  #   $DAEMON_ARGS, $CONFIG, $PIDFILE, $USER, $NICE, $SIGHUP_RELOAD
+  ##
+  for dir in "$sysconfdir/default" "$sysconfdir/sysconfig"; do
+    [ -r "$dir/$SCRIPT_NAME" ] && . "$dir/$SCRIPT_NAME"
+  done
+  [ -z "$DAEMON_ARGS" -a -n "$OPTIONS" ] && DAEMON_ARGS="$OPTIONS"
+  [ "`id | sed 's/^uid=\([0-9]*\).*/\1/'`" -ne 0 ] && unset USER
+  expr -- "$NICE" : '[0-9]*$' >/dev/null 2>&1 && NICE="+$NICE"
   [ -n "$SIGHUP_RELOAD" -a "$SIGHUP_RELOAD" != 0 ] \
     && RELOAD=1 || unset RELOAD
-  expr -- "$NICE" : '[0-9]*$' >/dev/null 2>&1 && NICE="+$NICE"
-  [ "`id | sed 's/^uid=\([0-9]*\).*/\1/'`" -ne 0 ] && unset USER
 
   if [ -f /etc/debian_version -a -x /sbin/start-stop-daemon ]; then
     SYSTEM="DEBIAN"
+    [ -x "$DAEMON" ] || exit 0                  # pkg removed but not purged
+    [ -r /etc/default/rcS ] && . /etc/default/rcS
+    [ -r /lib/init/vars.sh ] && . /lib/init/vars.sh
+    [ -r /lib/lsb/init-functions ] && . /lib/lsb/init-functions
   elif [ -f /etc/redhat-release -a -r /etc/init.d/functions ]; then
     SYSTEM="REDHAT"
     . /etc/init.d/functions
@@ -91,6 +86,14 @@ service_init ()
   else
     SYSTEM="OTHER"
   fi
+
+  # Exit if the package has been removed.
+  ##
+  [ -x "$DAEMON" ] || exit 5                    # LSB: program not installed
+
+  # Exit if the configuration has been removed.
+  ##
+  [ -z "$CONFIG" -o -r "$CONFIG" ] || exit 6    # LSB: program not configured
 }
 
 service_fini ()
@@ -110,94 +113,81 @@ service_fini ()
 service_start ()
 {
 # Start the service.
-# Required by LSB.
 #
-# According to LSB, running "start" on a service already running should be
+# Required by LSB, where running "start" on a service already running should be
 #   considered successful.
 ##
-  printf "Starting $DESC: "
+  log_init "Starting $DESC" "$DAEMON_NAME"
   case $SYSTEM in
     DEBIAN)
-      printf "$DAEMON_NAME"
       if $0 status >/dev/null 2>&1; then
         STATUS=0
       else
-        ERROR=`start-stop-daemon --start --quiet \
+        ERRMSG=`start-stop-daemon --start --quiet \
           ${NICE:+"--nicelevel"} ${NICE:+"$NICE"} \
           ${USER:+"--chuid"} ${USER:+"$USER"} \
           ${PIDFILE:+"--pidfile"} ${PIDFILE:+"$PIDFILE"} \
-          --exec "$DAEMON" -- $OPTIONS 2>&1`
+          --exec "$DAEMON" -- $DAEMON_ARGS 2>&1`
         STATUS=$?
       fi
-      [ $STATUS -eq 0 ] && echo "." || echo " (failed)."
-      [ $STATUS -ne 0 -a -n "$ERROR" ] && echo "$ERROR"
       ;;
     REDHAT)
       if $0 status >/dev/null 2>&1; then
         STATUS=0
       else
         daemon ${NICE:+"$NICE"} ${USER:+"--user"} ${USER:+"$USER"} \
-          "$DAEMON" $OPTIONS
+          "$DAEMON" $DAEMON_ARGS
         STATUS=$?
       fi
-      echo
       [ $STATUS -eq 0 ] && touch "$RH_SUBSYS" >/dev/null 2>&1
       ;;
     SUSE)
-      ERROR=`startproc ${NICE:+"-n"} ${NICE:+"$NICE"} \
+      ERRMSG=`startproc ${NICE:+"-n"} ${NICE:+"$NICE"} \
         ${USER:+"-u"} ${USER:+"$USER"} \
         ${PIDFILE:+"-p"} ${PIDFILE:+"$PIDFILE"} \
-        "$DAEMON" $OPTIONS 2>&1`
+        "$DAEMON" $DAEMON_ARGS 2>&1`
       rc_status -v
       STATUS=$?
-      [ $STATUS -ne 0 -a -n "$ERROR" ] && echo "$ERROR"
       ;;
     LSB)
       if [ -n "$USER" ]; then
-        ERROR=`su "$USER" -c "/sbin/start_daemon \
+        ERRMSG=`su "$USER" -c "/sbin/start_daemon \
           ${NICE:+\"-n\"} ${NICE:+\"$NICE\"} \
           ${PIDFILE:+\"-p\"} ${PIDFILE:+\"$PIDFILE\"} \
-          \"$DAEMON\" $OPTIONS" 2>&1`
+          \"$DAEMON\" $DAEMON_ARGS" 2>&1`
       else
-        ERROR=`start_daemon ${NICE:+"-n"} ${NICE:+"$NICE"} \
-          ${PIDFILE:+"-p"} ${PIDFILE:+"$PIDFILE"} "$DAEMON" $OPTIONS 2>&1`
+        ERRMSG=`start_daemon ${NICE:+"-n"} ${NICE:+"$NICE"} \
+          ${PIDFILE:+"-p"} ${PIDFILE:+"$PIDFILE"} "$DAEMON" $DAEMON_ARGS 2>&1`
       fi
       STATUS=$?
-      [ $STATUS -eq 0 ] && log_success_msg || log_failure_msg
-      [ $STATUS -ne 0 -a -n "$ERROR" ] && echo "$ERROR"
       ;;
     *)
-      pids=`query_pids "$DAEMON" "$PIDFILE"`
-      rc=$?
-      if [ $rc -eq 0 -a -n "$pids" ]; then
+      if $0 status >/dev/null 2>&1; then
         STATUS=0
       else
         [ -n "$NICE" ] && nice="nice -n $NICE"
         if [ -n "$USER" ]; then
-          ERROR=`su "$USER" -c "$nice \"$DAEMON\" $OPTIONS" 2>&1`
+          ERRMSG=`su "$USER" -c "$nice \"$DAEMON\" $DAEMON_ARGS" 2>&1`
         else
-          ERROR=`$nice "$DAEMON" $OPTIONS 2>&1`
+          ERRMSG=`$nice "$DAEMON" $DAEMON_ARGS 2>&1`
         fi
         STATUS=$?
       fi
-      [ $STATUS -eq 0 ] && echo "success" || echo "failed"
-      [ $STATUS -ne 0 -a -n "$ERROR" ] && echo "$ERROR"
       ;;
   esac
+  log_fini "$STATUS" "$ERRMSG"
 }
 
 service_stop ()
 {
 # Stop the service.
-# Required by LSB.
 #
-# According to LSB, running "stop" on a service already stopped or not running
-#   should be considered successful.
+# Required by LSB, where running "stop" on a service already stopped or not
+#   running should be considered successful.
 ##
-  printf "Stopping $DESC: "
+  log_init "Stopping $DESC" "$DAEMON_NAME"
   case $SYSTEM in
     DEBIAN)
-      printf "$DAEMON_NAME"
       if ! $0 status >/dev/null 2>&1; then
         STATUS=0
       else
@@ -207,7 +197,6 @@ service_stop ()
           ${SIGTERM_TIMEOUT:+"$SIGTERM_TIMEOUT"} >/dev/null 2>&1
         STATUS=$?
       fi
-      [ $STATUS -eq 0 ] && echo "." || echo " (failed)."
       ;;
     REDHAT)
       if ! $0 status >/dev/null 2>&1; then
@@ -216,7 +205,6 @@ service_stop ()
         killproc "$DAEMON"
         STATUS=$?
       fi
-      echo
       [ $STATUS -eq 0 ] && rm -f "$RH_SUBSYS" >/dev/null 2>&1
       ;;
     SUSE)
@@ -228,24 +216,23 @@ service_stop ()
     LSB)
       killproc ${PIDFILE:+"-p"} ${PIDFILE:+"$PIDFILE"} "$DAEMON"
       STATUS=$?
-      [ $STATUS -eq 0 ] && log_success_msg || log_failure_msg
       ;;
     *)
       signal_process "$DAEMON"
       rc=$?
       [ $rc -eq 0 -o $rc -eq 2 ] && STATUS=0 || STATUS=1
-      [ $STATUS -eq 0 ] && echo "success" || echo "failed"
       ;;
   esac
+  log_fini "$STATUS"
+  [ -f "$PIDFILE" ] && rm -f "$PIDFILE"
 }
 
 service_restart ()
 {
 # Stop and restart the service if it is already running;
 #   otherwise, start the service.
-# Required by LSB.
 #
-# According to LSB, running "restart" on a service already stopped or not
+# Required by LSB, where running "restart" on a service already stopped or not
 #   running should be considered successful.
 ##
   if $0 status >/dev/null 2>&1; then
@@ -267,10 +254,10 @@ service_restart ()
 service_try_restart ()
 {
 # Restart the service if it is already running.
-# Optional for LSB.  Also known as "condrestart" by RedHat.
 #
-# According to LSB, running "try-restart" on a service already stopped or not
-#   running should be considered successful.
+# Optional for LSB, where running "try-restart" on a service already stopped or
+#   not running should be considered successful.
+# Also known as "condrestart" by RedHat.
 ##
   case $SYSTEM in
     REDHAT)
@@ -291,21 +278,20 @@ service_try_restart ()
 service_reload ()
 {
 # Reload the configuration without stopping and restarting the service.
+#
 # Optional for LSB.
 ##
-  [ -z "$RELOAD" ] && STATUS=3          # unimplemented feature
+  [ -z "$RELOAD" ] && STATUS=3          # LSB: unimplemented feature
 
-  printf "Reloading $DESC: "
+  log_init "Reloading $DESC" "$DAEMON_NAME"
   case $SYSTEM in
     DEBIAN)
-      printf "$DAEMON_NAME"
       if [ -n "$RELOAD" ]; then
         start-stop-daemon --stop --quiet --signal HUP \
           ${PIDFILE:+"--pidfile"} ${PIDFILE:+"$PIDFILE"} \
           --name "$DAEMON_NAME" >/dev/null 2>&1
         STATUS=$?
       fi
-      [ $STATUS -eq 0 ] && echo "." || echo " (failed)."
       ;;
     REDHAT)
       if [ -n "$RELOAD" ]; then
@@ -314,7 +300,6 @@ service_reload ()
       else
         echo_failure
       fi
-      echo
       ;;
     SUSE)
       if [ -n "$RELOAD" ]; then
@@ -329,25 +314,23 @@ service_reload ()
         killproc ${PIDFILE:+"-p"} ${PIDFILE:+"$PIDFILE"} "$DAEMON" -HUP
         STATUS=$?
       fi
-      [ $STATUS -eq 0 ] && log_success_msg || log_failure_msg
       ;;
     *)
       if [ -n "$RELOAD" ]; then
         signal_process "$DAEMON" "HUP"
         STATUS=$?
       fi
-      [ $STATUS -eq 0 ] && echo "success" || echo "failed"
       ;;
   esac
+  log_fini "$STATUS"
 }
 
 service_force_reload ()
 {
 # Reload the configuration if the service supports this;
 #   otherwise, restart the service if it is already running.
-# Required by LSB.
 #
-# According to LSB, running "force-reload" on a service already stopped or
+# Required by LSB, where running "force-reload" on a service already stopped or
 #   not running should be considered successful.
 ##
   if [ -n "$RELOAD" ]; then
@@ -369,6 +352,7 @@ service_force_reload ()
 service_status ()
 {
 # Print the current status of the service.
+#
 # Required by LSB.
 ##
   case $SYSTEM in
@@ -377,32 +361,39 @@ service_status ()
       STATUS=$?
       ;;
     SUSE)
-      printf "Checking for $DESC: "
+      printf "Checking for service $DESC: "
       checkproc ${PIDFILE:+"-p"} ${PIDFILE:+"$PIDFILE"} "$DAEMON"
       rc_status -v
       ;;
     LSB)
+      printf "Checking status of $DESC: "
       pids=`pidofproc ${PIDFILE:+"-p"} ${PIDFILE:+"$PIDFILE"} \
         "$DAEMON" 2>/dev/null`
       STATUS=$?
       if [ $STATUS -eq 0 -a -n "$pids" ]; then
-        echo "$DAEMON_NAME (pid $pids) is running"
+        echo "running."
+      elif [ $STATUS -ne 0 -a -s "$PIDFILE" ]; then
+        echo "dead."
       else
-        echo "$DAEMON_NAME is stopped"
+        echo "stopped."
       fi
       ;;
     DEBIAN|*)
+      printf "Checking status of $DESC: "
       pids=`query_pids "$DAEMON" "$PIDFILE"`
       rc=$?
       if [ $rc -eq 0 -a -n "$pids" ]; then
-        echo "$DAEMON_NAME (pid $pids) is running"
-        STATUS=0
+        echo "running."
+        STATUS=0                        # LSB: program is running
+      elif [ $rc -ne 0 -a -s "$PIDFILE" ]; then
+        echo "dead."
+        STATUS=1                        # LSB: program is dead & pidfile exists
       elif [ $rc -ne 0 ]; then
-        echo "$DAEMON_NAME is stopped"
-        STATUS=3                        # program is not running
+        echo "stopped."
+        STATUS=3                        # LSB: program is not running
       else
-        echo "$DAEMON_NAME status is unknown"
-        STATUS=4                        # program status unknown
+        echo "unknown."
+        STATUS=4                        # LSB: program status unknown
       fi
       ;;
   esac
@@ -416,10 +407,10 @@ query_pids ()
   PROCNAME="$1"
   PIDFILE="$2"
 
-  if query_exec pgrep; then
+  if type pgrep >/dev/null 2>&1; then
     pids=`pgrep -d ' ' -x "\`basename \"$PROCNAME\"\`" 2>/dev/null`
     rc=$?
-  elif query_exec pidof; then
+  elif type pidof >/dev/null 2>&1; then
     pids=`pidof -o $$ -x "$PROCNAME" 2>/dev/null`
     rc=$?
   else
@@ -441,24 +432,6 @@ query_pids ()
   fi
 
   echo $pids
-  return $rc
-}
-
-query_exec ()
-{
-# Returns 0 if EXECNAME is an executable file within the PATH.
-##
-  EXECNAME="$1"
-  rc=1
-
-  IFS_BAK="$IFS"
-  IFS=:
-  for dir in $PATH; do
-    [ -x "$dir/$EXECNAME" ] || continue
-    rc=0
-    break
-  done
-  IFS="$IFS_BAK"
   return $rc
 }
 
@@ -485,6 +458,61 @@ signal_process ()
   pids=`query_pids "$DAEMON" "$PIDFILE"`
   [ $? -ne 0 -o -z "$pids" ] && return 0
   return 1
+}
+
+log_init ()
+{
+# Output informational message at beginning of action.
+##
+  MESSAGE="$1"
+  PROCNAME="$2"
+
+  case $SYSTEM in
+    DEBIAN)
+      if [ "$VERBOSE" != no ]; then
+        if type log_daemon_msg >/dev/null 2>&1; then
+          log_daemon_msg "$MESSAGE" "$PROCNAME"
+        else
+          printf "$MESSAGE: $PROCNAME"
+        fi
+      fi
+      ;;
+    REDHAT|SUSE|LSB|*)
+      printf "$MESSAGE: $PROCNAME"
+      ;;
+  esac
+}
+
+log_fini ()
+{
+# Output informational/error message at end of action.
+##
+  STATUS="$1"
+  ERRMSG="$2"
+
+  case $SYSTEM in
+    DEBIAN)
+      if [ "$VERBOSE" != no ]; then
+        if ( type log_end_msg && type log_failure_msg ) >/dev/null 2>&1; then
+          log_end_msg "$STATUS"
+          [ $STATUS -eq 0 -o -z "$ERRMSG" ] || log_failure_msg "$ERRMSG"
+        else
+          [ $STATUS -eq 0 ] && echo "." || echo " (failed)."
+          [ $STATUS -eq 0 -o -z "$ERRMSG" ] || echo "$ERRMSG" >&2
+        fi
+      fi
+      ;;
+    REDHAT)
+      echo
+      ;;
+    SUSE)
+      [ $STATUS -eq 0 -o -z "$ERRMSG" ] || echo "$ERRMSG" >&2
+      ;;
+    LSB|*)
+      [ $STATUS -eq 0 ] && echo "." || echo " (failed)."
+      [ $STATUS -eq 0 -o -z "$ERRMSG" ] || echo "$ERRMSG" >&2
+      ;;
+  esac
 }
 
 ###############################################################################
@@ -514,9 +542,9 @@ case "$1" in
     service_status
     ;;
   *)
-    COMMANDS="start|stop|restart|try-restart|reload|force-reload|status"
-    echo "Usage: `basename \"$0\"` ($COMMANDS)" >&2
-    exit 2                              # invalid or excess argument(s)
+    echo "Usage: `basename \"$0\"`" \
+      "(start|stop|restart|try-restart|reload|force-reload|status)" >&2
+    exit 2                              # LSB: invalid or excess argument(s)
     ;;
 esac
 
