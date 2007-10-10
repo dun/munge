@@ -19,5 +19,5 @@ necessarily state or reflect those of the United States Government or
 the University of California, and shall not be used for advertising
 or product endorsement purposes.
 
-The precise terms and conditions for copying, distribution and
+The precise terms and conditions for copying, distribution, and
 modification are specified in the file "COPYING".

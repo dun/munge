@@ -1,3 +1,7 @@
+2007-10-10  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* DISCLAIMER.LLNS, DISCLAIMER.UC: Updated.
+
 2007-10-08  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/etc/munge.init.in: Updated to conman r806.
