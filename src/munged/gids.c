@@ -109,7 +109,8 @@ typedef struct gids_uid  * gids_uid_t;
 
 static void         _gids_update (gids_t gids);
 static hash_t       _gids_hash_create (void);
-static int          _gids_user_to_uid (hash_t hash, char *user);
+static int          _gids_user_to_uid (
+                        hash_t uid_hash, char *user, uid_t *uid_p);
 static int          _gids_hash_add (hash_t hash, uid_t uid, gid_t gid);
 static gids_gid_t   _gids_head_alloc (uid_t uid);
 static void         _gids_head_del (gids_gid_t g);
@@ -389,7 +390,7 @@ _gids_hash_create (void)
             goto err;
         }
         for (pp = gr_ptr->gr_mem; *pp; pp++) {
-            if ((uid = _gids_user_to_uid (uid_hash, *pp)) >= 0) {
+            if ((_gids_user_to_uid (uid_hash, *pp, &uid)) >= 0) {
                 if (_gids_hash_add (gid_hash, uid, gr_ptr->gr_gid) < 0) {
                     goto err;
                 }
@@ -427,9 +428,10 @@ err:
 
 
 static int
-_gids_user_to_uid (hash_t uid_hash, char *user)
+_gids_user_to_uid (hash_t uid_hash, char *user, uid_t *uid_p)
 {
-/*  Returns the UID associated with [user], or -1 on error.
+/*  Returns 0 on success, setting [*uid_p] (if non-NULL) to the UID associated
+ *    with [user]; o/w, returns -1.
  */
     gids_uid_t     u;
     uid_t          uid;
@@ -458,7 +460,10 @@ _gids_user_to_uid (hash_t uid_hash, char *user)
             "Unable to query password file entry for \"%s\"", user);
         return (-1);
     }
-    return (uid);
+    if (uid_p != NULL) {
+        *uid_p = uid;
+    }
+    return (0);
 }
 
 

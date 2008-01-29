@@ -1,3 +1,12 @@
+2008-01-28  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/munged/gids.c (_gids_hash_create, _gids_user_to_uid):
+	  Fixed bug (found by coverity) where _gids_user_to_uid() returned a
+	  signed int identifying the uid (on success) or -1 (on error).  This
+	  value was first assigned directly to an unsigned uid_t and then
+	  tested for error.  But since the var was unsigned, the test would
+	  always eval to true.
+
 2008-01-09  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* : Updated copyright date range.
