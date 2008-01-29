@@ -1,3 +1,11 @@
+2008-01-29  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/libcommon/str.c, src/libcommon/str.h (strcatf):
+	  Fixed bug (found by coverity) where strcatf()'s size_t return type
+	  prevented the error code of -1 from being returned to the caller.
+	* src/munged/crypto.c (openssl_log_msg):
+	  Specified void cast to discard return value from strcatf().
+
 2008-01-28  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/munged/gids.c (_gids_hash_create, _gids_user_to_uid):

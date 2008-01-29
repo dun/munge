@@ -42,7 +42,7 @@ char * strdupf (const char *fmt, ...);
  *  The caller is responsible for freeing this new string.
  */
 
-size_t strcatf (char *dst, size_t size, const char *fmt, ...);
+int strcatf (char *dst, size_t size, const char *fmt, ...);
 /*
  *  Concatenates the string specified by the format-string [fmt] to
  *    the NUL-terminated string [dst] within a buffer of size [size].

@@ -301,7 +301,7 @@ openssl_log_msg (int priority)
         ERR_error_string (e, buf);
 #endif /* !HAVE_ERR_ERROR_STRING_N */
         if (data && (flags & ERR_TXT_STRING)) {
-            strcatf (buf, sizeof (buf), ":%s", data);
+            (void) strcatf (buf, sizeof (buf), ":%s", data);
         }
         log_msg (priority, "%s", buf);
     }

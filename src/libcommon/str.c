@@ -70,7 +70,7 @@ strdupf (const char *fmt, ...)
 }
 
 
-size_t
+int
 strcatf (char *dst, size_t size, const char *fmt, ...)
 {
     va_list  vargs;
