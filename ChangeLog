@@ -1,5 +1,8 @@
 2008-01-29  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/libcommon/ctx.c (munge_ctx_create): Fixed bug (found by coverity)
+	  where ctx->error_str could be read before it was initialized.
+
 	* src/libcommon/str.c, src/libcommon/str.h (strcatf):
 	  Fixed bug (found by coverity) where strcatf()'s size_t return type
 	  prevented the error code of -1 from being returned to the caller.

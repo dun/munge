@@ -61,14 +61,14 @@ munge_ctx_create (void)
     ctx->time1 = 0;
     ctx->auth_uid = MUNGE_UID_ANY;
     ctx->auth_gid = MUNGE_GID_ANY;
-
-    if (!(ctx->socket_str = strdup (MUNGE_SOCKET_NAME))) {
-        munge_ctx_destroy (ctx);
-        return (NULL);
-    }
+    ctx->socket_str = strdup (MUNGE_SOCKET_NAME);
     ctx->error_num = EMUNGE_SUCCESS;
     ctx->error_str = NULL;
 
+    if (!ctx->socket_str) {
+        munge_ctx_destroy (ctx);
+        return (NULL);
+    }
     return (ctx);
 }
 
