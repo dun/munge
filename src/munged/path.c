@@ -84,30 +84,28 @@ path_dirname (const char *src, char *dst, size_t dstlen)
     char *p = NULL;
     enum { start, last_slash, last_word, prev_slash } state = start;
 
-    if ((dst == NULL) || (dstlen <= 1)) {
+    if ((src == NULL) || (dst == NULL) || (dstlen <= 1)) {
         errno = EINVAL;
         return (-1);
     }
-    if (src != NULL) {
-        if (strlcpy (dst, src, dstlen) >= dstlen) {
-            errno = ENAMETOOLONG;
-            return (-1);
+    if (strlcpy (dst, src, dstlen) >= dstlen) {
+        errno = ENAMETOOLONG;
+        return (-1);
+    }
+    for (p = dst + strlen (dst) - 1; p >= dst; p--) {
+        if (state == start) {
+            state = (*p == '/') ? last_slash : last_word;
         }
-        for (p = dst + strlen (dst) - 1; p >= dst; p--) {
-            if (state == start) {
-                state = (*p == '/') ? last_slash : last_word;
-            }
-            else if (state == last_slash) {
-                if (*p != '/') state = last_word;
-            }
-            else if (state == last_word) {
-                if (*p == '/') state = prev_slash;
-            }
-            else if (state == prev_slash) {
-                if (*p != '/') break;
-            }
-            *p = '\0';
+        else if (state == last_slash) {
+            if (*p != '/') state = last_word;
         }
+        else if (state == last_word) {
+            if (*p == '/') state = prev_slash;
+        }
+        else if (state == prev_slash) {
+            if (*p != '/') break;
+        }
+        *p = '\0';
     }
     if (p < dst) {
         dst[0] = (state == prev_slash || state == last_slash) ? '/' : '.';
