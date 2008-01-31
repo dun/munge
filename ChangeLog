@@ -1,5 +1,7 @@
 2008-01-30  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/munged/path.h: Added missing #include.
+
 	* src/munged/path.c (path_dirname): Changed behavior to return EINVAL
 	  error if src is NULL.
 

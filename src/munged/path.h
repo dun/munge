@@ -33,6 +33,7 @@
 #endif /* HAVE_CONFIG_H */
 
 #include <limits.h>
+#include <unistd.h>
 
 #ifndef PATH_MAX
 #  define PATH_MAX 4096
