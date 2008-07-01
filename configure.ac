@@ -80,6 +80,7 @@ if test "$CRYPTO_PKG" = "openssl"; then
     EVP_aes_128_cbc \
     EVP_aes_256_cbc \
     EVP_sha256 \
+    EVP_sha512 \
     HMAC_Init_ex \
   )
   AC_CHECK_TYPES(CRYPTO_dynlock, [], [], [#include <openssl/crypto.h>])

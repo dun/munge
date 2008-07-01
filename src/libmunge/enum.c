@@ -57,6 +57,12 @@
 #  define MUNGE_MAC_SHA256_FLAG         0
 #endif
 
+#if HAVE_LIBGCRYPT || HAVE_EVP_SHA512
+#  define MUNGE_MAC_SHA512_FLAG         1
+#else
+#  define MUNGE_MAC_SHA512_FLAG         0
+#endif
+
 #if HAVE_PKG_BZLIB
 #  define MUNGE_ZIP_BZLIB_FLAG          1
 #else
@@ -104,6 +110,7 @@ static struct munge_enum_table _munge_mac_table[] = {
     { MUNGE_MAC_SHA1,           "sha1",         1                        },
     { MUNGE_MAC_RIPEMD160,      "ripemd160",    1                        },
     { MUNGE_MAC_SHA256,         "sha256",       MUNGE_MAC_SHA256_FLAG    },
+    { MUNGE_MAC_SHA512,         "sha512",       MUNGE_MAC_SHA512_FLAG    },
     { -1,                        NULL,         -1                        }
 };
 

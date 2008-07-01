@@ -100,7 +100,8 @@ typedef enum munge_mac {
     MUNGE_MAC_MD5               =  2,   /* MD5 w/ 128b-digest                */
     MUNGE_MAC_SHA1              =  3,   /* SHA-1 w/ 160b-digest              */
     MUNGE_MAC_RIPEMD160         =  4,   /* RIPEMD-160 w/ 160b-digest         */
-    MUNGE_MAC_SHA256            =  5    /* SHA-256 w/ 256b-digest            */
+    MUNGE_MAC_SHA256            =  5,   /* SHA-256 w/ 256b-digest            */
+    MUNGE_MAC_SHA512            =  6    /* SHA-512 w/ 512b-digest            */
 } munge_mac_t;
 
 /*  MUNGE compression types

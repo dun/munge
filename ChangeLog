@@ -1,5 +1,9 @@
 2008-07-01  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/munged/md.c, src/libcommon/munge_defs.h, src/libmunge/munge.h,
+	  src/libmunge/enum.c, src/libmunge/munge_ctx.3.in, configure.ac:
+	  Added support for MUNGE_MAC_SHA512.
+
 	* doc/credential_v3_format.txt: Added additional details to the steps
 	  in which credentials are encoded.
 

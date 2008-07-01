@@ -208,10 +208,16 @@ margin.
 .B MUNGE_MAC_SHA256
 Specify the SHA-256 algorithm designed by the National Security Agency and
 published in 2002; this is one of the SHA-2 variants in the Secure Hash
-Algorithm family.  This algorithm has a 256-bit message digest.  It has not
-received as much scrutiny by the public cryptographic community as SHA-1 has,
-and so its cryptographic security is not yet as well-established.  However,
-no attacks have yet been reported against it.
+Algorithm family.  This algorithm has a 256-bit message digest.  In 2006,
+NIST began encouraging the use of the SHA-2 family of hash functions for
+all new applications and protocols.
+.TP
+.B MUNGE_MAC_SHA512
+Specify the SHA-512 algorithm designed by the National Security Agency and
+published in 2002; this is one of the SHA-2 variants in the Secure Hash
+Algorithm family.  This algorithm has a 512-bit message digest.  In 2006,
+NIST began encouraging the use of the SHA-2 family of hash functions for
+all new applications and protocols.
 
 .SH "ZIP TYPES"
 If a compression type is specified, a payload-bearing credential will be

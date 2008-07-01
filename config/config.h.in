@@ -30,6 +30,9 @@
 /* Define to 1 if you have the `EVP_sha256' function. */
 #undef HAVE_EVP_SHA256
 
+/* Define to 1 if you have the `EVP_sha512' function. */
+#undef HAVE_EVP_SHA512
+
 /* Define to 1 if file descriptors can be passed over a fifo. */
 #undef HAVE_FIFO_RECVFD
 

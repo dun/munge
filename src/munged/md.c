@@ -265,6 +265,9 @@ _md_map_enum (munge_mac_t md, void *dst)
         case MUNGE_MAC_SHA256:
             algo = GCRY_MD_SHA256;
             break;
+        case MUNGE_MAC_SHA512:
+            algo = GCRY_MD_SHA512;
+            break;
         default:
             rc = -1;
             break;
@@ -411,6 +414,11 @@ _md_map_enum (munge_mac_t md, void *dst)
             algo = EVP_sha256 ();
             break;
 #endif /* HAVE_EVP_SHA256 */
+#if HAVE_EVP_SHA512
+        case MUNGE_MAC_SHA512:
+            algo = EVP_sha512 ();
+            break;
+#endif /* HAVE_EVP_SHA512 */
         default:
             rc = -1;
             break;

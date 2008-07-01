@@ -81,11 +81,11 @@
  */
 #define MUNGE_MAXIMUM_KEY_LEN           32
 
-/*  Integer for the maximum size (in bytes) of a message digest.
+/*  Integer for the maximum size (in bytes) of a message digest (ie, SHA512).
  */
-#define MUNGE_MAXIMUM_MD_LEN            32
+#define MUNGE_MAXIMUM_MD_LEN            64
 
-/*  Integer for the minimum size (in bytes) of a message digest.
+/*  Integer for the minimum size (in bytes) of a message digest (ie, MD5).
  */
 #define MUNGE_MINIMUM_MD_LEN            16
 
