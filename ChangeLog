@@ -1,3 +1,8 @@
+2008-07-01  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* doc/credential_v3_format.txt: Added additional details to the steps
+	  in which credentials are encoded.
+
 2008-01-30  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/munged/path.h: Added missing #include.
