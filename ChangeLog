@@ -1,7 +1,10 @@
 2008-07-01  Chris Dunlap  <cdunlap@llnl.gov>
 
-	* src/munged/md.c, src/libcommon/munge_defs.h, src/libmunge/munge.h,
-	  src/libmunge/enum.c, src/libmunge/munge_ctx.3.in, configure.ac:
+	* : Re-bootstrap'd with autoconf-2.61, automake-1.10.
+
+	* configure.ac, config/config.h.in,
+	  src/libcommon/munge_defs.h, src/libmunge/enum.c,
+	  src/libmunge/munge.h, src/libmunge/munge_ctx.3.in, src/munged/md.c:
 	  Added support for MUNGE_MAC_SHA512.
 
 	* doc/credential_v3_format.txt: Added additional details to the steps
