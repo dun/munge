@@ -1,3 +1,8 @@
+2008-08-14  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/libmissing/inet_ntop.h, src/munged/conf.c, src/munge/unmunge.c:
+	  Moved <arpa/inet.h> header include into "inet_ntop.h" #if/#else.
+
 2008-07-01  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* : Re-bootstrap'd with autoconf-2.61, automake-1.10.

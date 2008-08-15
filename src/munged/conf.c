@@ -30,7 +30,6 @@
 
 #include <sys/types.h>                  /* include before in.h for bsd */
 #include <netinet/in.h>                 /* include before inet.h for bsd */
-#include <arpa/inet.h>                  /* for inet_ntop() */
 #include <assert.h>
 #include <errno.h>
 #include <fcntl.h>
@@ -47,7 +46,7 @@
 #include "license.h"
 #include "log.h"
 #include "md.h"
-#include "missing.h"
+#include "missing.h"                    /* for inet_ntop() */
 #include "munge_defs.h"
 #include "path.h"
 #include "str.h"

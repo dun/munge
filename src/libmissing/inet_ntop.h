@@ -35,8 +35,10 @@
 #  define INET_ADDRSTRLEN 16
 #endif /* !INET_ADDRSTRLEN */
 
-#if !HAVE_INET_NTOP
-#include <sys/socket.h>
+#if HAVE_INET_NTOP
+#  include <arpa/inet.h>
+#else  /* !HAVE_INET_NTOP */
+#  include <sys/socket.h>
 const char *inet_ntop (int af, const void *src, char *dst, socklen_t cnt);
 #endif /* !HAVE_INET_NTOP */
 
