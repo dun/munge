@@ -1,5 +1,9 @@
 2008-08-14  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/libcommon/m_msg.c, src/libmunge/encode.c, src/munged/dec.c,
+	  src/munged/enc.c, src/munged/munged.c: Removed unnecessary header
+	  includes.
+
 	* src/libmissing/inet_ntop.h, src/munged/conf.c, src/munge/unmunge.c:
 	  Moved <arpa/inet.h> header include into "inet_ntop.h" #if/#else.
 

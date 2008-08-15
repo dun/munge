@@ -37,7 +37,6 @@
 #include "ctx.h"
 #include "m_msg.h"
 #include "m_msg_client.h"
-#include "munge_defs.h"
 #include "str.h"
 
 

@@ -39,7 +39,6 @@
 #include <unistd.h>
 #include "fd.h"
 #include "m_msg.h"
-#include "munge_defs.h"
 #include "str.h"
 
 

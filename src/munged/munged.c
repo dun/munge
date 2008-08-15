@@ -55,7 +55,6 @@
 #include "random.h"
 #include "replay.h"
 #include "timer.h"
-#include "version.h"
 
 
 /*****************************************************************************
