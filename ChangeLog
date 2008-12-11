@@ -1,5 +1,8 @@
 2008-12-10  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/munged/gids.c (_gids_hash_create): Added guard for processing
+	  results of getgrent() to avoid dereferencing gr_mem if NULL.
+
 	* src/munged/gids.c (_gids_hash_create): Added strerror() to log msg
 	  for getgrent() failure.
 

@@ -400,7 +400,7 @@ _gids_hash_create (void)
                     strerror (errno));
             goto err;
         }
-        for (pp = gr_ptr->gr_mem; *pp; pp++) {
+        for (pp = gr_ptr->gr_mem; pp && *pp; pp++) {
             if ((_gids_user_to_uid (uid_hash, *pp, &uid)) >= 0) {
                 if (_gids_hash_add (gid_hash, uid, gr_ptr->gr_gid) < 0) {
                     goto err;
