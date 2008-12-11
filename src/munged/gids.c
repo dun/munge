@@ -284,7 +284,7 @@ _gids_update (gids_t gids)
     time_t          t_now;
     struct stat     st;
     int             do_update = 1;
-    hash_t          hash, hash_bak;
+    hash_t          hash;
 
     assert (gids != NULL);
 
@@ -304,28 +304,30 @@ _gids_update (gids_t gids)
             t_now = st.st_mtime;
         }
     }
-    if (do_update && (hash = _gids_hash_create ())) {
+    /*  Update the GIDS mapping.
+     */
+    hash = NULL;
+    if (do_update) {
+        hash = _gids_hash_create ();
+    }
+    if ((errno = pthread_mutex_lock (&gids->lock)) != 0) {
+        log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to lock gids mutex");
+    }
+    /*  Replace the old GIDS mapping if the update was successful.
+     */
+    if (hash) {
 
-        if ((errno = pthread_mutex_lock (&gids->lock)) != 0) {
-            log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to lock gids mutex");
-        }
+        hash_t hash_bak;
+
         hash_bak = gids->hash;
         gids->hash = hash;
-
-        if ((errno = pthread_mutex_unlock (&gids->lock)) != 0) {
-            log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to unlock gids mutex");
-        }
-        hash_destroy (hash_bak);
+        hash = hash_bak;
         t_last_update = t_now;
     }
     /*  Enable subsequent updating of the GIDs mapping only if the update
      *    interval is positive.
      */
-    if ((errno = pthread_mutex_lock (&gids->lock)) != 0) {
-        log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to lock gids mutex");
-    }
     gids->timer = 0;
-
     if (gids->interval > 0) {
         gids->timer = timer_set_relative (
                 (callback_f) _gids_update, gids, gids->interval * 1000);
@@ -336,6 +338,11 @@ _gids_update (gids_t gids)
     }
     if ((errno = pthread_mutex_unlock (&gids->lock)) != 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to unlock gids mutex");
+    }
+    /*  Clean up.
+     */
+    if (hash) {
+        hash_destroy (hash);
     }
     return;
 }
