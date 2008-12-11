@@ -396,7 +396,8 @@ _gids_hash_create (void)
                 break;
             if (errno == EINTR)
                 continue;
-            log_msg (LOG_ERR, "Unable to query group info");
+            log_msg (LOG_ERR, "Unable to query group info: %s",
+                    strerror (errno));
             goto err;
         }
         for (pp = gr_ptr->gr_mem; *pp; pp++) {

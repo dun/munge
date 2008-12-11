@@ -1,5 +1,8 @@
 2008-12-10  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/munged/gids.c (_gids_hash_create): Added strerror() to log msg
+	  for getgrent() failure.
+
 	* src/munged/gids.c (_gids_hash_create): Added 'do_group_db_close'
 	  guard var for endgrent() in 'err' path.
 
