@@ -599,6 +599,9 @@ _gids_uid_alloc (char *user, uid_t uid)
  */
     gids_uid_t u;
 
+    if ((user == NULL) || (*user == '\0')) {
+        return (NULL);
+    }
     if (!(u = malloc (sizeof (*u)))) {
         return (NULL);
     }

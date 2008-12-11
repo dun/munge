@@ -1,5 +1,7 @@
 2008-12-10  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/munged/gids.c (_gids_uid_alloc): Added check for valid 'user'.
+
 	* src/munged/gids.c (_gids_uid_alloc): Updated usage comment.
 
 	* src/munged/gids.c (_gids_hash_create): Added guard for processing
