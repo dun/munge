@@ -595,7 +595,7 @@ _gids_node_key (uid_t *uid_p)
 static gids_uid_t
 _gids_uid_alloc (char *user, uid_t uid)
 {
-/*  Returns an allocated UID node mapping [user] to [uid].
+/*  Returns an allocated UID node mapping [user] to [uid], or NULL on error.
  */
     gids_uid_t u;
 
