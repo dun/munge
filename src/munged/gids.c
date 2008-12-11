@@ -357,6 +357,7 @@ _gids_hash_create (void)
     hash_t          uid_hash = NULL;
     struct timeval  t_start;
     struct timeval  t_stop;
+    int             do_group_db_close = 0;
     struct group   *gr_ptr;
     char          **pp;
     uid_t           uid;
@@ -382,6 +383,8 @@ _gids_hash_create (void)
         goto err;
     }
     setgrent ();
+    do_group_db_close = 1;
+
     for (;;) {
         errno = 0;
         if (!(gr_ptr = getgrent ())) {
@@ -427,7 +430,9 @@ _gids_hash_create (void)
     return (gid_hash);
 
 err:
-    endgrent ();
+    if (do_group_db_close) {
+        endgrent ();
+    }
     hash_destroy (uid_hash);
     hash_destroy (gid_hash);
     return (NULL);
