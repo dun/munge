@@ -1,3 +1,8 @@
+2009-04-06  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/etc/munge.init.in: Changed LSB Default-Start / Default-Stop and
+	  chkconfig runlevels so daemon is not started by default.
+
 2008-12-10  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/munged/gids.c (_gids_uid_alloc): Added check for valid 'user'.

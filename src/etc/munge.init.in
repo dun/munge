@@ -3,11 +3,11 @@
 # $Id$
 ###############################################################################
 # Written by Chris Dunlap <cdunlap@llnl.gov>.
-# Copyright (C) 2007-2008 Lawrence Livermore National Security, LLC.
+# Copyright (C) 2007-2009 Lawrence Livermore National Security, LLC.
 # Copyright (C) 2002-2007 The Regents of the University of California.
 # UCRL-CODE-155910.
 ###############################################################################
-# chkconfig:          2345 40 60
+# chkconfig:          - 40 60
 # Description:        Start/Stop the MUNGE authentication service.
 ###############################################################################
 ### BEGIN INIT INFO
@@ -16,9 +16,10 @@
 # Required-Stop:      $named $time
 # Should-Start:       $local_fs $syslog
 # Should-Stop:        $local_fs $syslog
-# Default-Start:      2 3 4 5
-# Default-Stop:       0 1 6
 # Short-Description:  Start/Stop the MUNGE authentication service.
+# Description:        MUNGE (MUNGE Uid 'N' Gid Emporium) is a highly scalable
+#                     authentication service for creating and validating
+#                     credentials.
 ### END INIT INFO
 ###############################################################################
 
