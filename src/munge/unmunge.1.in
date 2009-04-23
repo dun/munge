@@ -72,7 +72,7 @@ If a subset is not specified, all available keys are selected by default.
 .BI "-K, --list-keys"
 Display a list of metadata keys.
 .TP
-.BI "-S, --socket " string
+.BI "-S, --socket " path
 Specify the local domain socket for connecting with \fBmunged\fR.
 
 .SH "METADATA KEYS"

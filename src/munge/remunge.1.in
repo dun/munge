@@ -97,7 +97,7 @@ Specify the time-to-live (in seconds).  This controls how long the credential
 is valid once it has been encoded.  A value of 0 selects the default TTL.
 A value of \-1 selects the maximum allowed TTL.
 .TP
-.BI "-S, --socket " string
+.BI "-S, --socket " path
 Specify the local domain socket for connecting with \fBmunged\fR.
 .TP
 .BI "-D, --duration " integer

@@ -1,5 +1,8 @@
 2009-04-23  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/munge/munge.1.in, src/munge/remunge.1.in, src/munge/unmunge.1.in,
+	  src/munged/munged.8.in: Changed "--socket string" to "--socket path".
+
 	* src/etc/munge.init.in: Swapped order of CONFIG & DAEMON_ARGS vars.
 
 2009-04-06  Chris Dunlap  <cdunlap@llnl.gov>

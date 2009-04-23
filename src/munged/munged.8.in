@@ -74,7 +74,7 @@ file/directory permissions.
 .BI "-F, --foreground"
 Run the daemon in the foreground.
 .TP
-.BI "-S, --socket " string
+.BI "-S, --socket " path
 Specify the local domain socket for communicating with clients.
 .TP
 .BI "--auth-server-dir " directory
