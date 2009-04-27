@@ -1,3 +1,10 @@
+2009-04-27  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* : Re-bootstrap'd with autoconf-2.61, automake-1.10.1.
+
+	* configure.ac: Added AM_PROG_CC_C_O for compiling auth_recv.c with
+	  per-target flags.
+
 2009-04-23  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* : Updated copyright date range.
