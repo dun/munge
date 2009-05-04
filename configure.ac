@@ -47,6 +47,7 @@ AM_MAINTAINER_MODE
 ##
 # Checks for programs.
 ##
+AC_GNU_SOURCE
 X_AC_ARCH
 AC_PROG_CC
 AM_PROG_CC_C_O

@@ -1,3 +1,10 @@
+2009-05-04  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* configure.ac: Added AC_GNU_SOURCE macro (note that it is called
+	  before any macros that run the C compiler).  As of glibc 2.8, the
+	  _GNU_SOURCE feature test macro must be defined in order to obtain the
+	  ucred struct definition.
+
 2009-04-27  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* : Re-bootstrap'd with autoconf-2.61, automake-1.10.1.

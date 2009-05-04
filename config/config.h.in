@@ -233,6 +233,11 @@
 /* Define to 1 if you are building on Darwin (Mac OS X). */
 #undef _APPLE_C_SOURCE
 
+/* Enable GNU extensions on systems that have them.  */
+#ifndef _GNU_SOURCE
+# undef _GNU_SOURCE
+#endif
+
 /* Define to 1 if you plan to link against multithreaded code. */
 #undef _REENTRANT
 
