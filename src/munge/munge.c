@@ -326,10 +326,12 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                     i = pw_ptr->pw_uid;
                 }
                 else {
+                    errno = 0;
                     l = strtol (optarg, &p, 10);
-                    if ((optarg == p) || (*p != '\0')
-                            || (l < 0) || (l > INT_MAX)
-                            || ((l == LONG_MAX) && (errno == ERANGE))) {
+                    if (((errno == ERANGE)
+                                && ((l == LONG_MIN) || (l == LONG_MAX)))
+                            || (optarg == p) || (*p != '\0')
+                            || (l < 0) || (l > INT_MAX)) {
                         log_err (EMUNGE_SNAFU, LOG_ERR,
                             "Unrecognized user \"%s\"", optarg);
                     }
@@ -347,10 +349,12 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                     i = gr_ptr->gr_gid;
                 }
                 else {
+                    errno = 0;
                     l = strtol (optarg, &p, 10);
-                    if ((optarg == p) || (*p != '\0')
-                            || (l < 0) || (l > INT_MAX)
-                            || ((l == LONG_MAX) && (errno == ERANGE))) {
+                    if (((errno == ERANGE)
+                                && ((l == LONG_MIN) || (l == LONG_MAX)))
+                            || (optarg == p) || (*p != '\0')
+                            || (l < 0) || (l > INT_MAX)) {
                         log_err (EMUNGE_SNAFU, LOG_ERR,
                             "Unrecognized group \"%s\"", optarg);
                     }
@@ -364,12 +368,13 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                 }
                 break;
             case 't':
+                errno = 0;
                 l = strtol (optarg, &p, 10);
                 if ((optarg == p) || (*p != '\0')) {
                     log_err (EMUNGE_SNAFU, LOG_ERR,
                         "Invalid time-to-live '%s'", optarg);
                 }
-                if (((l == LONG_MAX) && (errno == ERANGE)) || (l > INT_MAX)) {
+                if (((errno == ERANGE) && (l == LONG_MAX)) || (l > INT_MAX)) {
                     log_err (EMUNGE_SNAFU, LOG_ERR,
                         "Exceeded maximum time-to-live of %d seconds",
                         INT_MAX);

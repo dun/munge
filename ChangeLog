@@ -1,3 +1,11 @@
+2009-06-10  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/libmunge/enum.c (munge_enum_str_to_int),
+	  src/munge/munge.c (parse_cmdline),
+	  src/munge/remunge.c (parse_cmdline),
+	  src/munged/conf.c (parse_cmdline):
+	  Added additional checks for strtol() & strtoul().
+
 2009-05-04  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* configure.ac: Added AC_GNU_SOURCE macro (note that it is called

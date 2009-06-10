@@ -278,8 +278,10 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                         "Cannot dup key-file name string");
                 break;
             case '1':
+                errno = 0;
                 l = strtol (optarg, &p, 10);
-                if ((optarg == p) || (*p != '\0')
+                if (((errno == ERANGE) && ((l == LONG_MIN) || (l == LONG_MAX)))
+                        || (optarg == p) || (*p != '\0')
                         || (l <= 0) || (l > INT_MAX)) {
                     log_err (EMUNGE_SNAFU, LOG_ERR,
                         "Invalid value \"%s\" for num-threads", optarg);
@@ -303,16 +305,20 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                 break;
 #endif /* MUNGE_AUTH_RECVFD */
             case '4':
+                errno = 0;
                 l = strtol (optarg, &p, 10);
-                if ((optarg == p) || (*p != '\0')) {
+                if (((errno == ERANGE) && ((l == LONG_MIN) || (l == LONG_MAX)))
+                        || (optarg == p) || (*p != '\0')) {
                     log_err (EMUNGE_SNAFU, LOG_ERR,
                         "Invalid value \"%s\" for group-check-mtime", optarg);
                 }
                 conf->got_group_stat = !! l;
                 break;
             case '5':
+                errno = 0;
                 l = strtol (optarg, &p, 10);
-                if ((optarg == p) || (*p != '\0')
+                if (((errno == ERANGE) && ((l == LONG_MIN) || (l == LONG_MAX)))
+                        || (optarg == p) || (*p != '\0')
                         || (l < INT_MIN) || (l > INT_MAX)) {
                     log_err (EMUNGE_SNAFU, LOG_ERR,
                         "Invalid value \"%s\" for group-update-time", optarg);

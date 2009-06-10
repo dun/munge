@@ -441,13 +441,14 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                 conf->do_decode = 1;
                 break;
             case 'l':
+                errno = 0;
                 l = strtol (optarg, &p, 10);
-                if ((optarg == p) || ((*p != '\0') && *(p+1) != '\0')
+                if ((optarg == p) || ((*p != '\0') && (*(p+1) != '\0'))
                         || (l < 0)) {
                     log_err (EMUNGE_SNAFU, LOG_ERR,
                         "Invalid number of bytes '%s'", optarg);
                 }
-                if (((l == LONG_MAX) && (errno == ERANGE)) || (l > INT_MAX)) {
+                if (((errno == ERANGE) && (l == LONG_MAX)) || (l > INT_MAX)) {
                     log_err (EMUNGE_SNAFU, LOG_ERR,
                         "Exceeded maximum number of %d bytes", INT_MAX);
                 }
@@ -466,10 +467,12 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                     i = pw_ptr->pw_uid;
                 }
                 else {
+                    errno = 0;
                     l = strtol (optarg, &p, 10);
-                    if ((optarg == p) || (*p != '\0')
-                            || (l < 0) || (l > INT_MAX)
-                            || ((l == LONG_MAX) && (errno == ERANGE))) {
+                    if (((errno == ERANGE)
+                                && ((l == LONG_MIN) || (l == LONG_MAX)))
+                            || (optarg == p) || (*p != '\0')
+                            || (l < 0) || (l > INT_MAX)) {
                         log_err (EMUNGE_SNAFU, LOG_ERR,
                             "Unrecognized user \"%s\"", optarg);
                     }
@@ -487,10 +490,12 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                     i = gr_ptr->gr_gid;
                 }
                 else {
+                    errno = 0;
                     l = strtol (optarg, &p, 10);
-                    if ((optarg == p) || (*p != '\0')
-                            || (l < 0) || (l > INT_MAX)
-                            || ((l == LONG_MAX) && (errno == ERANGE))) {
+                    if (((errno == ERANGE)
+                                && ((l == LONG_MIN) || (l == LONG_MAX)))
+                            || (optarg == p) || (*p != '\0')
+                            || (l < 0) || (l > INT_MAX)) {
                         log_err (EMUNGE_SNAFU, LOG_ERR,
                             "Unrecognized group \"%s\"", optarg);
                     }
@@ -504,12 +509,13 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                 }
                 break;
             case 't':
+                errno = 0;
                 l = strtol (optarg, &p, 10);
                 if ((optarg == p) || (*p != '\0')) {
                     log_err (EMUNGE_SNAFU, LOG_ERR,
                         "Invalid time-to-live '%s'", optarg);
                 }
-                if (((l == LONG_MAX) && (errno == ERANGE)) || (l > INT_MAX)) {
+                if (((errno == ERANGE) && (l == LONG_MAX)) || (l > INT_MAX)) {
                     log_err (EMUNGE_SNAFU, LOG_ERR,
                         "Exceeded maximum time-to-live of %d seconds",
                         INT_MAX);
@@ -533,12 +539,14 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                 }
                 break;
             case 'D':
+                errno = 0;
                 l = strtol (optarg, &p, 10);
-                if ((optarg == p) || ((*p != '\0') && (*(p+1) != '\0'))) {
+                if ((optarg == p) || ((*p != '\0') && (*(p+1) != '\0'))
+                        || (l <= 0)) {
                     log_err (EMUNGE_SNAFU, LOG_ERR,
                         "Invalid duration '%s'", optarg);
                 }
-                if (((l == LONG_MAX) && (errno == ERANGE)) || (l > INT_MAX)) {
+                if (((errno == ERANGE) && (l == LONG_MAX)) || (l > INT_MAX)) {
                     log_err (EMUNGE_SNAFU, LOG_ERR,
                         "Exceeded maximum duration of %d seconds", INT_MAX);
                 }
@@ -553,12 +561,14 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                 conf->num_seconds = (int) (l * multiplier);
                 break;
             case 'N':
+                errno = 0;
                 u = strtoul (optarg, &p, 10);
-                if ((optarg == p) || ((*p != '\0') && (*(p+1) != '\0'))) {
+                if ((optarg == p) || ((*p != '\0') && (*(p+1) != '\0'))
+                        || (u == 0)) {
                     log_err (EMUNGE_SNAFU, LOG_ERR,
                         "Invalid number of credentials '%s'", optarg);
                 }
-                if ((u == ULONG_MAX) && (errno == ERANGE)) {
+                if ((errno == ERANGE) && (u == ULONG_MAX)) {
                     log_err (EMUNGE_SNAFU, LOG_ERR,
                         "Exceeded maximum number of %lu credentials",
                         ULONG_MAX);
@@ -575,12 +585,13 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                 conf->num_creds = u * multiplier;
                 break;
             case 'T':
+                errno = 0;
                 l = strtol (optarg, &p, 10);
-                if ((optarg == p) || (*p != '\0') || (l < 1)) {
+                if ((optarg == p) || (*p != '\0') || (l <= 0)) {
                     log_err (EMUNGE_SNAFU, LOG_ERR,
                         "Invalid number of threads '%s'", optarg);
                 }
-                if (((l == LONG_MAX) && (errno == ERANGE))
+                if (((errno == ERANGE) && (l == LONG_MAX)) || (l > INT_MAX)
                         || (l > conf->max_threads)) {
                     log_err (EMUNGE_SNAFU, LOG_ERR,
                         "Exceeded maximum number of %d thread%s",
@@ -590,12 +601,13 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                 conf->num_threads = (int) l;
                 break;
             case 'W':
+                errno = 0;
                 l = strtol (optarg, &p, 10);
-                if ((optarg == p) || (*p != '\0') || (l < 1)) {
+                if ((optarg == p) || (*p != '\0') || (l <= 0)) {
                     log_err (EMUNGE_SNAFU, LOG_ERR,
                         "Invalid number of seconds '%s'", optarg);
                 }
-                if (((l == LONG_MAX) && (errno == ERANGE)) || (l > INT_MAX)) {
+                if (((errno == ERANGE) && (l == LONG_MAX)) || (l > INT_MAX)) {
                     log_err (EMUNGE_SNAFU, LOG_ERR,
                         "Exceeded maximum number of %d seconds", INT_MAX);
                 }

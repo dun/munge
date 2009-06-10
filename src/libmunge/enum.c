@@ -28,6 +28,7 @@
 #  include <config.h>
 #endif /* HAVE_CONFIG_H */
 
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <strings.h>
@@ -177,6 +178,7 @@ munge_enum_str_to_int (munge_enum_t type, const char *str)
     int                 i;
     int                 n;
     char               *p;
+    int                 errno_bak, errno_sav;
 
     if (!str || !*str) {
         return (-1);
@@ -193,9 +195,19 @@ munge_enum_str_to_int (munge_enum_t type, const char *str)
         }
     }
     /*  Check if the given string matches a valid enum.
+     *  Save & restore errno in order to check for strtol() errors.
+     *    This check is technically unnecessary since (str == p) should check
+     *    for no digits and (*p != '\0') should check for trailing non-digits.
+     *    ERANGE is not compared against LONG_MIN or LONG_MAX since these enums
+     *    can never get that large.  It's just an extra check for the paranoid.
      */
+    errno_bak = errno;
+    errno = 0;
     n = strtol (str, &p, 10);
-    if ((str == p) || (*p != '\0')) {
+    errno_sav = errno;
+    errno = errno_bak;
+
+    if ((errno_sav != 0) || (str == p) || (*p != '\0')) {
         return (-1);
     }
     if ((n < 0) || (n >= i)) {
