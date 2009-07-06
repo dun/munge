@@ -4,6 +4,12 @@
 	  src/munge/remunge.c (parse_cmdline),
 	  src/munge/unmunge.c (parse_cmdline),
 	  src/munged/conf.c (parse_cmdline):
+	  Renamed opt_string to short_opts, opt_table to long_opts.
+
+	* src/munge/munge.c (parse_cmdline),
+	  src/munge/remunge.c (parse_cmdline),
+	  src/munge/unmunge.c (parse_cmdline),
+	  src/munged/conf.c (parse_cmdline):
 	  Added case for missing option argument.
 
 2009-06-10  Chris Dunlap  <cdunlap@llnl.gov>

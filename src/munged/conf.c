@@ -58,27 +58,27 @@
  *  Command-Line Options
  *****************************************************************************/
 
-#  include <getopt.h>
-struct option opt_table[] = {
-    { "help",       0, NULL, 'h' },
-    { "license",    0, NULL, 'L' },
-    { "version",    0, NULL, 'V' },
-    { "force",      0, NULL, 'f' },
-    { "foreground", 0, NULL, 'F' },
-    { "socket",     1, NULL, 'S' },
-    { "advice",     0, NULL, 'A' },
-    { "key-file",          1, NULL, '0' },
-    { "num-threads",       1, NULL, '1' },
-#ifdef MUNGE_AUTH_RECVFD
-    { "auth-server-dir",   1, NULL, '2' },
-    { "auth-client-dir",   1, NULL, '3' },
-#endif /* MUNGE_AUTH_RECVFD */
-    { "group-check-mtime", 1, NULL, '4' },
-    { "group-update-time", 1, NULL, '5' },
-    {  NULL,        0, NULL,  0  }
-};
+const char * const short_opts = ":hLVfFS:";
 
-const char * const opt_string = ":hLVfFS:";
+#include <getopt.h>
+struct option long_opts[] = {
+    { "help",              no_argument,       NULL, 'h' },
+    { "license",           no_argument,       NULL, 'L' },
+    { "version",           no_argument,       NULL, 'V' },
+    { "force",             no_argument,       NULL, 'f' },
+    { "foreground",        no_argument,       NULL, 'F' },
+    { "socket",            required_argument, NULL, 'S' },
+    { "advice",            no_argument,       NULL, 'A' },
+    { "key-file",          required_argument, NULL, '0' },
+    { "num-threads",       required_argument, NULL, '1' },
+#ifdef MUNGE_AUTH_RECVFD
+    { "auth-server-dir",   required_argument, NULL, '2' },
+    { "auth-client-dir",   required_argument, NULL, '3' },
+#endif /* MUNGE_AUTH_RECVFD */
+    { "group-check-mtime", required_argument, NULL, '4' },
+    { "group-update-time", required_argument, NULL, '5' },
+    {  NULL,               0,                 NULL,  0  }
+};
 
 
 /*****************************************************************************
@@ -235,7 +235,7 @@ parse_cmdline (conf_t conf, int argc, char **argv)
 
     for (;;) {
 
-        c = getopt_long (argc, argv, opt_string, opt_table, NULL);
+        c = getopt_long (argc, argv, short_opts, long_opts, NULL);
 
         if (c == -1) {                  /* reached end of option list */
             break;

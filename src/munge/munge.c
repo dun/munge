@@ -50,29 +50,29 @@
  *  Command-Line Options
  *****************************************************************************/
 
-#include <getopt.h>
-struct option opt_table[] = {
-    { "help",         0, NULL, 'h' },
-    { "license",      0, NULL, 'L' },
-    { "version",      0, NULL, 'V' },
-    { "no-input",     0, NULL, 'n' },
-    { "string",       1, NULL, 's' },
-    { "input",        1, NULL, 'i' },
-    { "output",       1, NULL, 'o' },
-    { "cipher",       1, NULL, 'c' },
-    { "list-ciphers", 0, NULL, 'C' },
-    { "mac",          1, NULL, 'm' },
-    { "list-macs",    0, NULL, 'M' },
-    { "zip",          1, NULL, 'z' },
-    { "list-zips",    0, NULL, 'Z' },
-    { "restrict-uid", 1, NULL, 'u' },
-    { "restrict-gid", 1, NULL, 'g' },
-    { "ttl",          1, NULL, 't' },
-    { "socket",       1, NULL, 'S' },
-    {  NULL,          0, NULL,  0  }
-};
+const char * const short_opts = ":hLVns:i:o:c:Cm:Mz:Zu:g:t:S:";
 
-const char * const opt_string = ":hLVns:i:o:c:Cm:Mz:Zu:g:t:S:";
+#include <getopt.h>
+struct option long_opts[] = {
+    { "help",         no_argument,       NULL, 'h' },
+    { "license",      no_argument,       NULL, 'L' },
+    { "version",      no_argument,       NULL, 'V' },
+    { "no-input",     no_argument,       NULL, 'n' },
+    { "string",       required_argument, NULL, 's' },
+    { "input",        required_argument, NULL, 'i' },
+    { "output",       required_argument, NULL, 'o' },
+    { "cipher",       required_argument, NULL, 'c' },
+    { "list-ciphers", no_argument,       NULL, 'C' },
+    { "mac",          required_argument, NULL, 'm' },
+    { "list-macs",    no_argument,       NULL, 'M' },
+    { "zip",          required_argument, NULL, 'z' },
+    { "list-zips",    no_argument,       NULL, 'Z' },
+    { "restrict-uid", required_argument, NULL, 'u' },
+    { "restrict-gid", required_argument, NULL, 'g' },
+    { "ttl",          required_argument, NULL, 't' },
+    { "socket",       required_argument, NULL, 'S' },
+    {  NULL,          0,                 NULL,  0  }
+};
 
 
 /*****************************************************************************
@@ -237,7 +237,7 @@ parse_cmdline (conf_t conf, int argc, char **argv)
 
     for (;;) {
 
-        c = getopt_long (argc, argv, opt_string, opt_table, NULL);
+        c = getopt_long (argc, argv, short_opts, long_opts, NULL);
 
         if (c == -1) {                  /* reached end of option list */
             break;

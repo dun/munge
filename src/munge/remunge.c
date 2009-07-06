@@ -63,32 +63,32 @@
  *  Command-Line Options
  *****************************************************************************/
 
-#include <getopt.h>
-struct option opt_table[] = {
-    { "help",         0, NULL, 'h' },
-    { "license",      0, NULL, 'L' },
-    { "version",      0, NULL, 'V' },
-    { "cipher",       1, NULL, 'c' },
-    { "list-ciphers", 0, NULL, 'C' },
-    { "mac",          1, NULL, 'm' },
-    { "list-macs",    0, NULL, 'M' },
-    { "zip",          1, NULL, 'z' },
-    { "list-zips",    0, NULL, 'Z' },
-    { "encode",       0, NULL, 'e' },
-    { "decode",       0, NULL, 'd' },
-    { "length",       1, NULL, 'l' },
-    { "restrict-uid", 1, NULL, 'u' },
-    { "restrict-gid", 1, NULL, 'g' },
-    { "ttl",          1, NULL, 't' },
-    { "socket",       1, NULL, 'S' },
-    { "duration",     1, NULL, 'D' },
-    { "num-creds",    1, NULL, 'N' },
-    { "num-threads",  1, NULL, 'T' },
-    { "warn-time",    1, NULL, 'W' },
-    {  NULL,          0, NULL,  0  }
-};
+const char * const short_opts = ":hLVc:Cm:Mz:Zedl:u:g:t:S:D:N:T:W:";
 
-const char * const opt_string = ":hLVc:Cm:Mz:Zedl:u:g:t:S:D:N:T:W:";
+#include <getopt.h>
+struct option long_opts[] = {
+    { "help",         no_argument,       NULL, 'h' },
+    { "license",      no_argument,       NULL, 'L' },
+    { "version",      no_argument,       NULL, 'V' },
+    { "cipher",       required_argument, NULL, 'c' },
+    { "list-ciphers", no_argument,       NULL, 'C' },
+    { "mac",          required_argument, NULL, 'm' },
+    { "list-macs",    no_argument,       NULL, 'M' },
+    { "zip",          required_argument, NULL, 'z' },
+    { "list-zips",    no_argument,       NULL, 'Z' },
+    { "encode",       no_argument,       NULL, 'e' },
+    { "decode",       no_argument,       NULL, 'd' },
+    { "length",       required_argument, NULL, 'l' },
+    { "restrict-uid", required_argument, NULL, 'u' },
+    { "restrict-gid", required_argument, NULL, 'g' },
+    { "ttl",          required_argument, NULL, 't' },
+    { "socket",       required_argument, NULL, 'S' },
+    { "duration",     required_argument, NULL, 'D' },
+    { "num-creds",    required_argument, NULL, 'N' },
+    { "num-threads",  required_argument, NULL, 'T' },
+    { "warn-time",    required_argument, NULL, 'W' },
+    {  NULL,          0,                 NULL,  0  }
+};
 
 
 /*****************************************************************************
@@ -365,7 +365,7 @@ parse_cmdline (conf_t conf, int argc, char **argv)
 
     for (;;) {
 
-        c = getopt_long (argc, argv, opt_string, opt_table, NULL);
+        c = getopt_long (argc, argv, short_opts, long_opts, NULL);
 
         if (c == -1) {                  /* reached end of option list */
             break;

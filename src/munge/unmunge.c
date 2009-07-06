@@ -63,22 +63,22 @@
  *  Command-Line Options
  *****************************************************************************/
 
-#include <getopt.h>
-struct option opt_table[] = {
-    { "help",         0, NULL, 'h' },
-    { "license",      0, NULL, 'L' },
-    { "version",      0, NULL, 'V' },
-    { "input",        1, NULL, 'i' },
-    { "no-output",    0, NULL, 'n' },
-    { "metadata",     1, NULL, 'm' },
-    { "output",       1, NULL, 'o' },
-    { "keys",         1, NULL, 'k' },
-    { "list-keys",    0, NULL, 'K' },
-    { "socket",       1, NULL, 'S' },
-    {  NULL,          0, NULL,  0  }
-};
+const char * const short_opts = ":hLVi:nm:o:k:KS:";
 
-const char * const opt_string = ":hLVi:nm:o:k:KS:";
+#include <getopt.h>
+struct option long_opts[] = {
+    { "help",      no_argument,       NULL, 'h' },
+    { "license",   no_argument,       NULL, 'L' },
+    { "version",   no_argument,       NULL, 'V' },
+    { "input",     required_argument, NULL, 'i' },
+    { "no-output", no_argument,       NULL, 'n' },
+    { "metadata",  required_argument, NULL, 'm' },
+    { "output",    required_argument, NULL, 'o' },
+    { "keys",      required_argument, NULL, 'k' },
+    { "list-keys", no_argument,       NULL, 'K' },
+    { "socket",    required_argument, NULL, 'S' },
+    {  NULL,       0,                 NULL,  0  }
+};
 
 
 /*****************************************************************************
@@ -325,7 +325,7 @@ parse_cmdline (conf_t conf, int argc, char **argv)
 
     for (;;) {
 
-        c = getopt_long (argc, argv, opt_string, opt_table, NULL);
+        c = getopt_long (argc, argv, short_opts, long_opts, NULL);
 
         if (c == -1) {                  /* reached end of option list */
             break;
