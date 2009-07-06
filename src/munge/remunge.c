@@ -88,7 +88,7 @@ struct option opt_table[] = {
     {  NULL,          0, NULL,  0  }
 };
 
-const char * const opt_string = "hLVc:Cm:Mz:Zedl:u:g:t:S:D:N:T:W:";
+const char * const opt_string = ":hLVc:Cm:Mz:Zedl:u:g:t:S:D:N:T:W:";
 
 
 /*****************************************************************************
@@ -618,14 +618,41 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                     log_err (EMUNGE_SNAFU, LOG_ERR,
                         "Invalid option \"-%c\"", optopt);
                 }
-                else {
+                else if (optind > 1) {
                     log_err (EMUNGE_SNAFU, LOG_ERR,
                         "Invalid option \"%s\"", argv[optind - 1]);
                 }
+                else {
+                    log_err (EMUNGE_SNAFU, LOG_ERR,
+                        "Unable to process command-line");
+                }
+                break;
+            case ':':
+                if ((optind > 1)
+                        && (strncmp (argv[optind - 1], "--", 2) == 0)) {
+                    log_err (EMUNGE_SNAFU, LOG_ERR,
+                        "Missing argument for option \"%s\"",
+                        argv[optind - 1]);
+                }
+                else if (optopt > 0) {
+                    log_err (EMUNGE_SNAFU, LOG_ERR,
+                        "Missing argument for option \"-%c\"", optopt);
+                }
+                else {
+                    log_err (EMUNGE_SNAFU, LOG_ERR,
+                        "Unable to process command-line");
+                }
                 break;
             default:
-                log_err (EMUNGE_SNAFU, LOG_ERR,
-                    "Unimplemented option \"%s\"", argv[optind - 1]);
+                if ((optind > 1)
+                        && (strncmp (argv[optind - 1], "--", 2) == 0)) {
+                    log_err (EMUNGE_SNAFU, LOG_ERR,
+                        "Unimplemented option \"%s\"", argv[optind - 1]);
+                }
+                else {
+                    log_err (EMUNGE_SNAFU, LOG_ERR,
+                        "Unimplemented option \"-%c\"", c);
+                }
                 break;
         }
     }

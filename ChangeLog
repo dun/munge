@@ -1,3 +1,11 @@
+2009-07-06  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/munge/munge.c (parse_cmdline),
+	  src/munge/remunge.c (parse_cmdline),
+	  src/munge/unmunge.c (parse_cmdline),
+	  src/munged/conf.c (parse_cmdline):
+	  Added case for missing option argument.
+
 2009-06-10  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/libmunge/enum.c (munge_enum_str_to_int),
