@@ -49,10 +49,10 @@
 /*  Default munge_cipher_t for encrypting credentials.
  *
  *  2009-07-30: Do not default to MUNGE_CIPHER_AES256 since recent attacks show
- *  it has a lower safety margin than AES128.  Currently, AES128 has no known
- *  attack which is faster than 2^128.  However, the latest attack against
- *  11-round AES256 requires only 2^70; note that full AES256 has 14 rounds.
- *  <http://www.schneier.com/blog/archives/2009/07/another_new_aes.html>
+ *    it has a lower safety margin than AES128.  Currently, AES128 has no known
+ *    attack which is faster than 2^128.  However, the latest attack against
+ *    11-round AES256 requires only 2^70; note that full AES256 has 14 rounds.
+ *    <http://www.schneier.com/blog/archives/2009/07/another_new_aes.html>
  */
 #if HAVE_OPENSSL && !HAVE_EVP_AES_128_CBC
 #  define MUNGE_DEFAULT_CIPHER          MUNGE_CIPHER_CAST5
