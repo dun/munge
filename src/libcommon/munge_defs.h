@@ -34,11 +34,11 @@
 #include <munge.h>
 
 
-/*  Munge credential prefix string.
+/*  MUNGE credential prefix string.
  */
 #define MUNGE_CRED_PREFIX               "MUNGE:"
 
-/*  Munge credential suffix string.
+/*  MUNGE credential suffix string.
  */
 #define MUNGE_CRED_SUFFIX               ":"
 
