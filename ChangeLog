@@ -1,5 +1,7 @@
 2009-08-04  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/libcommon/log.c (_log_aux): Replaced timestamp code w/ strftimet.
+
 	* src/libcommon/str.c (strftimet): Added.
 	* src/libcommon/str.h: Added strftimet() prototype.  Tweaked comments.
 

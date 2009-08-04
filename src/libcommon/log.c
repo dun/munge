@@ -40,6 +40,7 @@
 #include <time.h>
 #include <unistd.h>
 #include "log.h"
+#include "str.h"
 
 
 /*****************************************************************************
@@ -242,26 +243,13 @@ _log_aux (int errnum, int priority, char *msgbuf, int msgbuflen,
     /*  Add timestamp.
      */
     if ((len > 0) && (log_ctx.options & LOG_OPT_TIMESTAMP)) {
-        time_t t;
-        struct tm *tm_ptr;
-        if (time (&t) != ((time_t) -1)) {
-#if HAVE_LOCALTIME_R
-            struct tm tm;
-            tm_ptr = localtime_r (&t, &tm);
-#else  /* !HAVE_LOCALTIME_R */
-            tm_ptr = localtime (&t);
-#endif /* !HAVE_LOCALTIME_R */
-            if (tm_ptr != NULL) {
-                n = strftime (p, len, "%Y-%m-%d %H:%M:%S ", tm_ptr);
-                if ((n <= 0) || (n >= len)) {
-                    /* do not update p since strftime output is undefined */
-                    len = 0;
-                }
-                else {
-                    p += n;
-                    len -= n;
-                }
-            }
+        n = strftimet (p, len, "%Y-%m-%d %H:%M:%S ", 0);
+        if (n == 0) {
+            len = 0;
+        }
+        else if (n > 0) {
+            p += n;
+            len -= n;
         }
     }
     /*  Add priority string.
