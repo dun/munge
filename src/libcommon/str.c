@@ -35,6 +35,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <sys/types.h>
+#include <time.h>
 #include "str.h"
 
 
@@ -169,6 +170,41 @@ strhex2bin (void *dst, size_t dstlen, const char *src, size_t srclen)
         }
     }
     return ((srclen + 1) / 2);
+}
+
+
+int
+strftimet (char *dst, size_t dstlen, const char *tfmt, time_t t)
+{
+#if HAVE_LOCALTIME_R
+    struct tm  tm;
+#endif /* !HAVE_LOCALTIME_R */
+    struct tm *tm_ptr;
+    int        n;
+
+    if ((dst == NULL) || (dstlen == 0) || (tfmt == NULL)) {
+        errno = EINVAL;
+        return (-1);
+    }
+    if (t == 0) {
+        if (time (&t) == ((time_t) -1)) {
+            return (-1);
+        }
+    }
+#if HAVE_LOCALTIME_R
+    tm_ptr = localtime_r (&t, &tm);
+#else  /* !HAVE_LOCALTIME_R */
+    tm_ptr = localtime (&t);            /* FIXME: protect with mutex? */
+#endif /* !HAVE_LOCALTIME_R */
+    if (tm_ptr == NULL) {
+        return (-1);
+    }
+    n = strftime (dst, dstlen, tfmt, tm_ptr);
+    if ((n <= 0) || (n >= dstlen)) {
+        /*  On strftime() error, contents of 'dst' are undefined.  */
+        return (0);
+    }
+    return (n);
 }
 
 
