@@ -1,3 +1,7 @@
+2009-08-25  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/munged/munged.c: Re-ordered functions.
+
 2009-08-04  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/libcommon/munge_defs.h: Tweaked comments.

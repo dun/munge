@@ -61,14 +61,14 @@
  *  Prototypes
  *****************************************************************************/
 
+static int  daemonize_init (char *progname);
+static void daemonize_fini (int fd);
+static void open_logfile (const char *logfile, int priority, int got_force);
 static void handle_signals (void);
 static void hup_handler (int signum);
 static void exit_handler (int signum);
 static void segv_handler (int signum);
-static int  daemonize_init (char *progname);
-static void daemonize_fini (int fd);
 static void write_pidfile (const char *pidfile, int got_force);
-static void open_logfile (const char *logfile, int priority, int got_force);
 static void sock_create (conf_t conf);
 static void sock_destroy (conf_t conf);
 
@@ -141,59 +141,6 @@ main (int argc, char *argv[])
         META_ALIAS, (int) getpid ());
 
     exit (EMUNGE_SUCCESS);
-}
-
-
-static void
-handle_signals (void)
-{
-    if (posignal (SIGHUP, hup_handler) == SIG_ERR) {
-        log_err (EMUNGE_SNAFU, LOG_ERR, "Unable to handle signal=%d", SIGHUP);
-    }
-    if (posignal (SIGINT, exit_handler) == SIG_ERR) {
-        log_err (EMUNGE_SNAFU, LOG_ERR, "Unable to handle signal=%d", SIGINT);
-    }
-    if (posignal (SIGTERM, exit_handler) == SIG_ERR) {
-        log_err (EMUNGE_SNAFU, LOG_ERR, "Unable to handle signal=%d", SIGTERM);
-    }
-    if (posignal (SIGSEGV, segv_handler) == SIG_ERR) {
-        log_err (EMUNGE_SNAFU, LOG_ERR, "Unable to handle signal=%d", SIGSEGV);
-    }
-    if (posignal (SIGPIPE, SIG_IGN) == SIG_ERR) {
-        log_err (EMUNGE_SNAFU, LOG_ERR, "Unable to ignore signal=%d", SIGPIPE);
-    }
-    return;
-}
-
-
-static void
-hup_handler (int signum)
-{
-    if (conf) {
-        gids_update (conf->gids);
-    }
-    return;
-}
-
-
-static void
-exit_handler (int signum)
-{
-    if (!done) {
-        done = 1;
-        log_msg (LOG_NOTICE, "Exiting on signal=%d", signum);
-    }
-    return;
-}
-
-
-static void
-segv_handler (int signum)
-{
-    log_err (EMUNGE_SNAFU, LOG_CRIT,
-        "Exiting on signal=%d (segmentation violation)", signum);
-    assert (1);                         /* not reached */
-    return;
 }
 
 
@@ -346,77 +293,6 @@ daemonize_fini (int fd)
 
 
 static void
-write_pidfile (const char *pidfile, int got_force)
-{
-/*  Creates the specified pidfile.
- *  The pidfile must be created after the daemon has finished forking.
- */
-    char    piddir [PATH_MAX];
-    char    ebuf [1024];
-    int     n;
-    mode_t  mask;
-    FILE   *fp;
-
-    assert (pidfile != NULL);
-
-    /*  The pidfile must be specified with an absolute pathname; o/w, the
-     *    unlink() call in destroy_conf() will fail because the daemon has
-     *    chdir()'d.
-     */
-    if (pidfile[0] != '/') {
-        log_err (EMUNGE_SNAFU, LOG_ERR,
-            "Pidfile \"%s\" requires an absolute path", pidfile);
-    }
-    /*  Ensure pidfile dir is secure against modification by others.
-     */
-    if (path_dirname (pidfile, piddir, sizeof (piddir)) < 0) {
-        log_err (EMUNGE_SNAFU, LOG_ERR,
-            "Cannot determine dirname of pidfile \"%s\"", pidfile);
-    }
-    n = path_is_secure (piddir, ebuf, sizeof (ebuf));
-    if (n < 0) {
-        log_err (EMUNGE_SNAFU, LOG_ERR,
-            "Cannot check pidfile dir \"%s\": %s", piddir, ebuf);
-    }
-    else if ((n == 0) && (!got_force)) {
-        log_err (EMUNGE_SNAFU, LOG_ERR, "Pidfile is insecure: %s", ebuf);
-    }
-    else if (n == 0) {
-        log_msg (LOG_WARNING, "Pidfile is insecure: %s", ebuf);
-    }
-    /*  Protect pidfile against unauthorized access by removing write-access
-     *    from group and other.
-     */
-    mask = umask (0);
-    umask (mask | 022);
-    (void) unlink (pidfile);
-    fp = fopen (pidfile, "w");
-    umask (mask);
-    /*
-     *  An error in creating the pidfile is not considered fatal.
-     */
-    if (!fp) {
-        log_msg (LOG_WARNING, "Unable to open pidfile \"%s\": %s",
-            pidfile, strerror (errno));
-    }
-    else if (fprintf (fp, "%d\n", (int) getpid ()) == EOF) {
-        log_msg (LOG_WARNING, "Unable to write to pidfile \"%s\": %s",
-            pidfile, strerror (errno));
-        (void) fclose (fp);
-    }
-    else if (fclose (fp) == EOF) {
-        log_msg (LOG_WARNING, "Unable to close pidfile \"%s\": %s",
-            pidfile, strerror (errno));
-    }
-    else {
-        return;                         /* success */
-    }
-    (void) unlink (pidfile);
-    return;                             /* failure */
-}
-
-
-static void
 open_logfile (const char *logfile, int priority, int got_force)
 {
     int          got_symlink;
@@ -514,6 +390,130 @@ open_logfile (const char *logfile, int priority, int got_force)
     log_open_file (fp, NULL, priority,
         LOG_OPT_JUSTIFY | LOG_OPT_PRIORITY | LOG_OPT_TIMESTAMP);
     return;
+}
+
+
+static void
+handle_signals (void)
+{
+    if (posignal (SIGHUP, hup_handler) == SIG_ERR) {
+        log_err (EMUNGE_SNAFU, LOG_ERR, "Unable to handle signal=%d", SIGHUP);
+    }
+    if (posignal (SIGINT, exit_handler) == SIG_ERR) {
+        log_err (EMUNGE_SNAFU, LOG_ERR, "Unable to handle signal=%d", SIGINT);
+    }
+    if (posignal (SIGTERM, exit_handler) == SIG_ERR) {
+        log_err (EMUNGE_SNAFU, LOG_ERR, "Unable to handle signal=%d", SIGTERM);
+    }
+    if (posignal (SIGSEGV, segv_handler) == SIG_ERR) {
+        log_err (EMUNGE_SNAFU, LOG_ERR, "Unable to handle signal=%d", SIGSEGV);
+    }
+    if (posignal (SIGPIPE, SIG_IGN) == SIG_ERR) {
+        log_err (EMUNGE_SNAFU, LOG_ERR, "Unable to ignore signal=%d", SIGPIPE);
+    }
+    return;
+}
+
+
+static void
+hup_handler (int signum)
+{
+    if (conf) {
+        gids_update (conf->gids);
+    }
+    return;
+}
+
+
+static void
+exit_handler (int signum)
+{
+    if (!done) {
+        done = 1;
+        log_msg (LOG_NOTICE, "Exiting on signal=%d", signum);
+    }
+    return;
+}
+
+
+static void
+segv_handler (int signum)
+{
+    log_err (EMUNGE_SNAFU, LOG_CRIT,
+        "Exiting on signal=%d (segmentation violation)", signum);
+    assert (1);                         /* not reached */
+    return;
+}
+
+
+static void
+write_pidfile (const char *pidfile, int got_force)
+{
+/*  Creates the specified pidfile.
+ *  The pidfile must be created after the daemon has finished forking.
+ */
+    char    piddir [PATH_MAX];
+    char    ebuf [1024];
+    int     n;
+    mode_t  mask;
+    FILE   *fp;
+
+    assert (pidfile != NULL);
+
+    /*  The pidfile must be specified with an absolute pathname; o/w, the
+     *    unlink() call in destroy_conf() will fail because the daemon has
+     *    chdir()'d.
+     */
+    if (pidfile[0] != '/') {
+        log_err (EMUNGE_SNAFU, LOG_ERR,
+            "Pidfile \"%s\" requires an absolute path", pidfile);
+    }
+    /*  Ensure pidfile dir is secure against modification by others.
+     */
+    if (path_dirname (pidfile, piddir, sizeof (piddir)) < 0) {
+        log_err (EMUNGE_SNAFU, LOG_ERR,
+            "Cannot determine dirname of pidfile \"%s\"", pidfile);
+    }
+    n = path_is_secure (piddir, ebuf, sizeof (ebuf));
+    if (n < 0) {
+        log_err (EMUNGE_SNAFU, LOG_ERR,
+            "Cannot check pidfile dir \"%s\": %s", piddir, ebuf);
+    }
+    else if ((n == 0) && (!got_force)) {
+        log_err (EMUNGE_SNAFU, LOG_ERR, "Pidfile is insecure: %s", ebuf);
+    }
+    else if (n == 0) {
+        log_msg (LOG_WARNING, "Pidfile is insecure: %s", ebuf);
+    }
+    /*  Protect pidfile against unauthorized access by removing write-access
+     *    from group and other.
+     */
+    mask = umask (0);
+    umask (mask | 022);
+    (void) unlink (pidfile);
+    fp = fopen (pidfile, "w");
+    umask (mask);
+    /*
+     *  An error in creating the pidfile is not considered fatal.
+     */
+    if (!fp) {
+        log_msg (LOG_WARNING, "Unable to open pidfile \"%s\": %s",
+            pidfile, strerror (errno));
+    }
+    else if (fprintf (fp, "%d\n", (int) getpid ()) == EOF) {
+        log_msg (LOG_WARNING, "Unable to write to pidfile \"%s\": %s",
+            pidfile, strerror (errno));
+        (void) fclose (fp);
+    }
+    else if (fclose (fp) == EOF) {
+        log_msg (LOG_WARNING, "Unable to close pidfile \"%s\": %s",
+            pidfile, strerror (errno));
+    }
+    else {
+        return;                         /* success */
+    }
+    (void) unlink (pidfile);
+    return;                             /* failure */
 }
 
 
