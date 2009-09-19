@@ -12,10 +12,10 @@
 ###############################################################################
 ### BEGIN INIT INFO
 # Provides:           munge
-# Required-Start:     $named $time
-# Required-Stop:      $named $time
-# Should-Start:       $local_fs $syslog
-# Should-Stop:        $local_fs $syslog
+# Required-Start:     $remote_fs $time
+# Required-Stop:      $remote_fs $time
+# Should-Start:       $named $syslog
+# Should-Stop:        $named $syslog
 # Short-Description:  Start/Stop the MUNGE authentication service.
 # Description:        MUNGE (MUNGE Uid 'N' Gid Emporium) is a highly scalable
 #                     authentication service for creating and validating

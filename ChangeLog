@@ -1,3 +1,11 @@
+2009-09-18  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/etc/munge.init.in: Applied patch from Petter Reinholdtsen
+	  <pere@hungry.com> to correct LSB run-time dependencies
+	  <http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=541238>.
+	  Note that LSB runlevels were removed by an earlier change to
+	  prevent the daemon from being started by default on Fedora/RedHat.
+
 2009-08-25  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/munged/munged.c: Re-ordered functions.
