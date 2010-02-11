@@ -1,5 +1,7 @@
 2010-02-10  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* : Re-bootstrap'd with autoconf-2.65, automake-1.11.1, libtool 2.2.6b.
+
 	* : Updated copyright date range.
 
 2009-09-18  Chris Dunlap  <cdunlap@llnl.gov>
