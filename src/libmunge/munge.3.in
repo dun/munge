@@ -30,7 +30,6 @@ munge_encode, munge_decode, munge_strerror \- MUNGE primary functions
 
 .SH SYNOPSIS
 .nf
-.B #define GPL_LICENSED 1
 .B #include <munge.h>
 .sp
 .BI "munge_err_t munge_encode (char **" cred ", munge_ctx_t " ctx ,
@@ -149,8 +148,6 @@ The following example program illustrates the use of a munge credential to
 ascertain the effective user and group ID of the encoding process.
 .PP
 .nf
-#define GPL_LICENSED 1
-.sp
 #include <stdio.h>                      /* for printf() */
 #include <stdlib.h>                     /* for exit() & free() */
 #include <unistd.h>                     /* for uid_t & gid_t */

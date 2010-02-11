@@ -31,18 +31,6 @@
 
 
 /*****************************************************************************
- *  Got GPL?
- *****************************************************************************/
-
-#if ! GPL_LICENSED
-#  error By linking against libmunge, the derivative
-#  error work becomes licensed under the terms of the
-#  error GNU General Public License.  Acknowledge by
-#  error defining the GPL_LICENSED preprocessor macro.
-#endif /* !GPL_LICENSED */
-
-
-/*****************************************************************************
  *  Got C++?
  *****************************************************************************/
 

@@ -30,7 +30,6 @@ munge_enum_is_valid, munge_enum_int_to_str, munge_enum_str_to_int \- MUNGE enume
 
 .SH SYNOPSIS
 .nf
-.B #define GPL_LICENSED 1
 .B #include <munge.h>
 .sp
 .BI "int munge_enum_is_valid (munge_enum_t " type ", int " val );
@@ -86,8 +85,6 @@ The following example program illustrates how a list of available cipher
 types can be queried.
 .PP
 .nf
-#define GPL_LICENSED 1
-.sp
 #include <stdio.h>                      /* for printf() */
 #include <stdlib.h>                     /* for exit() */
 #include <munge.h>

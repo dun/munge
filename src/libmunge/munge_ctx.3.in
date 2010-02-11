@@ -30,7 +30,6 @@ munge_ctx_create, munge_ctx_copy, munge_ctx_destroy, munge_ctx_strerror, munge_c
 
 .SH SYNOPSIS
 .nf
-.B #define GPL_LICENSED 1
 .B #include <munge.h>
 .sp
 .BI "munge_ctx_t munge_ctx_create (void);"
@@ -275,8 +274,6 @@ The following example program illustrates the use of the munge context to
 query the location of the \fBmunged\fR domain socket.
 .PP
 .nf
-#define GPL_LICENSED 1
-.sp
 #include <stdio.h>                      /* for printf() */
 #include <stdlib.h>                     /* for exit() */
 #include <munge.h>
