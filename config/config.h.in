@@ -105,6 +105,9 @@
 /* Define to 1 if the system has the type `struct strrecvfd'. */
 #undef HAVE_STRUCT_STRRECVFD
 
+/* Define to 1 if the system has the type `struct ucred'. */
+#undef HAVE_STRUCT_UCRED
+
 /* Define to 1 if the system has the type `struct xucred'. */
 #undef HAVE_STRUCT_XUCRED
 

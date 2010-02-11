@@ -13059,6 +13059,17 @@ fi
 
 done
 
+ac_fn_c_check_type "$LINENO" "struct ucred" "ac_cv_type_struct_ucred" "#include <sys/socket.h>
+"
+if test "x$ac_cv_type_struct_ucred" = x""yes; then :
+
+cat >>confdefs.h <<_ACEOF
+#define HAVE_STRUCT_UCRED 1
+_ACEOF
+
+
+fi
+
 
   { $as_echo "$as_me:${as_lineno-$LINENO}: checking for SO_PEERCRED sockopt" >&5
 $as_echo_n "checking for SO_PEERCRED sockopt... " >&6; }

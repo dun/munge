@@ -114,6 +114,7 @@ AC_CHECK_TYPES(socklen_t, [], [], [#include <sys/socket.h>])
 AC_CHECK_FUNCS(getpeereid)
 AC_CHECK_FUNCS(getpeerucred)
 AC_CHECK_HEADERS(ucred.h)
+AC_CHECK_TYPES(struct ucred, [], [], [#include <sys/socket.h>])
 X_AC_CHECK_SO_PEERCRED
 AC_CHECK_TYPES(struct xucred, [], [], [#include <sys/ucred.h>])
 X_AC_CHECK_LOCAL_PEERCRED
