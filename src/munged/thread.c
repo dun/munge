@@ -3,7 +3,7 @@
  *  LSD-Id: thread.c,v 1.2 2003/09/11 21:09:45 dun Exp
  *****************************************************************************
  *  Written by Chris Dunlap <cdunlap@llnl.gov>.
- *  Copyright (C) 2007-2009 Lawrence Livermore National Security, LLC.
+ *  Copyright (C) 2007-2010 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2002-2007 The Regents of the University of California.
  *  UCRL-CODE-155910.
  *
