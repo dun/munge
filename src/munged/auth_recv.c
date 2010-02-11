@@ -294,10 +294,10 @@ auth_recv (m_msg_t m, uid_t *uid, gid_t *gid)
 
 
 /*****************************************************************************
- *  peercred sockopt
+ *  SO_PEERCRED sockopt
  *****************************************************************************/
 
-#ifdef MUNGE_AUTH_PEERCRED
+#ifdef MUNGE_AUTH_SO_PEERCRED
 
 #include <sys/socket.h>
 
@@ -320,7 +320,7 @@ auth_recv (m_msg_t m, uid_t *uid, gid_t *gid)
     return (0);
 }
 
-#endif /* MUNGE_AUTH_PEERCRED */
+#endif /* MUNGE_AUTH_SO_PEERCRED */
 
 
 /*****************************************************************************

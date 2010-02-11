@@ -37,7 +37,7 @@
  *    connected across the Unix domain socket.  The client's UID and GID are
  *    then obtained via ucred_geteuid() and ucred_getegid().
  *
- *  MUNGE_AUTH_PEERCRED (Linux)
+ *  MUNGE_AUTH_SO_PEERCRED (Linux)
  *    The server uses the SO_PEERCRED socket option to determine the identity
  *    of the client connected across the Unix domain socket.  The client's UID
  *    and GID are then obtained from the ucred struct returned by getsockopt().
@@ -87,7 +87,7 @@
 #  define MUNGE_AUTH_GETPEERUCRED
 
 #elif HAVE_SO_PEERCRED
-#  define MUNGE_AUTH_PEERCRED
+#  define MUNGE_AUTH_SO_PEERCRED
 
 #elif HAVE_STRUCT_XUCRED && HAVE_LOCAL_PEERCRED
 #  define MUNGE_AUTH_LOCAL_PEERCRED

@@ -1,5 +1,10 @@
 2010-02-10  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* configure.ac, config/x_ac_check_so_peercred.m4:
+	  Renamed from config/x_ac_check_peercred.m4.
+	* src/libcommon/auth_policy.h, src/munged/auth_recv.c:
+	  Renamed MUNGE_AUTH_PEERCRED to MUNGE_AUTH_SO_PEERCRED.
+
 	* configure.ac, config/x_ac_check_local_peercred.m4:
 	  Added X_AC_CHECK_LOCAL_PEERCRED.
 	* src/libcommon/auth_policy.h, src/munged/auth_recv.c (auth_recv):
