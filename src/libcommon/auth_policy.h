@@ -42,6 +42,12 @@
  *    of the client connected across the Unix domain socket.  The client's UID
  *    and GID are then obtained from the ucred struct returned by getsockopt().
  *
+ *  MUNGE_AUTH_LOCAL_PEERCRED (BSD)
+ *    The server uses the LOCAL_PEERCRED socket option to determine the
+ *    identity of the client connected across the Unix domain socket.
+ *    The client's UID and GID are then obtained from the xucred struct
+ *    returned by getsockopt().
+ *
  *  MUNGE_AUTH_RECVFD_MKFIFO (Irix, Solaris)
  *    The server creates a unique FIFO special file via mkfifo() and sends a
  *    request to the client for it to pass an open file descriptor back across
@@ -82,6 +88,9 @@
 
 #elif HAVE_SO_PEERCRED
 #  define MUNGE_AUTH_PEERCRED
+
+#elif HAVE_STRUCT_XUCRED && HAVE_LOCAL_PEERCRED
+#  define MUNGE_AUTH_LOCAL_PEERCRED
 
 #elif HAVE_STRUCT_STRRECVFD && HAVE_FIFO_RECVFD
 #  define MUNGE_AUTH_RECVFD_MKFIFO

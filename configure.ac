@@ -115,6 +115,8 @@ AC_CHECK_FUNCS(getpeereid)
 AC_CHECK_FUNCS(getpeerucred)
 AC_CHECK_HEADERS(ucred.h)
 X_AC_CHECK_PEERCRED
+AC_CHECK_TYPES(struct xucred, [], [], [#include <sys/ucred.h>])
+X_AC_CHECK_LOCAL_PEERCRED
 AC_CHECK_FILES(/dev/spx)
 X_AC_CHECK_FIFO_RECVFD
 

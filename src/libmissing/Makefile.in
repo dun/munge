@@ -49,6 +49,7 @@ am__aclocal_m4_deps = $(top_srcdir)/config/libtool.m4 \
 	$(top_srcdir)/config/x_ac_canonical.m4 \
 	$(top_srcdir)/config/x_ac_check_cond_lib.m4 \
 	$(top_srcdir)/config/x_ac_check_fifo_recvfd.m4 \
+	$(top_srcdir)/config/x_ac_check_local_peercred.m4 \
 	$(top_srcdir)/config/x_ac_check_peercred.m4 \
 	$(top_srcdir)/config/x_ac_check_pthreads.m4 \
 	$(top_srcdir)/config/x_ac_darwin.m4 \

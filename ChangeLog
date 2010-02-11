@@ -1,5 +1,11 @@
 2010-02-10  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* configure.ac, config/x_ac_check_local_peercred.m4:
+	  Added X_AC_CHECK_LOCAL_PEERCRED.
+	* src/libcommon/auth_policy.h, src/munged/auth_recv.c (auth_recv):
+	  Added MUNGE_AUTH_LOCAL_PEERCRED client authentication support for
+	  Debian GNU/kFreeBSD systems.
+
 	* configure.ac: Replaced AC_GNU_SOURCE with AC_USE_SYSTEM_EXTENSIONS
 	  per autoupdate.
 

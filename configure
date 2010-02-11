@@ -13103,6 +13103,61 @@ $as_echo "#define HAVE_SO_PEERCRED 1" >>confdefs.h
 
 fi
 
+ac_fn_c_check_type "$LINENO" "struct xucred" "ac_cv_type_struct_xucred" "#include <sys/ucred.h>
+"
+if test "x$ac_cv_type_struct_xucred" = x""yes; then :
+
+cat >>confdefs.h <<_ACEOF
+#define HAVE_STRUCT_XUCRED 1
+_ACEOF
+
+
+fi
+
+
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for LOCAL_PEERCRED sockopt" >&5
+$as_echo_n "checking for LOCAL_PEERCRED sockopt... " >&6; }
+if test "${x_ac_cv_check_local_peercred+set}" = set; then :
+  $as_echo_n "(cached) " >&6
+else
+
+    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+
+
+#include <sys/types.h>
+#include <sys/socket.h>
+int
+main ()
+{
+
+
+getsockopt (0, 0, LOCAL_PEERCRED, 0, 0);
+
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"; then :
+  x_ac_cv_check_local_peercred=yes
+else
+  x_ac_cv_check_local_peercred=no
+
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $x_ac_cv_check_local_peercred" >&5
+$as_echo "$x_ac_cv_check_local_peercred" >&6; }
+  if test $x_ac_cv_check_local_peercred = yes; then :
+
+$as_echo "#define HAVE_LOCAL_PEERCRED 1" >>confdefs.h
+
+
+fi
+
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for /dev/spx" >&5
 $as_echo_n "checking for /dev/spx... " >&6; }
 if test "${ac_cv_file__dev_spx+set}" = set; then :

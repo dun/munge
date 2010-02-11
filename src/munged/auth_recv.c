@@ -324,6 +324,42 @@ auth_recv (m_msg_t m, uid_t *uid, gid_t *gid)
 
 
 /*****************************************************************************
+ *  LOCAL_PEERCRED sockopt
+ *****************************************************************************/
+
+#ifdef MUNGE_AUTH_LOCAL_PEERCRED
+
+#include <sys/socket.h>
+#include <sys/ucred.h>
+
+#ifndef HAVE_SOCKLEN_T
+typedef int socklen_t;                  /* socklen_t is uint32_t in Posix.1g */
+#endif /* !HAVE_SOCKLEN_T */
+
+int
+auth_recv (m_msg_t m, uid_t *uid, gid_t *gid)
+{
+    struct xucred cred;
+    socklen_t len = sizeof (cred);
+
+    if (getsockopt (m->sd, 0, LOCAL_PEERCRED, &cred, &len) < 0) {
+        log_msg (LOG_ERR, "Unable to get peer identity: %s", strerror (errno));
+        return (-1);
+    }
+    if (cred.cr_version != XUCRED_VERSION) {
+        log_msg (LOG_ERR, "Unable to get peer identity: invalid xucred v%d",
+            cred.cr_version);
+        return (-1);
+    }
+    *uid = cred.cr_uid;
+    *gid = cred.cr_gid;
+    return (0);
+}
+
+#endif /* MUNGE_AUTH_LOCAL_PEERCRED */
+
+
+/*****************************************************************************
  *  strrecvfd struct (mkfifo)
  *****************************************************************************/
 

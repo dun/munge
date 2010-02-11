@@ -66,6 +66,9 @@
 /* Define to 1 if you have the `localtime_r' function. */
 #undef HAVE_LOCALTIME_R
 
+/* Define to 1 if you have the LOCAL_PEERCRED socket option. */
+#undef HAVE_LOCAL_PEERCRED
+
 /* Define to 1 if you have the <memory.h> header file. */
 #undef HAVE_MEMORY_H
 
@@ -101,6 +104,9 @@
 
 /* Define to 1 if the system has the type `struct strrecvfd'. */
 #undef HAVE_STRUCT_STRRECVFD
+
+/* Define to 1 if the system has the type `struct xucred'. */
+#undef HAVE_STRUCT_XUCRED
 
 /* Define to 1 if you have the <sys/stat.h> header file. */
 #undef HAVE_SYS_STAT_H
