@@ -1,5 +1,8 @@
 2010-02-11  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* config/x_ac_select_crypto_lib.m4:
+	  Tweaked AC_MSG_RESULT text on failure.
+
 	* : Moved the compile-time checks for determining the client
 	  authentication method into the configure script.
 	* configure.ac, config/x_ac_select_auth_method.m4:

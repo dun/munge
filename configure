@@ -12476,8 +12476,8 @@ $as_echo "#define HAVE_OPENSSL 1" >>confdefs.h
 $as_echo "#define HAVE_LIBGCRYPT 1" >>confdefs.h
 
   else
-    { $as_echo "$as_me:${as_lineno-$LINENO}: result: error" >&5
-$as_echo "error" >&6; }
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: failed" >&5
+$as_echo "failed" >&6; }
     as_fn_error "unable to locate cryptographic library" "$LINENO" 5
   fi
 

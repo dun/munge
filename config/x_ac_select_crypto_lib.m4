@@ -52,7 +52,7 @@ AC_DEFUN([X_AC_SELECT_CRYPTO_LIB], [
     AC_DEFINE([HAVE_LIBGCRYPT], [1],
       [Define to 1 if you want to use the Libgcrypt cryptographic library.])
   else
-    AC_MSG_RESULT([error])
+    AC_MSG_RESULT([failed])
     AC_MSG_ERROR([unable to locate cryptographic library])
   fi
 
