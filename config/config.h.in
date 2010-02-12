@@ -3,6 +3,24 @@
 /* Define if building universal (internal helper macro) */
 #undef AC_APPLE_UNIVERSAL_BUILD
 
+/* Define to 1 if authenticating via AUTH_METHOD_GETPEEREID */
+#undef AUTH_METHOD_GETPEEREID
+
+/* Define to 1 if authenticating via AUTH_METHOD_GETPEERUCRED */
+#undef AUTH_METHOD_GETPEERUCRED
+
+/* Define to 1 if authenticating via AUTH_METHOD_LOCAL_PEERCRED */
+#undef AUTH_METHOD_LOCAL_PEERCRED
+
+/* Define to 1 if authenticating via AUTH_METHOD_RECVFD_MKFIFO */
+#undef AUTH_METHOD_RECVFD_MKFIFO
+
+/* Define to 1 if authenticating via AUTH_METHOD_RECVFD_MKNOD */
+#undef AUTH_METHOD_RECVFD_MKNOD
+
+/* Define to 1 if authenticating via AUTH_METHOD_SO_PEERCRED */
+#undef AUTH_METHOD_SO_PEERCRED
+
 /* Define to 1 if you have the <bzlib.h> header file. */
 #undef HAVE_BZLIB_H
 

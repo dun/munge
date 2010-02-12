@@ -41,7 +41,6 @@
 #include <sys/socket.h>                 /* for AF_INET */
 #include <sys/stat.h>
 #include <unistd.h>
-#include "auth_policy.h"
 #include "conf.h"
 #include "license.h"
 #include "log.h"
@@ -71,10 +70,10 @@ struct option long_opts[] = {
     { "advice",            no_argument,       NULL, 'A' },
     { "key-file",          required_argument, NULL, '0' },
     { "num-threads",       required_argument, NULL, '1' },
-#ifdef MUNGE_AUTH_RECVFD
+#if defined(AUTH_METHOD_RECVFD_MKFIFO) || defined(AUTH_METHOD_RECVFD_MKNOD)
     { "auth-server-dir",   required_argument, NULL, '2' },
     { "auth-client-dir",   required_argument, NULL, '3' },
-#endif /* MUNGE_AUTH_RECVFD */
+#endif /* AUTH_METHOD_RECVFD_MKFIFO || AUTH_METHOD_RECVFD_MKNOD */
     { "group-check-mtime", required_argument, NULL, '4' },
     { "group-update-time", required_argument, NULL, '5' },
     {  NULL,               0,                 NULL,  0  }
@@ -148,7 +147,7 @@ create_conf (void)
     conf->gids_interval = MUNGE_GROUP_UPDATE_TIMER;
     conf->nthreads = MUNGE_THREADS;
 
-#ifdef MUNGE_AUTH_RECVFD
+#if defined(AUTH_METHOD_RECVFD_MKFIFO) || defined(AUTH_METHOD_RECVFD_MKNOD)
 
     if (!(conf->auth_server_dir = strdup (MUNGE_AUTH_SERVER_DIR))) {
         log_errno (EMUNGE_NO_MEMORY, LOG_ERR,
@@ -158,7 +157,7 @@ create_conf (void)
         log_errno (EMUNGE_NO_MEMORY, LOG_ERR,
             "Cannot dup auth-client-dir default string");
     }
-#endif /* MUNGE_AUTH_RECVFD */
+#endif /* AUTH_METHOD_RECVFD_MKFIFO || AUTH_METHOD_RECVFD_MKNOD */
 
     conf->auth_rnd_bytes = MUNGE_AUTH_RND_BYTES;
 
@@ -288,7 +287,7 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                 }
                 conf->nthreads = l;
                 break;
-#ifdef MUNGE_AUTH_RECVFD
+#if defined(AUTH_METHOD_RECVFD_MKFIFO) || defined(AUTH_METHOD_RECVFD_MKNOD)
             case '2':
                 if (conf->auth_server_dir)
                     free (conf->auth_server_dir);
@@ -303,7 +302,7 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                     log_errno (EMUNGE_NO_MEMORY, LOG_ERR,
                         "Cannot dup auth-client-dir cmdline string");
                 break;
-#endif /* MUNGE_AUTH_RECVFD */
+#endif /* AUTH_METHOD_RECVFD_MKFIFO || AUTH_METHOD_RECVFD_MKNOD */
             case '4':
                 errno = 0;
                 l = strtol (optarg, &p, 10);
@@ -413,13 +412,13 @@ display_help (char *prog)
      */
     printf ("\n");
 
-#ifdef MUNGE_AUTH_RECVFD
+#if defined(AUTH_METHOD_RECVFD_MKFIFO) || defined(AUTH_METHOD_RECVFD_MKNOD)
     printf ("  %*s %s [%s]\n", w, "--auth-server-dir=DIR",
             "Specify auth-server directory", MUNGE_AUTH_SERVER_DIR);
 
     printf ("  %*s %s [%s]\n", w, "--auth-client-dir=DIR",
             "Specify auth-client directory", MUNGE_AUTH_CLIENT_DIR);
-#endif /* MUNGE_AUTH_RECVFD */
+#endif /* AUTH_METHOD_RECVFD_MKFIFO || AUTH_METHOD_RECVFD_MKNOD */
 
     printf ("  %*s Specify whether to check \"%s\" mtime [%d]\n",
             w, "--group-check-mtime=BOOL", GIDS_GROUP_FILE,

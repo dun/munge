@@ -29,7 +29,6 @@
 #endif /* HAVE_CONFIG_H */
 
 #include <munge.h>
-#include "auth_policy.h"
 #include "m_msg.h"
 
 
@@ -37,7 +36,7 @@
  *  null client
  *****************************************************************************/
 
-#ifndef MUNGE_AUTH_RECVFD
+#if !defined(AUTH_METHOD_RECVFD_MKFIFO) && !defined(AUTH_METHOD_RECVFD_MKNOD)
 
 int
 auth_send (m_msg_t m)
@@ -45,14 +44,14 @@ auth_send (m_msg_t m)
     return (EMUNGE_SUCCESS);
 }
 
-#endif /* !MUNGE_AUTH_RECVFD */
+#endif /* !AUTH_METHOD_RECVFD_MKFIFO && !AUTH_METHOD_RECVFD_MKNOD */
 
 
 /*****************************************************************************
  *  strrecvfd struct (common)
  *****************************************************************************/
 
-#ifdef MUNGE_AUTH_RECVFD
+#if defined(AUTH_METHOD_RECVFD_MKFIFO) || defined(AUTH_METHOD_RECVFD_MKNOD)
 
 #include <assert.h>
 #include <errno.h>
@@ -286,4 +285,4 @@ err:
     return (-1);
 }
 
-#endif /* MUNGE_AUTH_RECVFD */
+#endif /* AUTH_METHOD_RECVFD_MKFIFO || AUTH_METHOD_RECVFD_MKNOD */

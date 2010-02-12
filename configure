@@ -13018,9 +13018,13 @@ fi
 
 
 ##
-# Checks for how to authenticate a client process.
+# Checks for client authentication method.
 ##
-for ac_func in getpeereid
+
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking authentication support" >&5
+$as_echo "$as_me: checking authentication support" >&6;}
+
+  for ac_func in getpeereid
 do :
   ac_fn_c_check_func "$LINENO" "getpeereid" "ac_cv_func_getpeereid"
 if test "x$ac_cv_func_getpeereid" = x""yes; then :
@@ -13031,7 +13035,7 @@ _ACEOF
 fi
 done
 
-for ac_func in getpeerucred
+  for ac_func in getpeerucred
 do :
   ac_fn_c_check_func "$LINENO" "getpeerucred" "ac_cv_func_getpeerucred"
 if test "x$ac_cv_func_getpeerucred" = x""yes; then :
@@ -13042,7 +13046,7 @@ _ACEOF
 fi
 done
 
-for ac_header in ucred.h
+  for ac_header in ucred.h
 do :
   ac_fn_c_check_header_mongrel "$LINENO" "ucred.h" "ac_cv_header_ucred_h" "$ac_includes_default"
 if test "x$ac_cv_header_ucred_h" = x""yes; then :
@@ -13054,7 +13058,7 @@ fi
 
 done
 
-ac_fn_c_check_type "$LINENO" "struct ucred" "ac_cv_type_struct_ucred" "#include <sys/socket.h>
+  ac_fn_c_check_type "$LINENO" "struct ucred" "ac_cv_type_struct_ucred" "#include <sys/socket.h>
 "
 if test "x$ac_cv_type_struct_ucred" = x""yes; then :
 
@@ -13109,7 +13113,7 @@ $as_echo "#define HAVE_SO_PEERCRED 1" >>confdefs.h
 
 fi
 
-ac_fn_c_check_type "$LINENO" "struct xucred" "ac_cv_type_struct_xucred" "#include <sys/ucred.h>
+  ac_fn_c_check_type "$LINENO" "struct xucred" "ac_cv_type_struct_xucred" "#include <sys/ucred.h>
 "
 if test "x$ac_cv_type_struct_xucred" = x""yes; then :
 
@@ -13164,30 +13168,6 @@ $as_echo "#define HAVE_LOCAL_PEERCRED 1" >>confdefs.h
 
 fi
 
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for /dev/spx" >&5
-$as_echo_n "checking for /dev/spx... " >&6; }
-if test "${ac_cv_file__dev_spx+set}" = set; then :
-  $as_echo_n "(cached) " >&6
-else
-  test "$cross_compiling" = yes &&
-  as_fn_error "cannot check for file existence when cross compiling" "$LINENO" 5
-if test -r "/dev/spx"; then
-  ac_cv_file__dev_spx=yes
-else
-  ac_cv_file__dev_spx=no
-fi
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_file__dev_spx" >&5
-$as_echo "$ac_cv_file__dev_spx" >&6; }
-if test "x$ac_cv_file__dev_spx" = x""yes; then :
-
-cat >>confdefs.h <<_ACEOF
-#define HAVE__DEV_SPX 1
-_ACEOF
-
-fi
-
-
   ac_fn_c_check_type "$LINENO" "struct strrecvfd" "ac_cv_type_struct_strrecvfd" "#include <stropts.h>
 "
 if test "x$ac_cv_type_struct_strrecvfd" = x""yes; then :
@@ -13199,6 +13179,7 @@ _ACEOF
 
 fi
 
+
   { $as_echo "$as_me:${as_lineno-$LINENO}: checking if file descriptors can be passed over a fifo" >&5
 $as_echo_n "checking if file descriptors can be passed over a fifo... " >&6; }
 if test "${x_ac_cv_check_fifo_recvfd+set}" = set; then :
@@ -13206,9 +13187,7 @@ if test "${x_ac_cv_check_fifo_recvfd+set}" = set; then :
 else
 
     x_ac_cv_check_fifo_recvfd=no
-    if test $ac_cv_type_struct_strrecvfd = yes; then :
-
-      if test "$cross_compiling" = yes; then :
+    if test "$cross_compiling" = yes; then :
   { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
 $as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
 as_fn_error "cannot run test program while cross compiling
@@ -13270,8 +13249,6 @@ fi
 
 
 fi
-
-fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $x_ac_cv_check_fifo_recvfd" >&5
 $as_echo "$x_ac_cv_check_fifo_recvfd" >&6; }
   if test $x_ac_cv_check_fifo_recvfd = yes; then :
@@ -13280,6 +13257,75 @@ $as_echo "#define HAVE_FIFO_RECVFD 1" >>confdefs.h
 
 
 fi
+
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for /dev/spx" >&5
+$as_echo_n "checking for /dev/spx... " >&6; }
+if test "${ac_cv_file__dev_spx+set}" = set; then :
+  $as_echo_n "(cached) " >&6
+else
+  test "$cross_compiling" = yes &&
+  as_fn_error "cannot check for file existence when cross compiling" "$LINENO" 5
+if test -r "/dev/spx"; then
+  ac_cv_file__dev_spx=yes
+else
+  ac_cv_file__dev_spx=no
+fi
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_file__dev_spx" >&5
+$as_echo "$ac_cv_file__dev_spx" >&6; }
+if test "x$ac_cv_file__dev_spx" = x""yes; then :
+
+cat >>confdefs.h <<_ACEOF
+#define HAVE__DEV_SPX 1
+_ACEOF
+
+fi
+
+
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for authentication method" >&5
+$as_echo_n "checking for authentication method... " >&6; }
+  if   test $ac_cv_func_getpeereid = yes ; then
+    AUTH_METHOD=AUTH_METHOD_GETPEEREID
+
+$as_echo "#define AUTH_METHOD_GETPEEREID 1" >>confdefs.h
+
+  elif test $ac_cv_func_getpeerucred = yes \
+         -a $ac_cv_header_ucred_h = yes ; then
+    AUTH_METHOD=AUTH_METHOD_GETPEERUCRED
+
+$as_echo "#define AUTH_METHOD_GETPEERUCRED 1" >>confdefs.h
+
+  elif test $ac_cv_type_struct_ucred = yes \
+         -a $x_ac_cv_check_so_peercred = yes ; then
+    AUTH_METHOD=AUTH_METHOD_SO_PEERCRED
+
+$as_echo "#define AUTH_METHOD_SO_PEERCRED 1" >>confdefs.h
+
+  elif test $ac_cv_type_struct_xucred = yes \
+         -a $x_ac_cv_check_local_peercred = yes ; then
+    AUTH_METHOD=AUTH_METHOD_LOCAL_PEERCRED
+
+$as_echo "#define AUTH_METHOD_LOCAL_PEERCRED 1" >>confdefs.h
+
+  elif test $ac_cv_type_struct_strrecvfd = yes \
+         -a $x_ac_cv_check_fifo_recvfd = yes ; then
+    AUTH_METHOD=AUTH_METHOD_RECVFD_MKFIFO
+
+$as_echo "#define AUTH_METHOD_RECVFD_MKFIFO 1" >>confdefs.h
+
+  elif test $ac_cv_type_struct_strrecvfd = yes \
+         -a $ac_cv_file__dev_spx = yes ; then
+    AUTH_METHOD=AUTH_METHOD_RECVFD_MKNOD
+
+$as_echo "#define AUTH_METHOD_RECVFD_MKNOD 1" >>confdefs.h
+
+  else
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: failed" >&5
+$as_echo "failed" >&6; }
+    as_fn_error "cannot determine authentication method" "$LINENO" 5
+  fi
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $AUTH_METHOD" >&5
+$as_echo "$AUTH_METHOD" >&6; }
 
 
 ##

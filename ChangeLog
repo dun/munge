@@ -1,5 +1,17 @@
 2010-02-11  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* : Moved the compile-time checks for determining the client
+	  authentication method into the configure script.
+	* configure.ac, config/x_ac_select_auth_method.m4:
+	  Added X_AC_SELECT_AUTH_METHOD.
+	* config/x_ac_check_fifo_recvfd.m4: Moved check for struct strrecvfd
+	  into config/x_ac_select_auth_method.m4 since it is required for both
+	  AUTH_METHOD_RECVFD_MKFIFO & AUTH_METHOD_RECVFD_MKNOD.
+	* src/libcommon/auth_policy.h, src/libcommon/common.h,
+	  src/libcommon/Makefile.am: Removed "auth_policy.h".
+	* src/libmunge/auth_send.c, src/munged/auth_recv.c, src/munged/conf.c:
+	  Replaced MUNGE_AUTH_* defs with corresponding AUTH_METHOD_* defs.
+
 	* src/libmunge/auth_send.h: Changed #ifdef guard to MUNGE_AUTH_SEND_H.
 	* src/munged/auth_recv.h: Changed #ifdef guard to MUNGE_AUTH_RECV_H.
 

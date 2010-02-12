@@ -32,7 +32,6 @@
 #  include <config.h>
 #endif /* HAVE_CONFIG_H */
 
-#include "auth_policy.h"
 #include "fd.h"
 #include "license.h"
 #include "log.h"

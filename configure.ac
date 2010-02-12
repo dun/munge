@@ -108,17 +108,9 @@ AC_TYPE_UID_T
 AC_CHECK_TYPES(socklen_t, [], [], [#include <sys/socket.h>])
 
 ##
-# Checks for how to authenticate a client process.
+# Checks for client authentication method.
 ##
-AC_CHECK_FUNCS(getpeereid)
-AC_CHECK_FUNCS(getpeerucred)
-AC_CHECK_HEADERS(ucred.h)
-AC_CHECK_TYPES(struct ucred, [], [], [#include <sys/socket.h>])
-X_AC_CHECK_SO_PEERCRED
-AC_CHECK_TYPES(struct xucred, [], [], [#include <sys/ucred.h>])
-X_AC_CHECK_LOCAL_PEERCRED
-AC_CHECK_FILES(/dev/spx)
-X_AC_CHECK_FIFO_RECVFD
+X_AC_SELECT_AUTH_METHOD
 
 ##
 # Checks for library functions.

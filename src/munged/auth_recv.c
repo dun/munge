@@ -33,7 +33,6 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <munge.h>
-#include "auth_policy.h"
 #include "log.h"
 #include "m_msg.h"
 #include "path.h"
@@ -49,12 +48,12 @@ static void _check_auth_client_dir (const char *dir, int got_force);
 void
 auth_recv_init (const char *srvrdir, const char *clntdir, int got_force)
 {
-#ifdef MUNGE_AUTH_RECVFD_MKNOD
+#ifdef AUTH_METHOD_RECVFD_MKNOD
     if (geteuid () != 0) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
             "MUNGE daemon requires root privileges");
     }
-#endif /* MUNGE_AUTH_RECVFD_MKNOD */
+#endif /* AUTH_METHOD_RECVFD_MKNOD */
 
     _check_auth_server_dir (srvrdir, got_force);
     _check_auth_client_dir (clntdir, got_force);
@@ -65,7 +64,7 @@ auth_recv_init (const char *srvrdir, const char *clntdir, int got_force)
 static void
 _check_auth_server_dir (const char *dir, int got_force)
 {
-#ifdef MUNGE_AUTH_RECVFD
+#if defined(AUTH_METHOD_RECVFD_MKFIFO) || defined(AUTH_METHOD_RECVFD_MKNOD)
     int          got_symlink;
     struct stat  st;
     int          n;
@@ -142,14 +141,14 @@ _check_auth_server_dir (const char *dir, int got_force)
         log_msg (LOG_WARNING,
             "The auth server dir is inaccessible: %s", ebuf);
     }
-#endif /* MUNGE_AUTH_RECVFD */
+#endif /* AUTH_METHOD_RECVFD_MKFIFO || AUTH_METHOD_RECVFD_MKNOD */
     return;
 }
 
 static void
 _check_auth_client_dir (const char *dir, int got_force)
 {
-#ifdef MUNGE_AUTH_RECVFD
+#if defined(AUTH_METHOD_RECVFD_MKFIFO) || defined(AUTH_METHOD_RECVFD_MKNOD)
     int          got_symlink;
     struct stat  st;
     int          n;
@@ -227,7 +226,7 @@ _check_auth_client_dir (const char *dir, int got_force)
         log_msg (LOG_WARNING,
             "The auth client dir is inaccessible: %s", ebuf);
     }
-#endif /* MUNGE_AUTH_RECVFD */
+#endif /* AUTH_METHOD_RECVFD_MKFIFO || AUTH_METHOD_RECVFD_MKNOD */
     return;
 }
 
@@ -236,7 +235,7 @@ _check_auth_client_dir (const char *dir, int got_force)
  *  getpeereid
  *****************************************************************************/
 
-#ifdef MUNGE_AUTH_GETPEEREID
+#ifdef AUTH_METHOD_GETPEEREID
 
 #include <sys/types.h>
 
@@ -250,14 +249,14 @@ auth_recv (m_msg_t m, uid_t *uid, gid_t *gid)
     return (0);
 }
 
-#endif /* MUNGE_AUTH_GETPEEREID */
+#endif /* AUTH_METHOD_GETPEEREID */
 
 
 /*****************************************************************************
  *  getpeerucred
  *****************************************************************************/
 
-#ifdef MUNGE_AUTH_GETPEERUCRED
+#ifdef AUTH_METHOD_GETPEERUCRED
 
 #include <ucred.h>
 
@@ -290,14 +289,14 @@ auth_recv (m_msg_t m, uid_t *uid, gid_t *gid)
     return (rc);
 }
 
-#endif /* MUNGE_AUTH_GETPEERUCRED */
+#endif /* AUTH_METHOD_GETPEERUCRED */
 
 
 /*****************************************************************************
  *  SO_PEERCRED sockopt
  *****************************************************************************/
 
-#ifdef MUNGE_AUTH_SO_PEERCRED
+#ifdef AUTH_METHOD_SO_PEERCRED
 
 #include <sys/socket.h>
 
@@ -320,14 +319,14 @@ auth_recv (m_msg_t m, uid_t *uid, gid_t *gid)
     return (0);
 }
 
-#endif /* MUNGE_AUTH_SO_PEERCRED */
+#endif /* AUTH_METHOD_SO_PEERCRED */
 
 
 /*****************************************************************************
  *  LOCAL_PEERCRED sockopt
  *****************************************************************************/
 
-#ifdef MUNGE_AUTH_LOCAL_PEERCRED
+#ifdef AUTH_METHOD_LOCAL_PEERCRED
 
 #include <sys/socket.h>
 #include <sys/ucred.h>
@@ -356,14 +355,14 @@ auth_recv (m_msg_t m, uid_t *uid, gid_t *gid)
     return (0);
 }
 
-#endif /* MUNGE_AUTH_LOCAL_PEERCRED */
+#endif /* AUTH_METHOD_LOCAL_PEERCRED */
 
 
 /*****************************************************************************
  *  strrecvfd struct (mkfifo)
  *****************************************************************************/
 
-#ifdef MUNGE_AUTH_RECVFD_MKFIFO
+#ifdef AUTH_METHOD_RECVFD_MKFIFO
 
 #include <assert.h>
 #include <fcntl.h>                      /* open, O_RDONLY */
@@ -446,14 +445,14 @@ err:
     return (-1);
 }
 
-#endif /* MUNGE_AUTH_RECVFD_MKFIFO */
+#endif /* AUTH_METHOD_RECVFD_MKFIFO */
 
 
 /*****************************************************************************
  *  strrecvfd struct (mknod)
  *****************************************************************************/
 
-#ifdef MUNGE_AUTH_RECVFD_MKNOD
+#ifdef AUTH_METHOD_RECVFD_MKNOD
 
 #include <assert.h>
 #include <fcntl.h>                      /* open, O_RDWR */
@@ -628,14 +627,14 @@ _s_pipe (int fd[2])
     return (0);
 }
 
-#endif /* MUNGE_AUTH_RECVFD_MKNOD */
+#endif /* AUTH_METHOD_RECVFD_MKNOD */
 
 
 /*****************************************************************************
  *  strrecvfd struct (common)
  *****************************************************************************/
 
-#ifdef MUNGE_AUTH_RECVFD
+#if defined(AUTH_METHOD_RECVFD_MKFIFO) || defined(AUTH_METHOD_RECVFD_MKNOD)
 
 #include <assert.h>
 #include <stdio.h>                      /* snprintf */
@@ -747,4 +746,4 @@ end:
     return (e == EMUNGE_SUCCESS ? 0 : -1);
 }
 
-#endif /* MUNGE_AUTH_RECVFD */
+#endif /* AUTH_METHOD_RECVFD_MKFIFO || AUTH_METHOD_RECVFD_MKNOD */

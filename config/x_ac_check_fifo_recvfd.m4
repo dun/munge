@@ -13,14 +13,12 @@
 ##*****************************************************************************
 
 AC_DEFUN([X_AC_CHECK_FIFO_RECVFD], [
-  AC_CHECK_TYPES(struct strrecvfd, [], [], [#include <stropts.h>])
   AC_CACHE_CHECK(
     [if file descriptors can be passed over a fifo],
     [x_ac_cv_check_fifo_recvfd], [
     AS_VAR_SET(x_ac_cv_check_fifo_recvfd, no)
-    AS_IF([test AS_VAR_GET(ac_cv_type_struct_strrecvfd) = yes], [
-      AC_RUN_IFELSE([
-        AC_LANG_PROGRAM([[
+    AC_RUN_IFELSE([
+      AC_LANG_PROGRAM([[
 
 #include <errno.h>
 #include <fcntl.h>
@@ -52,10 +50,9 @@ if ( ( mkfifo (name, S_IWUSR | S_IRUSR) == 0)
 unlink (name);
 return (rc); ]]
 
-        )],
-        AS_VAR_SET(x_ac_cv_check_fifo_recvfd, yes),
-        AS_VAR_SET(x_ac_cv_check_fifo_recvfd, no)
-      )]
+      )],
+      AS_VAR_SET(x_ac_cv_check_fifo_recvfd, yes),
+      AS_VAR_SET(x_ac_cv_check_fifo_recvfd, no)
     )]
   )
   AS_IF([test AS_VAR_GET(x_ac_cv_check_fifo_recvfd) = yes],

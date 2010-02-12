@@ -14,7 +14,6 @@ noinst_LTLIBRARIES = \
 
 libcommon_la_SOURCES = \
 	common.h \
-	auth_policy.h \
 	fd.c \
 	fd.h \
 	license.c \
