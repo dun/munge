@@ -11867,8 +11867,8 @@ if test "${enable_debug+set}" = set; then :
   enableval=$enable_debug;  case "$enableval" in
         yes) x_ac_debug=yes ;;
          no) x_ac_debug=no ;;
-          *) { $as_echo "$as_me:${as_lineno-$LINENO}: result: doh!" >&5
-$as_echo "doh!" >&6; }
+          *) { $as_echo "$as_me:${as_lineno-$LINENO}: result: failed" >&5
+$as_echo "failed" >&6; }
              as_fn_error "bad value \"$enableval\" for --enable-debug" "$LINENO" 5 ;;
       esac
 

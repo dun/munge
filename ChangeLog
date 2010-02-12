@@ -1,5 +1,7 @@
 2010-02-11  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* config/x_ac_debug.m4: Tweaked AC_MSG_RESULT text on failure.
+
 	* config/x_ac_select_crypto_lib.m4:
 	  Tweaked AC_MSG_RESULT text on failure.
 

@@ -24,7 +24,7 @@ AC_DEFUN([X_AC_DEBUG], [
     [ case "$enableval" in
         yes) x_ac_debug=yes ;;
          no) x_ac_debug=no ;;
-          *) AC_MSG_RESULT([doh!])
+          *) AC_MSG_RESULT([failed])
              AC_MSG_ERROR([bad value "$enableval" for --enable-debug]) ;;
       esac
     ]
