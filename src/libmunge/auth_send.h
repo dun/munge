@@ -24,8 +24,8 @@
  *****************************************************************************/
 
 
-#ifndef MUNGE_AUTH_CLIENT_H
-#define MUNGE_AUTH_CLIENT_H
+#ifndef MUNGE_AUTH_SEND_H
+#define MUNGE_AUTH_SEND_H
 
 #include "m_msg.h"
 
@@ -37,4 +37,4 @@ int auth_send (m_msg_t m);
  */
 
 
-#endif /* !MUNGE_AUTH_CLIENT_H */
+#endif /* !MUNGE_AUTH_SEND_H */

@@ -1,5 +1,8 @@
 2010-02-11  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/libmunge/auth_send.h: Changed #ifdef guard to MUNGE_AUTH_SEND_H.
+	* src/munged/auth_recv.h: Changed #ifdef guard to MUNGE_AUTH_RECV_H.
+
 	* configure.ac, config/x_ac_gpl_licensed.m4: Removed X_AC_GPL_LICENSED.
 	* src/libmunge/munge.h: Removed #error if !GPL_LICENSED.
 	* src/libmunge/munge.3.in, src/libmunge/munge_ctx.3.in,

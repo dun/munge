@@ -24,8 +24,8 @@
  *****************************************************************************/
 
 
-#ifndef MUNGE_AUTH_SERVER_H
-#define MUNGE_AUTH_SERVER_H
+#ifndef MUNGE_AUTH_RECV_H
+#define MUNGE_AUTH_RECV_H
 
 
 #include <sys/types.h>
@@ -46,4 +46,4 @@ int auth_recv (m_msg_t m, uid_t *uid, gid_t *gid);
  */
 
 
-#endif /* !MUNGE_AUTH_SERVER_H */
+#endif /* !MUNGE_AUTH_RECV_H */
