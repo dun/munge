@@ -1,5 +1,7 @@
 2010-03-02  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* config/x_ac_select_auth_method.m4: Tweaked whitespace.
+
 	* : Changed license from GPLv2+ to GPLv3+/LGPLv3+.
 
 2010-02-11  Chris Dunlap  <cdunlap@llnl.gov>
@@ -577,7 +579,7 @@
 	  src/munged/crypto_thread.c, src/munged/crypto_thread.h,
 	  src/munged/lookup.c, src/munged/lookup.h: Removed.
 	* src/libmunge/enum.c: Updated test for MUNGE_CIPHER_AES128_FLAG.
-	* src/libcommon/munge_defs.h: Updated MUNGE_DEFAULT_CIPHER test for 
+	* src/libcommon/munge_defs.h: Updated MUNGE_DEFAULT_CIPHER test for
 	  libgcrypt.  Added MUNGE_MAXIMUM_BLK_LEN, MUNGE_MAXIMUM_KEY_LEN, and
 	  MUNGE_MAXIMUM_MD_LEN.
 	* src/munged/cred.h: Updated MAX_DEK, MAX_IV, and MAX_MAC to use new
