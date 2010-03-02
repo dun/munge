@@ -1,3 +1,7 @@
+2010-03-02  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* : Changed license from GPLv2+ to GPLv3+/LGPLv3+.
+
 2010-02-11  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* config/x_ac_debug.m4: Tweaked AC_MSG_RESULT text on failure.

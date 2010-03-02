@@ -9,18 +9,22 @@
  *  This file is part of the MUNGE Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://home.gna.org/munge/>.
  *
- *  This is free software; you can redistribute it and/or modify it
- *  under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 2 of the License, or
- *  (at your option) any later version.
+ *  MUNGE is free software: you can redistribute it and/or modify it under
+ *  the terms of the GNU General Public License as published by the Free
+ *  Software Foundation, either version 3 of the License, or (at your option)
+ *  any later version.  Additionally for the MUNGE library (libmunge), you
+ *  can redistribute it and/or modify it under the terms of the GNU Lesser
+ *  General Public License as published by the Free Software Foundation,
+ *  either version 3 of the License, or (at your option) any later version.
  *
- *  This is distributed in the hope that it will be useful, but WITHOUT
+ *  MUNGE is distributed in the hope that it will be useful, but WITHOUT
  *  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  *  FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
- *  for more details.
+ *  and GNU Lesser General Public License for more details.
  *
  *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *  and GNU Lesser General Public License along with MUNGE.  If not, see
+ *  <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 
 
@@ -32,24 +36,43 @@
 #include "license.h"
 
 
-static const char *license_string = \
-    "Welcome to the MUNGE Uid 'N' Gid Emporium (MUNGE).\n"                    \
-    "http://home.gna.org/munge/\n"                                            \
-    "\n"                                                                      \
-    "Written by Chris Dunlap <cdunlap@llnl.gov>.\n"                           \
-    "Copyright (C) 2007-2010 Lawrence Livermore National Security, LLC.\n"    \
-    "Copyright (C) 2002-2007 The Regents of the University of California.\n"  \
-    "\n"                                                                      \
-    "MUNGE is free software; you can redistribute it and/or modify it\n"      \
-    "under the terms of the GNU General Public License as published by\n"     \
-    "the Free Software Foundation; either version 2 of the License, or\n"     \
-    "(at your option) any later version.\n"                                   \
-    "\n";
+/*  The license string was broken into an array of strings in order to keep
+ *    below the 509-character limit that ISO C90 compilers are required to
+ *    support (detected when compiling with -pedantic).
+ */
+static const char *license_text[] = { \
+    "Welcome to the MUNGE Uid 'N' Gid Emporium (MUNGE).",
+    "http://home.gna.org/munge/",
+    "",
+    "Written by Chris Dunlap <cdunlap@llnl.gov>.",
+    "Copyright (C) 2007-2010 Lawrence Livermore National Security, LLC.",
+    "Copyright (C) 2002-2007 The Regents of the University of California.",
+    "",
+    "MUNGE is free software: you can redistribute it and/or modify it under",
+    "the terms of the GNU General Public License as published by the Free",
+    "Software Foundation, either version 3 of the License,"
+        " or (at your option)",
+    "any later version.  Additionally for the MUNGE library (libmunge), you",
+    "can redistribute it and/or modify it under the terms of the GNU Lesser",
+    "General Public License as published by the Free Software Foundation,",
+    "either version 3 of the License, or (at your option) any later version.",
+    "",
+    "MUNGE is distributed in the hope that it will be useful, but WITHOUT",
+    "ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or",
+    "FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License",
+    "and GNU Lesser General Public License for more details.",
+    "",
+    NULL
+};
 
 
 void
 display_license (void)
 {
-    printf ("%s", license_string);
+    const char **pp;
+
+    for (pp = license_text; *pp != NULL; pp++) {
+        printf ("%s\n", *pp);
+    }
     return;
 }

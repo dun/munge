@@ -20,4 +20,4 @@ the University of California, and shall not be used for advertising
 or product endorsement purposes.
 
 The precise terms and conditions for copying, distribution, and
-modification are specified in the file "COPYING".
+modification are specified in the files "COPYING" and "COPYING.LESSER".

@@ -9,18 +9,22 @@
  *  This file is part of the MUNGE Uid 'N' Gid Emporium (MUNGE).
  *  For details, see <http://home.gna.org/munge/>.
  *
- *  This is free software; you can redistribute it and/or modify it
- *  under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 2 of the License, or
- *  (at your option) any later version.
+ *  MUNGE is free software: you can redistribute it and/or modify it under
+ *  the terms of the GNU General Public License as published by the Free
+ *  Software Foundation, either version 3 of the License, or (at your option)
+ *  any later version.  Additionally for the MUNGE library (libmunge), you
+ *  can redistribute it and/or modify it under the terms of the GNU Lesser
+ *  General Public License as published by the Free Software Foundation,
+ *  either version 3 of the License, or (at your option) any later version.
  *
- *  This is distributed in the hope that it will be useful, but WITHOUT
+ *  MUNGE is distributed in the hope that it will be useful, but WITHOUT
  *  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  *  FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
- *  for more details.
+ *  and GNU Lesser General Public License for more details.
  *
  *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *  and GNU Lesser General Public License along with MUNGE.  If not, see
+ *  <http://www.gnu.org/licenses/>.
  *****************************************************************************
  *  Refer to "posignal.h" for documentation on public functions.
  *****************************************************************************/
