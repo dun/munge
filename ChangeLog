@@ -1,3 +1,9 @@
+2010-03-08  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/etc/munge.init.in: Added stanza to service_start() to create
+	  /var/run/munge dir if needed.  Fixes bug on Debian/Ubuntu when RAMRUN
+	  is enabled.
+
 2010-03-02  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* config/x_ac_select_auth_method.m4: Tweaked whitespace.

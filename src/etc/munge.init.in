@@ -119,6 +119,13 @@ service_start ()
 #   considered successful.
 ##
   log_init "Starting $DESC" "$DAEMON_NAME"
+
+  VARRUNDIR="$localstatedir/run/munge"
+  if [ ! -d "$VARRUNDIR" ]; then
+    mkdir -m 755 -p "$VARRUNDIR"
+    [ -n "$USER" ] && chown "$USER" "$VARRUNDIR"
+  fi
+
   case $SYSTEM in
     DEBIAN)
       if $0 status >/dev/null 2>&1; then
