@@ -36,6 +36,7 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <munge.h>
+#include <signal.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/time.h>                   /* include before resource.h for bsd */
@@ -81,7 +82,7 @@ static void sock_destroy (conf_t conf);
  *  Global Variables
  *****************************************************************************/
 
-int done = 0;                           /* global flag set true for exit     */
+volatile sig_atomic_t done = 0;         /* global flag set true for exit     */
 
 
 /*****************************************************************************
@@ -433,8 +434,7 @@ static void
 exit_handler (int signum)
 {
     if (!done) {
-        done = 1;
-        log_msg (LOG_NOTICE, "Exiting on signal=%d", signum);
+        done = signum;
     }
     return;
 }

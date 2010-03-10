@@ -35,6 +35,7 @@
 #include <assert.h>
 #include <errno.h>
 #include <munge.h>
+#include <signal.h>
 #include <string.h>
 #include <sys/socket.h>
 #include <unistd.h>
@@ -52,7 +53,7 @@
  *  Extern Variables
  *****************************************************************************/
 
-extern int done;                        /* defined in munged.c               */
+extern volatile sig_atomic_t done;      /* defined in munged.c               */
 
 
 /*****************************************************************************
@@ -117,6 +118,7 @@ job_accept (conf_t conf)
             log_msg (LOG_WARNING, "Unable to queue client request");
         }
     }
+    log_msg (LOG_NOTICE, "Exiting on signal=%d", done);
     work_fini (w, 1);
     return;
 }
