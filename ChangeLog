@@ -2,8 +2,7 @@
 
 	* src/munged/munged.c, src/munged/job.c: Changed type of global "done"
 	  signal handler flag to volatile sig_atomic_t.  Moved exit_handler()'s
-	  log_msg() call outside of signal handler to instead follow
-	  job_accept()'s while-loop.
+	  log_msg() call outside of signal handler and into job_accept().
 
 2010-03-08  Chris Dunlap  <cdunlap@llnl.gov>
 
