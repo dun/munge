@@ -13005,7 +13005,8 @@ $as_echo "#define gid_t int" >>confdefs.h
 
 fi
 
-ac_fn_c_check_type "$LINENO" "socklen_t" "ac_cv_type_socklen_t" "#include <sys/socket.h>
+ac_fn_c_check_type "$LINENO" "socklen_t" "ac_cv_type_socklen_t" "#include <sys/types.h>
+#include <sys/socket.h>
 "
 if test "x$ac_cv_type_socklen_t" = x""yes; then :
 
@@ -13135,16 +13136,15 @@ else
 /* end confdefs.h.  */
 
 
-
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <sys/un.h>
+
 int
 main ()
 {
 
-
 getsockopt (0, 0, LOCAL_PEERCRED, 0, 0);
-
 
   ;
   return 0;

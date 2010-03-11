@@ -1,3 +1,14 @@
+2010-03-10  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* configure.ac: Fixed check for socklen_t to work on FreeBSD-4.7 with
+	  the addition of <sys/types.h>.
+	* config/x_ac_check_local_peercred.m4, src/munged/auth_recv.c:
+	  Added <sys/un.h> for LOCAL_PEERCRED define on FreeBSD-4.7.
+	  Added <sys/param.h> for NGROUPS on FreeBSD-4.7 (needed for ucred.h).
+	  Note that, by default, AUTH_METHOD_GETPEEREID is selected on FreeBSD;
+	  however, AUTH_METHOD_LOCAL_PEERCRED also works there since supposedly
+	  its getpeereid() is implemented via LOCAL_PEERCRED.
+
 2010-03-09  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/munged/munged.c, src/munged/job.c: Changed type of global "done"

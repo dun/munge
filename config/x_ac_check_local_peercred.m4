@@ -17,12 +17,12 @@ AC_DEFUN([X_AC_CHECK_LOCAL_PEERCRED], [
     [x_ac_cv_check_local_peercred], [
     AC_COMPILE_IFELSE([
       AC_LANG_PROGRAM([[
-
 #include <sys/types.h>
-#include <sys/socket.h>]], [[
-
-getsockopt (0, 0, LOCAL_PEERCRED, 0, 0);]]
-
+#include <sys/socket.h>
+#include <sys/un.h>
+]],
+[[
+getsockopt (0, 0, LOCAL_PEERCRED, 0, 0); ]]
       )],
       AS_VAR_SET(x_ac_cv_check_local_peercred, yes),
       AS_VAR_SET(x_ac_cv_check_local_peercred, no)

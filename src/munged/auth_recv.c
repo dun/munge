@@ -332,8 +332,10 @@ auth_recv (m_msg_t m, uid_t *uid, gid_t *gid)
 
 #ifdef AUTH_METHOD_LOCAL_PEERCRED
 
+#include <sys/param.h>                  /* for FreeBSD */
 #include <sys/socket.h>
 #include <sys/ucred.h>
+#include <sys/un.h>                     /* for FreeBSD */
 
 #ifndef HAVE_SOCKLEN_T
 typedef int socklen_t;                  /* socklen_t is uint32_t in Posix.1g */
