@@ -1,5 +1,8 @@
 2010-03-11  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* config/x_ac_select_auth_method.m4: Tweaked platform comment for
+	  AUTH_METHOD_LOCAL_PEERCRED.
+
 	* config/x_ac_select_auth_method.m4: Fixed check for struct xucred to
 	  work on FreeBSD-4.7 with the addition of <sys/param.h> and
 	  <sys/types.h>.
