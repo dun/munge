@@ -13112,7 +13112,9 @@ $as_echo "#define HAVE_SO_PEERCRED 1" >>confdefs.h
 
 fi
 
-  ac_fn_c_check_type "$LINENO" "struct xucred" "ac_cv_type_struct_xucred" "#include <sys/ucred.h>
+  ac_fn_c_check_type "$LINENO" "struct xucred" "ac_cv_type_struct_xucred" "#include <sys/param.h>
+#include <sys/types.h>
+#include <sys/ucred.h>
 "
 if test "x$ac_cv_type_struct_xucred" = x""yes; then :
 

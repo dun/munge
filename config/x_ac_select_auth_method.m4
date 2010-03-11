@@ -61,7 +61,9 @@ AC_DEFUN([X_AC_SELECT_AUTH_METHOD], [
   AC_CHECK_HEADERS(ucred.h)
   AC_CHECK_TYPES(struct ucred, [], [], [#include <sys/socket.h>])
   X_AC_CHECK_SO_PEERCRED
-  AC_CHECK_TYPES(struct xucred, [], [], [#include <sys/ucred.h>])
+  AC_CHECK_TYPES(struct xucred, [], [], [#include <sys/param.h>
+#include <sys/types.h>
+#include <sys/ucred.h>])
   X_AC_CHECK_LOCAL_PEERCRED
   AC_CHECK_TYPES(struct strrecvfd, [], [], [#include <stropts.h>])
   X_AC_CHECK_FIFO_RECVFD
