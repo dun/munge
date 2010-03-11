@@ -109,8 +109,7 @@ AC_CHECK_HEADERS( \
 AC_C_BIGENDIAN
 AC_C_CONST
 AC_TYPE_UID_T
-AC_CHECK_TYPES(socklen_t, [], [],
-[#include <sys/types.h>
+AC_CHECK_TYPES(socklen_t, [], [], [#include <sys/types.h>
 #include <sys/socket.h>])
 
 ##
