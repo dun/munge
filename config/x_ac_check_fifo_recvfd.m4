@@ -19,7 +19,6 @@ AC_DEFUN([X_AC_CHECK_FIFO_RECVFD], [
     AS_VAR_SET(x_ac_cv_check_fifo_recvfd, no)
     AC_RUN_IFELSE([
       AC_LANG_PROGRAM([[
-
 #include <errno.h>
 #include <fcntl.h>
 #include <limits.h>
@@ -29,8 +28,9 @@ AC_DEFUN([X_AC_CHECK_FIFO_RECVFD], [
 #include <sys/ioctl.h>
 #include <sys/stat.h>
 #include <sys/types.h>
-#include <unistd.h> ]], [[
-
+#include <unistd.h>
+]],
+[[
 char name[PATH_MAX];
 char *tmpdir;
 char *basename = "fifo";
@@ -49,7 +49,6 @@ if ( ( mkfifo (name, S_IWUSR | S_IRUSR) == 0)
 }
 unlink (name);
 return (rc); ]]
-
       )],
       AS_VAR_SET(x_ac_cv_check_fifo_recvfd, yes),
       AS_VAR_SET(x_ac_cv_check_fifo_recvfd, no)

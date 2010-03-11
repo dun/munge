@@ -1,5 +1,8 @@
 2010-03-10  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* config/x_ac_check_fifo_recvfd.m4, config/x_ac_check_so_peercred.m4:
+	  Tweaked formatting.
+
 	* configure.ac: Fixed check for socklen_t to work on FreeBSD-4.7 with
 	  the addition of <sys/types.h>.
 	* config/x_ac_check_local_peercred.m4, src/munged/auth_recv.c:
