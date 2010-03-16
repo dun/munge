@@ -1,16 +1,29 @@
-The current version of MUNGE has been built on the following platforms.
+The current version of MUNGE has been built on the following platforms:
 
   AIX 5.2, 5.3
-  Darwin 8.7.0
-  FreeBSD 6.1
-  Linux 2.6 (Debian, RedHat, SuSE) (x86, x86_64, ia64)
-  Solaris 10
+    AUTH_METHOD_GETPEEREID
+    AUTH_METHOD_RECVFD_MKNOD
+  Darwin 8.11.0 (powerpc)
+    AUTH_METHOD_GETPEEREID
+    AUTH_METHOD_LOCAL_PEERCRED
+  FreeBSD 4.7 (i386)
+    AUTH_METHOD_GETPEEREID
+    AUTH_METHOD_LOCAL_PEERCRED
+  GNU/kFreeBSD (x86_64)
+    AUTH_METHOD_LOCAL_PEERCRED
+  Linux 2.6 (i686, ppc64, x86_64)
+    AUTH_METHOD_SO_PEERCRED
+  Solaris 10, 11 (sparc)
+    AUTH_METHOD_GETPEERUCRED
+    AUTH_METHOD_RECVFD_MKFIFO
 
-
-Previous versions have also been built on the following platforms.
-The current version may build there as well, but I no longer have
-access to these platforms for testing.
+Previous versions have also been built on the following platforms:
 
   AIX 5.1
-  FreeBSD 4.8, 4.10
+  Darwin 8.7.0
+  FreeBSD 4.8, 4.10, 6.1
+  Linux 2.4
   Solaris 2.8
+
+The current version may build there as well, but I no longer have
+access to those platforms for testing.
