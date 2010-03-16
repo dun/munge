@@ -1,3 +1,7 @@
+2010-03-16  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* README: Added license info.
+
 2010-03-15  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* config/x_ac_select_auth_method.m4: Tweaked platform comment for
