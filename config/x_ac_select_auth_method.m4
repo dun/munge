@@ -29,7 +29,7 @@
 #      and GID are then obtained from the ucred struct returned by
 #      getsockopt().
 #
-#    AUTH_METHOD_LOCAL_PEERCRED (BSD, GNU/kFreeBSD)
+#    AUTH_METHOD_LOCAL_PEERCRED (BSD, Darwin, GNU/kFreeBSD)
 #      The server uses the LOCAL_PEERCRED socket option to determine the
 #      identity of the client connected across the Unix domain socket.  The
 #      client's UID and GID are then obtained from the xucred struct returned
