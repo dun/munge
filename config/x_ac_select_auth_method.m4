@@ -18,7 +18,7 @@
 #      The server uses getpeereid() to determine the identity of the client
 #      connected across the Unix domain socket.
 #
-#    AUTH_METHOD_GETPEERUCRED (Solaris >= 10)
+#    AUTH_METHOD_GETPEERUCRED (SunOS >= 5.10)
 #      The server uses getpeerucred() to determine the identity of the client
 #      connected across the Unix domain socket.  The client's UID and GID are
 #      then obtained via ucred_geteuid() and ucred_getegid().
@@ -35,7 +35,7 @@
 #      client's UID and GID are then obtained from the xucred struct returned
 #      by getsockopt().
 #
-#    AUTH_METHOD_RECVFD_MKFIFO (Irix, Solaris)
+#    AUTH_METHOD_RECVFD_MKFIFO (Irix, SunOS)
 #      The server creates a unique FIFO special file via mkfifo() and sends a
 #      request to the client for it to pass an open file descriptor back across
 #      this FIFO.  The client creates a unique file and sends the open
