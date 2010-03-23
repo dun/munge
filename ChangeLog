@@ -1,7 +1,7 @@
 2010-03-23  Chris Dunlap  <cdunlap@llnl.gov>
 
-	* config/x_ac_select_auth_method.m4: Renamed Solaris references to
-	  SunOS in order to be consistent with uname output.
+	* config/x_ac_select_auth_method.m4, PLATFORMS: Renamed Solaris
+	  references to SunOS in order to be consistent with uname output.
 
 	* config/config.guess, config/config.sub:
 	  Updated via autotools-dev-20100122.1.
