@@ -1,3 +1,11 @@
+munge-0.5.9 (2010-03-23):
+- Changed license to GPLv3+/LGPLv3+.
+- Fixed bug with failed Linux builds under glibc-2.8+.
+- Fixed bug with failed daemon starts after clearing /var/run.
+- Moved selection of authentication method into configure script.
+- Added support for LOCAL_PEERCRED authentication (BSD, Darwin, GNU/kFreeBSD).
+- Added support for SHA-512 message digest.
+
 munge-0.5.8 (2007-02-05):
 - Fixed bug causing stack corruption on amd64 when using Libgcrypt.
 
