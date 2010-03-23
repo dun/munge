@@ -9,7 +9,7 @@ This version of MUNGE has been built and tested on the following platforms:
   FreeBSD 4.7 (i386)
     AUTH_METHOD_GETPEEREID
     AUTH_METHOD_LOCAL_PEERCRED
-  GNU/kFreeBSD (x86_64)
+  GNU/kFreeBSD 7.2 (x86_64)
     AUTH_METHOD_LOCAL_PEERCRED
   Linux 2.6 (i686, ppc64, x86_64)
     AUTH_METHOD_SO_PEERCRED

@@ -1,5 +1,7 @@
 2010-03-23  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* PLATFORMS: Added kernel release info for GNU/kFreeBSD.
+
 	* config/x_ac_select_auth_method.m4, PLATFORMS: Renamed Solaris
 	  references to SunOS in order to be consistent with uname output.
 
