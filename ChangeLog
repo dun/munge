@@ -1,5 +1,7 @@
 2010-03-23  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* : Released 0.5.9.
+
 	* HISTORY, META, NEWS: Updated for 0.5.9 release.
 
 	* PLATFORMS: Added kernel release info for GNU/kFreeBSD.
