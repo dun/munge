@@ -1,5 +1,7 @@
 2010-03-23  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/etc/munge.sysconfig: Removed svn id keyword.
+
 	* Makefile.am, src/Makefile.am, src/etc/Makefile.am,
 	  src/libcommon/Makefile.am, src/libmissing/Makefile.am,
 	  src/libmunge/Makefile.am, src/munge/Makefile.am,
