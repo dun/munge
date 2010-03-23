@@ -1,5 +1,8 @@
 2010-03-23  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* config/config.guess, config/config.sub:
+	  Updated via autotools-dev-20100122.1.
+
 	* src/etc/munge.sysconfig: Removed svn id keyword.
 
 	* Makefile.am, src/Makefile.am, src/etc/Makefile.am,
