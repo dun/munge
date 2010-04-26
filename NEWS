@@ -1,3 +1,6 @@
+munge-? (????-??-??):
+- Changed project homepage to <http://munge.googlecode.com/>.
+
 munge-0.5.9 (2010-03-23):
 - Changed license to GPLv3+/LGPLv3+.
 - Fixed bug with failed Linux builds under glibc-2.8+.

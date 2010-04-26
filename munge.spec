@@ -7,7 +7,7 @@ Release:	0
 Summary:	MUNGE Uid 'N' Gid Emporium
 Group:		System Environment/Daemons
 License:	GPLv3+ and LGPLv3+
-URL:		http://home.gna.org/munge/
+URL:		http://munge.googlecode.com/
 
 BuildRequires:	openssl-devel
 BuildRequires:	bzip2-devel
