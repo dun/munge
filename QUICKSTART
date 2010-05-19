@@ -121,11 +121,12 @@ MUNGE Installation Guide
    and /etc/sysconfig/munge (found on RedHat-based systems), if present,
    to set variables recognized by the script.
 
-   The OPTIONS variable passes additional command-line options to the daemon;
-   for example, this can be used to override the location of the secret key
-   (--key-file) or set the number of worker threads (--num-threads).  If the
-   init script is invoked by root, the USER variable causes the daemon to
-   execute under the specified username; the "daemon" user is used by default.
+   The DAEMON_ARGS variable passes additional command-line options to
+   the daemon; for example, this can be used to override the location
+   of the secret key (--key-file) or set the number of worker threads
+   (--num-threads).  If the init script is invoked by root, the USER variable
+   causes the daemon to execute under the specified username; the "daemon"
+   user is used by default.
 
 
 5. Testing the Installation
@@ -154,7 +155,6 @@ MUNGE Installation Guide
 
 6. Using MUNGE
 
-   Applications written in C/C++ can use the interface provided by
-   <libmunge.h>.  Scripts can invoke the /usr/bin/munge and /usr/bin/unmunge
-   executables -- specify "-h" or "--help" for usage information, or
-   Read The Fine Manpages.
+   Applications written in C/C++ can use the interface provided by <munge.h>.
+   Scripts can invoke the /usr/bin/munge and /usr/bin/unmunge executables --
+   specify "-h" or "--help" for usage information, or Read The Fine Manpages.
