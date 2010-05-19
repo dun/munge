@@ -32,24 +32,30 @@ RATIONALE
   client identity is authentic.
 
 
-OVERVIEW
+USAGE
 
   A process creates a credential by requesting one from the local
-  MUNGE service.  The encoded credential contains the UID and GID of
-  the originating process.  This process sends the credential to another
-  process within the security realm as a means of proving its identity.
-  The receiving process validates the credential with the use of its local
-  MUNGE service.  The decoded credential provides the receiving process with
-  a reliable means of ascertaining the UID and GID of the originating process.
-  This information can be used for accounting or access control decisions.
+  MUNGE service, either via munge_encode() or the "munge" executable.
+  The encoded credential contains the UID and GID of the originating
+  process.  This process sends the credential to another process within the
+  security realm as a means of proving its identity.  The receiving process
+  validates the credential with the use of its local MUNGE service, either
+  via munge_decode() or the "unmunge" executable.  The decoded credential
+  provides the receiving process with a reliable means of ascertaining the
+  UID and GID of the originating process.  This information can be used
+  for accounting or access control decisions.
+
+
+DETAILS
 
   The contents of the credential (including any optional payload data) are
   encrypted with a key shared by all munged daemons within the security realm.
   The integrity of the credential is ensured by a message authentication
-  code (MAC).  The credential is valid for a limited time defined by
-  its time-to-live (TTL).  The daemon ensures unexpired credentials
-  are not replayed on a particular host.  Decoding of a credential can
-  be restricted to a particular user and/or group ID.  The payload data
+  code (MAC).  The credential is valid for a limited time defined by its
+  time-to-live (TTL); this presumes clocks within a security realm are
+  in sync.  Unexpired credentials are tracked by the local munged daemon in
+  order to prevent replay attacks on a given host.  Decoding of a credential
+  can be restricted to a particular user and/or group ID.  The payload data
   can be used for purposes such as embedding the destination's address to
   ensure the credential is only valid on a specific host.  The internal
   format of the credential is encoded in a platform-independent manner.
@@ -62,10 +68,12 @@ LICENSE
   MUNGE is free software: you can redistribute it and/or modify it under
   the terms of the GNU General Public License as published by the Free
   Software Foundation, either version 3 of the License, or (at your option)
-  any later version.  Additionally for the MUNGE library (libmunge), you
-  can redistribute it and/or modify it under the terms of the GNU Lesser
-  General Public License as published by the Free Software Foundation,
-  either version 3 of the License, or (at your option) any later version.
+  any later version.
+
+  Additionally for the MUNGE library (libmunge), you can redistribute it
+  and/or modify it under the terms of the GNU Lesser General Public License
+  as published by the Free Software Foundation, either version 3 of the
+  License, or (at your option) any later version.
 
 
 HOMEPAGE

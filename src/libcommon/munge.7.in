@@ -61,27 +61,32 @@ given host directly limits scalability.  Third, root privileges are required
 in order to bind to a reserved port.  Finally, the remote daemons have no
 means of determining whether the client identity is authentic.
 
-.SH OVERVIEW
-A process creates a credential by requesting one from the local MUNGE service.
-The encoded credential contains the UID and GID of the originating process.
-This process sends the credential to another process within the security
-realm as a means of proving its identity.  The receiving process validates the
-credential with the use of its local MUNGE service.  The decoded credential
-provides the receiving process with a reliable means of ascertaining the
-UID and GID of the originating process.  This information can be used for
-accounting or access control decisions.
-.PP
+.SH USAGE
+A process creates a credential by requesting one from the local MUNGE service,
+either via \fBmunge_encode\fR() or the \fBmunge\fR executable.  The encoded
+credential contains the UID and GID of the originating process.  This process
+sends the credential to another process within the security realm as a means
+of proving its identity.  The receiving process validates the credential
+with the use of its local MUNGE service, either via \fBmunge_decode\fR()
+or the \fBunmunge\fR executable.  The decoded credential provides the
+receiving process with a reliable means of ascertaining the UID and GID of
+the originating process.  This information can be used for accounting or
+access control decisions.
+
+.SH DETAILS
 The contents of the credential (including any optional payload data)
 are encrypted with a key shared by all \fBmunged\fR daemons within the
 security realm.  The integrity of the credential is ensured by a message
 authentication code (MAC).  The credential is valid for a limited time defined
-by its time-to-live (TTL).  The daemon ensures unexpired credentials are not
-replayed on a particular host.  Decoding of a credential can be restricted
-to a particular user and/or group ID.  The payload data can be used for
-purposes such as embedding the destination's address to ensure the credential
-is only valid on a specific host.  The internal format of the credential
-is encoded in a platform-independent manner.  And the credential itself is
-base64 encoded to allow it to be transmitted over virtually any transport.
+by its time-to-live (TTL); this presumes clocks within a security realm are
+in sync.  Unexpired credentials are tracked by the local \fBmunged\fR daemon
+in order to prevent replay attacks on a given host.  Decoding of a credential
+can be restricted to a particular user and/or group ID.  The payload data
+can be used for purposes such as embedding the destination's address to
+ensure the credential is only valid on a specific host.  The internal
+format of the credential is encoded in a platform-independent manner.
+And the credential itself is base64 encoded to allow it to be transmitted
+over virtually any transport.
 
 .SH AUTHOR
 @META_AUTHOR@
