@@ -1,5 +1,7 @@
 2010-05-23  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* doc/credential_v3_format.txt: Twiddled quote marks.
+
 	* README: Tweaked usage text.
 
 2010-05-19  Chris Dunlap  <cdunlap@llnl.gov>
