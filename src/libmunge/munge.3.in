@@ -30,7 +30,7 @@
 .TH MUNGE 3 "@META_DATE@" "@META_ALIAS@" "MUNGE Uid 'N' Gid Emporium"
 
 .SH NAME
-munge_encode, munge_decode, munge_strerror \- MUNGE primary functions
+munge_encode, munge_decode, munge_strerror \- MUNGE core functions
 
 .SH SYNOPSIS
 .nf

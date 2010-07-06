@@ -1,5 +1,7 @@
 2010-07-06  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/libmunge/munge.3.in: Tweaked munge(3) manpage name.
+
 	* config/x_ac_check_pthreads.m4: Tweaked description.
 
 2010-05-23  Chris Dunlap  <cdunlap@llnl.gov>
