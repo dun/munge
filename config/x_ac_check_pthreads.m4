@@ -8,7 +8,7 @@
 #    X_AC_CHECK_PTHREADS
 #
 #  DESCRIPTION:
-#    Check to see how to link a process against Pthreads.
+#    Check how to link against Pthreads.
 #
 #    Also define both _REENTRANT and _THREAD_SAFE which may be needed when
 #    linking against multithreaded code.  By defining them here, the define

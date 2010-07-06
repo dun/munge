@@ -1,3 +1,7 @@
+2010-07-06  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* config/x_ac_check_pthreads.m4: Tweaked description.
+
 2010-05-23  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* doc/credential_v3_format.txt: Twiddled quote marks.
