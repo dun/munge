@@ -67,7 +67,7 @@ struct conf {
     int             mac_key_len;        /* length of mac subkey              */
     struct in_addr  addr;               /* IPv4 addr in n/w byte order       */
     gids_t          gids;               /* supplementary group information   */
-    int             gids_interval;      /* gids update interval in seconds   */
+    int             gids_update_secs;   /* gids update interval in seconds   */
     int             nthreads;           /* num threads for processing creds  */
     char           *auth_server_dir;    /* dir in which to create auth pipe  */
     char           *auth_client_dir;    /* dir in which to create auth file  */

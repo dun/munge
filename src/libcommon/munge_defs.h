@@ -119,7 +119,7 @@
  *  If set to 0, the GIDs mapping will be computed initially but never updated.
  *  If set to -1, the GIDs mapping will be disabled altogether.
  */
-#define MUNGE_GROUP_UPDATE_TIMER        3600
+#define MUNGE_GROUP_UPDATE_SECS         3600
 
 /*  Flag to allow previously-decoded credentials to be retried.
  *  If the client receives a socket error while communicating with the

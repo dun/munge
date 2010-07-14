@@ -1,5 +1,10 @@
 2010-07-14  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/libcommon/munge_defs.h, src/munged/conf.c:
+	  Renamed MUNGE_GROUP_UPDATE_TIMER to MUNGE_GROUP_UPDATE_SECS.
+	* src/munged/conf.c, src/munged/conf.h, src/munged/munged.c:
+	  Renamed gids_interval to gids_update_secs in struct conf.
+
 	* src/munged/conf.h: Tweaked struct conf comment for def_ttl & max_ttl.
 
 2010-07-06  Chris Dunlap  <cdunlap@llnl.gov>

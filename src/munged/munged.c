@@ -121,7 +121,7 @@ main (int argc, char *argv[])
         }
     }
     create_subkeys (conf);
-    conf->gids = gids_create (conf->gids_interval, conf->got_group_stat);
+    conf->gids = gids_create (conf->gids_update_secs, conf->got_group_stat);
     replay_init ();
     timer_init ();
     sock_create (conf);

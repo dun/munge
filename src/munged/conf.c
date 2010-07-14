@@ -148,7 +148,7 @@ create_conf (void)
     conf->mac_key = NULL;
     conf->mac_key_len = 0;
     conf->gids = NULL;
-    conf->gids_interval = MUNGE_GROUP_UPDATE_TIMER;
+    conf->gids_update_secs = MUNGE_GROUP_UPDATE_SECS;
     conf->nthreads = MUNGE_THREADS;
 
 #if defined(AUTH_METHOD_RECVFD_MKFIFO) || defined(AUTH_METHOD_RECVFD_MKNOD)
@@ -326,7 +326,7 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                     log_err (EMUNGE_SNAFU, LOG_ERR,
                         "Invalid value \"%s\" for group-update-time", optarg);
                 }
-                conf->gids_interval = l;
+                conf->gids_update_secs = l;
                 break;
             /* End deprecated cmdline opts */
             case '?':
@@ -430,7 +430,7 @@ display_help (char *prog)
 
     printf ("  %*s %s [%d]\n", w, "--group-update-time=INT",
             "Specify seconds between group info updates",
-            MUNGE_GROUP_UPDATE_TIMER);
+            MUNGE_GROUP_UPDATE_SECS);
 
     printf ("  %*s %s [%s]\n", w, "--key-file=PATH",
             "Specify secret key file", MUNGED_SECRET_KEY);
