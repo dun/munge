@@ -1,3 +1,7 @@
+2010-07-14  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/munged/conf.h: Tweaked struct conf comment for def_ttl & max_ttl.
+
 2010-07-06  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/libmunge/munge.3.in: Tweaked munge(3) manpage name.

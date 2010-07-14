@@ -53,8 +53,8 @@ struct conf {
     munge_cipher_t  def_cipher;         /* default cipher type               */
     munge_zip_t     def_zip;            /* default compression type          */
     munge_mac_t     def_mac;            /* default message auth code type    */
-    munge_ttl_t     def_ttl;            /* default time-to-live              */
-    munge_ttl_t     max_ttl;            /* default time-to-live              */
+    munge_ttl_t     def_ttl;            /* default time-to-live in seconds   */
+    munge_ttl_t     max_ttl;            /* maximum time-to-live in seconds   */
     char           *config_name;        /* configuration filename            */
     char           *logfile_name;       /* daemon log file name              */
     char           *pidfile_name;       /* daemon pid file name              */
