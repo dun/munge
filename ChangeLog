@@ -1,5 +1,8 @@
 2010-07-14  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/libcommon/munge_defs.h, src/munged/replay.c:
+	  Renamed MUNGE_REPLAY_PURGE_TIMER to MUNGE_REPLAY_PURGE_SECS.
+
 	* src/libcommon/munge_defs.h, src/munged/conf.c:
 	  Renamed MUNGE_GROUP_UPDATE_TIMER to MUNGE_GROUP_UPDATE_SECS.
 	* src/munged/conf.c, src/munged/conf.h, src/munged/munged.c:

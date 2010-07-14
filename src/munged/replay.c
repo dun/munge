@@ -117,7 +117,7 @@ replay_init (void)
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to allocate replay hash");
     }
     if (timer_set_relative (
-      (callback_f) replay_purge, NULL, MUNGE_REPLAY_PURGE_TIMER * 1000) < 0) {
+      (callback_f) replay_purge, NULL, MUNGE_REPLAY_PURGE_SECS * 1000) < 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to set replay purge timer");
     }
     return;
@@ -236,7 +236,7 @@ replay_purge (void)
             n, ((n == 1) ? "" : "s"));
     }
     if (timer_set_relative (
-      (callback_f) replay_purge, NULL, MUNGE_REPLAY_PURGE_TIMER * 1000) < 0) {
+      (callback_f) replay_purge, NULL, MUNGE_REPLAY_PURGE_SECS * 1000) < 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to set replay purge timer");
     }
     return;

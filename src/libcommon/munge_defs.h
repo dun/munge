@@ -135,7 +135,7 @@
 /*  Integer for the number of seconds between purging the replay hash
  *    of expired credentials.
  */
-#define MUNGE_REPLAY_PURGE_TIMER        60
+#define MUNGE_REPLAY_PURGE_SECS         60
 
 /*  Socket backlog for the server listening on the unix domain socket.
  */
