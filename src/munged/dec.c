@@ -223,7 +223,7 @@ dec_check_retry (munge_cred_t c)
             "Decode retry #%d for client uid=%d gid=%d",
             m->retry, m->client_uid, m->client_gid);
     }
-    if (m->retry > MUNGE_SOCKET_XFER_ATTEMPTS) {
+    if (m->retry > MUNGE_SOCKET_RETRY_ATTEMPTS) {
         return (m_msg_set_err (m, EMUNGE_SOCKET,
             strdupf ("Exceeded maximum transaction retry attempts")));
     }
@@ -1010,9 +1010,9 @@ dec_validate_replay (munge_cred_t c)
         return (0);
     }
     if (rc > 0) {
-        if ((conf->got_replay_retry)
+        if ((conf->got_socket_retry)
                 && (m->retry > 0)
-                && (m->retry <= MUNGE_SOCKET_XFER_ATTEMPTS)) {
+                && (m->retry <= MUNGE_SOCKET_RETRY_ATTEMPTS)) {
             log_msg (LOG_NOTICE,
                 "Allowed credential replay for client uid=%d gid=%d",
                 m->client_uid, m->client_gid);

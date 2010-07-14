@@ -272,7 +272,7 @@ enc_check_retry (munge_cred_t c)
             "Encode retry #%d for client uid=%d gid=%d",
             m->retry, m->client_uid, m->client_gid);
     }
-    if (m->retry > MUNGE_SOCKET_XFER_ATTEMPTS) {
+    if (m->retry > MUNGE_SOCKET_RETRY_ATTEMPTS) {
         return (m_msg_set_err (m, EMUNGE_SOCKET,
             strdupf ("Exceeded maximum transaction retry attempts")));
     }

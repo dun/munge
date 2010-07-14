@@ -121,17 +121,6 @@
  */
 #define MUNGE_GROUP_UPDATE_SECS         3600
 
-/*  Flag to allow previously-decoded credentials to be retried.
- *  If the client receives a socket error while communicating with the
- *    server, it will retry the transaction up to MUNGE_SOCKET_XFER_ATTEMPTS.
- *    If such an error occurs after the credential has been inserted into the
- *    replay hash, a subsequent retry will appear as a replayed credential.
- *  If set, a previously-decoded credential will not be marked as being
- *    replayed if the transaction is being retried.
- *  So far, these types of errors have only been seen under linux smp kernels.
- */
-#define MUNGE_REPLAY_RETRY_FLAG         1
-
 /*  Integer for the number of seconds between purging the replay hash
  *    of expired credentials.
  */
@@ -149,16 +138,26 @@
  */
 #define MUNGE_SOCKET_CONNECT_ATTEMPTS   5
 
+/*  Flag to allow previously-decoded credentials to be retried.
+ *  If the client receives a socket error while communicating with the
+ *    server, it will retry the transaction up to MUNGE_SOCKET_RETRY_ATTEMPTS.
+ *    If such an error occurs after the credential has been inserted into the
+ *    replay hash, a subsequent retry will appear as a replayed credential.
+ *  If set, a previously-decoded credential will not be marked as being
+ *    replayed if the transaction is being retried.
+ */
+#define MUNGE_SOCKET_RETRY_FLAG         1
+
 /*  Number of attempts a client makes communicating with the server for a
  *    given credential transaction before failing.
  */
-#define MUNGE_SOCKET_XFER_ATTEMPTS      5
+#define MUNGE_SOCKET_RETRY_ATTEMPTS     5
 
 /*  Number of microseconds for the start of the linear back-off where the
  *    client sleeps between attempts at retrying a credential transaction.
- *  Ensure (MUNGE_SOCKET_XFER_ATTEMPTS * MUNGE_SOCKET_XFER_USLEEP) < 1e6.
+ *  Ensure (MUNGE_SOCKET_RETRY_ATTEMPTS * MUNGE_SOCKET_RETRY_USECS) < 1e6.
  */
-#define MUNGE_SOCKET_XFER_USLEEP        10000
+#define MUNGE_SOCKET_RETRY_USECS        10000
 
 /*  Number of threads to create for processing credential requests.
  */

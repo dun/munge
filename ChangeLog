@@ -1,5 +1,13 @@
 2010-07-14  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/libcommon/munge_defs.h, src/libmunge/m_msg_client.c,
+	  src/munged/conf.c, src/munged/conf.h,
+	  src/munged/dec.c, src/munged/enc.c:
+	  Renamed MUNGE_REPLAY_RETRY_FLAG to MUNGE_SOCKET_RETRY_FLAG.
+	  Renamed MUNGE_SOCKET_XFER_ATTEMPTS to MUNGE_SOCKET_RETRY_ATTEMPTS.
+	  Renamed MUNGE_SOCKET_XFER_USLEEP to MUNGE_SOCKET_RETRY_USECS.
+	  Renamed got_replay_retry to got_socket_retry in struct conf.
+
 	* src/libcommon/munge_defs.h, src/munged/replay.c:
 	  Renamed MUNGE_REPLAY_PURGE_TIMER to MUNGE_REPLAY_PURGE_SECS.
 

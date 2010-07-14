@@ -71,7 +71,7 @@ m_msg_client_xfer (m_msg_t *pm, m_msg_type_t mreq_type, munge_ctx_t ctx)
     m_msg_t       mreq, mrsp;
     m_msg_type_t  mrsp_type;
 
-    assert (MUNGE_SOCKET_XFER_ATTEMPTS * MUNGE_SOCKET_XFER_USLEEP < 1000000);
+    assert (MUNGE_SOCKET_RETRY_ATTEMPTS * MUNGE_SOCKET_RETRY_USECS < 1000000);
 
     if (!pm || !*pm) {
         return (EMUNGE_SNAFU);
@@ -119,7 +119,7 @@ m_msg_client_xfer (m_msg_t *pm, m_msg_type_t mreq_type, munge_ctx_t ctx)
             break;
         }
 
-        if (i >= MUNGE_SOCKET_XFER_ATTEMPTS) {
+        if (i >= MUNGE_SOCKET_RETRY_ATTEMPTS) {
             break;
         }
         if (e == EMUNGE_BAD_LENGTH) {
@@ -135,7 +135,7 @@ m_msg_client_xfer (m_msg_t *pm, m_msg_type_t mreq_type, munge_ctx_t ctx)
             mreq->sd = -1;
         }
         mreq->retry = i;
-        usleep (i * MUNGE_SOCKET_XFER_USLEEP);
+        usleep (i * MUNGE_SOCKET_RETRY_USECS);
         i++;
     }
     if (mrsp) {
