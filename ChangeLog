@@ -1,3 +1,22 @@
+2010-08-25  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* : Fixed potential deadlock in munged that can occur if clients block
+	  while sending data (issue 1).  The wrappers for read() & write()
+	  implement a timeout by preceding the read/write call with a poll().
+	  The writev() coalescing of the message header & body has been
+	  replaced with two separate fd_timed_write_n()s (for simplicity).
+	  The client socket has been made nonblocking.	And the m_msg_send()
+	  check for max message length has been moved up to before the
+	  write()s.  Unfortunately, this commit degrades throughput by 20%.
+	* src/libcommon/m_msg.c (m_msg_send, m_msg_recv): Added support for
+	  timing-out sent messages with fd_timed_write_n() and received
+	  messages with fd_timed_read_n().
+	* src/libcommon/m_msg.c (_get_timeval): Added.
+	* src/libcommon/fd.c (fd_timed_read_n, fd_timed_write_n): Added.
+	* src/libcommon/fd.h: Added new prototypes.
+	* src/libcommon/munge_defs.h: Added MUNGE_SOCKET_TIMEOUT_MSECS.
+	* src/munged/job.c (job_accept): Set client socket as nonblocking.
+
 2010-07-14  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/libcommon/munge_defs.h, src/libmunge/m_msg_client.c,

@@ -37,8 +37,10 @@
 #include <assert.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <poll.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/time.h>
 #include <unistd.h>
 #include "fd.h"
 
@@ -47,7 +49,10 @@
  *  Static Prototypes
  *****************************************************************************/
 
+static int _fd_get_poll_timeout (const struct timeval *when);
+
 static int _fd_get_lock (int fd, int cmd, int type);
+
 static pid_t _fd_test_lock (int fd, int type);
 
 
@@ -101,6 +106,136 @@ fd_write_n (int fd, void *buf, size_t n)
         p += nwritten;
     }
     return (n);
+}
+
+
+ssize_t
+fd_timed_read_n (int fd, void *buf, size_t n, const struct timeval *when)
+{
+    unsigned char *p;
+    int            msecs;
+    struct pollfd  pfd;
+    int            nfd;
+    size_t         nleft;
+    ssize_t        nread;
+
+    if ((fd < 0) || (buf == NULL)) {
+        errno = EINVAL;
+        return (-1);
+    }
+    p = buf;
+    nleft = n;
+    pfd.fd = fd;
+    pfd.events = POLLIN;
+
+    while (nleft > 0) {
+
+        msecs = _fd_get_poll_timeout (when);
+        nfd = poll (&pfd, 1, msecs);
+
+        if (nfd < 0) {
+            if ((errno == EINTR) || (errno == EAGAIN))
+                continue;
+            else
+                return (-1);
+        }
+        else if (nfd == 0) {            /* timeout */
+            errno = ETIME;
+            break;
+        }
+        else if (pfd.revents & POLLNVAL) {
+            errno = EBADF;
+            return (-1);
+        }
+        else if (pfd.revents & POLLERR) {
+            errno = EIO;
+            return (-1);
+        }
+        assert (pfd.revents & POLLIN);
+
+        nread = read (fd, p, nleft);
+        if (nread < 0) {
+            if ((errno == EINTR) || (errno == EAGAIN))
+                continue;
+            else
+                return (-1);
+        }
+        else if (nread == 0) {          /* EOF */
+            break;
+        }
+        nleft -= nread;
+        p += nread;
+
+        if (msecs == 0) {
+            break;
+        }
+    }
+    return (n - nleft);
+}
+
+
+ssize_t
+fd_timed_write_n (int fd, void *buf, size_t n, const struct timeval *when)
+{
+    unsigned char *p;
+    int            msecs;
+    struct pollfd  pfd;
+    int            nfd;
+    size_t         nleft;
+    ssize_t        nwritten;
+
+    if ((fd < 0) || (buf == NULL)) {
+        errno = EINVAL;
+        return (-1);
+    }
+    p = buf;
+    nleft = n;
+    pfd.fd = fd;
+    pfd.events = POLLOUT;
+
+    while (nleft > 0) {
+
+        msecs = _fd_get_poll_timeout (when);
+        nfd = poll (&pfd, 1, msecs);
+
+        if (nfd < 0) {
+            if ((errno == EINTR) || (errno == EAGAIN))
+                continue;
+            else
+                return (-1);
+        }
+        else if (nfd == 0) {            /* timeout */
+            errno = ETIME;
+            break;
+        }
+        else if (pfd.revents & POLLHUP) {
+            break;
+        }
+        else if (pfd.revents & POLLNVAL) {
+            errno = EBADF;
+            return (-1);
+        }
+        else if (pfd.revents & POLLERR) {
+            errno = EIO;
+            return (-1);
+        }
+        assert (pfd.revents & POLLOUT);
+
+        nwritten = write (fd, p, nleft);
+        if (nwritten < 0) {
+            if ((errno == EINTR) || (errno == EAGAIN))
+                continue;
+            else
+                return (-1);
+        }
+        nleft -= nwritten;
+        p += nwritten;
+
+        if (msecs == 0) {
+            break;
+        }
+    }
+    return (n - nleft);
 }
 
 
@@ -224,6 +359,40 @@ fd_set_nonblocking (int fd)
 /*****************************************************************************
  *  Static Functions
  *****************************************************************************/
+
+static int
+_fd_get_poll_timeout (const struct timeval *when)
+{
+/*  Returns the poll() timeout value for the number of milliseconds between now
+ *    and [when] (which specifies an absolute time in seconds and microseconds
+ *    since the Epoch), 0 if [when] is in the past, or -1 if [when] is NULL
+ *    (indicating poll() should wait indefinitely).
+ */
+    struct timeval now;
+    int            msecs;
+
+    if (when == NULL) {
+        return (-1);
+    }
+    if ((when->tv_sec == 0) && (when->tv_usec == 0)) {
+        return (0);
+    }
+    /*  POSIX says gettimeofday() can't fail, but just in case ...
+     */
+    if (gettimeofday (&now, NULL) < 0) {
+        return (0);
+    }
+    /*  Round up to the next millisecond.
+     *  XXX: msecs can overflow/underflow if [when] is too far from now.
+     */
+    msecs = ( (when->tv_sec  - now.tv_sec)        * 1000 ) +
+            ( (when->tv_usec - now.tv_usec + 999) / 1000 ) ;
+    /*
+     *  Return 0 if [when] is in the past to indicate poll() should not block.
+     */
+    return ((msecs < 0) ? 0 : msecs);
+}
+
 
 static int
 _fd_get_lock (int fd, int cmd, int type)

@@ -42,6 +42,7 @@
 #include "conf.h"
 #include "dec.h"
 #include "enc.h"
+#include "fd.h"
 #include "log.h"
 #include "m_msg.h"
 #include "munge_defs.h"
@@ -104,6 +105,21 @@ job_accept (conf_t conf)
                         "Unable to accept connection");
                     break;
             }
+        }
+        /*  With fd_timed_read_n(), a poll() is performed before any read()
+         *    in order to provide timeouts and ensure the read() won't block.
+         *    As such, it shouldn't be necessary to set the client socket as
+         *    non-blocking.  However according to the Linux poll(2) and
+         *    select(2) manpages, spurious readiness notifications can occur.
+         *    poll()/select() may report a socket as ready for reading while
+         *    the subsequent read() blocks.  This could happen when data has
+         *    arrived, but upon examination is discarded due to an invalid
+         *    checksum.  To protect against this, the client socket is set
+         *    non-blocking and EAGAIN is handled appropriately.
+         */
+        if (fd_set_nonblocking (sd) < 0) {
+            close (sd);
+            log_msg (LOG_WARNING, "Unable to set nonblocking client socket");
         }
         if (m_msg_create (&m) != EMUNGE_SUCCESS) {
             close (sd);
