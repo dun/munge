@@ -1,3 +1,8 @@
+2010-08-26  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/munged/job.c (job_accept): Added strerror() to err msg for
+	  fd_set_nonblocking() failure.
+
 2010-08-25  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* : Fixed potential deadlock in munged that can occur if clients block
