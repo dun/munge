@@ -333,10 +333,13 @@ fd_is_write_lock_blocked (int fd)
 int
 fd_set_close_on_exec (int fd)
 {
-    assert (fd >= 0);
-
-    if (fcntl (fd, F_SETFD, FD_CLOEXEC) < 0)
+    if (fd < 0) {
+        errno = EINVAL;
         return (-1);
+    }
+    if (fcntl (fd, F_SETFD, FD_CLOEXEC) < 0) {
+        return (-1);
+    }
     return (0);
 }
 
@@ -346,12 +349,16 @@ fd_set_nonblocking (int fd)
 {
     int fval;
 
-    assert (fd >= 0);
-
-    if ((fval = fcntl (fd, F_GETFL, 0)) < 0)
+    if (fd < 0) {
+        errno = EINVAL;
         return (-1);
-    if (fcntl (fd, F_SETFL, fval | O_NONBLOCK) < 0)
+    }
+    if ((fval = fcntl (fd, F_GETFL, 0)) < 0) {
         return (-1);
+    }
+    if (fcntl (fd, F_SETFL, fval | O_NONBLOCK) < 0) {
+        return (-1);
+    }
     return (0);
 }
 
@@ -442,9 +449,11 @@ _fd_test_lock (int fd, int type)
     lock.l_whence = SEEK_SET;
     lock.l_len = 0;
 
-    if (fcntl (fd, F_GETLK, &lock) < 0)
+    if (fcntl (fd, F_GETLK, &lock) < 0) {
         return (-1);
-    if (lock.l_type == F_UNLCK)
+    }
+    if (lock.l_type == F_UNLCK) {
         return (0);
+    }
     return (lock.l_pid);
 }

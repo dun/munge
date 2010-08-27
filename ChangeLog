@@ -1,5 +1,8 @@
 2010-08-26  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/libcommon/fd.c (fd_set_close_on_exec, fd_set_nonblocking):
+	  Replaced assert-check of "fd" parm with runtime-check.
+
 	* src/libcommon/fd.c (fd_is_nonblocking): Added.
 	* src/libcommon/fd.h: Added prototype.
 
