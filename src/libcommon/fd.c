@@ -372,14 +372,10 @@ fd_is_nonblocking (int fd)
         errno = EINVAL;
         return (-1);
     }
-    fval = fcntl (fd, F_GETFL, 0);
-    if (fval < 0) {
+    if ((fval = fcntl (fd, F_GETFL, 0)) < 0) {
         return (-1);
     }
-    if (fval & O_NONBLOCK) {
-        return (1);
-    }
-    return (0);
+    return ((fval & O_NONBLOCK) ? 1 : 0);
 }
 
 

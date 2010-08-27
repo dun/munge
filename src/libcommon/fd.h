@@ -54,7 +54,7 @@ int fd_set_nonblocking (int fd);
 
 int fd_is_nonblocking (int fd);
 /*
- *  Returns 1 if the file descriptor [fd] is set for nonblocking I/O,
+ *  Returns >0 if the file descriptor [fd] is set for nonblocking I/O,
  *     0 if not set, or -1 on error (with errno set appropriately).
  */
 

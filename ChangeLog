@@ -1,5 +1,10 @@
 2010-08-26  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/libcommon/fd.c (fd_is_nonblocking):
+	  Changed return value to conditional expression.
+	* src/libcommon/fd.h (fd_is_nonblocking):
+	  Updated documentation for return value so true is now >0.
+
 	* src/libcommon/fd.c (fd_set_close_on_exec, fd_set_nonblocking):
 	  Replaced assert-check of "fd" parm with runtime-check.
 
