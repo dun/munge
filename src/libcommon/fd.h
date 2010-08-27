@@ -52,6 +52,12 @@ int fd_set_nonblocking (int fd);
  *  Returns 0 on success, or -1 on error.
  */
 
+int fd_is_nonblocking (int fd);
+/*
+ *  Returns 1 if the file descriptor [fd] is set for nonblocking I/O,
+ *     0 if not set, or -1 on error (with errno set appropriately).
+ */
+
 int fd_get_read_lock (int fd);
 /*
  *  Obtains a read lock on the file specified by [fd].

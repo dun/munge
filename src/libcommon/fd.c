@@ -356,6 +356,26 @@ fd_set_nonblocking (int fd)
 }
 
 
+int
+fd_is_nonblocking (int fd)
+{
+    int fval;
+
+    if (fd < 0) {
+        errno = EINVAL;
+        return (-1);
+    }
+    fval = fcntl (fd, F_GETFL, 0);
+    if (fval < 0) {
+        return (-1);
+    }
+    if (fval & O_NONBLOCK) {
+        return (1);
+    }
+    return (0);
+}
+
+
 /*****************************************************************************
  *  Static Functions
  *****************************************************************************/

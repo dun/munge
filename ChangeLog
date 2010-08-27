@@ -1,5 +1,8 @@
 2010-08-26  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/libcommon/fd.c (fd_is_nonblocking): Added.
+	* src/libcommon/fd.h: Added prototype.
+
 	* src/munged/job.c (job_accept): Added strerror() to err msg for
 	  fd_set_nonblocking() failure.
 
