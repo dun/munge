@@ -81,7 +81,8 @@ typedef enum munge_cipher {
     MUNGE_CIPHER_BLOWFISH       =  2,   /* Blowfish CBC w/ 64b-blk/128b-key  */
     MUNGE_CIPHER_CAST5          =  3,   /* CAST5 CBC w/ 64b-blk/128b-key     */
     MUNGE_CIPHER_AES128         =  4,   /* AES CBC w/ 128b-blk/128b-key      */
-    MUNGE_CIPHER_AES256         =  5    /* AES CBC w/ 128b-blk/256b-key      */
+    MUNGE_CIPHER_AES256         =  5,   /* AES CBC w/ 128b-blk/256b-key      */
+    MUNGE_CIPHER_LAST_ITEM
 } munge_cipher_t;
 
 /*  MUNGE message authentication code types
@@ -93,7 +94,8 @@ typedef enum munge_mac {
     MUNGE_MAC_SHA1              =  3,   /* SHA-1 w/ 160b-digest              */
     MUNGE_MAC_RIPEMD160         =  4,   /* RIPEMD-160 w/ 160b-digest         */
     MUNGE_MAC_SHA256            =  5,   /* SHA-256 w/ 256b-digest            */
-    MUNGE_MAC_SHA512            =  6    /* SHA-512 w/ 512b-digest            */
+    MUNGE_MAC_SHA512            =  6,   /* SHA-512 w/ 512b-digest            */
+    MUNGE_MAC_LAST_ITEM
 } munge_mac_t;
 
 /*  MUNGE compression types
@@ -102,7 +104,8 @@ typedef enum munge_zip {
     MUNGE_ZIP_NONE              =  0,   /* compression disabled              */
     MUNGE_ZIP_DEFAULT           =  1,   /* default zip specified by daemon   */
     MUNGE_ZIP_BZLIB             =  2,   /* bzip2 by Julian Seward            */
-    MUNGE_ZIP_ZLIB              =  3    /* zlib "deflate" by Gailly & Adler  */
+    MUNGE_ZIP_ZLIB              =  3,   /* zlib "deflate" by Gailly & Adler  */
+    MUNGE_ZIP_LAST_ITEM
 } munge_zip_t;
 
 /*  MUNGE credential time-to-live (in seconds)

@@ -1,3 +1,22 @@
+2010-09-08  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* : Replaced _cipher_map_enum() & _md_map_enum() case statements with
+	  static array lookups resulting in a slight performance improvement.
+	  The cipher_init_subsystem() & md_init_subsystem() routines were added
+	  to initialize these static arrays before race conditions could arise.
+	* src/munged/crypto.c (crypto_init):
+	  Added calls to cipher_init_subsystem() & md_init_subsystem().
+	* src/munged/cipher.c: Added _cipher_is_initialized flag & asserts.
+	  Added cipher_init_subsystem().  Replaced _cipher_map_enum() case
+	  statement with _cipher_map[] array lookup for Libgcrypt & OpenSSL.
+	* src/munged/cipher.h: Added prototype for cipher_init_subsystem().
+	* src/munged/md.c: Added _md_is_initialized flag & asserts.
+	  Added md_init_subsystem().  Replaced _md_map_enum() case statement
+	  with _md_map[] array lookup for Libgrypt & OpenSSL.
+	* src/munged/md.h: Added prototype for md_init_subsystem().
+	* src/libmunge/munge.h: Added enums for MUNGE_CIPHER_LAST_ITEM,
+	  MUNGE_MAC_LAST_ITEM, and MUNGE_ZIP_LAST_ITEM.
+
 2010-07-14  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/libcommon/munge_defs.h, src/libmunge/m_msg_client.c,

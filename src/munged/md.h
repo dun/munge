@@ -79,6 +79,12 @@ typedef struct {
  *  Prototypes
  *****************************************************************************/
 
+void md_init_subsystem (void);
+/*
+ *  Initializes the message digest subsystem.
+ *  WARNING: This routine is *NOT* guaranteed to be thread-safe.
+ */
+
 int md_init (md_ctx *x, munge_mac_t md);
 /*
  *  Initializes the message digest context [x] with the message digest [md].

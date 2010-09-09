@@ -46,9 +46,17 @@
 
 
 /*****************************************************************************
+ *  Private Data
+ *****************************************************************************/
+
+static int _cipher_is_initialized = 0;
+
+
+/*****************************************************************************
  *  Private Prototypes
  *****************************************************************************/
 
+static void _cipher_init_subsystem (void);
 static int _cipher_init (cipher_ctx *x, munge_cipher_t cipher,
     unsigned char *key, unsigned char *iv, int enc);
 static int _cipher_update (cipher_ctx *x, void *dst, int *dstlen,
@@ -65,12 +73,26 @@ static int _cipher_map_enum (munge_cipher_t cipher, void *dst);
  *  Public Functions
  *****************************************************************************/
 
+void
+cipher_init_subsystem (void)
+{
+/*  Note that this call is *NOT* thread-safe.
+ */
+    if (! _cipher_is_initialized) {
+        _cipher_init_subsystem ();
+        _cipher_is_initialized++;
+    }
+    return;
+}
+
+
 int
 cipher_init (cipher_ctx *x, munge_cipher_t cipher,
              unsigned char *key, unsigned char *iv, int enc)
 {
     int rc;
 
+    assert (_cipher_is_initialized);
     assert (x != NULL);
     assert (key != NULL);
     assert (iv != NULL);
@@ -91,6 +113,7 @@ cipher_update (cipher_ctx *x, void *dst, int *dstlen,
 {
     int rc;
 
+    assert (_cipher_is_initialized);
     assert (x != NULL);
     assert (x->magic == CIPHER_MAGIC);
     assert (x->finalized != 1);
@@ -114,6 +137,7 @@ cipher_final (cipher_ctx *x, void *dst, int *dstlen)
 {
     int rc;
 
+    assert (_cipher_is_initialized);
     assert (x != NULL);
     assert (x->magic == CIPHER_MAGIC);
     assert (x->finalized != 1);
@@ -134,6 +158,7 @@ cipher_cleanup (cipher_ctx *x)
 {
     int rc;
 
+    assert (_cipher_is_initialized);
     assert (x != NULL);
     assert (x->magic == CIPHER_MAGIC);
 
@@ -147,6 +172,7 @@ cipher_cleanup (cipher_ctx *x)
 int
 cipher_block_size (munge_cipher_t cipher)
 {
+    assert (_cipher_is_initialized);
     return (_cipher_block_size (cipher));
 }
 
@@ -154,6 +180,7 @@ cipher_block_size (munge_cipher_t cipher)
 int
 cipher_iv_size (munge_cipher_t cipher)
 {
+    assert (_cipher_is_initialized);
     return (_cipher_iv_size (cipher));
 }
 
@@ -161,6 +188,7 @@ cipher_iv_size (munge_cipher_t cipher)
 int
 cipher_key_size (munge_cipher_t cipher)
 {
+    assert (_cipher_is_initialized);
     return (_cipher_key_size (cipher));
 }
 
@@ -168,6 +196,7 @@ cipher_key_size (munge_cipher_t cipher)
 int
 cipher_map_enum (munge_cipher_t cipher, void *dst)
 {
+    assert (_cipher_is_initialized);
     return (_cipher_map_enum (cipher, dst));
 }
 
@@ -183,8 +212,27 @@ cipher_map_enum (munge_cipher_t cipher, void *dst)
 #include "common.h"
 #include "log.h"
 
+static int _cipher_map [MUNGE_CIPHER_LAST_ITEM];
+
 static int _cipher_update_aux (cipher_ctx *x, void *dst, int *dstlen,
     const void *src, int srclen);
+
+
+void
+_cipher_init_subsystem (void)
+{
+    int i;
+
+    for (i = 0; i < MUNGE_CIPHER_LAST_ITEM; i++) {
+        _cipher_map [i] = -1;
+    }
+    _cipher_map [MUNGE_CIPHER_BLOWFISH] = GCRY_CIPHER_BLOWFISH;
+    _cipher_map [MUNGE_CIPHER_CAST5] = GCRY_CIPHER_CAST5;
+    _cipher_map [MUNGE_CIPHER_AES128] = GCRY_CIPHER_AES128;
+    _cipher_map [MUNGE_CIPHER_AES256] = GCRY_CIPHER_AES256;
+    return;
+}
+
 
 static int
 _cipher_init (cipher_ctx *x, munge_cipher_t cipher,
@@ -484,30 +532,18 @@ _cipher_key_size (munge_cipher_t cipher)
 static int
 _cipher_map_enum (munge_cipher_t cipher, void *dst)
 {
-    int algo;
-    int rc = 0;
+    int algo = -1;
 
-    switch (cipher) {
-        case MUNGE_CIPHER_BLOWFISH:
-            algo = GCRY_CIPHER_BLOWFISH;
-            break;
-        case MUNGE_CIPHER_CAST5:
-            algo = GCRY_CIPHER_CAST5;
-            break;
-        case MUNGE_CIPHER_AES128:
-            algo = GCRY_CIPHER_AES128;
-            break;
-        case MUNGE_CIPHER_AES256:
-            algo = GCRY_CIPHER_AES256;
-            break;
-        default:
-            rc = -1;
-            break;
+    if ((cipher > MUNGE_CIPHER_DEFAULT) && (cipher < MUNGE_CIPHER_LAST_ITEM)) {
+        algo = _cipher_map [cipher];
     }
-    if ((dst != NULL) && (rc == 0)) {
+    if (algo < 0) {
+        return (-1);
+    }
+    if (dst != NULL) {
         * (int *) dst = algo;
     }
-    return (rc);
+    return (0);
 }
 
 #endif /* HAVE_LIBGCRYPT */
@@ -534,6 +570,32 @@ _cipher_map_enum (munge_cipher_t cipher, void *dst)
 #if HAVE_OPENSSL
 
 #include <openssl/evp.h>
+
+static const EVP_CIPHER *_cipher_map [MUNGE_CIPHER_LAST_ITEM];
+
+
+void
+_cipher_init_subsystem (void)
+{
+    int i;
+
+    for (i = 0; i < MUNGE_CIPHER_LAST_ITEM; i++) {
+        _cipher_map [i] = NULL;
+    }
+    _cipher_map [MUNGE_CIPHER_BLOWFISH] = EVP_bf_cbc ();
+    _cipher_map [MUNGE_CIPHER_CAST5] = EVP_cast5_cbc ();
+
+#if HAVE_EVP_AES_128_CBC
+    _cipher_map [MUNGE_CIPHER_AES128] = EVP_aes_128_cbc ();
+#endif /* HAVE_EVP_AES_128_CBC */
+
+#if HAVE_EVP_AES_256_CBC && HAVE_EVP_SHA256
+    _cipher_map [MUNGE_CIPHER_AES256] = EVP_aes_256_cbc ();
+#endif /* HAVE_EVP_AES_256_CBC && HAVE_EVP_SHA256 */
+
+    return;
+}
+
 
 static int
 _cipher_init (cipher_ctx *x, munge_cipher_t cipher,
@@ -640,34 +702,18 @@ _cipher_key_size (munge_cipher_t cipher)
 static int
 _cipher_map_enum (munge_cipher_t cipher, void *dst)
 {
-    const EVP_CIPHER *algo;
-    int               rc = 0;
+    const EVP_CIPHER *algo = NULL;
 
-    switch (cipher) {
-        case MUNGE_CIPHER_BLOWFISH:
-            algo = EVP_bf_cbc ();
-            break;
-        case MUNGE_CIPHER_CAST5:
-            algo = EVP_cast5_cbc ();
-            break;
-#if HAVE_EVP_AES_128_CBC
-        case MUNGE_CIPHER_AES128:
-            algo = EVP_aes_128_cbc ();
-            break;
-#endif /* HAVE_EVP_AES_128_CBC */
-#if HAVE_EVP_AES_256_CBC && HAVE_EVP_SHA256
-        case MUNGE_CIPHER_AES256:
-            algo = EVP_aes_256_cbc ();
-            break;
-#endif /* HAVE_EVP_AES_256_CBC && HAVE_EVP_SHA256 */
-        default:
-            rc = -1;
-            break;
+    if ((cipher > MUNGE_CIPHER_DEFAULT) && (cipher < MUNGE_CIPHER_LAST_ITEM)) {
+        algo = _cipher_map [cipher];
     }
-    if ((dst != NULL) && (rc == 0)) {
+    if (algo == NULL) {
+        return (-1);
+    }
+    if (dst != NULL) {
         * (const EVP_CIPHER **) dst = algo;
     }
-    return (rc);
+    return (0);
 }
 
 #endif /* HAVE_OPENSSL */

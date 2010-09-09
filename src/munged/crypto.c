@@ -37,6 +37,8 @@
 #include <pthread.h>
 #include <stdlib.h>
 #include "crypto.h"
+#include "cipher.h"
+#include "md.h"
 #include "log.h"
 
 
@@ -79,6 +81,8 @@ crypto_init (void)
             "Unable to complete Libgcrypt initialization: %s",
             gcry_strerror (e));
     }
+    cipher_init_subsystem ();
+    md_init_subsystem ();
     return;
 }
 
@@ -165,6 +169,8 @@ crypto_init (void)
     CRYPTO_set_dynlock_destroy_callback (_openssl_thread_dynlock_destroy);
 #endif /* HAVE_CRYPTO_DYNLOCK */
 
+    cipher_init_subsystem ();
+    md_init_subsystem ();
     return;
 }
 

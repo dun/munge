@@ -88,6 +88,12 @@ enum {
  *  Prototypes
  *****************************************************************************/
 
+void cipher_init_subsystem (void);
+/*  
+ *  Initializes the cipher subsystem.
+ *  WARNING: This routine is *NOT* guaranteed to be thread-safe.
+ */
+
 int cipher_init (cipher_ctx *x, munge_cipher_t cipher,
                  unsigned char *key, unsigned char *iv, int enc);
 /*

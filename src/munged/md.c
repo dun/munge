@@ -46,9 +46,17 @@
 
 
 /*****************************************************************************
+ *  Private Data
+ *****************************************************************************/
+
+static int _md_is_initialized = 0;
+
+
+/*****************************************************************************
  *  Private Prototypes
  *****************************************************************************/
 
+static void _md_init_subsystem (void);
 static int _md_init (md_ctx *x, munge_mac_t md);
 static int _md_update (md_ctx *x, const void *src, int srclen);
 static int _md_final (md_ctx *x, void *dst, int *dstlen);
@@ -62,11 +70,25 @@ static int _md_map_enum (munge_mac_t md, void *dst);
  *  Public Functions
  *****************************************************************************/
 
+void
+md_init_subsystem (void)
+{
+/*  Note that this call is *NOT* thread-safe.
+ */
+    if (! _md_is_initialized) {
+        _md_init_subsystem ();
+        _md_is_initialized++;
+    }
+    return;
+}
+
+
 int
 md_init (md_ctx *x, munge_mac_t md)
 {
     int rc;
 
+    assert (_md_is_initialized);
     assert (x != NULL);
 
     rc = _md_init (x, md);
@@ -83,6 +105,7 @@ md_update (md_ctx *x, const void *src, int srclen)
 {
     int rc;
 
+    assert (_md_is_initialized);
     assert (x != NULL);
     assert (x->magic == MD_MAGIC);
     assert (x->finalized != 1);
@@ -101,6 +124,7 @@ md_final (md_ctx *x, void *dst, int *dstlen)
 {
     int rc;
 
+    assert (_md_is_initialized);
     assert (x != NULL);
     assert (x->magic == MD_MAGIC);
     assert (x->finalized != 1);
@@ -121,6 +145,7 @@ md_cleanup (md_ctx *x)
 {
     int rc;
 
+    assert (_md_is_initialized);
     assert (x != NULL);
     assert (x->magic == MD_MAGIC);
 
@@ -136,6 +161,7 @@ md_copy (md_ctx *xdst, md_ctx *xsrc)
 {
     int rc;
 
+    assert (_md_is_initialized);
     assert (xdst != NULL);
     assert (xsrc != NULL);
     assert (xsrc->magic == MD_MAGIC);
@@ -152,6 +178,7 @@ md_copy (md_ctx *xdst, md_ctx *xsrc)
 int
 md_size (munge_mac_t md)
 {
+    assert (_md_is_initialized);
     return (_md_size (md));
 }
 
@@ -159,6 +186,7 @@ md_size (munge_mac_t md)
 int
 md_map_enum (munge_mac_t md, void *dst)
 {
+    assert (_md_is_initialized);
     return (_md_map_enum (md, dst));
 }
 
@@ -172,6 +200,26 @@ md_map_enum (munge_mac_t md, void *dst)
 #include <gcrypt.h>
 #include <string.h>
 #include "log.h"
+
+static int _md_map [MUNGE_MAC_LAST_ITEM];
+
+
+static void
+_md_init_subsystem (void)
+{
+    int i;
+
+    for (i = 0; i < MUNGE_MAC_LAST_ITEM; i++) {
+        _md_map [i] = -1;
+    }
+    _md_map [MUNGE_MAC_MD5] = GCRY_MD_MD5;
+    _md_map [MUNGE_MAC_SHA1] = GCRY_MD_SHA1;
+    _md_map [MUNGE_MAC_RIPEMD160] = GCRY_MD_RMD160;
+    _md_map [MUNGE_MAC_SHA256] = GCRY_MD_SHA256;
+    _md_map [MUNGE_MAC_SHA512] = GCRY_MD_SHA512;
+    return;
+}
+
 
 static int
 _md_init (md_ctx *x, munge_mac_t md)
@@ -253,33 +301,18 @@ _md_size (munge_mac_t md)
 static int
 _md_map_enum (munge_mac_t md, void *dst)
 {
-    int algo;
-    int rc = 0;
+    int algo = -1;
 
-    switch (md) {
-        case MUNGE_MAC_MD5:
-            algo = GCRY_MD_MD5;
-            break;
-        case MUNGE_MAC_SHA1:
-            algo = GCRY_MD_SHA1;
-            break;
-        case MUNGE_MAC_RIPEMD160:
-            algo = GCRY_MD_RMD160;
-            break;
-        case MUNGE_MAC_SHA256:
-            algo = GCRY_MD_SHA256;
-            break;
-        case MUNGE_MAC_SHA512:
-            algo = GCRY_MD_SHA512;
-            break;
-        default:
-            rc = -1;
-            break;
+    if ((md > MUNGE_MAC_DEFAULT) && (md < MUNGE_MAC_LAST_ITEM)) {
+        algo = _md_map [md];
     }
-    if ((dst != NULL) && (rc == 0)) {
+    if (algo < 0) {
+        return (-1);
+    }
+    if (dst != NULL) {
         * (int *) dst = algo;
     }
-    return (rc);
+    return (0);
 }
 
 #endif /* HAVE_LIBGCRYPT */
@@ -300,6 +333,33 @@ _md_map_enum (munge_mac_t md, void *dst)
 #if HAVE_OPENSSL
 
 #include <openssl/evp.h>
+
+static const EVP_MD * _md_map [MUNGE_MAC_LAST_ITEM];
+
+
+static void
+_md_init_subsystem (void)
+{
+    int i;
+
+    for (i = 0; i < MUNGE_MAC_LAST_ITEM; i++) {
+        _md_map [i] = NULL;
+    }
+    _md_map [MUNGE_MAC_MD5] = EVP_md5 ();
+    _md_map [MUNGE_MAC_SHA1] = EVP_sha1 ();
+    _md_map [MUNGE_MAC_RIPEMD160] = EVP_ripemd160 ();
+
+#if HAVE_EVP_SHA256
+    _md_map [MUNGE_MAC_SHA256] = EVP_sha256 ();
+#endif /* HAVE_EVP_SHA256 */
+
+#if HAVE_EVP_SHA512
+    _md_map [MUNGE_MAC_SHA512] = EVP_sha512 ();
+#endif /* HAVE_EVP_SHA512 */
+
+    return;
+}
+
 
 static int
 _md_init (md_ctx *x, munge_mac_t md)
@@ -400,37 +460,18 @@ _md_size (munge_mac_t md)
 static int
 _md_map_enum (munge_mac_t md, void *dst)
 {
-    const EVP_MD *algo;
-    int           rc = 0;
+    const EVP_MD *algo = NULL;
 
-    switch (md) {
-        case MUNGE_MAC_MD5:
-            algo = EVP_md5 ();
-            break;
-        case MUNGE_MAC_SHA1:
-            algo = EVP_sha1 ();
-            break;
-        case MUNGE_MAC_RIPEMD160:
-            algo = EVP_ripemd160 ();
-            break;
-#if HAVE_EVP_SHA256
-        case MUNGE_MAC_SHA256:
-            algo = EVP_sha256 ();
-            break;
-#endif /* HAVE_EVP_SHA256 */
-#if HAVE_EVP_SHA512
-        case MUNGE_MAC_SHA512:
-            algo = EVP_sha512 ();
-            break;
-#endif /* HAVE_EVP_SHA512 */
-        default:
-            rc = -1;
-            break;
+    if ((md > MUNGE_MAC_DEFAULT) && (md < MUNGE_MAC_LAST_ITEM)) {
+        algo = _md_map [md];
     }
-    if ((dst != NULL) && (rc == 0)) {
+    if (algo == NULL) {
+        return (-1);
+    }
+    if (dst != NULL) {
         * (const EVP_MD **) dst = algo;
     }
-    return (rc);
+    return (0);
 }
 
 #endif /* HAVE_OPENSSL */
