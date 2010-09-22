@@ -34,15 +34,15 @@ RATIONALE
 
 USAGE
 
-  A process creates a credential by requesting one from the local MUNGE
-  service, either via the munge_encode() C library call or the munge(1)
-  executable.  The encoded credential contains the UID and GID of the
-  originating process.  This process sends the credential to another process
-  within the security realm as a means of proving its identity.  The receiving
-  process validates the credential with the use of its local MUNGE service,
-  either via the munge_decode() C library call or the unmunge(1) executable.
-  The decoded credential provides the receiving process with a reliable
-  means of ascertaining the UID and GID of the originating process.
+  A process creates a credential by requesting one from the local
+  MUNGE service, either via the munge_encode() C library call or the
+  munge executable.  The encoded credential contains the UID and GID of
+  the originating process.  This process sends the credential to another
+  process within the security realm as a means of proving its identity.
+  The receiving process validates the credential with the use of its local
+  MUNGE service, either via the munge_decode() C library call or the unmunge
+  executable.  The decoded credential provides the receiving process with a
+  reliable means of ascertaining the UID and GID of the originating process.
   This information can be used for accounting or access control decisions.
 
 

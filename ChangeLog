@@ -1,5 +1,7 @@
 2010-09-21  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* README: Tweaked usage formatting.
+
 	* src/libcommon/license.c: Tweaked spacing in license_text[].
 
 2010-09-08  Chris Dunlap  <cdunlap@llnl.gov>
