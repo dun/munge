@@ -1,5 +1,11 @@
 2010-09-21  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/munge/munge.1.in, src/munge/remunge.1.in, src/munge/unmunge.1.in,
+	  src/libmunge/munge.3.in, src/libmunge/munge_ctx.3.in,
+	  src/libmunge/munge_enum.3.in, src/libcommon/munge.7.in,
+	  src/munged/munged.8.in: Tweaked manpages.  Updated content.
+	  Fixed typos and formatting.
+
 	* README: Tweaked usage formatting.
 
 	* src/libcommon/license.c: Tweaked spacing in license_text[].

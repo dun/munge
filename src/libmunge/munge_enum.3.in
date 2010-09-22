@@ -46,10 +46,10 @@ munge_enum_is_valid, munge_enum_int_to_str, munge_enum_str_to_int \- MUNGE enume
 .fi
 
 .SH DESCRIPTION
-The \fBmunge_enum_is_valid\fR() function checks if the given value \fIval\fR
-is a valid MUNGE enumeration of the specified type \fItype\fR in the software
-configuration as currently compiled.  Some enumerations correspond to options
-that can only be enabled at compile-time.
+The \fBmunge_enum_is_valid\fR() function checks if the given value
+\fIval\fR is a valid MUNGE enumeration of the specified type \fItype\fR
+in the software configuration as currently compiled.  Some enumerations
+correspond to options that can only be enabled at compile-time.
 .PP
 The \fBmunge_enum_int_to_str\fR() function converts the MUNGE enumeration
 \fIval\fR of the specified type \fItype\fR into a text string.
@@ -59,12 +59,12 @@ case-insensitive string \fIstr\fR into the corresponding MUNGE enumeration
 of the specified type \fItype\fR.
 
 .SH RETURN VALUE
-The \fBmunge_enum_is_valid\fR() function returns non-zero if the given value
-\fIval\fR is a valid enumeration.
+The \fBmunge_enum_is_valid\fR() function returns non-zero if the given
+value \fIval\fR is a valid enumeration.
 .PP
 The \fBmunge_enum_int_to_str\fR() function returns a NUL-terminated constant
-text string, or NULL on error; this string should not be freed or modified by
-the caller.
+text string, or NULL on error; this string should not be freed or modified
+by the caller.
 .PP
 The \fBmunge_enum_str_to_int\fR() function returns a MUNGE enumeration on
 success (i.e., >= 0), or \-1 on error.
@@ -116,14 +116,16 @@ main (int argc, char *argv[])
 Copyright (C) 2007-2010 Lawrence Livermore National Security, LLC.
 .br
 Copyright (C) 2002-2007 The Regents of the University of California.
-
-MUNGE is free software: you can redistribute it and/or modify it under
-the terms of the GNU General Public License as published by the Free
-Software Foundation, either version 3 of the License, or (at your option)
-any later version.  Additionally for the MUNGE library (libmunge), you
-can redistribute it and/or modify it under the terms of the GNU Lesser
-General Public License as published by the Free Software Foundation,
-either version 3 of the License, or (at your option) any later version.
+.PP
+MUNGE is free software: you can redistribute it and/or modify it under the
+terms of the GNU General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later
+version.
+.PP
+Additionally for the MUNGE library (libmunge), you can redistribute it
+and/or modify it under the terms of the GNU Lesser General Public License as
+published by the Free Software Foundation, either version 3 of the License,
+or (at your option) any later version.
 
 .SH "SEE ALSO"
 .BR munge (1),

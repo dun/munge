@@ -38,11 +38,11 @@ munge \- MUNGE credential encoder
 
 .SH DESCRIPTION
 The \fBmunge\fR program creates an MUNGE credential containing the UID and
-GID of the calling process.  Additional payload data can be encapsulated in
-as well.  The returned credential can be passed to another process which can
-validate its contents (e.g., via the \fBunmunge\fR program).  This allows
-an unrelated and potentially remote process to ascertain the identity of
-the calling process.
+GID of the calling process.  Additional payload data can be encapsulated
+in as well.  The returned credential can be passed to another process
+which can validate its contents (e.g., via the \fBunmunge\fR program).
+This allows an unrelated and potentially remote process to ascertain the
+identity of the calling process.
 .PP
 By default, payload input is read from stdin and the credential is written
 to stdout.
@@ -109,8 +109,8 @@ Specify the local domain socket for connecting with \fBmunged\fR.
 
 .SH "EXIT STATUS"
 The \fBmunge\fR program returns a zero exit code when the credential is
-successfully created and returned.  On error, it prints an error message to
-stderr and returns a non-zero exit code.
+successfully created and returned.  On error, it prints an error message
+to stderr and returns a non-zero exit code.
 
 .SH AUTHOR
 @META_AUTHOR@
@@ -119,14 +119,16 @@ stderr and returns a non-zero exit code.
 Copyright (C) 2007-2010 Lawrence Livermore National Security, LLC.
 .br
 Copyright (C) 2002-2007 The Regents of the University of California.
-
-MUNGE is free software: you can redistribute it and/or modify it under
-the terms of the GNU General Public License as published by the Free
-Software Foundation, either version 3 of the License, or (at your option)
-any later version.  Additionally for the MUNGE library (libmunge), you
-can redistribute it and/or modify it under the terms of the GNU Lesser
-General Public License as published by the Free Software Foundation,
-either version 3 of the License, or (at your option) any later version.
+.PP
+MUNGE is free software: you can redistribute it and/or modify it under the
+terms of the GNU General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later
+version.
+.PP
+Additionally for the MUNGE library (libmunge), you can redistribute it
+and/or modify it under the terms of the GNU Lesser General Public License as
+published by the Free Software Foundation, either version 3 of the License,
+or (at your option) any later version.
 
 .SH "SEE ALSO"
 .BR remunge (1),

@@ -50,14 +50,14 @@ the data, and base64-encodes the result before returning the credential to
 the client.
 .PP
 When a credential is validated, \fBmunged\fR first checks the message
-authentication code to ensure the credential has not been subsequently altered.
-Next, it checks the embedded UID/GID restrictions to determine whether the
-requesting client is allowed to decode it.  Then, it checks the embedded
-encode time against the current time; if this difference exceeds the embedded
-time-to-live, the credential has expired.  Finally, it checks whether this
-credential has been previously decoded on this host; if so, the credential
-has been replayed.  If all checks pass, the credential metadata and payload
-are returned to the client.
+authentication code to ensure the credential has not been subsequently
+altered.  Next, it checks the embedded UID/GID restrictions to determine
+whether the requesting client is allowed to decode it.  Then, it checks
+the embedded encode time against the current time; if this difference
+exceeds the embedded time-to-live, the credential has expired.  Finally,
+it checks whether this credential has been previously decoded on this host;
+if so, the credential has been replayed.  If all checks pass, the credential
+metadata and payload are returned to the client.
 
 .SH OPTIONS
 .TP
@@ -82,22 +82,22 @@ Run the daemon in the foreground.
 Specify the local domain socket for communicating with clients.
 .TP
 .BI "--auth-server-dir " directory
-Specify an alternate directory in which the daemon will create the pipe used to
-authenticate clients.  The recommended permissions for this directory are 0711.
-This option is only valid on platforms where client authentication is performed
-via a file-descriptor passing mechanism.
+Specify an alternate directory in which the daemon will create the pipe used
+to authenticate clients.  The recommended permissions for this directory
+are 0711.  This option is only valid on platforms where client authentication
+is performed via a file-descriptor passing mechanism.
 .TP
 .BI "--auth-client-dir " directory
-Specify an alternate directory in which clients will create the file used to
-authenticate themselves to the daemon.  The recommended permissions for this
-directory are 1733.  This option is only valid on platforms where client
-authentication is performed via a file-descriptor passing mechanism.
+Specify an alternate directory in which clients will create the file used
+to authenticate themselves to the daemon.  The recommended permissions
+for this directory are 1733.  This option is only valid on platforms where
+client authentication is performed via a file-descriptor passing mechanism.
 .TP
 .BI "--group-check-mtime " boolean
 Specify whether the modification time of \fI/etc/group\fR should be checked
-before updating the supplementary group membership mapping.  If this value is
-non-zero, the check will be enabled and the mapping will not be updated unless
-the file has been modified since the last update.
+before updating the supplementary group membership mapping.  If this value
+is non-zero, the check will be enabled and the mapping will not be updated
+unless the file has been modified since the last update.
 .TP
 .BI "--group-update-time " integer
 Specify the number of seconds between updates to the supplementary group
@@ -138,14 +138,16 @@ decoded on multiple hosts within the security realm before it expires.
 Copyright (C) 2007-2010 Lawrence Livermore National Security, LLC.
 .br
 Copyright (C) 2002-2007 The Regents of the University of California.
-
-MUNGE is free software: you can redistribute it and/or modify it under
-the terms of the GNU General Public License as published by the Free
-Software Foundation, either version 3 of the License, or (at your option)
-any later version.  Additionally for the MUNGE library (libmunge), you
-can redistribute it and/or modify it under the terms of the GNU Lesser
-General Public License as published by the Free Software Foundation,
-either version 3 of the License, or (at your option) any later version.
+.PP
+MUNGE is free software: you can redistribute it and/or modify it under the
+terms of the GNU General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later
+version.
+.PP
+Additionally for the MUNGE library (libmunge), you can redistribute it
+and/or modify it under the terms of the GNU Lesser General Public License as
+published by the Free Software Foundation, either version 3 of the License,
+or (at your option) any later version.
 
 .SH "SEE ALSO"
 .BR munge (1),

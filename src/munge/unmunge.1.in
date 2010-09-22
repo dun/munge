@@ -37,10 +37,10 @@ unmunge \- MUNGE credential decoder
 [\fIOPTION\fR]...
 
 .SH DESCRIPTION
-The \fBunmunge\fR program validates a MUNGE credential (e.g., one created by
-the \fBmunge\fR program).
+The \fBunmunge\fR program validates a MUNGE credential (e.g., one created
+by the \fBmunge\fR program).
 .PP
-By default, the credential is read from stdin and the metadata & payload
+By default, the credential is read from stdin and the metadata and payload
 are written to stdout.  When the metadata and payload are written to the
 same stream, they are separated by a blank line.
 
@@ -69,9 +69,10 @@ Output the payload to the specified file.
 .TP
 .BI "-k, --keys " string
 Specify a subset of metadata keys to output.  The keys are case-insensitive
-and delimited by whitespace, commas, semicolons, or periods -- as long as the
-string is treated as a single argument by the shell (e.g., enclosed by quotes).
-If a subset is not specified, all available keys are selected by default.
+and delimited by whitespace, commas, semicolons, or periods -- as long as
+the string is treated as a single argument by the shell (e.g., enclosed
+by quotes).  If a subset is not specified, all available keys are selected
+by default.
 .TP
 .BI "-K, --list-keys"
 Display a list of metadata keys.
@@ -89,11 +90,12 @@ The status of the credential decode operation.
 The address of the host on which the credential was encoded.
 .TP
 .B ENCODE_TIME
-The time at which the credential was encoded (according to the clock of the
-host that encoded it).
+The time at which the credential was encoded (according to the local clock
+of the host that encoded it).
 .TP
 .B DECODE_TIME
-The time at which the credential was decoded (according to the local clock).
+The time at which the credential was decoded (according to the local clock
+of the host that decoded it).
 .TP
 .B TTL
 The time-to-live value (in seconds) placed within the credential.
@@ -124,9 +126,9 @@ The length (in bytes) of the payload.
 
 .SH "EXIT STATUS"
 The \fBunmunge\fR program returns an exit code corresponding to the return
-code of \fBmunge_decode\fR(3).  On success, it returns a zero exit code which
-signifies the credential is valid.  On error, it prints an error message to
-stderr and returns a non-zero exit code.
+code of \fBmunge_decode\fR().  On success, it returns a zero exit code
+which signifies the credential is valid.  On error, it prints an error
+message to stderr and returns a non-zero exit code.
 
 .SH AUTHOR
 @META_AUTHOR@
@@ -135,14 +137,16 @@ stderr and returns a non-zero exit code.
 Copyright (C) 2007-2010 Lawrence Livermore National Security, LLC.
 .br
 Copyright (C) 2002-2007 The Regents of the University of California.
-
-MUNGE is free software: you can redistribute it and/or modify it under
-the terms of the GNU General Public License as published by the Free
-Software Foundation, either version 3 of the License, or (at your option)
-any later version.  Additionally for the MUNGE library (libmunge), you
-can redistribute it and/or modify it under the terms of the GNU Lesser
-General Public License as published by the Free Software Foundation,
-either version 3 of the License, or (at your option) any later version.
+.PP
+MUNGE is free software: you can redistribute it and/or modify it under the
+terms of the GNU General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later
+version.
+.PP
+Additionally for the MUNGE library (libmunge), you can redistribute it
+and/or modify it under the terms of the GNU Lesser General Public License as
+published by the Free Software Foundation, either version 3 of the License,
+or (at your option) any later version.
 
 .SH "SEE ALSO"
 .BR munge (1),

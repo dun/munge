@@ -52,38 +52,38 @@ munge_ctx_create, munge_ctx_copy, munge_ctx_destroy, munge_ctx_strerror, munge_c
 .fi
 
 .SH DESCRIPTION
-The \fBmunge_ctx_create\fR() function creates and returns a new munge context
-or NULL or error.
+The \fBmunge_ctx_create\fR() function creates and returns a new MUNGE context,
+or NULL on error.
 .PP
-The \fBmunge_ctx_copy\fR() function copies the context \fIctx\fR, returning
-a new munge context or NULL on error.
+The \fBmunge_ctx_copy\fR() function copies the context \fIctx\fR and returns
+a new MUNGE context, or NULL on error.
 .PP
 The \fBmunge_ctx_destroy\fR() function destroys the context \fIctx\fR.
 .PP
 The \fBmunge_ctx_strerror\fR() function returns a descriptive text string
-describing the munge error number according to the context \fIctx\fR, or
+describing the MUNGE error number according to the context \fIctx\fR, or
 NULL if no error condition exists.  This may provide a more detailed error
 message than that returned by \fBmunge_strerror\fR().
 .PP
 The \fBmunge_ctx_get\fR() function gets the value for the option \fIopt\fR
-associated with the munge context \fIctx\fR, storing the result in the
+associated with the MUNGE context \fIctx\fR, storing the result in the
 subsequent pointer argument.  If the result is a string, that string should
 not be freed or modified by the caller.
 .PP
 The \fBmunge_ctx_set\fR() function sets the value for the option \fIopt\fR
-associated with the munge context \fIctx\fR, using the value of the subsequent
-argument.
+associated with the MUNGE context \fIctx\fR, using the value of the
+subsequent argument.
 
 .SH RETURN VALUE
-The \fBmunge_ctx_create\fR() and \fBmunge_ctx_copy\fR() functions return a
-newly allocated munge context, or NULL on error.
+The \fBmunge_ctx_create\fR() and \fBmunge_ctx_copy\fR() functions return
+a newly allocated MUNGE context, or NULL on error.
 .PP
-The \fBmunge_cxt_strerror\fR() function returns a pointer to a NUL-terminated
-constant text string; this string should not be freed or modified by the
-caller.
+The \fBmunge_ctx_strerror\fR() function returns a pointer to a NUL-terminated
+constant text string, or NULL if no error condition exists.  This string
+should not be freed or modified by the caller.
 .PP
 The \fBmunge_ctx_get\fR() and \fBmunge_ctx_set\fR() functions return
-\fBEMUNGE_SUCCESS\fR on success; otherwise, a munge error number is returned.
+\fBEMUNGE_SUCCESS\fR on success, or a MUNGE error number otherwise.
 
 .SH "CONTEXT OPTIONS"
 The following context options can be queried via \fBmunge_ctx_get\fR() or
@@ -99,16 +99,16 @@ Get or set the cipher type (cf., \fBCIPHER TYPES\fR).
 Get or set the MAC type (cf., \fBMAC TYPES\fR).
 .TP
 \fBMUNGE_OPT_ZIP_TYPE\fR , \fIint\fR
-Get or set the compression type (cf., \fBZIP TYPES\fR).
+Get or set the compression type (cf., \fBCOMPRESSION TYPES\fR).
 .TP
 \fBMUNGE_OPT_REALM\fR , \fIchar *\fR
-Get or set the security realm, where the \fIchar *\fR type is a
-NUL-terminated character string.  The string returned by \fBmunge_ctx_get\fR()
-should not be freed or modified by the caller.  \fBNOT YET SUPPORTED\fR.
+Get or set the security realm, where the \fIchar *\fR type is a NUL-terminated
+character string.  The string returned by \fBmunge_ctx_get\fR() should not
+be freed or modified by the caller.  \fBNOT CURRENTLY SUPPORTED\fR.
 .TP
 \fBMUNGE_OPT_TTL\fR , \fIint\fR
-Get or set the time-to-live (in seconds) (cf., \fBTTL TYPES\fR).
-This value controls how long the credential is valid once it has been encoded.
+Get or set the time-to-live (in seconds) (cf., \fBTTL TYPES\fR).  This value
+controls how long the credential is valid once it has been encoded.
 .TP
 \fBMUNGE_OPT_ADDR4\fR , \fIstruct in_addr\fR
 Get the IPv4 address of the host where the credential was encoded.
@@ -123,30 +123,29 @@ Get the time (in seconds since the epoch) at which the credential was decoded.
 This option cannot be explicitly set.
 .TP
 \fBMUNGE_OPT_SOCKET\fR , \fIchar *\fR
-Get or set the local domain socket for connecting with \fBmunged\fR, where
-the \fIchar *\fR type is a NUL-terminated character string.  The string
-returned by \fBmunge_ctx_get\fR() should not be freed or modified by the
-caller.
+Get or set the local domain socket for connecting with \fBmunged\fR, where the
+\fIchar *\fR type is a NUL-terminated character string.  The string returned
+by \fBmunge_ctx_get\fR() should not be freed or modified by the caller.
 .TP
 \fBMUNGE_OPT_UID_RESTRICTION\fR , \fIuid_t\fR
 Get or set the UID allowed to decode the credential (cf., \fBUID & GID
-TYPES\fR).  This value will be matched against the effective user ID of the
-process requesting the credential decode.
+TYPES\fR).  This value will be matched against the effective user ID of
+the process requesting the credential decode.
 .TP
 \fBMUNGE_OPT_GID_RESTRICTION\fR , \fIgid_t\fR
 Get or set the GID allowed to decode the credential (cf., \fBUID & GID
 TYPES\fR).  This value will be matched against the effective group ID of
 the process requesting the credential decode, as well as each supplementary
-group of which the effective user ID of that process is a memeber.
+group of which the effective user ID of that process is a member.
 
 .SH "CIPHER TYPES"
 Credentials can be encrypted using the secret key shared by all \fBmunged\fR
-daemons within a security realm.  Anyone having access to this key can use
-it to decrypt a credential, thereby bypassing any restrictions being imposed
-by \fBmunged\fR.
+daemons within a security realm.  Anyone having access to this key can
+use it to decrypt a credential, thereby bypassing any restrictions being
+imposed by \fBmunged\fR.
 .TP
 .B MUNGE_CIPHER_NONE
-Specify encryption is to be disabled.
+Specify that encryption is to be disabled.
 .TP
 .B MUNGE_CIPHER_DEFAULT
 Specify the default according to the \fBmunged\fR configuration.
@@ -164,41 +163,38 @@ it with a 128-bit key in CBC mode.
 .TP
 .B MUNGE_CIPHER_AES128
 Specify the AES (Advanced Encryption Standard) cipher, also known as Rijndael.
-It was designed by Joan Daemen and Vincent Rijmen.  This cipher has a 128-bit
-block-size and a key length of 128, 192, or 256 bits.  MUNGE uses it here with
-a 128-bit key in CBC mode.
+It was designed by Joan Daemen and Vincent Rijmen.  This cipher has a
+128-bit block-size and a key length of 128, 192, or 256 bits.  MUNGE uses
+it here with a 128-bit key in CBC mode.
 .TP
 .B MUNGE_CIPHER_AES256
 Specify the AES (Advanced Encryption Standard) cipher, also known as Rijndael.
 It was designed by Joan Daemen and Vincent Rijmen.  This cipher has a 128-bit
-block-size and a key length of 128, 192, or 256 bits.  MUNGE uses it here with
-a 256-bit key in CBC mode.  Currently, MUNGE_CIPHER_AES256 requires the use of
-MUNGE_MAC_SHA256.
+block-size and a key length of 128, 192, or 256 bits.  MUNGE uses it here
+with a 256-bit key in CBC mode.  Currently, \fBMUNGE_CIPHER_AES256\fR
+requires the use of \fBMUNGE_MAC_SHA256\fR.
 
 .SH "MAC TYPES"
-The message authentication code (MAC), also known as a message integrity code
-(MIC), is a required component of the credental; consequently, it cannot
-be disabled.
+The message authentication code (MAC) is a required component of the
+credential; consequently, it cannot be disabled.
 .TP
 .B MUNGE_MAC_DEFAULT
 Specify the default according to the \fBmunged\fR configuration.
 .TP
 .B MUNGE_MAC_MD5
-Specify the MD5 algorithm designed by Ron Rivest and published in 1991.  This
-algorithm has a 128-bit message digest.  In 2004, a successful collision attack
-was demonstrated against MD5.  But since a pre-image attack has not yet been
-demonstrated, MD5 should still be safe to use within MUNGE.  However, use of
-SHA-1, RIPEMD-160, or SHA-256 is recommended in order to provide a better
-security margin.
+Specify the MD5 algorithm designed by Ron Rivest and published in 1991.
+This algorithm has a 128-bit message digest.  In 2004, a successful
+collision attack against MD5 was demonstrated.  In 2009, a theoretical
+pre-image attack against MD5 was published.  Consequently, use of MD5 is
+not recommended due to its lower security margin.
 .TP
 .B MUNGE_MAC_SHA1
-Specify the SHA-1 algorithm designed by the National Security Agency and
-published in 1995; this is the successor to the original Secure Hash Algorithm
-(now called SHA-0) published in 1993.  This algorithm has a 160-bit message
-digest.  In 2005, successful collision attacks were demonstrated against SHA-1.
-But since a pre-image attack has not yet been demonstrated, SHA-1 should still
-be safe to use within MUNGE.  NIST has announced plans to phase out the use of
-SHA-1 by 2010 in favor of the SHA-2 variants.
+Specify the SHA-1 algorithm designed by the National Security Agency
+and published in 1995; this is the successor to the original Secure Hash
+Algorithm (now called SHA-0) published in 1993.  This algorithm has a 160-bit
+message digest.  In 2005, successful collision attacks were demonstrated
+against SHA-1.  But since a pre-image attack has not yet been demonstrated,
+SHA-1 should still be safe to use within MUNGE.
 .TP
 .B MUNGE_MAC_RIPEMD160
 Specify the RIPEMD-160 (RACE Integrity Primitives Evaluation Message Digest)
@@ -222,34 +218,32 @@ Algorithm family.  This algorithm has a 512-bit message digest.  In 2006,
 NIST began encouraging the use of the SHA-2 family of hash functions for
 all new applications and protocols.
 
-.SH "ZIP TYPES"
-If a compression type is specified, a payload-bearing credential will be
-compressed accordingly.  However, if the resulting compressed data is larger
-than the original uncompressed data, the uncompressed data will be restored
-and compression will be disabled.
+.SH "COMPRESSION TYPES"
+If a compression type is specified, a payload-bearing credential will
+be compressed accordingly.  However, if the resulting compressed data is
+larger than the original uncompressed data, the uncompressed data will be
+restored and compression will be disabled for that credential.
 .TP
 .B MUNGE_ZIP_NONE
-Specify compression is to be disabled.  This is the recommended setting
+Specify that compression is to be disabled.  This is the recommended setting
 unless there is a payload of sufficient size to compress.
 .TP
 .B MUNGE_ZIP_DEFAULT
 Specify the default according to the \fBmunged\fR configuration.
 .TP
 .B MUNGE_ZIP_BZLIB
-Specify the bzip2 algorithm developed by Julian Seward.  This algorithm
-is slower and uses more memory, but generally gets the best compression on
-larger payloads.
+Specify the bzip2 library developed by Julian Seward.  This is slower and
+uses more memory, but generally gets the best compression on larger payloads.
 .TP
 .B MUNGE_ZIP_ZLIB
-Specify the zlib "deflate" algorithm developed by Jean-loup Gailly and
-Mark Adler.  This algorithm is faster and uses less memory, but gets pretty
-good compression nonetheless.
+Specify the zlib library developed by Jean-loup Gailly and Mark Adler.
+This is faster and uses less memory, but gets pretty good compression
+nonetheless.
 
 .SH "TTL TYPES"
-The time-to-live value specifies the number of seconds the credential is
-considered valid from the time it was encoded according to the clock on the
-host on which it was encoded.  In addition to specifying an integer value,
-the following types are available.
+The time-to-live value specifies the number of seconds after the encode-time
+that the credential is considered valid.  In addition to specifying an
+integer value, the following types are available.
 .TP
 .B MUNGE_TTL_MAXIMUM
 Specify the maximum allowed by the \fBmunged\fR configuration.
@@ -258,8 +252,8 @@ Specify the maximum allowed by the \fBmunged\fR configuration.
 Specify the default according to the \fBmunged\fR configuration.
 
 .SH "UID & GID TYPES"
-The UID and GID restrictions can be used to restrict the credential
-decode based on the effective user and group ID of the requesting process.
+The UID and GID restrictions can be used to restrict the decoding of the
+credential based on the effective user and group ID of the requesting process.
 In addition to specifying an integer value, the following types are available.
 .TP
 .B MUNGE_UID_ANY
@@ -274,7 +268,7 @@ behavior.
 Refer to \fBmunge\fR(3) for a complete list of errors.
 
 .SH EXAMPLE
-The following example program illustrates the use of the munge context to
+The following example program illustrates the use of the MUNGE context to
 query the location of the \fBmunged\fR domain socket.
 .PP
 .nf
@@ -290,7 +284,7 @@ main (int argc, char *argv[])
     char        *str;
 .sp
     if (!(ctx = munge_ctx_create ())) {
-        fprintf (stderr, "ERROR: Unable to create munge context\\n");
+        fprintf (stderr, "ERROR: Unable to create MUNGE context\\n");
         exit (1);
     }
     err = munge_ctx_get (ctx, MUNGE_OPT_SOCKET, &str);
@@ -310,15 +304,15 @@ main (int argc, char *argv[])
 .fi
 
 .SH NOTES
-Abandoning a new or copied munge context without destroying it will result
+Abandoning a new or copied MUNGE context without destroying it will result
 in a memory leak.
 .PP
 The context passed to \fBmunge_encode\fR() is treated read-only except
 for the error message that is set when an error is returned.  The context
-passed to \fBmunge_decode\fR() is set according to the context used to encode
-the credential; however, on error, its settings may be in a state which is
-invalid for encoding.  Consequently, separate contexts should be used for
-encoding and decoding.
+passed to \fBmunge_decode\fR() is set according to the context used to
+encode the credential; however, on error, its settings may be in a state
+which is invalid for encoding.  Consequently, separate contexts should be
+used for encoding and decoding.
 .PP
 A context should not be shared between threads unless it is protected by a
 mutex; however, a better alternative is to use a separate context (or two)
@@ -332,14 +326,16 @@ or copying an existing one via \fBmunge_ctx_copy\fR().
 Copyright (C) 2007-2010 Lawrence Livermore National Security, LLC.
 .br
 Copyright (C) 2002-2007 The Regents of the University of California.
-
-MUNGE is free software: you can redistribute it and/or modify it under
-the terms of the GNU General Public License as published by the Free
-Software Foundation, either version 3 of the License, or (at your option)
-any later version.  Additionally for the MUNGE library (libmunge), you
-can redistribute it and/or modify it under the terms of the GNU Lesser
-General Public License as published by the Free Software Foundation,
-either version 3 of the License, or (at your option) any later version.
+.PP
+MUNGE is free software: you can redistribute it and/or modify it under the
+terms of the GNU General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later
+version.
+.PP
+Additionally for the MUNGE library (libmunge), you can redistribute it
+and/or modify it under the terms of the GNU Lesser General Public License as
+published by the Free Software Foundation, either version 3 of the License,
+or (at your option) any later version.
 
 .SH "SEE ALSO"
 .BR munge (1),

@@ -62,16 +62,16 @@ in order to bind to a reserved port.  Finally, the remote daemons have no
 means of determining whether the client identity is authentic.
 
 .SH USAGE
-A process creates a credential by requesting one from the local MUNGE service,
-either via \fBmunge_encode\fR() or the \fBmunge\fR executable.  The encoded
-credential contains the UID and GID of the originating process.  This process
-sends the credential to another process within the security realm as a means
-of proving its identity.  The receiving process validates the credential
-with the use of its local MUNGE service, either via \fBmunge_decode\fR()
-or the \fBunmunge\fR executable.  The decoded credential provides the
-receiving process with a reliable means of ascertaining the UID and GID of
-the originating process.  This information can be used for accounting or
-access control decisions.
+A process creates a credential by requesting one from the local MUNGE
+service, either via the \fBmunge_encode\fR() C library call or the
+\fBmunge\fR executable.  The encoded credential contains the UID and GID of
+the originating process.  This process sends the credential to another process
+within the security realm as a means of proving its identity.  The receiving
+process validates the credential with the use of its local MUNGE service,
+either via the \fBmunge_decode\fR() C library call or the \fBunmunge\fR
+executable.  The decoded credential provides the receiving process with a
+reliable means of ascertaining the UID and GID of the originating process.
+This information can be used for accounting or access control decisions.
 
 .SH DETAILS
 The contents of the credential (including any optional payload data)
@@ -95,14 +95,16 @@ over virtually any transport.
 Copyright (C) 2007-2010 Lawrence Livermore National Security, LLC.
 .br
 Copyright (C) 2002-2007 The Regents of the University of California.
-
-MUNGE is free software: you can redistribute it and/or modify it under
-the terms of the GNU General Public License as published by the Free
-Software Foundation, either version 3 of the License, or (at your option)
-any later version.  Additionally for the MUNGE library (libmunge), you
-can redistribute it and/or modify it under the terms of the GNU Lesser
-General Public License as published by the Free Software Foundation,
-either version 3 of the License, or (at your option) any later version.
+.PP
+MUNGE is free software: you can redistribute it and/or modify it under the
+terms of the GNU General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later
+version.
+.PP
+Additionally for the MUNGE library (libmunge), you can redistribute it
+and/or modify it under the terms of the GNU Lesser General Public License as
+published by the Free Software Foundation, either version 3 of the License,
+or (at your option) any later version.
 
 .SH "SEE ALSO"
 .BR munge (1),

@@ -74,8 +74,8 @@ Specify the compression type, either by name or number.
 Display a list of supported compression types.
 .TP
 .BI "-e, --encode"
-Encode (but do not decode) each credential.  By bypassing the decode operation,
-the credential is not stored in the replay cache.
+Encode (but do not decode) each credential.  By bypassing the decode
+operation, the credential is not stored in the replay cache.
 .TP
 .BI "-d, --decode"
 Encode and decode each credential.
@@ -106,8 +106,8 @@ Specify the local domain socket for connecting with \fBmunged\fR.
 .TP
 .BI "-D, --duration " integer
 Specify the test duration (in seconds).  The default duration is one second.
-A value of \-1 selects the maximum duration.  The integer may be followed by
-a single-character modifier: s=seconds, m=minutes, h=hours, d=days.
+A value of \-1 selects the maximum duration.  The integer may be followed
+by a single-character modifier: s=seconds, m=minutes, h=hours, d=days.
 .TP
 .BI "-N, --num-creds " integer
 Specify the number of credentials to generate.  The integer may be followed
@@ -119,8 +119,8 @@ Specify the number of threads to spawn for processing credentials.
 .TP
 .BI "-W, --warn-time " integer
 Specify the maximum number of seconds to allow for a given
-\fBmunge_encode\fR() or \fBmunge_decode\fR() operation before issuing a
-warning.
+\fBmunge_encode\fR() or \fBmunge_decode\fR() operation before issuing
+a warning.
 
 .SH "EXIT STATUS"
 The \fBremunge\fR program returns a zero exit code if the benchmark completes.
@@ -134,14 +134,16 @@ exit code.
 Copyright (C) 2007-2010 Lawrence Livermore National Security, LLC.
 .br
 Copyright (C) 2002-2007 The Regents of the University of California.
-
-MUNGE is free software: you can redistribute it and/or modify it under
-the terms of the GNU General Public License as published by the Free
-Software Foundation, either version 3 of the License, or (at your option)
-any later version.  Additionally for the MUNGE library (libmunge), you
-can redistribute it and/or modify it under the terms of the GNU Lesser
-General Public License as published by the Free Software Foundation,
-either version 3 of the License, or (at your option) any later version.
+.PP
+MUNGE is free software: you can redistribute it and/or modify it under the
+terms of the GNU General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later
+version.
+.PP
+Additionally for the MUNGE library (libmunge), you can redistribute it
+and/or modify it under the terms of the GNU Lesser General Public License as
+published by the Free Software Foundation, either version 3 of the License,
+or (at your option) any later version.
 
 .SH "SEE ALSO"
 .BR munge (1),
