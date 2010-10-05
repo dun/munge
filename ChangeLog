@@ -1,5 +1,11 @@
 2010-10-05  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/libcommon/fd.c (fd_timed_write_iov): Added.
+	* src/libcommon/fd.h: Added prototype.
+	* src/libcommon/m_msg.c (m_msg_send): Replaced fd_timed_write_n() with
+	  fd_timed_write_iov().  Restoring writev() coalescing reclaims some of
+	  the lost throughput.
+
 	* src/libcommon/fd.h: Fixed prototype comment for fd_timed_write_n().
 
 2010-08-26  Chris Dunlap  <cdunlap@llnl.gov>

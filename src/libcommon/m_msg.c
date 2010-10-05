@@ -40,6 +40,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/time.h>                   /* gettimeofday */
+#include <sys/uio.h>
 #include <unistd.h>
 #include "fd.h"
 #include "m_msg.h"
@@ -203,6 +204,7 @@ m_msg_send (m_msg_t m, m_msg_type_t type, int maxlen)
     munge_err_t     e;
     int             n, nsend;
     uint8_t         hdr [MUNGE_MSG_HDR_SIZE];
+    struct iovec    iov [2];
     struct timeval  tv;
 
     assert (m != NULL);
@@ -266,44 +268,33 @@ m_msg_send (m_msg_t m, m_msg_type_t type, int maxlen)
             strdup ("Unable to pack message header"));
         return (e);
     }
+    /*  Compute iovec for response header + body.
+     */
+    nsend = 0;
+    iov[0].iov_base = hdr;
+    nsend += iov[0].iov_len = sizeof (hdr);
+    iov[1].iov_base = m->pkt;
+    nsend += iov[1].iov_len = m->pkt_len;
+
     /*  Compute maximum time to wait for transmission of message.
      */
     _get_timeval (&tv, MUNGE_SOCKET_TIMEOUT_MSECS);
 
     /*  Send the message.
      */
-    nsend = sizeof (hdr);
-    if ((errno = 0, n = fd_timed_write_n (m->sd, hdr, nsend, &tv)) < 0) {
+    if ((errno = 0, n = fd_timed_write_iov (m->sd, iov, 2, &tv)) < 0) {
         m_msg_set_err (m, EMUNGE_SOCKET,
-            strdupf ("Unable to send message header: %s", strerror (errno)));
+            strdupf ("Unable to send message: %s", strerror (errno)));
         return (EMUNGE_SOCKET);
     }
     else if (errno == ETIME) {
         m_msg_set_err (m, EMUNGE_SOCKET,
-            strdup ("Unable to send message header: Timed-out"));
+            strdup ("Unable to send message: Timed-out"));
         return (EMUNGE_SOCKET);
     }
     else if (n != nsend) {
         m_msg_set_err (m, EMUNGE_SOCKET,
-            strdupf ("Sent incomplete message header: %d of %d bytes",
-                n, nsend));
-        return (EMUNGE_SOCKET);
-    }
-    else if ((errno = 0,
-              n = fd_timed_write_n (m->sd, m->pkt, m->pkt_len, &tv)) < 0) {
-        m_msg_set_err (m, EMUNGE_SOCKET,
-            strdupf ("Unable to send message body: %s", strerror (errno)));
-        return (EMUNGE_SOCKET);
-    }
-    else if (errno == ETIME) {
-        m_msg_set_err (m, EMUNGE_SOCKET,
-            strdup ("Unable to send message body: Timed-out"));
-        return (EMUNGE_SOCKET);
-    }
-    else if (n != m->pkt_len) {
-        m_msg_set_err (m, EMUNGE_SOCKET,
-            strdupf ("Sent incomplete message body: %d of %d bytes",
-                n, m->pkt_len));
+            strdupf ("Sent incomplete message: %d of %d bytes", n, nsend));
         return (EMUNGE_SOCKET);
     }
     return (EMUNGE_SUCCESS);

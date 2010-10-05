@@ -37,6 +37,7 @@
 #endif /* HAVE_CONFIG_H */
 
 #include <sys/types.h>
+#include <sys/uio.h>
 #include <unistd.h>
 
 
@@ -132,6 +133,19 @@ ssize_t fd_timed_write_n (int fd, void *buf, size_t n,
  *    specifies a ceiling on the time for which the call will block.
  *    This ceiling is an absolute timeout in seconds and microseconds since
  *    the Epoch.  If [when] is NULL, the write will block until [n] bytes
+ *    have been written or a POLLHUP is encountered.
+ *  Returns the number of bytes written, or -1 on error.  A timeout is not
+ *    an error.  If a timeout has occurred, errno will be set to ETIME.
+ *    The caller should reset errno beforehand when checking for timeout.
+ */
+
+ssize_t fd_timed_write_iov (int fd, const struct iovec *iov, int iov_cnt,
+        const struct timeval *when);
+/*
+ *  Writes the entire vector [iov] of [iov_cnt] blocks to [fd], timing-out at
+ *    [when] which specifies a ceiling on the time for which the call will
+ *    block.  This ceiling is an absolute timeout in seconds and microseconds
+ *    since the Epoch.  If [when] is NULL, the write will block until [n] bytes
  *    have been written or a POLLHUP is encountered.
  *  Returns the number of bytes written, or -1 on error.  A timeout is not
  *    an error.  If a timeout has occurred, errno will be set to ETIME.

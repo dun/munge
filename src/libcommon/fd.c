@@ -41,6 +41,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/time.h>
+#include <sys/uio.h>
 #include <unistd.h>
 #include "fd.h"
 
@@ -236,6 +237,98 @@ fd_timed_write_n (int fd, void *buf, size_t n, const struct timeval *when)
         }
     }
     return (n - nleft);
+}
+
+
+ssize_t
+fd_timed_write_iov (int fd, const struct iovec *iov_orig, int iov_cnt,
+                   const struct timeval *when)
+{
+    int            iov_mem_len;
+    struct iovec  *iov;
+    int            i;
+    size_t         n, nleft, iov_len;
+    struct pollfd  pfd;
+    int            nfd;
+    int            msecs;
+    ssize_t        nwritten;
+
+    if ((fd < 0) || (iov_orig == NULL) || (iov_cnt <= 0)) {
+        errno = EINVAL;
+        return (-1);
+    }
+    /*  Create copy of iovec for modification to handle retrying short writes.
+     */
+    iov_mem_len = sizeof (struct iovec) * iov_cnt;
+    iov = malloc (iov_mem_len);
+    if (iov == NULL) {
+        errno = ENOMEM;
+        return (-1);
+    }
+    memcpy (iov, iov_orig, iov_mem_len);
+
+    for (i = 0, n = 0; i < iov_cnt; i++) {
+        n += iov[i].iov_len;
+    }
+    nleft = iov_len = n;
+    pfd.fd = fd;
+    pfd.events = POLLOUT;
+
+    while (nleft > 0) {
+
+        msecs = _fd_get_poll_timeout (when);
+        nfd = poll (&pfd, 1, msecs);
+
+        if (nfd < 0) {
+            if ((errno == EINTR) || (errno == EAGAIN))
+                continue;
+            else
+                goto err;
+        }
+        else if (nfd == 0) {            /* timeout */
+            errno = ETIME;
+            break;
+        }
+        else if (pfd.revents & POLLHUP) {
+            break;
+        }
+        else if (pfd.revents & POLLNVAL) {
+            errno = EBADF;
+            goto err;
+        }
+        else if (pfd.revents & POLLERR) {
+            errno = EIO;
+            goto err;
+        }
+        assert (pfd.revents & POLLOUT);
+
+        nwritten = writev (fd, iov, iov_cnt);
+        if (nwritten < 0) {
+            if ((errno == EINTR) || (errno == EAGAIN))
+                continue;
+            else
+                goto err;
+        }
+        nleft -= nwritten;
+
+        if (msecs == 0) {
+            break;
+        }
+        for (i = 0; (i < iov_cnt) && (nwritten > 0); i++) {
+            n = (nwritten > iov[i].iov_len) ? iov[i].iov_len : nwritten;
+            if (n == 0)
+                continue;
+            nwritten -= n;
+            iov[i].iov_len -= n;
+            iov[i].iov_base += n;
+        }
+    }
+    free (iov);
+    return (iov_len - nleft);
+
+err:
+    free (iov);
+    return (-1);
 }
 
 
