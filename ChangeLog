@@ -1,5 +1,8 @@
 2010-10-05  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/munged/job.c (job_accept): Prevented continued execution of
+	  function if unable to set server's socket to client as nonblocking.
+
 	* src/libmunge/m_msg_client.c (_m_msg_client_connect):
 	  Fixed fd leak if unable to set client's socket as nonblocking.
 

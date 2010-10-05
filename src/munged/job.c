@@ -123,7 +123,7 @@ job_accept (conf_t conf)
                 "Unable to set nonblocking client socket: %s",
                 strerror (errno));
         }
-        if (m_msg_create (&m) != EMUNGE_SUCCESS) {
+        else if (m_msg_create (&m) != EMUNGE_SUCCESS) {
             close (sd);
             log_msg (LOG_WARNING, "Unable to create client request");
         }
