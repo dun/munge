@@ -1,3 +1,7 @@
+2010-10-05  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/libcommon/fd.h: Fixed prototype comment for fd_timed_write_n().
+
 2010-08-26  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/libcommon/fd.c (fd_is_nonblocking):

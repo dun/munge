@@ -128,7 +128,7 @@ ssize_t fd_timed_read_n (int fd, void *buf, size_t n,
 ssize_t fd_timed_write_n (int fd, void *buf, size_t n,
         const struct timeval *when);
 /*
- *  Writes [n] bytes from [fd] into [buf], timing-out at [when] which
+ *  Writes [n] bytes from [buf] to [fd], timing-out at [when] which
  *    specifies a ceiling on the time for which the call will block.
  *    This ceiling is an absolute timeout in seconds and microseconds since
  *    the Epoch.  If [when] is NULL, the write will block until [n] bytes
