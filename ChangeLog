@@ -1,5 +1,8 @@
 2010-10-05  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/libmunge/m_msg_client.c (_m_msg_client_connect):
+	  Set client's socket to server as nonblocking.
+
 	* src/libcommon/fd.c (fd_timed_write_iov): Added.
 	* src/libcommon/fd.h: Added prototype.
 	* src/libcommon/m_msg.c (m_msg_send): Replaced fd_timed_write_n() with
