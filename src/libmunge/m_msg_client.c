@@ -186,6 +186,7 @@ _m_msg_client_connect (m_msg_t m, char *path)
         return (EMUNGE_SOCKET);
     }
     if (fd_set_nonblocking (sd) < 0) {
+        close (sd);
         m_msg_set_err (m, EMUNGE_SOCKET,
             strdupf ("Unable to set nonblocking socket: %s",
             strerror (errno)));
