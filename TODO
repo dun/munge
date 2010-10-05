@@ -7,6 +7,5 @@
 -add pam support
 -add realm (multi-key) support
 -periodically stat keyfile and look for changed inode/mtime
--add server timeout for unresponsive clients
 -change remunge to exit on persistent errors
 -change remunge to stop and output results on sigint

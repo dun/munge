@@ -1,5 +1,7 @@
 2010-10-05  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* TODO: Updated.
+
 	* src/libmunge/m_msg_client.c (_m_msg_client_connect):
 	  Set client's socket to server as nonblocking.
 
