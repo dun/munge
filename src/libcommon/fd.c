@@ -367,59 +367,6 @@ fd_read_line (int fd, void *buf, size_t maxlen)
 
 
 /*****************************************************************************
- *  Extern Locking Functions
- *****************************************************************************/
-
-int
-fd_get_read_lock (int fd)
-{
-    return (_fd_get_lock (fd, F_SETLK, F_RDLCK));
-}
-
-
-int
-fd_get_readw_lock (int fd)
-{
-    return (_fd_get_lock (fd, F_SETLKW, F_RDLCK));
-}
-
-
-int
-fd_get_write_lock (int fd)
-{
-    return (_fd_get_lock (fd, F_SETLK, F_WRLCK));
-}
-
-
-int
-fd_get_writew_lock (int fd)
-{
-    return (_fd_get_lock (fd, F_SETLKW, F_WRLCK));
-}
-
-
-int
-fd_release_lock (int fd)
-{
-    return (_fd_get_lock (fd, F_SETLK, F_UNLCK));
-}
-
-
-pid_t
-fd_is_read_lock_blocked (int fd)
-{
-    return (_fd_test_lock (fd, F_RDLCK));
-}
-
-
-pid_t
-fd_is_write_lock_blocked (int fd)
-{
-    return (_fd_test_lock (fd, F_WRLCK));
-}
-
-
-/*****************************************************************************
  *  Extern Attribute Functions
  *****************************************************************************/
 
@@ -469,6 +416,59 @@ fd_is_nonblocking (int fd)
         return (-1);
     }
     return ((fval & O_NONBLOCK) ? 1 : 0);
+}
+
+
+/*****************************************************************************
+ *  Extern Locking Functions
+ *****************************************************************************/
+
+int
+fd_get_read_lock (int fd)
+{
+    return (_fd_get_lock (fd, F_SETLK, F_RDLCK));
+}
+
+
+int
+fd_get_readw_lock (int fd)
+{
+    return (_fd_get_lock (fd, F_SETLKW, F_RDLCK));
+}
+
+
+int
+fd_get_write_lock (int fd)
+{
+    return (_fd_get_lock (fd, F_SETLK, F_WRLCK));
+}
+
+
+int
+fd_get_writew_lock (int fd)
+{
+    return (_fd_get_lock (fd, F_SETLKW, F_WRLCK));
+}
+
+
+int
+fd_release_lock (int fd)
+{
+    return (_fd_get_lock (fd, F_SETLK, F_UNLCK));
+}
+
+
+pid_t
+fd_is_read_lock_blocked (int fd)
+{
+    return (_fd_test_lock (fd, F_RDLCK));
+}
+
+
+pid_t
+fd_is_write_lock_blocked (int fd)
+{
+    return (_fd_test_lock (fd, F_WRLCK));
 }
 
 

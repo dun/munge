@@ -41,6 +41,65 @@
 #include <unistd.h>
 
 
+ssize_t fd_read_n (int fd, void *buf, size_t n);
+/*
+ *  Reads up to [n] bytes from [fd] into [buf].
+ *  Returns the number of bytes read, 0 on EOF, or -1 on error.
+ */
+
+ssize_t fd_write_n (int fd, void *buf, size_t n);
+/*
+ *  Writes [n] bytes from [buf] to [fd].
+ *  Returns the number of bytes written, or -1 on error.
+ */
+
+ssize_t fd_timed_read_n (int fd, void *buf, size_t n,
+        const struct timeval *when);
+/*
+ *  Reads up to [n] bytes from [fd] into [buf], timing-out at [when]
+ *    which specifies a ceiling on the time for which the call will block.
+ *    This ceiling is an absolute timeout in seconds and microseconds since
+ *    the Epoch.  If [when] is NULL, the read will block until [n] bytes
+ *    have been read or an EOF is encountered.
+ *  Returns the number of bytes read, or -1 on error.  A timeout is not
+ *    an error.  If a timeout has occurred, errno will be set to ETIME.
+ *    The caller should reset errno beforehand when checking for timeout.
+ */
+
+ssize_t fd_timed_write_n (int fd, void *buf, size_t n,
+        const struct timeval *when);
+/*
+ *  Writes [n] bytes from [buf] to [fd], timing-out at [when] which
+ *    specifies a ceiling on the time for which the call will block.
+ *    This ceiling is an absolute timeout in seconds and microseconds since
+ *    the Epoch.  If [when] is NULL, the write will block until [n] bytes
+ *    have been written or a POLLHUP is encountered.
+ *  Returns the number of bytes written, or -1 on error.  A timeout is not
+ *    an error.  If a timeout has occurred, errno will be set to ETIME.
+ *    The caller should reset errno beforehand when checking for timeout.
+ */
+
+ssize_t fd_timed_write_iov (int fd, const struct iovec *iov, int iov_cnt,
+        const struct timeval *when);
+/*
+ *  Writes the [iov] vector of [iov_cnt] blocks to [fd], timing-out at [when]
+ *    which specifies a ceiling on the time for which the call will block.
+ *    This ceiling is an absolute timeout in seconds and microseconds since
+ *    the Epoch.  If [when] is NULL, the write will block until [n] bytes
+ *    have been written or a POLLHUP is encountered.
+ *  Returns the number of bytes written, or -1 on error.  A timeout is not
+ *    an error.  If a timeout has occurred, errno will be set to ETIME.
+ *    The caller should reset errno beforehand when checking for timeout.
+ */
+
+ssize_t fd_read_line (int fd, void *buf, size_t maxlen);
+/*
+ *  Reads at most [maxlen-1] bytes up to a newline from [fd] into [buf].
+ *  The [buf] is guaranteed to be NUL-terminated and will contain the
+ *    newline if it is encountered within [maxlen-1] bytes.
+ *  Returns the number of bytes read, 0 on EOF, or -1 on error.
+ */
+
 int fd_set_close_on_exec (int fd);
 /*
  *  Sets the file descriptor [fd] to be closed on exec().
@@ -105,65 +164,6 @@ pid_t fd_is_write_lock_blocked (int fd);
  *    write-lock (ie, if any lock is already being held on the file).
  *  Returns the pid of the process holding the lock, 0 if no lock exists,
  *    or -1 on error.
- */
-
-ssize_t fd_read_n (int fd, void *buf, size_t n);
-/*
- *  Reads up to [n] bytes from [fd] into [buf].
- *  Returns the number of bytes read, 0 on EOF, or -1 on error.
- */
-
-ssize_t fd_timed_read_n (int fd, void *buf, size_t n,
-        const struct timeval *when);
-/*
- *  Reads up to [n] bytes from [fd] into [buf], timing-out at [when]
- *    which specifies a ceiling on the time for which the call will block.
- *    This ceiling is an absolute timeout in seconds and microseconds since
- *    the Epoch.  If [when] is NULL, the read will block until [n] bytes
- *    have been read or an EOF is encountered.
- *  Returns the number of bytes read, or -1 on error.  A timeout is not
- *    an error.  If a timeout has occurred, errno will be set to ETIME.
- *    The caller should reset errno beforehand when checking for timeout.
- */
-
-ssize_t fd_timed_write_n (int fd, void *buf, size_t n,
-        const struct timeval *when);
-/*
- *  Writes [n] bytes from [buf] to [fd], timing-out at [when] which
- *    specifies a ceiling on the time for which the call will block.
- *    This ceiling is an absolute timeout in seconds and microseconds since
- *    the Epoch.  If [when] is NULL, the write will block until [n] bytes
- *    have been written or a POLLHUP is encountered.
- *  Returns the number of bytes written, or -1 on error.  A timeout is not
- *    an error.  If a timeout has occurred, errno will be set to ETIME.
- *    The caller should reset errno beforehand when checking for timeout.
- */
-
-ssize_t fd_timed_write_iov (int fd, const struct iovec *iov, int iov_cnt,
-        const struct timeval *when);
-/*
- *  Writes the entire vector [iov] of [iov_cnt] blocks to [fd], timing-out at
- *    [when] which specifies a ceiling on the time for which the call will
- *    block.  This ceiling is an absolute timeout in seconds and microseconds
- *    since the Epoch.  If [when] is NULL, the write will block until [n] bytes
- *    have been written or a POLLHUP is encountered.
- *  Returns the number of bytes written, or -1 on error.  A timeout is not
- *    an error.  If a timeout has occurred, errno will be set to ETIME.
- *    The caller should reset errno beforehand when checking for timeout.
- */
-
-ssize_t fd_write_n (int fd, void *buf, size_t n);
-/*
- *  Writes [n] bytes from [buf] to [fd].
- *  Returns the number of bytes written, or -1 on error.
- */
-
-ssize_t fd_read_line (int fd, void *buf, size_t maxlen);
-/*
- *  Reads at most [maxlen-1] bytes up to a newline from [fd] into [buf].
- *  The [buf] is guaranteed to be NUL-terminated and will contain the
- *    newline if it is encountered within [maxlen-1] bytes.
- *  Returns the number of bytes read, 0 on EOF, or -1 on error.
  */
 
 

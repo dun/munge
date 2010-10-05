@@ -1,5 +1,7 @@
 2010-10-05  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/libcommon/fd.c, src/libcommon/fd.h: Re-ordered functions.
+
 	* TODO: Updated.
 
 	* src/libmunge/m_msg_client.c (_m_msg_client_connect):
