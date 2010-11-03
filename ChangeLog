@@ -1,5 +1,7 @@
 2010-11-03  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/munged/gids.h (gids_is_member): Fixed comment.
+
 	* : Re-bootstrap'd with autoconf-2.67.
 
 2010-09-21  Chris Dunlap  <cdunlap@llnl.gov>

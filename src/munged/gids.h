@@ -77,9 +77,8 @@ void gids_update (gids_t gids);
 
 int gids_is_member (gids_t gids, uid_t uid, gid_t gid);
 /*
- *  Returns true (non-zero) if user [uid] is a member of one of the
- *    supplementary group [gid] according to the GIDs mapping [gids];
- *    o/w, returns false (zero).
+ *  Returns true (non-zero) if user [uid] is a member of the supplementary
+ *    group [gid] according to the GIDs mapping [gids]; o/w, returns false.
  */
 
 
