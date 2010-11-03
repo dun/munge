@@ -161,7 +161,7 @@ gids_create (int interval, int do_group_stat)
     gids->do_group_stat = do_group_stat;
     gids_update (gids);
 
-    if (gids->interval == 0) {
+    if (interval == 0) {
         log_msg (LOG_INFO, "Disabled updates to supplementary group mapping");
     }
     else {
@@ -438,8 +438,12 @@ err:
     if (do_group_db_close) {
         endgrent ();
     }
-    hash_destroy (uid_hash);
-    hash_destroy (gid_hash);
+    if (uid_hash != NULL) {
+        hash_destroy (uid_hash);
+    }
+    if (gid_hash != NULL) {
+        hash_destroy (gid_hash);
+    }
     return (NULL);
 }
 
