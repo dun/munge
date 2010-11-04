@@ -438,10 +438,10 @@ err:
     if (do_group_db_close) {
         endgrent ();
     }
-    if (uid_hash != NULL) {
+    if (uid_hash) {
         hash_destroy (uid_hash);
     }
-    if (gid_hash != NULL) {
+    if (gid_hash) {
         hash_destroy (gid_hash);
     }
     return (NULL);
