@@ -363,7 +363,7 @@ _gids_hash_create (void)
     struct timeval  t_stop;
     int             do_group_db_close = 0;
     struct group   *gr_ptr;
-    char          **pp;
+    char          **user_p;
     uid_t           uid;
     int             n_users;
     double          n_seconds;
@@ -404,8 +404,11 @@ _gids_hash_create (void)
                     strerror (errno));
             goto err;
         }
-        for (pp = gr_ptr->gr_mem; pp && *pp; pp++) {
-            if ((_gids_user_to_uid (uid_hash, *pp, &uid)) >= 0) {
+        /*  gr_mem is a null-terminated array of pointers to the user names
+         *    belonging to the group.
+         */
+        for (user_p = gr_ptr->gr_mem; user_p && *user_p; user_p++) {
+            if ((_gids_user_to_uid (uid_hash, *user_p, &uid)) >= 0) {
                 if (_gids_hash_add (gid_hash, uid, gr_ptr->gr_gid) < 0) {
                     goto err;
                 }
