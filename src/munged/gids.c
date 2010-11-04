@@ -464,16 +464,14 @@ _gids_user_to_uid (hash_t uid_hash, char *user, uid_t *uid_p)
     else if ((pw_ptr = getpwnam (user))) {
         uid = pw_ptr->pw_uid;
         if (!(u = _gids_uid_alloc (user, uid))) {
-            log_msg (LOG_ERR,
+            log_msg (LOG_WARNING,
                 "Unable to allocate uid node for %s/%d -- out of memory",
                 user, uid);
-            return (-1);
         }
-        if (!hash_insert (uid_hash, u->user, u)) {
-            log_msg (LOG_ERR,
+        else if (!hash_insert (uid_hash, u->user, u)) {
+            log_msg (LOG_WARNING,
                 "Unable to insert uid node for %s/%d into hash", user, uid);
             _gids_uid_del (u);
-            return (-1);
         }
     }
     else {
@@ -481,6 +479,7 @@ _gids_user_to_uid (hash_t uid_hash, char *user, uid_t *uid_p)
             "Unable to query password file entry for \"%s\"", user);
         return (-1);
     }
+
     if (uid_p != NULL) {
         *uid_p = uid;
     }

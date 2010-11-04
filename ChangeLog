@@ -1,5 +1,8 @@
 2010-11-03  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/munged/gids.c (_gids_user_to_uid): Made errors inserting into the
+	  uid hash nonfatal since they are just a performance optimization.
+
 	* src/munged/gids.c: Minor cosmetic changes.
 
 	* src/munged/gids.h (gids_is_member): Fixed comment.
