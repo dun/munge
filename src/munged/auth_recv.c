@@ -392,7 +392,7 @@ auth_recv (m_msg_t m, uid_t *uid, gid_t *gid)
         goto err;
     }
     assert (pipe_name != NULL);
-    (void) unlink (pipe_name);                  /* in case it already exists */
+    (void) unlink (pipe_name);          /* in case it already exists */
     /*
      *  The auth pipe must be created in the filesystem before the auth req
      *    is sent to the client in order to prevent a race condition.
