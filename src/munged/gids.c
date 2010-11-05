@@ -283,9 +283,8 @@ _gids_update (gids_t gids)
     int             do_group_stat;
     time_t          t_last_update;
     time_t          t_now;
-    struct stat     st;
     int             do_update = 1;
-    hash_t          hash;
+    hash_t          hash = NULL;
 
     assert (gids != NULL);
 
@@ -303,6 +302,8 @@ _gids_update (gids_t gids)
     }
     if (do_group_stat > 0) {
 
+        struct stat  st;
+
         /*  On stat() error, disable future stat()s until reset via SIGHUP.
          */
         if (stat (GIDS_GROUP_FILE, &st) < 0) {
@@ -319,7 +320,6 @@ _gids_update (gids_t gids)
     }
     /*  Update the GIDS mapping.
      */
-    hash = NULL;
     if (do_update) {
         hash = _gids_hash_create ();
     }
@@ -330,11 +330,10 @@ _gids_update (gids_t gids)
      */
     if (hash) {
 
-        hash_t hash_bak;
-
-        hash_bak = gids->hash;
+        hash_t hash_bak = gids->hash;
         gids->hash = hash;
         hash = hash_bak;
+
         gids->t_last_update = t_now;
     }
     gids->do_group_stat = do_group_stat;

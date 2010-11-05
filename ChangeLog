@@ -1,5 +1,7 @@
 2010-11-04  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/munged/gids.c (_gids_update): Minor cosmetic changes.
+
 	* src/munged/gids.c (gids_create, _gids_update): Fixed do_group_stat
 	  not being protected by the gids mutex.  A minor race-condition
 	  could occur if a SIGHUP was received towards the beginning of
