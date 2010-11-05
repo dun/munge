@@ -314,9 +314,6 @@ _gids_update (gids_t gids)
         else if (st.st_mtime <= t_last_update) {
             do_update = 0;
         }
-        else {
-            t_now = st.st_mtime;
-        }
     }
     /*  Update the GIDS mapping.
      */
