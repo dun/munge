@@ -1,3 +1,12 @@
+2010-11-04  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/munged/gids.c (gids_create, _gids_update): Fixed do_group_stat
+	  not being protected by the gids mutex.  A minor race-condition
+	  could occur if a SIGHUP was received towards the beginning of
+	  _gids_update().  Now the mutex is held while do_group_stat is copied.
+	  And since the mutex is being acquired at the top of _gids_update,
+	  t_last_update has been moved into the gids struct as well.
+
 2010-11-03  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/munged/gids.c (_gids_hash_create): Minor cosmetic changes.

@@ -85,6 +85,7 @@ struct gids {
     int                 timer;          /* timer ID for next GIDs map update */
     int                 interval;       /* seconds between GIDs map updates  */
     int                 do_group_stat;  /* true if updates stat group file   */
+    time_t              t_last_update;  /* time of last good GIDs map update */
 };
 
 struct gids_node {
@@ -159,6 +160,7 @@ gids_create (int interval, int do_group_stat)
     gids->timer = 0;
     gids->interval = interval;
     gids->do_group_stat = do_group_stat;
+    gids->t_last_update = 0;
     gids_update (gids);
 
     if (interval == 0) {
@@ -277,14 +279,9 @@ static void
 _gids_update (gids_t gids)
 {
 /*  Updates the GIDs mapping [gids] if needed.
- *
- *  The use of a static t_last_update here is groovy since there will
- *    never be multiple instances of this routine running concurrently.
- *    Placing t_last_update within the gids struct would potentially
- *    require locking the struct twice per function invocation: once
- *    for the stat and once for the update.
  */
-    static time_t   t_last_update = 0;
+    int             do_group_stat;
+    time_t          t_last_update;
     time_t          t_now;
     struct stat     st;
     int             do_update = 1;
@@ -292,12 +289,24 @@ _gids_update (gids_t gids)
 
     assert (gids != NULL);
 
+    if ((errno = pthread_mutex_lock (&gids->lock)) != 0) {
+        log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to lock gids mutex");
+    }
+    do_group_stat = gids->do_group_stat;
+    t_last_update = gids->t_last_update;
+
+    if ((errno = pthread_mutex_unlock (&gids->lock)) != 0) {
+        log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to unlock gids mutex");
+    }
     if (time (&t_now) == (time_t) -1) {
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to query current time");
     }
-    if (gids->do_group_stat > 0) {
+    if (do_group_stat > 0) {
+
+        /*  On stat() error, disable future stat()s until reset via SIGHUP.
+         */
         if (stat (GIDS_GROUP_FILE, &st) < 0) {
-            gids->do_group_stat = -1;
+            do_group_stat = -1;
             log_msg (LOG_ERR, "Unable to stat \"%s\": %s",
                 GIDS_GROUP_FILE, strerror (errno));
         }
@@ -326,8 +335,10 @@ _gids_update (gids_t gids)
         hash_bak = gids->hash;
         gids->hash = hash;
         hash = hash_bak;
-        t_last_update = t_now;
+        gids->t_last_update = t_now;
     }
+    gids->do_group_stat = do_group_stat;
+
     /*  Enable subsequent updating of the GIDs mapping only if the update
      *    interval is positive.
      */
