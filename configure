@@ -13023,6 +13023,90 @@ fi
 
 
 ##
+# Checks for library functions.
+##
+for ac_func in \
+  localtime_r \
+
+do :
+  as_ac_var=`$as_echo "ac_cv_func_$ac_func" | $as_tr_sh`
+ac_fn_c_check_func "$LINENO" "$ac_func" "$as_ac_var"
+if eval test \"x\$"$as_ac_var"\" = x"yes"; then :
+  cat >>confdefs.h <<_ACEOF
+#define `$as_echo "HAVE_$ac_func" | $as_tr_cpp` 1
+_ACEOF
+
+fi
+done
+
+ac_fn_c_check_func "$LINENO" "inet_ntop" "ac_cv_func_inet_ntop"
+if test "x$ac_cv_func_inet_ntop" = x""yes; then :
+  $as_echo "#define HAVE_INET_NTOP 1" >>confdefs.h
+
+else
+  case " $LIBOBJS " in
+  *" inet_ntop.$ac_objext "* ) ;;
+  *) LIBOBJS="$LIBOBJS inet_ntop.$ac_objext"
+ ;;
+esac
+
+fi
+
+ac_fn_c_check_func "$LINENO" "strlcat" "ac_cv_func_strlcat"
+if test "x$ac_cv_func_strlcat" = x""yes; then :
+  $as_echo "#define HAVE_STRLCAT 1" >>confdefs.h
+
+else
+  case " $LIBOBJS " in
+  *" strlcat.$ac_objext "* ) ;;
+  *) LIBOBJS="$LIBOBJS strlcat.$ac_objext"
+ ;;
+esac
+
+fi
+
+ac_fn_c_check_func "$LINENO" "strlcpy" "ac_cv_func_strlcpy"
+if test "x$ac_cv_func_strlcpy" = x""yes; then :
+  $as_echo "#define HAVE_STRLCPY 1" >>confdefs.h
+
+else
+  case " $LIBOBJS " in
+  *" strlcpy.$ac_objext "* ) ;;
+  *) LIBOBJS="$LIBOBJS strlcpy.$ac_objext"
+ ;;
+esac
+
+fi
+
+
+
+##
+# Check for platform-specific issues.
+##
+
+  case "$host" in
+    *-*-aix*)
+      LDFLAGS="$LDFLAGS -Wl,-brtl"      # enable run-time linking
+      ;;
+    *)
+      ;;
+  esac
+
+
+
+  case "$host" in
+    *-*-darwin*)
+
+$as_echo "#define _APPLE_C_SOURCE 1" >>confdefs.h
+
+      ;;
+    *)
+      ;;
+  esac
+
+
+
+##
 # Checks for client authentication method.
 ##
 
@@ -13328,90 +13412,6 @@ $as_echo "failed" >&6; }
   fi
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: $AUTH_METHOD" >&5
 $as_echo "$AUTH_METHOD" >&6; }
-
-
-##
-# Checks for library functions.
-##
-for ac_func in \
-  localtime_r \
-
-do :
-  as_ac_var=`$as_echo "ac_cv_func_$ac_func" | $as_tr_sh`
-ac_fn_c_check_func "$LINENO" "$ac_func" "$as_ac_var"
-if eval test \"x\$"$as_ac_var"\" = x"yes"; then :
-  cat >>confdefs.h <<_ACEOF
-#define `$as_echo "HAVE_$ac_func" | $as_tr_cpp` 1
-_ACEOF
-
-fi
-done
-
-ac_fn_c_check_func "$LINENO" "inet_ntop" "ac_cv_func_inet_ntop"
-if test "x$ac_cv_func_inet_ntop" = x""yes; then :
-  $as_echo "#define HAVE_INET_NTOP 1" >>confdefs.h
-
-else
-  case " $LIBOBJS " in
-  *" inet_ntop.$ac_objext "* ) ;;
-  *) LIBOBJS="$LIBOBJS inet_ntop.$ac_objext"
- ;;
-esac
-
-fi
-
-ac_fn_c_check_func "$LINENO" "strlcat" "ac_cv_func_strlcat"
-if test "x$ac_cv_func_strlcat" = x""yes; then :
-  $as_echo "#define HAVE_STRLCAT 1" >>confdefs.h
-
-else
-  case " $LIBOBJS " in
-  *" strlcat.$ac_objext "* ) ;;
-  *) LIBOBJS="$LIBOBJS strlcat.$ac_objext"
- ;;
-esac
-
-fi
-
-ac_fn_c_check_func "$LINENO" "strlcpy" "ac_cv_func_strlcpy"
-if test "x$ac_cv_func_strlcpy" = x""yes; then :
-  $as_echo "#define HAVE_STRLCPY 1" >>confdefs.h
-
-else
-  case " $LIBOBJS " in
-  *" strlcpy.$ac_objext "* ) ;;
-  *) LIBOBJS="$LIBOBJS strlcpy.$ac_objext"
- ;;
-esac
-
-fi
-
-
-
-##
-# Check for platform-specific issues.
-##
-
-  case "$host" in
-    *-*-aix*)
-      LDFLAGS="$LDFLAGS -Wl,-brtl"      # enable run-time linking
-      ;;
-    *)
-      ;;
-  esac
-
-
-
-  case "$host" in
-    *-*-darwin*)
-
-$as_echo "#define _APPLE_C_SOURCE 1" >>confdefs.h
-
-      ;;
-    *)
-      ;;
-  esac
-
 
 
 ##

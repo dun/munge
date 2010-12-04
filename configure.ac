@@ -113,11 +113,6 @@ AC_CHECK_TYPES(socklen_t, [], [], [#include <sys/types.h>
 #include <sys/socket.h>])
 
 ##
-# Checks for client authentication method.
-##
-X_AC_SELECT_AUTH_METHOD
-
-##
 # Checks for library functions.
 ##
 AC_CHECK_FUNCS( \
@@ -134,6 +129,11 @@ AC_REPLACE_FUNCS( \
 ##
 X_AC_AIX
 X_AC_DARWIN
+
+##
+# Checks for client authentication method.
+##
+X_AC_SELECT_AUTH_METHOD
 
 ##
 # Epilogue.
