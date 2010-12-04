@@ -126,6 +126,9 @@
 /* Define to 1 if the system has the type `struct xucred'. */
 #undef HAVE_STRUCT_XUCRED
 
+/* Define to 1 if you have the `sysconf' function. */
+#undef HAVE_SYSCONF
+
 /* Define to 1 if you have the <sys/stat.h> header file. */
 #undef HAVE_SYS_STAT_H
 

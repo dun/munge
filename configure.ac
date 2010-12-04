@@ -117,6 +117,7 @@ AC_CHECK_TYPES(socklen_t, [], [], [#include <sys/types.h>
 ##
 AC_CHECK_FUNCS( \
   localtime_r \
+  sysconf \
 )
 AC_REPLACE_FUNCS( \
   inet_ntop \
