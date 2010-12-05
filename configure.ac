@@ -127,7 +127,7 @@ AC_REPLACE_FUNCS( \
 X_AC_GETGRENT
 
 ##
-# Check for platform-specific issues.
+# Checks for platform-specific issues.
 ##
 X_AC_AIX
 X_AC_DARWIN
