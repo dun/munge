@@ -54,6 +54,18 @@
 /* Define to 1 if file descriptors can be passed over a fifo. */
 #undef HAVE_FIFO_RECVFD
 
+/* Define to 1 if you have the `getgrent' function. */
+#undef HAVE_GETGRENT
+
+/* Define to 1 if you have the `getgrent_r' function from AIX. */
+#undef HAVE_GETGRENT_R_AIX
+
+/* Define to 1 if you have the `getgrent_r' function from POSIX. */
+#undef HAVE_GETGRENT_R_POSIX
+
+/* Define to 1 if you have the `getgrent_r' function from Sun. */
+#undef HAVE_GETGRENT_R_SUN
+
 /* Define to 1 if you have the `getpeereid' function. */
 #undef HAVE_GETPEEREID
 

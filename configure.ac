@@ -124,6 +124,7 @@ AC_REPLACE_FUNCS( \
   strlcat \
   strlcpy \
 )
+X_AC_GETGRENT
 
 ##
 # Check for platform-specific issues.

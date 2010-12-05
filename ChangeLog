@@ -1,5 +1,7 @@
 2010-12-04  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* configure.ac, config/x_ac_getgrent.m4: Added X_AC_GETGRENT.
+
 	* configure.ac: Added autoconf check for sysconf().
 
 	* configure.ac: Moved X_AC_SELECT_AUTH_METHOD to end.
