@@ -1,3 +1,8 @@
+2010-12-14  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* config/x_ac_getgrent.m4: Renamed HAVE_GETGRENT_R_POSIX to
+	  HAVE_GETGRENT_R_GNU.
+
 2010-12-04  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* configure.ac: Fixed typo.

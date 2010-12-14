@@ -60,8 +60,8 @@
 /* Define to 1 if you have the `getgrent_r' function from AIX. */
 #undef HAVE_GETGRENT_R_AIX
 
-/* Define to 1 if you have the `getgrent_r' function from POSIX. */
-#undef HAVE_GETGRENT_R_POSIX
+/* Define to 1 if you have the `getgrent_r' function from GNU. */
+#undef HAVE_GETGRENT_R_GNU
 
 /* Define to 1 if you have the `getgrent_r' function from Sun. */
 #undef HAVE_GETGRENT_R_SUN

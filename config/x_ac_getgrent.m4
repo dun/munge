@@ -12,7 +12,7 @@
 #
 #  NOTES:
 #    The C "Werror" flag is enabled to treat compiler warnings as errors.
-#    This is needed since the getgrent_r() prototypes for AIX and POSIX differ
+#    This is needed since the getgrent_r() prototypes for AIX and GNU differ
 #    only in the pointer type of the 4th argument (which is reported as a
 #    compiler warning).
 #
@@ -24,7 +24,7 @@
 AC_DEFUN([X_AC_GETGRENT], [
   AC_CHECK_FUNCS(getgrent)
   _X_AC_GETGRENT_R_AIX
-  _X_AC_GETGRENT_R_POSIX
+  _X_AC_GETGRENT_R_GNU
   _X_AC_GETGRENT_R_SUN
 ])
 
@@ -59,11 +59,11 @@ rv = getgrent_r (&gr, gr_buf, sizeof (gr_buf), &gr_fp); ]]
   )]
 )
 
-AC_DEFUN([_X_AC_GETGRENT_R_POSIX], [
+AC_DEFUN([_X_AC_GETGRENT_R_GNU], [
   AC_CACHE_CHECK(
-    [for getgrent_r (POSIX)],
-    [x_ac_cv_have_getgrent_r_posix], [
-    _x_ac_getgrent_r_posix_c_werror_flag="$ac_c_werror_flag"
+    [for getgrent_r (GNU)],
+    [x_ac_cv_have_getgrent_r_gnu], [
+    _x_ac_getgrent_r_gnu_c_werror_flag="$ac_c_werror_flag"
     ac_c_werror_flag=yes
     AC_LINK_IFELSE([
       AC_LANG_PROGRAM([[
@@ -76,14 +76,14 @@ struct group gr, *gr_ptr;
 char gr_buf [1024];
 rv = getgrent_r (&gr, gr_buf, sizeof (gr_buf), &gr_ptr); ]]
       )],
-      AS_VAR_SET(x_ac_cv_have_getgrent_r_posix, yes),
-      AS_VAR_SET(x_ac_cv_have_getgrent_r_posix, no)
+      AS_VAR_SET(x_ac_cv_have_getgrent_r_gnu, yes),
+      AS_VAR_SET(x_ac_cv_have_getgrent_r_gnu, no)
     )
-    ac_c_werror_flag="$_x_ac_getgrent_r_posix_c_werror_flag"]
+    ac_c_werror_flag="$_x_ac_getgrent_r_gnu_c_werror_flag"]
   )
-  AS_IF([test AS_VAR_GET(x_ac_cv_have_getgrent_r_posix) = yes],
-    AC_DEFINE([HAVE_GETGRENT_R_POSIX], [1],
-      [Define to 1 if you have the `getgrent_r' function from POSIX.]
+  AS_IF([test AS_VAR_GET(x_ac_cv_have_getgrent_r_gnu) = yes],
+    AC_DEFINE([HAVE_GETGRENT_R_GNU], [1],
+      [Define to 1 if you have the `getgrent_r' function from GNU.]
     )
   )]
 )
