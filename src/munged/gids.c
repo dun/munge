@@ -37,7 +37,6 @@
 #include <sys/types.h>                  /* include before grp.h for bsd */
 #include <assert.h>
 #include <errno.h>
-#include <grp.h>
 #include <pthread.h>
 #include <pwd.h>
 #include <stdlib.h>
@@ -50,6 +49,7 @@
 #include "log.h"
 #include "munge_defs.h"
 #include "timer.h"
+#include "xgetgrent.h"
 
 
 /*****************************************************************************
@@ -369,7 +369,9 @@ _gids_hash_create (void)
     struct timeval  t_start;
     struct timeval  t_stop;
     int             do_group_db_close = 0;
-    struct group   *gr_ptr;
+    struct group    gr;
+    char           *gr_buf_ptr = NULL;
+    int             gr_buf_len;
     char          **user_p;
     uid_t           uid;
     int             n_users;
@@ -393,17 +395,16 @@ _gids_hash_create (void)
         log_msg (LOG_ERR, "Unable to query current time");
         goto err;
     }
-    setgrent ();
+    if (xgetgrent_buf_create (&gr_buf_ptr, &gr_buf_len) < 0) {
+        log_msg (LOG_ERR, "Unable to allocate group entry buffer");
+        goto err;
+    }
+    xgetgrent_init ();
     do_group_db_close = 1;
 
-    for (;;) {
-        errno = 0;
-        if (!(gr_ptr = getgrent ())) {
-            /*
-             *  In addition to returning NULL when there are no more entries,
-             *    glibc-2.2.5 sets errno to ENOENT.  Deal with it.
-             */
-            if ((errno == 0) || (errno == ENOENT))
+    while (1) {
+        if (xgetgrent (&gr, gr_buf_ptr, gr_buf_len) < 0) {
+            if (errno == ENOENT)
                 break;
             if (errno == EINTR)
                 continue;
@@ -414,15 +415,16 @@ _gids_hash_create (void)
         /*  gr_mem is a null-terminated array of pointers to the user names
          *    belonging to the group.
          */
-        for (user_p = gr_ptr->gr_mem; user_p && *user_p; user_p++) {
+        for (user_p = gr.gr_mem; user_p && *user_p; user_p++) {
             if ((_gids_user_to_uid (uid_hash, *user_p, &uid)) >= 0) {
-                if (_gids_hash_add (gid_hash, uid, gr_ptr->gr_gid) < 0) {
+                if (_gids_hash_add (gid_hash, uid, gr.gr_gid) < 0) {
                     goto err;
                 }
             }
         }
     }
-    endgrent ();
+    xgetgrent_fini ();
+    xgetgrent_buf_destroy (gr_buf_ptr);
 
     if (gettimeofday (&t_stop, NULL) < 0) {
         log_msg (LOG_ERR, "Unable to query current time");
@@ -446,12 +448,15 @@ _gids_hash_create (void)
 
 err:
     if (do_group_db_close) {
-        endgrent ();
+        xgetgrent_fini ();
     }
-    if (uid_hash) {
+    if (gr_buf_ptr != NULL) {
+        xgetgrent_buf_destroy (gr_buf_ptr);
+    }
+    if (uid_hash != NULL) {
         hash_destroy (uid_hash);
     }
-    if (gid_hash) {
+    if (gid_hash != NULL) {
         hash_destroy (gid_hash);
     }
     return (NULL);

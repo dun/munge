@@ -1,3 +1,11 @@
+2011-01-05  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/munged/gids.c (_gids_hash_create): Replaced calls to
+	  setgrent(), getgrent(), and endgrent() with xgetgrent_init(),
+	  xgetgrent(), and xgetgrent_fini().
+	* src/munged/xgetgrent.c, src/munged/xgetgrent.h: Added.
+	* src/munged/Makefile.am: Added xgetgrent.c and xgetgrent.h.
+
 2010-12-14  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* config/x_ac_getgrent.m4: Renamed HAVE_GETGRENT_R_POSIX to
