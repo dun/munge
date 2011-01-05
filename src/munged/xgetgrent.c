@@ -179,8 +179,8 @@ xgetgrent (struct group *gr, char *buf, size_t buflen)
 #elif HAVE_GETGRENT_R_SUN
     struct group           *gr_ptr;
 #elif HAVE_GETGRENT
-    static pthread_mutex_t  lock = PTHREAD_MUTEX_INITIALIZER;
-    int                     rv_lock;
+    static pthread_mutex_t  mutex = PTHREAD_MUTEX_INITIALIZER;
+    int                     rv_mutex;
     int                     rv_copy;
     struct group           *gr_ptr;
 #endif
@@ -223,8 +223,8 @@ xgetgrent (struct group *gr, char *buf, size_t buflen)
         }
     }
 #elif HAVE_GETGRENT
-    if ((rv_lock = pthread_mutex_lock (&lock)) != 0) {
-        errno = rv_lock;
+    if ((rv_mutex = pthread_mutex_lock (&mutex)) != 0) {
+        errno = rv_mutex;
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to lock xgetgrent mutex");
     }
     gr_ptr = getgrent ();
@@ -239,8 +239,8 @@ xgetgrent (struct group *gr, char *buf, size_t buflen)
     else {
         rv_copy = _xgetgrent_copy (gr_ptr, gr, buf, buflen);
     }
-    if ((rv_lock = pthread_mutex_unlock (&lock)) != 0) {
-        errno = rv_lock;
+    if ((rv_mutex = pthread_mutex_unlock (&mutex)) != 0) {
+        errno = rv_mutex;
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to unlock xgetgrent mutex");
     }
     if (rv_copy < 0) {

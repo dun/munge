@@ -1,5 +1,7 @@
 2011-01-05  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/munged/xgetgrent.c (xgetgrent): Renamed lock to mutex.
+
 	* src/munged/gids.c (_gids_hash_create): Replaced calls to
 	  setgrent(), getgrent(), and endgrent() with xgetgrent_init(),
 	  xgetgrent(), and xgetgrent_fini().
