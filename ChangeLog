@@ -1,5 +1,8 @@
 2011-01-05  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/munged/gids.c (_gids_hash_create): Tweaked test of return value
+	  from _gids_user_to_uid().
+
 	* src/munged/xgetgrent.c (xgetgrent): Renamed lock to mutex.
 
 	* src/munged/gids.c (_gids_hash_create): Replaced calls to

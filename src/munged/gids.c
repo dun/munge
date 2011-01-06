@@ -416,7 +416,7 @@ _gids_hash_create (void)
          *    belonging to the group.
          */
         for (user_p = gr.gr_mem; user_p && *user_p; user_p++) {
-            if ((_gids_user_to_uid (uid_hash, *user_p, &uid)) >= 0) {
+            if ((_gids_user_to_uid (uid_hash, *user_p, &uid)) == 0) {
                 if (_gids_hash_add (gid_hash, uid, gr.gr_gid) < 0) {
                     goto err;
                 }
