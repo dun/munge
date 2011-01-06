@@ -1,5 +1,7 @@
 2011-01-05  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/munged/gids.c: Updated note regarding use of getpwnam / getgrent.
+
 	* src/munged/gids.c (_gids_hash_create): Tweaked test of return value
 	  from _gids_user_to_uid().
 

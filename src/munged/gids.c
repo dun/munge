@@ -60,9 +60,12 @@
  *    gids_nodes for each UID with supplementary groups.  The GIDs in each
  *    list of gids_nodes are sorted in increasing order without duplicates.
  *
- *  The non-reentrant passwd/group functions are not an issue since this
- *    routine is the only place where they are used within the daemon.  There
- *    will never be multiple instances of gids_create() running concurrently.
+ *  The use of non-reentrant passwd/group functions (ie, getpwnam & getgrent)
+ *    should be ok here since they are only called in/from _gids_hash_create(),
+ *    and only one instance of that routine can be running at a time within
+ *    munged.  However, crashes have been traced to the use of getgrent() here
+ *    (cf, <http://code.google.com/p/munge/issues/detail?id=2>) so the
+ *    reentrant functions are now used.
  */
 
 
