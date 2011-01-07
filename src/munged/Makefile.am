@@ -40,6 +40,7 @@ sbin_PROGRAMS = \
 	munged
 
 munged_CFLAGS = \
+	$(AM_CFLAGS) \
 	-DWITH_PTHREADS \
 	$(CRYPTO_CFLAGS)
 

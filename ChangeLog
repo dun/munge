@@ -1,3 +1,10 @@
+2011-01-06  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* config/x_ac_debug.m4: Instead of modifying CFLAGS, set DEBUGCFLAGS
+	  and passed it via AM_CFLAGS.  Also fixed NDEBUG to ensure it is not
+	  defined when --enable-debug is set.
+	* src/munged/Makefile.am: Added AM_CFLAGS to munged_CFLAGS.
+
 2010-11-05  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/munged/auth_recv.c: Tweaked whitespace.
