@@ -1,3 +1,7 @@
+2011-01-09  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/munged/xgetgrent.c (xgetgrent_buf_destroy): Fixed comment.
+
 2011-01-05  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/munged/gids.c: Updated note regarding use of getpwnam / getgrent.

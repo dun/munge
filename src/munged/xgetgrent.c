@@ -129,7 +129,6 @@ void
 xgetgrent_buf_destroy (char *buf)
 {
 /*  Destroys the buffer [buf].
- *  Returns 0 on success, or -1 on error (with errno).
  */
     if (buf != NULL) {
         free (buf);
