@@ -125,6 +125,7 @@ AC_REPLACE_FUNCS( \
   strlcpy \
 )
 X_AC_GETGRENT
+X_AC_GETPWNAM
 
 ##
 # Checks for platform-specific issues.

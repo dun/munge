@@ -13241,6 +13241,162 @@ fi
 
 
 
+  for ac_func in getpwnam
+do :
+  ac_fn_c_check_func "$LINENO" "getpwnam" "ac_cv_func_getpwnam"
+if test "x$ac_cv_func_getpwnam" = x""yes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_GETPWNAM 1
+_ACEOF
+
+fi
+done
+
+
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for getpwnam_r (AIX)" >&5
+$as_echo_n "checking for getpwnam_r (AIX)... " >&6; }
+if test "${x_ac_cv_have_getpwnam_r_aix+set}" = set; then :
+  $as_echo_n "(cached) " >&6
+else
+
+    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+
+#undef _ALL_SOURCE                      /* for overriding POSIX getpwnam_r */
+#define _THREAD_SAFE 1
+#define _XOPEN_SOURCE_EXTENDED 1
+#include <pwd.h>
+
+int
+main ()
+{
+
+int rv;
+char *user;
+struct passwd pw;
+char pw_buf [1024];
+rv = getpwnam_r (user, &pw, pw_buf, sizeof (pw_buf));
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  x_ac_cv_have_getpwnam_r_aix=yes
+else
+  x_ac_cv_have_getpwnam_r_aix=no
+
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $x_ac_cv_have_getpwnam_r_aix" >&5
+$as_echo "$x_ac_cv_have_getpwnam_r_aix" >&6; }
+  if test $x_ac_cv_have_getpwnam_r_aix = yes; then :
+
+$as_echo "#define HAVE_GETPWNAM_R_AIX 1" >>confdefs.h
+
+
+fi
+
+
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for getpwnam_r (POSIX)" >&5
+$as_echo_n "checking for getpwnam_r (POSIX)... " >&6; }
+if test "${x_ac_cv_have_getpwnam_r_posix+set}" = set; then :
+  $as_echo_n "(cached) " >&6
+else
+
+    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+
+#define _POSIX_C_SOURCE 1               /* for Linux */
+#define _POSIX_PTHREAD_SEMANTICS 1      /* for SunOS */
+#include <pwd.h>
+
+int
+main ()
+{
+
+int rv;
+char *user;
+struct passwd pw, *pw_ptr;
+char pw_buf [1024];
+rv = getpwnam_r (user, &pw, pw_buf, sizeof (pw_buf), &pw_ptr);
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  x_ac_cv_have_getpwnam_r_posix=yes
+else
+  x_ac_cv_have_getpwnam_r_posix=no
+
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $x_ac_cv_have_getpwnam_r_posix" >&5
+$as_echo "$x_ac_cv_have_getpwnam_r_posix" >&6; }
+  if test $x_ac_cv_have_getpwnam_r_posix = yes; then :
+
+$as_echo "#define HAVE_GETPWNAM_R_POSIX 1" >>confdefs.h
+
+
+fi
+
+
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for getpwnam_r (Sun)" >&5
+$as_echo_n "checking for getpwnam_r (Sun)... " >&6; }
+if test "${x_ac_cv_have_getpwnam_r_sun+set}" = set; then :
+  $as_echo_n "(cached) " >&6
+else
+
+    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+
+#undef _POSIX_PTHREAD_SEMANTICS         /* for overriding POSIX getpwnam_r */
+#include <pwd.h>
+
+int
+main ()
+{
+
+char *user;
+struct passwd pw, *pw_ptr;
+char pw_buf [1024];
+pw_ptr = getpwnam_r (user, &pw, pw_buf, sizeof (pw_buf));
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  x_ac_cv_have_getpwnam_r_sun=yes
+else
+  x_ac_cv_have_getpwnam_r_sun=no
+
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $x_ac_cv_have_getpwnam_r_sun" >&5
+$as_echo "$x_ac_cv_have_getpwnam_r_sun" >&6; }
+  if test $x_ac_cv_have_getpwnam_r_sun = yes; then :
+
+$as_echo "#define HAVE_GETPWNAM_R_SUN 1" >>confdefs.h
+
+
+fi
+
+
+
 ##
 # Checks for platform-specific issues.
 ##

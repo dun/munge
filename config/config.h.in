@@ -72,6 +72,18 @@
 /* Define to 1 if you have the `getpeerucred' function. */
 #undef HAVE_GETPEERUCRED
 
+/* Define to 1 if you have the `getpwnam' function. */
+#undef HAVE_GETPWNAM
+
+/* Define to 1 if you have the `getpwnam_r' function from AIX. */
+#undef HAVE_GETPWNAM_R_AIX
+
+/* Define to 1 if you have the `getpwnam_r' function from POSIX. */
+#undef HAVE_GETPWNAM_R_POSIX
+
+/* Define to 1 if you have the `getpwnam_r' function from Sun. */
+#undef HAVE_GETPWNAM_R_SUN
+
 /* Define to 1 if you have the `HMAC_Init_ex' function. */
 #undef HAVE_HMAC_INIT_EX
 
