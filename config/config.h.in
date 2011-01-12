@@ -63,7 +63,7 @@
 /* Define to 1 if you have the `getgrent_r' function from GNU. */
 #undef HAVE_GETGRENT_R_GNU
 
-/* Define to 1 if you have the `getgrent_r' function from Sun. */
+/* Define to 1 if you have the `getgrent_r' function from SunOS. */
 #undef HAVE_GETGRENT_R_SUN
 
 /* Define to 1 if you have the `getpeereid' function. */
@@ -81,7 +81,7 @@
 /* Define to 1 if you have the `getpwnam_r' function from POSIX. */
 #undef HAVE_GETPWNAM_R_POSIX
 
-/* Define to 1 if you have the `getpwnam_r' function from Sun. */
+/* Define to 1 if you have the `getpwnam_r' function from SunOS. */
 #undef HAVE_GETPWNAM_R_SUN
 
 /* Define to 1 if you have the `HMAC_Init_ex' function. */

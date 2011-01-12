@@ -90,7 +90,7 @@ rv = getgrent_r (&gr, gr_buf, sizeof (gr_buf), &gr_ptr); ]]
 
 AC_DEFUN([_X_AC_GETGRENT_R_SUN], [
   AC_CACHE_CHECK(
-    [for getgrent_r (Sun)],
+    [for getgrent_r (SunOS)],
     [x_ac_cv_have_getgrent_r_sun], [
     _x_ac_getgrent_r_sun_c_werror_flag="$ac_c_werror_flag"
     ac_c_werror_flag=yes
@@ -110,7 +110,7 @@ gr_ptr = getgrent_r (&gr, gr_buf, sizeof (gr_buf)); ]]
   )
   AS_IF([test AS_VAR_GET(x_ac_cv_have_getgrent_r_sun) = yes],
     AC_DEFINE([HAVE_GETGRENT_R_SUN], [1],
-      [Define to 1 if you have the `getgrent_r' function from Sun.]
+      [Define to 1 if you have the `getgrent_r' function from SunOS.]
     )
   )]
 )

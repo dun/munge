@@ -77,7 +77,7 @@ rv = getpwnam_r (user, &pw, pw_buf, sizeof (pw_buf), &pw_ptr); ]]
 
 AC_DEFUN([_X_AC_GETPWNAM_R_SUN], [
   AC_CACHE_CHECK(
-    [for getpwnam_r (Sun)],
+    [for getpwnam_r (SunOS)],
     [x_ac_cv_have_getpwnam_r_sun], [
     AC_LINK_IFELSE([
       AC_LANG_PROGRAM([[
@@ -96,7 +96,7 @@ pw_ptr = getpwnam_r (user, &pw, pw_buf, sizeof (pw_buf)); ]]
   )
   AS_IF([test AS_VAR_GET(x_ac_cv_have_getpwnam_r_sun) = yes],
     AC_DEFINE([HAVE_GETPWNAM_R_SUN], [1],
-      [Define to 1 if you have the `getpwnam_r' function from Sun.]
+      [Define to 1 if you have the `getpwnam_r' function from SunOS.]
     )
   )]
 )

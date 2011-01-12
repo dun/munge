@@ -13193,8 +13193,8 @@ $as_echo "#define HAVE_GETGRENT_R_GNU 1" >>confdefs.h
 fi
 
 
-  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for getgrent_r (Sun)" >&5
-$as_echo_n "checking for getgrent_r (Sun)... " >&6; }
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for getgrent_r (SunOS)" >&5
+$as_echo_n "checking for getgrent_r (SunOS)... " >&6; }
 if test "${x_ac_cv_have_getgrent_r_sun+set}" = set; then :
   $as_echo_n "(cached) " >&6
 else
@@ -13350,8 +13350,8 @@ $as_echo "#define HAVE_GETPWNAM_R_POSIX 1" >>confdefs.h
 fi
 
 
-  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for getpwnam_r (Sun)" >&5
-$as_echo_n "checking for getpwnam_r (Sun)... " >&6; }
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for getpwnam_r (SunOS)" >&5
+$as_echo_n "checking for getpwnam_r (SunOS)... " >&6; }
 if test "${x_ac_cv_have_getpwnam_r_sun+set}" = set; then :
   $as_echo_n "(cached) " >&6
 else
