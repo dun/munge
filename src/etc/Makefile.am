@@ -38,10 +38,10 @@ install-data-local:
 	expr "`id`" : 'uid=0(' >/dev/null && OWNER="-o daemon" || OWNER=""; \
 	$(INSTALL) -m 0755 -d "$(DESTDIR)$(sysconfdir)/init.d"; \
 	new=""; test ! -f "$(DESTDIR)$(sysconfdir)/init.d/munge" \
-	  || cmp "$(srcdir)/munge.init" \
+	  || cmp "$(builddir)/munge.init" \
 	    "$(DESTDIR)$(sysconfdir)/init.d/munge" \
 	  1>/dev/null 2>&1 || new=".new"; \
-	$(INSTALL) -m 0755 "$(srcdir)/munge.init" \
+	$(INSTALL) -m 0755 "$(builddir)/munge.init" \
 	  "$(DESTDIR)$(sysconfdir)/init.d/munge$${new}"; \
 	test -d "/etc/sysconfig" && d="sysconfig" || d="default"; \
 	new=""; test ! -f "$(DESTDIR)$(sysconfdir)/$${d}/munge" \
