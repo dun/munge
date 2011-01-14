@@ -32,11 +32,11 @@
 #  include "config.h"
 #endif /* HAVE_CONFIG_H */
 
-#if   HAVE_GETGRENT_R_AIX
+#if   HAVE_GETGRENT_R_GNU
+#define _GNU_SOURCE 1
+#elif HAVE_GETGRENT_R_AIX
 #define _THREAD_SAFE 1
 #include <stdio.h>
-#elif HAVE_GETGRENT_R_GNU
-#define _GNU_SOURCE 1
 #elif HAVE_GETGRENT_R_SUN
 #elif HAVE_GETGRENT
 #include <pthread.h>
@@ -170,11 +170,11 @@ xgetgrent (struct group *gr, char *buf, size_t buflen)
  *  Returns 0 on success, or -1 on error (with errno).
  *    Returns -1 with ENOENT when there are no more entries.
  */
-#if   HAVE_GETGRENT_R_AIX
-    int                     rv;
-#elif HAVE_GETGRENT_R_GNU
+#if   HAVE_GETGRENT_R_GNU
     int                     rv;
     struct group           *gr_ptr;
+#elif HAVE_GETGRENT_R_AIX
+    int                     rv;
 #elif HAVE_GETGRENT_R_SUN
     struct group           *gr_ptr;
 #elif HAVE_GETGRENT
@@ -192,7 +192,16 @@ xgetgrent (struct group *gr, char *buf, size_t buflen)
     }
     errno = 0;
 
-#if   HAVE_GETGRENT_R_AIX
+#if   HAVE_GETGRENT_R_GNU
+    rv = getgrent_r (gr, buf, buflen, &gr_ptr);
+    if (rv == ENOENT) {
+        got_eof = 1;
+    }
+    else if (rv != 0) {
+        got_err = 1;
+        errno = rv;
+    }
+#elif HAVE_GETGRENT_R_AIX
     rv = getgrent_r (gr, buf, buflen, &_gr_fp);
     if (rv != 0) {
         if (errno == 0) {
@@ -201,15 +210,6 @@ xgetgrent (struct group *gr, char *buf, size_t buflen)
         else {
             got_err = 1;
         }
-    }
-#elif HAVE_GETGRENT_R_GNU
-    rv = getgrent_r (gr, buf, buflen, &gr_ptr);
-    if (rv == ENOENT) {
-        got_eof = 1;
-    }
-    else if (rv != 0) {
-        got_err = 1;
-        errno = rv;
     }
 #elif HAVE_GETGRENT_R_SUN
     gr_ptr = getgrent_r (gr, buf, buflen);

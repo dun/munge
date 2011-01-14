@@ -1,5 +1,7 @@
 2011-01-13  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/munged/xgetgrent.c: Moved HAVE_GETGRENT_R_GNU #if-block to top.
+
 	* config/x_ac_getpwnam.m4: Removed _POSIX_C_SOURCE def.
 
 2011-01-11  Chris Dunlap  <cdunlap@llnl.gov>
