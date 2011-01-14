@@ -87,7 +87,7 @@ static FILE *_gr_fp;
 
 static int _xgetgrent_get_buf_size (void);
 
-static int _xgetgrent_copy (struct group *src, struct group *dst,
+static int _xgetgrent_copy (const struct group *src, struct group *dst,
     char *buf, size_t buflen) _UNUSED_;
 
 static int _xgetgrent_copy_str (const char *src, char **dst_p,
@@ -287,7 +287,7 @@ _xgetgrent_get_buf_size (void)
 
 
 static int
-_xgetgrent_copy (struct group *src, struct group *dst,
+_xgetgrent_copy (const struct group *src, struct group *dst,
                  char *buf, size_t buflen)
 {
 /*  Copies the group entry [src] into [dst], placing additional strings
