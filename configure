@@ -13312,7 +13312,6 @@ else
 /* end confdefs.h.  */
 
 
-#define _POSIX_C_SOURCE 1               /* for Linux */
 #define _POSIX_PTHREAD_SEMANTICS 1      /* for SunOS */
 #include <pwd.h>
 

@@ -1,3 +1,7 @@
+2011-01-13  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* config/x_ac_getpwnam.m4: Removed _POSIX_C_SOURCE def.
+
 2011-01-11  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* config/x_ac_getgrent.m4, config/x_ac_getpwnam.m4:

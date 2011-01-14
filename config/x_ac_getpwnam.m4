@@ -53,7 +53,6 @@ AC_DEFUN([_X_AC_GETPWNAM_R_POSIX], [
     [x_ac_cv_have_getpwnam_r_posix], [
     AC_LINK_IFELSE([
       AC_LANG_PROGRAM([[
-#define _POSIX_C_SOURCE 1               /* for Linux */
 #define _POSIX_PTHREAD_SEMANTICS 1      /* for SunOS */
 #include <pwd.h>
 ]],
