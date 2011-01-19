@@ -1,3 +1,8 @@
+2011-01-18  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/munged/xgetgrent.c (_xgetgrent_copy_str): Fixed assert that
+	  dereferenced uninitialized memory.
+
 2011-01-13  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/munged/xgetgrent.c (_xgetgrent_copy): Made "src" parm const.

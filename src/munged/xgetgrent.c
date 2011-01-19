@@ -357,7 +357,6 @@ _xgetgrent_copy_str (const char *src, char **dst_p,
     size_t n;
 
     assert (dst_p != NULL);
-    assert (*dst_p != NULL);
     assert (buf_p != NULL);
     assert (*buf_p != NULL);
     assert (buflen_p != NULL);
