@@ -26,6 +26,7 @@ AC_DEFUN([_X_AC_GETPWNAM_R_AIX], [
       AC_LANG_PROGRAM([[
 #undef _ALL_SOURCE                      /* for overriding POSIX getpwnam_r */
 #define _THREAD_SAFE 1
+#define _UNIX95 1
 #define _XOPEN_SOURCE_EXTENDED 1
 #include <pwd.h>
 ]],

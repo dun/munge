@@ -1,3 +1,7 @@
+2011-01-19  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* config/x_ac_getpwnam.m4: Added _UNIX95 def for _X_AC_GETPWNAM_R_AIX.
+
 2011-01-18  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/munged/xgetgrent.c (_xgetgrent_copy_str): Fixed assert that
