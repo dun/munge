@@ -93,6 +93,8 @@ munged_SOURCES = \
 	work.h \
 	xgetgrent.c \
 	xgetgrent.h \
+	xgetpwnam.c \
+	xgetpwnam.h \
 	zip.c \
 	zip.h \
 	munged.c

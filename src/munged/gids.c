@@ -38,7 +38,6 @@
 #include <assert.h>
 #include <errno.h>
 #include <pthread.h>
-#include <pwd.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
@@ -50,6 +49,7 @@
 #include "munge_defs.h"
 #include "timer.h"
 #include "xgetgrent.h"
+#include "xgetpwnam.h"
 
 
 /*****************************************************************************
@@ -117,8 +117,8 @@ typedef struct gids_uid  * gids_uid_t;
 
 static void         _gids_update (gids_t gids);
 static hash_t       _gids_hash_create (void);
-static int          _gids_user_to_uid (
-                        hash_t uid_hash, char *user, uid_t *uid_p);
+static int          _gids_user_to_uid (hash_t uid_hash,
+                        char *user, uid_t *uid_p, char *buf, size_t buflen);
 static int          _gids_hash_add (hash_t hash, uid_t uid, gid_t gid);
 static gids_gid_t   _gids_head_alloc (uid_t uid);
 static void         _gids_head_del (gids_gid_t g);
@@ -375,6 +375,8 @@ _gids_hash_create (void)
     struct group    gr;
     char           *gr_buf_ptr = NULL;
     int             gr_buf_len;
+    char           *pw_buf_ptr = NULL;
+    int             pw_buf_len;
     char          **user_p;
     uid_t           uid;
     int             n_users;
@@ -402,6 +404,10 @@ _gids_hash_create (void)
         log_msg (LOG_ERR, "Unable to allocate group entry buffer");
         goto err;
     }
+    if (xgetpwnam_buf_create (&pw_buf_ptr, &pw_buf_len) < 0) {
+        log_msg (LOG_ERR, "Unable to allocate password entry buffer");
+        goto err;
+    }
     xgetgrent_init ();
     do_group_db_close = 1;
 
@@ -419,7 +425,9 @@ _gids_hash_create (void)
          *    belonging to the group.
          */
         for (user_p = gr.gr_mem; user_p && *user_p; user_p++) {
-            if ((_gids_user_to_uid (uid_hash, *user_p, &uid)) == 0) {
+            int rv = _gids_user_to_uid (uid_hash, *user_p, &uid,
+                    pw_buf_ptr, pw_buf_len);
+            if (rv == 0) {
                 if (_gids_hash_add (gid_hash, uid, gr.gr_gid) < 0) {
                     goto err;
                 }
@@ -453,6 +461,9 @@ err:
     if (do_group_db_close) {
         xgetgrent_fini ();
     }
+    if (pw_buf_ptr != NULL) {
+        xgetpwnam_buf_destroy (pw_buf_ptr);
+    }
     if (gr_buf_ptr != NULL) {
         xgetgrent_buf_destroy (gr_buf_ptr);
     }
@@ -467,20 +478,21 @@ err:
 
 
 static int
-_gids_user_to_uid (hash_t uid_hash, char *user, uid_t *uid_p)
+_gids_user_to_uid (hash_t uid_hash, char *user, uid_t *uid_p,
+                   char *buf, size_t buflen)
 {
 /*  Returns 0 on success, setting [*uid_p] (if non-NULL) to the UID associated
  *    with [user]; o/w, returns -1.
  */
     gids_uid_t     u;
     uid_t          uid;
-    struct passwd *pw_ptr;
+    struct passwd  pw;
 
     if ((u = hash_find (uid_hash, user))) {
         uid = u->uid;
     }
-    else if ((pw_ptr = getpwnam (user))) {
-        uid = pw_ptr->pw_uid;
+    else if (xgetpwnam (user, &pw, buf, buflen) == 0) {
+        uid = pw.pw_uid;
         if (!(u = _gids_uid_alloc (user, uid))) {
             log_msg (LOG_WARNING,
                 "Unable to allocate uid node for %s/%d -- out of memory",
