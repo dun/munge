@@ -1,3 +1,7 @@
+2011-01-20  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/munged/gids.c: Renamed GIDS_DEBUG to _GIDS_DEBUG.
+
 2011-01-19  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* : Updated copyright date range.

@@ -73,9 +73,9 @@
  *  Constants
  *****************************************************************************/
 
-#ifndef GIDS_DEBUG
-#  define GIDS_DEBUG            0
-#endif /* !GIDS_DEBUG */
+#ifndef _GIDS_DEBUG
+#define _GIDS_DEBUG 0
+#endif /* !_GIDS_DEBUG */
 
 
 /*****************************************************************************
@@ -129,12 +129,12 @@ static gids_uid_t   _gids_uid_alloc (char *user, uid_t uid);
 static int          _gids_uid_cmp (char *user1, char *user2);
 static void         _gids_uid_del (gids_uid_t u);
 
-#if GIDS_DEBUG
+#if _GIDS_DEBUG
 static void _gids_dump_gid_hash (hash_t gid_hash);
 static void _gids_dump_gid_node (gids_gid_t g, uid_t *uid_p, void *null);
 static void _gids_dump_uid_hash (hash_t uid_hash);
 static void _gids_dump_uid_node (gids_uid_t u, char *user, void *null);
-#endif /* GIDS_DEBUG */
+#endif /* _GIDS_DEBUG */
 
 
 /*****************************************************************************
@@ -442,10 +442,10 @@ _gids_hash_create (void)
         goto err;
     }
 
-#if GIDS_DEBUG
+#if _GIDS_DEBUG
     _gids_dump_uid_hash (uid_hash);
     _gids_dump_gid_hash (gid_hash);
-#endif /* GIDS_DEBUG */
+#endif /* _GIDS_DEBUG */
 
     n_users = hash_count (gid_hash);
     n_seconds = (t_stop.tv_sec - t_start.tv_sec)
@@ -681,7 +681,7 @@ _gids_uid_del (gids_uid_t u)
  *  Debug Functions
  *****************************************************************************/
 
-#if GIDS_DEBUG
+#if _GIDS_DEBUG
 
 static void
 _gids_dump_gid_hash (hash_t gid_hash)
@@ -732,4 +732,4 @@ _gids_dump_uid_node (gids_uid_t u, char *user, void *null)
     return;
 }
 
-#endif /* GIDS_DEBUG */
+#endif /* _GIDS_DEBUG */
