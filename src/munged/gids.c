@@ -83,7 +83,7 @@
  *****************************************************************************/
 
 struct gids {
-    pthread_mutex_t     lock;           /* mutex for accessing struct        */
+    pthread_mutex_t     mutex;          /* mutex for accessing struct        */
     hash_t              hash;           /* hash of GIDs mappings             */
     int                 timer;          /* timer ID for next GIDs map update */
     int                 interval;       /* seconds between GIDs map updates  */
@@ -156,7 +156,7 @@ gids_create (int interval, int do_group_stat)
         log_errno (EMUNGE_NO_MEMORY, LOG_ERR,
             "Unable to allocate gids struct");
     }
-    if ((errno = pthread_mutex_init (&gids->lock, NULL)) != 0) {
+    if ((errno = pthread_mutex_init (&gids->mutex, NULL)) != 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to init gids mutex");
     }
     gids->hash = NULL;
@@ -189,7 +189,7 @@ gids_destroy (gids_t gids)
     if (!gids) {
         return;
     }
-    if ((errno = pthread_mutex_lock (&gids->lock)) != 0) {
+    if ((errno = pthread_mutex_lock (&gids->mutex)) != 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to lock gids mutex");
     }
     if (gids->timer > 0) {
@@ -199,12 +199,12 @@ gids_destroy (gids_t gids)
     h = gids->hash;
     gids->hash = NULL;
 
-    if ((errno = pthread_mutex_unlock (&gids->lock)) != 0) {
+    if ((errno = pthread_mutex_unlock (&gids->mutex)) != 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to unlock gids mutex");
     }
     hash_destroy (h);
 
-    if ((errno = pthread_mutex_destroy (&gids->lock)) != 0) {
+    if ((errno = pthread_mutex_destroy (&gids->mutex)) != 0) {
         log_msg (LOG_ERR, "Unable to destroy gids mutex: %s",
             strerror (errno));
     }
@@ -219,7 +219,7 @@ gids_update (gids_t gids)
     if (!gids) {
         return;
     }
-    if ((errno = pthread_mutex_lock (&gids->lock)) != 0) {
+    if ((errno = pthread_mutex_lock (&gids->mutex)) != 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to lock gids mutex");
     }
     /*  Cancel a pending update before scheduling a new one.
@@ -238,7 +238,7 @@ gids_update (gids_t gids)
      */
     gids->do_group_stat = !! gids->do_group_stat;
 
-    if ((errno = pthread_mutex_unlock (&gids->lock)) != 0) {
+    if ((errno = pthread_mutex_unlock (&gids->mutex)) != 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to unlock gids mutex");
     }
     return;
@@ -255,7 +255,7 @@ gids_is_member (gids_t gids, uid_t uid, gid_t gid)
     if (!gids) {
         return (0);
     }
-    if ((errno = pthread_mutex_lock (&gids->lock)) != 0) {
+    if ((errno = pthread_mutex_lock (&gids->mutex)) != 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to lock gids mutex");
     }
     if ((gids->hash) && (g = hash_find (gids->hash, &uid))) {
@@ -267,7 +267,7 @@ gids_is_member (gids_t gids, uid_t uid, gid_t gid)
             }
         }
     }
-    if ((errno = pthread_mutex_unlock (&gids->lock)) != 0) {
+    if ((errno = pthread_mutex_unlock (&gids->mutex)) != 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to unlock gids mutex");
     }
     return (is_member);
@@ -291,13 +291,13 @@ _gids_update (gids_t gids)
 
     assert (gids != NULL);
 
-    if ((errno = pthread_mutex_lock (&gids->lock)) != 0) {
+    if ((errno = pthread_mutex_lock (&gids->mutex)) != 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to lock gids mutex");
     }
     do_group_stat = gids->do_group_stat;
     t_last_update = gids->t_last_update;
 
-    if ((errno = pthread_mutex_unlock (&gids->lock)) != 0) {
+    if ((errno = pthread_mutex_unlock (&gids->mutex)) != 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to unlock gids mutex");
     }
     if (time (&t_now) == (time_t) -1) {
@@ -323,7 +323,7 @@ _gids_update (gids_t gids)
     if (do_update) {
         hash = _gids_hash_create ();
     }
-    if ((errno = pthread_mutex_lock (&gids->lock)) != 0) {
+    if ((errno = pthread_mutex_lock (&gids->mutex)) != 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to lock gids mutex");
     }
     /*  Replace the old GIDS mapping if the update was successful.
@@ -350,7 +350,7 @@ _gids_update (gids_t gids)
                 "Unable to reset gids update timer");
         }
     }
-    if ((errno = pthread_mutex_unlock (&gids->lock)) != 0) {
+    if ((errno = pthread_mutex_unlock (&gids->mutex)) != 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to unlock gids mutex");
     }
     /*  Clean up.
