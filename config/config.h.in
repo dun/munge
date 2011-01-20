@@ -54,11 +54,35 @@
 /* Define to 1 if file descriptors can be passed over a fifo. */
 #undef HAVE_FIFO_RECVFD
 
+/* Define to 1 if you have the `getgrent' function. */
+#undef HAVE_GETGRENT
+
+/* Define to 1 if you have the `getgrent_r' function from AIX. */
+#undef HAVE_GETGRENT_R_AIX
+
+/* Define to 1 if you have the `getgrent_r' function from GNU. */
+#undef HAVE_GETGRENT_R_GNU
+
+/* Define to 1 if you have the `getgrent_r' function from SunOS. */
+#undef HAVE_GETGRENT_R_SUN
+
 /* Define to 1 if you have the `getpeereid' function. */
 #undef HAVE_GETPEEREID
 
 /* Define to 1 if you have the `getpeerucred' function. */
 #undef HAVE_GETPEERUCRED
+
+/* Define to 1 if you have the `getpwnam' function. */
+#undef HAVE_GETPWNAM
+
+/* Define to 1 if you have the `getpwnam_r' function from AIX. */
+#undef HAVE_GETPWNAM_R_AIX
+
+/* Define to 1 if you have the `getpwnam_r' function from POSIX. */
+#undef HAVE_GETPWNAM_R_POSIX
+
+/* Define to 1 if you have the `getpwnam_r' function from SunOS. */
+#undef HAVE_GETPWNAM_R_SUN
 
 /* Define to 1 if you have the `HMAC_Init_ex' function. */
 #undef HAVE_HMAC_INIT_EX
@@ -125,6 +149,9 @@
 
 /* Define to 1 if the system has the type `struct xucred'. */
 #undef HAVE_STRUCT_XUCRED
+
+/* Define to 1 if you have the `sysconf' function. */
+#undef HAVE_SYSCONF
 
 /* Define to 1 if you have the <sys/stat.h> header file. */
 #undef HAVE_SYS_STAT_H

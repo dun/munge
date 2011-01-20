@@ -37,9 +37,7 @@
 #include <sys/types.h>                  /* include before grp.h for bsd */
 #include <assert.h>
 #include <errno.h>
-#include <grp.h>
 #include <pthread.h>
-#include <pwd.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
@@ -50,6 +48,8 @@
 #include "log.h"
 #include "munge_defs.h"
 #include "timer.h"
+#include "xgetgrent.h"
+#include "xgetpwnam.h"
 
 
 /*****************************************************************************
@@ -60,9 +60,12 @@
  *    gids_nodes for each UID with supplementary groups.  The GIDs in each
  *    list of gids_nodes are sorted in increasing order without duplicates.
  *
- *  The non-reentrant passwd/group functions are not an issue since this
- *    routine is the only place where they are used within the daemon.  There
- *    will never be multiple instances of gids_create() running concurrently.
+ *  The use of non-reentrant passwd/group functions (ie, getpwnam & getgrent)
+ *    should be ok here since they are only called in/from _gids_hash_create(),
+ *    and only one instance of that routine can be running at a time within
+ *    munged.  However, crashes have been traced to the use of getgrent() here
+ *    (cf, <http://code.google.com/p/munge/issues/detail?id=2>) so the
+ *    reentrant functions are now used.
  */
 
 
@@ -85,6 +88,7 @@ struct gids {
     int                 timer;          /* timer ID for next GIDs map update */
     int                 interval;       /* seconds between GIDs map updates  */
     int                 do_group_stat;  /* true if updates stat group file   */
+    time_t              t_last_update;  /* time of last good GIDs map update */
 };
 
 struct gids_node {
@@ -113,8 +117,8 @@ typedef struct gids_uid  * gids_uid_t;
 
 static void         _gids_update (gids_t gids);
 static hash_t       _gids_hash_create (void);
-static int          _gids_user_to_uid (
-                        hash_t uid_hash, char *user, uid_t *uid_p);
+static int          _gids_user_to_uid (hash_t uid_hash,
+                        char *user, uid_t *uid_p, char *buf, size_t buflen);
 static int          _gids_hash_add (hash_t hash, uid_t uid, gid_t gid);
 static gids_gid_t   _gids_head_alloc (uid_t uid);
 static void         _gids_head_del (gids_gid_t g);
@@ -159,9 +163,10 @@ gids_create (int interval, int do_group_stat)
     gids->timer = 0;
     gids->interval = interval;
     gids->do_group_stat = do_group_stat;
+    gids->t_last_update = 0;
     gids_update (gids);
 
-    if (gids->interval == 0) {
+    if (interval == 0) {
         log_msg (LOG_INFO, "Disabled updates to supplementary group mapping");
     }
     else {
@@ -277,40 +282,44 @@ static void
 _gids_update (gids_t gids)
 {
 /*  Updates the GIDs mapping [gids] if needed.
- *
- *  The use of a static t_last_update here is groovy since there will
- *    never be multiple instances of this routine running concurrently.
- *    Placing t_last_update within the gids struct would potentially
- *    require locking the struct twice per function invocation: once
- *    for the stat and once for the update.
  */
-    static time_t   t_last_update = 0;
+    int             do_group_stat;
+    time_t          t_last_update;
     time_t          t_now;
-    struct stat     st;
     int             do_update = 1;
-    hash_t          hash;
+    hash_t          hash = NULL;
 
     assert (gids != NULL);
 
+    if ((errno = pthread_mutex_lock (&gids->lock)) != 0) {
+        log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to lock gids mutex");
+    }
+    do_group_stat = gids->do_group_stat;
+    t_last_update = gids->t_last_update;
+
+    if ((errno = pthread_mutex_unlock (&gids->lock)) != 0) {
+        log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to unlock gids mutex");
+    }
     if (time (&t_now) == (time_t) -1) {
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to query current time");
     }
-    if (gids->do_group_stat > 0) {
+    if (do_group_stat > 0) {
+
+        struct stat  st;
+
+        /*  On stat() error, disable future stat()s until reset via SIGHUP.
+         */
         if (stat (GIDS_GROUP_FILE, &st) < 0) {
-            gids->do_group_stat = -1;
+            do_group_stat = -1;
             log_msg (LOG_ERR, "Unable to stat \"%s\": %s",
                 GIDS_GROUP_FILE, strerror (errno));
         }
         else if (st.st_mtime <= t_last_update) {
             do_update = 0;
         }
-        else {
-            t_now = st.st_mtime;
-        }
     }
     /*  Update the GIDS mapping.
      */
-    hash = NULL;
     if (do_update) {
         hash = _gids_hash_create ();
     }
@@ -321,13 +330,14 @@ _gids_update (gids_t gids)
      */
     if (hash) {
 
-        hash_t hash_bak;
-
-        hash_bak = gids->hash;
+        hash_t hash_bak = gids->hash;
         gids->hash = hash;
         hash = hash_bak;
-        t_last_update = t_now;
+
+        gids->t_last_update = t_now;
     }
+    gids->do_group_stat = do_group_stat;
+
     /*  Enable subsequent updating of the GIDs mapping only if the update
      *    interval is positive.
      */
@@ -362,8 +372,12 @@ _gids_hash_create (void)
     struct timeval  t_start;
     struct timeval  t_stop;
     int             do_group_db_close = 0;
-    struct group   *gr_ptr;
-    char          **pp;
+    struct group    gr;
+    char           *gr_buf_ptr = NULL;
+    int             gr_buf_len;
+    char           *pw_buf_ptr = NULL;
+    int             pw_buf_len;
+    char          **user_p;
     uid_t           uid;
     int             n_users;
     double          n_seconds;
@@ -386,17 +400,20 @@ _gids_hash_create (void)
         log_msg (LOG_ERR, "Unable to query current time");
         goto err;
     }
-    setgrent ();
+    if (xgetgrent_buf_create (&gr_buf_ptr, &gr_buf_len) < 0) {
+        log_msg (LOG_ERR, "Unable to allocate group entry buffer");
+        goto err;
+    }
+    if (xgetpwnam_buf_create (&pw_buf_ptr, &pw_buf_len) < 0) {
+        log_msg (LOG_ERR, "Unable to allocate password entry buffer");
+        goto err;
+    }
+    xgetgrent_init ();
     do_group_db_close = 1;
 
-    for (;;) {
-        errno = 0;
-        if (!(gr_ptr = getgrent ())) {
-            /*
-             *  In addition to returning NULL when there are no more entries,
-             *    glibc-2.2.5 sets errno to ENOENT.  Deal with it.
-             */
-            if ((errno == 0) || (errno == ENOENT))
+    while (1) {
+        if (xgetgrent (&gr, gr_buf_ptr, gr_buf_len) < 0) {
+            if (errno == ENOENT)
                 break;
             if (errno == EINTR)
                 continue;
@@ -404,15 +421,21 @@ _gids_hash_create (void)
                     strerror (errno));
             goto err;
         }
-        for (pp = gr_ptr->gr_mem; pp && *pp; pp++) {
-            if ((_gids_user_to_uid (uid_hash, *pp, &uid)) >= 0) {
-                if (_gids_hash_add (gid_hash, uid, gr_ptr->gr_gid) < 0) {
+        /*  gr_mem is a null-terminated array of pointers to the user names
+         *    belonging to the group.
+         */
+        for (user_p = gr.gr_mem; user_p && *user_p; user_p++) {
+            int rv = _gids_user_to_uid (uid_hash, *user_p, &uid,
+                    pw_buf_ptr, pw_buf_len);
+            if (rv == 0) {
+                if (_gids_hash_add (gid_hash, uid, gr.gr_gid) < 0) {
                     goto err;
                 }
             }
         }
     }
-    endgrent ();
+    xgetgrent_fini ();
+    xgetgrent_buf_destroy (gr_buf_ptr);
 
     if (gettimeofday (&t_stop, NULL) < 0) {
         log_msg (LOG_ERR, "Unable to query current time");
@@ -436,40 +459,49 @@ _gids_hash_create (void)
 
 err:
     if (do_group_db_close) {
-        endgrent ();
+        xgetgrent_fini ();
     }
-    hash_destroy (uid_hash);
-    hash_destroy (gid_hash);
+    if (pw_buf_ptr != NULL) {
+        xgetpwnam_buf_destroy (pw_buf_ptr);
+    }
+    if (gr_buf_ptr != NULL) {
+        xgetgrent_buf_destroy (gr_buf_ptr);
+    }
+    if (uid_hash != NULL) {
+        hash_destroy (uid_hash);
+    }
+    if (gid_hash != NULL) {
+        hash_destroy (gid_hash);
+    }
     return (NULL);
 }
 
 
 static int
-_gids_user_to_uid (hash_t uid_hash, char *user, uid_t *uid_p)
+_gids_user_to_uid (hash_t uid_hash, char *user, uid_t *uid_p,
+                   char *buf, size_t buflen)
 {
 /*  Returns 0 on success, setting [*uid_p] (if non-NULL) to the UID associated
  *    with [user]; o/w, returns -1.
  */
     gids_uid_t     u;
     uid_t          uid;
-    struct passwd *pw_ptr;
+    struct passwd  pw;
 
     if ((u = hash_find (uid_hash, user))) {
         uid = u->uid;
     }
-    else if ((pw_ptr = getpwnam (user))) {
-        uid = pw_ptr->pw_uid;
+    else if (xgetpwnam (user, &pw, buf, buflen) == 0) {
+        uid = pw.pw_uid;
         if (!(u = _gids_uid_alloc (user, uid))) {
-            log_msg (LOG_ERR,
+            log_msg (LOG_WARNING,
                 "Unable to allocate uid node for %s/%d -- out of memory",
                 user, uid);
-            return (-1);
         }
-        if (!hash_insert (uid_hash, u->user, u)) {
-            log_msg (LOG_ERR,
+        else if (!hash_insert (uid_hash, u->user, u)) {
+            log_msg (LOG_WARNING,
                 "Unable to insert uid node for %s/%d into hash", user, uid);
             _gids_uid_del (u);
-            return (-1);
         }
     }
     else {
@@ -477,6 +509,7 @@ _gids_user_to_uid (hash_t uid_hash, char *user, uid_t *uid_p)
             "Unable to query password file entry for \"%s\"", user);
         return (-1);
     }
+
     if (uid_p != NULL) {
         *uid_p = uid;
     }

@@ -28,58 +28,21 @@
  *****************************************************************************/
 
 
-#ifndef GIDS_H
-#define GIDS_H
+#ifndef XGETPWNAM_H
+#define XGETPWNAM_H
 
-
-/*****************************************************************************
- *  Constants
- *****************************************************************************/
-
-#define GIDS_GROUP_FILE         "/etc/group"
-#define GIDS_HASH_SIZE          2053
-#define UIDS_HASH_SIZE          4099
-
-
-/*****************************************************************************
- *  Data Types
- *****************************************************************************/
-
-typedef struct gids * gids_t;
-/*
- *  GIDs opaque data type.
- */
+#include <pwd.h>
 
 
 /*****************************************************************************
  *  Functions
  *****************************************************************************/
 
-gids_t gids_create (int interval, int do_group_stat);
-/*
- *  Creates a list of supplementary GIDs for each UID based on information
- *    from getgrent().
- *  The [interval] is the number of seconds between updates.
- *  The [do_group_stat] flag specifies whether the /etc/group mtime is
- *    checked to determine if updates are needed.
- *  Returns a GIDs mapping or dies trying.
- */
+int  xgetpwnam_buf_create (char **buf_p, int *buflen_p);
 
-void gids_destroy (gids_t gids);
-/*
- *  Destroys the GIDs mapping [gids].
- */
+void xgetpwnam_buf_destroy (char *buf);
 
-void gids_update (gids_t gids);
-/*
- *  Updates the GIDs mapping [gids].
- */
-
-int gids_is_member (gids_t gids, uid_t uid, gid_t gid);
-/*
- *  Returns true (non-zero) if user [uid] is a member of the supplementary
- *    group [gid] according to the GIDs mapping [gids]; o/w, returns false.
- */
+int  xgetpwnam (const char *user, struct passwd *pw, char *buf, size_t buflen);
 
 
-#endif /* !GIDS_H */
+#endif /* !XGETPWNAM_H */

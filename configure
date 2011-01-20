@@ -13043,6 +13043,407 @@ fi
 
 
 ##
+# Checks for library functions.
+##
+for ac_func in \
+  localtime_r \
+  sysconf \
+
+do :
+  as_ac_var=`$as_echo "ac_cv_func_$ac_func" | $as_tr_sh`
+ac_fn_c_check_func "$LINENO" "$ac_func" "$as_ac_var"
+if eval test \"x\$"$as_ac_var"\" = x"yes"; then :
+  cat >>confdefs.h <<_ACEOF
+#define `$as_echo "HAVE_$ac_func" | $as_tr_cpp` 1
+_ACEOF
+
+fi
+done
+
+ac_fn_c_check_func "$LINENO" "inet_ntop" "ac_cv_func_inet_ntop"
+if test "x$ac_cv_func_inet_ntop" = x""yes; then :
+  $as_echo "#define HAVE_INET_NTOP 1" >>confdefs.h
+
+else
+  case " $LIBOBJS " in
+  *" inet_ntop.$ac_objext "* ) ;;
+  *) LIBOBJS="$LIBOBJS inet_ntop.$ac_objext"
+ ;;
+esac
+
+fi
+
+ac_fn_c_check_func "$LINENO" "strlcat" "ac_cv_func_strlcat"
+if test "x$ac_cv_func_strlcat" = x""yes; then :
+  $as_echo "#define HAVE_STRLCAT 1" >>confdefs.h
+
+else
+  case " $LIBOBJS " in
+  *" strlcat.$ac_objext "* ) ;;
+  *) LIBOBJS="$LIBOBJS strlcat.$ac_objext"
+ ;;
+esac
+
+fi
+
+ac_fn_c_check_func "$LINENO" "strlcpy" "ac_cv_func_strlcpy"
+if test "x$ac_cv_func_strlcpy" = x""yes; then :
+  $as_echo "#define HAVE_STRLCPY 1" >>confdefs.h
+
+else
+  case " $LIBOBJS " in
+  *" strlcpy.$ac_objext "* ) ;;
+  *) LIBOBJS="$LIBOBJS strlcpy.$ac_objext"
+ ;;
+esac
+
+fi
+
+
+
+  for ac_func in getgrent
+do :
+  ac_fn_c_check_func "$LINENO" "getgrent" "ac_cv_func_getgrent"
+if test "x$ac_cv_func_getgrent" = x""yes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_GETGRENT 1
+_ACEOF
+
+fi
+done
+
+
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for getgrent_r (AIX)" >&5
+$as_echo_n "checking for getgrent_r (AIX)... " >&6; }
+if test "${x_ac_cv_have_getgrent_r_aix+set}" = set; then :
+  $as_echo_n "(cached) " >&6
+else
+
+    _x_ac_getgrent_r_aix_c_werror_flag="$ac_c_werror_flag"
+    ac_c_werror_flag=yes
+    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+
+#define _THREAD_SAFE 1
+#include <grp.h>
+#include <stdio.h>
+
+int
+main ()
+{
+
+int rv;
+struct group gr;
+char gr_buf [1024];
+FILE *gr_fp;
+rv = getgrent_r (&gr, gr_buf, sizeof (gr_buf), &gr_fp);
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  x_ac_cv_have_getgrent_r_aix=yes
+else
+  x_ac_cv_have_getgrent_r_aix=no
+
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+    ac_c_werror_flag="$_x_ac_getgrent_r_aix_c_werror_flag"
+
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $x_ac_cv_have_getgrent_r_aix" >&5
+$as_echo "$x_ac_cv_have_getgrent_r_aix" >&6; }
+  if test $x_ac_cv_have_getgrent_r_aix = yes; then :
+
+$as_echo "#define HAVE_GETGRENT_R_AIX 1" >>confdefs.h
+
+
+fi
+
+
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for getgrent_r (GNU)" >&5
+$as_echo_n "checking for getgrent_r (GNU)... " >&6; }
+if test "${x_ac_cv_have_getgrent_r_gnu+set}" = set; then :
+  $as_echo_n "(cached) " >&6
+else
+
+    _x_ac_getgrent_r_gnu_c_werror_flag="$ac_c_werror_flag"
+    ac_c_werror_flag=yes
+    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+
+#define _GNU_SOURCE 1
+#include <grp.h>
+
+int
+main ()
+{
+
+int rv;
+struct group gr, *gr_ptr;
+char gr_buf [1024];
+rv = getgrent_r (&gr, gr_buf, sizeof (gr_buf), &gr_ptr);
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  x_ac_cv_have_getgrent_r_gnu=yes
+else
+  x_ac_cv_have_getgrent_r_gnu=no
+
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+    ac_c_werror_flag="$_x_ac_getgrent_r_gnu_c_werror_flag"
+
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $x_ac_cv_have_getgrent_r_gnu" >&5
+$as_echo "$x_ac_cv_have_getgrent_r_gnu" >&6; }
+  if test $x_ac_cv_have_getgrent_r_gnu = yes; then :
+
+$as_echo "#define HAVE_GETGRENT_R_GNU 1" >>confdefs.h
+
+
+fi
+
+
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for getgrent_r (SunOS)" >&5
+$as_echo_n "checking for getgrent_r (SunOS)... " >&6; }
+if test "${x_ac_cv_have_getgrent_r_sun+set}" = set; then :
+  $as_echo_n "(cached) " >&6
+else
+
+    _x_ac_getgrent_r_sun_c_werror_flag="$ac_c_werror_flag"
+    ac_c_werror_flag=yes
+    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+
+#include <grp.h>
+
+int
+main ()
+{
+
+struct group gr, *gr_ptr;
+char gr_buf [1024];
+gr_ptr = getgrent_r (&gr, gr_buf, sizeof (gr_buf));
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  x_ac_cv_have_getgrent_r_sun=yes
+else
+  x_ac_cv_have_getgrent_r_sun=no
+
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+    ac_c_werror_flag="$_x_ac_getgrent_r_sun_c_werror_flag"
+
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $x_ac_cv_have_getgrent_r_sun" >&5
+$as_echo "$x_ac_cv_have_getgrent_r_sun" >&6; }
+  if test $x_ac_cv_have_getgrent_r_sun = yes; then :
+
+$as_echo "#define HAVE_GETGRENT_R_SUN 1" >>confdefs.h
+
+
+fi
+
+
+
+  for ac_func in getpwnam
+do :
+  ac_fn_c_check_func "$LINENO" "getpwnam" "ac_cv_func_getpwnam"
+if test "x$ac_cv_func_getpwnam" = x""yes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_GETPWNAM 1
+_ACEOF
+
+fi
+done
+
+
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for getpwnam_r (AIX)" >&5
+$as_echo_n "checking for getpwnam_r (AIX)... " >&6; }
+if test "${x_ac_cv_have_getpwnam_r_aix+set}" = set; then :
+  $as_echo_n "(cached) " >&6
+else
+
+    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+
+#undef _ALL_SOURCE                      /* for overriding POSIX getpwnam_r */
+#define _THREAD_SAFE 1
+#define _UNIX95 1
+#define _XOPEN_SOURCE_EXTENDED 1
+#include <pwd.h>
+
+int
+main ()
+{
+
+int rv;
+char *user;
+struct passwd pw;
+char pw_buf [1024];
+rv = getpwnam_r (user, &pw, pw_buf, sizeof (pw_buf));
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  x_ac_cv_have_getpwnam_r_aix=yes
+else
+  x_ac_cv_have_getpwnam_r_aix=no
+
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $x_ac_cv_have_getpwnam_r_aix" >&5
+$as_echo "$x_ac_cv_have_getpwnam_r_aix" >&6; }
+  if test $x_ac_cv_have_getpwnam_r_aix = yes; then :
+
+$as_echo "#define HAVE_GETPWNAM_R_AIX 1" >>confdefs.h
+
+
+fi
+
+
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for getpwnam_r (POSIX)" >&5
+$as_echo_n "checking for getpwnam_r (POSIX)... " >&6; }
+if test "${x_ac_cv_have_getpwnam_r_posix+set}" = set; then :
+  $as_echo_n "(cached) " >&6
+else
+
+    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+
+#define _POSIX_PTHREAD_SEMANTICS 1      /* for SunOS */
+#include <pwd.h>
+
+int
+main ()
+{
+
+int rv;
+char *user;
+struct passwd pw, *pw_ptr;
+char pw_buf [1024];
+rv = getpwnam_r (user, &pw, pw_buf, sizeof (pw_buf), &pw_ptr);
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  x_ac_cv_have_getpwnam_r_posix=yes
+else
+  x_ac_cv_have_getpwnam_r_posix=no
+
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $x_ac_cv_have_getpwnam_r_posix" >&5
+$as_echo "$x_ac_cv_have_getpwnam_r_posix" >&6; }
+  if test $x_ac_cv_have_getpwnam_r_posix = yes; then :
+
+$as_echo "#define HAVE_GETPWNAM_R_POSIX 1" >>confdefs.h
+
+
+fi
+
+
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for getpwnam_r (SunOS)" >&5
+$as_echo_n "checking for getpwnam_r (SunOS)... " >&6; }
+if test "${x_ac_cv_have_getpwnam_r_sun+set}" = set; then :
+  $as_echo_n "(cached) " >&6
+else
+
+    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+
+#undef _POSIX_PTHREAD_SEMANTICS         /* for overriding POSIX getpwnam_r */
+#include <pwd.h>
+
+int
+main ()
+{
+
+char *user;
+struct passwd pw, *pw_ptr;
+char pw_buf [1024];
+pw_ptr = getpwnam_r (user, &pw, pw_buf, sizeof (pw_buf));
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  x_ac_cv_have_getpwnam_r_sun=yes
+else
+  x_ac_cv_have_getpwnam_r_sun=no
+
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $x_ac_cv_have_getpwnam_r_sun" >&5
+$as_echo "$x_ac_cv_have_getpwnam_r_sun" >&6; }
+  if test $x_ac_cv_have_getpwnam_r_sun = yes; then :
+
+$as_echo "#define HAVE_GETPWNAM_R_SUN 1" >>confdefs.h
+
+
+fi
+
+
+
+##
+# Checks for platform-specific issues.
+##
+
+  case "$host" in
+    *-*-aix*)
+      LDFLAGS="$LDFLAGS -Wl,-brtl"      # enable run-time linking
+      ;;
+    *)
+      ;;
+  esac
+
+
+
+  case "$host" in
+    *-*-darwin*)
+
+$as_echo "#define _APPLE_C_SOURCE 1" >>confdefs.h
+
+      ;;
+    *)
+      ;;
+  esac
+
+
+
+##
 # Checks for client authentication method.
 ##
 
@@ -13348,90 +13749,6 @@ $as_echo "failed" >&6; }
   fi
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: $AUTH_METHOD" >&5
 $as_echo "$AUTH_METHOD" >&6; }
-
-
-##
-# Checks for library functions.
-##
-for ac_func in \
-  localtime_r \
-
-do :
-  as_ac_var=`$as_echo "ac_cv_func_$ac_func" | $as_tr_sh`
-ac_fn_c_check_func "$LINENO" "$ac_func" "$as_ac_var"
-if eval test \"x\$"$as_ac_var"\" = x"yes"; then :
-  cat >>confdefs.h <<_ACEOF
-#define `$as_echo "HAVE_$ac_func" | $as_tr_cpp` 1
-_ACEOF
-
-fi
-done
-
-ac_fn_c_check_func "$LINENO" "inet_ntop" "ac_cv_func_inet_ntop"
-if test "x$ac_cv_func_inet_ntop" = x""yes; then :
-  $as_echo "#define HAVE_INET_NTOP 1" >>confdefs.h
-
-else
-  case " $LIBOBJS " in
-  *" inet_ntop.$ac_objext "* ) ;;
-  *) LIBOBJS="$LIBOBJS inet_ntop.$ac_objext"
- ;;
-esac
-
-fi
-
-ac_fn_c_check_func "$LINENO" "strlcat" "ac_cv_func_strlcat"
-if test "x$ac_cv_func_strlcat" = x""yes; then :
-  $as_echo "#define HAVE_STRLCAT 1" >>confdefs.h
-
-else
-  case " $LIBOBJS " in
-  *" strlcat.$ac_objext "* ) ;;
-  *) LIBOBJS="$LIBOBJS strlcat.$ac_objext"
- ;;
-esac
-
-fi
-
-ac_fn_c_check_func "$LINENO" "strlcpy" "ac_cv_func_strlcpy"
-if test "x$ac_cv_func_strlcpy" = x""yes; then :
-  $as_echo "#define HAVE_STRLCPY 1" >>confdefs.h
-
-else
-  case " $LIBOBJS " in
-  *" strlcpy.$ac_objext "* ) ;;
-  *) LIBOBJS="$LIBOBJS strlcpy.$ac_objext"
- ;;
-esac
-
-fi
-
-
-
-##
-# Check for platform-specific issues.
-##
-
-  case "$host" in
-    *-*-aix*)
-      LDFLAGS="$LDFLAGS -Wl,-brtl"      # enable run-time linking
-      ;;
-    *)
-      ;;
-  esac
-
-
-
-  case "$host" in
-    *-*-darwin*)
-
-$as_echo "#define _APPLE_C_SOURCE 1" >>confdefs.h
-
-      ;;
-    *)
-      ;;
-  esac
-
 
 
 ##

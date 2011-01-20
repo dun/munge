@@ -92,6 +92,10 @@ munged_SOURCES = \
 	timer.h \
 	work.c \
 	work.h \
+	xgetgrent.c \
+	xgetgrent.h \
+	xgetpwnam.c \
+	xgetpwnam.h \
 	zip.c \
 	zip.h \
 	munged.c

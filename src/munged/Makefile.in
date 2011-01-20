@@ -57,6 +57,8 @@ am__aclocal_m4_deps = $(top_srcdir)/config/libtool.m4 \
 	$(top_srcdir)/config/x_ac_darwin.m4 \
 	$(top_srcdir)/config/x_ac_debug.m4 \
 	$(top_srcdir)/config/x_ac_expand_install_dirs.m4 \
+	$(top_srcdir)/config/x_ac_getgrent.m4 \
+	$(top_srcdir)/config/x_ac_getpwnam.m4 \
 	$(top_srcdir)/config/x_ac_humor.m4 \
 	$(top_srcdir)/config/x_ac_meta.m4 \
 	$(top_srcdir)/config/x_ac_path_openssl.m4 \
@@ -84,6 +86,7 @@ am_munged_OBJECTS = munged-auth_recv.$(OBJEXT) munged-base64.$(OBJEXT) \
 	munged-path.$(OBJEXT) munged-random.$(OBJEXT) \
 	munged-replay.$(OBJEXT) munged-thread.$(OBJEXT) \
 	munged-timer.$(OBJEXT) munged-work.$(OBJEXT) \
+	munged-xgetgrent.$(OBJEXT) munged-xgetpwnam.$(OBJEXT) \
 	munged-zip.$(OBJEXT) munged-munged.$(OBJEXT)
 munged_OBJECTS = $(am_munged_OBJECTS)
 am__DEPENDENCIES_1 =
@@ -346,6 +349,10 @@ munged_SOURCES = \
 	timer.h \
 	work.c \
 	work.h \
+	xgetgrent.c \
+	xgetgrent.h \
+	xgetpwnam.c \
+	xgetpwnam.h \
 	zip.c \
 	zip.h \
 	munged.c
@@ -481,6 +488,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/munged-thread.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/munged-timer.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/munged-work.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/munged-xgetgrent.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/munged-xgetpwnam.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/munged-zip.Po@am__quote@
 
 .c.o:
@@ -769,6 +778,34 @@ munged-work.obj: work.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='work.c' object='munged-work.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -c -o munged-work.obj `if test -f 'work.c'; then $(CYGPATH_W) 'work.c'; else $(CYGPATH_W) '$(srcdir)/work.c'; fi`
+
+munged-xgetgrent.o: xgetgrent.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -MT munged-xgetgrent.o -MD -MP -MF $(DEPDIR)/munged-xgetgrent.Tpo -c -o munged-xgetgrent.o `test -f 'xgetgrent.c' || echo '$(srcdir)/'`xgetgrent.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/munged-xgetgrent.Tpo $(DEPDIR)/munged-xgetgrent.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='xgetgrent.c' object='munged-xgetgrent.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -c -o munged-xgetgrent.o `test -f 'xgetgrent.c' || echo '$(srcdir)/'`xgetgrent.c
+
+munged-xgetgrent.obj: xgetgrent.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -MT munged-xgetgrent.obj -MD -MP -MF $(DEPDIR)/munged-xgetgrent.Tpo -c -o munged-xgetgrent.obj `if test -f 'xgetgrent.c'; then $(CYGPATH_W) 'xgetgrent.c'; else $(CYGPATH_W) '$(srcdir)/xgetgrent.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/munged-xgetgrent.Tpo $(DEPDIR)/munged-xgetgrent.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='xgetgrent.c' object='munged-xgetgrent.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -c -o munged-xgetgrent.obj `if test -f 'xgetgrent.c'; then $(CYGPATH_W) 'xgetgrent.c'; else $(CYGPATH_W) '$(srcdir)/xgetgrent.c'; fi`
+
+munged-xgetpwnam.o: xgetpwnam.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -MT munged-xgetpwnam.o -MD -MP -MF $(DEPDIR)/munged-xgetpwnam.Tpo -c -o munged-xgetpwnam.o `test -f 'xgetpwnam.c' || echo '$(srcdir)/'`xgetpwnam.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/munged-xgetpwnam.Tpo $(DEPDIR)/munged-xgetpwnam.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='xgetpwnam.c' object='munged-xgetpwnam.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -c -o munged-xgetpwnam.o `test -f 'xgetpwnam.c' || echo '$(srcdir)/'`xgetpwnam.c
+
+munged-xgetpwnam.obj: xgetpwnam.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -MT munged-xgetpwnam.obj -MD -MP -MF $(DEPDIR)/munged-xgetpwnam.Tpo -c -o munged-xgetpwnam.obj `if test -f 'xgetpwnam.c'; then $(CYGPATH_W) 'xgetpwnam.c'; else $(CYGPATH_W) '$(srcdir)/xgetpwnam.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/munged-xgetpwnam.Tpo $(DEPDIR)/munged-xgetpwnam.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='xgetpwnam.c' object='munged-xgetpwnam.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -c -o munged-xgetpwnam.obj `if test -f 'xgetpwnam.c'; then $(CYGPATH_W) 'xgetpwnam.c'; else $(CYGPATH_W) '$(srcdir)/xgetpwnam.c'; fi`
 
 munged-zip.o: zip.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -MT munged-zip.o -MD -MP -MF $(DEPDIR)/munged-zip.Tpo -c -o munged-zip.o `test -f 'zip.c' || echo '$(srcdir)/'`zip.c
