@@ -1,5 +1,7 @@
 2011-01-19  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* : Updated copyright date range.
+
 	* : Merged issue-2:854-888 into trunk.
 	* src/munged/gids.c (_gids_hash_create, _gids_user_to_uid):
 	  Replaced calls to getpwnam() with xgetpwnam().
