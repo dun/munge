@@ -1,3 +1,7 @@
+2011-01-24  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/libcommon/fd.c: Tweaked comment headers.
+
 2010-10-05  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/munged/job.c (job_accept): Prevented continued execution of
