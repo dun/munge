@@ -320,7 +320,7 @@ fd_timed_write_iov (int fd, const struct iovec *iov_orig, int iov_cnt,
                 continue;
             nwritten -= n;
             iov[i].iov_len -= n;
-            iov[i].iov_base += n;
+            iov[i].iov_base = (unsigned char *) iov[i].iov_base + n;
         }
     }
     free (iov);
