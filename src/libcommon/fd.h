@@ -108,7 +108,7 @@ int fd_set_close_on_exec (int fd);
 
 int fd_set_nonblocking (int fd);
 /*
- *  Sets the file descriptor [fd] for non-blocking I/O.
+ *  Sets the file descriptor [fd] for nonblocking I/O.
  *  Returns 0 on success, or -1 on error.
  */
 
