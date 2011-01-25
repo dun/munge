@@ -64,9 +64,9 @@ static pid_t _fd_test_lock (int fd, int type);
 ssize_t
 fd_read_n (int fd, void *buf, size_t n)
 {
-    size_t nleft;
-    ssize_t nread;
     unsigned char *p;
+    size_t         nleft;
+    ssize_t        nread;
 
     p = buf;
     nleft = n;
@@ -90,9 +90,9 @@ fd_read_n (int fd, void *buf, size_t n)
 ssize_t
 fd_write_n (int fd, const void *buf, size_t n)
 {
-    size_t nleft;
-    ssize_t nwritten;
     const unsigned char *p;
+    size_t               nleft;
+    ssize_t              nwritten;
 
     p = buf;
     nleft = n;
