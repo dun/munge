@@ -47,7 +47,7 @@ ssize_t fd_read_n (int fd, void *buf, size_t n);
  *  Returns the number of bytes read, 0 on EOF, or -1 on error.
  */
 
-ssize_t fd_write_n (int fd, void *buf, size_t n);
+ssize_t fd_write_n (int fd, const void *buf, size_t n);
 /*
  *  Writes [n] bytes from [buf] to [fd].
  *  Returns the number of bytes written, or -1 on error.
@@ -66,7 +66,7 @@ ssize_t fd_timed_read_n (int fd, void *buf, size_t n,
  *    The caller should reset errno beforehand when checking for timeout.
  */
 
-ssize_t fd_timed_write_n (int fd, void *buf, size_t n,
+ssize_t fd_timed_write_n (int fd, const void *buf, size_t n,
         const struct timeval *when);
 /*
  *  Writes [n] bytes from [buf] to [fd], timing-out at [when] which

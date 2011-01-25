@@ -88,11 +88,11 @@ fd_read_n (int fd, void *buf, size_t n)
 
 
 ssize_t
-fd_write_n (int fd, void *buf, size_t n)
+fd_write_n (int fd, const void *buf, size_t n)
 {
     size_t nleft;
     ssize_t nwritten;
-    unsigned char *p;
+    const unsigned char *p;
 
     p = buf;
     nleft = n;
@@ -176,14 +176,15 @@ fd_timed_read_n (int fd, void *buf, size_t n, const struct timeval *when)
 
 
 ssize_t
-fd_timed_write_n (int fd, void *buf, size_t n, const struct timeval *when)
+fd_timed_write_n (int fd, const void *buf, size_t n,
+                  const struct timeval *when)
 {
-    unsigned char *p;
-    int            msecs;
-    struct pollfd  pfd;
-    int            nfd;
-    size_t         nleft;
-    ssize_t        nwritten;
+    const unsigned char *p;
+    int                  msecs;
+    struct pollfd        pfd;
+    int                  nfd;
+    size_t               nleft;
+    ssize_t              nwritten;
 
     if ((fd < 0) || (buf == NULL)) {
         errno = EINVAL;
