@@ -242,7 +242,7 @@ fd_timed_write_n (int fd, void *buf, size_t n, const struct timeval *when)
 
 ssize_t
 fd_timed_write_iov (int fd, const struct iovec *iov_orig, int iov_cnt,
-                   const struct timeval *when)
+                    const struct timeval *when)
 {
     int            iov_mem_len;
     struct iovec  *iov;

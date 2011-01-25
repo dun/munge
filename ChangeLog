@@ -1,5 +1,7 @@
 2011-01-24  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/libcommon/fd.c: Tweaked spacing.
+
 	* src/libcommon/fd.c (fd_timed_write_iov): Fixed compiler warning for
 	  "pointer of type ‘void *’ used in arithmetic".
 
