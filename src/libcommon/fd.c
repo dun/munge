@@ -129,6 +129,10 @@ fd_timed_read_n (int fd, void *buf, size_t n, const struct timeval *when)
     pfd.fd = fd;
     pfd.events = POLLIN;
 
+    if (fd_is_nonblocking (fd) && (nleft > 0)) {
+        msecs = _fd_get_poll_timeout (when);
+        goto read_me;
+    }
     while (nleft > 0) {
 
         msecs = _fd_get_poll_timeout (when);
@@ -154,6 +158,7 @@ fd_timed_read_n (int fd, void *buf, size_t n, const struct timeval *when)
         }
         assert (pfd.revents & POLLIN);
 
+read_me:
         nread = read (fd, p, nleft);
         if (nread < 0) {
             if ((errno == EINTR) || (errno == EAGAIN))
@@ -195,6 +200,10 @@ fd_timed_write_n (int fd, const void *buf, size_t n,
     pfd.fd = fd;
     pfd.events = POLLOUT;
 
+    if (fd_is_nonblocking (fd) && (nleft > 0)) {
+        msecs = _fd_get_poll_timeout (when);
+        goto write_me;
+    }
     while (nleft > 0) {
 
         msecs = _fd_get_poll_timeout (when);
@@ -223,6 +232,7 @@ fd_timed_write_n (int fd, const void *buf, size_t n,
         }
         assert (pfd.revents & POLLOUT);
 
+write_me:
         nwritten = write (fd, p, nleft);
         if (nwritten < 0) {
             if ((errno == EINTR) || (errno == EAGAIN))
@@ -275,6 +285,10 @@ fd_timed_write_iov (int fd, const struct iovec *iov_orig, int iov_cnt,
     pfd.fd = fd;
     pfd.events = POLLOUT;
 
+    if (fd_is_nonblocking (fd) && (nleft > 0)) {
+        msecs = _fd_get_poll_timeout (when);
+        goto writev_me;
+    }
     while (nleft > 0) {
 
         msecs = _fd_get_poll_timeout (when);
@@ -303,6 +317,7 @@ fd_timed_write_iov (int fd, const struct iovec *iov_orig, int iov_cnt,
         }
         assert (pfd.revents & POLLOUT);
 
+writev_me:
         nwritten = writev (fd, iov, iov_cnt);
         if (nwritten < 0) {
             if ((errno == EINTR) || (errno == EAGAIN))
