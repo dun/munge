@@ -91,7 +91,7 @@
 	  replaced with two separate fd_timed_write_n()s (for simplicity).
 	  The client socket has been made nonblocking.	And the m_msg_send()
 	  check for max message length has been moved up to before the
-	  write()s.  Unfortunately, this commit degrades throughput by 20%.
+	  write()s.  Unfortunately, this commit degrades throughput by ~10%.
 	* src/libcommon/m_msg.c (m_msg_send, m_msg_recv): Added support for
 	  timing-out sent messages with fd_timed_write_n() and received
 	  messages with fd_timed_read_n().
