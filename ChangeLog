@@ -1,6 +1,18 @@
 2011-01-25  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/libcommon/fd.c (fd_timed_read_n, fd_timed_write_n,
+	  fd_timed_write_iov): Replaced call to fd_is_nonblocking() with
+	  "do_skip_first_poll" parm.  This eliminates the overhead of a
+	  function call and fcntl() at the expense of an additional function
+	  arg to determine whether the fd is nonblocking.  The old behavior
+	  can be preserved by passing "fd_is_nonblocking(fd)" for the new arg.
+	* src/libcommon/fd.h: Updated prototypes.
+	* src/libcommon/m_msg.c (m_msg_send):
+	  Updated call to fd_timed_write_iov().
+	* src/libcommon/m_msg.c (m_msg_recv):
+	  Updated call to fd_timed_read_n().
+
+	* src/libcommon/fd.c (fd_timed_read_n, fd_timed_write_n,
 	  fd_timed_write_iov): Added optimization to skip the poll() on the
 	  first iteration of the loop for nonblocking sockets.  This helps the
 	  case where the read or write can complete immediately and in a single

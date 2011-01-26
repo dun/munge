@@ -111,7 +111,8 @@ fd_write_n (int fd, const void *buf, size_t n)
 
 
 ssize_t
-fd_timed_read_n (int fd, void *buf, size_t n, const struct timeval *when)
+fd_timed_read_n (int fd, void *buf, size_t n,
+                 const struct timeval *when, int do_skip_first_poll)
 {
     unsigned char *p;
     int            msecs;
@@ -129,7 +130,7 @@ fd_timed_read_n (int fd, void *buf, size_t n, const struct timeval *when)
     pfd.fd = fd;
     pfd.events = POLLIN;
 
-    if (fd_is_nonblocking (fd) && (nleft > 0)) {
+    if (do_skip_first_poll && (nleft > 0)) {
         msecs = _fd_get_poll_timeout (when);
         goto read_me;
     }
@@ -182,7 +183,7 @@ read_me:
 
 ssize_t
 fd_timed_write_n (int fd, const void *buf, size_t n,
-                  const struct timeval *when)
+                  const struct timeval *when, int do_skip_first_poll)
 {
     const unsigned char *p;
     int                  msecs;
@@ -200,7 +201,7 @@ fd_timed_write_n (int fd, const void *buf, size_t n,
     pfd.fd = fd;
     pfd.events = POLLOUT;
 
-    if (fd_is_nonblocking (fd) && (nleft > 0)) {
+    if (do_skip_first_poll && (nleft > 0)) {
         msecs = _fd_get_poll_timeout (when);
         goto write_me;
     }
@@ -253,7 +254,7 @@ write_me:
 
 ssize_t
 fd_timed_write_iov (int fd, const struct iovec *iov_orig, int iov_cnt,
-                    const struct timeval *when)
+                    const struct timeval *when, int do_skip_first_poll)
 {
     int            iov_mem_len;
     struct iovec  *iov;
@@ -285,7 +286,7 @@ fd_timed_write_iov (int fd, const struct iovec *iov_orig, int iov_cnt,
     pfd.fd = fd;
     pfd.events = POLLOUT;
 
-    if (fd_is_nonblocking (fd) && (nleft > 0)) {
+    if (do_skip_first_poll && (nleft > 0)) {
         msecs = _fd_get_poll_timeout (when);
         goto writev_me;
     }

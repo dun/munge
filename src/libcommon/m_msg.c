@@ -282,7 +282,7 @@ m_msg_send (m_msg_t m, m_msg_type_t type, int maxlen)
 
     /*  Send the message.
      */
-    if ((errno = 0, n = fd_timed_write_iov (m->sd, iov, 2, &tv)) < 0) {
+    if ((errno = 0, n = fd_timed_write_iov (m->sd, iov, 2, &tv, 1)) < 0) {
         m_msg_set_err (m, EMUNGE_SOCKET,
             strdupf ("Unable to send message: %s", strerror (errno)));
         return (EMUNGE_SOCKET);
@@ -333,7 +333,7 @@ m_msg_recv (m_msg_t m, m_msg_type_t type, int maxlen)
     /*  Read and validate the message header.
      */
     nrecv = sizeof (hdr);
-    if ((errno = 0, n = fd_timed_read_n (m->sd, &hdr, nrecv, &tv)) < 0) {
+    if ((errno = 0, n = fd_timed_read_n (m->sd, &hdr, nrecv, &tv, 1)) < 0) {
         m_msg_set_err (m, EMUNGE_SOCKET,
             strdupf ("Unable to receive message header: %s",
                 strerror (errno)));
@@ -374,7 +374,7 @@ m_msg_recv (m_msg_t m, m_msg_type_t type, int maxlen)
         return (EMUNGE_NO_MEMORY);
     }
     else if ((errno = 0,
-              n = fd_timed_read_n (m->sd, m->pkt, m->pkt_len, &tv)) < 0) {
+              n = fd_timed_read_n (m->sd, m->pkt, m->pkt_len, &tv, 1)) < 0) {
         m_msg_set_err (m, EMUNGE_SOCKET,
             strdupf ("Unable to receive message body: %s", strerror (errno)));
         return (EMUNGE_SOCKET);

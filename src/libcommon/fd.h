@@ -54,39 +54,48 @@ ssize_t fd_write_n (int fd, const void *buf, size_t n);
  */
 
 ssize_t fd_timed_read_n (int fd, void *buf, size_t n,
-        const struct timeval *when);
+        const struct timeval *when, int do_skip_first_poll);
 /*
  *  Reads up to [n] bytes from [fd] into [buf], timing-out at [when]
  *    which specifies a ceiling on the time for which the call will block.
  *    This ceiling is an absolute timeout in seconds and microseconds since
  *    the Epoch.  If [when] is NULL, the read will block until [n] bytes
  *    have been read or an EOF is encountered.
+ *  If [do_skip_first_poll] is enabled, the poll() preceding the read()
+ *    will be skipped on the first iteration of the loop; this optimization
+ *    should only be enabled if [fd] is nonblocking.
  *  Returns the number of bytes read, or -1 on error.  A timeout is not
  *    an error.  If a timeout has occurred, errno will be set to ETIME.
  *    The caller should reset errno beforehand when checking for timeout.
  */
 
 ssize_t fd_timed_write_n (int fd, const void *buf, size_t n,
-        const struct timeval *when);
+        const struct timeval *when, int do_skip_first_poll);
 /*
  *  Writes [n] bytes from [buf] to [fd], timing-out at [when] which
  *    specifies a ceiling on the time for which the call will block.
  *    This ceiling is an absolute timeout in seconds and microseconds since
  *    the Epoch.  If [when] is NULL, the write will block until [n] bytes
  *    have been written or a POLLHUP is encountered.
+ *  If [do_skip_first_poll] is enabled, the poll() preceding the write()
+ *    will be skipped on the first iteration of the loop; this optimization
+ *    should only be enabled if [fd] is nonblocking.
  *  Returns the number of bytes written, or -1 on error.  A timeout is not
  *    an error.  If a timeout has occurred, errno will be set to ETIME.
  *    The caller should reset errno beforehand when checking for timeout.
  */
 
 ssize_t fd_timed_write_iov (int fd, const struct iovec *iov, int iov_cnt,
-        const struct timeval *when);
+        const struct timeval *when, int do_skip_first_poll);
 /*
  *  Writes the [iov] vector of [iov_cnt] blocks to [fd], timing-out at [when]
  *    which specifies a ceiling on the time for which the call will block.
  *    This ceiling is an absolute timeout in seconds and microseconds since
  *    the Epoch.  If [when] is NULL, the write will block until [n] bytes
  *    have been written or a POLLHUP is encountered.
+ *  If [do_skip_first_poll] is enabled, the poll() preceding the writev()
+ *    will be skipped on the first iteration of the loop; this optimization
+ *    should only be enabled if [fd] is nonblocking.
  *  Returns the number of bytes written, or -1 on error.  A timeout is not
  *    an error.  If a timeout has occurred, errno will be set to ETIME.
  *    The caller should reset errno beforehand when checking for timeout.
