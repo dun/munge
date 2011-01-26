@@ -131,7 +131,7 @@ fd_timed_read_n (int fd, void *buf, size_t n,
     pfd.events = POLLIN;
 
     if (do_skip_first_poll && (nleft > 0)) {
-        msecs = _fd_get_poll_timeout (when);
+        msecs = -1;
         goto read_me;
     }
     while (nleft > 0) {
@@ -202,7 +202,7 @@ fd_timed_write_n (int fd, const void *buf, size_t n,
     pfd.events = POLLOUT;
 
     if (do_skip_first_poll && (nleft > 0)) {
-        msecs = _fd_get_poll_timeout (when);
+        msecs = -1;
         goto write_me;
     }
     while (nleft > 0) {
@@ -287,7 +287,7 @@ fd_timed_write_iov (int fd, const struct iovec *iov_orig, int iov_cnt,
     pfd.events = POLLOUT;
 
     if (do_skip_first_poll && (nleft > 0)) {
-        msecs = _fd_get_poll_timeout (when);
+        msecs = -1;
         goto writev_me;
     }
     while (nleft > 0) {
