@@ -1,3 +1,28 @@
+2011-01-26  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* : Fixed potential deadlock in munged that can occur if clients block
+	  while sending data (issue 1).  The wrappers for read() & write()
+	  implement a timeout by preceding the read/write calls with a poll().
+	  In addition, the client & server sockets have been made nonblocking
+	  to protect against spurious readiness notifications.  Throughput is
+	  degraded by ~5%.
+	* src/libcommon/munge_defs.h: Added MUNGE_SOCKET_TIMEOUT_MSECS.
+	* src/munged/job.c (job_accept): Set socket connection to client as
+	  nonblocking.
+	* src/libmunge/m_msg_client.c (_m_msg_client_connect):
+	  Set socket connection to server as nonblocking.
+	* src/libcommon/m_msg.c (m_msg_send, m_msg_recv): Added support for
+	  timing-out sent messages with fd_timed_write_iov() and received
+	  messages with fd_timed_read_n().
+	* src/libcommon/m_msg.c (_get_timeval): Added.
+	* src/libcommon/fd.c (fd_timed_read_n, fd_timed_write_n,
+	  fd_timed_write_iov, fd_is_nonblocking, _fd_get_poll_timeout): Added.
+	* src/libcommon/fd.c (fd_set_close_on_exec, fd_set_nonblocking):
+	  Replaced assert-check of "fd" parm with runtime-check.
+	* src/libcommon/fd.c (fd_write_n): Changed "buf" parm type to const.
+	* src/libcommon/fd.h: Updated prototypes.
+	* TODO: Updated.
+
 2011-01-20  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/munged/gids.c: Renamed struct gids "lock" to "mutex".

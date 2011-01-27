@@ -43,6 +43,7 @@
 #include <munge.h>
 #include "auth_send.h"
 #include "ctx.h"
+#include "fd.h"
 #include "missing.h"
 #include "m_msg.h"
 #include "m_msg_client.h"
@@ -182,6 +183,13 @@ _m_msg_client_connect (m_msg_t m, char *path)
     if ((sd = socket (PF_UNIX, SOCK_STREAM, 0)) < 0) {
         m_msg_set_err (m, EMUNGE_SOCKET,
             strdupf ("Unable to create socket: %s", strerror (errno)));
+        return (EMUNGE_SOCKET);
+    }
+    if (fd_set_nonblocking (sd) < 0) {
+        close (sd);
+        m_msg_set_err (m, EMUNGE_SOCKET,
+            strdupf ("Unable to set nonblocking socket: %s",
+            strerror (errno)));
         return (EMUNGE_SOCKET);
     }
     memset (&addr, 0, sizeof (addr));

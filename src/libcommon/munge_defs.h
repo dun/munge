@@ -159,6 +159,10 @@
  */
 #define MUNGE_SOCKET_RETRY_USECS        10000
 
+/*  Number of milliseconds until a client connection is timed-out.
+ */
+#define MUNGE_SOCKET_TIMEOUT_MSECS      3000
+
 /*  Number of threads to create for processing credential requests.
  */
 #define MUNGE_THREADS                   2

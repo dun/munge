@@ -39,10 +39,12 @@
 #include <munge.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/time.h>                   /* gettimeofday */
 #include <sys/uio.h>
 #include <unistd.h>
 #include "fd.h"
 #include "m_msg.h"
+#include "munge_defs.h"
 #include "str.h"
 
 
@@ -57,6 +59,7 @@ typedef void ** vpp;
  *  Prototypes
  *****************************************************************************/
 
+static void _get_timeval (struct timeval *tv, int msecs);
 static int _msg_length (m_msg_t m, m_msg_type_t type);
 static munge_err_t _msg_pack (m_msg_t m, m_msg_type_t type,
         void *dst, int dstlen);
@@ -198,10 +201,11 @@ m_msg_send (m_msg_t m, m_msg_type_t type, int maxlen)
  *    and an error returned.
  *  Returns a standard munge error code.
  */
-    munge_err_t   e;
-    int           n, nsend;
-    uint8_t       hdr [MUNGE_MSG_HDR_SIZE];
-    struct iovec  iov [2];
+    munge_err_t     e;
+    int             n, nsend;
+    uint8_t         hdr [MUNGE_MSG_HDR_SIZE];
+    struct iovec    iov [2];
+    struct timeval  tv;
 
     assert (m != NULL);
     assert (m->sd >= 0);
@@ -248,6 +252,14 @@ m_msg_send (m_msg_t m, m_msg_type_t type, int maxlen)
             return (e);
         }
     }
+    /*  Check if the message exceeds the maximum allowed length.
+     */
+    if ((maxlen > 0) && (m->pkt_len > maxlen)) {
+        m_msg_set_err (m, EMUNGE_SOCKET,
+            strdupf ("Unable to send message: "
+                "length of %d exceeds max of %d", m->pkt_len, maxlen));
+        return (EMUNGE_BAD_LENGTH);
+    }
     /*  Always repack the message header.
      */
     e = _msg_pack (m, MUNGE_MSG_HDR, hdr, sizeof (hdr));
@@ -256,42 +268,37 @@ m_msg_send (m_msg_t m, m_msg_type_t type, int maxlen)
             strdup ("Unable to pack message header"));
         return (e);
     }
+    /*  Compute iovec for response header + body.
+     */
     nsend = 0;
     iov[0].iov_base = hdr;
     nsend += iov[0].iov_len = sizeof (hdr);
     iov[1].iov_base = m->pkt;
     nsend += iov[1].iov_len = m->pkt_len;
 
-    /*  An EINTR should only occur before any data is transferred.
-     *    As such, it should be jiggy to restart the whole writev() if needed.
+    /*  Compute maximum time to wait for transmission of message.
      */
-again:
-    if ((n = writev (m->sd, iov, 2)) < 0) {
-        if (errno == EINTR)
-            goto again;
+    _get_timeval (&tv, MUNGE_SOCKET_TIMEOUT_MSECS);
+
+    /*  Send the message.
+     */
+    if ((errno = 0, n = fd_timed_write_iov (m->sd, iov, 2, &tv, 1)) < 0) {
         m_msg_set_err (m, EMUNGE_SOCKET,
             strdupf ("Unable to send message: %s", strerror (errno)));
         return (EMUNGE_SOCKET);
     }
-    /*  Normally, the test here for exceeding the message length would be
-     *    placed before the write to prevent an error that will surely happen.
-     *    But the reason it is placed here after the writev() is to allow the
-     *    daemon to log the attempt to exceed the maximum message length.
-     *    The daemon will abort its read after having read only the
-     *    m_msg_head struct.
-     */
-    if ((maxlen > 0) && (m->pkt_len > maxlen)) {
+    else if (errno == ETIME) {
         m_msg_set_err (m, EMUNGE_SOCKET,
-            strdupf ("Unable to send message: length %d exceeds max of %d",
-                m->pkt_len, maxlen));
-        return (EMUNGE_BAD_LENGTH);
+            strdup ("Unable to send message: Timed-out"));
+        return (EMUNGE_SOCKET);
     }
-    if (n != nsend) {
+    else if (n != nsend) {
         m_msg_set_err (m, EMUNGE_SOCKET,
             strdupf ("Sent incomplete message: %d of %d bytes", n, nsend));
         return (EMUNGE_SOCKET);
     }
     return (EMUNGE_SUCCESS);
+
 }
 
 
@@ -307,8 +314,9 @@ m_msg_recv (m_msg_t m, m_msg_type_t type, int maxlen)
  *    and an error returned.
  *  Returns a standard munge error code.
  */
-    int      n, nrecv;
-    uint8_t  hdr [MUNGE_MSG_HDR_SIZE];
+    int             n, nrecv;
+    uint8_t         hdr [MUNGE_MSG_HDR_SIZE];
+    struct timeval  tv;
 
     assert (m != NULL);
     assert (m->sd >= 0);
@@ -318,18 +326,22 @@ m_msg_recv (m_msg_t m, m_msg_type_t type, int maxlen)
     assert (m->pkt_is_copy == 0);
     assert (_msg_length (m, MUNGE_MSG_HDR) == MUNGE_MSG_HDR_SIZE);
 
+    /*  Compute maximum time to wait for receipt of message.
+     */
+    _get_timeval (&tv, MUNGE_SOCKET_TIMEOUT_MSECS);
+
     /*  Read and validate the message header.
      */
     nrecv = sizeof (hdr);
-    if ((n = fd_read_n (m->sd, &hdr, nrecv)) < 0) {
+    if ((errno = 0, n = fd_timed_read_n (m->sd, &hdr, nrecv, &tv, 1)) < 0) {
         m_msg_set_err (m, EMUNGE_SOCKET,
             strdupf ("Unable to receive message header: %s",
                 strerror (errno)));
         return (EMUNGE_SOCKET);
     }
-    else if (n == 0) {
+    else if (errno == ETIME) {
         m_msg_set_err (m, EMUNGE_SOCKET,
-            strdup ("Received empty message header"));
+            strdup ("Unable to receive message header: Timed-out"));
         return (EMUNGE_SOCKET);
     }
     else if (n != nrecv) {
@@ -352,8 +364,8 @@ m_msg_recv (m_msg_t m, m_msg_type_t type, int maxlen)
     }
     else if ((maxlen > 0) && (m->pkt_len > maxlen)) {
         m_msg_set_err (m, EMUNGE_SOCKET,
-            strdupf ("Received message length %d exceeding max of %d",
-                m->pkt_len, maxlen));
+            strdupf ("Unable to receive message: "
+                "length of %d exceeds max of %d", m->pkt_len, maxlen));
         return (EMUNGE_BAD_LENGTH);
     }
     else if (!(m->pkt = malloc (m->pkt_len))) {
@@ -361,9 +373,15 @@ m_msg_recv (m_msg_t m, m_msg_type_t type, int maxlen)
             strdupf ("Unable to malloc %d bytes for message recv", n));
         return (EMUNGE_NO_MEMORY);
     }
-    else if ((n = fd_read_n (m->sd, m->pkt, m->pkt_len)) < 0) {
+    else if ((errno = 0,
+              n = fd_timed_read_n (m->sd, m->pkt, m->pkt_len, &tv, 1)) < 0) {
         m_msg_set_err (m, EMUNGE_SOCKET,
             strdupf ("Unable to receive message body: %s", strerror (errno)));
+        return (EMUNGE_SOCKET);
+    }
+    else if (errno == ETIME) {
+        m_msg_set_err (m, EMUNGE_SOCKET,
+            strdup ("Unable to receive message body: Timed-out"));
         return (EMUNGE_SOCKET);
     }
     else if (n != m->pkt_len) {
@@ -420,6 +438,27 @@ m_msg_set_err (m_msg_t m, munge_err_t e, char *s)
 /*****************************************************************************
  *  Private Functions
  *****************************************************************************/
+
+static void
+_get_timeval (struct timeval *tv, int msecs)
+{
+/*  Sets [tv] to the current time adjusted forward by [msecs] milliseconds.
+ */
+    assert (tv != NULL);
+
+    gettimeofday (tv, NULL);
+
+    if (msecs > 0) {
+        tv->tv_sec += msecs / 1000;
+        tv->tv_usec += (msecs % 1000) * 1000;
+        if (tv->tv_usec >= 1000000) {
+            tv->tv_sec += tv->tv_usec / 1000000;
+            tv->tv_usec %= 1000000;
+        }
+    }
+    return;
+}
+
 
 static int
 _msg_length (m_msg_t m, m_msg_type_t type)
