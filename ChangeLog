@@ -1,11 +1,11 @@
 2011-01-26  Chris Dunlap  <cdunlap@llnl.gov>
 
-	* : Fixed potential deadlock in munged that can occur if clients block
-	  while sending data (issue 1).  The wrappers for read() & write()
-	  implement a timeout by preceding the read/write calls with a poll().
+	* : Fixed a potential deadlock in munged that can occur if clients
+	  block while sending data.  The wrappers for read() & write()
+	  implement a timeout by preceding the read/write calls with poll().
 	  In addition, the client & server sockets have been made nonblocking
 	  to protect against spurious readiness notifications.  Throughput is
-	  degraded by ~5%.
+	  degraded by ~6%.  (issue 1)
 	* src/libcommon/munge_defs.h: Added MUNGE_SOCKET_TIMEOUT_MSECS.
 	* src/munged/job.c (job_accept): Set socket connection to client as
 	  nonblocking.
@@ -33,60 +33,52 @@
 
 	* : Updated copyright date range.
 
-	* : Merged issue-2:854-888 into trunk.
-	* src/munged/gids.c (_gids_hash_create, _gids_user_to_uid):
-	  Replaced calls to getpwnam() with xgetpwnam().
-	* src/munged/xgetpwnam.c, src/munged/xgetpwnam.h: Added.
-	* src/munged/Makefile.am: Added xgetpwnam.c and xgetpwnam.h.
-	* config/x_ac_getpwnam.m4: Added _UNIX95 def for _X_AC_GETPWNAM_R_AIX.
-	* src/munged/xgetgrent.c (_xgetgrent_copy_str): Fixed assert that
-	  dereferenced uninitialized memory.
-	* src/munged/xgetgrent.c (_xgetgrent_copy): Made "src" parm const.
-	* src/munged/xgetgrent.c: Moved HAVE_GETGRENT_R_GNU #if-block to top.
-	* config/x_ac_getpwnam.m4: Removed _POSIX_C_SOURCE def.
-	* config/x_ac_getgrent.m4, config/x_ac_getpwnam.m4:
-	  Renamed Sun references to SunOS.
-	* configure.ac, config/x_ac_getpwnam.m4: Added X_AC_GETPWNAM.
-	* src/munged/xgetgrent.c (xgetgrent_buf_destroy): Fixed comment.
-	* src/munged/gids.c: Updated note regarding use of getpwnam / getgrent.
-	* src/munged/gids.c (_gids_hash_create): Tweaked test of return value
-	  from _gids_user_to_uid().
-	* src/munged/xgetgrent.c (xgetgrent): Renamed lock to mutex.
+	* : Fixed bug with getgrent() / getpwnam() crashing munged during
+	  supplementary group processing under glibc.  The use of the
+	  non-reentrant getgrent() & getpwnam() should have been ok since they
+	  were only called in/from _gids_hash_create(), and only one instance
+	  of that routine could be running at a time from within munged;
+	  as such, the use of static buffers in those routines was not an
+	  issue.  However, users running NIS or LDAP domains under glibc
+	  reported SEGVs which were traced back to getgrent() & getpwnam().
+	  The switch to the corresponding reentrant routines appears to have
+	  resolved the problem.  Abstractions for both getgrent() and
+	  getpwnam() were added to address portability issues.  (issue 2)
 	* src/munged/gids.c (_gids_hash_create): Replaced calls to
 	  setgrent(), getgrent(), and endgrent() with xgetgrent_init(),
 	  xgetgrent(), and xgetgrent_fini().
 	* src/munged/xgetgrent.c, src/munged/xgetgrent.h: Added.
 	* src/munged/Makefile.am: Added xgetgrent.c and xgetgrent.h.
-	* config/x_ac_getgrent.m4: Renamed HAVE_GETGRENT_R_POSIX to
-	  HAVE_GETGRENT_R_GNU.
-	* configure.ac: Fixed typo.
 	* configure.ac, config/x_ac_getgrent.m4: Added X_AC_GETGRENT.
+	* src/munged/gids.c (_gids_hash_create, _gids_user_to_uid):
+	  Replaced calls to getpwnam() with xgetpwnam().
+	* src/munged/xgetpwnam.c, src/munged/xgetpwnam.h: Added.
+	* src/munged/Makefile.am: Added xgetpwnam.c and xgetpwnam.h.
+	* configure.ac, config/x_ac_getpwnam.m4: Added X_AC_GETPWNAM.
 	* configure.ac: Added autoconf check for sysconf().
-	* configure.ac: Moved X_AC_SELECT_AUTH_METHOD to end.
+	* src/munged/gids.c (_gids_hash_create): Tweaked test of return value
+	  from _gids_user_to_uid().
 	* src/munged/gids.c (_gids_update): Set t_last_update to the time of
 	  the last successful update instead of the GIDS_GROUP_FILE mtime.
-	* src/munged/gids.c (_gids_update): Minor cosmetic changes.
 	* src/munged/gids.c (gids_create, _gids_update): Fixed do_group_stat
 	  not being protected by the gids mutex.  A minor race-condition
 	  could occur if a SIGHUP was received towards the beginning of
 	  _gids_update().  Now the mutex is held while do_group_stat is copied.
 	  And since the mutex is being acquired at the top of _gids_update,
 	  t_last_update has been moved into the gids struct as well.
-	* src/munged/gids.c (_gids_hash_create): Minor cosmetic changes.
 	* src/munged/gids.c (_gids_user_to_uid): Made errors inserting into the
 	  uid hash nonfatal since they are just a performance optimization.
-	* src/munged/gids.c: Minor cosmetic changes.
-	* src/munged/gids.h (gids_is_member): Fixed comment.
 
 2011-01-13  Chris Dunlap  <cdunlap@llnl.gov>
 
-	* : Merged issue-4:883-884 into trunk.
+	* : Fixed VPATH builds failing to install the init script.  (issue 4)
 	* src/etc/Makefile.am: Fixed install-data-local target to use $builddir
 	  for referencing munge.init since it is listed in AC_CONFIG_FILES.
 
 2011-01-06  Chris Dunlap  <cdunlap@llnl.gov>
 
-	* : Merged issue-3:874-875 into trunk.
+	* : Fixed bug with CFLAGS specified at configure-time nullifying the
+	  "--enable-debug" configure option.  (issue 3)
 	* config/x_ac_debug.m4: Instead of modifying CFLAGS, set DEBUGCFLAGS
 	  and passed it via AM_CFLAGS.  Also fixed NDEBUG to ensure it is not
 	  defined when --enable-debug is set.
