@@ -1,3 +1,7 @@
+2011-02-03  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* munge.spec: Fixed RPM spec file for openSUSE.  (issue 5)
+
 2011-01-26  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* : Fixed a potential deadlock in munged that can occur if clients

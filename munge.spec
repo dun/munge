@@ -9,9 +9,21 @@ Group:		System Environment/Daemons
 License:	GPLv3+ and LGPLv3+
 URL:		http://munge.googlecode.com/
 
-BuildRequires:	openssl-devel
-BuildRequires:	bzip2-devel
+%if 0%{?suse_version} >= 1100
+BuildRequires:	libbz2-devel
+BuildRequires:	libopenssl-devel
 BuildRequires:	zlib-devel
+%else
+%if 0%{?sles_version} || 0%{?suse_version}
+BuildRequires:	bzip2
+BuildRequires:	openssl-devel
+BuildRequires:	zlib-devel
+%else
+BuildRequires:	bzip2-devel
+BuildRequires:	openssl-devel
+BuildRequires:	zlib-devel
+%endif
+%endif
 BuildRoot:	%{_tmppath}/%{name}-%{version}
 
 Source0:	%{name}-%{version}.tar
