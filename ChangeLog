@@ -1,3 +1,9 @@
+2011-02-08  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/munged/gids.c (_gids_update): Added guard to update of
+	  do_group_stat flag for allowing a SIGHUP triggered during
+	  _gids_hash_update() to reset the flag.
+
 2011-02-03  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* munge.spec: Fixed RPM spec file for openSUSE.  (issue 5)

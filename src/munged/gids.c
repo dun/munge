@@ -310,7 +310,7 @@ _gids_update (gids_t gids)
         /*  On stat() error, disable future stat()s until reset via SIGHUP.
          */
         if (stat (GIDS_GROUP_FILE, &st) < 0) {
-            do_group_stat = -1;
+            do_group_stat = -2;
             log_msg (LOG_ERR, "Unable to stat \"%s\": %s",
                 GIDS_GROUP_FILE, strerror (errno));
         }
@@ -336,8 +336,14 @@ _gids_update (gids_t gids)
 
         gids->t_last_update = t_now;
     }
-    gids->do_group_stat = do_group_stat;
-
+    /*  Change the GIDs do_group_stat flag only when the stat() first fails.
+     *    This is done by setting the local flag to -2 on error, but storing -1
+     *    in the GIDs struct when the mutex is next acquired.  By doing this, a
+     *    SIGHUP triggered during _gids_hash_update() can still reset the flag.
+     */
+    if (do_group_stat < -1) {
+        gids->do_group_stat = -1;
+    }
     /*  Enable subsequent updating of the GIDs mapping only if the update
      *    interval is positive.
      */
