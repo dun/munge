@@ -406,6 +406,11 @@ _gids_hash_create (void)
         log_msg (LOG_ERR, "Unable to query current time");
         goto err;
     }
+    /*  Allocate memory for both the xgetgrent() and xgetpwnam() buffers here.
+     *    The xgetpwnam() buffer will be passed to _gids_user_to_uid() where it
+     *    is used, but allocating it here allows the same buffer to be reused
+     *    throughout a given GIDs creation cycle.
+     */
     if (xgetgrent_buf_create (&gr_buf_ptr, &gr_buf_len) < 0) {
         log_msg (LOG_ERR, "Unable to allocate group entry buffer");
         goto err;

@@ -1,3 +1,8 @@
+2011-02-09  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/munged/gids.c (_gids_hash_create): Added comment wrt xgetpwnam()
+	  buffer creation.
+
 2011-02-08  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/munged/gids.c (_gids_update): Added guard to update of
