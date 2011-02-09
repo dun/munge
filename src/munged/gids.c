@@ -318,7 +318,7 @@ _gids_update (gids_t gids)
             do_update = 0;
         }
     }
-    /*  Update the GIDS mapping.
+    /*  Update the GIDs mapping.
      */
     if (do_update) {
         hash = _gids_hash_create ();
@@ -326,7 +326,7 @@ _gids_update (gids_t gids)
     if ((errno = pthread_mutex_lock (&gids->mutex)) != 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to lock gids mutex");
     }
-    /*  Replace the old GIDS mapping if the update was successful.
+    /*  Replace the old GIDs mapping if the update was successful.
      */
     if (hash) {
 
