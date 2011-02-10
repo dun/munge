@@ -1,3 +1,9 @@
+2011-02-10  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/munged/job.c (_job_exec): Added the origin IP address to the
+	  logged error messages of select credential errors to aid in
+	  troubleshooting.
+
 2011-02-09  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/munged/gids.c (_gids_hash_create): Added comment wrt xgetpwnam()

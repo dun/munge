@@ -32,9 +32,11 @@
 #  include "config.h"
 #endif /* HAVE_CONFIG_H */
 
+#include <arpa/inet.h>                  /* for inet_ntop() */
 #include <assert.h>
 #include <errno.h>
 #include <munge.h>
+#include <netinet/in.h>                 /* for INET_ADDRSTRLEN */
 #include <signal.h>
 #include <string.h>
 #include <sys/socket.h>
@@ -171,11 +173,33 @@ _job_exec (m_msg_t m)
                 break;
         }
     }
+    /*  For certain MUNGE "cred" errors, the credential has been successfully
+     *    decoded but is deemed invalid for other reasons.  In these cases,
+     *    the origin IP address is added to the logged error message to aid
+     *    in troubleshooting.
+     */
     if (m->error_num != EMUNGE_SUCCESS) {
         p = (m->error_str != NULL)
             ? m->error_str
             : munge_strerror (m->error_num);
-        log_msg (LOG_INFO, "%s", p);
+        switch (m->error_num) {
+            case EMUNGE_CRED_EXPIRED:
+            case EMUNGE_CRED_REWOUND:
+            case EMUNGE_CRED_REPLAYED:
+            case EMUNGE_CRED_UNAUTHORIZED:
+                if (m->addr_len == 4) {
+                    char ip_addr_buf [INET_ADDRSTRLEN];
+                    if (inet_ntop (AF_INET, &m->addr, ip_addr_buf,
+                                   sizeof (ip_addr_buf)) != NULL) {
+                        log_msg (LOG_INFO, "%s from %s", p, ip_addr_buf);
+                        break;
+                    }
+                }
+                /* fall-through */
+            default:
+                log_msg (LOG_INFO, "%s", p);
+                break;
+        }
     }
     m_msg_destroy (m);
     return;
