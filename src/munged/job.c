@@ -186,7 +186,6 @@ _job_exec (m_msg_t m)
             case EMUNGE_CRED_EXPIRED:
             case EMUNGE_CRED_REWOUND:
             case EMUNGE_CRED_REPLAYED:
-            case EMUNGE_CRED_UNAUTHORIZED:
                 if (m->addr_len == 4) {
                     char ip_addr_buf [INET_ADDRSTRLEN];
                     if (inet_ntop (AF_INET, &m->addr, ip_addr_buf,

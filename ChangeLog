@@ -1,5 +1,10 @@
 2011-02-10  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/munged/job.c (_job_exec): Removed EMUNGE_CRED_UNAUTHORIZED errors
+	  from the set whose origin IP address is logged.  Although the
+	  credential has been successfully decoded, the client is not
+	  authorized to know any of its contents.
+
 	* src/munged/job.c (_job_exec): Added the origin IP address to the
 	  logged error messages of select credential errors to aid in
 	  troubleshooting.
