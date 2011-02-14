@@ -65,7 +65,7 @@ ssize_t fd_timed_read_n (int fd, void *buf, size_t n,
  *    will be skipped on the first iteration of the loop; this optimization
  *    should only be enabled if [fd] is nonblocking.
  *  Returns the number of bytes read, or -1 on error.  A timeout is not
- *    an error.  If a timeout has occurred, errno will be set to ETIME.
+ *    an error.  If a timeout has occurred, errno will be set to ETIMEDOUT.
  *    The caller should reset errno beforehand when checking for timeout.
  */
 
@@ -81,7 +81,7 @@ ssize_t fd_timed_write_n (int fd, const void *buf, size_t n,
  *    will be skipped on the first iteration of the loop; this optimization
  *    should only be enabled if [fd] is nonblocking.
  *  Returns the number of bytes written, or -1 on error.  A timeout is not
- *    an error.  If a timeout has occurred, errno will be set to ETIME.
+ *    an error.  If a timeout has occurred, errno will be set to ETIMEDOUT.
  *    The caller should reset errno beforehand when checking for timeout.
  */
 
@@ -97,7 +97,7 @@ ssize_t fd_timed_write_iov (int fd, const struct iovec *iov, int iov_cnt,
  *    will be skipped on the first iteration of the loop; this optimization
  *    should only be enabled if [fd] is nonblocking.
  *  Returns the number of bytes written, or -1 on error.  A timeout is not
- *    an error.  If a timeout has occurred, errno will be set to ETIME.
+ *    an error.  If a timeout has occurred, errno will be set to ETIMEDOUT.
  *    The caller should reset errno beforehand when checking for timeout.
  */
 

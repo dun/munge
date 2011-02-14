@@ -146,7 +146,7 @@ fd_timed_read_n (int fd, void *buf, size_t n,
                 return (-1);
         }
         else if (nfd == 0) {            /* timeout */
-            errno = ETIME;
+            errno = ETIMEDOUT;
             break;
         }
         else if (pfd.revents & POLLNVAL) {
@@ -217,7 +217,7 @@ fd_timed_write_n (int fd, const void *buf, size_t n,
                 return (-1);
         }
         else if (nfd == 0) {            /* timeout */
-            errno = ETIME;
+            errno = ETIMEDOUT;
             break;
         }
         else if (pfd.revents & POLLHUP) {
@@ -302,7 +302,7 @@ fd_timed_write_iov (int fd, const struct iovec *iov_orig, int iov_cnt,
                 goto err;
         }
         else if (nfd == 0) {            /* timeout */
-            errno = ETIME;
+            errno = ETIMEDOUT;
             break;
         }
         else if (pfd.revents & POLLHUP) {

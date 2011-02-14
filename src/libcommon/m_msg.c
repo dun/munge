@@ -287,7 +287,7 @@ m_msg_send (m_msg_t m, m_msg_type_t type, int maxlen)
             strdupf ("Unable to send message: %s", strerror (errno)));
         return (EMUNGE_SOCKET);
     }
-    else if (errno == ETIME) {
+    else if (errno == ETIMEDOUT) {
         m_msg_set_err (m, EMUNGE_SOCKET,
             strdup ("Unable to send message: Timed-out"));
         return (EMUNGE_SOCKET);
@@ -339,7 +339,7 @@ m_msg_recv (m_msg_t m, m_msg_type_t type, int maxlen)
                 strerror (errno)));
         return (EMUNGE_SOCKET);
     }
-    else if (errno == ETIME) {
+    else if (errno == ETIMEDOUT) {
         m_msg_set_err (m, EMUNGE_SOCKET,
             strdup ("Unable to receive message header: Timed-out"));
         return (EMUNGE_SOCKET);
@@ -379,7 +379,7 @@ m_msg_recv (m_msg_t m, m_msg_type_t type, int maxlen)
             strdupf ("Unable to receive message body: %s", strerror (errno)));
         return (EMUNGE_SOCKET);
     }
-    else if (errno == ETIME) {
+    else if (errno == ETIMEDOUT) {
         m_msg_set_err (m, EMUNGE_SOCKET,
             strdup ("Unable to receive message body: Timed-out"));
         return (EMUNGE_SOCKET);
