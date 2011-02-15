@@ -241,6 +241,7 @@ _check_auth_client_dir (const char *dir, int got_force)
 
 #ifdef AUTH_METHOD_GETPEEREID
 
+#include <sys/socket.h>
 #include <sys/types.h>
 
 int
