@@ -446,8 +446,9 @@ _get_timeval (struct timeval *tv, int msecs)
  */
     assert (tv != NULL);
 
-    gettimeofday (tv, NULL);
-
+    if (gettimeofday (tv, NULL) < 0) {
+        tv->tv_sec = tv->tv_usec = 0;
+    }
     if (msecs > 0) {
         tv->tv_sec += msecs / 1000;
         tv->tv_usec += (msecs % 1000) * 1000;

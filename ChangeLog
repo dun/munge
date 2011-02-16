@@ -1,5 +1,8 @@
 2011-02-16  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/libcommon/m_msg.c (_get_timeval): Added check for gettimeofday()
+	  error.
+
 	* src/munge/remunge.c (process_creds): Fixed "overflow in implicit
 	  constant conversion" warning for to.tv_sec (time_t) on OpenBSD 4.7
 	  where a time_t is 4 bytes and LONG_MAX is 8 bytes.
