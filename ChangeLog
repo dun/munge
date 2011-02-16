@@ -1,3 +1,7 @@
+2011-02-16  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/libmunge/munge_ctx.3.in: Twiddled wording for MUNGE_ZIP_BZLIB.
+
 2011-02-15  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/munged/auth_recv.c: Added <sys/socket.h> include for getpeereid()

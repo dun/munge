@@ -233,7 +233,7 @@ Specify the default according to the \fBmunged\fR configuration.
 .TP
 .B MUNGE_ZIP_BZLIB
 Specify the bzip2 library developed by Julian Seward.  This is slower and
-uses more memory, but generally gets the best compression on larger payloads.
+uses more memory, but generally gets better compression on larger payloads.
 .TP
 .B MUNGE_ZIP_ZLIB
 Specify the zlib library developed by Jean-loup Gailly and Mark Adler.
