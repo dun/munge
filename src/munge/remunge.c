@@ -950,12 +950,12 @@ process_creds (conf_t conf)
     if (conf->num_seconds) {
         to.tv_sec = conf->t_main_start.tv_sec + conf->num_seconds;
         if (to.tv_sec < conf->t_main_start.tv_sec) {
-            to.tv_sec = LONG_MAX;
+            to.tv_sec = (sizeof (to.tv_sec) == 4) ? INT_MAX : LONG_MAX;
         }
         to.tv_nsec = conf->t_main_start.tv_usec * 1e3;
     }
     else {
-        to.tv_sec = LONG_MAX;
+        to.tv_sec = (sizeof (to.tv_sec) == 4) ? INT_MAX : LONG_MAX;
         to.tv_nsec = 0;
     }
     /*  Recompute the number of seconds in case the specified duration
