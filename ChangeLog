@@ -1,3 +1,10 @@
+2011-02-24  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/munged/xgetgrent.c (_xgetgrent_get_buf_size):
+	  Replaced DEFAULT_GR_BUF_SIZE with MINIMUM_GR_BUF_SIZE.
+	* src/munged/xgetpwnam.c (_xgetpwnam_get_buf_size):
+	  Replaced DEFAULT_PW_BUF_SIZE with MINIMUM_PW_BUF_SIZE.
+
 2011-02-16  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/libcommon/m_msg.c (_get_timeval): Added check for gettimeofday()

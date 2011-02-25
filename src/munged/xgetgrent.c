@@ -69,7 +69,7 @@
  *  Constants
  *****************************************************************************/
 
-#define DEFAULT_GR_BUF_SIZE     4096
+#define MINIMUM_GR_BUF_SIZE     4096
 
 
 /*****************************************************************************
@@ -277,8 +277,8 @@ _xgetgrent_get_buf_size (void)
 #endif /* _SC_GETGR_R_SIZE_MAX */
 #endif /* HAVE_SYSCONF */
 
-        if (n <= 0) {
-            n = DEFAULT_GR_BUF_SIZE;
+        if (n <= MINIMUM_GR_BUF_SIZE) {
+            n = MINIMUM_GR_BUF_SIZE;
         }
         log_msg (LOG_DEBUG, "Using gr buf size of %d", n);
     }

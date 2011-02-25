@@ -71,7 +71,7 @@
  *  Constants
  *****************************************************************************/
 
-#define DEFAULT_PW_BUF_SIZE     4096
+#define MINIMUM_PW_BUF_SIZE     4096
 
 
 /*****************************************************************************
@@ -277,8 +277,8 @@ _xgetpwnam_get_buf_size (void)
 #endif /* _SC_GETPW_R_SIZE_MAX */
 #endif /* HAVE_SYSCONF */
 
-        if (n <= 0) {
-            n = DEFAULT_PW_BUF_SIZE;
+        if (n <= MINIMUM_PW_BUF_SIZE) {
+            n = MINIMUM_PW_BUF_SIZE;
         }
         log_msg (LOG_DEBUG, "Using pw buf size of %d", n);
     }
