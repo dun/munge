@@ -1,5 +1,7 @@
 2011-02-25  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* : Released 0.5.10.
+
 	* HISTORY, META, NEWS, PLATFORMS, munge.spec:
 	  Updated for 0.5.10 release.
 
