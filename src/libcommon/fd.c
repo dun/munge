@@ -337,7 +337,7 @@ writev_me:
                 continue;
             nwritten -= n;
             iov[i].iov_len -= n;
-            iov[i].iov_base = (unsigned char *) iov[i].iov_base + n;
+            iov[i].iov_base = (char *) iov[i].iov_base + n;
         }
     }
     free (iov);
