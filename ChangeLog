@@ -1,5 +1,8 @@
 2011-02-25  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* HISTORY, META, NEWS, PLATFORMS, munge.spec:
+	  Updated for 0.5.10 release.
+
 	* src/libcommon/fd.c (fd_timed_write_iov):
 	  Fixed "assignment type mismatch" compiler warning on Solaris when
 	  assigning an unsigned value to the signed struct iovec iov_base ptr.

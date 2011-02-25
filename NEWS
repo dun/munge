@@ -1,5 +1,10 @@
-munge-? (????-??-??):
+munge-0.5.10 (2011-02-25):
 - Changed project homepage to <http://munge.googlecode.com/>.
+- Fixed bug where munged could deadlock if clients blocked.
+- Fixed bug where munged could crash while processing supplementary groups.
+- Fixed bug with CFLAGS at configure-time nullifying --enable-debug.
+- Fixed bug with VPATH builds failing to install init script.
+- Fixed RPM spec file for openSUSE & SLES.
 
 munge-0.5.9 (2010-03-23):
 - Changed license to GPLv3+/LGPLv3+.

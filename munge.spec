@@ -1,8 +1,8 @@
 # $Id$
 
 Name:		munge
-Version:	0
-Release:	0
+Version:	0.5.10
+Release:	1%{?dist}
 
 Summary:	MUNGE Uid 'N' Gid Emporium
 Group:		System Environment/Daemons
@@ -26,7 +26,7 @@ BuildRequires:	zlib-devel
 %endif
 BuildRoot:	%{_tmppath}/%{name}-%{version}
 
-Source0:	%{name}-%{version}.tar
+Source0:	%{name}-%{version}.tar.bz2
 
 %package devel
 Requires:	%{name} = %{version}-%{release}
@@ -55,7 +55,7 @@ A header file and static library for developing applications using MUNGE.
 A shared library for applications using MUNGE.
 
 %prep
-%setup -n munge
+%setup
 
 %build
 %ifos aix5.3 aix5.2 aix5.1 aix5.0 aix4.3
