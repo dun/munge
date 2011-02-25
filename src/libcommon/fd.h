@@ -36,6 +36,7 @@
 #  include "config.h"
 #endif /* HAVE_CONFIG_H */
 
+#include <sys/time.h>
 #include <sys/types.h>
 #include <sys/uio.h>
 #include <unistd.h>
