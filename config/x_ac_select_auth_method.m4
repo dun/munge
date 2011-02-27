@@ -14,28 +14,33 @@
 #    MUNGE supports the following methods for authenticating the UID and GID of
 #    a client:
 #
-#    AUTH_METHOD_GETPEEREID (AIX >= 5.2-ML4, Darwin, FreeBSD >= 4.6)
+#    AUTH_METHOD_GETPEEREID
+#     (AIX >= 5.2-ML4, Darwin, FreeBSD >= 4.6, OpenBSD >= 3.0)
 #      The server uses getpeereid() to determine the identity of the client
 #      connected across the Unix domain socket.
 #
-#    AUTH_METHOD_GETPEERUCRED (SunOS >= 5.10)
+#    AUTH_METHOD_GETPEERUCRED
+#     (SunOS >= 5.10)
 #      The server uses getpeerucred() to determine the identity of the client
 #      connected across the Unix domain socket.  The client's UID and GID are
 #      then obtained via ucred_geteuid() and ucred_getegid().
 #
-#    AUTH_METHOD_SO_PEERCRED (Linux)
+#    AUTH_METHOD_SO_PEERCRED
+#     (Linux)
 #      The server uses the SO_PEERCRED socket option to determine the identity
 #      of the client connected across the Unix domain socket.  The client's UID
 #      and GID are then obtained from the ucred struct returned by
 #      getsockopt().
 #
-#    AUTH_METHOD_LOCAL_PEERCRED (BSD, Darwin, GNU/kFreeBSD)
+#    AUTH_METHOD_LOCAL_PEERCRED
+#     (BSD, Darwin, GNU/kFreeBSD)
 #      The server uses the LOCAL_PEERCRED socket option to determine the
 #      identity of the client connected across the Unix domain socket.  The
 #      client's UID and GID are then obtained from the xucred struct returned
 #      by getsockopt().
 #
-#    AUTH_METHOD_RECVFD_MKFIFO (Irix, SunOS)
+#    AUTH_METHOD_RECVFD_MKFIFO
+#     (Irix, SunOS)
 #      The server creates a unique FIFO special file via mkfifo() and sends a
 #      request to the client for it to pass an open file descriptor back across
 #      this FIFO.  The client creates a unique file and sends the open
@@ -43,7 +48,8 @@
 #      using the I_RECVFD ioctl(). The identity of the client is then obtained
 #      from the strrecvfd struct used to receive the file descriptor.
 #
-#    AUTH_METHOD_RECVFD_MKNOD (AIX)
+#    AUTH_METHOD_RECVFD_MKNOD
+#     (AIX)
 #      The server creates a unique STREAMS-based pipe via mknod() and sends a
 #      request to the client for it to pass an open file descriptor back across
 #      this pipe.  The client creates a unique file and sends the open
