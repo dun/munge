@@ -1,3 +1,8 @@
+2012-02-21  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* configure, config/x_ac_arch.m4: Applied patches from asau@netbsd.org
+	  to fix calls to test for integer equality on NetBSD.  (issue 12)
+
 2011-02-27  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* config/x_ac_select_auth_method.m4: Updated AUTH_METHOD_GETPEEREID
