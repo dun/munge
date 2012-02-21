@@ -57,7 +57,7 @@ AC_DEFUN([X_AC_ARCH], [
     fi
   fi
 
-  if test "$x_ac_arch" == "32"; then
+  if test "$x_ac_arch" = "32"; then
     if expr "$host_os" : "aix" >/dev/null 2>&1; then
       test -z "$OBJECT_MODE" && AC_MSG_ERROR(
         [The OBJECT_MODE variable must be exported to the shell.])
@@ -67,7 +67,7 @@ AC_DEFUN([X_AC_ARCH], [
       test -d /lib -o -d /usr/lib \
         && LDFLAGS="-L/lib -L/usr/lib $LDFLAGS"
     fi
-  elif test "$x_ac_arch" == "64"; then
+  elif test "$x_ac_arch" = "64"; then
     if expr "$host_os" : "aix" >/dev/null 2>&1; then
       test -z "$OBJECT_MODE" && AC_MSG_ERROR(
         [The OBJECT_MODE variable must be exported to the shell.])
