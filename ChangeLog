@@ -1,5 +1,7 @@
 2012-02-22  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* : Updated copyright date range.
+
 	* src/munged/random.c (random_init): Stir the entropy pool with the
 	  current time.
 
