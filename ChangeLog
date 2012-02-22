@@ -1,3 +1,8 @@
+2012-02-22  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/munged/random.c (random_init): Stir the entropy pool with the
+	  current time.
+
 2012-02-21  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* configure, config/x_ac_arch.m4: Applied patches from asau@netbsd.org
