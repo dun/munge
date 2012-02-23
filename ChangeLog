@@ -1,5 +1,8 @@
 2012-02-22  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* config/x_ac_expand_install_dirs.m4:
+	  Created _X_AC_EXPAND_INSTALL_DIRS_EVAL.
+
 	* : Updated copyright date range.
 
 	* src/munged/random.c (random_init): Stir the entropy pool with the
