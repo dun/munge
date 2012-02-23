@@ -1,3 +1,9 @@
+2012-02-23  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* config/x_ac_expand_install_dirs.m4:
+	  Changed _X_AC_EXPAND_INSTALL_DIRS_EVAL to loop over the eval
+	  expansion in order to handle increased levels of indirection.
+
 2012-02-22  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* config/x_ac_expand_install_dirs.m4:

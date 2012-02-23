@@ -96,5 +96,11 @@ AC_DEFUN([X_AC_EXPAND_INSTALL_DIRS], [
 ])
 
 AC_DEFUN([_X_AC_EXPAND_INSTALL_DIRS_EVAL],
-  [eval $1="$2" dnl]
+  [_eval_old="$2"
+  for _eval_cnt in 1 2 3 4 5 6 7 8; do
+    eval _eval_new="$_eval_old"
+    test "$_eval_new" = "$_eval_old" && break
+    _eval_old="$_eval_new"
+  done
+  $1="$_eval_old" dnl]
 )

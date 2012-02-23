@@ -2735,7 +2735,13 @@ $as_echo_n "checking installation directory variables... " >&6; }
   _x_ac_expand_install_dirs_exec_prefix="$exec_prefix"
   test "$exec_prefix" = NONE && exec_prefix="$prefix"
 
-  eval X_PREFIX="$prefix"
+  _eval_old="$prefix"
+  for _eval_cnt in 1 2 3 4 5 6 7 8; do
+    eval _eval_new="$_eval_old"
+    test "$_eval_new" = "$_eval_old" && break
+    _eval_old="$_eval_new"
+  done
+  X_PREFIX="$_eval_old"
 
 cat >>confdefs.h <<_ACEOF
 #define X_PREFIX "$X_PREFIX"
@@ -2743,7 +2749,13 @@ _ACEOF
 
 
 
-  eval X_EXEC_PREFIX="$exec_prefix"
+  _eval_old="$exec_prefix"
+  for _eval_cnt in 1 2 3 4 5 6 7 8; do
+    eval _eval_new="$_eval_old"
+    test "$_eval_new" = "$_eval_old" && break
+    _eval_old="$_eval_new"
+  done
+  X_EXEC_PREFIX="$_eval_old"
 
 cat >>confdefs.h <<_ACEOF
 #define X_EXEC_PREFIX "$X_EXEC_PREFIX"
@@ -2751,7 +2763,13 @@ _ACEOF
 
 
 
-  eval X_BINDIR="$bindir"
+  _eval_old="$bindir"
+  for _eval_cnt in 1 2 3 4 5 6 7 8; do
+    eval _eval_new="$_eval_old"
+    test "$_eval_new" = "$_eval_old" && break
+    _eval_old="$_eval_new"
+  done
+  X_BINDIR="$_eval_old"
 
 cat >>confdefs.h <<_ACEOF
 #define X_BINDIR "$X_BINDIR"
@@ -2759,7 +2777,13 @@ _ACEOF
 
 
 
-  eval X_SBINDIR="$sbindir"
+  _eval_old="$sbindir"
+  for _eval_cnt in 1 2 3 4 5 6 7 8; do
+    eval _eval_new="$_eval_old"
+    test "$_eval_new" = "$_eval_old" && break
+    _eval_old="$_eval_new"
+  done
+  X_SBINDIR="$_eval_old"
 
 cat >>confdefs.h <<_ACEOF
 #define X_SBINDIR "$X_SBINDIR"
@@ -2767,7 +2791,13 @@ _ACEOF
 
 
 
-  eval X_LIBEXECDIR="$libexecdir"
+  _eval_old="$libexecdir"
+  for _eval_cnt in 1 2 3 4 5 6 7 8; do
+    eval _eval_new="$_eval_old"
+    test "$_eval_new" = "$_eval_old" && break
+    _eval_old="$_eval_new"
+  done
+  X_LIBEXECDIR="$_eval_old"
 
 cat >>confdefs.h <<_ACEOF
 #define X_LIBEXECDIR "$X_LIBEXECDIR"
@@ -2775,7 +2805,13 @@ _ACEOF
 
 
 
-  eval X_DATADIR="$datadir"
+  _eval_old="$datadir"
+  for _eval_cnt in 1 2 3 4 5 6 7 8; do
+    eval _eval_new="$_eval_old"
+    test "$_eval_new" = "$_eval_old" && break
+    _eval_old="$_eval_new"
+  done
+  X_DATADIR="$_eval_old"
 
 cat >>confdefs.h <<_ACEOF
 #define X_DATADIR "$X_DATADIR"
@@ -2783,7 +2819,13 @@ _ACEOF
 
 
 
-  eval X_SYSCONFDIR="$sysconfdir"
+  _eval_old="$sysconfdir"
+  for _eval_cnt in 1 2 3 4 5 6 7 8; do
+    eval _eval_new="$_eval_old"
+    test "$_eval_new" = "$_eval_old" && break
+    _eval_old="$_eval_new"
+  done
+  X_SYSCONFDIR="$_eval_old"
 
 cat >>confdefs.h <<_ACEOF
 #define X_SYSCONFDIR "$X_SYSCONFDIR"
@@ -2791,7 +2833,13 @@ _ACEOF
 
 
 
-  eval X_SHAREDSTATEDIR="$sharedstatedir"
+  _eval_old="$sharedstatedir"
+  for _eval_cnt in 1 2 3 4 5 6 7 8; do
+    eval _eval_new="$_eval_old"
+    test "$_eval_new" = "$_eval_old" && break
+    _eval_old="$_eval_new"
+  done
+  X_SHAREDSTATEDIR="$_eval_old"
 
 cat >>confdefs.h <<_ACEOF
 #define X_SHAREDSTATEDIR "$X_SHAREDSTATEDIR"
@@ -2799,7 +2847,13 @@ _ACEOF
 
 
 
-  eval X_LOCALSTATEDIR="$localstatedir"
+  _eval_old="$localstatedir"
+  for _eval_cnt in 1 2 3 4 5 6 7 8; do
+    eval _eval_new="$_eval_old"
+    test "$_eval_new" = "$_eval_old" && break
+    _eval_old="$_eval_new"
+  done
+  X_LOCALSTATEDIR="$_eval_old"
 
 cat >>confdefs.h <<_ACEOF
 #define X_LOCALSTATEDIR "$X_LOCALSTATEDIR"
@@ -2807,7 +2861,13 @@ _ACEOF
 
 
 
-  eval X_LIBDIR="$libdir"
+  _eval_old="$libdir"
+  for _eval_cnt in 1 2 3 4 5 6 7 8; do
+    eval _eval_new="$_eval_old"
+    test "$_eval_new" = "$_eval_old" && break
+    _eval_old="$_eval_new"
+  done
+  X_LIBDIR="$_eval_old"
 
 cat >>confdefs.h <<_ACEOF
 #define X_LIBDIR "$X_LIBDIR"
@@ -2815,7 +2875,13 @@ _ACEOF
 
 
 
-  eval X_INCLUDEDIR="$includedir"
+  _eval_old="$includedir"
+  for _eval_cnt in 1 2 3 4 5 6 7 8; do
+    eval _eval_new="$_eval_old"
+    test "$_eval_new" = "$_eval_old" && break
+    _eval_old="$_eval_new"
+  done
+  X_INCLUDEDIR="$_eval_old"
 
 cat >>confdefs.h <<_ACEOF
 #define X_INCLUDEDIR "$X_INCLUDEDIR"
@@ -2823,7 +2889,13 @@ _ACEOF
 
 
 
-  eval X_OLDINCLUDEDIR="$oldincludedir"
+  _eval_old="$oldincludedir"
+  for _eval_cnt in 1 2 3 4 5 6 7 8; do
+    eval _eval_new="$_eval_old"
+    test "$_eval_new" = "$_eval_old" && break
+    _eval_old="$_eval_new"
+  done
+  X_OLDINCLUDEDIR="$_eval_old"
 
 cat >>confdefs.h <<_ACEOF
 #define X_OLDINCLUDEDIR "$X_OLDINCLUDEDIR"
@@ -2831,7 +2903,13 @@ _ACEOF
 
 
 
-  eval X_INFODIR="$infodir"
+  _eval_old="$infodir"
+  for _eval_cnt in 1 2 3 4 5 6 7 8; do
+    eval _eval_new="$_eval_old"
+    test "$_eval_new" = "$_eval_old" && break
+    _eval_old="$_eval_new"
+  done
+  X_INFODIR="$_eval_old"
 
 cat >>confdefs.h <<_ACEOF
 #define X_INFODIR "$X_INFODIR"
@@ -2839,7 +2917,13 @@ _ACEOF
 
 
 
-  eval X_MANDIR="$mandir"
+  _eval_old="$mandir"
+  for _eval_cnt in 1 2 3 4 5 6 7 8; do
+    eval _eval_new="$_eval_old"
+    test "$_eval_new" = "$_eval_old" && break
+    _eval_old="$_eval_new"
+  done
+  X_MANDIR="$_eval_old"
 
 cat >>confdefs.h <<_ACEOF
 #define X_MANDIR "$X_MANDIR"
@@ -6157,13 +6241,13 @@ if test "${lt_cv_nm_interface+set}" = set; then :
 else
   lt_cv_nm_interface="BSD nm"
   echo "int some_variable = 0;" > conftest.$ac_ext
-  (eval echo "\"\$as_me:6160: $ac_compile\"" >&5)
+  (eval echo "\"\$as_me:6244: $ac_compile\"" >&5)
   (eval "$ac_compile" 2>conftest.err)
   cat conftest.err >&5
-  (eval echo "\"\$as_me:6163: $NM \\\"conftest.$ac_objext\\\"\"" >&5)
+  (eval echo "\"\$as_me:6247: $NM \\\"conftest.$ac_objext\\\"\"" >&5)
   (eval "$NM \"conftest.$ac_objext\"" 2>conftest.err > conftest.out)
   cat conftest.err >&5
-  (eval echo "\"\$as_me:6166: output\"" >&5)
+  (eval echo "\"\$as_me:6250: output\"" >&5)
   cat conftest.out >&5
   if $GREP 'External.*some_variable' conftest.out > /dev/null; then
     lt_cv_nm_interface="MS dumpbin"
@@ -7368,7 +7452,7 @@ ia64-*-hpux*)
   ;;
 *-*-irix6*)
   # Find out which ABI we are using.
-  echo '#line 7371 "configure"' > conftest.$ac_ext
+  echo '#line 7455 "configure"' > conftest.$ac_ext
   if { { eval echo "\"\$as_me\":${as_lineno-$LINENO}: \"$ac_compile\""; } >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -8630,11 +8714,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:8633: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:8717: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:8637: \$? = $ac_status" >&5
+   echo "$as_me:8721: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -8969,11 +9053,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:8972: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:9056: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:8976: \$? = $ac_status" >&5
+   echo "$as_me:9060: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -9074,11 +9158,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:9077: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:9161: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:9081: \$? = $ac_status" >&5
+   echo "$as_me:9165: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -9129,11 +9213,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:9132: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:9216: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:9136: \$? = $ac_status" >&5
+   echo "$as_me:9220: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -11513,7 +11597,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 11516 "configure"
+#line 11600 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -11609,7 +11693,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 11612 "configure"
+#line 11696 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
