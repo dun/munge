@@ -1,5 +1,9 @@
 2012-02-23  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/munged/random.h, src/munged/random.c (random_stir): Added.
+	* src/munged/random.c (random_init): Replaced code to stir the entropy
+	  pool with random_stir().
+
 	* config/x_ac_expand_install_dirs.m4:
 	  Changed _X_AC_EXPAND_INSTALL_DIRS_EVAL to loop over the eval
 	  expansion in order to handle increased levels of indirection.

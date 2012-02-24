@@ -78,15 +78,14 @@ void _random_pseudo_bytes (unsigned char *buf, int n);
 int
 random_init (const char *seed)
 {
-    int             rnd_bytes_needed    = RANDOM_SEED_BYTES;
-    int             rc                  = 0;
-    int             do_unlink           = 1;
-    int             got_symlink;
-    struct stat     st;
-    int             n;
-    char            seed_dir [PATH_MAX];
-    char            ebuf [1024];
-    struct timeval  tv;
+    int          rnd_bytes_needed       = RANDOM_SEED_BYTES;
+    int          rc                     = 0;
+    int          do_unlink              = 1;
+    int          got_symlink;
+    struct stat  st;
+    int          n;
+    char         seed_dir [PATH_MAX];
+    char         ebuf [1024];
 
     /*  Load entropy from seed file.
      */
@@ -181,12 +180,7 @@ random_init (const char *seed)
     else {
         rc = 1;
     }
-    /*  Stir the entropy pool with the current time.
-     */
-    if (gettimeofday (&tv, NULL) == 0) {
-        random_add (&tv.tv_sec, sizeof (tv.tv_sec));
-        random_add (&tv.tv_usec, sizeof (tv.tv_usec));
-    }
+    random_stir ();
     return (rc);
 }
 
@@ -242,6 +236,22 @@ random_pseudo_bytes (unsigned char *buf, int n)
         return;
     }
     _random_pseudo_bytes (buf, n);
+    return;
+}
+
+
+void
+random_stir (void)
+{
+    struct timeval  tv;
+
+    /*  Stir the entropy pool with the current time.
+     *  There should be some entropy down in the usec resolution.
+     */
+    if (gettimeofday (&tv, NULL) == 0) {
+        random_add (&tv.tv_sec, sizeof (tv.tv_sec));
+        random_add (&tv.tv_usec, sizeof (tv.tv_usec));
+    }
     return;
 }
 
