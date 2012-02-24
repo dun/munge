@@ -191,6 +191,8 @@ random_fini (const char *seed)
     mode_t  mask;
     int     n;
 
+    random_stir ();
+
     if (seed != NULL) {
 
         mask = umask (0);

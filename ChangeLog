@@ -1,5 +1,8 @@
 2012-02-23  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/munged/random.c (random_fini): Stir the entropy pool before
+	  writing out the seed file.
+
 	* src/munged/random.h, src/munged/random.c (random_stir): Added.
 	* src/munged/random.c (random_init): Replaced code to stir the entropy
 	  pool with random_stir().
