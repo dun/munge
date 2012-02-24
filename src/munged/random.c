@@ -251,8 +251,8 @@ random_stir (void)
      *  There should be some entropy down in the usec resolution.
      */
     if (gettimeofday (&tv, NULL) == 0) {
-        random_add (&tv.tv_sec, sizeof (tv.tv_sec));
-        random_add (&tv.tv_usec, sizeof (tv.tv_usec));
+        _random_add (&tv.tv_sec, sizeof (tv.tv_sec));
+        _random_add (&tv.tv_usec, sizeof (tv.tv_usec));
     }
     return;
 }
