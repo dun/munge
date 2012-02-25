@@ -218,6 +218,7 @@
 
 /*  Integer for the minimum number of seconds between stirrings of the PRNG
  *    entropy pool from which the exponential backoff starts.
+ *  If set to 0, the timer for repeated stirrings will be disabled.
  */
 #define RANDOM_SEED_STIR_MIN_SECS       1
 

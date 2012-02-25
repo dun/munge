@@ -1,5 +1,10 @@
 2012-02-25  Chris Dunlap  <cdunlap@llnl.gov>
 
+	* src/munged/random.c (_random_seed_stir_callback): Disabled timer for
+	  repeated stirrings if the minimum timeout is set to 0.
+	* src/libcommon/munge_defs.h:
+	  Updated comment for RANDOM_SEED_STIR_MIN_SECS.
+
 	* src/munged/random.c (random_init):
 	  Set _random_timer_id when initial callback is scheduled.
 

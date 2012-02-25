@@ -552,10 +552,14 @@ _random_seed_stir_callback (void *_arg_not_used_)
     int             msecs;
 
     _random_timer_id = 0;
-    log_msg (LOG_DEBUG, "Stirring PRNG entropy pool");
+    /*
+     *  Disable repeated stirrings if the mininum timeout is set to 0.
+     */
     if (timeout_secs <= 0) {
-        timeout_secs = 1;
+        return;
     }
+    log_msg (LOG_DEBUG, "Stirring PRNG entropy pool");
+
     /*  Stir the entropy pool with the current time.
      *  There should be some entropy in the usec component.
      */
