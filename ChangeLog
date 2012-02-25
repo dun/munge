@@ -1,3 +1,13 @@
+2012-02-24  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/munged/random.c (_random_seed_stir_callback): Added.
+	* src/munged/random.c (random_init):
+	  Set timer for _random_seed_stir_callback().
+	* src/munged/random.c (random_fini):
+	  Canceled the next scheduled timer for _random_seed_stir_callback().
+	* src/libcommon/munge_defs.h:
+	  Added RANDOM_SEED_STIR_MAX_SECS and RANDOM_SEED_STIR_MIN_SECS.
+
 2012-02-23  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/munged/random.c (random_stir):
