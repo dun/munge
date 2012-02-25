@@ -206,7 +206,8 @@ random_init (const char *seed)
     random_stir ();
 
     _random_timer_id = timer_set_relative (
-            (callback_f) _random_seed_stir_callback, NULL, 0);
+            (callback_f) _random_seed_stir_callback, NULL,
+            RANDOM_SEED_STIR_MIN_SECS * 1000);
 
     if (_random_timer_id < 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to set PRNG stir timer");
@@ -561,22 +562,22 @@ _random_seed_stir_callback (void *_arg_not_used_)
     log_msg (LOG_DEBUG, "Stirring PRNG entropy pool");
 
     /*  Stir the entropy pool with the current time.
-     *  There should be some entropy in the usec component.
+     *  There should be some entropy (up to 20 bits) in the tv_usec component.
      */
     if (gettimeofday (&tv, NULL) == 0) {
         _random_add (&tv.tv_usec, sizeof (tv.tv_usec));
     }
-    /*  The 10 low-order bits of the current time are used to stagger
-     *    subsequent callbacks by up to 1023ms.
-     */
-    msecs = (timeout_secs * 1000) + (tv.tv_usec & 0x3FF);
-    /*
-     *  Perform an exponential backoff up to the maximum timeout.  This allows
+    /*  Perform an exponential backoff up to the maximum timeout.  This allows
      *    for vigorous stirring of the entropy pool when the daemon is started.
      */
     if (timeout_secs < RANDOM_SEED_STIR_MAX_SECS) {
         timeout_secs = MIN(timeout_secs * 2, RANDOM_SEED_STIR_MAX_SECS);
     }
+    /*  The 10 low-order bits of the current time are used to stagger
+     *    subsequent callbacks by up to 1023ms.
+     */
+    msecs = (timeout_secs * 1000) + (tv.tv_usec & 0x3FF);
+
     _random_timer_id = timer_set_relative (
             (callback_f) _random_seed_stir_callback, NULL, msecs);
 
