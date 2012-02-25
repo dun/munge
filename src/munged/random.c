@@ -204,7 +204,13 @@ random_init (const char *seed)
      *    of the entropy pool before the PRNG is used.
      */
     random_stir ();
-    timer_set_relative ((callback_f) _random_seed_stir_callback, NULL, 0);
+
+    _random_timer_id = timer_set_relative (
+            (callback_f) _random_seed_stir_callback, NULL, 0);
+
+    if (_random_timer_id < 0) {
+        log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to set PRNG stir timer");
+    }
     return (rc);
 }
 
