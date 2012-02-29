@@ -1,3 +1,7 @@
+2012-02-28  Chris Dunlap  <cdunlap@llnl.gov>
+
+	* src/munged/random.c (_random_seed_stir_callback): Tweaked comments.
+
 2012-02-25  Chris Dunlap  <cdunlap@llnl.gov>
 
 	* src/munged/random.c (random_init, _random_seed_stir_callback):

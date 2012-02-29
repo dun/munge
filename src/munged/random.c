@@ -553,16 +553,17 @@ _random_seed_stir_callback (void *_arg_not_used_)
     int             msecs;
 
     _random_timer_id = 0;
-    /*
-     *  Disable repeated stirrings if the mininum timeout is set to 0.
+
+    /*  Disable repeated stirrings if the mininum timeout is set to 0.
      */
     if (timeout_secs <= 0) {
         return;
     }
     log_msg (LOG_DEBUG, "Stirring PRNG entropy pool");
 
-    /*  Stir the entropy pool with the current time.
-     *  There should be some entropy (up to 20 bits) in the tv_usec component.
+    /*  Stir the entropy pool with the current time.  There should be some
+     *    entropy in the tv_usec component -- up to 20 bits, but probably
+     *    more in the range of 5-10 bits.
      */
     if (gettimeofday (&tv, NULL) == 0) {
         _random_add (&tv.tv_usec, sizeof (tv.tv_usec));
@@ -573,8 +574,8 @@ _random_seed_stir_callback (void *_arg_not_used_)
     if (timeout_secs < RANDOM_SEED_STIR_MAX_SECS) {
         timeout_secs = MIN(timeout_secs * 2, RANDOM_SEED_STIR_MAX_SECS);
     }
-    /*  The 10 low-order bits of the current time are used to stagger
-     *    subsequent callbacks by up to 1023ms.
+    /*  The 10 low-order bits of the current time are used to mix things up and
+     *    stagger subsequent callbacks by up to 1023ms.
      */
     msecs = (timeout_secs * 1000) + (tv.tv_usec & 0x3FF);
 
