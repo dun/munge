@@ -162,7 +162,6 @@ if [ -x /sbin/ldconfig ]; then /sbin/ldconfig %{_libdir}; fi
 %defattr(-,root,root,0755)
 %doc AUTHORS
 %doc BUGS
-%doc ChangeLog
 %doc COPYING
 %doc DISCLAIMER*
 %doc HISTORY
