@@ -1,7 +1,4 @@
 /*****************************************************************************
- *  $Id$
- *  LSD-Id: hash.c,v 1.8 2003/11/19 23:33:48 dun Exp
- *****************************************************************************
  *  Written by Chris Dunlap <cdunlap@llnl.gov>.
  *  Copyright (C) 2007-2012 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2002-2007 The Regents of the University of California.

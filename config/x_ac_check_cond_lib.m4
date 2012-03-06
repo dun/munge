@@ -1,6 +1,4 @@
-##*****************************************************************************
-## $Id$
-##*****************************************************************************
+#******************************************************************************
 #  AUTHOR:
 #    Chris Dunlap <cdunlap@llnl.gov>
 #
@@ -18,7 +16,7 @@
 #    all executables), the shell variable LIB<library> is defined so it can be
 #    added to the linking of just those executables needing this library.
 #    Also note that this checks to see if the library is even needed at all.
-##*****************************************************************************
+#******************************************************************************
 
 AC_DEFUN([X_AC_CHECK_COND_LIB], [
   AC_CACHE_CHECK(

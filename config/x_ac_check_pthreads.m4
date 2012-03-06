@@ -1,6 +1,4 @@
-##*****************************************************************************
-## $Id$
-##*****************************************************************************
+#******************************************************************************
 #  AUTHOR:
 #    Chris Dunlap <cdunlap@llnl.gov>
 #
@@ -15,7 +13,7 @@
 #    goes into "config.h" which is the first include (in my code, at least).
 #    For more information wrt _REENTRANT, refer to the LinuxThreads FAQ:
 #      <http://pauillac.inria.fr/~xleroy/linuxthreads/faq.html#H>.
-##*****************************************************************************
+#******************************************************************************
 
 AC_DEFUN([X_AC_CHECK_PTHREADS], [
   AC_CACHE_CHECK(

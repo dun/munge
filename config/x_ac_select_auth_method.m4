@@ -1,6 +1,4 @@
-##*****************************************************************************
-## $Id$
-##*****************************************************************************
+#******************************************************************************
 #  AUTHOR:
 #    Chris Dunlap <cdunlap@llnl.gov>
 #
@@ -57,7 +55,7 @@
 #      using the I_RECVFD ioctl(). The identity of the client is then obtained
 #      from the strrecvfd struct used to receive the file descriptor. The
 #      server requires root privileges in order to create this pipe.
-##*****************************************************************************
+#******************************************************************************
 
 AC_DEFUN([X_AC_SELECT_AUTH_METHOD], [
   AC_MSG_NOTICE([checking authentication support])

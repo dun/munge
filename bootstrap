@@ -1,7 +1,4 @@
 #!/bin/sh
-##
-# $Id$
-##
 
 set -x
 aclocal -I config || exit 1

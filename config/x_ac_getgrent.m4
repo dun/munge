@@ -1,6 +1,4 @@
-##*****************************************************************************
-## $Id$
-##*****************************************************************************
+#******************************************************************************
 #  AUTHOR:
 #    Chris Dunlap <cdunlap@llnl.gov>
 #
@@ -19,7 +17,7 @@
 #    AC_LINK_IFELSE is used instead of AC_COMPILE_IFELSE since these tests
 #    compile successfully on BSD systems without getgrent_r() implementations.
 #    The missing getgrent_r() is detected when linking.
-##*****************************************************************************
+#******************************************************************************
 
 AC_DEFUN([X_AC_GETGRENT], [
   AC_CHECK_FUNCS(getgrent)

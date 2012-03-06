@@ -1,5 +1,3 @@
-# $Id$
-
 Name:		munge
 Version:	0.5.10
 Release:	1%{?dist}

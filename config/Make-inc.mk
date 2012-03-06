@@ -1,6 +1,4 @@
 ##*****************************************************************************
-## $Id$
-##*****************************************************************************
 ## Written by Chris Dunlap <cdunlap@llnl.gov>.
 ## Copyright (C) 2007-2012 Lawrence Livermore National Security, LLC.
 ## Copyright (C) 2002-2007 The Regents of the University of California.
