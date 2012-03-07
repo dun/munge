@@ -49,6 +49,7 @@
 #define MUNGE_MSG_HDR_SIZE              11
 
 /*  Sentinel for a valid munge message.
+ *    M (13*26^4) + U (21*26^3) + N (14*26^2) + G (7*26^1) + E (5*26^0)
  */
 #define MUNGE_MSG_MAGIC                 0x00606D4B
 
