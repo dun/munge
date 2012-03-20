@@ -196,13 +196,18 @@ random_init (const char *seed)
     else {
         rc = 1;
     }
-    /*  Schedule repeated stirrings of the entropy pool.
-     *  The callback won't run until after timer_init() is invoked in main(),
-     *    so random_stir() is still needed here to stir the initial state
-     *    of the entropy pool before the PRNG is used.
+    /*  Stir the initial state of the entropy pool.  This helps to protect
+     *    against multiple instances starting with the same seed: for example,
+     *    starting after a previous instance that did not shutdown gracefully
+     *    (so its final seed state was not written), or cloning a VM.
      */
     random_stir ();
-
+    /*
+     *  Schedule repeated stirrings of the entropy pool.
+     *  The callback won't run until after timer_init() is invoked in main(),
+     *    so random_stir() is still needed above to stir the initial state of
+     *    the entropy pool before the PRNG is used.
+     */
     _random_timer_id = timer_set_relative (
             (callback_f) _random_seed_stir_callback, NULL,
             RANDOM_SEED_STIR_MIN_SECS * 1000);
@@ -560,8 +565,9 @@ _random_seed_stir_callback (void *_arg_not_used_)
     log_msg (LOG_DEBUG, "Stirring PRNG entropy pool");
 
     /*  Stir the entropy pool with the current time.  There should be some
-     *    entropy in the tv_usec component -- up to 20 bits, but probably
-     *    more in the range of 5-10 bits.
+     *    entropy in the tv_usec component -- up to 20 bits, but probably more
+     *    in the range of 5-10 bits.  The entropy arises from the uncertainty
+     *    as to precisely when the callback executes.
      */
     if (gettimeofday (&tv, NULL) == 0) {
         _random_add (&tv.tv_usec, sizeof (tv.tv_usec));
