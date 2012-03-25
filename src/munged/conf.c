@@ -171,7 +171,7 @@ void
 destroy_conf (conf_t conf)
 {
     assert (conf != NULL);
-    assert (conf->ld < 0);              /* munge_sock_destroy already called */
+    assert (conf->ld < 0);              /* sock_destroy() already called */
 
     if (conf->config_name) {
         free (conf->config_name);
