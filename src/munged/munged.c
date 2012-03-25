@@ -64,7 +64,7 @@
  *  Prototypes
  *****************************************************************************/
 
-static int  daemonize_init (char *progname);
+static int daemonize_init (char *progname);
 static void daemonize_fini (int fd);
 static void open_logfile (const char *logfile, int priority, int got_force);
 static void handle_signals (void);
