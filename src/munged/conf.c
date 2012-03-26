@@ -124,6 +124,9 @@ create_conf (void)
      *  FIXME: Add support for default realm.
      */
     conf->config_name = NULL;
+    conf->lockfile_fd = -1;
+    conf->lockfile_name = NULL;
+
     if (!(conf->logfile_name = strdup (MUNGED_LOGFILE))) {
         log_errno (EMUNGE_NO_MEMORY, LOG_ERR,
             "Cannot dup logfile name string");
@@ -172,10 +175,15 @@ destroy_conf (conf_t conf)
 {
     assert (conf != NULL);
     assert (conf->ld < 0);              /* sock_destroy() already called */
+    assert (conf->lockfile_fd < 0);
 
     if (conf->config_name) {
         free (conf->config_name);
         conf->config_name = NULL;
+    }
+    if (conf->lockfile_name) {
+        free (conf->lockfile_name);
+        conf->lockfile_name = NULL;
     }
     if (conf->logfile_name) {
         free (conf->logfile_name);

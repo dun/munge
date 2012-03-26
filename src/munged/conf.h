@@ -54,6 +54,8 @@ struct conf {
     munge_ttl_t     def_ttl;            /* default time-to-live in seconds   */
     munge_ttl_t     max_ttl;            /* maximum time-to-live in seconds   */
     char           *config_name;        /* configuration filename            */
+    int             lockfile_fd;        /* daemon lockfile fd                */
+    char           *lockfile_name;      /* daemon lockfile name              */
     char           *logfile_name;       /* daemon logfile name               */
     char           *pidfile_name;       /* daemon pidfile name               */
     char           *socket_name;        /* unix domain socket filename       */
