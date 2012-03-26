@@ -529,9 +529,10 @@ sock_create (conf_t conf)
     char                sockdir [PATH_MAX];
     char                ebuf [1024];
     int                 n;
-    mode_t              mask;
     int                 sd;
     struct sockaddr_un  addr;
+    mode_t              mask;
+    int                 rv;
 
     assert (conf != NULL);
 
@@ -572,10 +573,8 @@ sock_create (conf_t conf)
      */
     sock_lock (conf);
     /*
-     *  Create the socket, ensuring everyone has access to it.
+     *  Create socket for communicating with clients.
      */
-    mask = umask (0);
-
     if ((sd = socket (PF_UNIX, SOCK_STREAM, 0)) < 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Cannot create socket");
     }
@@ -586,12 +585,16 @@ sock_create (conf_t conf)
         log_err (EMUNGE_SNAFU, LOG_ERR,
             "Exceeded maximum length of socket pathname");
     }
-    if (bind (sd, (struct sockaddr *) &addr, sizeof (addr)) < 0) {
+    /*  Ensure socket is accessible by all.
+     */
+    mask = umask (0);
+    rv = bind (sd, (struct sockaddr *) &addr, sizeof (addr));
+    umask (mask);
+
+    if (rv < 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR,
             "Cannot bind to \"%s\"", conf->socket_name);
     }
-    umask (mask);
-
     if (listen (sd, MUNGE_SOCKET_BACKLOG) < 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR,
             "Cannot listen to \"%s\"", conf->socket_name);
