@@ -194,7 +194,7 @@ timer_set_absolute (callback_f cb, void *arg, const struct timespec *tsp)
     static int  id = 1;
     int         do_signal = 0;
 
-    if (!cb) {
+    if (!cb || !tsp) {
         errno = EINVAL;
         return (-1);
     }
