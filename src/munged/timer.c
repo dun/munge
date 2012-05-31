@@ -247,19 +247,19 @@ timer_set_absolute (callback_f cb, void *arg, const struct timespec *tsp)
 int
 timer_set_relative (callback_f cb, void *arg, int ms)
 {
-    struct timespec     ts;
+    struct timespec ts;
 
-    /*  Convert the relative time offset into an absolute timespec.
+    /*  Convert the relative time offset into an absolute timespec from now.
      */
     timer_get_timespec (&ts);
 
-    ts.tv_sec += ms / 1000;
-    ts.tv_nsec += (ms % 1000) * 1000000;
-    assert (ts.tv_nsec < 2000000000);
-
-    if (ts.tv_nsec >= 1000000000) {
-        ts.tv_sec += ts.tv_nsec / 1000000000;
-        ts.tv_nsec %= 1000000000;
+    if (ms > 0) {
+        ts.tv_sec += ms / 1000;
+        ts.tv_nsec += (ms % 1000) * 1000000;
+        if (ts.tv_nsec >= 1000000000) {
+            ts.tv_sec += ts.tv_nsec / 1000000000;
+            ts.tv_nsec %= 1000000000;
+        }
     }
     return (timer_set_absolute (cb, arg, &ts));
 }
