@@ -212,7 +212,7 @@
 /*  Integer for the maximum number of seconds between stirrings of the PRNG
  *    entropy pool once the exponential backoff completes.
  */
-#define RANDOM_SEED_STIR_MAX_SECS       14400
+#define RANDOM_SEED_STIR_MAX_SECS       3600
 
 /*  Integer for the minimum number of seconds between stirrings of the PRNG
  *    entropy pool from which the exponential backoff starts.
