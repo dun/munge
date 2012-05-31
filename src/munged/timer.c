@@ -497,11 +497,6 @@ timer_is_timespec_ge (struct timespec *tsp0, struct timespec *tsp1)
 {
 /*  Returns non-zero if the time specified by [tsp0] is
  *    greater than or equal to the time specified by [tsp1].
- *
- *  XXX: This routine is almost identical to the timercmp macro def.
- *    Comments in <sys/time.h> claim it doesn't work for >= or <=,
- *    but I can't fathom why.  To play it safe, I could implement
- *    ">=" as "!<" (eg, !timercmp(a,b,<) ), but that's an extra op.
  */
     assert (tsp0 != NULL);
     assert (tsp1 != NULL);
