@@ -51,13 +51,6 @@
 
 
 /*****************************************************************************
- *  Private Constants
- *****************************************************************************/
-
-#define TIMER_ALLOC     10
-
-
-/*****************************************************************************
  *  Private Data Types
  *****************************************************************************/
 
@@ -147,8 +140,9 @@ timer_init (void)
 void
 timer_fini (void)
 {
-    _timer_t   *t_ptr;
-    void       *result;
+    void     *result;
+    _timer_t *t_ptr;
+    _timer_t  t;
 
     if (timer_tid == 0) {
         return;
@@ -163,24 +157,27 @@ timer_fini (void)
         log_err (EMUNGE_SNAFU, LOG_ERR, "Timer thread was not canceled");
     }
     timer_tid = 0;
-    /*
-     *  Cancel all pending timers.
-     *  Note that this method doesn't preserve the ordering of the inactive
-     *    list as if the timers had been individually dispatched, but the
-     *    ordering of timers on the inactive list really doesn't matter.
-     *  Ideally, memory allocated to the inactive timers would be reclaimed
-     *    at this point, but that's not possible in this implementation.
-     */
+
     if ((errno = pthread_mutex_lock (&timer_mutex)) != 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to lock timer mutex");
     }
+    /*  Cancel pending timers.
+     */
     t_ptr = &timer_active;
-    while (*t_ptr)
+    while (*t_ptr) {
         t_ptr = &(*t_ptr)->next;
+    }
     *t_ptr = timer_inactive;
     timer_inactive = timer_active;
     timer_active = NULL;
-
+    /*
+     *  De-allocate timers.
+     */
+    while (timer_inactive) {
+        t = timer_inactive;
+        timer_inactive = timer_inactive->next;
+        free (t);
+    }
     if ((errno = pthread_mutex_unlock (&timer_mutex)) != 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to unlock timer mutex");
     }
@@ -455,27 +452,20 @@ static _timer_t
 timer_alloc (void)
 {
 /*  Returns a new timer, or NULL if memory allocation fails.
+ *  The mutex must be locked before calling this routine.
  */
-    _timer_t    t;
-    _timer_t    t_last;
+    _timer_t t;
 
-    assert (TIMER_ALLOC > 0);
-
-    /*  The mutex must be locked before calling this routine.
-     */
     assert (lsd_mutex_is_locked (&timer_mutex));
 
-    if (!timer_inactive) {
-        if (!(timer_inactive = malloc (TIMER_ALLOC * sizeof (struct timer))))
-            return (NULL);
-        t_last = timer_inactive + TIMER_ALLOC - 1;
-        for (t = timer_inactive; t < t_last; t++)
-            t->next = t + 1;
-        t_last->next = NULL;
+    if (timer_inactive) {
+        t = timer_inactive;
+        timer_inactive = timer_inactive->next;
+        t->next = NULL;
     }
-    t = timer_inactive;
-    timer_inactive = timer_inactive->next;
-    t->next = NULL;
+    else {
+        t = malloc (sizeof (struct timer));
+    }
     return (t);
 }
 
