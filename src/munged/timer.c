@@ -55,7 +55,7 @@
  *****************************************************************************/
 
 struct timer {
-    int                 id;             /* timer id                          */
+    long                id;             /* timer ID                          */
     struct timespec     ts;             /* time at which timer expires       */
     callback_f          f;              /* callback function                 */
     void               *arg;            /* callback function arg             */
@@ -185,14 +185,14 @@ timer_fini (void)
 }
 
 
-int
+long
 timer_set_absolute (callback_f cb, void *arg, const struct timespec *tsp)
 {
-    _timer_t    t;
-    _timer_t    t_curr;
-    _timer_t   *t_prev_ptr;
-    static int  id = 1;
-    int         do_signal = 0;
+    static long  id = 1;
+    _timer_t     t;
+    _timer_t     t_curr;
+    _timer_t    *t_prev_ptr;
+    int          do_signal = 0;
 
     if (!cb || !tsp) {
         errno = EINVAL;
@@ -244,7 +244,7 @@ timer_set_absolute (callback_f cb, void *arg, const struct timespec *tsp)
 }
 
 
-int
+long
 timer_set_relative (callback_f cb, void *arg, int ms)
 {
     struct timespec ts;
@@ -266,20 +266,8 @@ timer_set_relative (callback_f cb, void *arg, int ms)
 
 
 int
-timer_cancel (int id)
+timer_cancel (long id)
 {
-/*  XXX: Since timer IDs aren't guaranteed to be unique, it's possible for
- *    a given ID to be in use by more than one active timer.  In such a case,
- *    the timer with the earlier expiration time (ie, the one that will
- *    expire first) will be the one removed from the active list -- and this
- *    is probably the desired behavior.
- *  Snader suggests the use of a timer ID instead of the _timer_t's address.
- *    When a timer expires, the _timer_t is placed on the inactive list.
- *    When a new timer is set, the struct at the head of the inactive list is
- *    used.  If the app then tries to cancel the first (now expired) timer
- *    via the _timer_t's address, the second timer would be canceled instead.
- *  Thus, timer IDs appear to be the proverbial lesser of two evils here.
- */
     _timer_t    t_curr;
     _timer_t   *t_prev_ptr;
     int         do_signal = 0;

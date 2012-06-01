@@ -83,7 +83,7 @@
 struct gids {
     pthread_mutex_t     mutex;          /* mutex for accessing struct        */
     hash_t              hash;           /* hash of GIDs mappings             */
-    int                 timer;          /* timer ID for next GIDs map update */
+    long                timer;          /* timer ID for next GIDs map update */
     int                 interval;       /* seconds between GIDs map updates  */
     int                 do_group_stat;  /* true if updates stat group file   */
     time_t              t_last_update;  /* time of last good GIDs map update */

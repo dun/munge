@@ -62,21 +62,21 @@ void timer_fini (void);
  *  Cancels the timer thread and all pending timers.
  */
 
-int timer_set_absolute (callback_f cb, void *arg, const struct timespec *tsp);
+long timer_set_absolute (callback_f cb, void *arg, const struct timespec *tsp);
 /*
  *  Sets a timer to expire at the absolute time specified by [tsp].
  *    At expiration, the callback function [cb] will be invoked with [arg].
  *  Returns a timer ID > 0, or -1 on error (with errno set appropriately).
  */
 
-int timer_set_relative (callback_f cb, void *arg, int ms);
+long timer_set_relative (callback_f cb, void *arg, int ms);
 /*
  *  Sets a timer to expire at [ms] milliseconds past the current time.
  *    At expiration, the callback function [cb] will be invoked with [arg].
  *  Returns a timer ID > 0, or -1 on error (with errno set appropriately).
  */
 
-int timer_cancel (int id);
+int timer_cancel (long id);
 /*
  *  Cancels the timer specified by [id] before it expires.
  *  Returns 1 on success, 0 if the [id] did not match an active timer,

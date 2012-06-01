@@ -71,7 +71,7 @@
  *  Private Data
  *****************************************************************************/
 
-static int _random_timer_id = 0;        /* id for scheduled stir fn callback */
+static long _random_timer_id = 0;       /* ID for scheduled stir fn callback */
 
 
 /*****************************************************************************
