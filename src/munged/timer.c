@@ -339,7 +339,8 @@ timer_thread (void *arg)
     sigset_t            sigset;
     int                 cancel_state;
     struct timespec     ts_now;
-    _timer_t            t;
+    _timer_t           *tp;
+    _timer_t            timer_expired;
 
     if (sigfillset (&sigset)) {
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to init timer sigset");
@@ -373,31 +374,49 @@ timer_thread (void *arg)
             log_errno (EMUNGE_SNAFU, LOG_ERR,
                 "Unable to disable timer thread cancellation");
         }
-        /*  Dispatch timer events that have expired.
+        /*  Select expired timers.
+         *  Expired timers are moved from the active list onto an expired list.
+         *    All expired timers are then dispatched before the active list is
+         *    rescanned.  This protects against an erroneous ts_now set in the
+         *    future from causing recurring timers to be continually dispatched
+         *    since ts_now will be requeried once the expired list is processed
+         *    (cf, <http://code.google.com/p/munge/issues/detail?id=15>).
          */
         timer_get_timespec (&ts_now);
-        while (timer_active
-               && timer_is_timespec_ge (&ts_now, &timer_active->ts)) {
-            t = timer_active;
-            timer_active = timer_active->next;
-            /*
-             *  Unlock the mutex while performing the callback function
-             *    in case it wants to set/cancel another timer.
-             *  Note that at this point in time, the active timer
-             *    is on neither the active nor the inactive list.
-             */
-            if ((errno = pthread_mutex_unlock (&timer_mutex)) != 0) {
-                log_errno (EMUNGE_SNAFU, LOG_ERR,
-                    "Unable to unlock timer mutex");
-            }
-            t->f (t->arg);
-
-            if ((errno = pthread_mutex_lock (&timer_mutex)) != 0) {
-                log_errno (EMUNGE_SNAFU, LOG_ERR,
-                    "Unable to lock timer mutex");
-            }
-            t->next = timer_inactive;
-            timer_inactive = t;
+        tp = &timer_active;
+        while (*tp && timer_is_timespec_ge (&ts_now, &(*tp)->ts)) {
+            tp = &(*tp)->next;
+        }
+        if (tp != &timer_active) {
+            timer_expired = timer_active;
+            timer_active = *tp;
+            *tp = NULL;
+        }
+        else {
+            timer_expired = NULL;
+        }
+        /*  Unlock the mutex while dispatching callback functions in case any
+         *    need to set/cancel timers.  Note that expired timers have been
+         *    removed from the active list while they are being dispatched.
+         */
+        if ((errno = pthread_mutex_unlock (&timer_mutex)) != 0) {
+            log_errno (EMUNGE_SNAFU, LOG_ERR,
+                "Unable to unlock timer mutex");
+        }
+        /*  Dispatch expired timers.
+         */
+        tp = &timer_expired;
+        while (*tp) {
+            (*tp)->f ((*tp)->arg);
+            tp = &(*tp)->next;
+        }
+        if ((errno = pthread_mutex_lock (&timer_mutex)) != 0) {
+            log_errno (EMUNGE_SNAFU, LOG_ERR,
+                "Unable to lock timer mutex");
+        }
+        if (timer_expired) {
+            *tp = timer_inactive;
+            timer_inactive = timer_expired;
         }
         /*  Enable the thread's cancellation state.
          *    Since enabling cancellation is not a cancellation point,
