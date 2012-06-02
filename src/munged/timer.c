@@ -62,7 +62,7 @@ struct timer {
     struct timer       *next;           /* next timer in list                */
 };
 
-typedef struct timer * _timer_t;
+typedef struct timer * timer_p;
 
 
 /*****************************************************************************
@@ -73,7 +73,7 @@ static void * timer_thread (void *arg);
 
 static void timer_thread_cleanup (void *arg);
 
-static _timer_t timer_alloc (void);
+static timer_p timer_alloc (void);
 
 static void timer_get_timespec (struct timespec *tsp);
 
@@ -88,8 +88,8 @@ static pthread_t        timer_tid = 0;
 static pthread_cond_t   timer_cond = PTHREAD_COND_INITIALIZER;
 static pthread_mutex_t  timer_mutex = PTHREAD_MUTEX_INITIALIZER;
 
-static _timer_t         timer_active = NULL;
-static _timer_t         timer_inactive = NULL;
+static timer_p          timer_active = NULL;
+static timer_p          timer_inactive = NULL;
 
 /*  The timer_active list is sorted in order of increasing timespecs.
  *    The head of the list is the next timer to expire.
@@ -141,8 +141,8 @@ void
 timer_fini (void)
 {
     void     *result;
-    _timer_t *t_ptr;
-    _timer_t  t;
+    timer_p  *t_ptr;
+    timer_p   t;
 
     if (timer_tid == 0) {
         return;
@@ -189,9 +189,9 @@ long
 timer_set_absolute (callback_f cb, void *arg, const struct timespec *tsp)
 {
     static long  id = 1;
-    _timer_t     t;
-    _timer_t     t_curr;
-    _timer_t    *t_prev_ptr;
+    timer_p      t;
+    timer_p      t_curr;
+    timer_p     *t_prev_ptr;
     int          do_signal = 0;
 
     if (!cb || !tsp) {
@@ -268,8 +268,8 @@ timer_set_relative (callback_f cb, void *arg, int ms)
 int
 timer_cancel (long id)
 {
-    _timer_t    t_curr;
-    _timer_t   *t_prev_ptr;
+    timer_p     t_curr;
+    timer_p    *t_prev_ptr;
     int         do_signal = 0;
 
     if (id <= 0) {
@@ -327,8 +327,8 @@ timer_thread (void *arg)
     sigset_t            sigset;
     int                 cancel_state;
     struct timespec     ts_now;
-    _timer_t           *tp;
-    _timer_t            timer_expired;
+    timer_p            *tp;
+    timer_p             timer_expired;
 
     if (sigfillset (&sigset)) {
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to init timer sigset");
@@ -455,13 +455,13 @@ timer_thread_cleanup (void *arg)
 }
 
 
-static _timer_t
+static timer_p
 timer_alloc (void)
 {
 /*  Returns a new timer, or NULL if memory allocation fails.
  *  The mutex must be locked before calling this routine.
  */
-    _timer_t t;
+    timer_p t;
 
     assert (lsd_mutex_is_locked (&timer_mutex));
 
