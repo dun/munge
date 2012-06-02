@@ -5,7 +5,7 @@
 # Copyright (C) 2002-2007 The Regents of the University of California.
 # UCRL-CODE-155910.
 ###############################################################################
-# chkconfig:          - 40 60
+# chkconfig:          - 66 33
 # Description:        Start/Stop the MUNGE authentication service.
 ###############################################################################
 ### BEGIN INIT INFO
