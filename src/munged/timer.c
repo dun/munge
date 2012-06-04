@@ -69,15 +69,16 @@ typedef struct timer * timer_p;
  *  Private Prototypes
  *****************************************************************************/
 
-static void * timer_thread (void *arg);
+static void * _timer_thread (void *arg);
 
-static void timer_thread_cleanup (void *arg);
+static void _timer_thread_cleanup (void *arg);
 
-static timer_p timer_alloc (void);
+static timer_p _timer_alloc (void);
 
-static void timer_get_timespec (struct timespec *tsp);
+static void _timer_get_timespec (struct timespec *tsp);
 
-static int timer_is_timespec_ge (struct timespec *tsp0, struct timespec *tsp1);
+static int _timer_is_timespec_ge (
+        struct timespec *tsp0, struct timespec *tsp1);
 
 
 /*****************************************************************************
@@ -125,7 +126,8 @@ timer_init (void)
     log_msg (LOG_DEBUG, "Set timer thread stacksize to %d", (int) stacksize);
 #endif /* _POSIX_THREAD_ATTR_STACKSIZE */
 
-    if ((errno= pthread_create (&timer_tid, &tattr, timer_thread, NULL)) !=0) {
+    if ((errno = pthread_create (&timer_tid, &tattr, _timer_thread, NULL))
+            !=0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR,
             "Unable to create timer thread");
     }
@@ -201,7 +203,7 @@ timer_set_absolute (callback_f cb, void *arg, const struct timespec *tsp)
     if ((errno = pthread_mutex_lock (&timer_mutex)) != 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to lock timer mutex");
     }
-    if (!(t = timer_alloc ())) {
+    if (!(t = _timer_alloc ())) {
         log_errno (EMUNGE_NO_MEMORY, LOG_ERR, "Unable to allocate timer");
     }
     /*  Initialize the timer.
@@ -217,7 +219,7 @@ timer_set_absolute (callback_f cb, void *arg, const struct timespec *tsp)
      */
     t_prev_ptr = &timer_active;
     t_curr = *t_prev_ptr;
-    while (t_curr && timer_is_timespec_ge (&t->ts, &t_curr->ts)) {
+    while (t_curr && _timer_is_timespec_ge (&t->ts, &t_curr->ts)) {
         t_prev_ptr = &t_curr->next;
         t_curr = *t_prev_ptr;
     }
@@ -251,7 +253,7 @@ timer_set_relative (callback_f cb, void *arg, int ms)
 
     /*  Convert the relative time offset into an absolute timespec from now.
      */
-    timer_get_timespec (&ts);
+    _timer_get_timespec (&ts);
 
     if (ms > 0) {
         ts.tv_sec += ms / 1000;
@@ -319,7 +321,7 @@ timer_cancel (long id)
  *****************************************************************************/
 
 static void *
-timer_thread (void *arg)
+_timer_thread (void *arg)
 {
 /*  The timer thread.  It waits until the next active timer expires,
  *    at which point it invokes the timer's callback function.
@@ -339,7 +341,7 @@ timer_thread (void *arg)
     if ((errno = pthread_mutex_lock (&timer_mutex)) != 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to lock timer mutex");
     }
-    pthread_cleanup_push (timer_thread_cleanup, NULL);
+    pthread_cleanup_push (_timer_thread_cleanup, NULL);
 
     for (;;) {
         /*
@@ -370,9 +372,9 @@ timer_thread (void *arg)
          *    since ts_now will be requeried once the expired list is processed
          *    (cf, <http://code.google.com/p/munge/issues/detail?id=15>).
          */
-        timer_get_timespec (&ts_now);
+        _timer_get_timespec (&ts_now);
         tp = &timer_active;
-        while (*tp && timer_is_timespec_ge (&ts_now, &(*tp)->ts)) {
+        while (*tp && _timer_is_timespec_ge (&ts_now, &(*tp)->ts)) {
             tp = &(*tp)->next;
         }
         if (tp != &timer_active) {
@@ -443,7 +445,7 @@ timer_thread (void *arg)
 
 
 static void
-timer_thread_cleanup (void *arg)
+_timer_thread_cleanup (void *arg)
 {
 /*  The cleanup routine for the timer thread.
  *    It ensures the mutex is released when the thread is canceled.
@@ -456,7 +458,7 @@ timer_thread_cleanup (void *arg)
 
 
 static timer_p
-timer_alloc (void)
+_timer_alloc (void)
 {
 /*  Returns a new timer, or NULL if memory allocation fails.
  *  The mutex must be locked before calling this routine.
@@ -478,7 +480,7 @@ timer_alloc (void)
 
 
 static void
-timer_get_timespec (struct timespec *tsp)
+_timer_get_timespec (struct timespec *tsp)
 {
 /*  Sets the timespec [tsp] to the current time.
  */
@@ -500,7 +502,7 @@ timer_get_timespec (struct timespec *tsp)
 
 
 static int
-timer_is_timespec_ge (struct timespec *tsp0, struct timespec *tsp1)
+_timer_is_timespec_ge (struct timespec *tsp0, struct timespec *tsp1)
 {
 /*  Returns non-zero if the time specified by [tsp0] is
  *    greater than or equal to the time specified by [tsp1].
