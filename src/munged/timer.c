@@ -85,14 +85,14 @@ static int _timer_is_timespec_ge (
  *  Private Variables
  *****************************************************************************/
 
-static pthread_t        timer_tid = 0;
-static pthread_cond_t   timer_cond = PTHREAD_COND_INITIALIZER;
-static pthread_mutex_t  timer_mutex = PTHREAD_MUTEX_INITIALIZER;
+static pthread_t       _timer_tid = 0;
+static pthread_cond_t  _timer_cond = PTHREAD_COND_INITIALIZER;
+static pthread_mutex_t _timer_mutex = PTHREAD_MUTEX_INITIALIZER;
 
-static timer_p          timer_active = NULL;
-static timer_p          timer_inactive = NULL;
+static timer_p         _timer_active = NULL;
+static timer_p         _timer_inactive = NULL;
 
-/*  The timer_active list is sorted in order of increasing timespecs.
+/*  The _timer_active list is sorted in order of increasing timespecs.
  *    The head of the list is the next timer to expire.
  */
 
@@ -107,7 +107,7 @@ timer_init (void)
     pthread_attr_t tattr;
     size_t stacksize = 256 * 1024;
 
-    if (timer_tid != 0) {
+    if (_timer_tid != 0) {
         return;
     }
     if ((errno = pthread_attr_init (&tattr)) != 0) {
@@ -126,7 +126,7 @@ timer_init (void)
     log_msg (LOG_DEBUG, "Set timer thread stacksize to %d", (int) stacksize);
 #endif /* _POSIX_THREAD_ATTR_STACKSIZE */
 
-    if ((errno = pthread_create (&timer_tid, &tattr, _timer_thread, NULL))
+    if ((errno = pthread_create (&_timer_tid, &tattr, _timer_thread, NULL))
             !=0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR,
             "Unable to create timer thread");
@@ -146,41 +146,41 @@ timer_fini (void)
     timer_p  *t_ptr;
     timer_p   t;
 
-    if (timer_tid == 0) {
+    if (_timer_tid == 0) {
         return;
     }
-    if ((errno = pthread_cancel (timer_tid)) != 0) {
+    if ((errno = pthread_cancel (_timer_tid)) != 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to cancel timer thread");
     }
-    if ((errno = pthread_join (timer_tid, &result)) != 0) {
+    if ((errno = pthread_join (_timer_tid, &result)) != 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to join timer thread");
     }
     if (result != PTHREAD_CANCELED) {
         log_err (EMUNGE_SNAFU, LOG_ERR, "Timer thread was not canceled");
     }
-    timer_tid = 0;
+    _timer_tid = 0;
 
-    if ((errno = pthread_mutex_lock (&timer_mutex)) != 0) {
+    if ((errno = pthread_mutex_lock (&_timer_mutex)) != 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to lock timer mutex");
     }
     /*  Cancel pending timers.
      */
-    t_ptr = &timer_active;
+    t_ptr = &_timer_active;
     while (*t_ptr) {
         t_ptr = &(*t_ptr)->next;
     }
-    *t_ptr = timer_inactive;
-    timer_inactive = timer_active;
-    timer_active = NULL;
+    *t_ptr = _timer_inactive;
+    _timer_inactive = _timer_active;
+    _timer_active = NULL;
     /*
      *  De-allocate timers.
      */
-    while (timer_inactive) {
-        t = timer_inactive;
-        timer_inactive = timer_inactive->next;
+    while (_timer_inactive) {
+        t = _timer_inactive;
+        _timer_inactive = _timer_inactive->next;
         free (t);
     }
-    if ((errno = pthread_mutex_unlock (&timer_mutex)) != 0) {
+    if ((errno = pthread_mutex_unlock (&_timer_mutex)) != 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to unlock timer mutex");
     }
     return;
@@ -200,7 +200,7 @@ timer_set_absolute (callback_f cb, void *arg, const struct timespec *tsp)
         errno = EINVAL;
         return (-1);
     }
-    if ((errno = pthread_mutex_lock (&timer_mutex)) != 0) {
+    if ((errno = pthread_mutex_lock (&_timer_mutex)) != 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to lock timer mutex");
     }
     if (!(t = _timer_alloc ())) {
@@ -217,7 +217,7 @@ timer_set_absolute (callback_f cb, void *arg, const struct timespec *tsp)
     /*
      *  Insert the timer into the active list.
      */
-    t_prev_ptr = &timer_active;
+    t_prev_ptr = &_timer_active;
     t_curr = *t_prev_ptr;
     while (t_curr && _timer_is_timespec_ge (&t->ts, &t_curr->ts)) {
         t_prev_ptr = &t_curr->next;
@@ -229,14 +229,14 @@ timer_set_absolute (callback_f cb, void *arg, const struct timespec *tsp)
      *  Only signal the timer thread if the active timer has changed.
      *  Set a flag here so the signal can be done outside the monitor lock.
      */
-    if (t_prev_ptr == &timer_active) {
+    if (t_prev_ptr == &_timer_active) {
         do_signal = 1;
     }
-    if ((errno = pthread_mutex_unlock (&timer_mutex)) != 0) {
+    if ((errno = pthread_mutex_unlock (&_timer_mutex)) != 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to unlock timer mutex");
     }
     if (do_signal) {
-        if ((errno = pthread_cond_signal (&timer_cond)) != 0) {
+        if ((errno = pthread_cond_signal (&_timer_cond)) != 0) {
             log_errno (EMUNGE_SNAFU, LOG_ERR,
                 "Unable to signal timer condition");
         }
@@ -278,12 +278,12 @@ timer_cancel (long id)
         errno = EINVAL;
         return (-1);
     }
-    if ((errno = pthread_mutex_lock (&timer_mutex)) != 0) {
+    if ((errno = pthread_mutex_lock (&_timer_mutex)) != 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to lock timer mutex");
     }
     /*  Locate the active timer specified by [id].
      */
-    t_prev_ptr = &timer_active;
+    t_prev_ptr = &_timer_active;
     t_curr = *t_prev_ptr;
     while (t_curr && (id != t_curr->id)) {
         t_prev_ptr = &t_curr->next;
@@ -293,21 +293,21 @@ timer_cancel (long id)
      */
     if (t_curr != NULL) {
         *t_prev_ptr = t_curr->next;
-        t_curr->next = timer_inactive;
-        timer_inactive = t_curr;
+        t_curr->next = _timer_inactive;
+        _timer_inactive = t_curr;
         /*
          *  Only signal the timer thread if the active timer was canceled.
          *  Set a flag here so the signal can be done outside the monitor lock.
          */
-        if (t_prev_ptr == &timer_active) {
+        if (t_prev_ptr == &_timer_active) {
             do_signal = 1;
         }
     }
-    if ((errno = pthread_mutex_unlock (&timer_mutex)) != 0) {
+    if ((errno = pthread_mutex_unlock (&_timer_mutex)) != 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to unlock timer mutex");
     }
     if (do_signal) {
-        if ((errno = pthread_cond_signal (&timer_cond)) != 0) {
+        if ((errno = pthread_cond_signal (&_timer_cond)) != 0) {
             log_errno (EMUNGE_SNAFU, LOG_ERR,
                 "Unable to signal timer condition");
         }
@@ -338,7 +338,7 @@ _timer_thread (void *arg)
     if (pthread_sigmask (SIG_SETMASK, &sigset, NULL) != 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to set timer sigset");
     }
-    if ((errno = pthread_mutex_lock (&timer_mutex)) != 0) {
+    if ((errno = pthread_mutex_lock (&_timer_mutex)) != 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to lock timer mutex");
     }
     pthread_cleanup_push (_timer_thread_cleanup, NULL);
@@ -347,11 +347,12 @@ _timer_thread (void *arg)
         /*
          *  Wait until a timer has been added to the active list.
          */
-        while (!timer_active) {
+        while (!_timer_active) {
             /*
              *  Cancellation point.
              */
-            if ((errno = pthread_cond_wait (&timer_cond, &timer_mutex)) != 0) {
+            if ((errno = pthread_cond_wait (&_timer_cond, &_timer_mutex)) != 0)
+            {
                 log_errno (EMUNGE_SNAFU, LOG_ERR,
                     "Unable to wait on timer condition");
             }
@@ -373,13 +374,13 @@ _timer_thread (void *arg)
          *    (cf, <http://code.google.com/p/munge/issues/detail?id=15>).
          */
         _timer_get_timespec (&ts_now);
-        tp = &timer_active;
+        tp = &_timer_active;
         while (*tp && _timer_is_timespec_ge (&ts_now, &(*tp)->ts)) {
             tp = &(*tp)->next;
         }
-        if (tp != &timer_active) {
-            timer_expired = timer_active;
-            timer_active = *tp;
+        if (tp != &_timer_active) {
+            timer_expired = _timer_active;
+            _timer_active = *tp;
             *tp = NULL;
         }
         else {
@@ -389,7 +390,7 @@ _timer_thread (void *arg)
          *    need to set/cancel timers.  Note that expired timers have been
          *    removed from the active list while they are being dispatched.
          */
-        if ((errno = pthread_mutex_unlock (&timer_mutex)) != 0) {
+        if ((errno = pthread_mutex_unlock (&_timer_mutex)) != 0) {
             log_errno (EMUNGE_SNAFU, LOG_ERR,
                 "Unable to unlock timer mutex");
         }
@@ -400,13 +401,13 @@ _timer_thread (void *arg)
             (*tp)->f ((*tp)->arg);
             tp = &(*tp)->next;
         }
-        if ((errno = pthread_mutex_lock (&timer_mutex)) != 0) {
+        if ((errno = pthread_mutex_lock (&_timer_mutex)) != 0) {
             log_errno (EMUNGE_SNAFU, LOG_ERR,
                 "Unable to lock timer mutex");
         }
         if (timer_expired) {
-            *tp = timer_inactive;
-            timer_inactive = timer_expired;
+            *tp = _timer_inactive;
+            _timer_inactive = timer_expired;
         }
         /*  Enable the thread's cancellation state.
          *    Since enabling cancellation is not a cancellation point,
@@ -424,12 +425,12 @@ _timer_thread (void *arg)
         /*  Wait until the next active timer is set to expire,
          *    or until the active timer changes.
          */
-        while (timer_active) {
+        while (_timer_active) {
             /*
              *  Cancellation point.
              */
             errno = pthread_cond_timedwait (
-                &timer_cond, &timer_mutex, &(timer_active->ts));
+                &_timer_cond, &_timer_mutex, &(_timer_active->ts));
             if (errno == EINTR)
                 continue;
             if ((errno == ETIMEDOUT) || (errno == 0))
@@ -450,7 +451,7 @@ _timer_thread_cleanup (void *arg)
 /*  The cleanup routine for the timer thread.
  *    It ensures the mutex is released when the thread is canceled.
  */
-    if ((errno = pthread_mutex_unlock (&timer_mutex)) != 0) {
+    if ((errno = pthread_mutex_unlock (&_timer_mutex)) != 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to unlock timer mutex");
     }
     return;
@@ -465,11 +466,11 @@ _timer_alloc (void)
  */
     timer_p t;
 
-    assert (lsd_mutex_is_locked (&timer_mutex));
+    assert (lsd_mutex_is_locked (&_timer_mutex));
 
-    if (timer_inactive) {
-        t = timer_inactive;
-        timer_inactive = timer_inactive->next;
+    if (_timer_inactive) {
+        t = _timer_inactive;
+        _timer_inactive = _timer_inactive->next;
         t->next = NULL;
     }
     else {
