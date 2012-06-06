@@ -89,9 +89,12 @@ static pthread_t       _timer_tid = 0;
 static pthread_cond_t  _timer_cond = PTHREAD_COND_INITIALIZER;
 static pthread_mutex_t _timer_mutex = PTHREAD_MUTEX_INITIALIZER;
 
+static long            _timer_id = 0;
 static timer_p         _timer_active = NULL;
 static timer_p         _timer_inactive = NULL;
 
+/*  The _timer_id is the ID of the last timer that was set.
+ */
 /*  The _timer_active list is sorted in order of increasing timespecs.
  *    The head of the list is the next timer to expire.
  */
@@ -190,7 +193,6 @@ timer_fini (void)
 long
 timer_set_absolute (callback_f cb, void *arg, const struct timespec *tsp)
 {
-    static long  id = 1;
     timer_p      t;
     timer_p      t_curr;
     timer_p     *t_prev_ptr;
@@ -208,9 +210,11 @@ timer_set_absolute (callback_f cb, void *arg, const struct timespec *tsp)
     }
     /*  Initialize the timer.
      */
-    t->id = id++;
-    if (id <= 0)
-        id = 1;
+    _timer_id++;
+    if (_timer_id <= 0) {
+        _timer_id = 1;
+    }
+    t->id = _timer_id;
     t->f = cb;
     t->arg = arg;
     t->ts = *tsp;
