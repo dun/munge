@@ -150,7 +150,7 @@ void
 timer_fini (void)
 {
     void    *result;
-    timer_p *t_ptr;
+    timer_p *t_prev_ptr;
     timer_p  t;
 
     if (_timer_tid == 0) {
@@ -170,17 +170,18 @@ timer_fini (void)
     if ((errno = pthread_mutex_lock (&_timer_mutex)) != 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to lock timer mutex");
     }
-    /*  Cancel pending timers.
+    /*  Cancel pending timers by moving active timers to the inactive list.
      */
-    t_ptr = &_timer_active;
-    while (*t_ptr) {
-        t_ptr = &(*t_ptr)->next;
+    if (_timer_active) {
+        t_prev_ptr = &_timer_active;
+        while (*t_prev_ptr) {
+            t_prev_ptr = &(*t_prev_ptr)->next;
+        }
+        *t_prev_ptr = _timer_inactive;
+        _timer_inactive = _timer_active;
+        _timer_active = NULL;
     }
-    *t_ptr = _timer_inactive;
-    _timer_inactive = _timer_active;
-    _timer_active = NULL;
-    /*
-     *  De-allocate timers.
+    /*  De-allocate timers.
      */
     while (_timer_inactive) {
         t = _timer_inactive;
@@ -198,7 +199,6 @@ long
 timer_set_absolute (callback_f cb, void *arg, const struct timespec *tsp)
 {
     timer_p  t;
-    timer_p  t_curr;
     timer_p *t_prev_ptr;
     int      do_signal = 0;
 
@@ -222,19 +222,17 @@ timer_set_absolute (callback_f cb, void *arg, const struct timespec *tsp)
     t->f = cb;
     t->arg = arg;
     t->ts = *tsp;
-    /*
-     *  Insert the timer into the active list.
+
+    /*  Insert the timer into the active list.
      */
     t_prev_ptr = &_timer_active;
-    t_curr = *t_prev_ptr;
-    while (t_curr && _timer_is_timespec_ge (&t->ts, &t_curr->ts)) {
-        t_prev_ptr = &t_curr->next;
-        t_curr = *t_prev_ptr;
+    while (*t_prev_ptr && _timer_is_timespec_ge (&t->ts, &(*t_prev_ptr)->ts)) {
+        t_prev_ptr = &(*t_prev_ptr)->next;
     }
+    t->next = *t_prev_ptr;
     *t_prev_ptr = t;
-    t->next = t_curr;
-    /*
-     *  Only signal the timer thread if the active timer has changed.
+
+    /*  Only signal the timer thread if the active timer has changed.
      *  Set a flag here so the signal can be done outside the monitor lock.
      */
     if (t_prev_ptr == &_timer_active) {
@@ -278,8 +276,8 @@ timer_set_relative (callback_f cb, void *arg, int ms)
 int
 timer_cancel (long id)
 {
-    timer_p  t_curr;
     timer_p *t_prev_ptr;
+    timer_p  t = NULL;
     int      do_signal = 0;
 
     if (id <= 0) {
@@ -292,17 +290,16 @@ timer_cancel (long id)
     /*  Locate the active timer specified by [id].
      */
     t_prev_ptr = &_timer_active;
-    t_curr = *t_prev_ptr;
-    while (t_curr && (id != t_curr->id)) {
-        t_prev_ptr = &t_curr->next;
-        t_curr = *t_prev_ptr;
+    while (*t_prev_ptr && (id != (*t_prev_ptr)->id)) {
+        t_prev_ptr = &(*t_prev_ptr)->next;
     }
     /*  Remove the located timer from the active list.
      */
-    if (t_curr != NULL) {
-        *t_prev_ptr = t_curr->next;
-        t_curr->next = _timer_inactive;
-        _timer_inactive = t_curr;
+    if (*t_prev_ptr) {
+        t = *t_prev_ptr;
+        *t_prev_ptr = t->next;
+        t->next = _timer_inactive;
+        _timer_inactive = t;
         /*
          *  Only signal the timer thread if the active timer was canceled.
          *  Set a flag here so the signal can be done outside the monitor lock.
@@ -320,7 +317,7 @@ timer_cancel (long id)
                 "Unable to signal timer condition");
         }
     }
-    return (t_curr ? 1 : 0);
+    return (t ? 1 : 0);
 }
 
 
@@ -337,7 +334,7 @@ _timer_thread (void *arg)
     sigset_t         sigset;
     int              cancel_state;
     struct timespec  ts_now;
-    timer_p         *tp;
+    timer_p         *t_prev_ptr;
     timer_p          timer_expired;
 
     if (sigfillset (&sigset)) {
@@ -382,14 +379,15 @@ _timer_thread (void *arg)
          *    (cf, <http://code.google.com/p/munge/issues/detail?id=15>).
          */
         _timer_get_timespec (&ts_now);
-        tp = &_timer_active;
-        while (*tp && _timer_is_timespec_ge (&ts_now, &(*tp)->ts)) {
-            tp = &(*tp)->next;
+        t_prev_ptr = &_timer_active;
+        while (*t_prev_ptr
+                && _timer_is_timespec_ge (&ts_now, &(*t_prev_ptr)->ts)) {
+            t_prev_ptr = &(*t_prev_ptr)->next;
         }
-        if (tp != &_timer_active) {
+        if (t_prev_ptr != &_timer_active) {
             timer_expired = _timer_active;
-            _timer_active = *tp;
-            *tp = NULL;
+            _timer_active = *t_prev_ptr;
+            *t_prev_ptr = NULL;
         }
         else {
             timer_expired = NULL;
@@ -403,18 +401,21 @@ _timer_thread (void *arg)
                     "Unable to unlock timer mutex");
         }
         /*  Dispatch expired timers.
+         *  At the end of the while-loop, t_prev_ptr is the address of the
+         *    terminating NULL ptr of the timer_expired list.  This will be
+         *    used to move the expired list onto the inactive list.
          */
-        tp = &timer_expired;
-        while (*tp) {
-            (*tp)->f ((*tp)->arg);
-            tp = &(*tp)->next;
+        t_prev_ptr = &timer_expired;
+        while (*t_prev_ptr) {
+            (*t_prev_ptr)->f ((*t_prev_ptr)->arg);
+            t_prev_ptr = &(*t_prev_ptr)->next;
         }
         if ((errno = pthread_mutex_lock (&_timer_mutex)) != 0) {
             log_errno (EMUNGE_SNAFU, LOG_ERR,
                     "Unable to lock timer mutex");
         }
         if (timer_expired) {
-            *tp = _timer_inactive;
+            *t_prev_ptr = _timer_inactive;
             _timer_inactive = timer_expired;
         }
         /*  Enable the thread's cancellation state.
