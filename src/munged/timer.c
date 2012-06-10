@@ -266,7 +266,7 @@ timer_set_absolute (callback_f cb, void *arg, const struct timespec *tsp)
 
 
 long
-timer_set_relative (callback_f cb, void *arg, int ms)
+timer_set_relative (callback_f cb, void *arg, long msec)
 {
     struct timespec ts;
 
@@ -274,9 +274,9 @@ timer_set_relative (callback_f cb, void *arg, int ms)
      */
     _timer_get_timespec (&ts);
 
-    if (ms > 0) {
-        ts.tv_sec += ms / 1000;
-        ts.tv_nsec += (ms % 1000) * 1000000;
+    if (msec > 0) {
+        ts.tv_sec += msec / 1000;
+        ts.tv_nsec += (msec % 1000) * 1000000;
         if (ts.tv_nsec >= 1000000000) {
             ts.tv_sec += ts.tv_nsec / 1000000000;
             ts.tv_nsec %= 1000000000;

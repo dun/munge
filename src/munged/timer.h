@@ -69,9 +69,9 @@ long timer_set_absolute (callback_f cb, void *arg, const struct timespec *tsp);
  *  Returns a timer ID > 0, or -1 on error (with errno set appropriately).
  */
 
-long timer_set_relative (callback_f cb, void *arg, int ms);
+long timer_set_relative (callback_f cb, void *arg, long msec);
 /*
- *  Sets a timer to expire at [ms] milliseconds past the current time.
+ *  Sets a timer to expire at [msec] milliseconds past the current time.
  *    At expiration, the callback function [cb] will be invoked with [arg].
  *  Returns a timer ID > 0, or -1 on error (with errno set appropriately).
  */
