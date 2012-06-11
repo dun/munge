@@ -387,14 +387,6 @@ _timer_thread (void *arg)
             log_errno (EMUNGE_SNAFU, LOG_ERR,
                     "Unable to disable timer thread cancellation");
         }
-        /*  Select expired timers.
-         *  Expired timers are moved from the active list onto an expired list.
-         *    All expired timers are then dispatched before the active list is
-         *    rescanned.  This protects against an erroneous ts_now set in the
-         *    future from causing recurring timers to be continually dispatched
-         *    since ts_now will be requeried once the expired list is processed
-         *    (cf, <http://code.google.com/p/munge/issues/detail?id=15>).
-         */
         _timer_get_timespec (&ts_now);
 
 #if _TIMER_CLOCK_CHECK
@@ -409,42 +401,48 @@ _timer_thread (void *arg)
         ts_prev = ts_now;
 #endif /* _TIMER_CLOCK_CHECK */
 
+        /*  Select expired timers.
+         */
         t_prev_ptr = &_timer_active;
         while (*t_prev_ptr
                 && _timer_is_timespec_ge (&ts_now, &(*t_prev_ptr)->ts)) {
             t_prev_ptr = &(*t_prev_ptr)->next;
         }
         if (t_prev_ptr != &_timer_active) {
+            /*
+             *  Move expired timers from the active list onto an expired list.
+             *  All expired timers are dispatched before the active list is
+             *    rescanned.  This protects against an erroneous ts_now set in
+             *    the future from causing recurring timers to be continually
+             *    dispatched since ts_now will be requeried once the expired
+             *    list is processed.  (Issue 15)
+             */
             timer_expired = _timer_active;
             _timer_active = *t_prev_ptr;
             *t_prev_ptr = NULL;
-        }
-        else {
-            timer_expired = NULL;
-        }
-        /*  Unlock the mutex while dispatching callback functions in case any
-         *    need to set/cancel timers.  Note that expired timers have been
-         *    removed from the active list while they are being dispatched.
-         */
-        if ((errno = pthread_mutex_unlock (&_timer_mutex)) != 0) {
-            log_errno (EMUNGE_SNAFU, LOG_ERR,
-                    "Unable to unlock timer mutex");
-        }
-        /*  Dispatch expired timers.
-         *  At the end of the while-loop, t_prev_ptr is the address of the
-         *    terminating NULL ptr of the timer_expired list.  This will be
-         *    used to move the expired list onto the inactive list.
-         */
-        t_prev_ptr = &timer_expired;
-        while (*t_prev_ptr) {
-            (*t_prev_ptr)->f ((*t_prev_ptr)->arg);
-            t_prev_ptr = &(*t_prev_ptr)->next;
-        }
-        if ((errno = pthread_mutex_lock (&_timer_mutex)) != 0) {
-            log_errno (EMUNGE_SNAFU, LOG_ERR,
-                    "Unable to lock timer mutex");
-        }
-        if (timer_expired) {
+            /*
+             *  Unlock the mutex while dispatching callback functions in case
+             *    any need to set/cancel timers.
+             */
+            if ((errno = pthread_mutex_unlock (&_timer_mutex)) != 0) {
+                log_errno (EMUNGE_SNAFU, LOG_ERR,
+                        "Unable to unlock timer mutex");
+            }
+            /*  Dispatch expired timers.
+             */
+            t_prev_ptr = &timer_expired;
+            while (*t_prev_ptr) {
+                (*t_prev_ptr)->f ((*t_prev_ptr)->arg);
+                t_prev_ptr = &(*t_prev_ptr)->next;
+            }
+            if ((errno = pthread_mutex_lock (&_timer_mutex)) != 0) {
+                log_errno (EMUNGE_SNAFU, LOG_ERR,
+                        "Unable to lock timer mutex");
+            }
+            /*  Move the expired timers onto the inactive list.
+             *  At the end of the previous while-loop, t_prev_ptr is the
+             *    address of the terminating NULL of the timer_expired list.
+             */
             *t_prev_ptr = _timer_inactive;
             _timer_inactive = timer_expired;
         }
