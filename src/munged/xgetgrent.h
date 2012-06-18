@@ -33,16 +33,23 @@
 
 
 /*****************************************************************************
+ *  Data Types
+ *****************************************************************************/
+
+typedef struct xgrbuf_t * xgrbuf_p;
+
+
+/*****************************************************************************
  *  Functions
  *****************************************************************************/
 
-int  xgetgrent_buf_create (char **buf_p, int *buflen_p);
+xgrbuf_p xgetgrent_buf_create (void);
 
-void xgetgrent_buf_destroy (char *buf);
+void xgetgrent_buf_destroy (xgrbuf_p grbufp);
 
 void xgetgrent_init (void);
 
-int  xgetgrent (struct group *gr, char *buf, size_t buflen);
+int xgetgrent (struct group *grp, xgrbuf_p grbufp);
 
 void xgetgrent_fini (void);
 

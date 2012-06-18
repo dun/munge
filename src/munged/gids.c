@@ -377,8 +377,7 @@ _gids_hash_create (void)
     struct timeval  t_stop;
     int             do_group_db_close = 0;
     struct group    gr;
-    char           *gr_buf_ptr = NULL;
-    int             gr_buf_len;
+    xgrbuf_p        grbufp = NULL;
     char           *pw_buf_ptr = NULL;
     int             pw_buf_len;
     char          **user_p;
@@ -409,7 +408,7 @@ _gids_hash_create (void)
      *    is used, but allocating it here allows the same buffer to be reused
      *    throughout a given GIDs creation cycle.
      */
-    if (xgetgrent_buf_create (&gr_buf_ptr, &gr_buf_len) < 0) {
+    if (!(grbufp = xgetgrent_buf_create ())) {
         log_msg (LOG_ERR, "Unable to allocate group entry buffer");
         goto err;
     }
@@ -421,7 +420,7 @@ _gids_hash_create (void)
     do_group_db_close = 1;
 
     while (1) {
-        if (xgetgrent (&gr, gr_buf_ptr, gr_buf_len) < 0) {
+        if (xgetgrent (&gr, grbufp) < 0) {
             if (errno == ENOENT)
                 break;
             if (errno == EINTR)
@@ -444,7 +443,7 @@ _gids_hash_create (void)
         }
     }
     xgetgrent_fini ();
-    xgetgrent_buf_destroy (gr_buf_ptr);
+    xgetgrent_buf_destroy (grbufp);
 
     if (gettimeofday (&t_stop, NULL) < 0) {
         log_msg (LOG_ERR, "Unable to query current time");
@@ -473,8 +472,8 @@ err:
     if (pw_buf_ptr != NULL) {
         xgetpwnam_buf_destroy (pw_buf_ptr);
     }
-    if (gr_buf_ptr != NULL) {
-        xgetgrent_buf_destroy (gr_buf_ptr);
+    if (grbufp != NULL) {
+        xgetgrent_buf_destroy (grbufp);
     }
     if (uid_hash != NULL) {
         hash_destroy (uid_hash);

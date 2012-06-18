@@ -45,11 +45,14 @@
 #include <assert.h>
 #include <errno.h>
 #include <grp.h>
+#include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/types.h>
 #include <unistd.h>
 #include <munge.h>
 #include "log.h"
+#include "xgetgrent.h"
 
 
 /*****************************************************************************
@@ -68,6 +71,16 @@
  *****************************************************************************/
 
 #define MINIMUM_GR_BUF_SIZE     4096
+
+
+/*****************************************************************************
+ *  Data Types
+ *****************************************************************************/
+
+struct xgrbuf_t {
+    char   *buf;
+    size_t  len;
+};
 
 
 /*****************************************************************************
@@ -96,40 +109,40 @@ static int _xgetgrent_copy_str (const char *src, char **dst_p,
  *  Public Functions
  *****************************************************************************/
 
-int
-xgetgrent_buf_create (char **buf_p, int *buflen_p)
+xgrbuf_p
+xgetgrent_buf_create (void)
 {
-/*  Allocates a buffer for xgetgrent(), storing the result in [buf_p];
- *    the size of the buffer is returned in [buflen_p].
- *  Returns 0 on success, or -1 on error (with errno).
+/*  Allocates a buffer for xgetgrent().
+ *  Returns the buffer on success, or NULL on error (with errno).
  */
-    static int  gr_buf_size = -1;
-    char       *buf;
+    static int gr_buf_size = -1;
+    xgrbuf_p   grbufp;
 
-    if ((buf_p == NULL) || (buflen_p == NULL)) {
-        errno = EINVAL;
-        return (-1);
-    }
     if (gr_buf_size < 0) {
         gr_buf_size = _xgetgrent_get_buf_size ();
     }
-    buf = malloc (gr_buf_size);
-    if (buf == NULL) {
-        return (-1);
+    if (!(grbufp = malloc (sizeof (struct xgrbuf_t)))) {
+        return (NULL);
     }
-    *buf_p = buf;
-    *buflen_p = gr_buf_size;
-    return (0);
+    if (!(grbufp->buf = malloc (gr_buf_size))) {
+        free (grbufp);
+        return (NULL);
+    }
+    grbufp->len = gr_buf_size;
+    return (grbufp);
 }
 
 
 void
-xgetgrent_buf_destroy (char *buf)
+xgetgrent_buf_destroy (xgrbuf_p grbufp)
 {
-/*  Destroys the buffer [buf].
+/*  Destroys the buffer [grbufp].
  */
-    if (buf != NULL) {
-        free (buf);
+    if (grbufp != NULL) {
+        if (grbufp->buf != NULL) {
+            free (grbufp->buf);
+        }
+        free (grbufp);
     }
     return;
 }
@@ -149,40 +162,42 @@ xgetgrent_init (void)
 
 
 int
-xgetgrent (struct group *gr, char *buf, size_t buflen)
+xgetgrent (struct group *grp, xgrbuf_p grbufp)
 {
 /*  Portable encapsulation of getgrent_r().
  *  Reads the next group entry from the stream initialized by xgetgrent_init(),
- *    storing the struct group result in [gr] and additional strings in
- *    buffer [buf] of length [buflen].
+ *    storing the struct group result in [grp] and additional strings in the
+ *    buffer [grbufp].
  *  Returns 0 on success, or -1 on error (with errno).
  *    Returns -1 with ENOENT when there are no more entries.
  */
 #if   HAVE_GETGRENT_R_GNU
     int                     rv;
-    struct group           *gr_ptr;
+    struct group           *rv_grp;
 #elif HAVE_GETGRENT_R_AIX
     int                     rv;
 #elif HAVE_GETGRENT_R_SUN
-    struct group           *gr_ptr;
+    struct group           *rv_grp;
 #elif HAVE_GETGRENT
     static pthread_mutex_t  mutex = PTHREAD_MUTEX_INITIALIZER;
     int                     rv_mutex;
     int                     rv_copy;
-    struct group           *gr_ptr;
+    struct group           *rv_grp;
 #endif
     int                     got_eof = 0;
     int                     got_err = 0;
 
-    if ((gr == NULL) || (buf == NULL) || (buflen <= 0)) {
+    if ((grp == NULL) || (grbufp == NULL)) {
         errno = EINVAL;
         return (-1);
     }
+    assert (grbufp->buf != NULL);
+    assert (grbufp->len > 0);
     errno = 0;
 
 #if   HAVE_GETGRENT_R_GNU
-    rv = getgrent_r (gr, buf, buflen, &gr_ptr);
-    if (((rv == ENOENT) || (rv == 0)) && (gr_ptr == NULL)) {
+    rv = getgrent_r (grp, grbufp->buf, grbufp->len, &rv_grp);
+    if (((rv == ENOENT) || (rv == 0)) && (rv_grp == NULL)) {
         got_eof = 1;
     }
     else if (rv != 0) {
@@ -190,7 +205,7 @@ xgetgrent (struct group *gr, char *buf, size_t buflen)
         errno = rv;
     }
 #elif HAVE_GETGRENT_R_AIX
-    rv = getgrent_r (gr, buf, buflen, &_gr_fp);
+    rv = getgrent_r (grp, grbufp->buf, grbufp->len, &_gr_fp);
     if (rv != 0) {
         if (errno == 0) {
             got_eof = 1;
@@ -200,8 +215,8 @@ xgetgrent (struct group *gr, char *buf, size_t buflen)
         }
     }
 #elif HAVE_GETGRENT_R_SUN
-    gr_ptr = getgrent_r (gr, buf, buflen);
-    if (gr_ptr == NULL) {
+    rv_grp = getgrent_r (grp, grbufp->buf, grbufp->len);
+    if (rv_grp == NULL) {
         if (errno == 0) {
             got_eof = 1;
         }
@@ -214,8 +229,8 @@ xgetgrent (struct group *gr, char *buf, size_t buflen)
         errno = rv_mutex;
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to lock xgetgrent mutex");
     }
-    gr_ptr = getgrent ();
-    if (gr_ptr == NULL) {
+    rv_grp = getgrent ();
+    if (rv_grp == NULL) {
         if ((errno == 0) || (errno == ENOENT)) {
             got_eof = 1;
         }
@@ -224,7 +239,7 @@ xgetgrent (struct group *gr, char *buf, size_t buflen)
         }
     }
     else {
-        rv_copy = _xgetgrent_copy (gr_ptr, gr, buf, buflen);
+        rv_copy = _xgetgrent_copy (rv_grp, grp, grbufp->buf, grbufp->len);
     }
     if ((rv_mutex = pthread_mutex_unlock (&mutex)) != 0) {
         errno = rv_mutex;
