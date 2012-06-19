@@ -117,20 +117,20 @@ typedef struct gids_uid  * gids_uid_t;
 static void         _gids_update (gids_t gids);
 static hash_t       _gids_hash_create (void);
 static int          _gids_user_to_uid (hash_t uid_hash,
-                        char *user, uid_t *uid_p, xpwbuf_p pwbufp);
+                        char *user, uid_t *uidp, xpwbuf_p pwbufp);
 static int          _gids_hash_add (hash_t hash, uid_t uid, gid_t gid);
 static gids_gid_t   _gids_head_alloc (uid_t uid);
 static void         _gids_head_del (gids_gid_t g);
 static gids_node_t  _gids_node_alloc (gid_t gid);
-static int          _gids_node_cmp (uid_t *uid1_p, uid_t *uid2_p);
-static unsigned int _gids_node_key (uid_t *uid_p);
+static int          _gids_node_cmp (uid_t *uid1p, uid_t *uid2p);
+static unsigned int _gids_node_key (uid_t *uidp);
 static gids_uid_t   _gids_uid_alloc (char *user, uid_t uid);
 static int          _gids_uid_cmp (char *user1, char *user2);
 static void         _gids_uid_del (gids_uid_t u);
 
 #if _GIDS_DEBUG
 static void _gids_dump_gid_hash (hash_t gid_hash);
-static void _gids_dump_gid_node (gids_gid_t g, uid_t *uid_p, void *null);
+static void _gids_dump_gid_node (gids_gid_t g, uid_t *uidp, void *null);
 static void _gids_dump_uid_hash (hash_t uid_hash);
 static void _gids_dump_uid_node (gids_uid_t u, char *user, void *null);
 #endif /* _GIDS_DEBUG */
@@ -384,7 +384,7 @@ _gids_hash_create (void)
     struct group    gr;
     xgrbuf_p        grbufp = NULL;
     xpwbuf_p        pwbufp = NULL;
-    char          **user_p;
+    char          **userp;
     uid_t           uid;
     int             n_users;
     double          n_seconds;
@@ -444,8 +444,8 @@ restart:
         /*  gr_mem is a null-terminated array of pointers to the user names
          *    belonging to the group.
          */
-        for (user_p = gr.gr_mem; user_p && *user_p; user_p++) {
-            int rv = _gids_user_to_uid (uid_hash, *user_p, &uid, pwbufp);
+        for (userp = gr.gr_mem; userp && *userp; userp++) {
+            int rv = _gids_user_to_uid (uid_hash, *userp, &uid, pwbufp);
             if (rv == 0) {
                 if (_gids_hash_add (gid_hash, uid, gr.gr_gid) < 0) {
                     goto err;
@@ -505,9 +505,9 @@ err:
 
 
 static int
-_gids_user_to_uid (hash_t uid_hash, char *user, uid_t *uid_p, xpwbuf_p pwbufp)
+_gids_user_to_uid (hash_t uid_hash, char *user, uid_t *uidp, xpwbuf_p pwbufp)
 {
-/*  Returns 0 on success, setting [*uid_p] (if non-NULL) to the UID associated
+/*  Returns 0 on success, setting [*uidp] (if non-NULL) to the UID associated
  *    with [user]; o/w, returns -1.
  */
     gids_uid_t     u;
@@ -536,8 +536,8 @@ _gids_user_to_uid (hash_t uid_hash, char *user, uid_t *uid_p, xpwbuf_p pwbufp)
         return (-1);
     }
 
-    if (uid_p != NULL) {
-        *uid_p = uid;
+    if (uidp != NULL) {
+        *uidp = uid;
     }
     return (0);
 }
@@ -552,7 +552,7 @@ _gids_hash_add (hash_t hash, uid_t uid, gid_t gid)
  */
     gids_gid_t   g;
     gids_node_t  node;
-    gids_node_t *node_p;
+    gids_node_t *nodep;
 
     if (!(g = hash_find (hash, &uid))) {
         if (!(g = _gids_head_alloc (uid))) {
@@ -567,19 +567,19 @@ _gids_hash_add (hash_t hash, uid_t uid, gid_t gid)
     }
     assert (g->uid == uid);
 
-    node_p = &g->next;
-    while ((*node_p) && ((*node_p)->gid < gid)) {
-        node_p = &(*node_p)->next;
+    nodep = &g->next;
+    while ((*nodep) && ((*nodep)->gid < gid)) {
+        nodep = &(*nodep)->next;
     }
-    if ((*node_p) && ((*node_p)->gid == gid)) {
+    if ((*nodep) && ((*nodep)->gid == gid)) {
         return (0);
     }
     if (!(node = _gids_node_alloc (gid))) {
         log_msg (LOG_ERR, "Unable to allocate gids node -- out of memory");
         return (-1);
     }
-    node->next = *node_p;
-    *node_p = node;
+    node->next = *nodep;
+    *nodep = node;
     return (1);
 }
 
@@ -638,20 +638,20 @@ _gids_node_alloc (gid_t gid)
 
 
 static int
-_gids_node_cmp (uid_t *uid1_p, uid_t *uid2_p)
+_gids_node_cmp (uid_t *uid1p, uid_t *uid2p)
 {
-/*  Used by the hash routines to compare hash keys [uid1_p] and [uid2_p].
+/*  Used by the hash routines to compare hash keys [uid1p] and [uid2p].
  */
-    return (!(*uid1_p == *uid2_p));
+    return (!(*uid1p == *uid2p));
 }
 
 
 static unsigned int
-_gids_node_key (uid_t *uid_p)
+_gids_node_key (uid_t *uidp)
 {
-/*  Used by the hash routines to convert [uid_p] into a hash key.
+/*  Used by the hash routines to convert [uidp] into a hash key.
  */
-    return (*uid_p);
+    return (*uidp);
 }
 
 
@@ -722,11 +722,11 @@ _gids_dump_gid_hash (hash_t gid_hash)
 
 
 static void
-_gids_dump_gid_node (gids_gid_t g, uid_t *uid_p, void *null)
+_gids_dump_gid_node (gids_gid_t g, uid_t *uidp, void *null)
 {
     gids_node_t node;
 
-    assert (g->uid == *uid_p);
+    assert (g->uid == *uidp);
 
     printf (" %5d:", g->uid);
     for (node = g->next; node; node = node->next) {
