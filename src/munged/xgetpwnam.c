@@ -47,11 +47,14 @@
 #include <assert.h>
 #include <errno.h>
 #include <pwd.h>
+#include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/types.h>
 #include <unistd.h>
 #include <munge.h>
 #include "log.h"
+#include "xgetpwnam.h"
 
 
 /*****************************************************************************
@@ -73,6 +76,16 @@
 
 
 /*****************************************************************************
+ *  Data Types
+ *****************************************************************************/
+
+struct xpwbuf_t {
+    char   *buf;
+    size_t  len;
+};
+
+
+/*****************************************************************************
  *  Private Prototypes
  *****************************************************************************/
 
@@ -89,90 +102,92 @@ static int _xgetpwnam_copy_str (const char *src, char **dst_p,
  *  Public Functions
  *****************************************************************************/
 
-int
-xgetpwnam_buf_create (char **buf_p, int *buflen_p)
+xpwbuf_p
+xgetpwnam_buf_create (void)
 {
-/*  Allocates a buffer for xgetpwnam(), storing the result in [buf_p];
- *    the size of the buffer is returned in [buflen_p].
- *  Returns 0 on success, or -1 on error (with errno).
+/*  Allocates a buffer for xgetpwnam().
+ *  Returns the buffer on success, or NULL on error (with errno).
  */
-    static int  pw_buf_size = -1;
-    char       *buf;
+    static int pw_buf_size = -1;
+    xpwbuf_p   pwbufp;
 
-    if ((buf_p == NULL) || (buflen_p == NULL)) {
-        errno = EINVAL;
-        return (-1);
-    }
     if (pw_buf_size < 0) {
         pw_buf_size = _xgetpwnam_get_buf_size ();
     }
-    buf = malloc (pw_buf_size);
-    if (buf == NULL) {
-        return (-1);
+    if (!(pwbufp = malloc (sizeof (struct xpwbuf_t)))) {
+        return (NULL);
     }
-    *buf_p = buf;
-    *buflen_p = pw_buf_size;
-    return (0);
+    if (!(pwbufp->buf = malloc (pw_buf_size))) {
+        free (pwbufp);
+        return (NULL);
+    }
+    pwbufp->len = pw_buf_size;
+    return (pwbufp);
 }
 
 
 void
-xgetpwnam_buf_destroy (char *buf)
+xgetpwnam_buf_destroy (xpwbuf_p pwbufp)
 {
-/*  Destroys the buffer [buf].
+/*  Destroys the buffer [pwbufp].
  */
-    if (buf != NULL) {
-        free (buf);
+    if (pwbufp != NULL) {
+        if (pwbufp->buf != NULL) {
+            free (pwbufp->buf);
+        }
+        free (pwbufp);
     }
     return;
 }
 
 
 int
-xgetpwnam (const char *user, struct passwd *pw, char *buf, size_t buflen)
+xgetpwnam (const char *user, struct passwd *pwp, xpwbuf_p pwbufp)
 {
 /*  Portable encapsulation of getpwnam_r().
  *  Queries the password database for [user], storing the struct passwd result
- *    in [pw] and additional strings in buffer [buf] of length [buflen].
+ *    in [pwp] and additional strings in the buffer [pwbufp].
  *  Returns 0 on success, or -1 on error (with errno).
  *    Returns -1 with ENOENT when [user] is not found.
  */
 #if   HAVE_GETPWNAM_R_POSIX
     int                     rv;
-    struct passwd          *pw_ptr;
+    struct passwd          *rv_pwp;
 #elif HAVE_GETPWNAM_R_AIX
     int                     rv;
 #elif HAVE_GETPWNAM_R_SUN
-    struct passwd          *pw_ptr;
+    struct passwd          *rv_pwp;
 #elif HAVE_GETPWNAM
     static pthread_mutex_t  mutex = PTHREAD_MUTEX_INITIALIZER;
     int                     rv_mutex;
     int                     rv_copy;
-    struct passwd          *pw_ptr;
+    struct passwd          *rv_pwp;
 #endif
     int                     got_err = 0;
     int                     got_none = 0;
 
     if ((user == NULL)    ||
         (user[0] == '\0') ||
-        (pw == NULL)      ||
-        (buf == NULL)     ||
-        (buflen <= 0))
+        (pwp == NULL)     ||
+        (pwbufp == NULL))
     {
         errno = EINVAL;
         return (-1);
     }
+    assert (pwbufp->buf != NULL);
+    assert (pwbufp->len > 0);
+
     errno = 0;
 
 #if   HAVE_GETPWNAM_R_POSIX
-    rv = getpwnam_r (user, pw, buf, buflen, &pw_ptr);
+    rv = getpwnam_r (user, pwp, pwbufp->buf, pwbufp->len, &rv_pwp);
     /*
      *  POSIX.1-2001 does not call "user not found" an error, so the return
      *    value of getpwnam_r() is of limited value.  When errors do occur,
      *    some systems return them via the retval, some via errno, and some
      *    return no indication whatsoever.
      */
-    if (pw_ptr == NULL) {
+    if (rv_pwp == NULL) {
         /*
          *  Coalesce the error number onto rv if needed.
          */
@@ -206,7 +221,7 @@ xgetpwnam (const char *user, struct passwd *pw, char *buf, size_t buflen)
         }
     }
 #elif HAVE_GETPWNAM_R_AIX
-    rv = getpwnam_r (user, pw, buf, buflen);
+    rv = getpwnam_r (user, pwp, pwbufp->buf, pwbufp->len);
     if (rv != 0) {
         if (errno == ESRCH) {
             got_none = 1;
@@ -216,8 +231,8 @@ xgetpwnam (const char *user, struct passwd *pw, char *buf, size_t buflen)
         }
     }
 #elif HAVE_GETPWNAM_R_SUN
-    pw_ptr = getpwnam_r (user, pw, buf, buflen);
-    if (pw_ptr == NULL) {
+    rv_pwp = getpwnam_r (user, pwp, pwbufp->buf, pwbufp->len);
+    if (rv_pwp == NULL) {
         if (errno == 0) {
             got_none = 1;
         }
@@ -230,13 +245,13 @@ xgetpwnam (const char *user, struct passwd *pw, char *buf, size_t buflen)
         errno = rv_mutex;
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to lock xgetpwnam mutex");
     }
-    pw_ptr = getpwnam (user);
+    rv_pwp = getpwnam (user);
     /*
      *  The initial test for (errno != 0), while redundant, allows for the
      *    "user not found" case to short-circuit the rest of the if-condition
      *    on many systems.
      */
-    if (pw_ptr == NULL) {
+    if (rv_pwp == NULL) {
         if ((errno != 0) &&
             ((errno == EINTR)  ||
              (errno == ERANGE) ||
@@ -252,7 +267,7 @@ xgetpwnam (const char *user, struct passwd *pw, char *buf, size_t buflen)
         }
     }
     else {
-        rv_copy = _xgetpwnam_copy (pw_ptr, pw, buf, buflen);
+        rv_copy = _xgetpwnam_copy (rv_pwp, pwp, pwbufp->buf, pwbufp->len);
     }
     if ((rv_mutex = pthread_mutex_unlock (&mutex)) != 0) {
         errno = rv_mutex;

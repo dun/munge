@@ -33,14 +33,21 @@
 
 
 /*****************************************************************************
+ *  Data Types
+ *****************************************************************************/
+
+typedef struct xpwbuf_t * xpwbuf_p;
+
+
+/*****************************************************************************
  *  Functions
  *****************************************************************************/
 
-int  xgetpwnam_buf_create (char **buf_p, int *buflen_p);
+xpwbuf_p xgetpwnam_buf_create (void);
 
-void xgetpwnam_buf_destroy (char *buf);
+void xgetpwnam_buf_destroy (xpwbuf_p pwbufp);
 
-int  xgetpwnam (const char *user, struct passwd *pw, char *buf, size_t buflen);
+int xgetpwnam (const char *user, struct passwd *pwp, xpwbuf_p pwbufp);
 
 
 #endif /* !XGETPWNAM_H */

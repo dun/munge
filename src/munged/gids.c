@@ -117,7 +117,7 @@ typedef struct gids_uid  * gids_uid_t;
 static void         _gids_update (gids_t gids);
 static hash_t       _gids_hash_create (void);
 static int          _gids_user_to_uid (hash_t uid_hash,
-                        char *user, uid_t *uid_p, char *buf, size_t buflen);
+                        char *user, uid_t *uid_p, xpwbuf_p pwbufp);
 static int          _gids_hash_add (hash_t hash, uid_t uid, gid_t gid);
 static gids_gid_t   _gids_head_alloc (uid_t uid);
 static void         _gids_head_del (gids_gid_t g);
@@ -382,8 +382,7 @@ _gids_hash_create (void)
     const int       max_inits = 16;
     struct group    gr;
     xgrbuf_p        grbufp = NULL;
-    char           *pw_buf_ptr = NULL;
-    int             pw_buf_len;
+    xpwbuf_p        pwbufp = NULL;
     char          **user_p;
     uid_t           uid;
     int             n_users;
@@ -416,7 +415,7 @@ _gids_hash_create (void)
         log_msg (LOG_ERR, "Unable to allocate group entry buffer");
         goto err;
     }
-    if (xgetpwnam_buf_create (&pw_buf_ptr, &pw_buf_len) < 0) {
+    if (!(pwbufp = xgetpwnam_buf_create ())) {
         log_msg (LOG_ERR, "Unable to allocate password entry buffer");
         goto err;
     }
@@ -445,8 +444,7 @@ restart:
          *    belonging to the group.
          */
         for (user_p = gr.gr_mem; user_p && *user_p; user_p++) {
-            int rv = _gids_user_to_uid (uid_hash, *user_p, &uid,
-                    pw_buf_ptr, pw_buf_len);
+            int rv = _gids_user_to_uid (uid_hash, *user_p, &uid, pwbufp);
             if (rv == 0) {
                 if (_gids_hash_add (gid_hash, uid, gr.gr_gid) < 0) {
                     goto err;
@@ -487,8 +485,8 @@ err:
     if (do_group_db_close) {
         xgetgrent_fini ();
     }
-    if (pw_buf_ptr != NULL) {
-        xgetpwnam_buf_destroy (pw_buf_ptr);
+    if (pwbufp != NULL) {
+        xgetpwnam_buf_destroy (pwbufp);
     }
     if (grbufp != NULL) {
         xgetgrent_buf_destroy (grbufp);
@@ -504,8 +502,7 @@ err:
 
 
 static int
-_gids_user_to_uid (hash_t uid_hash, char *user, uid_t *uid_p,
-                   char *buf, size_t buflen)
+_gids_user_to_uid (hash_t uid_hash, char *user, uid_t *uid_p, xpwbuf_p pwbufp)
 {
 /*  Returns 0 on success, setting [*uid_p] (if non-NULL) to the UID associated
  *    with [user]; o/w, returns -1.
@@ -517,7 +514,7 @@ _gids_user_to_uid (hash_t uid_hash, char *user, uid_t *uid_p,
     if ((u = hash_find (uid_hash, user))) {
         uid = u->uid;
     }
-    else if (xgetpwnam (user, &pw, buf, buflen) == 0) {
+    else if (xgetpwnam (user, &pw, pwbufp) == 0) {
         uid = pw.pw_uid;
         if (!(u = _gids_uid_alloc (user, uid))) {
             log_msg (LOG_WARNING,
