@@ -73,7 +73,7 @@
  *****************************************************************************/
 
 #ifndef _GIDS_DEBUG
-#define _GIDS_DEBUG 0
+#define _GIDS_DEBUG     0
 #endif /* !_GIDS_DEBUG */
 
 
