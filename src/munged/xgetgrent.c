@@ -70,7 +70,7 @@
  *  Constants
  *****************************************************************************/
 
-#define MINIMUM_GR_BUF_SIZE     4096
+#define MINIMUM_GR_BUF_SIZE     1024
 
 
 /*****************************************************************************
@@ -96,13 +96,15 @@ static FILE *_gr_fp;
  *  Private Prototypes
  *****************************************************************************/
 
-static int _xgetgrent_get_buf_size (void);
+static size_t _xgetgrent_get_buf_size (void);
+
+static int _xgetgrent_buf_grow (xgrbuf_p grbufp, size_t minlen);
 
 static int _xgetgrent_copy (const struct group *src, struct group *dst,
-    char *buf, size_t buflen) _UNUSED_;
+    xgrbuf_p grbufp) _UNUSED_;
 
-static int _xgetgrent_copy_str (const char *src, char **dst_p,
-    char **buf_p, size_t *buflen_p) _UNUSED_;
+static int _xgetgrent_copy_str (const char *src, char **dstp,
+    char **bufp, size_t *buflenp) _UNUSED_;
 
 
 /*****************************************************************************
@@ -115,16 +117,18 @@ xgetgrent_buf_create (void)
 /*  Allocates a buffer for xgetgrent().
  *  Returns the buffer on success, or NULL on error (with errno).
  */
-    static int gr_buf_size = -1;
-    xgrbuf_p   grbufp;
+    static size_t gr_buf_size = 0;
+    xgrbuf_p      grbufp;
 
-    if (gr_buf_size < 0) {
+    if (gr_buf_size <= 0) {
         gr_buf_size = _xgetgrent_get_buf_size ();
     }
-    if (!(grbufp = malloc (sizeof (struct xgrbuf_t)))) {
+    grbufp = malloc (sizeof (struct xgrbuf_t));
+    if (grbufp == NULL) {
         return (NULL);
     }
-    if (!(grbufp->buf = malloc (gr_buf_size))) {
+    grbufp->buf = malloc (gr_buf_size);
+    if (grbufp->buf == NULL) {
         free (grbufp);
         return (NULL);
     }
@@ -169,7 +173,9 @@ xgetgrent (struct group *grp, xgrbuf_p grbufp)
  *    storing the struct group result in [grp] and additional strings in the
  *    buffer [grbufp].
  *  Returns 0 on success, or -1 on error (with errno).
- *    Returns -1 with ENOENT when there are no more entries.
+ *  Returns -1 with ENOENT when there are no more entries.
+ *  Returns -1 with ERANGE when the underlying getgrent_r() call cannot be
+ *    automatically restarted after resizing the buffer [grbufp].
  */
 #if   HAVE_GETGRENT_R_GNU
     int                     rv;
@@ -184,8 +190,8 @@ xgetgrent (struct group *grp, xgrbuf_p grbufp)
     int                     rv_copy;
     struct group           *rv_grp;
 #endif
-    int                     got_eof = 0;
-    int                     got_err = 0;
+    int                     got_eof;
+    int                     got_err;
 
     if ((grp == NULL) || (grbufp == NULL)) {
         errno = EINVAL;
@@ -193,7 +199,11 @@ xgetgrent (struct group *grp, xgrbuf_p grbufp)
     }
     assert (grbufp->buf != NULL);
     assert (grbufp->len > 0);
+
+restart:
     errno = 0;
+    got_eof = 0;
+    got_err = 0;
 
 #if   HAVE_GETGRENT_R_GNU
     rv = getgrent_r (grp, grbufp->buf, grbufp->len, &rv_grp);
@@ -239,7 +249,7 @@ xgetgrent (struct group *grp, xgrbuf_p grbufp)
         }
     }
     else {
-        rv_copy = _xgetgrent_copy (rv_grp, grp, grbufp->buf, grbufp->len);
+        rv_copy = _xgetgrent_copy (rv_grp, grp, grbufp);
     }
     if ((rv_mutex = pthread_mutex_unlock (&mutex)) != 0) {
         errno = rv_mutex;
@@ -255,6 +265,11 @@ xgetgrent (struct group *grp, xgrbuf_p grbufp)
         return (-1);
     }
     if (got_err) {
+        if (errno == ERANGE) {
+            if (_xgetgrent_buf_grow (grbufp, 0) == 0) {
+                goto restart;
+            }
+        }
         return (-1);
     }
     return (0);
@@ -275,14 +290,16 @@ xgetgrent_fini (void)
  *  Private Functions
  *****************************************************************************/
 
-static int
+static size_t
 _xgetgrent_get_buf_size (void)
 {
-/*  Returns the recommended size of the getgrent_r() caller-provided buffer.
+/*  Returns the recommended size for the xgetgrent() buffer.
  */
-    static int n = -1;
+    static size_t len = 0;
 
-    if (n < 0) {
+    if (len <= 0) {
+
+        long n = -1;
 
 #if HAVE_SYSCONF
 #ifdef _SC_GETGR_R_SIZE_MAX
@@ -290,65 +307,118 @@ _xgetgrent_get_buf_size (void)
 #endif /* _SC_GETGR_R_SIZE_MAX */
 #endif /* HAVE_SYSCONF */
 
-        if (n <= MINIMUM_GR_BUF_SIZE) {
-            n = MINIMUM_GR_BUF_SIZE;
-        }
-        log_msg (LOG_DEBUG, "Using gr buf size of %d", n);
+        len = (n <= MINIMUM_GR_BUF_SIZE) ? MINIMUM_GR_BUF_SIZE : (size_t) n;
+        log_msg (LOG_DEBUG, "Initialized group entry buffer to %d", len);
     }
-    return (n);
+    return (len);
 }
 
 
 static int
-_xgetgrent_copy (const struct group *src, struct group *dst,
-                 char *buf, size_t buflen)
+_xgetgrent_buf_grow (xgrbuf_p grbufp, size_t minlen)
 {
-/*  Copies the group entry [src] into [dst], placing additional strings
- *    and whatnot into buffer [buf] of length [buflen].
+/*  Grows the buffer [grbufp] to be at least as large as the length [minlen].
+ *  Returns 0 on success, or -1 on error (with errno).
+ */
+    char   *newbuf;
+    size_t  newlen;
+
+    assert (grbufp != NULL);
+    assert (grbufp->buf != NULL);
+    assert (grbufp->len > 0);
+
+    newlen = (minlen > grbufp->len) ? minlen : grbufp->len * 2;
+    if (newlen < grbufp->len) {
+        errno = ENOMEM;                 /* newlen overflowed */
+        return (-1);
+    }
+    newbuf = realloc (grbufp->buf, newlen);
+    if (newbuf == NULL) {
+        errno = ENOMEM;
+        return (-1);
+    }
+    grbufp->buf = newbuf;
+    grbufp->len = newlen;
+
+    log_msg (LOG_DEBUG, "Increased group entry buffer to %d", newlen);
+    return (0);
+}
+
+
+static int
+_xgetgrent_copy (const struct group *src, struct group *dst, xgrbuf_p grbufp)
+{
+/*  Copies the group entry [src] into [dst], placing additional strings and
+ *    whatnot into the buffer [grbufp].
  *  Returns 0 on success, or -1 on error (with errno).
  */
     int      num_ptrs;
-    char   **user_p;
-    char    *p = buf;
-    size_t   nleft = buflen;
+    size_t   num_bytes;
+    char   **userp;
+    char    *p;
     size_t   n;
     int      i;
 
     assert (src != NULL);
     assert (dst != NULL);
-    assert (buf != NULL);
-    assert (buflen > 0);
+    assert (grbufp != NULL);
+    assert (grbufp->buf != NULL);
+    assert (grbufp->len > 0);
 
-    num_ptrs = 1;                       /* +1 for null-term of gr_mem array */
-    for (user_p = src->gr_mem; user_p && *user_p; user_p++) {
+    /*  Compute requisite buffer space.
+     */
+    num_ptrs = 1;                       /* +1 for gr_mem[] null termination */
+    num_bytes = 0;
+    for (userp = src->gr_mem; userp && *userp; userp++) {
         num_ptrs++;
+        num_bytes += strlen (*userp) + 1;
     }
+    if (src->gr_name) {
+        num_bytes += strlen (src->gr_name) + 1;
+    }
+    if (src->gr_passwd) {
+        num_bytes += strlen (src->gr_passwd) + 1;
+    }
+    num_bytes += num_ptrs * (sizeof (char *));
+
+    /*  Ensure requisite buffer space.
+     */
+    if (grbufp->len < num_bytes) {
+        if (_xgetgrent_buf_grow (grbufp, num_bytes) < 0) {
+            return (-1);
+        }
+    }
+    /*  Copy group entry.
+     */
+    assert (grbufp->len >= num_bytes);
+    memset (dst, 0, sizeof (*dst));
+    p = grbufp->buf;
+
     n = num_ptrs * (sizeof (char *));
-    if (nleft < n) {
+    if (num_bytes < n) {
         goto err;
     }
     dst->gr_mem = (char **) p;
-    dst->gr_mem [num_ptrs - 1] = NULL;
     p += n;
-    nleft -= n;
+    num_bytes -= n;
 
     if (_xgetgrent_copy_str
-            (src->gr_name, &(dst->gr_name), &p, &nleft) < 0) {
+            (src->gr_name, &(dst->gr_name), &p, &num_bytes) < 0) {
         goto err;
     }
     if (_xgetgrent_copy_str
-            (src->gr_passwd, &(dst->gr_passwd), &p, &nleft) < 0) {
+            (src->gr_passwd, &(dst->gr_passwd), &p, &num_bytes) < 0) {
         goto err;
     }
     for (i = 0; i < num_ptrs; i++) {
         if (_xgetgrent_copy_str
-                (src->gr_mem [i], &(dst->gr_mem [i]), &p, &nleft) < 0) {
+                (src->gr_mem [i], &(dst->gr_mem [i]), &p, &num_bytes) < 0) {
             goto err;
         }
     }
     dst->gr_gid = src->gr_gid;
 
-    assert (p <= buf + buflen);
+    assert (p <= grbufp->buf + grbufp->len);
     return (0);
 
 err:
@@ -358,33 +428,32 @@ err:
 
 
 static int
-_xgetgrent_copy_str (const char *src, char **dst_p,
-                     char **buf_p, size_t *buflen_p)
+_xgetgrent_copy_str (const char *src, char **dstp,
+                     char **bufp, size_t *buflenp)
 {
-/*  Copies the string [src] into the buffer [*buf_p] of size [*buflen_p],
- *    setting the pointer [*dst_p] to the newly-copied string.  The values
- *    for [buf_p] and [buflen_p] are adjusted for the remaining buffer space.
- *  Note that [dst_p], [buf_p], and [buflen_p] are all passed by reference.
+/*  Copies the string [src] into the buffer [bufp] of size [buflenp],
+ *    setting the pointer [dstp] to the newly-copied string.  The values
+ *    for [bufp] and [buflenp] are adjusted for the remaining buffer space.
+ *  Note that [dstp], [bufp], and [buflenp] are all passed by reference.
  *  Returns the number of bytes copied, or -1 on error.
  */
     size_t n;
 
-    assert (dst_p != NULL);
-    assert (buf_p != NULL);
-    assert (*buf_p != NULL);
-    assert (buflen_p != NULL);
+    assert (dstp != NULL);
+    assert (bufp != NULL);
+    assert (*bufp != NULL);
+    assert (buflenp != NULL);
 
     if (src == NULL) {
-        *dst_p = NULL;
+        *dstp = NULL;
         return (0);
     }
     n = strlen (src) + 1;
-    if (*buflen_p < n) {
+    if (*buflenp < n) {
         return (-1);
     }
-    (void) strcpy (*buf_p, src);
-    *dst_p = *buf_p;
-    *buf_p += n;
-    *buflen_p -= n;
+    *dstp = strcpy (*bufp, src);
+    *bufp += n;
+    *buflenp -= n;
     return (n);
 }
