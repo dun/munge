@@ -42,9 +42,9 @@ void xgetgrent_buf_destroy (char *buf);
 
 void xgetgrent_init (void);
 
-void xgetgrent_fini (void);
-
 int  xgetgrent (struct group *gr, char *buf, size_t buflen);
+
+void xgetgrent_fini (void);
 
 
 #endif /* !XGETGRENT_H */

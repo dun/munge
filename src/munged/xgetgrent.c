@@ -148,16 +148,6 @@ xgetgrent_init (void)
 }
 
 
-void
-xgetgrent_fini (void)
-{
-/*  Portable encapsulation of endgrent().
- */
-    endgrent ();
-    return;
-}
-
-
 int
 xgetgrent (struct group *gr, char *buf, size_t buflen)
 {
@@ -253,6 +243,16 @@ xgetgrent (struct group *gr, char *buf, size_t buflen)
         return (-1);
     }
     return (0);
+}
+
+
+void
+xgetgrent_fini (void)
+{
+/*  Portable encapsulation of endgrent().
+ */
+    endgrent ();
+    return;
 }
 
 
