@@ -376,6 +376,8 @@ _gids_hash_create (void)
     struct timeval  t_start;
     struct timeval  t_stop;
     int             do_group_db_close = 0;
+    int             num_inits = 0;
+    const int       max_inits = 16;
     struct group    gr;
     xgrbuf_p        grbufp = NULL;
     char           *pw_buf_ptr = NULL;
@@ -416,15 +418,23 @@ _gids_hash_create (void)
         log_msg (LOG_ERR, "Unable to allocate password entry buffer");
         goto err;
     }
-    xgetgrent_init ();
     do_group_db_close = 1;
+restart:
+    xgetgrent_init ();
+    num_inits++;
 
     while (1) {
         if (xgetgrent (&gr, grbufp) < 0) {
-            if (errno == ENOENT)
+            if (errno == ENOENT) {
                 break;
-            if (errno == EINTR)
+            }
+            if (errno == EINTR) {
                 continue;
+            }
+            if ((errno == ERANGE) && (num_inits < max_inits)) {
+                hash_reset (gid_hash);
+                goto restart;
+            }
             log_msg (LOG_ERR, "Unable to query group info: %s",
                     strerror (errno));
             goto err;

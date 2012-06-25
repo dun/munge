@@ -33,9 +33,11 @@
 #if   HAVE_GETGRENT_R_GNU
 #define _GNU_SOURCE 1
 #elif HAVE_GETGRENT_R_AIX
+#define HAVE_GETGRENT_R_ERANGE_BROKEN 1
 #define _THREAD_SAFE 1
 #include <stdio.h>
 #elif HAVE_GETGRENT_R_SUN
+#define HAVE_GETGRENT_R_ERANGE_BROKEN 1
 #elif HAVE_GETGRENT
 #include <pthread.h>
 #else
@@ -177,11 +179,10 @@ xgetgrent (struct group *grp, xgrbuf_p grbufp)
  *  Returns -1 with ERANGE when the underlying getgrent_r() call cannot be
  *    automatically restarted after resizing the buffer [grbufp].
  */
-#if   HAVE_GETGRENT_R_GNU
     int                     rv;
+#if   HAVE_GETGRENT_R_GNU
     struct group           *rv_grp;
 #elif HAVE_GETGRENT_R_AIX
-    int                     rv;
 #elif HAVE_GETGRENT_R_SUN
     struct group           *rv_grp;
 #elif HAVE_GETGRENT
@@ -266,9 +267,12 @@ restart:
     }
     if (got_err) {
         if (errno == ERANGE) {
-            if (_xgetgrent_buf_grow (grbufp, 0) == 0) {
+            rv = _xgetgrent_buf_grow (grbufp, 0);
+#if ! HAVE_GETGRENT_R_ERANGE_BROKEN
+            if (rv == 0) {
                 goto restart;
             }
+#endif /* ! HAVE_GETGRENT_R_ERANGE_BROKEN */
         }
         return (-1);
     }
