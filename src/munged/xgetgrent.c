@@ -114,27 +114,28 @@ static int _xgetgrent_copy_str (const char *src, char **dstp,
  *****************************************************************************/
 
 xgrbuf_p
-xgetgrent_buf_create (void)
+xgetgrent_buf_create (size_t len)
 {
-/*  Allocates a buffer for xgetgrent().
+/*  Allocates a buffer for xgetgrent().  [len] specifies a suggested size
+ *    for the buffer; if 0, the system recommended size will be used.
  *  Returns the buffer on success, or NULL on error (with errno).
  */
-    static size_t gr_buf_size = 0;
-    xgrbuf_p      grbufp;
+    xgrbuf_p grbufp;
 
-    if (gr_buf_size <= 0) {
-        gr_buf_size = _xgetgrent_get_buf_size ();
+    if (len == 0) {
+        len = _xgetgrent_get_buf_size ();
     }
     grbufp = malloc (sizeof (struct xgrbuf_t));
     if (grbufp == NULL) {
         return (NULL);
     }
-    grbufp->buf = malloc (gr_buf_size);
+    grbufp->buf = malloc (len);
     if (grbufp->buf == NULL) {
         free (grbufp);
         return (NULL);
     }
-    grbufp->len = gr_buf_size;
+    grbufp->len = len;
+    log_msg (LOG_DEBUG, "Created group entry buffer of size %u", len);
     return (grbufp);
 }
 
@@ -151,6 +152,20 @@ xgetgrent_buf_destroy (xgrbuf_p grbufp)
         free (grbufp);
     }
     return;
+}
+
+
+size_t
+xgetgrent_buf_get_len (xgrbuf_p grbufp)
+{
+/*  Returns the current size of the allocated buffer within [grbufp],
+ *    or 0 on error (with errno).
+ */
+    if (grbufp == NULL) {
+        errno = EINVAL;
+        return (0);
+    }
+    return (grbufp->len);
 }
 
 
@@ -299,21 +314,16 @@ _xgetgrent_get_buf_size (void)
 {
 /*  Returns the recommended size for the xgetgrent() buffer.
  */
-    static size_t len = 0;
-
-    if (len <= 0) {
-
-        long n = -1;
+    long   n = -1;
+    size_t len;
 
 #if HAVE_SYSCONF
 #ifdef _SC_GETGR_R_SIZE_MAX
-        n = sysconf (_SC_GETGR_R_SIZE_MAX);
+    n = sysconf (_SC_GETGR_R_SIZE_MAX);
 #endif /* _SC_GETGR_R_SIZE_MAX */
 #endif /* HAVE_SYSCONF */
 
-        len = (n <= MINIMUM_GR_BUF_SIZE) ? MINIMUM_GR_BUF_SIZE : (size_t) n;
-        log_msg (LOG_DEBUG, "Initialized group entry buffer to %d", len);
-    }
+    len = (n <= MINIMUM_GR_BUF_SIZE) ? MINIMUM_GR_BUF_SIZE : (size_t) n;
     return (len);
 }
 

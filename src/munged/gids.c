@@ -36,6 +36,7 @@
 #include <assert.h>
 #include <errno.h>
 #include <pthread.h>
+#include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
@@ -371,6 +372,7 @@ _gids_hash_create (void)
 {
 /*  Returns a new hash containing the new GIDs mapping, or NULL on error.
  */
+    static size_t   grbuflen = 0;
     hash_t          gid_hash = NULL;
     hash_t          uid_hash = NULL;
     struct timeval  t_start;
@@ -410,7 +412,7 @@ _gids_hash_create (void)
      *    is used, but allocating it here allows the same buffer to be reused
      *    throughout a given GIDs creation cycle.
      */
-    if (!(grbufp = xgetgrent_buf_create ())) {
+    if (!(grbufp = xgetgrent_buf_create (grbuflen))) {
         log_msg (LOG_ERR, "Unable to allocate group entry buffer");
         goto err;
     }
@@ -453,6 +455,12 @@ restart:
         }
     }
     xgetgrent_fini ();
+    /*
+     *  Record the final size of the xgetgrent() buffer.  This allows
+     *    subsequent scans to start with a buffer that will generally
+     *    not need to be realloc()d.
+     */
+    grbuflen = xgetgrent_buf_get_len (grbufp);
     xgetgrent_buf_destroy (grbufp);
 
     if (gettimeofday (&t_stop, NULL) < 0) {
