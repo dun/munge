@@ -98,7 +98,7 @@ static FILE *_gr_fp;
  *  Private Prototypes
  *****************************************************************************/
 
-static size_t _xgetgrent_get_buf_size (void);
+static size_t _xgetgrent_buf_get_sys_size (void);
 
 static int _xgetgrent_buf_grow (xgrbuf_p grbufp, size_t minlen);
 
@@ -123,7 +123,7 @@ xgetgrent_buf_create (size_t len)
     xgrbuf_p grbufp;
 
     if (len == 0) {
-        len = _xgetgrent_get_buf_size ();
+        len = _xgetgrent_buf_get_sys_size ();
     }
     grbufp = malloc (sizeof (struct xgrbuf_t));
     if (grbufp == NULL) {
@@ -310,9 +310,9 @@ xgetgrent_fini (void)
  *****************************************************************************/
 
 static size_t
-_xgetgrent_get_buf_size (void)
+_xgetgrent_buf_get_sys_size (void)
 {
-/*  Returns the recommended size for the xgetgrent() buffer.
+/*  Returns the system recommended size for the xgetgrent() buffer.
  */
     long   n = -1;
     size_t len;
