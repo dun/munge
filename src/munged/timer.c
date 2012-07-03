@@ -546,9 +546,15 @@ _timer_is_timespec_ge (struct timespec *tsp0, struct timespec *tsp1)
  */
     assert (tsp0 != NULL);
     assert (tsp1 != NULL);
-    assert (tsp0->tv_nsec < 1000000000);
-    assert (tsp1->tv_nsec < 1000000000);
 
+    if (tsp0->tv_nsec >= 1000000000) {
+        tsp0->tv_sec += tsp0->tv_nsec / 1000000000;
+        tsp0->tv_nsec %= 1000000000;
+    }
+    if (tsp1->tv_nsec >= 1000000000) {
+        tsp1->tv_sec += tsp1->tv_nsec / 1000000000;
+        tsp1->tv_nsec %= 1000000000;
+    }
     if (tsp0->tv_sec == tsp1->tv_sec) {
         return (tsp0->tv_nsec >= tsp1->tv_nsec);
     }
