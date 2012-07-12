@@ -107,6 +107,8 @@ void   destroy_conf (conf_t conf);
 void   parse_cmdline (conf_t conf, int argc, char **argv);
 void   display_help (char *prog);
 void   display_strings (const char *header, munge_enum_t type);
+uid_t  query_uid (const char *user);
+gid_t  query_gid (const char *group);
 void   open_files (conf_t conf);
 void   display_cred (conf_t conf);
 
@@ -224,14 +226,12 @@ destroy_conf (conf_t conf)
 void
 parse_cmdline (conf_t conf, int argc, char **argv)
 {
-    char          *prog;
-    int            c;
-    char          *p;
-    munge_err_t    e;
-    int            i;
-    long int       l;
-    struct passwd *pw_ptr;
-    struct group  *gr_ptr;
+    char        *prog;
+    int          c;
+    char        *p;
+    munge_err_t  e;
+    int          i;
+    long int     l;
 
     opterr = 0;                         /* suppress default getopt err msgs */
 
@@ -324,20 +324,10 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                 exit (EMUNGE_SUCCESS);
                 break;
             case 'u':
-                if ((pw_ptr = getpwnam (optarg)) != NULL) {
-                    i = pw_ptr->pw_uid;
-                }
-                else {
-                    errno = 0;
-                    l = strtol (optarg, &p, 10);
-                    if (((errno == ERANGE)
-                                && ((l == LONG_MIN) || (l == LONG_MAX)))
-                            || (optarg == p) || (*p != '\0')
-                            || (l < 0) || (l > INT_MAX)) {
-                        log_err (EMUNGE_SNAFU, LOG_ERR,
+                i = query_uid (optarg);
+                if (i < 0) {
+                    log_err (EMUNGE_SNAFU, LOG_ERR,
                             "Unrecognized user \"%s\"", optarg);
-                    }
-                    i = (int) l;
                 }
                 e = munge_ctx_set (conf->ctx, MUNGE_OPT_UID_RESTRICTION, i);
                 if (e != EMUNGE_SUCCESS) {
@@ -347,20 +337,10 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                 }
                 break;
             case 'g':
-                if ((gr_ptr = getgrnam (optarg)) != NULL) {
-                    i = gr_ptr->gr_gid;
-                }
-                else {
-                    errno = 0;
-                    l = strtol (optarg, &p, 10);
-                    if (((errno == ERANGE)
-                                && ((l == LONG_MIN) || (l == LONG_MAX)))
-                            || (optarg == p) || (*p != '\0')
-                            || (l < 0) || (l > INT_MAX)) {
-                        log_err (EMUNGE_SNAFU, LOG_ERR,
+                i = query_gid (optarg);
+                if (i < 0) {
+                    log_err (EMUNGE_SNAFU, LOG_ERR,
                             "Unrecognized group \"%s\"", optarg);
-                    }
-                    i = (int) l;
                 }
                 e = munge_ctx_set (conf->ctx, MUNGE_OPT_GID_RESTRICTION, i);
                 if (e != EMUNGE_SUCCESS) {
@@ -542,6 +522,78 @@ display_strings (const char *header, munge_enum_t type)
     }
     printf ("\n");
     return;
+}
+
+
+uid_t
+query_uid (const char *user)
+{
+/*  Returns the uid for [user], or -1 on error.
+ */
+    struct passwd *pw_ptr;
+    uid_t          uid;
+    long int       luid;
+    char          *end_ptr;
+
+    if (user == NULL) {
+        errno = EINVAL;
+        return (-1);
+    }
+    pw_ptr = getpwnam (user);
+    if (pw_ptr != NULL) {
+        uid = pw_ptr->pw_uid;
+    }
+    else {
+        errno = 0;
+        luid = strtol (user, &end_ptr, 10);
+        if ((errno == ERANGE) && ((luid == LONG_MIN) || (luid == LONG_MAX))) {
+            return (-1);
+        }
+        if ((user == end_ptr) || (*end_ptr != '\0')) {
+            return (-1);
+        }
+        if ((luid < 0) || (luid > INT_MAX)) {
+            return (-1);
+        }
+        uid = (int) luid;
+    }
+    return (uid);
+}
+
+
+gid_t
+query_gid (const char *group)
+{
+/*  Returns the gid for [group], or -1 on error.
+ */
+    struct group  *gr_ptr;
+    gid_t          gid;
+    long int       lgid;
+    char          *end_ptr;
+
+    if (group == NULL) {
+        errno = EINVAL;
+        return (-1);
+    }
+    gr_ptr = getgrnam (group);
+    if (gr_ptr != NULL) {
+        gid = gr_ptr->gr_gid;
+    }
+    else {
+        errno = 0;
+        lgid = strtol (group, &end_ptr, 10);
+        if ((errno == ERANGE) && ((lgid == LONG_MIN) || (lgid == LONG_MAX))) {
+            return (-1);
+        }
+        if ((group == end_ptr) || (*end_ptr != '\0')) {
+            return (-1);
+        }
+        if ((lgid < 0) || (lgid > INT_MAX)) {
+            return (-1);
+        }
+        gid = (int) lgid;
+    }
+    return (gid);
 }
 
 
