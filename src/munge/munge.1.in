@@ -91,11 +91,19 @@ Specify the user name or UID allowed to decode the credential.  This will
 be matched against the effective user ID of the process requesting the
 credential decode.
 .TP
+.BI "-U, --uid " uid
+Specify the user name or UID under which to request the credential.
+This requires root privileges or the CAP_SETUID capability.
+.TP
 .BI "-g, --restrict-gid " gid
 Specify the group name or GID allowed to decode the credential.  This will
 be matched against the effective group ID of the process requesting the
 credential decode, as well as each supplementary group of which the effective
 user ID of that process is a member.
+.TP
+.BI "-G, --gid " gid
+Specify the group name or GID under which to request the credential.
+This requires root privileges or the CAP_SETGID capability.
 .TP
 .BI "-t, --ttl " integer
 Specify the time-to-live (in seconds).  This controls how long the credential
