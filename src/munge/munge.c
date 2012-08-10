@@ -52,7 +52,7 @@
  *  Command-Line Options
  *****************************************************************************/
 
-const char * const short_opts = ":hLVns:i:o:c:Cm:Mz:Zu:g:t:S:";
+const char * const short_opts = ":hLVns:i:o:c:Cm:Mz:Zu:U:g:G:t:S:";
 
 #include <getopt.h>
 struct option long_opts[] = {
@@ -70,7 +70,9 @@ struct option long_opts[] = {
     { "zip",          required_argument, NULL, 'z' },
     { "list-zips",    no_argument,       NULL, 'Z' },
     { "restrict-uid", required_argument, NULL, 'u' },
+    { "uid",          required_argument, NULL, 'U' },
     { "restrict-gid", required_argument, NULL, 'g' },
+    { "gid",          required_argument, NULL, 'G' },
     { "ttl",          required_argument, NULL, 't' },
     { "socket",       required_argument, NULL, 'S' },
     {  NULL,          0,                 NULL,  0  }
@@ -84,6 +86,8 @@ struct option long_opts[] = {
 struct conf {
     munge_ctx_t  ctx;                   /* munge context                     */
     munge_err_t  status;                /* error status munging the cred     */
+    uid_t        cuid;                  /* credential UID                    */
+    gid_t        cgid;                  /* credential GID                    */
     char        *string;                /* input from string instead of file */
     char        *fn_in;                 /* input filename, '-' for stdin     */
     char        *fn_out;                /* output filename, '-' for stdout   */
@@ -107,7 +111,10 @@ void   destroy_conf (conf_t conf);
 void   parse_cmdline (conf_t conf, int argc, char **argv);
 void   display_help (char *prog);
 void   display_strings (const char *header, munge_enum_t type);
+uid_t  query_uid (const char *user);
+gid_t  query_gid (const char *group);
 void   open_files (conf_t conf);
+int    encode_cred (conf_t conf);
 void   display_cred (conf_t conf);
 
 
@@ -144,10 +151,7 @@ main (int argc, char *argv[])
             log_err (EMUNGE_SNAFU, LOG_ERR, "Read error");
         }
     }
-    conf->status = munge_encode (&conf->cred, conf->ctx,
-        conf->data, conf->dlen);
-
-    if (conf->status != EMUNGE_SUCCESS) {
+    if (encode_cred (conf) < 0) {
         if (!(p = munge_ctx_strerror (conf->ctx))) {
             p = munge_strerror (conf->status);
         }
@@ -174,6 +178,8 @@ create_conf (void)
         log_errno (EMUNGE_NO_MEMORY, LOG_ERR, "Unable to create conf ctx");
     }
     conf->status = -1;
+    conf->cuid = geteuid ();
+    conf->cgid = getegid ();
     conf->string = NULL;
     conf->fn_in = "-";
     conf->fn_out = "-";
@@ -224,14 +230,12 @@ destroy_conf (conf_t conf)
 void
 parse_cmdline (conf_t conf, int argc, char **argv)
 {
-    char          *prog;
-    int            c;
-    char          *p;
-    munge_err_t    e;
-    int            i;
-    long int       l;
-    struct passwd *pw_ptr;
-    struct group  *gr_ptr;
+    char        *prog;
+    int          c;
+    char        *p;
+    munge_err_t  e;
+    int          i;
+    long int     l;
 
     opterr = 0;                         /* suppress default getopt err msgs */
 
@@ -324,20 +328,10 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                 exit (EMUNGE_SUCCESS);
                 break;
             case 'u':
-                if ((pw_ptr = getpwnam (optarg)) != NULL) {
-                    i = pw_ptr->pw_uid;
-                }
-                else {
-                    errno = 0;
-                    l = strtol (optarg, &p, 10);
-                    if (((errno == ERANGE)
-                                && ((l == LONG_MIN) || (l == LONG_MAX)))
-                            || (optarg == p) || (*p != '\0')
-                            || (l < 0) || (l > INT_MAX)) {
-                        log_err (EMUNGE_SNAFU, LOG_ERR,
+                i = query_uid (optarg);
+                if (i < 0) {
+                    log_err (EMUNGE_SNAFU, LOG_ERR,
                             "Unrecognized user \"%s\"", optarg);
-                    }
-                    i = (int) l;
                 }
                 e = munge_ctx_set (conf->ctx, MUNGE_OPT_UID_RESTRICTION, i);
                 if (e != EMUNGE_SUCCESS) {
@@ -346,21 +340,19 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                         munge_ctx_strerror (conf->ctx));
                 }
                 break;
-            case 'g':
-                if ((gr_ptr = getgrnam (optarg)) != NULL) {
-                    i = gr_ptr->gr_gid;
+            case 'U':
+                i = query_uid (optarg);
+                if (i < 0) {
+                    log_err (EMUNGE_SNAFU, LOG_ERR,
+                            "Unrecognized user \"%s\"", optarg);
                 }
-                else {
-                    errno = 0;
-                    l = strtol (optarg, &p, 10);
-                    if (((errno == ERANGE)
-                                && ((l == LONG_MIN) || (l == LONG_MAX)))
-                            || (optarg == p) || (*p != '\0')
-                            || (l < 0) || (l > INT_MAX)) {
-                        log_err (EMUNGE_SNAFU, LOG_ERR,
+                conf->cuid = i;
+                break;
+            case 'g':
+                i = query_gid (optarg);
+                if (i < 0) {
+                    log_err (EMUNGE_SNAFU, LOG_ERR,
                             "Unrecognized group \"%s\"", optarg);
-                    }
-                    i = (int) l;
                 }
                 e = munge_ctx_set (conf->ctx, MUNGE_OPT_GID_RESTRICTION, i);
                 if (e != EMUNGE_SUCCESS) {
@@ -368,6 +360,14 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                         "Unable to set gid restriction: %s",
                         munge_ctx_strerror (conf->ctx));
                 }
+                break;
+            case 'G':
+                i = query_gid (optarg);
+                if (i < 0) {
+                    log_err (EMUNGE_SNAFU, LOG_ERR,
+                            "Unrecognized group \"%s\"", optarg);
+                }
+                conf->cgid = i;
                 break;
             case 't':
                 errno = 0;
@@ -510,8 +510,14 @@ display_help (char *prog)
     printf ("  %*s %s\n", w, "-u, --restrict-uid=UID",
             "Restrict credential decoding by UID");
 
+    printf ("  %*s %s\n", w, "-U, --uid=UID",
+            "Specify credential UID (requires root/CAP_SETUID)");
+
     printf ("  %*s %s\n", w, "-g, --restrict-gid=GID",
             "Restrict credential decoding by GID");
+
+    printf ("  %*s %s\n", w, "-G, --gid=GID",
+            "Specify credential GID (requires root/CAP_SETGID)");
 
     printf ("  %*s %s\n", w, "-t, --ttl=INTEGER",
             "Specify time-to-live (in seconds; 0=dfl -1=max)");
@@ -545,6 +551,78 @@ display_strings (const char *header, munge_enum_t type)
 }
 
 
+uid_t
+query_uid (const char *user)
+{
+/*  Returns the uid for [user], or -1 on error.
+ */
+    struct passwd *pw_ptr;
+    uid_t          uid;
+    long int       luid;
+    char          *end_ptr;
+
+    if (user == NULL) {
+        errno = EINVAL;
+        return (-1);
+    }
+    pw_ptr = getpwnam (user);
+    if (pw_ptr != NULL) {
+        uid = pw_ptr->pw_uid;
+    }
+    else {
+        errno = 0;
+        luid = strtol (user, &end_ptr, 10);
+        if ((errno == ERANGE) && ((luid == LONG_MIN) || (luid == LONG_MAX))) {
+            return (-1);
+        }
+        if ((user == end_ptr) || (*end_ptr != '\0')) {
+            return (-1);
+        }
+        if ((luid < 0) || (luid > INT_MAX)) {
+            return (-1);
+        }
+        uid = (int) luid;
+    }
+    return (uid);
+}
+
+
+gid_t
+query_gid (const char *group)
+{
+/*  Returns the gid for [group], or -1 on error.
+ */
+    struct group  *gr_ptr;
+    gid_t          gid;
+    long int       lgid;
+    char          *end_ptr;
+
+    if (group == NULL) {
+        errno = EINVAL;
+        return (-1);
+    }
+    gr_ptr = getgrnam (group);
+    if (gr_ptr != NULL) {
+        gid = gr_ptr->gr_gid;
+    }
+    else {
+        errno = 0;
+        lgid = strtol (group, &end_ptr, 10);
+        if ((errno == ERANGE) && ((lgid == LONG_MIN) || (lgid == LONG_MAX))) {
+            return (-1);
+        }
+        if ((group == end_ptr) || (*end_ptr != '\0')) {
+            return (-1);
+        }
+        if ((lgid < 0) || (lgid > INT_MAX)) {
+            return (-1);
+        }
+        gid = (int) lgid;
+    }
+    return (gid);
+}
+
+
 void
 open_files (conf_t conf)
 {
@@ -567,6 +645,49 @@ open_files (conf_t conf)
         }
     }
     return;
+}
+
+
+int
+encode_cred (conf_t conf)
+{
+/*  Encodes the credential based on the configuration [conf].
+ *  Returns 0 on success, -1 on error.
+ */
+    uid_t euid;
+    gid_t egid;
+
+    euid = geteuid ();
+    egid = getegid ();
+
+    if (egid != conf->cgid) {
+        if (setegid (conf->cgid) < 0) {
+            log_errno (errno, LOG_ERR,
+                    "Unable to create credential for GID %u", conf->cgid);
+        }
+    }
+    if (euid != conf->cuid) {
+        if (seteuid (conf->cuid) < 0) {
+            log_errno (errno, LOG_ERR,
+                    "Unable to create credential for UID %u", conf->cuid);
+        }
+    }
+    conf->status = munge_encode (&conf->cred, conf->ctx,
+            conf->data, conf->dlen);
+
+    if (euid != conf->cuid) {
+        if (seteuid (euid) < 0) {
+            log_errno (errno, LOG_ERR,
+                    "Unable to restore privileges for UID %u", euid);
+        }
+    }
+    if (egid != conf->cgid) {
+        if (setegid (egid) < 0) {
+            log_errno (errno, LOG_ERR,
+                    "Unable to restore privileges for GID %u", egid);
+        }
+    }
+    return ((conf->status == EMUNGE_SUCCESS) ? 0 : -1);
 }
 
 
