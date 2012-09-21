@@ -7,9 +7,31 @@
 #
 #  DESCRIPTION:
 #    Read metadata from the META file.
+#
+#    The META file format is as follows:
+#      ^[ ]*KEY:[ \t]+VALUE$
+#
+#    In other words:
+#    - KEY is separated from VALUE by a colon and one or more spaces/tabs.
+#    - KEY and VALUE are case sensitive.
+#    - Leading spaces are ignored.
+#    - First match wins for duplicate keys.
+#
+#    A line can be commented out by preceding it with a '#' (or technically any
+#    non-space character since that will prevent the regex from matching).
+#
+#  WARNING:
+#    Placing a colon followed by a space or tab (ie, ":[ \t]+") within the
+#    VALUE will prematurely terminate the string since that sequence is
+#    used as the awk field separator.
+#
+#  KEYS:
+#    The following META keys are recognized:
+#      Name, Version, Release, Date, Author, LT_Current, LT_Revision, LT_Age
 #******************************************************************************
 
 AC_DEFUN([X_AC_META], [
+  AC_PROG_AWK
   AC_MSG_CHECKING([metadata])
 
   META="$srcdir/META"
@@ -17,7 +39,7 @@ AC_DEFUN([X_AC_META], [
   if test -f "$META"; then
     _x_ac_meta_got_file=yes
 
-    META_NAME=_X_AC_META_GETVAL([(?:NAME|PROJECT|PACKAGE)]);
+    META_NAME=_X_AC_META_GETVAL([(Name|Project|Package)]);
     if test -n "$META_NAME"; then
       AC_DEFINE_UNQUOTED([META_NAME], ["$META_NAME"],
         [Define the project name.]
@@ -25,7 +47,7 @@ AC_DEFUN([X_AC_META], [
       AC_SUBST([META_NAME])
     fi
 
-    META_VERSION=_X_AC_META_GETVAL([VERSION]);
+    META_VERSION=_X_AC_META_GETVAL([Version]);
     if test -n "$META_VERSION"; then
       AC_DEFINE_UNQUOTED([META_VERSION], ["$META_VERSION"],
         [Define the project version.]
@@ -33,7 +55,7 @@ AC_DEFUN([X_AC_META], [
       AC_SUBST([META_VERSION])
     fi
 
-    META_RELEASE=_X_AC_META_GETVAL([RELEASE]);
+    META_RELEASE=_X_AC_META_GETVAL([Release]);
     if test -n "$META_RELEASE"; then
       AC_DEFINE_UNQUOTED([META_RELEASE], ["$META_RELEASE"],
         [Define the project release.]
@@ -51,7 +73,7 @@ AC_DEFUN([X_AC_META], [
         AC_SUBST([META_ALIAS])
     fi
 
-    META_DATE=_X_AC_META_GETVAL([DATE]);
+    META_DATE=_X_AC_META_GETVAL([Date]);
     if test -n "$META_DATE"; then
       AC_DEFINE_UNQUOTED([META_DATE], ["$META_DATE"],
         [Define the project release date.]
@@ -59,7 +81,7 @@ AC_DEFUN([X_AC_META], [
       AC_SUBST([META_DATE])
     fi
 
-    META_AUTHOR=_X_AC_META_GETVAL([AUTHOR]);
+    META_AUTHOR=_X_AC_META_GETVAL([Author]);
     if test -n "$META_AUTHOR"; then
       AC_DEFINE_UNQUOTED([META_AUTHOR], ["$META_AUTHOR"],
         [Define the project author.]
@@ -68,9 +90,9 @@ AC_DEFUN([X_AC_META], [
     fi
 
     m4_pattern_allow([^LT_(CURRENT|REVISION|AGE)$])
-    META_LT_CURRENT=_X_AC_META_GETVAL([LT_CURRENT]);
-    META_LT_REVISION=_X_AC_META_GETVAL([LT_REVISION]);
-    META_LT_AGE=_X_AC_META_GETVAL([LT_AGE]);
+    META_LT_CURRENT=_X_AC_META_GETVAL([LT_Current]);
+    META_LT_REVISION=_X_AC_META_GETVAL([LT_Revision]);
+    META_LT_AGE=_X_AC_META_GETVAL([LT_Age]);
     if test -n "$META_LT_CURRENT" \
          -o -n "$META_LT_REVISION" \
          -o -n "$META_LT_AGE"; then
@@ -96,15 +118,19 @@ AC_DEFUN([X_AC_META], [
   ]
 )
 
+# _X_AC_META_GETVAL (KEY_NAME_OR_REGEX)
+#
+# Returns the META VALUE associated with the given KEY_NAME_OR_REGEX expr.
+#
+# Despite their resemblance to line noise,
+#   the "@<:@" and "@:>@" constructs are quadrigraphs for "[" and "]".
+#   <https://www.gnu.org/software/autoconf/manual/autoconf.html#Quadrigraphs>
+#
+# The "$[]1" and "$[]2" constructs prevent M4 parameter expansion
+#   so a literal $1 and $2 will be passed to the resulting awk script,
+#   whereas the "$1" will undergo M4 parameter expansion for the META key.
+#   <https://www.gnu.org/software/autoconf/manual/autoconf.html#Quoting-and-Parameters>
+#
 AC_DEFUN([_X_AC_META_GETVAL],
-  [`perl -n\
-    -e "BEGIN { \\$key=shift @ARGV; }"\
-    -e "next unless s/^\s*\\$key@<:@:=@:>@//i;"\
-    -e "s/^((?:@<:@^'\"#@:>@*(?:(@<:@'\"@:>@)@<:@^\2@:>@*\2)*)*)#.*/\\@S|@1/;"\
-    -e "s/^\s+//;"\
-    -e "s/\s+$//;"\
-    -e "s/^(@<:@'\"@:>@)(.*)\1/\\@S|@2/;"\
-    -e "\\$val=\\$_;"\
-    -e "END { print \\$val if defined \\$val; }"\
-    '$1' $META`]dnl
+   [`$AWK -F ':@<:@ \t@:>@+' '$[]1 ~ /^ *$1$/ { print $[]2; exit }' $META`]dnl
 )
