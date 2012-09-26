@@ -192,7 +192,7 @@ xgetgrent (struct group *gr, char *buf, size_t buflen)
 
 #if   HAVE_GETGRENT_R_GNU
     rv = getgrent_r (gr, buf, buflen, &gr_ptr);
-    if (rv == ENOENT) {
+    if (((rv == ENOENT) || (rv == 0)) && (gr_ptr == NULL)) {
         got_eof = 1;
     }
     else if (rv != 0) {
