@@ -209,6 +209,11 @@
  */
 #define RANDOM_SEED_DEVICE              "/dev/urandom"
 
+/*  Integer for the number of bytes to read from the RANDOM_SEED_DEVICE when
+ *    stirring the PRNG entropy pool.
+ */
+#define RANDOM_SEED_STIR_BYTES          16
+
 /*  Integer for the maximum number of seconds between stirrings of the PRNG
  *    entropy pool once the exponential backoff completes.
  */

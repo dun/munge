@@ -31,6 +31,7 @@
 #endif /* HAVE_CONFIG_H */
 
 #include <errno.h>
+#include <fcntl.h>
 #include <munge.h>
 #include <string.h>
 #include <sys/stat.h>
@@ -57,6 +58,10 @@
 #ifndef RANDOM_SEED_DEVICE
 #  define RANDOM_SEED_DEVICE            "/dev/urandom"
 #endif /* !RANDOM_SEED_DEVICE */
+
+#ifndef RANDOM_SEED_STIR_BYTES
+#  define RANDOM_SEED_STIR_BYTES        16
+#endif /* !RANDOM_SEED_STIR_BYTES */
 
 #ifndef RANDOM_SEED_STIR_MAX_SECS
 #  define RANDOM_SEED_STIR_MAX_SECS     3600
@@ -282,13 +287,21 @@ random_pseudo_bytes (unsigned char *buf, int n)
 void
 random_stir (void)
 {
-    struct timeval  tv;
+    int            fd;
+    int            n;
+    unsigned char  stir_buf [RANDOM_SEED_STIR_BYTES];
 
-    /*  Stir the entropy pool with the current time.
+    log_msg (LOG_DEBUG, "Stirring PRNG entropy pool");
+
+    /*  Stir the entropy pool with some pseudorandom data.
      */
-    if (gettimeofday (&tv, NULL) == 0) {
-        _random_add (&tv.tv_sec, sizeof (tv.tv_sec));
-        _random_add (&tv.tv_usec, sizeof (tv.tv_usec));
+    fd = open (RANDOM_SEED_DEVICE, O_RDONLY | O_NONBLOCK);
+    if (fd >= 0) {
+        n = read (fd, stir_buf, sizeof (stir_buf));
+        if (n > 0) {
+            _random_add (stir_buf, n);
+        }
+        (void) close (fd);
     }
     return;
 }
@@ -301,7 +314,6 @@ random_stir (void)
 #if HAVE_LIBGCRYPT
 
 #include <assert.h>
-#include <fcntl.h>
 #include <gcrypt.h>
 #include "fd.h"
 
@@ -562,7 +574,7 @@ _random_seed_stir_callback (void *_arg_not_used_)
     if (timeout_secs <= 0) {
         return;
     }
-    log_msg (LOG_DEBUG, "Stirring PRNG entropy pool");
+    random_stir ();
 
     /*  Stir the entropy pool with the current time.  There should be some
      *    entropy in the tv_usec component -- up to 20 bits, but probably more
