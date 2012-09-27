@@ -54,9 +54,9 @@
 #  define RANDOM_SEED_BYTES             1024
 #endif /* !RANDOM_SEED_BYTES */
 
-#ifndef RANDOM_SEED_DEFAULT
-#  define RANDOM_SEED_DEFAULT           "/dev/urandom"
-#endif /* !RANDOM_SEED_DEFAULT */
+#ifndef RANDOM_SEED_DEVICE
+#  define RANDOM_SEED_DEVICE            "/dev/urandom"
+#endif /* !RANDOM_SEED_DEVICE */
 
 #ifndef RANDOM_SEED_STIR_MAX_SECS
 #  define RANDOM_SEED_STIR_MAX_SECS     3600
@@ -176,10 +176,10 @@ random_init (const char *seed)
     /*  Load entropy from default source if more is needed.
      */
     if (rnd_bytes_needed > 0) {
-        n = _random_read_seed (RANDOM_SEED_DEFAULT, rnd_bytes_needed);
+        n = _random_read_seed (RANDOM_SEED_DEVICE, rnd_bytes_needed);
         if (n > 0) {
             log_msg (LOG_INFO, "PRNG seeded with %d bytes from \"%s\"",
-                n, RANDOM_SEED_DEFAULT);
+                n, RANDOM_SEED_DEVICE);
             rnd_bytes_needed -= n;
         }
     }

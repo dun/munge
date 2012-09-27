@@ -207,7 +207,7 @@
 /*  String specifying the pathname of the random number source device to use
  *    in case the MUNGED_RANDOM_SEED file contains insufficient entropy.
  */
-#define RANDOM_SEED_DEFAULT             "/dev/urandom"
+#define RANDOM_SEED_DEVICE              "/dev/urandom"
 
 /*  Integer for the maximum number of seconds between stirrings of the PRNG
  *    entropy pool once the exponential backoff completes.
