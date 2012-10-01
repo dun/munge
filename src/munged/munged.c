@@ -94,13 +94,16 @@ volatile sig_atomic_t done = 0;         /* global flag set true for exit     */
 int
 main (int argc, char *argv[])
 {
-    int fd = -1;
-    int priority = LOG_INFO;
+    int   fd = -1;
+    char *log_identity = argv[0];
+    int   log_priority = LOG_INFO;
+    int   log_options = LOG_OPT_PRIORITY;
 
 #ifndef NDEBUG
-    priority = LOG_DEBUG;
+    log_priority = LOG_DEBUG;
+    log_options |= LOG_OPT_TIMESTAMP;
 #endif /* NDEBUG */
-    log_open_file (stderr, argv[0], priority, LOG_OPT_PRIORITY);
+    log_open_file (stderr, log_identity, log_priority, log_options);
 
     conf = create_conf ();
     parse_cmdline (conf, argc, argv);
@@ -109,7 +112,7 @@ main (int argc, char *argv[])
 
     if (!conf->got_foreground) {
         fd = daemonize_init (argv[0]);
-        open_logfile (conf->logfile_name, priority, conf->got_force);
+        open_logfile (conf->logfile_name, log_priority, conf->got_force);
     }
     handle_signals ();
     lookup_ip_addr (conf);
