@@ -245,7 +245,7 @@ _log_aux (int errnum, int priority, char *msgbuf, int msgbuflen,
     /*  Add timestamp.
      */
     if ((len > 0) && (log_ctx.options & LOG_OPT_TIMESTAMP)) {
-        n = strftimet (p, len, "%Y-%m-%d %H:%M:%S ", 0);
+        n = strftimet (p, len, "%Y-%m-%d %H:%M:%S %z ", 0);
         if (n == 0) {
             len = 0;
         }
