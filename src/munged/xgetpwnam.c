@@ -89,7 +89,7 @@ struct xpwbuf_t {
  *  Private Prototypes
  *****************************************************************************/
 
-static int _xgetpwnam_get_buf_size (void);
+static int _xgetpwnam_buf_get_sys_size (void);
 
 static int _xgetpwnam_copy (const struct passwd *src, struct passwd *dst,
     char *buf, size_t buflen) _UNUSED_;
@@ -112,7 +112,7 @@ xgetpwnam_buf_create (void)
     xpwbuf_p   pwbufp;
 
     if (pw_buf_size < 0) {
-        pw_buf_size = _xgetpwnam_get_buf_size ();
+        pw_buf_size = _xgetpwnam_buf_get_sys_size ();
     }
     if (!(pwbufp = malloc (sizeof (struct xpwbuf_t)))) {
         return (NULL);
@@ -297,26 +297,21 @@ xgetpwnam (const char *user, struct passwd *pwp, xpwbuf_p pwbufp)
  *****************************************************************************/
 
 static int
-_xgetpwnam_get_buf_size (void)
+_xgetpwnam_buf_get_sys_size (void)
 {
-/*  Returns the recommended size of the getpwnam_r() caller-provided buffer.
+/*  Returns the system recommended size for the xgetpwnam() buffer.
  */
-    static int n = -1;
-
-    if (n < 0) {
+    long   n = -1;
+    int    len;
 
 #if HAVE_SYSCONF
 #ifdef _SC_GETPW_R_SIZE_MAX
-        n = sysconf (_SC_GETPW_R_SIZE_MAX);
+    n = sysconf (_SC_GETPW_R_SIZE_MAX);
 #endif /* _SC_GETPW_R_SIZE_MAX */
 #endif /* HAVE_SYSCONF */
 
-        if (n <= MINIMUM_PW_BUF_SIZE) {
-            n = MINIMUM_PW_BUF_SIZE;
-        }
-        log_msg (LOG_DEBUG, "Using pw buf size of %d", n);
-    }
-    return (n);
+    len = (n <= MINIMUM_PW_BUF_SIZE) ? MINIMUM_PW_BUF_SIZE : (int) n;
+    return (len);
 }
 
 
