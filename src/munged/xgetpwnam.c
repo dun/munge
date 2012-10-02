@@ -89,7 +89,7 @@ struct xpwbuf_t {
  *  Private Prototypes
  *****************************************************************************/
 
-static int _xgetpwnam_buf_get_sys_size (void);
+static size_t _xgetpwnam_buf_get_sys_size (void);
 
 static int _xgetpwnam_copy (const struct passwd *src, struct passwd *dst,
     char *buf, size_t buflen) _UNUSED_;
@@ -296,13 +296,13 @@ xgetpwnam (const char *user, struct passwd *pwp, xpwbuf_p pwbufp)
  *  Private Functions
  *****************************************************************************/
 
-static int
+static size_t
 _xgetpwnam_buf_get_sys_size (void)
 {
 /*  Returns the system recommended size for the xgetpwnam() buffer.
  */
     long   n = -1;
-    int    len;
+    size_t len;
 
 #if HAVE_SYSCONF
 #ifdef _SC_GETPW_R_SIZE_MAX
@@ -310,7 +310,7 @@ _xgetpwnam_buf_get_sys_size (void)
 #endif /* _SC_GETPW_R_SIZE_MAX */
 #endif /* HAVE_SYSCONF */
 
-    len = (n <= MINIMUM_PW_BUF_SIZE) ? MINIMUM_PW_BUF_SIZE : (int) n;
+    len = (n <= MINIMUM_PW_BUF_SIZE) ? MINIMUM_PW_BUF_SIZE : (size_t) n;
     return (len);
 }
 
