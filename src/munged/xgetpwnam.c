@@ -103,25 +103,28 @@ static int _xgetpwnam_copy_str (const char *src, char **dstp,
  *****************************************************************************/
 
 xpwbuf_p
-xgetpwnam_buf_create (void)
+xgetpwnam_buf_create (size_t len)
 {
-/*  Allocates a buffer for xgetpwnam().
+/*  Allocates a buffer for xgetpwnam().  [len] specifies a suggested size
+ *    for the buffer; if 0, the system recommended size will be used.
  *  Returns the buffer on success, or NULL on error (with errno).
  */
-    static int pw_buf_size = -1;
-    xpwbuf_p   pwbufp;
+    xpwbuf_p pwbufp;
 
-    if (pw_buf_size < 0) {
-        pw_buf_size = _xgetpwnam_buf_get_sys_size ();
+    if (len == 0) {
+        len = _xgetpwnam_buf_get_sys_size ();
     }
-    if (!(pwbufp = malloc (sizeof (struct xpwbuf_t)))) {
+    pwbufp = malloc (sizeof (struct xpwbuf_t));
+    if (pwbufp == NULL) {
         return (NULL);
     }
-    if (!(pwbufp->buf = malloc (pw_buf_size))) {
+    pwbufp->buf = malloc (len);
+    if (pwbufp->buf == NULL) {
         free (pwbufp);
         return (NULL);
     }
-    pwbufp->len = pw_buf_size;
+    pwbufp->len = len;
+    log_msg (LOG_DEBUG, "Created password entry buffer of size %u", len);
     return (pwbufp);
 }
 

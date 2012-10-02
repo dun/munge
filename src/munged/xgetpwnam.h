@@ -30,6 +30,7 @@
 #define XGETPWNAM_H
 
 #include <pwd.h>
+#include <stddef.h>
 
 
 /*****************************************************************************
@@ -43,7 +44,7 @@ typedef struct xpwbuf_t * xpwbuf_p;
  *  Functions
  *****************************************************************************/
 
-xpwbuf_p xgetpwnam_buf_create (void);
+xpwbuf_p xgetpwnam_buf_create (size_t len);
 
 void xgetpwnam_buf_destroy (xpwbuf_p pwbufp);
 

@@ -415,7 +415,7 @@ _gids_hash_create (void)
         log_msg (LOG_ERR, "Unable to allocate group entry buffer");
         goto err;
     }
-    if (!(pwbufp = xgetpwnam_buf_create ())) {
+    if (!(pwbufp = xgetpwnam_buf_create (0))) {
         log_msg (LOG_ERR, "Unable to allocate password entry buffer");
         goto err;
     }
