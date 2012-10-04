@@ -163,25 +163,40 @@ xgetpwnam (const char *user, struct passwd *pw, char *buf, size_t buflen)
 #if   HAVE_GETPWNAM_R_POSIX
     rv = getpwnam_r (user, pw, buf, buflen, &pw_ptr);
     /*
-     *  POSIX.1-2001 does not call "user not found" an error, so the
-     *    return value of getpwnam_r() is of limited value.  For example,
-     *    "user not found" can be returned in the following ways:
-     *    - Linux and SunOS: rv=0 and errno=0
-     *    - OpenBSD: rv=1 and errno=EACCESS
-     *    - AIX: rv=-1 and errno=ESRCH
-     *  Strangely, the list of known errors is better defined; so these errors
-     *    are tested for, and anything else is assumed to be "user not found".
+     *  POSIX.1-2001 does not call "user not found" an error, so the return
+     *    value of getpwnam_r() is of limited value.  When errors do occur,
+     *    some systems return them via the retval, some via errno, and some
+     *    return no indication whatsoever.
      */
     if (pw_ptr == NULL) {
-        if ((rv != 0)
-            &&   ( (errno == EINTR)
-                || (errno == EIO)
-                || (errno == EMFILE)
-                || (errno == ENFILE)
-                || (errno == ENOMEM)
-                || (errno == ERANGE) )) {
-            got_err = 1;
+        /*
+         *  Coalesce the error number onto rv if needed.
+         */
+        if ((rv < 0) && (errno != 0)) {
+            rv = errno;
         }
+        /*  Likely that the user was not found.
+         */
+        if ((rv == 0)      ||
+            (rv == ENOENT) ||
+            (rv == ESRCH))
+        {
+            got_none = 1;
+        }
+        /*  Likely that an error occurred.
+         */
+        else if (
+            (rv == EINTR)  ||
+            (rv == ERANGE) ||
+            (rv == EIO)    ||
+            (rv == EMFILE) ||
+            (rv == ENFILE))
+        {
+            got_err = 1;
+            errno = rv;
+        }
+        /*  Unable to distinguish "user not found" from error.
+         */
         else {
             got_none = 1;
         }
@@ -213,20 +228,19 @@ xgetpwnam (const char *user, struct passwd *pw, char *buf, size_t buflen)
     }
     pw_ptr = getpwnam (user);
     /*
-     *  Refer to the HAVE_GETPWNAM_R_POSIX case regarding the "user not found"
-     *    return value conundrum.
      *  The initial test for (errno != 0), while redundant, allows for the
      *    "user not found" case to short-circuit the rest of the if-condition
-     *    on Linux / SunOS / Darwin.
+     *    on many systems.
      */
     if (pw_ptr == NULL) {
-        if ((errno != 0)
-            &&   ( (errno == EINTR)
-                || (errno == EIO)
-                || (errno == EMFILE)
-                || (errno == ENFILE)
-                || (errno == ENOMEM)
-                || (errno == ERANGE) )) {
+        if ((errno != 0) &&
+            ((errno == EINTR)  ||
+             (errno == ERANGE) ||
+             (errno == EIO)    ||
+             (errno == EMFILE) ||
+             (errno == ENFILE) ||
+             (errno == ENOMEM)))
+        {
             got_err = 1;
         }
         else {
@@ -252,6 +266,9 @@ xgetpwnam (const char *user, struct passwd *pw, char *buf, size_t buflen)
     if (got_err) {
         return (-1);
     }
+    /*  Some systems set errno even on success.  Go figure.
+     */
+    errno = 0;
     return (0);
 }
 
