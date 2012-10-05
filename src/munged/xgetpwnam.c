@@ -153,8 +153,12 @@ xgetpwnam (const char *user, struct passwd *pw, char *buf, size_t buflen)
     int                     got_err = 0;
     int                     got_none = 0;
 
-    if ((user == NULL) || (*user == '\0') || (pw == NULL)
-            || (buf == NULL) || (buflen <= 0)) {
+    if ((user == NULL)    ||
+        (user[0] == '\0') ||
+        (pw == NULL)      ||
+        (buf == NULL)     ||
+        (buflen <= 0))
+    {
         errno = EINVAL;
         return (-1);
     }
