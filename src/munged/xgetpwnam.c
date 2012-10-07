@@ -290,6 +290,9 @@ restart:
         return (-1);
     }
     if (got_err) {
+        if (errno == EINTR) {
+            goto restart;
+        }
         if (errno == ERANGE) {
             rv = _xgetpwnam_buf_grow (pwbufp, 0);
             if (rv == 0) {
