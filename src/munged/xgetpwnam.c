@@ -94,8 +94,8 @@ static int _xgetpwnam_buf_get_sys_size (void);
 static int _xgetpwnam_copy (const struct passwd *src, struct passwd *dst,
     char *buf, size_t buflen) _UNUSED_;
 
-static int _xgetpwnam_copy_str (const char *src, char **dst_p,
-    char **buf_p, size_t *buflen_p) _UNUSED_;
+static int _xgetpwnam_copy_str (const char *src, char **dstp,
+    char **bufp, size_t *buflenp) _UNUSED_;
 
 
 /*****************************************************************************
@@ -364,33 +364,32 @@ err:
 
 
 static int
-_xgetpwnam_copy_str (const char *src, char **dst_p,
-                     char **buf_p, size_t *buflen_p)
+_xgetpwnam_copy_str (const char *src, char **dstp,
+                     char **bufp, size_t *buflenp)
 {
-/*  Copies the string [src] into the buffer [*buf_p] of size [*buflen_p],
- *    setting the pointer [*dst_p] to the newly-copied string.  The values
- *    for [buf_p] and [buflen_p] are adjusted for the remaining buffer space.
- *  Note that [dst_p], [buf_p], and [buflen_p] are all passed by reference.
+/*  Copies the string [src] into the buffer [bufp] of size [buflenp],
+ *    setting the pointer [dstp] to the newly-copied string.  The values
+ *    for [bufp] and [buflenp] are adjusted for the remaining buffer space.
+ *  Note that [dstp], [bufp], and [buflenp] are all passed by reference.
  *  Returns the number of bytes copied, or -1 on error.
  */
     size_t n;
 
-    assert (dst_p != NULL);
-    assert (buf_p != NULL);
-    assert (*buf_p != NULL);
-    assert (buflen_p != NULL);
+    assert (dstp != NULL);
+    assert (bufp != NULL);
+    assert (*bufp != NULL);
+    assert (buflenp != NULL);
 
     if (src == NULL) {
-        *dst_p = NULL;
+        *dstp = NULL;
         return (0);
     }
     n = strlen (src) + 1;
-    if (*buflen_p < n) {
+    if (*buflenp < n) {
         return (-1);
     }
-    (void) strcpy (*buf_p, src);
-    *dst_p = *buf_p;
-    *buf_p += n;
-    *buflen_p -= n;
+    *dstp = strcpy (*bufp, src);
+    *bufp += n;
+    *buflenp -= n;
     return (n);
 }
