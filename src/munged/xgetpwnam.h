@@ -48,6 +48,8 @@ xpwbuf_p xgetpwnam_buf_create (size_t len);
 
 void xgetpwnam_buf_destroy (xpwbuf_p pwbufp);
 
+size_t xgetpwnam_buf_get_len (xpwbuf_p pwbufp);
+
 int xgetpwnam (const char *user, struct passwd *pwp, xpwbuf_p pwbufp);
 
 

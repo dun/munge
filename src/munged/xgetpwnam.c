@@ -146,6 +146,20 @@ xgetpwnam_buf_destroy (xpwbuf_p pwbufp)
 }
 
 
+size_t
+xgetpwnam_buf_get_len (xpwbuf_p pwbufp)
+{
+/*  Returns the current size of the allocated buffer within [pwbufp],
+ *    or 0 on error (with errno).
+ */
+    if (pwbufp == NULL) {
+        errno = EINVAL;
+        return (0);
+    }
+    return (pwbufp->len);
+}
+
+
 int
 xgetpwnam (const char *user, struct passwd *pwp, xpwbuf_p pwbufp)
 {

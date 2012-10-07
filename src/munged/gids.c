@@ -373,6 +373,7 @@ _gids_hash_create (void)
 /*  Returns a new hash containing the new GIDs mapping, or NULL on error.
  */
     static size_t   grbuflen = 0;
+    static size_t   pwbuflen = 0;
     hash_t          gid_hash = NULL;
     hash_t          uid_hash = NULL;
     struct timeval  t_start;
@@ -415,7 +416,7 @@ _gids_hash_create (void)
         log_msg (LOG_ERR, "Unable to allocate group entry buffer");
         goto err;
     }
-    if (!(pwbufp = xgetpwnam_buf_create (0))) {
+    if (!(pwbufp = xgetpwnam_buf_create (pwbuflen))) {
         log_msg (LOG_ERR, "Unable to allocate password entry buffer");
         goto err;
     }
@@ -453,13 +454,13 @@ restart:
         }
     }
     xgetgrent_fini ();
-
-    xgetpwnam_buf_destroy (pwbufp);
     /*
-     *  Record the final size of the xgetgrent() buffer.  This allows
-     *    subsequent scans to start with a buffer that will generally
-     *    not need to be realloc()d.
+     *  Record the final size of the xgetpwnam() and xgetgrent() buffers.
+     *    This allows subsequent scans to start with buffers that will
+     *    generally not need to be realloc()d.
      */
+    pwbuflen = xgetpwnam_buf_get_len (pwbufp);
+    xgetpwnam_buf_destroy (pwbufp);
     grbuflen = xgetgrent_buf_get_len (grbufp);
     xgetgrent_buf_destroy (grbufp);
 
