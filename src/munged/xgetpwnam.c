@@ -72,7 +72,7 @@
  *  Constants
  *****************************************************************************/
 
-#define MINIMUM_PW_BUF_SIZE     4096
+#define MINIMUM_PW_BUF_SIZE     1024
 
 
 /*****************************************************************************
@@ -91,8 +91,10 @@ struct xpwbuf_t {
 
 static size_t _xgetpwnam_buf_get_sys_size (void);
 
+static int _xgetpwnam_buf_grow (xpwbuf_p pwbufp, size_t minlen);
+
 static int _xgetpwnam_copy (const struct passwd *src, struct passwd *dst,
-    char *buf, size_t buflen) _UNUSED_;
+    xpwbuf_p pwbufp) _UNUSED_;
 
 static int _xgetpwnam_copy_str (const char *src, char **dstp,
     char **bufp, size_t *buflenp) _UNUSED_;
@@ -154,10 +156,8 @@ xgetpwnam (const char *user, struct passwd *pwp, xpwbuf_p pwbufp)
  *    Returns -1 with ENOENT when [user] is not found.
  */
 #if   HAVE_GETPWNAM_R_POSIX
-    int                     rv;
     struct passwd          *rv_pwp;
 #elif HAVE_GETPWNAM_R_AIX
-    int                     rv;
 #elif HAVE_GETPWNAM_R_SUN
     struct passwd          *rv_pwp;
 #elif HAVE_GETPWNAM
@@ -166,8 +166,9 @@ xgetpwnam (const char *user, struct passwd *pwp, xpwbuf_p pwbufp)
     int                     rv_copy;
     struct passwd          *rv_pwp;
 #endif
-    int                     got_err = 0;
-    int                     got_none = 0;
+    int                     rv;
+    int                     got_err;
+    int                     got_none;
 
     if ((user == NULL)    ||
         (user[0] == '\0') ||
@@ -180,7 +181,10 @@ xgetpwnam (const char *user, struct passwd *pwp, xpwbuf_p pwbufp)
     assert (pwbufp->buf != NULL);
     assert (pwbufp->len > 0);
 
+restart:
     errno = 0;
+    got_err = 0;
+    got_none = 0;
 
 #if   HAVE_GETPWNAM_R_POSIX
     rv = getpwnam_r (user, pwp, pwbufp->buf, pwbufp->len, &rv_pwp);
@@ -270,7 +274,7 @@ xgetpwnam (const char *user, struct passwd *pwp, xpwbuf_p pwbufp)
         }
     }
     else {
-        rv_copy = _xgetpwnam_copy (rv_pwp, pwp, pwbufp->buf, pwbufp->len);
+        rv_copy = _xgetpwnam_copy (rv_pwp, pwp, pwbufp);
     }
     if ((rv_mutex = pthread_mutex_unlock (&mutex)) != 0) {
         errno = rv_mutex;
@@ -286,6 +290,12 @@ xgetpwnam (const char *user, struct passwd *pwp, xpwbuf_p pwbufp)
         return (-1);
     }
     if (got_err) {
+        if (errno == ERANGE) {
+            rv = _xgetpwnam_buf_grow (pwbufp, 0);
+            if (rv == 0) {
+                goto restart;
+            }
+        }
         return (-1);
     }
     /*  Some systems set errno even on success.  Go figure.
@@ -319,45 +329,107 @@ _xgetpwnam_buf_get_sys_size (void)
 
 
 static int
-_xgetpwnam_copy (const struct passwd *src, struct passwd *dst,
-                 char *buf, size_t buflen)
+_xgetpwnam_buf_grow (xpwbuf_p pwbufp, size_t minlen)
 {
-/*  Copies the passwd entry [src] into [dst], placing additional strings
- *    and whatnot into buffer [buf] of length [buflen].
+/*  Grows the buffer [pwbufp] to be at least as large as the length [minlen].
  *  Returns 0 on success, or -1 on error (with errno).
  */
-    char   *p = buf;
-    size_t  nleft = buflen;
+    char   *newbuf;
+    size_t  newlen;
+
+    assert (pwbufp != NULL);
+    assert (pwbufp->buf != NULL);
+    assert (pwbufp->len > 0);
+
+    newlen = (minlen > pwbufp->len) ? minlen : pwbufp->len * 2;
+    if (newlen < pwbufp->len) {
+        errno = ENOMEM;                 /* newlen overflowed */
+        return (-1);
+    }
+    newbuf = realloc (pwbufp->buf, newlen);
+    if (newbuf == NULL) {
+        errno = ENOMEM;
+        return (-1);
+    }
+    pwbufp->buf = newbuf;
+    pwbufp->len = newlen;
+
+    log_msg (LOG_DEBUG, "Increased password entry buffer to %d", newlen);
+    return (0);
+}
+
+
+static int
+_xgetpwnam_copy (const struct passwd *src, struct passwd *dst, xpwbuf_p pwbufp)
+{
+/*  Copies the passwd entry [src] into [dst], placing additional strings
+ *    and whatnot into buffer [pwbuf].
+ *  Returns 0 on success, or -1 on error (with errno).
+ */
+    size_t  num_bytes;
+    char   *p;
 
     assert (src != NULL);
     assert (dst != NULL);
-    assert (buf != NULL);
-    assert (buflen > 0);
+    assert (pwbufp != NULL);
+    assert (pwbufp->buf != NULL);
+    assert (pwbufp->len > 0);
+
+    /*  Compute requisite buffer space.
+     */
+    num_bytes = 0;
+    if (src->pw_name) {
+        num_bytes += strlen (src->pw_name) + 1;
+    }
+    if (src->pw_passwd) {
+        num_bytes += strlen (src->pw_passwd) + 1;
+    }
+    if (src->pw_gecos) {
+        num_bytes += strlen (src->pw_gecos) + 1;
+    }
+    if (src->pw_dir) {
+        num_bytes += strlen (src->pw_dir) + 1;
+    }
+    if (src->pw_shell) {
+        num_bytes += strlen (src->pw_shell) + 1;
+    }
+    /*  Ensure requisite buffer space.
+     */
+    if (pwbufp->len < num_bytes) {
+        if (_xgetpwnam_buf_grow (pwbufp, num_bytes) < 0) {
+            return (-1);
+        }
+    }
+    /*  Copy password entry.
+     */
+    assert (pwbufp->len >= num_bytes);
+    memset (dst, 0, sizeof (*dst));
+    p = pwbufp->buf;
 
     if (_xgetpwnam_copy_str
-            (src->pw_name, &(dst->pw_name), &p, &nleft) < 0) {
+            (src->pw_name, &(dst->pw_name), &p, &num_bytes) < 0) {
         goto err;
     }
     if (_xgetpwnam_copy_str
-            (src->pw_passwd, &(dst->pw_passwd), &p, &nleft) < 0) {
+            (src->pw_passwd, &(dst->pw_passwd), &p, &num_bytes) < 0) {
         goto err;
     }
     if (_xgetpwnam_copy_str
-            (src->pw_gecos, &(dst->pw_gecos), &p, &nleft) < 0) {
+            (src->pw_gecos, &(dst->pw_gecos), &p, &num_bytes) < 0) {
         goto err;
     }
     if (_xgetpwnam_copy_str
-            (src->pw_dir, &(dst->pw_dir), &p, &nleft) < 0) {
+            (src->pw_dir, &(dst->pw_dir), &p, &num_bytes) < 0) {
         goto err;
     }
     if (_xgetpwnam_copy_str
-            (src->pw_shell, &(dst->pw_shell), &p, &nleft) < 0) {
+            (src->pw_shell, &(dst->pw_shell), &p, &num_bytes) < 0) {
         goto err;
     }
     dst->pw_uid = src->pw_uid;
     dst->pw_gid = src->pw_gid;
 
-    assert (p <= buf + buflen);
+    assert (p <= pwbufp->buf + pwbufp->len);
     return (0);
 
 err:
