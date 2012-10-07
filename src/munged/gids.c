@@ -453,6 +453,8 @@ restart:
         }
     }
     xgetgrent_fini ();
+
+    xgetpwnam_buf_destroy (pwbufp);
     /*
      *  Record the final size of the xgetgrent() buffer.  This allows
      *    subsequent scans to start with a buffer that will generally
