@@ -334,18 +334,22 @@ _xgetgrent_buf_grow (xgrbuf_p grbufp, size_t minlen)
 /*  Grows the buffer [grbufp] to be at least as large as the length [minlen].
  *  Returns 0 on success, or -1 on error (with errno).
  */
-    char   *newbuf;
     size_t  newlen;
+    char   *newbuf;
 
     assert (grbufp != NULL);
     assert (grbufp->buf != NULL);
     assert (grbufp->len > 0);
 
-    newlen = (minlen > grbufp->len) ? minlen : grbufp->len * 2;
-    if (newlen < grbufp->len) {
-        errno = ENOMEM;                 /* newlen overflowed */
-        return (-1);
-    }
+    newlen = grbufp->len;
+    do {
+        newlen *= 2;
+        if (newlen < grbufp->len) {     /* newlen overflowed */
+            errno = ENOMEM;
+            return (-1);
+        }
+    } while (newlen < minlen);
+
     newbuf = realloc (grbufp->buf, newlen);
     if (newbuf == NULL) {
         errno = ENOMEM;
@@ -354,7 +358,7 @@ _xgetgrent_buf_grow (xgrbuf_p grbufp, size_t minlen)
     grbufp->buf = newbuf;
     grbufp->len = newlen;
 
-    log_msg (LOG_DEBUG, "Increased group entry buffer to %d", newlen);
+    log_msg (LOG_INFO, "Increased group entry buffer size to %u", newlen);
     return (0);
 }
 

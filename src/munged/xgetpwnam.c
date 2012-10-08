@@ -351,18 +351,22 @@ _xgetpwnam_buf_grow (xpwbuf_p pwbufp, size_t minlen)
 /*  Grows the buffer [pwbufp] to be at least as large as the length [minlen].
  *  Returns 0 on success, or -1 on error (with errno).
  */
-    char   *newbuf;
     size_t  newlen;
+    char   *newbuf;
 
     assert (pwbufp != NULL);
     assert (pwbufp->buf != NULL);
     assert (pwbufp->len > 0);
 
-    newlen = (minlen > pwbufp->len) ? minlen : pwbufp->len * 2;
-    if (newlen < pwbufp->len) {
-        errno = ENOMEM;                 /* newlen overflowed */
-        return (-1);
-    }
+    newlen = pwbufp->len;
+    do {
+        newlen *= 2;
+        if (newlen < pwbufp->len) {     /* newlen overflowed */
+            errno = ENOMEM;
+            return (-1);
+        }
+    } while (newlen < minlen);
+
     newbuf = realloc (pwbufp->buf, newlen);
     if (newbuf == NULL) {
         errno = ENOMEM;
@@ -371,7 +375,7 @@ _xgetpwnam_buf_grow (xpwbuf_p pwbufp, size_t minlen)
     pwbufp->buf = newbuf;
     pwbufp->len = newlen;
 
-    log_msg (LOG_DEBUG, "Increased password entry buffer to %d", newlen);
+    log_msg (LOG_INFO, "Increased password entry buffer size to %u", newlen);
     return (0);
 }
 
