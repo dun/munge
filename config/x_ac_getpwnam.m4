@@ -62,7 +62,24 @@ struct passwd pw, *pw_ptr;
 char pw_buf [1024];
 rv = getpwnam_r (user, &pw, pw_buf, sizeof (pw_buf), &pw_ptr); ]]
       )],
-      AS_VAR_SET(x_ac_cv_have_getpwnam_r_posix, yes),
+      AC_RUN_IFELSE([
+        AC_LANG_PROGRAM([[
+#define _POSIX_PTHREAD_SEMANTICS 1      /* for SunOS */
+#include <errno.h>
+#include <pwd.h>
+#include <stdlib.h>
+]],
+[[
+int rv;
+char *user = "root";
+struct passwd pw, *pw_ptr;
+char pw_buf;
+rv = getpwnam_r (user, &pw, &pw_buf, sizeof (pw_buf), &pw_ptr);
+return ((rv == ERANGE || errno == ERANGE) ? EXIT_SUCCESS : EXIT_FAILURE); ]]
+        )],
+        AS_VAR_SET(x_ac_cv_have_getpwnam_r_posix, yes),
+        AS_VAR_SET(x_ac_cv_have_getpwnam_r_posix, broken),
+        AS_VAR_SET(x_ac_cv_have_getpwnam_r_posix, yes)),
       AS_VAR_SET(x_ac_cv_have_getpwnam_r_posix, no)
     )]
   )

@@ -13363,7 +13363,42 @@ rv = getpwnam_r (user, &pw, pw_buf, sizeof (pw_buf), &pw_ptr);
 }
 _ACEOF
 if ac_fn_c_try_link "$LINENO"; then :
+  if test "$cross_compiling" = yes; then :
   x_ac_cv_have_getpwnam_r_posix=yes
+else
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+
+#define _POSIX_PTHREAD_SEMANTICS 1      /* for SunOS */
+#include <errno.h>
+#include <pwd.h>
+#include <stdlib.h>
+
+int
+main ()
+{
+
+int rv;
+char *user = "root";
+struct passwd pw, *pw_ptr;
+char pw_buf;
+rv = getpwnam_r (user, &pw, &pw_buf, sizeof (pw_buf), &pw_ptr);
+return ((rv == ERANGE || errno == ERANGE) ? EXIT_SUCCESS : EXIT_FAILURE);
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_run "$LINENO"; then :
+  x_ac_cv_have_getpwnam_r_posix=yes
+else
+  x_ac_cv_have_getpwnam_r_posix=broken
+fi
+rm -f core *.core core.conftest.* gmon.out bb.out conftest$ac_exeext \
+  conftest.$ac_objext conftest.beam conftest.$ac_ext
+fi
+
 else
   x_ac_cv_have_getpwnam_r_posix=no
 
