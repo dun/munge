@@ -182,6 +182,32 @@ hash_destroy (hash_t h)
 }
 
 
+void hash_reset (hash_t h)
+{
+    int i;
+    struct hash_node *p, *q;
+
+    if (!h) {
+        errno = EINVAL;
+        return;
+    }
+    lsd_mutex_lock (&h->mutex);
+    assert (h->magic == HASH_MAGIC);
+    for (i = 0; i < h->size; i++) {
+        for (p = h->table[i]; p != NULL; p = q) {
+            q = p->next;
+            if (h->del_f)
+                h->del_f (p->data);
+            hash_node_free (p);
+        }
+        h->table[i] = NULL;
+    }
+    h->count = 0;
+    lsd_mutex_unlock (&h->mutex);
+    return;
+}
+
+
 int
 hash_is_empty (hash_t h)
 {

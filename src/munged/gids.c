@@ -36,6 +36,7 @@
 #include <assert.h>
 #include <errno.h>
 #include <pthread.h>
+#include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
@@ -371,14 +372,16 @@ _gids_hash_create (void)
 {
 /*  Returns a new hash containing the new GIDs mapping, or NULL on error.
  */
+    static size_t   grbuflen = 0;
     hash_t          gid_hash = NULL;
     hash_t          uid_hash = NULL;
     struct timeval  t_start;
     struct timeval  t_stop;
     int             do_group_db_close = 0;
+    int             num_inits = 0;
+    const int       max_inits = 16;
     struct group    gr;
-    char           *gr_buf_ptr = NULL;
-    int             gr_buf_len;
+    xgrbuf_p        grbufp = NULL;
     char           *pw_buf_ptr = NULL;
     int             pw_buf_len;
     char          **user_p;
@@ -409,7 +412,7 @@ _gids_hash_create (void)
      *    is used, but allocating it here allows the same buffer to be reused
      *    throughout a given GIDs creation cycle.
      */
-    if (xgetgrent_buf_create (&gr_buf_ptr, &gr_buf_len) < 0) {
+    if (!(grbufp = xgetgrent_buf_create (grbuflen))) {
         log_msg (LOG_ERR, "Unable to allocate group entry buffer");
         goto err;
     }
@@ -417,15 +420,23 @@ _gids_hash_create (void)
         log_msg (LOG_ERR, "Unable to allocate password entry buffer");
         goto err;
     }
-    xgetgrent_init ();
     do_group_db_close = 1;
+restart:
+    xgetgrent_init ();
+    num_inits++;
 
     while (1) {
-        if (xgetgrent (&gr, gr_buf_ptr, gr_buf_len) < 0) {
-            if (errno == ENOENT)
+        if (xgetgrent (&gr, grbufp) < 0) {
+            if (errno == ENOENT) {
                 break;
-            if (errno == EINTR)
+            }
+            if (errno == EINTR) {
                 continue;
+            }
+            if ((errno == ERANGE) && (num_inits < max_inits)) {
+                hash_reset (gid_hash);
+                goto restart;
+            }
             log_msg (LOG_ERR, "Unable to query group info: %s",
                     strerror (errno));
             goto err;
@@ -444,7 +455,13 @@ _gids_hash_create (void)
         }
     }
     xgetgrent_fini ();
-    xgetgrent_buf_destroy (gr_buf_ptr);
+    /*
+     *  Record the final size of the xgetgrent() buffer.  This allows
+     *    subsequent scans to start with a buffer that will generally
+     *    not need to be realloc()d.
+     */
+    grbuflen = xgetgrent_buf_get_len (grbufp);
+    xgetgrent_buf_destroy (grbufp);
 
     if (gettimeofday (&t_stop, NULL) < 0) {
         log_msg (LOG_ERR, "Unable to query current time");
@@ -473,8 +490,8 @@ err:
     if (pw_buf_ptr != NULL) {
         xgetpwnam_buf_destroy (pw_buf_ptr);
     }
-    if (gr_buf_ptr != NULL) {
-        xgetgrent_buf_destroy (gr_buf_ptr);
+    if (grbufp != NULL) {
+        xgetgrent_buf_destroy (grbufp);
     }
     if (uid_hash != NULL) {
         hash_destroy (uid_hash);

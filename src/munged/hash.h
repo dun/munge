@@ -117,6 +117,13 @@ void hash_destroy (hash_t h);
  *  Abadoning a hash without calling hash_destroy() will cause a memory leak.
  */
 
+void hash_reset (hash_t h);
+/*
+ *  Resets hash table [h] back to an empty state.  If a deletion function was
+ *    specified when the hash was created, it will be called for each item
+ *    contained within.
+ */
+
 int hash_is_empty (hash_t h);
 /*
  *  Returns non-zero if hash table [h] is empty; o/w, returns zero.
