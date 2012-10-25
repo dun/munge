@@ -784,6 +784,12 @@ display_data (conf_t conf)
     if (fwrite (conf->data, 1, conf->dlen, conf->fp_out) != conf->dlen) {
         log_err (EMUNGE_SNAFU, LOG_ERR, "Write error");
     }
+    /*  If outputting to a tty, append a final newline if one is missing.
+     */
+    if (isatty (fileno (conf->fp_out)) &&
+            ((char *) conf->data) [conf->dlen - 1] != '\n') {
+        fprintf (conf->fp_out, "\n");
+    }
     return;
 }
 

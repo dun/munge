@@ -47,7 +47,7 @@ int read_data_from_file (FILE *fp, void **buf, int *len);
 int read_data_from_string (const char *s, void **buf, int *len);
 /*
  *  Malloc()s a buffer and copies data from string [s] into it,
- *    ensuring the buffer contains a trailing newline and terminating NUL.
+ *    ensuring the buffer contains a terminating NUL.
  *  The reference parm [buf] is set to the address of the malloc'd buffer,
  *    and [len] is set to the length of the string (not including the
  *    terminating NUL character).

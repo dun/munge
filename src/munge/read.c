@@ -123,13 +123,10 @@ read_data_from_string (const char *s, void **buf, int *len)
     n = strlen (s);
     if (n == 0)
         return (0);
-    if (s[n - 1] != '\n')               /* reserve space for trailing LF */
-        n++;
 
     if (!(p = malloc (n + 1)))          /* reserve space for terminating NUL */
         return (-1);
     strcpy (p, s);                      /* strcpy() is safe to use here */
-    p[n - 1] = '\n';
     p[n] = '\0';
 
     *buf = p;
