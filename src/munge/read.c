@@ -44,7 +44,7 @@ int
 read_data_from_file (FILE *fp, void **buf, int *len)
 {
     unsigned char *bufmem;              /* base ptr to buffer memory         */
-    unsigned char *buftmp;              /* tmp ptr to bufmem for realloc's   */
+    unsigned char *buftmp;              /* tmp ptr to bufmem for realloc()   */
     unsigned char *bufptr;              /* current ptr to unused bufmem      */
     int            buflen;              /* num bytes of unused bufmem        */
     int            bufsiz;              /* size allocated for bufmem         */
