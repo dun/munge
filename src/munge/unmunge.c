@@ -58,7 +58,7 @@
  *  Constants
  *****************************************************************************/
 
-#define MAX_TIME_STR 33                 /* YYYY-MM-DD HH:MM:SS (4294967296)  */
+#define MAX_TIME_STR 64
 
 
 /*****************************************************************************
@@ -620,7 +620,8 @@ display_meta (conf_t conf)
                 munge_ctx_strerror (conf->ctx));
         }
         tm_ptr = localtime (&t);
-        t_len = strftime (t_buf, sizeof (t_buf), "%Y-%m-%d %H:%M:%S", tm_ptr);
+        t_len = strftime (t_buf, sizeof (t_buf),
+                "%Y-%m-%d %H:%M:%S %z", tm_ptr);
         if ((t_len == 0) || (t_len >= sizeof (t_buf))) {
             log_err (EMUNGE_OVERFLOW, LOG_ERR,
                 "Overran buffer for encode time");
@@ -643,7 +644,8 @@ display_meta (conf_t conf)
                 munge_ctx_strerror (conf->ctx));
         }
         tm_ptr = localtime (&t);
-        t_len = strftime (t_buf, sizeof (t_buf), "%Y-%m-%d %H:%M:%S", tm_ptr);
+        t_len = strftime (t_buf, sizeof (t_buf),
+                "%Y-%m-%d %H:%M:%S %z", tm_ptr);
         if ((t_len == 0) || (t_len >= sizeof (t_buf))) {
             log_err (EMUNGE_OVERFLOW, LOG_ERR,
                 "Overran buffer for decode time");
