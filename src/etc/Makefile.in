@@ -431,38 +431,27 @@ distclean-local::
 	-rm -f *~ \#* .\#* cscope*.out core core.* tags TAGS
 
 install-data-local:
-	expr "`id`" : 'uid=0(' >/dev/null && OWNER="-o daemon" || OWNER=""; \
-	$(INSTALL) -m 0755 -d "$(DESTDIR)$(sysconfdir)/init.d"; \
-	new=""; test ! -f "$(DESTDIR)$(sysconfdir)/init.d/munge" \
-	  || cmp "$(builddir)/munge.init" \
-	    "$(DESTDIR)$(sysconfdir)/init.d/munge" \
-	  1>/dev/null 2>&1 || new=".new"; \
-	$(INSTALL) -m 0755 "$(builddir)/munge.init" \
-	  "$(DESTDIR)$(sysconfdir)/init.d/munge$${new}"; \
-	test -d "/etc/sysconfig" && d="sysconfig" || d="default"; \
-	new=""; test ! -f "$(DESTDIR)$(sysconfdir)/$${d}/munge" \
-	  || cmp "$(srcdir)/munge.sysconfig" \
-	    "$(DESTDIR)$(sysconfdir)/$${d}/munge" \
-	  1>/dev/null 2>&1 || new=".new"; \
-	$(INSTALL) -m 0755 -d "$(DESTDIR)$(sysconfdir)/$${d}"; \
-	$(INSTALL) -m 0644 "$(srcdir)/munge.sysconfig" \
-	  "$(DESTDIR)$(sysconfdir)/$${d}/munge$${new}"; \
-	$(INSTALL) $${OWNER} -m 0700 -d \
-	  "$(DESTDIR)$(sysconfdir)/munge"; \
-	$(INSTALL) -m 0711 -d "$(DESTDIR)$(localstatedir)/lib"; \
-	$(INSTALL) $${OWNER} -m 0711 -d \
-	  "$(DESTDIR)$(localstatedir)/lib/munge"; \
-	$(INSTALL) -m 0711 -d "$(DESTDIR)$(localstatedir)/log"; \
-	$(INSTALL) $${OWNER} -m 0700 -d \
-	  "$(DESTDIR)$(localstatedir)/log/munge"; \
-	$(INSTALL) -m 0711 -d "$(DESTDIR)$(localstatedir)/run"; \
-	$(INSTALL) $${OWNER} -m 0755 -d \
-	  "$(DESTDIR)$(localstatedir)/run/munge"
-	chmod 755 "$(DESTDIR)$(sysconfdir)"
-	chmod 755 "$(DESTDIR)$(localstatedir)"
-	chmod 755 "$(DESTDIR)$(localstatedir)/lib"
-	chmod 755 "$(DESTDIR)$(localstatedir)/log"
-	chmod 755 "$(DESTDIR)$(localstatedir)/run"
+	test -d "/etc/rc.d/init.d" \
+	    && INITDIR="$(sysconfdir)/rc.d/init.d" \
+	    || INITDIR="$(sysconfdir)/init.d"; \
+	  $(INSTALL) -m 0755 -d "$(DESTDIR)$${INITDIR}"; \
+	  $(INSTALL) -m 0755 \
+	    "$(builddir)/munge.init" "$(DESTDIR)$${INITDIR}/munge"
+	test -d "/etc/sysconfig" \
+	    && CONFDIR="$(sysconfdir)/sysconfig" \
+	    || CONFDIR="$(sysconfdir)/default"; \
+	  $(INSTALL) -m 0755 -d "$(DESTDIR)$${CONFDIR}"; \
+	  $(INSTALL) -m 0644 \
+	    "$(srcdir)/munge.sysconfig" "$(DESTDIR)$${CONFDIR}/munge"
+	$(INSTALL) -m 0755 -d "$(DESTDIR)$(sysconfdir)"
+	$(INSTALL) -m 0700 -d "$(DESTDIR)$(sysconfdir)/munge"
+	$(INSTALL) -m 0755 -d "$(DESTDIR)$(localstatedir)"
+	$(INSTALL) -m 0755 -d "$(DESTDIR)$(localstatedir)/lib"
+	$(INSTALL) -m 0711 -d "$(DESTDIR)$(localstatedir)/lib/munge"
+	$(INSTALL) -m 0755 -d "$(DESTDIR)$(localstatedir)/log"
+	$(INSTALL) -m 0700 -d "$(DESTDIR)$(localstatedir)/log/munge"
+	$(INSTALL) -m 0755 -d "$(DESTDIR)$(localstatedir)/run"
+	$(INSTALL) -m 0755 -d "$(DESTDIR)$(localstatedir)/run/munge"
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
