@@ -9,16 +9,16 @@
 #    Select the client authentication method used by MUNGE.
 #
 #  NOTES:
-#    MUNGE supports the following methods for authenticating the UID and GID of
-#    a client:
+#    MUNGE supports the following methods for authenticating the UID and GID
+#    of a client:
 #
 #    AUTH_METHOD_GETPEEREID
-#     (AIX >= 5.2-ML4, Darwin, FreeBSD >= 4.6, OpenBSD >= 3.0)
+#     (AIX 5.2-ML4, Darwin, FreeBSD 4.6, NetBSD 5.0, OpenBSD 3.0)
 #      The server uses getpeereid() to determine the identity of the client
 #      connected across the Unix domain socket.
 #
 #    AUTH_METHOD_GETPEERUCRED
-#     (SunOS >= 5.10)
+#     (SunOS 5.10)
 #      The server uses getpeerucred() to determine the identity of the client
 #      connected across the Unix domain socket.  The client's UID and GID are
 #      then obtained via ucred_geteuid() and ucred_getegid().
@@ -31,7 +31,7 @@
 #      getsockopt().
 #
 #    AUTH_METHOD_LOCAL_PEERCRED
-#     (BSD, Darwin, GNU/kFreeBSD)
+#     (Darwin, FreeBSD, GNU/kFreeBSD)
 #      The server uses the LOCAL_PEERCRED socket option to determine the
 #      identity of the client connected across the Unix domain socket.  The
 #      client's UID and GID are then obtained from the xucred struct returned
