@@ -58,7 +58,7 @@ work_p work_init (work_func_t f, int n_threads);
 
 void work_fini (work_p wp, int do_wait);
 /*
- *  Stops the work crew [wp], cancelling all worker threads and releasing
+ *  Stops the work crew [wp], canceling all worker threads and releasing
  *    associated resources.  If [do_wait] is non-zero, all currently-queued
  *    work will be processed before the work crew is stopped; new work is
  *    prevented from being added to the queue during this time.
