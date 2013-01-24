@@ -1,1 +1,0 @@
-- daemon hangs if client does not respond to auth-via-fd-passing req
