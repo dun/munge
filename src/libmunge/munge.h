@@ -139,25 +139,25 @@ typedef enum munge_enum {
  *    a meaningful return status when returned via exit().
  */
 typedef enum munge_err {
-    EMUNGE_SUCCESS              =  0,   /* Whoohoo!                          */
-    EMUNGE_SNAFU                =  1,   /* Doh!                              */
+    EMUNGE_SUCCESS              =  0,   /* Success: Whoohoo!                 */
+    EMUNGE_SNAFU                =  1,   /* Internal error: Doh!              */
     EMUNGE_BAD_ARG              =  2,   /* Invalid argument                  */
     EMUNGE_BAD_LENGTH           =  3,   /* Exceeded maximum message length   */
     EMUNGE_OVERFLOW             =  4,   /* Buffer overflow                   */
     EMUNGE_NO_MEMORY            =  5,   /* Out of memory                     */
-    EMUNGE_SOCKET               =  6,   /* Munged communication error        */
-    EMUNGE_TIMEOUT              =  7,   /* Munged timeout                    */
-    EMUNGE_BAD_CRED             =  8,   /* Bad credential format             */
-    EMUNGE_BAD_VERSION          =  9,   /* Bad credential version            */
-    EMUNGE_BAD_CIPHER           = 10,   /* Bad credential cipher type        */
-    EMUNGE_BAD_MAC              = 11,   /* Bad credential msg auth code type */
-    EMUNGE_BAD_ZIP              = 12,   /* Bad credential compression type   */
-    EMUNGE_BAD_REALM            = 13,   /* Bad credential security realm     */
-    EMUNGE_CRED_INVALID         = 14,   /* Credential invalid                */
-    EMUNGE_CRED_EXPIRED         = 15,   /* Credential expired                */
-    EMUNGE_CRED_REWOUND         = 16,   /* Credential created in the future  */
-    EMUNGE_CRED_REPLAYED        = 17,   /* Credential replayed               */
-    EMUNGE_CRED_UNAUTHORIZED    = 18    /* Credential decode unauthorized    */
+    EMUNGE_SOCKET               =  6,   /* Socket communication error        */
+    EMUNGE_TIMEOUT              =  7,   /* Socket timeout (NOT USED)         */
+    EMUNGE_BAD_CRED             =  8,   /* Invalid credential format         */
+    EMUNGE_BAD_VERSION          =  9,   /* Invalid credential version        */
+    EMUNGE_BAD_CIPHER           = 10,   /* Invalid cipher type               */
+    EMUNGE_BAD_MAC              = 11,   /* Invalid MAC type                  */
+    EMUNGE_BAD_ZIP              = 12,   /* Invalid compression type          */
+    EMUNGE_BAD_REALM            = 13,   /* Unrecognized security realm       */
+    EMUNGE_CRED_INVALID         = 14,   /* Invalid credential                */
+    EMUNGE_CRED_EXPIRED         = 15,   /* Expired credential                */
+    EMUNGE_CRED_REWOUND         = 16,   /* Rewound credential, future ctime  */
+    EMUNGE_CRED_REPLAYED        = 17,   /* Replayed credential               */
+    EMUNGE_CRED_UNAUTHORIZED    = 18    /* Unauthorized credential decode    */
 } munge_err_t;
 
 /*  MUNGE defines for backwards-compatibility

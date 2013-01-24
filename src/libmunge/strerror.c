@@ -50,21 +50,21 @@ munge_strerror (munge_err_t errnum)
         case EMUNGE_NO_MEMORY:
             return ("Out of memory");
         case EMUNGE_SOCKET:
-            return ("Munged communication error");
+            return ("Socket communication error");
         case EMUNGE_TIMEOUT:
-            return ("Munged timed-out");
+            return ("Socket timeout");
         case EMUNGE_BAD_CRED:
             return ("Invalid credential format");
         case EMUNGE_BAD_VERSION:
-            return ("Unrecognized credential version");
+            return ("Invalid credential version");
         case EMUNGE_BAD_CIPHER:
-            return ("Unrecognized credential cipher type");
+            return ("Invalid cipher type");
         case EMUNGE_BAD_MAC:
-            return ("Unrecognized credential mac type");
+            return ("Invalid MAC type");
         case EMUNGE_BAD_ZIP:
-            return ("Unrecognized credential zip type");
+            return ("Invalid compression type");
         case EMUNGE_BAD_REALM:
-            return ("Unrecognized credential security realm");
+            return ("Unrecognized security realm");
         case EMUNGE_CRED_INVALID:
             return ("Invalid credential");
         case EMUNGE_CRED_EXPIRED:
