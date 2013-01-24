@@ -112,7 +112,13 @@ main (int argc, char *argv[])
 
     if (!conf->got_foreground) {
         fd = daemonize_init (argv[0]);
-        open_logfile (conf->logfile_name, log_priority, conf->got_force);
+        if (conf->got_syslog) {
+            log_open_file (NULL, NULL, 0, 0);
+            log_open_syslog (log_identity, LOG_DAEMON);
+        }
+        else {
+            open_logfile (conf->logfile_name, log_priority, conf->got_force);
+        }
     }
     handle_signals ();
     lookup_ip_addr (conf);

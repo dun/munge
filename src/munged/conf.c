@@ -78,6 +78,7 @@ struct option long_opts[] = {
 #endif /* AUTH_METHOD_RECVFD_MKFIFO || AUTH_METHOD_RECVFD_MKNOD */
     { "group-check-mtime", required_argument, NULL, '4' },
     { "group-update-time", required_argument, NULL, '5' },
+    { "syslog",            no_argument,       NULL, '6' },
     {  NULL,               0,                 NULL,  0  }
 };
 
@@ -115,6 +116,7 @@ create_conf (void)
     conf->got_group_stat = !! MUNGE_GROUP_STAT_FLAG;
     conf->got_socket_retry = !! MUNGE_SOCKET_RETRY_FLAG;
     conf->got_root_auth = !! MUNGE_AUTH_ROOT_ALLOW_FLAG;
+    conf->got_syslog = 0;
     conf->def_cipher = MUNGE_DEFAULT_CIPHER;
     conf->def_zip = zip_select_default_type (MUNGE_DEFAULT_ZIP);
     conf->def_mac = MUNGE_DEFAULT_MAC;
@@ -337,6 +339,9 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                 }
                 conf->gids_update_secs = l;
                 break;
+            case '6':
+                conf->got_syslog = 1;
+                break;
             /* End deprecated cmdline opts */
             case '?':
                 if (optopt > 0) {
@@ -446,6 +451,10 @@ display_help (char *prog)
 
     printf ("  %*s %s [%d]\n", w, "--num-threads=INT",
             "Specify number of threads to spawn", MUNGE_THREADS);
+
+    printf ("  %*s %s\n", w, "--syslog",
+            "Redirect log messages to syslog");
+
     /* End deprecated cmdline opts
      */
     printf ("\n");

@@ -108,6 +108,9 @@ Specify an alternate secret key file.
 .TP
 .BI "--num-threads " integer
 Specify the number of threads to spawn for processing credential requests.
+.TP
+.BI "--syslog"
+Redirect log messages to syslog when the daemon is running in the background.
 
 .SH SIGNALS
 .TP
