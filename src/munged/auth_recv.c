@@ -53,7 +53,7 @@ auth_recv_init (const char *srvrdir, const char *clntdir, int got_force)
 #ifdef AUTH_METHOD_RECVFD_MKNOD
     if (geteuid () != 0) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
-            "MUNGE daemon requires root privileges");
+            "Root privileges are required for munged");
     }
 #endif /* AUTH_METHOD_RECVFD_MKNOD */
 
@@ -73,7 +73,8 @@ _check_auth_server_dir (const char *dir, int got_force)
     char         ebuf [1024];
 
     if ((dir == NULL) || (*dir == '\0')) {
-        log_err (EMUNGE_SNAFU, LOG_ERR, "The auth server dir has no name");
+        log_err (EMUNGE_SNAFU, LOG_ERR,
+            "The auth server dir name is undefined");
     }
     /*  Check directory permissions and whatnot.
      */
@@ -81,7 +82,7 @@ _check_auth_server_dir (const char *dir, int got_force)
 
     if (stat (dir, &st) < 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR,
-            "Cannot check auth server dir \"%s\"", dir);
+            "Failed to stat auth server dir \"%s\"", dir);
     }
     if (!S_ISDIR (st.st_mode) || got_symlink) {
         if (!got_force || !got_symlink)
@@ -96,7 +97,7 @@ _check_auth_server_dir (const char *dir, int got_force)
     if (st.st_uid != geteuid ()) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
             "The auth server dir is insecure: "
-            "\"%s\" must be owned by uid=%u", dir, (unsigned) geteuid ());
+            "\"%s\" must be owned by UID %u", dir, (unsigned) geteuid ());
     }
     if (!(st.st_mode & S_IWUSR)) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
@@ -118,7 +119,7 @@ _check_auth_server_dir (const char *dir, int got_force)
     n = path_is_secure (dir, ebuf, sizeof (ebuf));
     if (n < 0) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
-            "Cannot check auth server dir \"%s\": %s", dir, ebuf);
+            "Failed to check auth server dir \"%s\": %s", dir, ebuf);
     }
     else if ((n == 0) && (!got_force)) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
@@ -133,7 +134,7 @@ _check_auth_server_dir (const char *dir, int got_force)
     n = path_is_accessible (dir, ebuf, sizeof (ebuf));
     if (n < 0) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
-            "Cannot check auth server dir \"%s\": %s", dir, ebuf);
+            "Failed to check auth server dir \"%s\": %s", dir, ebuf);
     }
     else if ((n == 0) && (!got_force)) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
@@ -158,7 +159,8 @@ _check_auth_client_dir (const char *dir, int got_force)
     char         ebuf [1024];
 
     if ((dir == NULL) || (*dir == '\0')) {
-        log_err (EMUNGE_SNAFU, LOG_ERR, "The auth client dir has no name");
+        log_err (EMUNGE_SNAFU, LOG_ERR,
+            "The auth client dir name is undefined");
     }
     /*  Check directory permissions and whatnot.
      */
@@ -166,7 +168,7 @@ _check_auth_client_dir (const char *dir, int got_force)
 
     if (stat (dir, &st) < 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR,
-            "Cannot check auth client dir \"%s\"", dir);
+            "Failed to check auth client dir \"%s\"", dir);
     }
     if (!S_ISDIR (st.st_mode) || got_symlink) {
         if (!got_force || !got_symlink)
@@ -198,12 +200,12 @@ _check_auth_client_dir (const char *dir, int got_force)
      */
     if (path_dirname (dir, dirdir, sizeof (dirdir)) < 0) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
-            "Cannot determine dirname of auth client dir \"%s\"", dir);
+            "Failed to determine dirname of auth client dir \"%s\"", dir);
     }
     n = path_is_secure (dirdir, ebuf, sizeof (ebuf));
     if (n < 0) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
-            "Cannot check auth client parent dir \"%s\": %s", dirdir, ebuf);
+            "Failed to check auth client parent dir \"%s\": %s", dirdir, ebuf);
     }
     else if ((n == 0) && (!got_force)) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
@@ -218,7 +220,7 @@ _check_auth_client_dir (const char *dir, int got_force)
     n = path_is_accessible (dir, ebuf, sizeof (ebuf));
     if (n < 0) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
-            "Cannot check auth client dir \"%s\": %s", dir, ebuf);
+            "Failed to check auth client dir \"%s\": %s", dir, ebuf);
     }
     else if ((n == 0) && (!got_force)) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
@@ -246,7 +248,7 @@ int
 auth_recv (m_msg_t m, uid_t *uid, gid_t *gid)
 {
     if (getpeereid (m->sd, uid, gid) < 0) {
-        log_msg (LOG_ERR, "Unable to get peer identity: %s", strerror (errno));
+        log_msg (LOG_ERR, "Failed to get peer identity: %s", strerror (errno));
         return (-1);
     }
     return (0);
@@ -272,13 +274,13 @@ auth_recv (m_msg_t m, uid_t *uid, gid_t *gid)
     int      rc = -1;
 
     if (getpeerucred (m->sd, &ucred) < 0) {
-        log_msg (LOG_ERR, "Unable to get peer ucred: %s", strerror (errno));
+        log_msg (LOG_ERR, "Failed to get peer ucred: %s", strerror (errno));
     }
     else if ((uid_tmp = ucred_geteuid (ucred)) < 0) {
-        log_msg (LOG_ERR, "Unable to get peer uid: %s", strerror (errno));
+        log_msg (LOG_ERR, "Failed to get peer UID: %s", strerror (errno));
     }
     else if ((gid_tmp = ucred_getegid (ucred)) < 0) {
-        log_msg (LOG_ERR, "Unable to get peer gid: %s", strerror (errno));
+        log_msg (LOG_ERR, "Failed to get peer GID: %s", strerror (errno));
     }
     else {
         *uid = uid_tmp;
@@ -314,7 +316,7 @@ auth_recv (m_msg_t m, uid_t *uid, gid_t *gid)
     socklen_t len = sizeof (cred);
 
     if (getsockopt (m->sd, SOL_SOCKET, SO_PEERCRED, &cred, &len) < 0) {
-        log_msg (LOG_ERR, "Unable to get peer identity: %s", strerror (errno));
+        log_msg (LOG_ERR, "Failed to get peer identity: %s", strerror (errno));
         return (-1);
     }
     *uid = cred.uid;
@@ -347,11 +349,11 @@ auth_recv (m_msg_t m, uid_t *uid, gid_t *gid)
     socklen_t len = sizeof (cred);
 
     if (getsockopt (m->sd, 0, LOCAL_PEERCRED, &cred, &len) < 0) {
-        log_msg (LOG_ERR, "Unable to get peer identity: %s", strerror (errno));
+        log_msg (LOG_ERR, "Failed to get peer identity: %s", strerror (errno));
         return (-1);
     }
     if (cred.cr_version != XUCRED_VERSION) {
-        log_msg (LOG_ERR, "Unable to get peer identity: invalid xucred v%d",
+        log_msg (LOG_ERR, "Failed to get peer identity: invalid xucred v%d",
             cred.cr_version);
         return (-1);
     }
@@ -387,7 +389,7 @@ auth_recv (m_msg_t m, uid_t *uid, gid_t *gid)
     struct strrecvfd  recvfd;
 
     if (_name_auth_pipe (&pipe_name) < 0) {
-        log_msg (LOG_ERR, "Unable to name auth pipe");
+        log_msg (LOG_ERR, "Failed to name auth pipe");
         goto err;
     }
     assert (pipe_name != NULL);
@@ -397,12 +399,12 @@ auth_recv (m_msg_t m, uid_t *uid, gid_t *gid)
      *    is sent to the client in order to prevent a race condition.
      */
     if (mkfifo (pipe_name, S_IWUSR | S_IRUSR | S_IRGRP | S_IROTH) < 0) {
-        log_msg (LOG_ERR, "Unable to create auth pipe \"%s\": %s",
+        log_msg (LOG_ERR, "Failed to create auth pipe \"%s\": %s",
             pipe_name, strerror (errno));
         goto err;
     }
     if (_send_auth_req (m->sd, pipe_name) < 0) {
-        log_msg (LOG_ERR, "Unable to send auth request");
+        log_msg (LOG_ERR, "Failed to send auth request");
         goto err;
     }
     /*  This open() blocks until the client opens the fifo for writing.
@@ -410,12 +412,12 @@ auth_recv (m_msg_t m, uid_t *uid, gid_t *gid)
      *  FIXME: The open() & ioctl() calls could block and lead to a DoS attack.
      */
     if ((pipe_fd = open (pipe_name, O_RDONLY)) < 0) {
-        log_msg (LOG_ERR, "Unable to open auth pipe \"%s\": %s",
+        log_msg (LOG_ERR, "Failed to open auth pipe \"%s\": %s",
             pipe_name, strerror (errno));
         goto err;
     }
     if (ioctl (pipe_fd, I_RECVFD, &recvfd) < 0) {
-        log_msg (LOG_ERR, "Unable to receive client identity: %s",
+        log_msg (LOG_ERR, "Failed to receive client identity: %s",
             strerror (errno));
         goto err;
     }
@@ -423,15 +425,15 @@ auth_recv (m_msg_t m, uid_t *uid, gid_t *gid)
      *    so the following "errors" are not considered fatal.
      */
     if (close (recvfd.fd) < 0) {
-        log_msg (LOG_WARNING, "Unable to close auth fd from \"%s\": %s",
+        log_msg (LOG_WARNING, "Failed to close auth fd from \"%s\": %s",
             pipe_name, strerror (errno));
     }
     if (close (pipe_fd) < 0) {
-        log_msg (LOG_WARNING, "Unable to close auth pipe \"%s\": %s",
+        log_msg (LOG_WARNING, "Failed to close auth pipe \"%s\": %s",
             pipe_name, strerror (errno));
     }
     if (unlink (pipe_name) < 0) {
-        log_msg (LOG_WARNING, "Unable to remove auth pipe \"%s\": %s",
+        log_msg (LOG_WARNING, "Failed to remove auth pipe \"%s\": %s",
             pipe_name, strerror (errno));
     }
     *uid = recvfd.uid;
@@ -481,7 +483,7 @@ auth_recv (m_msg_t m, uid_t *uid, gid_t *gid)
     struct strrecvfd  recvfd;
 
     if (_name_auth_pipe (&pipe_name) < 0) {
-        log_msg (LOG_ERR, "Unable to name auth pipe");
+        log_msg (LOG_ERR, "Failed to name auth pipe");
         goto err;
     }
     assert (pipe_name != NULL);
@@ -490,17 +492,17 @@ auth_recv (m_msg_t m, uid_t *uid, gid_t *gid)
      *    is sent to the client in order to prevent a race condition.
      */
     if ((_ns_pipe (pipe_name, pipe_fds)) < 0) {
-        log_msg (LOG_ERR, "Unable to create auth pipe \"%s\"", pipe_name);
+        log_msg (LOG_ERR, "Failed to create auth pipe \"%s\"", pipe_name);
         goto err;
     }
     if (_send_auth_req (m->sd, pipe_name) < 0) {
-        log_msg (LOG_ERR, "Unable to send auth request");
+        log_msg (LOG_ERR, "Failed to send auth request");
         goto err;
     }
     /*  FIXME: The ioctl() call could block and lead to a DoS attack.
      */
     if (ioctl (pipe_fds[0], I_RECVFD, &recvfd) < 0) {
-        log_msg (LOG_ERR, "Unable to receive client identity: %s",
+        log_msg (LOG_ERR, "Failed to receive client identity: %s",
             strerror (errno));
         goto err;
     }
@@ -508,21 +510,21 @@ auth_recv (m_msg_t m, uid_t *uid, gid_t *gid)
      *    so the following "errors" are not considered fatal.
      */
     if (close (recvfd.fd) < 0) {
-        log_msg (LOG_WARNING, "Unable to close auth fd from \"%s\": %s",
+        log_msg (LOG_WARNING, "Failed to close auth fd from \"%s\": %s",
             pipe_name, strerror (errno));
     }
     if (close (pipe_fds[0]) < 0) {
         log_msg (LOG_WARNING,
-            "Unable to close auth pipe \"%s\" for reading: %s",
+            "Failed to close auth pipe \"%s\" for reading: %s",
             pipe_name, strerror (errno));
     }
     if (close (pipe_fds[1]) < 0) {
         log_msg (LOG_WARNING,
-            "Unable to close auth pipe \"%s\" for writing: %s",
+            "Failed to close auth pipe \"%s\" for writing: %s",
             pipe_name, strerror (errno));
     }
     if (unlink (pipe_name) < 0) {
-        log_msg (LOG_WARNING, "Unable to remove auth pipe \"%s\": %s",
+        log_msg (LOG_WARNING, "Failed to remove auth pipe \"%s\": %s",
             pipe_name, strerror (errno));
     }
     *uid = recvfd.uid;

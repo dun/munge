@@ -179,7 +179,7 @@ daemonize_init (char *progname)
     limit.rlim_max = 0;
     if (setrlimit (RLIMIT_CORE, &limit) < 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR,
-            "Unable to prevent creation of core file");
+            "Failed to disable core dumps");
     }
     /*  Create pipe for IPC so parent process will wait to terminate until
      *    signaled by grandchild process.  This allows messages written to
@@ -187,7 +187,7 @@ daemonize_init (char *progname)
      *    the parent process returns control to the shell.
      */
     if (pipe (fds) < 0) {
-        log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to create daemon pipe");
+        log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to create daemon pipe");
     }
     /*  Set the fd used by log_err() to return status back to the parent.
      */
@@ -197,22 +197,22 @@ daemonize_init (char *progname)
      *    ensure child is not a process group leader.
      */
     if ((pid = fork ()) < 0) {
-        log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to create child process");
+        log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to create child process");
     }
     else if (pid > 0) {
         log_set_err_pipe (-1);
         if (close (fds[1]) < 0) {
             log_errno (EMUNGE_SNAFU, LOG_ERR,
-                "Unable to close write-pipe in parent process");
+                "Failed to close write-pipe in parent process");
         }
         if ((n = read (fds[0], &priority, sizeof (priority))) < 0) {
             log_errno (EMUNGE_SNAFU, LOG_ERR,
-                "Unable to read status from grandchild process");
+                "Failed to read status from grandchild process");
         }
         if ((n > 0) && (priority >= 0)) {
             if ((n = read (fds[0], ebuf, sizeof (ebuf))) < 0) {
                 log_errno (EMUNGE_SNAFU, LOG_ERR,
-                    "Unable to read err msg from grandchild process");
+                    "Failed to read err msg from grandchild process");
             }
             if ((n > 0) && (ebuf[0] != '\0')) {
                 log_open_file (stderr, progname, priority, LOG_OPT_PRIORITY);
@@ -224,27 +224,27 @@ daemonize_init (char *progname)
     }
     if (close (fds[0]) < 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR,
-            "Unable to close read-pipe in child process");
+            "Failed to close read-pipe in child process");
     }
     /*  Become a session leader and process group leader
      *    with no controlling tty.
      */
     if (setsid () < 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR,
-            "Unable to disassociate controlling tty");
+            "Failed to disassociate controlling tty");
     }
     /*  Ignore SIGHUP to keep child from terminating when
      *    the session leader (ie, the parent) terminates.
      */
     if (posignal (SIGHUP, SIG_IGN) == SIG_ERR) {
-        log_err (EMUNGE_SNAFU, LOG_ERR, "Unable to ignore signal=%d", SIGHUP);
+        log_err (EMUNGE_SNAFU, LOG_ERR, "Failed to ignore signal=%d", SIGHUP);
     }
     /*  Abdicate session leader position in order to guarantee
      *    daemon cannot automatically re-acquire a controlling tty.
      */
     if ((pid = fork ()) < 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR,
-            "Unable to create grandchild process");
+            "Failed to create grandchild process");
     }
     else if (pid > 0) {
         exit (0);
@@ -266,27 +266,27 @@ daemonize_fini (int fd)
      */
     if (chdir ("/") < 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR,
-            "Unable to change to root directory");
+            "Failed to change to root directory");
     }
     /*  Discard data to/from stdin, stdout, and stderr.
      */
     if ((dev_null = open ("/dev/null", O_RDWR)) < 0) {
-        log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to open \"/dev/null\"");
+        log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to open \"/dev/null\"");
     }
     if (dup2 (dev_null, STDIN_FILENO) < 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR,
-            "Unable to dup \"/dev/null\" onto stdin");
+            "Failed to dup \"/dev/null\" onto stdin");
     }
     if (dup2 (dev_null, STDOUT_FILENO) < 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR,
-            "Unable to dup \"/dev/null\" onto stdout");
+            "Failed to dup \"/dev/null\" onto stdout");
     }
     if (dup2 (dev_null, STDERR_FILENO) < 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR,
-            "Unable to dup \"/dev/null\" onto stderr");
+            "Failed to dup \"/dev/null\" onto stderr");
     }
     if (close (dev_null) < 0) {
-        log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to close \"/dev/null\"");
+        log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to close \"/dev/null\"");
     }
     /*  Clear the fd used by log_err() to return status back to the parent.
      */
@@ -296,7 +296,7 @@ daemonize_fini (int fd)
      */
     if ((fd >= 0) && (close (fd) < 0)) {
         log_errno (EMUNGE_SNAFU, LOG_ERR,
-            "Unable to close write-pipe in grandchild process");
+            "Failed to close write-pipe in grandchild process");
     }
     return;
 }
@@ -335,7 +335,7 @@ open_logfile (const char *logfile, int priority, int got_force)
     else {
         if (n < 0) {
             log_errno (EMUNGE_SNAFU, LOG_ERR,
-                "Cannot check logfile \"%s\"", logfile);
+                "Failed to check logfile \"%s\"", logfile);
         }
         if (!S_ISREG (st.st_mode) || got_symlink) {
             if (!got_force || !got_symlink)
@@ -350,11 +350,11 @@ open_logfile (const char *logfile, int priority, int got_force)
         if (st.st_uid != geteuid ()) {
             if (!got_force)
                 log_err (EMUNGE_SNAFU, LOG_ERR,
-                    "Logfile is insecure: \"%s\" should be owned by uid=%u",
+                    "Logfile is insecure: \"%s\" should be owned by UID %u",
                     logfile, (unsigned) geteuid ());
             else
                 log_msg (LOG_WARNING,
-                    "Logfile is insecure: \"%s\" should be owned by uid=%u",
+                    "Logfile is insecure: \"%s\" should be owned by UID %u",
                     logfile, (unsigned) geteuid ());
         }
         if (st.st_mode & (S_IWGRP | S_IWOTH)) {
@@ -372,12 +372,12 @@ open_logfile (const char *logfile, int priority, int got_force)
      */
     if (path_dirname (logfile, logdir, sizeof (logdir)) < 0) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
-            "Cannot determine dirname of logfile \"%s\"", logfile);
+            "Failed to determine dirname of logfile \"%s\"", logfile);
     }
     n = path_is_secure (logdir, ebuf, sizeof (ebuf));
     if (n < 0) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
-            "Cannot check logfile dir \"%s\": %s", logdir, ebuf);
+            "Failed to check logfile dir \"%s\": %s", logdir, ebuf);
     }
     else if ((n == 0) && (!got_force)) {
         log_err (EMUNGE_SNAFU, LOG_ERR, "Logfile is insecure: %s", ebuf);
@@ -395,7 +395,7 @@ open_logfile (const char *logfile, int priority, int got_force)
 
     if (!fp) {
         log_errno (EMUNGE_SNAFU, LOG_ERR,
-            "Unable to open logfile \"%s\"", logfile);
+            "Failed to open logfile \"%s\"", logfile);
     }
     log_open_file (fp, NULL, priority,
         LOG_OPT_JUSTIFY | LOG_OPT_PRIORITY | LOG_OPT_TIMESTAMP);
@@ -407,19 +407,19 @@ static void
 handle_signals (void)
 {
     if (posignal (SIGHUP, hup_handler) == SIG_ERR) {
-        log_err (EMUNGE_SNAFU, LOG_ERR, "Unable to handle signal=%d", SIGHUP);
+        log_err (EMUNGE_SNAFU, LOG_ERR, "Failed to handle signal=%d", SIGHUP);
     }
     if (posignal (SIGINT, exit_handler) == SIG_ERR) {
-        log_err (EMUNGE_SNAFU, LOG_ERR, "Unable to handle signal=%d", SIGINT);
+        log_err (EMUNGE_SNAFU, LOG_ERR, "Failed to handle signal=%d", SIGINT);
     }
     if (posignal (SIGTERM, exit_handler) == SIG_ERR) {
-        log_err (EMUNGE_SNAFU, LOG_ERR, "Unable to handle signal=%d", SIGTERM);
+        log_err (EMUNGE_SNAFU, LOG_ERR, "Failed to handle signal=%d", SIGTERM);
     }
     if (posignal (SIGSEGV, segv_handler) == SIG_ERR) {
-        log_err (EMUNGE_SNAFU, LOG_ERR, "Unable to handle signal=%d", SIGSEGV);
+        log_err (EMUNGE_SNAFU, LOG_ERR, "Failed to handle signal=%d", SIGSEGV);
     }
     if (posignal (SIGPIPE, SIG_IGN) == SIG_ERR) {
-        log_err (EMUNGE_SNAFU, LOG_ERR, "Unable to ignore signal=%d", SIGPIPE);
+        log_err (EMUNGE_SNAFU, LOG_ERR, "Failed to ignore signal=%d", SIGPIPE);
     }
     return;
 }
@@ -449,7 +449,7 @@ static void
 segv_handler (int signum)
 {
     log_err (EMUNGE_SNAFU, LOG_CRIT,
-        "Exiting on signal=%d (segmentation violation)", signum);
+        "Exiting on signal=%d (segfault)", signum);
     assert (1);                         /* not reached */
     return;
 }
@@ -481,12 +481,12 @@ write_pidfile (const char *pidfile, int got_force)
      */
     if (path_dirname (pidfile, piddir, sizeof (piddir)) < 0) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
-            "Cannot determine dirname of pidfile \"%s\"", pidfile);
+            "Failed to determine dirname of pidfile \"%s\"", pidfile);
     }
     n = path_is_secure (piddir, ebuf, sizeof (ebuf));
     if (n < 0) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
-            "Cannot check pidfile dir \"%s\": %s", piddir, ebuf);
+            "Failed to check pidfile dir \"%s\": %s", piddir, ebuf);
     }
     else if ((n == 0) && (!got_force)) {
         log_err (EMUNGE_SNAFU, LOG_ERR, "Pidfile is insecure: %s", ebuf);
@@ -506,16 +506,16 @@ write_pidfile (const char *pidfile, int got_force)
      *  An error in creating the pidfile is not considered fatal.
      */
     if (!fp) {
-        log_msg (LOG_WARNING, "Unable to open pidfile \"%s\": %s",
+        log_msg (LOG_WARNING, "Failed to open pidfile \"%s\": %s",
             pidfile, strerror (errno));
     }
     else if (fprintf (fp, "%d\n", (int) getpid ()) == EOF) {
-        log_msg (LOG_WARNING, "Unable to write to pidfile \"%s\": %s",
+        log_msg (LOG_WARNING, "Failed to write to pidfile \"%s\": %s",
             pidfile, strerror (errno));
         (void) fclose (fp);
     }
     else if (fclose (fp) == EOF) {
-        log_msg (LOG_WARNING, "Unable to close pidfile \"%s\": %s",
+        log_msg (LOG_WARNING, "Failed to close pidfile \"%s\": %s",
             pidfile, strerror (errno));
     }
     else {
@@ -540,18 +540,18 @@ sock_create (conf_t conf)
     assert (conf != NULL);
 
     if ((conf->socket_name == NULL) || (*conf->socket_name == '\0')) {
-        log_err (EMUNGE_SNAFU, LOG_ERR, "MUNGE socket has no name");
+        log_err (EMUNGE_SNAFU, LOG_ERR, "MUNGE socket name is undefined");
     }
     /*  Ensure socket dir is secure against modification by others.
      */
     if (path_dirname (conf->socket_name, sockdir, sizeof (sockdir)) < 0) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
-            "Cannot determine dirname of socket \"%s\"", conf->socket_name);
+            "Failed to determine dirname of socket \"%s\"", conf->socket_name);
     }
     n = path_is_secure (sockdir, ebuf, sizeof (ebuf));
     if (n < 0) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
-            "Cannot check socket dir \"%s\": %s", sockdir, ebuf);
+            "Failed to check socket dir \"%s\": %s", sockdir, ebuf);
     }
     else if ((n == 0) && (!conf->got_force)) {
         log_err (EMUNGE_SNAFU, LOG_ERR, "Socket is insecure: %s", ebuf);
@@ -564,7 +564,7 @@ sock_create (conf_t conf)
     n = path_is_accessible (sockdir, ebuf, sizeof (ebuf));
     if (n < 0) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
-            "Cannot check socket dir \"%s\": %s", sockdir, ebuf);
+            "Failed to check socket dir \"%s\": %s", sockdir, ebuf);
     }
     else if ((n == 0) && (!conf->got_force)) {
         log_err (EMUNGE_SNAFU, LOG_ERR, "Socket is inaccessible: %s", ebuf);
@@ -579,7 +579,7 @@ sock_create (conf_t conf)
      *  Create socket for communicating with clients.
      */
     if ((sd = socket (PF_UNIX, SOCK_STREAM, 0)) < 0) {
-        log_errno (EMUNGE_SNAFU, LOG_ERR, "Cannot create socket");
+        log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to create socket");
     }
     memset (&addr, 0, sizeof (addr));
     addr.sun_family = AF_UNIX;
@@ -596,11 +596,11 @@ sock_create (conf_t conf)
 
     if (rv < 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR,
-            "Cannot bind to \"%s\"", conf->socket_name);
+            "Failed to bind \"%s\"", conf->socket_name);
     }
     if (listen (sd, MUNGE_SOCKET_BACKLOG) < 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR,
-            "Cannot listen to \"%s\"", conf->socket_name);
+            "Failed to listen on \"%s\"", conf->socket_name);
     }
     conf->ld = sd;
     return;
@@ -644,12 +644,12 @@ sock_lock (conf_t conf)
     }
     else if (st.st_uid != geteuid()) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
-            "Lockfile is suspicious: \"%s\" should be owned by uid=%u",
+            "Lockfile is suspicious: \"%s\" should be owned by UID %u",
             conf->lockfile_name, (unsigned) geteuid());
     }
     else if ((st.st_mode & 07777) != S_IWUSR) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
-            "Lockfile is suspicious: \"%s\" should writable only by user",
+            "Lockfile is suspicious: \"%s\" should be writable only by user",
             conf->lockfile_name);
     }
     mask = umask (0);
@@ -764,13 +764,13 @@ sock_destroy (conf_t conf)
 
     if (conf->socket_name) {
         if (unlink (conf->socket_name) < 0) {
-            log_msg (LOG_WARNING, "Unable to unlink \"%s\": %s",
+            log_msg (LOG_WARNING, "Failed to remove \"%s\": %s",
                 conf->socket_name, strerror (errno));
         }
     }
     if (conf->ld >= 0) {
         if (close (conf->ld) < 0) {
-            log_msg (LOG_WARNING, "Unable to close \"%s\": %s",
+            log_msg (LOG_WARNING, "Failed to close \"%s\": %s",
                 conf->ld, strerror (errno));
         }
         conf->ld = -1;

@@ -445,7 +445,7 @@ _cipher_final (cipher_ctx *x, void *dst, int *dstlen)
         pad = x->buf[x->blklen - 1];
         if ((pad <= 0) || (pad > x->blklen)) {
             log_msg (LOG_DEBUG,
-                "Final decryption block has invalid pad=%d", pad);
+                "Final decryption block has invalid pad of %d", pad);
             return (-1);
         }
         for (i = x->blklen - pad; i < x->blklen; i++) {

@@ -182,7 +182,7 @@ main (int argc, char *argv[])
     const char  *p;
 
     if (posignal (SIGPIPE, SIG_IGN) == SIG_ERR) {
-        log_err (EMUNGE_SNAFU, LOG_ERR, "Unable to ignore signal=%d", SIGPIPE);
+        log_err (EMUNGE_SNAFU, LOG_ERR, "Failed to ignore signal=%d", SIGPIPE);
     }
     log_open_file (stderr, argv[0], LOG_INFO, LOG_OPT_PRIORITY);
     conf = create_conf ();
@@ -193,7 +193,7 @@ main (int argc, char *argv[])
         (void **) &conf->cred, &conf->clen);
     if (rc < 0) {
         if (errno == ENOMEM) {
-            log_errno (EMUNGE_NO_MEMORY, LOG_ERR, "Unable to read input");
+            log_errno (EMUNGE_NO_MEMORY, LOG_ERR, "Failed to read input");
         }
         else {
             log_err (EMUNGE_SNAFU, LOG_ERR, "Read error");
@@ -235,10 +235,10 @@ create_conf (void)
     int    maxlen;
 
     if (!(conf = malloc (sizeof (struct conf)))) {
-        log_errno (EMUNGE_NO_MEMORY, LOG_ERR, "Unable to create conf");
+        log_errno (EMUNGE_NO_MEMORY, LOG_ERR, "Failed to allocate conf");
     }
     if (!(conf->ctx = munge_ctx_create ())) {
-        log_errno (EMUNGE_NO_MEMORY, LOG_ERR, "Unable to create conf ctx");
+        log_errno (EMUNGE_NO_MEMORY, LOG_ERR, "Failed to create conf ctx");
     }
     conf->status = -1;
     conf->fn_in = "-";
@@ -273,14 +273,14 @@ destroy_conf (conf_t conf)
     if (conf->fp_in != NULL) {
         if (fclose (conf->fp_in) < 0) {
             log_errno (EMUNGE_SNAFU, LOG_ERR,
-                "Unable to close infile");
+                "Failed to close input file");
         }
         conf->fp_in = NULL;
     }
     if (conf->fp_meta != NULL) {
         if ((fclose (conf->fp_meta) < 0) && (errno != EPIPE)) {
             log_errno (EMUNGE_SNAFU, LOG_ERR,
-                "Unable to close metadata outfile");
+                "Failed to close metadata output file");
         }
         conf->fp_meta = NULL;
     }
@@ -289,7 +289,7 @@ destroy_conf (conf_t conf)
                 && strcmp (conf->fn_out, conf->fn_meta)) {
             if ((fclose (conf->fp_out) < 0) && (errno != EPIPE)) {
                 log_errno (EMUNGE_SNAFU, LOG_ERR,
-                    "Unable to close payload outfile");
+                    "Failed to close payload output file");
             }
         }
         conf->fp_out = NULL;
@@ -370,7 +370,7 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                 e = munge_ctx_set (conf->ctx, MUNGE_OPT_SOCKET, optarg);
                 if (e != EMUNGE_SUCCESS) {
                     log_err (EMUNGE_SNAFU, LOG_ERR,
-                        "Unable to set munge socket name: %s",
+                        "Failed to set munge socket name: %s",
                         munge_ctx_strerror (conf->ctx));
                 }
                 break;
@@ -385,7 +385,7 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                 }
                 else {
                     log_err (EMUNGE_SNAFU, LOG_ERR,
-                        "Unable to process command-line");
+                        "Failed to process command-line");
                 }
                 break;
             case ':':
@@ -401,7 +401,7 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                 }
                 else {
                     log_err (EMUNGE_SNAFU, LOG_ERR,
-                        "Unable to process command-line");
+                        "Failed to process command-line");
                 }
                 break;
             default:
@@ -474,7 +474,7 @@ display_help (char *prog)
             "Display list of metadata keys");
 
     printf ("  %*s %s\n", w, "-S, --socket=STRING",
-            "Specify local domain socket for daemon");
+            "Specify local domain socket for munged");
 
     printf ("\n");
     printf ("By default, credential read from stdin, "
@@ -528,7 +528,7 @@ open_files (conf_t conf)
         }
         else if (!(conf->fp_in = fopen (conf->fn_in, "r"))) {
             log_errno (EMUNGE_SNAFU, LOG_ERR,
-                "Unable to read from \"%s\"", conf->fn_in);
+                "Failed to read from \"%s\"", conf->fn_in);
         }
     }
     if (conf->fn_meta) {
@@ -542,7 +542,7 @@ open_files (conf_t conf)
         }
         else if (!(conf->fp_meta = fopen (conf->fn_meta, "w"))) {
             log_errno (EMUNGE_SNAFU, LOG_ERR,
-                "Unable to write to \"%s\"", conf->fn_meta);
+                "Failed to write to \"%s\"", conf->fn_meta);
         }
     }
     if (conf->fn_out) {
@@ -559,7 +559,7 @@ open_files (conf_t conf)
         }
         else if (!(conf->fp_out = fopen (conf->fn_out, "w"))) {
             log_errno (EMUNGE_SNAFU, LOG_ERR,
-                "Unable to write to \"%s\"", conf->fn_out);
+                "Failed to write to \"%s\"", conf->fn_out);
         }
     }
     return;
@@ -599,13 +599,13 @@ display_meta (conf_t conf)
         e = munge_ctx_get (conf->ctx, MUNGE_OPT_ADDR4, &addr);
         if (e != EMUNGE_SUCCESS) {
             log_err (EMUNGE_SNAFU, LOG_ERR,
-                "Unable to retrieve origin ip address: %s",
+                "Failed to retrieve origin IP address: %s",
                 munge_ctx_strerror (conf->ctx));
         }
         hptr = gethostbyaddr ((char *) &addr, sizeof (addr), AF_INET);
         if (!inet_ntop (AF_INET, &addr, ip_buf, sizeof (ip_buf))) {
             log_err (EMUNGE_SNAFU, LOG_ERR,
-                "Unable to convert ip address string");
+                "Failed to convert IP address string");
         }
         s = key_val_to_str (MUNGE_KEY_ENCODE_HOST);
         w = pad - strlen (s);
@@ -616,7 +616,7 @@ display_meta (conf_t conf)
         e = munge_ctx_get (conf->ctx, MUNGE_OPT_ENCODE_TIME, &t);
         if (e != EMUNGE_SUCCESS) {
             log_err (EMUNGE_SNAFU, LOG_ERR,
-                "Unable to retrieve encode time: %s",
+                "Failed to retrieve encode time: %s",
                 munge_ctx_strerror (conf->ctx));
         }
         tm_ptr = localtime (&t);
@@ -640,7 +640,7 @@ display_meta (conf_t conf)
         e = munge_ctx_get (conf->ctx, MUNGE_OPT_DECODE_TIME, &t);
         if (e != EMUNGE_SUCCESS) {
             log_err (EMUNGE_SNAFU, LOG_ERR,
-                "Unable to retrieve decode time: %s",
+                "Failed to retrieve decode time: %s",
                 munge_ctx_strerror (conf->ctx));
         }
         tm_ptr = localtime (&t);
@@ -664,7 +664,7 @@ display_meta (conf_t conf)
         e = munge_ctx_get (conf->ctx, MUNGE_OPT_TTL, &i);
         if (e != EMUNGE_SUCCESS) {
             log_err (EMUNGE_SNAFU, LOG_ERR,
-                "Unable to retrieve ttl: %s",
+                "Failed to retrieve time-to-live: %s",
                 munge_ctx_strerror (conf->ctx));
         }
         s = key_val_to_str (MUNGE_KEY_TTL);
@@ -675,7 +675,7 @@ display_meta (conf_t conf)
         e = munge_ctx_get (conf->ctx, MUNGE_OPT_CIPHER_TYPE, &i);
         if (e != EMUNGE_SUCCESS) {
             log_err (EMUNGE_SNAFU, LOG_ERR,
-                "Unable to retrieve cipher type: %s",
+                "Failed to retrieve cipher type: %s",
                 munge_ctx_strerror (conf->ctx));
         }
         s = key_val_to_str (MUNGE_KEY_CIPHER_TYPE);
@@ -687,7 +687,7 @@ display_meta (conf_t conf)
         e = munge_ctx_get (conf->ctx, MUNGE_OPT_MAC_TYPE, &i);
         if (e != EMUNGE_SUCCESS) {
             log_err (EMUNGE_SNAFU, LOG_ERR,
-                "Unable to retrieve message auth code type: %s",
+                "Failed to retrieve MAC type: %s",
                 munge_ctx_strerror (conf->ctx));
         }
         s = key_val_to_str (MUNGE_KEY_MAC_TYPE);
@@ -699,7 +699,7 @@ display_meta (conf_t conf)
         e = munge_ctx_get (conf->ctx, MUNGE_OPT_ZIP_TYPE, &i);
         if (e != EMUNGE_SUCCESS) {
             log_err (EMUNGE_SNAFU, LOG_ERR,
-                "Unable to retrieve compression type: %s",
+                "Failed to retrieve compression type: %s",
                 munge_ctx_strerror (conf->ctx));
         }
         s = key_val_to_str (MUNGE_KEY_ZIP_TYPE);
@@ -725,7 +725,7 @@ display_meta (conf_t conf)
         e = munge_ctx_get (conf->ctx, MUNGE_OPT_UID_RESTRICTION, &i);
         if (e != EMUNGE_SUCCESS) {
             log_err (EMUNGE_SNAFU, LOG_ERR,
-                "Unable to retrieve uid restriction: %s",
+                "Failed to retrieve UID restriction: %s",
                 munge_ctx_strerror (conf->ctx));
         }
         if (i != MUNGE_UID_ANY) {
@@ -740,7 +740,7 @@ display_meta (conf_t conf)
         e = munge_ctx_get (conf->ctx, MUNGE_OPT_GID_RESTRICTION, &i);
         if (e != EMUNGE_SUCCESS) {
             log_err (EMUNGE_SNAFU, LOG_ERR,
-                "Unable to retrieve gid restriction: %s",
+                "Failed to retrieve GID restriction: %s",
                 munge_ctx_strerror (conf->ctx));
         }
         if (i != MUNGE_GID_ANY) {

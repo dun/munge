@@ -112,11 +112,11 @@ replay_init (void)
         return;
     }
     if (!(replay_hash = hash_create (REPLAY_HASH_SIZE, keyf, cmpf, delf))) {
-        log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to allocate replay hash");
+        log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to allocate replay hash");
     }
     if (timer_set_relative (
       (callback_f) replay_purge, NULL, MUNGE_REPLAY_PURGE_SECS * 1000) < 0) {
-        log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to set replay purge timer");
+        log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to set replay purge timer");
     }
     return;
 }
@@ -180,7 +180,7 @@ replay_insert (munge_cred_t c)
     }
     if (e == EINVAL) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
-            "Attempt to insert cred into hash using invalid args");
+            "Attempted to insert cred into hash using invalid args");
     }
     return (-1);
 }
@@ -225,7 +225,7 @@ replay_purge (void)
         return;
     }
     if (time (&now) == (time_t) -1) {
-        log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to query current time");
+        log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to query current time");
     }
     n = hash_delete_if (replay_hash, (hash_arg_f) replay_is_expired, &now);
     assert (n >= 0);
@@ -235,7 +235,7 @@ replay_purge (void)
     }
     if (timer_set_relative (
       (callback_f) replay_purge, NULL, MUNGE_REPLAY_PURGE_SECS * 1000) < 0) {
-        log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to set replay purge timer");
+        log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to set replay purge timer");
     }
     return;
 }

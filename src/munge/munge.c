@@ -130,7 +130,7 @@ main (int argc, char *argv[])
     const char  *p;
 
     if (posignal (SIGPIPE, SIG_IGN) == SIG_ERR) {
-        log_err (EMUNGE_SNAFU, LOG_ERR, "Unable to ignore signal=%d", SIGPIPE);
+        log_err (EMUNGE_SNAFU, LOG_ERR, "Failed to ignore signal=%d", SIGPIPE);
     }
     log_open_file (stderr, argv[0], LOG_INFO, LOG_OPT_PRIORITY);
     conf = create_conf ();
@@ -145,7 +145,7 @@ main (int argc, char *argv[])
     }
     if (rc < 0) {
         if (errno == ENOMEM) {
-            log_errno (EMUNGE_NO_MEMORY, LOG_ERR, "Unable to read input");
+            log_errno (EMUNGE_NO_MEMORY, LOG_ERR, "Failed to read input");
         }
         else {
             log_err (EMUNGE_SNAFU, LOG_ERR, "Read error");
@@ -172,10 +172,10 @@ create_conf (void)
     conf_t conf;
 
     if (!(conf = malloc (sizeof (struct conf)))) {
-        log_errno (EMUNGE_NO_MEMORY, LOG_ERR, "Unable to create conf");
+        log_errno (EMUNGE_NO_MEMORY, LOG_ERR, "Failed to allocate conf");
     }
     if (!(conf->ctx = munge_ctx_create ())) {
-        log_errno (EMUNGE_NO_MEMORY, LOG_ERR, "Unable to create conf ctx");
+        log_errno (EMUNGE_NO_MEMORY, LOG_ERR, "Failed to create conf ctx");
     }
     conf->status = -1;
     conf->cuid = geteuid ();
@@ -201,13 +201,13 @@ destroy_conf (conf_t conf)
      */
     if (conf->fp_in != NULL) {
         if (fclose (conf->fp_in) < 0) {
-            log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to close infile");
+            log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to close input file");
         }
         conf->fp_in = NULL;
     }
     if (conf->fp_out != NULL) {
         if ((fclose (conf->fp_out) < 0) && (errno != EPIPE)) {
-            log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to close outfile");
+            log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to close output file");
         }
         conf->fp_out = NULL;
     }
@@ -285,7 +285,7 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                 e = munge_ctx_set (conf->ctx, MUNGE_OPT_CIPHER_TYPE, i);
                 if (e != EMUNGE_SUCCESS) {
                     log_err (EMUNGE_SNAFU, LOG_ERR,
-                        "Unable to set cipher type: %s",
+                        "Failed to set cipher type: %s",
                         munge_ctx_strerror (conf->ctx));
                 }
                 break;
@@ -297,12 +297,12 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                 i = munge_enum_str_to_int (MUNGE_ENUM_MAC, optarg);
                 if ((i < 0) || !munge_enum_is_valid (MUNGE_ENUM_MAC, i)) {
                     log_err (EMUNGE_SNAFU, LOG_ERR,
-                        "Invalid mac type \"%s\"", optarg);
+                        "Invalid MAC type \"%s\"", optarg);
                 }
                 e = munge_ctx_set (conf->ctx, MUNGE_OPT_MAC_TYPE, i);
                 if (e != EMUNGE_SUCCESS) {
                     log_err (EMUNGE_SNAFU, LOG_ERR,
-                        "Unable to set mac type: %s",
+                        "Failed to set MAC type: %s",
                         munge_ctx_strerror (conf->ctx));
                 }
                 break;
@@ -319,7 +319,7 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                 e = munge_ctx_set (conf->ctx, MUNGE_OPT_ZIP_TYPE, i);
                 if (e != EMUNGE_SUCCESS) {
                     log_err (EMUNGE_SNAFU, LOG_ERR,
-                        "Unable to set compression type: %s",
+                        "Failed to set compression type: %s",
                         munge_ctx_strerror (conf->ctx));
                 }
                 break;
@@ -336,7 +336,7 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                 e = munge_ctx_set (conf->ctx, MUNGE_OPT_UID_RESTRICTION, i);
                 if (e != EMUNGE_SUCCESS) {
                     log_err (EMUNGE_SNAFU, LOG_ERR,
-                        "Unable to set uid restriction: %s",
+                        "Failed to set UID restriction: %s",
                         munge_ctx_strerror (conf->ctx));
                 }
                 break;
@@ -357,7 +357,7 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                 e = munge_ctx_set (conf->ctx, MUNGE_OPT_GID_RESTRICTION, i);
                 if (e != EMUNGE_SUCCESS) {
                     log_err (EMUNGE_SNAFU, LOG_ERR,
-                        "Unable to set gid restriction: %s",
+                        "Failed to set GID restriction: %s",
                         munge_ctx_strerror (conf->ctx));
                 }
                 break;
@@ -387,7 +387,7 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                 e = munge_ctx_set (conf->ctx, MUNGE_OPT_TTL, (int) l);
                 if (e != EMUNGE_SUCCESS) {
                     log_err (EMUNGE_SNAFU, LOG_ERR,
-                        "Unable to set time-to-live: %s",
+                        "Failed to set time-to-live: %s",
                         munge_ctx_strerror (conf->ctx));
                 }
                 break;
@@ -395,7 +395,7 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                 e = munge_ctx_set (conf->ctx, MUNGE_OPT_SOCKET, optarg);
                 if (e != EMUNGE_SUCCESS) {
                     log_err (EMUNGE_SNAFU, LOG_ERR,
-                        "Unable to set munge socket name: %s",
+                        "Failed to set munge socket name: %s",
                         munge_ctx_strerror (conf->ctx));
                 }
                 break;
@@ -410,7 +410,7 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                 }
                 else {
                     log_err (EMUNGE_SNAFU, LOG_ERR,
-                        "Unable to process command-line");
+                        "Failed to process command-line");
                 }
                 break;
             case ':':
@@ -426,7 +426,7 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                 }
                 else {
                     log_err (EMUNGE_SNAFU, LOG_ERR,
-                        "Unable to process command-line");
+                        "Failed to process command-line");
                 }
                 break;
             default:
@@ -523,7 +523,7 @@ display_help (char *prog)
             "Specify time-to-live (in seconds; 0=dfl -1=max)");
 
     printf ("  %*s %s\n", w, "-S, --socket=STRING",
-            "Specify local domain socket for daemon");
+            "Specify local domain socket for munged");
 
     printf ("\n");
     printf ("By default, payload read from stdin, "
@@ -632,7 +632,7 @@ open_files (conf_t conf)
         }
         else if (!(conf->fp_in = fopen (conf->fn_in, "r"))) {
             log_errno (EMUNGE_SNAFU, LOG_ERR,
-                "Unable to read from \"%s\"", conf->fn_in);
+                "Failed to read from \"%s\"", conf->fn_in);
         }
     }
     if (conf->fn_out) {
@@ -641,7 +641,7 @@ open_files (conf_t conf)
         }
         else if (!(conf->fp_out = fopen (conf->fn_out, "w"))) {
             log_errno (EMUNGE_SNAFU, LOG_ERR,
-                "Unable to write to \"%s\"", conf->fn_out);
+                "Failed to write to \"%s\"", conf->fn_out);
         }
     }
     return;
@@ -663,13 +663,13 @@ encode_cred (conf_t conf)
     if (egid != conf->cgid) {
         if (setegid (conf->cgid) < 0) {
             log_errno (errno, LOG_ERR,
-                    "Unable to create credential for GID %u", conf->cgid);
+                    "Failed to create credential for GID %u", conf->cgid);
         }
     }
     if (euid != conf->cuid) {
         if (seteuid (conf->cuid) < 0) {
             log_errno (errno, LOG_ERR,
-                    "Unable to create credential for UID %u", conf->cuid);
+                    "Failed to create credential for UID %u", conf->cuid);
         }
     }
     conf->status = munge_encode (&conf->cred, conf->ctx,
@@ -678,13 +678,13 @@ encode_cred (conf_t conf)
     if (euid != conf->cuid) {
         if (seteuid (euid) < 0) {
             log_errno (errno, LOG_ERR,
-                    "Unable to restore privileges for UID %u", euid);
+                    "Failed to restore privileges for UID %u", euid);
         }
     }
     if (egid != conf->cgid) {
         if (setegid (egid) < 0) {
             log_errno (errno, LOG_ERR,
-                    "Unable to restore privileges for GID %u", egid);
+                    "Failed to restore privileges for GID %u", egid);
         }
     }
     return ((conf->status == EMUNGE_SUCCESS) ? 0 : -1);

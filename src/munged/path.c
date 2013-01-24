@@ -137,7 +137,7 @@ path_is_accessible (const char *path, char *errbuf, size_t errbuflen)
     }
     if (lstat (buf, &st) < 0) {
         return (_path_set_err (-1, errbuf, errbuflen,
-            "cannot check \"%s\": %s", buf, strerror (errno)));
+            "cannot stat \"%s\": %s", buf, strerror (errno)));
     }
     if (!S_ISDIR (st.st_mode)) {
         if ((p = strrchr (buf, '/'))) {
@@ -147,7 +147,7 @@ path_is_accessible (const char *path, char *errbuf, size_t errbuflen)
     while (buf[0] != '\0') {
         if (lstat (buf, &st) < 0) {
             return (_path_set_err (-1, errbuf, errbuflen,
-                "cannot check \"%s\": %s", buf, strerror (errno)));
+                "cannot stat \"%s\": %s", buf, strerror (errno)));
         }
         if (!S_ISDIR (st.st_mode)) {
             errno = EINVAL;
@@ -195,7 +195,7 @@ path_is_secure (const char *path, char *errbuf, size_t errbuflen)
     }
     if (lstat (buf, &st) < 0) {
         return (_path_set_err (-1, errbuf, errbuflen,
-            "cannot check \"%s\": %s", buf, strerror (errno)));
+            "cannot stat \"%s\": %s", buf, strerror (errno)));
     }
     if (!S_ISDIR (st.st_mode)) {
         if ((p = strrchr (buf, '/'))) {
@@ -208,7 +208,7 @@ path_is_secure (const char *path, char *errbuf, size_t errbuflen)
     while (buf[0] != '\0') {
         if (lstat (buf, &st) < 0) {
             return (_path_set_err (-1, errbuf, errbuflen,
-                "cannot check \"%s\": %s", buf, strerror (errno)));
+                "cannot stat \"%s\": %s", buf, strerror (errno)));
         }
         if (!S_ISDIR (st.st_mode)) {
             errno = EINVAL;

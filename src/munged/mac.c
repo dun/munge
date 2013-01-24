@@ -183,12 +183,12 @@ _mac_init (mac_ctx *x, munge_mac_t md, const void *key, int keylen)
         return (-1);
     }
     if ((e = gcry_md_open (&(x->ctx), algo, GCRY_MD_FLAG_HMAC)) != 0) {
-        log_msg (LOG_DEBUG, "gcry_md_open failed for mac=%d hmac: %s",
+        log_msg (LOG_DEBUG, "gcry_md_open failed for MAC=%d HMAC: %s",
             md, gcry_strerror (e));
         return (-1);
     }
     if ((e = gcry_md_setkey (x->ctx, key, keylen)) != 0) {
-        log_msg (LOG_DEBUG, "gcry_md_setkey failed for mac=%d hmac: %s",
+        log_msg (LOG_DEBUG, "gcry_md_setkey failed for MAC=%d HMAC: %s",
             md, gcry_strerror (e));
         return (-1);
     }
@@ -248,12 +248,12 @@ _mac_block (munge_mac_t md, const void *key, int keylen,
         return (-1);
     }
     if ((e = gcry_md_open (&ctx, algo, GCRY_MD_FLAG_HMAC)) != 0) {
-        log_msg (LOG_DEBUG, "gcry_md_open failed for mac=%d hmac: %s",
+        log_msg (LOG_DEBUG, "gcry_md_open failed for MAC=%d HMAC: %s",
             md, gcry_strerror (e));
         return (-1);
     }
     if ((e = gcry_md_setkey (ctx, key, keylen)) != 0) {
-        log_msg (LOG_DEBUG, "gcry_md_setkey failed for mac=%d hmac: %s",
+        log_msg (LOG_DEBUG, "gcry_md_setkey failed for MAC=%d HMAC: %s",
             md, gcry_strerror (e));
         gcry_md_close (ctx);
         return (-1);

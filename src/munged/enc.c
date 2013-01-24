@@ -154,7 +154,7 @@ enc_validate_msg (m_msg_t m)
     }
     else if (mac_map_enum (m->mac, NULL) < 0) {
         return (m_msg_set_err (m, EMUNGE_BAD_MAC,
-            strdupf ("Invalid mac type %d", m->mac)));
+            strdupf ("Invalid MAC type %d", m->mac)));
     }
     assert (m->mac != MUNGE_MAC_NONE);
     /*
@@ -164,7 +164,7 @@ enc_validate_msg (m_msg_t m)
      */
     if (mac_size (m->mac) < cipher_key_size (m->cipher)) {
         return (m_msg_set_err (m, EMUNGE_BAD_MAC,
-            strdupf ("Invalid mac type %d with cipher type %d",
+            strdupf ("Invalid MAC type %d with cipher type %d",
             m->mac, m->cipher)));
     }
     /*  Validate compression type.
@@ -224,7 +224,7 @@ enc_init (munge_cred_t c)
         c->iv_len = cipher_iv_size (m->cipher);
         if (c->iv_len < 0) {
             return (m_msg_set_err (m, EMUNGE_SNAFU,
-                strdupf ("Unable to determine iv length for cipher type %d",
+                strdupf ("Failed to determine IV length for cipher type %d",
                 m->cipher)));
         }
         if (c->iv_len > 0) {
@@ -252,7 +252,7 @@ enc_authenticate (munge_cred_t c)
      */
     if (auth_recv (m, p_uid, p_gid) != EMUNGE_SUCCESS) {
         return (m_msg_set_err (m, EMUNGE_SNAFU,
-            strdup ("Unable to determine identity of client")));
+            strdup ("Failed to determine client identity")));
     }
     return (0);
 }
@@ -267,12 +267,12 @@ enc_check_retry (munge_cred_t c)
 
     if (m->retry > 0) {
         log_msg (LOG_INFO,
-            "Encode retry #%d for client uid=%d gid=%d",
+            "Encode retry #%d for client UID=%d GID=%d",
             m->retry, m->client_uid, m->client_gid);
     }
     if (m->retry > MUNGE_SOCKET_RETRY_ATTEMPTS) {
         return (m_msg_set_err (m, EMUNGE_SOCKET,
-            strdupf ("Exceeded maximum transaction retry attempts")));
+            strdupf ("Exceeded maximum number of encode attempts")));
     }
     return (0);
 }
@@ -290,7 +290,7 @@ enc_timestamp (munge_cred_t c)
      */
     if (time (&now) == ((time_t) -1)) {
         return (m_msg_set_err (m, EMUNGE_SNAFU,
-            strdup ("Unable to query current time")));
+            strdup ("Failed to query current time")));
     }
     m->time0 = now;                     /* potential 64b value for 32b var */
     m->time1 = 0;
@@ -512,7 +512,7 @@ err:
         free (buf);
     }
     return (m_msg_set_err (m, EMUNGE_SNAFU,
-        strdup ("Unable to compress credential")));
+        strdup ("Failed to compress credential")));
 }
 
 
@@ -531,7 +531,7 @@ enc_mac (munge_cred_t c)
     c->mac_len = mac_size (m->mac);
     if (c->mac_len <= 0) {
         return (m_msg_set_err (m, EMUNGE_SNAFU,
-            strdupf ("Unable to determine digest length for mac type %d",
+            strdupf ("Failed to determine digest length for MAC type %d",
                 m->mac)));
     }
     assert (c->mac_len <= sizeof (c->mac));
@@ -562,7 +562,7 @@ err_cleanup:
     mac_cleanup (&x);
 err:
     return (m_msg_set_err (m, EMUNGE_SNAFU,
-        strdup ("Unable to mac credential")));
+        strdup ("Failed to MAC credential")));
 }
 
 
@@ -590,7 +590,7 @@ enc_encrypt (munge_cred_t c)
     c->dek_len = mac_size (m->mac);
     if (c->dek_len <= 0) {
         return (m_msg_set_err (m, EMUNGE_SNAFU,
-            strdupf ("Unable to determine dek key length for mac type %d",
+            strdupf ("Failed to determine DEK key length for MAC type %d",
                 m->mac)));
     }
     assert (c->dek_len <= sizeof (c->dek));
@@ -599,7 +599,7 @@ enc_encrypt (munge_cred_t c)
     if (mac_block (m->mac, conf->dek_key, conf->dek_key_len,
             c->dek, &n, c->mac, c->mac_len) < 0) {
         return (m_msg_set_err (m, EMUNGE_SNAFU,
-            strdup ("Unable to compute dek")));
+            strdup ("Failed to compute DEK")));
     }
     assert (n <= c->dek_len);
     assert (n >= cipher_key_size (m->cipher));
@@ -610,7 +610,7 @@ enc_encrypt (munge_cred_t c)
     n = cipher_block_size (m->cipher);
     if (n <= 0) {
         return (m_msg_set_err (m, EMUNGE_SNAFU,
-            strdupf ("Unable to determine block size for cipher type %d",
+            strdupf ("Failed to determine block size for cipher type %d",
                 m->cipher)));
     }
     buf_len = c->inner_len + n;
@@ -659,7 +659,7 @@ err:
     memset (buf, 0, buf_len);
     free (buf);
     return (m_msg_set_err (m, EMUNGE_SNAFU,
-        strdup ("Unable to encrypt credential")));
+        strdup ("Failed to encrypt credential")));
 }
 
 
@@ -762,7 +762,7 @@ err:
     memset (buf, 0, buf_len);
     free (buf);
     return (m_msg_set_err (m, EMUNGE_SNAFU,
-        strdup ("Unable to base64-encode credential")));
+        strdup ("Failed to base64-encode credential")));
 }
 
 

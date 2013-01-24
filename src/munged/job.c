@@ -80,7 +80,7 @@ job_accept (conf_t conf)
 
     if (!(w = work_init ((work_func_t) _job_exec, conf->nthreads))) {
         log_errno (EMUNGE_SNAFU, LOG_ERR,
-            "Unable to create %d work thread%s", conf->nthreads,
+            "Failed to create %d work thread%s", conf->nthreads,
             ((conf->nthreads > 1) ? "s" : ""));
     }
     log_msg (LOG_INFO, "Created %d work thread%s", conf->nthreads,
@@ -102,7 +102,7 @@ job_accept (conf_t conf)
                     continue;
                 default:
                     log_errno (EMUNGE_SNAFU, LOG_ERR,
-                        "Unable to accept connection");
+                        "Failed to accept connection");
                     break;
             }
         }
@@ -120,20 +120,20 @@ job_accept (conf_t conf)
         if (fd_set_nonblocking (sd) < 0) {
             close (sd);
             log_msg (LOG_WARNING,
-                "Unable to set nonblocking client socket: %s",
+                "Failed to set nonblocking client socket: %s",
                 strerror (errno));
         }
         else if (m_msg_create (&m) != EMUNGE_SUCCESS) {
             close (sd);
-            log_msg (LOG_WARNING, "Unable to create client request");
+            log_msg (LOG_WARNING, "Failed to create client request");
         }
         else if (m_msg_bind (m, sd) != EMUNGE_SUCCESS) {
             m_msg_destroy (m);
-            log_msg (LOG_WARNING, "Unable to bind socket for client request");
+            log_msg (LOG_WARNING, "Failed to bind socket for client request");
         }
         else if (work_queue (w, m) < 0) {
             m_msg_destroy (m);
-            log_msg (LOG_WARNING, "Unable to queue client request");
+            log_msg (LOG_WARNING, "Failed to queue client request");
         }
     }
     log_msg (LOG_NOTICE, "Exiting on signal=%d", done);

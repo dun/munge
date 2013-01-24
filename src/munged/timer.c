@@ -132,16 +132,16 @@ timer_init (void)
 
     if ((errno = pthread_attr_init (&tattr)) != 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR,
-                "Unable to init timer thread attribute");
+                "Failed to init timer thread attribute");
     }
 #ifdef _POSIX_THREAD_ATTR_STACKSIZE
     if ((errno = pthread_attr_setstacksize (&tattr, stacksize)) != 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR,
-                "Unable to set timer thread stacksize");
+                "Failed to set timer thread stacksize");
     }
     if ((errno = pthread_attr_getstacksize (&tattr, &stacksize)) != 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR,
-                "Unable to get timer thread stacksize");
+                "Failed to get timer thread stacksize");
     }
     log_msg (LOG_DEBUG, "Set timer thread stacksize to %d", (int) stacksize);
 #endif /* _POSIX_THREAD_ATTR_STACKSIZE */
@@ -149,11 +149,11 @@ timer_init (void)
     if ((errno = pthread_create (&_timer_tid, &tattr, _timer_thread, NULL))
             != 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR,
-                "Unable to create timer thread");
+                "Failed to create timer thread");
     }
     if ((errno = pthread_attr_destroy (&tattr)) != 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR,
-                "Unable to destroy timer thread attribute");
+                "Failed to destroy timer thread attribute");
     }
     return;
 }
@@ -170,10 +170,10 @@ timer_fini (void)
         return;
     }
     if ((errno = pthread_cancel (_timer_tid)) != 0) {
-        log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to cancel timer thread");
+        log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to cancel timer thread");
     }
     if ((errno = pthread_join (_timer_tid, &result)) != 0) {
-        log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to join timer thread");
+        log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to join timer thread");
     }
     if (result != PTHREAD_CANCELED) {
         log_err (EMUNGE_SNAFU, LOG_ERR, "Timer thread was not canceled");
@@ -181,7 +181,7 @@ timer_fini (void)
     _timer_tid = 0;
 
     if ((errno = pthread_mutex_lock (&_timer_mutex)) != 0) {
-        log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to lock timer mutex");
+        log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to lock timer mutex");
     }
     /*  Cancel pending timers by moving active timers to the inactive list.
      */
@@ -202,7 +202,7 @@ timer_fini (void)
         free (t);
     }
     if ((errno = pthread_mutex_unlock (&_timer_mutex)) != 0) {
-        log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to unlock timer mutex");
+        log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to unlock timer mutex");
     }
     return;
 }
@@ -220,10 +220,10 @@ timer_set_absolute (callback_f cb, void *arg, const struct timespec *tsp)
         return (-1);
     }
     if ((errno = pthread_mutex_lock (&_timer_mutex)) != 0) {
-        log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to lock timer mutex");
+        log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to lock timer mutex");
     }
     if (!(t = _timer_alloc ())) {
-        log_errno (EMUNGE_NO_MEMORY, LOG_ERR, "Unable to allocate timer");
+        log_errno (EMUNGE_NO_MEMORY, LOG_ERR, "Failed to allocate timer");
     }
     /*  Initialize the timer.
      */
@@ -252,12 +252,12 @@ timer_set_absolute (callback_f cb, void *arg, const struct timespec *tsp)
         do_signal = 1;
     }
     if ((errno = pthread_mutex_unlock (&_timer_mutex)) != 0) {
-        log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to unlock timer mutex");
+        log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to unlock timer mutex");
     }
     if (do_signal) {
         if ((errno = pthread_cond_signal (&_timer_cond)) != 0) {
             log_errno (EMUNGE_SNAFU, LOG_ERR,
-                    "Unable to signal timer condition");
+                    "Failed to signal timer condition");
         }
     }
     assert (t->id > 0);
@@ -298,7 +298,7 @@ timer_cancel (long id)
         return (-1);
     }
     if ((errno = pthread_mutex_lock (&_timer_mutex)) != 0) {
-        log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to lock timer mutex");
+        log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to lock timer mutex");
     }
     /*  Locate the active timer specified by [id].
      */
@@ -322,12 +322,12 @@ timer_cancel (long id)
         }
     }
     if ((errno = pthread_mutex_unlock (&_timer_mutex)) != 0) {
-        log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to unlock timer mutex");
+        log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to unlock timer mutex");
     }
     if (do_signal) {
         if ((errno = pthread_cond_signal (&_timer_cond)) != 0) {
             log_errno (EMUNGE_SNAFU, LOG_ERR,
-                "Unable to signal timer condition");
+                "Failed to signal timer condition");
         }
     }
     return (t ? 1 : 0);
@@ -355,13 +355,13 @@ _timer_thread (void *arg)
 #endif /* _TIMER_CLOCK_CHECK */
 
     if (sigfillset (&sigset)) {
-        log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to init timer sigset");
+        log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to init timer sigset");
     }
     if (pthread_sigmask (SIG_SETMASK, &sigset, NULL) != 0) {
-        log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to set timer sigset");
+        log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to set timer sigset");
     }
     if ((errno = pthread_mutex_lock (&_timer_mutex)) != 0) {
-        log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to lock timer mutex");
+        log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to lock timer mutex");
     }
     pthread_cleanup_push (_timer_thread_cleanup, NULL);
 
@@ -376,7 +376,7 @@ _timer_thread (void *arg)
             if ((errno = pthread_cond_wait (&_timer_cond, &_timer_mutex)) != 0)
             {
                 log_errno (EMUNGE_SNAFU, LOG_ERR,
-                        "Unable to wait on timer condition");
+                        "Failed to wait on timer condition");
             }
         }
         /*  Disable the thread's cancellation state in case any
@@ -385,7 +385,7 @@ _timer_thread (void *arg)
         errno = pthread_setcancelstate (PTHREAD_CANCEL_DISABLE, &cancel_state);
         if (errno != 0) {
             log_errno (EMUNGE_SNAFU, LOG_ERR,
-                    "Unable to disable timer thread cancellation");
+                    "Failed to disable timer thread cancellation");
         }
         _timer_get_timespec (&ts_now);
 
@@ -426,7 +426,7 @@ _timer_thread (void *arg)
              */
             if ((errno = pthread_mutex_unlock (&_timer_mutex)) != 0) {
                 log_errno (EMUNGE_SNAFU, LOG_ERR,
-                        "Unable to unlock timer mutex");
+                        "Failed to unlock timer mutex");
             }
             /*  Dispatch expired timers.
              */
@@ -437,7 +437,7 @@ _timer_thread (void *arg)
             }
             if ((errno = pthread_mutex_lock (&_timer_mutex)) != 0) {
                 log_errno (EMUNGE_SNAFU, LOG_ERR,
-                        "Unable to lock timer mutex");
+                        "Failed to lock timer mutex");
             }
             /*  Move the expired timers onto the inactive list.
              *  At the end of the previous while-loop, t_prev_ptr is the
@@ -457,7 +457,7 @@ _timer_thread (void *arg)
         errno = pthread_setcancelstate (cancel_state, &cancel_state);
         if (errno != 0) {
             log_errno (EMUNGE_SNAFU, LOG_ERR,
-                    "Unable to enable timer thread cancellation");
+                    "Failed to enable timer thread cancellation");
         }
         /*  Wait until the next active timer is set to expire,
          *    or until the active timer changes.
@@ -476,7 +476,7 @@ _timer_thread (void *arg)
                 break;
             }
             log_errno (EMUNGE_SNAFU, LOG_ERR,
-                    "Unable to wait on timer condition");
+                    "Failed to wait on timer condition");
         }
     }
     assert (1);                         /* not reached */
@@ -492,7 +492,7 @@ _timer_thread_cleanup (void *arg)
  *    It ensures the mutex is released when the thread is canceled.
  */
     if ((errno = pthread_mutex_unlock (&_timer_mutex)) != 0) {
-        log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to unlock timer mutex");
+        log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to unlock timer mutex");
     }
     return;
 }
@@ -530,7 +530,7 @@ _timer_get_timespec (struct timespec *tsp)
     assert (tsp != NULL);
 
     if (gettimeofday (&tv, NULL) < 0) {
-        log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to get time of day");
+        log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to query current time");
     }
     tsp->tv_sec = tv.tv_sec;
     tsp->tv_nsec = tv.tv_usec * 1000;

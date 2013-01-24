@@ -153,10 +153,10 @@ gids_create (int interval, int do_group_stat)
     }
     if (!(gids = malloc (sizeof (*gids)))) {
         log_errno (EMUNGE_NO_MEMORY, LOG_ERR,
-            "Unable to allocate gids struct");
+            "Failed to allocate gids struct");
     }
     if ((errno = pthread_mutex_init (&gids->mutex, NULL)) != 0) {
-        log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to init gids mutex");
+        log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to init gids mutex");
     }
     gids->hash = NULL;
     gids->timer = 0;
@@ -189,7 +189,7 @@ gids_destroy (gids_t gids)
         return;
     }
     if ((errno = pthread_mutex_lock (&gids->mutex)) != 0) {
-        log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to lock gids mutex");
+        log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to lock gids mutex");
     }
     if (gids->timer > 0) {
         timer_cancel (gids->timer);
@@ -199,12 +199,12 @@ gids_destroy (gids_t gids)
     gids->hash = NULL;
 
     if ((errno = pthread_mutex_unlock (&gids->mutex)) != 0) {
-        log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to unlock gids mutex");
+        log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to unlock gids mutex");
     }
     hash_destroy (h);
 
     if ((errno = pthread_mutex_destroy (&gids->mutex)) != 0) {
-        log_msg (LOG_ERR, "Unable to destroy gids mutex: %s",
+        log_msg (LOG_ERR, "Failed to destroy gids mutex: %s",
             strerror (errno));
     }
     free (gids);
@@ -219,7 +219,7 @@ gids_update (gids_t gids)
         return;
     }
     if ((errno = pthread_mutex_lock (&gids->mutex)) != 0) {
-        log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to lock gids mutex");
+        log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to lock gids mutex");
     }
     /*  Cancel a pending update before scheduling a new one.
      */
@@ -230,7 +230,7 @@ gids_update (gids_t gids)
      */
     gids->timer = timer_set_relative ((callback_f) _gids_update, gids, 0);
     if (gids->timer < 0) {
-        log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to set gids update timer");
+        log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to set gids update timer");
     }
     /*  Reset the do_group_stat flag in case it had been disabled on error
      *    (ie, set to -1).
@@ -238,7 +238,7 @@ gids_update (gids_t gids)
     gids->do_group_stat = !! gids->do_group_stat;
 
     if ((errno = pthread_mutex_unlock (&gids->mutex)) != 0) {
-        log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to unlock gids mutex");
+        log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to unlock gids mutex");
     }
     return;
 }
@@ -255,7 +255,7 @@ gids_is_member (gids_t gids, uid_t uid, gid_t gid)
         return (0);
     }
     if ((errno = pthread_mutex_lock (&gids->mutex)) != 0) {
-        log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to lock gids mutex");
+        log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to lock gids mutex");
     }
     if ((gids->hash) && (g = hash_find (gids->hash, &uid))) {
         assert (g->uid == uid);
@@ -267,7 +267,7 @@ gids_is_member (gids_t gids, uid_t uid, gid_t gid)
         }
     }
     if ((errno = pthread_mutex_unlock (&gids->mutex)) != 0) {
-        log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to unlock gids mutex");
+        log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to unlock gids mutex");
     }
     return (is_member);
 }
@@ -291,16 +291,16 @@ _gids_update (gids_t gids)
     assert (gids != NULL);
 
     if ((errno = pthread_mutex_lock (&gids->mutex)) != 0) {
-        log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to lock gids mutex");
+        log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to lock gids mutex");
     }
     do_group_stat = gids->do_group_stat;
     t_last_update = gids->t_last_update;
 
     if ((errno = pthread_mutex_unlock (&gids->mutex)) != 0) {
-        log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to unlock gids mutex");
+        log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to unlock gids mutex");
     }
     if (time (&t_now) == (time_t) -1) {
-        log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to query current time");
+        log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to query current time");
     }
     if (do_group_stat > 0) {
 
@@ -310,7 +310,7 @@ _gids_update (gids_t gids)
          */
         if (stat (GIDS_GROUP_FILE, &st) < 0) {
             do_group_stat = -2;
-            log_msg (LOG_ERR, "Unable to stat \"%s\": %s",
+            log_msg (LOG_ERR, "Failed to stat \"%s\": %s",
                 GIDS_GROUP_FILE, strerror (errno));
         }
         else if (st.st_mtime <= t_last_update) {
@@ -323,7 +323,7 @@ _gids_update (gids_t gids)
         hash = _gids_hash_create ();
     }
     if ((errno = pthread_mutex_lock (&gids->mutex)) != 0) {
-        log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to lock gids mutex");
+        log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to lock gids mutex");
     }
     /*  Replace the old GIDs mapping if the update was successful.
      */
@@ -352,11 +352,11 @@ _gids_update (gids_t gids)
                 (callback_f) _gids_update, gids, gids->interval * 1000);
         if (gids->timer < 0) {
             log_errno (EMUNGE_SNAFU, LOG_ERR,
-                "Unable to reset gids update timer");
+                "Failed to reset gids update timer");
         }
     }
     if ((errno = pthread_mutex_unlock (&gids->mutex)) != 0) {
-        log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to unlock gids mutex");
+        log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to unlock gids mutex");
     }
     /*  Clean up.
      */
@@ -393,18 +393,18 @@ _gids_hash_create (void)
             (hash_cmp_f) _gids_node_cmp, (hash_del_f) _gids_head_del);
 
     if (!gid_hash) {
-        log_msg (LOG_ERR, "Unable to allocate gids hash -- out of memory");
+        log_msg (LOG_ERR, "Failed to allocate gids hash");
         goto err;
     }
     uid_hash = hash_create (UIDS_HASH_SIZE, (hash_key_f) hash_key_string,
             (hash_cmp_f) _gids_uid_cmp, (hash_del_f) _gids_uid_del);
 
     if (!uid_hash) {
-        log_msg (LOG_ERR, "Unable to allocate uids hash -- out of memory");
+        log_msg (LOG_ERR, "Failed to allocate uids hash");
         goto err;
     }
     if (gettimeofday (&t_start, NULL) < 0) {
-        log_msg (LOG_ERR, "Unable to query current time");
+        log_msg (LOG_ERR, "Failed to query current time");
         goto err;
     }
     /*  Allocate memory for both the xgetgrent() and xgetpwnam() buffers here.
@@ -413,11 +413,11 @@ _gids_hash_create (void)
      *    throughout a given GIDs creation cycle.
      */
     if (!(grbufp = xgetgrent_buf_create (grbuflen))) {
-        log_msg (LOG_ERR, "Unable to allocate group entry buffer");
+        log_msg (LOG_ERR, "Failed to allocate group entry buffer");
         goto err;
     }
     if (!(pwbufp = xgetpwnam_buf_create (pwbuflen))) {
-        log_msg (LOG_ERR, "Unable to allocate password entry buffer");
+        log_msg (LOG_ERR, "Failed to allocate password entry buffer");
         goto err;
     }
     do_group_db_close = 1;
@@ -437,7 +437,7 @@ restart:
                 hash_reset (gid_hash);
                 goto restart;
             }
-            log_msg (LOG_ERR, "Unable to query group info: %s",
+            log_msg (LOG_ERR, "Failed to query group info: %s",
                     strerror (errno));
             goto err;
         }
@@ -465,7 +465,7 @@ restart:
     xgetgrent_buf_destroy (grbufp);
 
     if (gettimeofday (&t_stop, NULL) < 0) {
-        log_msg (LOG_ERR, "Unable to query current time");
+        log_msg (LOG_ERR, "Failed to query current time");
         goto err;
     }
 
@@ -521,18 +521,18 @@ _gids_user_to_uid (hash_t uid_hash, char *user, uid_t *uidp, xpwbuf_p pwbufp)
         uid = pw.pw_uid;
         if (!(u = _gids_uid_alloc (user, uid))) {
             log_msg (LOG_WARNING,
-                "Unable to allocate uid node for %s/%d -- out of memory",
+                "Failed to allocate uid node for %s/%d",
                 user, uid);
         }
         else if (!hash_insert (uid_hash, u->user, u)) {
             log_msg (LOG_WARNING,
-                "Unable to insert uid node for %s/%d into hash", user, uid);
+                "Failed to insert uid node for %s/%d into hash", user, uid);
             _gids_uid_del (u);
         }
     }
     else {
         log_msg (LOG_INFO,
-            "Unable to query password file entry for \"%s\"", user);
+            "Failed to query password file entry for \"%s\"", user);
         return (-1);
     }
 
@@ -556,11 +556,11 @@ _gids_hash_add (hash_t hash, uid_t uid, gid_t gid)
 
     if (!(g = hash_find (hash, &uid))) {
         if (!(g = _gids_head_alloc (uid))) {
-            log_msg (LOG_ERR, "Unable to allocate gids node -- out of memory");
+            log_msg (LOG_ERR, "Failed to allocate gids node");
             return (-1);
         }
         if (!hash_insert (hash, &g->uid, g)) {
-            log_msg (LOG_ERR, "Unable to insert gids node into hash");
+            log_msg (LOG_ERR, "Failed to insert gids node into hash");
             _gids_head_del (g);
             return (-1);
         }
@@ -575,7 +575,7 @@ _gids_hash_add (hash_t hash, uid_t uid, gid_t gid)
         return (0);
     }
     if (!(node = _gids_node_alloc (gid))) {
-        log_msg (LOG_ERR, "Unable to allocate gids node -- out of memory");
+        log_msg (LOG_ERR, "Failed to allocate gids node");
         return (-1);
     }
     node->next = *nodep;

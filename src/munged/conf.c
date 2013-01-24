@@ -106,7 +106,7 @@ create_conf (void)
     conf_t conf;
 
     if (!(conf = malloc (sizeof (struct conf)))) {
-        log_errno (EMUNGE_NO_MEMORY, LOG_ERR, "Unable to create conf");
+        log_errno (EMUNGE_NO_MEMORY, LOG_ERR, "Failed to allocate conf");
     }
     conf->ld = -1;
     conf->got_clock_skew = 1;
@@ -129,20 +129,23 @@ create_conf (void)
 
     if (!(conf->logfile_name = strdup (MUNGED_LOGFILE))) {
         log_errno (EMUNGE_NO_MEMORY, LOG_ERR,
-            "Cannot dup logfile name string");
+            "Failed to copy logfile name string");
     }
     if (!(conf->pidfile_name = strdup (MUNGED_PIDFILE))) {
         log_errno (EMUNGE_NO_MEMORY, LOG_ERR,
-            "Cannot dup pidfile name string");
+            "Failed to copy pidfile name string");
     }
     if (!(conf->socket_name = strdup (MUNGE_SOCKET_NAME))) {
-        log_errno (EMUNGE_NO_MEMORY, LOG_ERR, "Cannot dup socket name string");
+        log_errno (EMUNGE_NO_MEMORY, LOG_ERR,
+            "Failed to copy socket name string");
     }
     if (!(conf->seed_name = strdup (MUNGED_RANDOM_SEED))) {
-        log_errno (EMUNGE_NO_MEMORY, LOG_ERR, "Cannot dup seed name string");
+        log_errno (EMUNGE_NO_MEMORY, LOG_ERR,
+            "Failed to copy seed name string");
     }
     if (!(conf->key_name = strdup (MUNGED_SECRET_KEY))) {
-        log_errno (EMUNGE_NO_MEMORY, LOG_ERR, "Cannot dup key name string");
+        log_errno (EMUNGE_NO_MEMORY, LOG_ERR,
+            "Failed to copy key name string");
     }
     conf->dek_key = NULL;
     conf->dek_key_len = 0;
@@ -156,11 +159,11 @@ create_conf (void)
 
     if (!(conf->auth_server_dir = strdup (MUNGE_AUTH_SERVER_DIR))) {
         log_errno (EMUNGE_NO_MEMORY, LOG_ERR,
-            "Cannot dup auth-server-dir default string");
+            "Failed to copy auth-server-dir default string");
     }
     if (!(conf->auth_client_dir = strdup (MUNGE_AUTH_CLIENT_DIR))) {
         log_errno (EMUNGE_NO_MEMORY, LOG_ERR,
-            "Cannot dup auth-client-dir default string");
+            "Failed to copy auth-client-dir default string");
     }
 #endif /* AUTH_METHOD_RECVFD_MKFIFO || AUTH_METHOD_RECVFD_MKNOD */
 
@@ -273,7 +276,7 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                     free (conf->socket_name);
                 if (!(conf->socket_name = strdup (optarg)))
                     log_errno (EMUNGE_NO_MEMORY, LOG_ERR,
-                        "Cannot dup socket name string");
+                        "Failed to copy socket name string");
                 break;
             case 'A':
                 printf ("Don't Panic!\n");
@@ -284,7 +287,7 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                     free (conf->key_name);
                 if (!(conf->key_name = strdup (optarg)))
                     log_errno (EMUNGE_NO_MEMORY, LOG_ERR,
-                        "Cannot dup key-file name string");
+                        "Failed to copy key-file name string");
                 break;
             case '1':
                 errno = 0;
@@ -303,14 +306,14 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                     free (conf->auth_server_dir);
                 if (!(conf->auth_server_dir = strdup (optarg)))
                     log_errno (EMUNGE_NO_MEMORY, LOG_ERR,
-                        "Cannot dup auth-server-dir cmdline string");
+                        "Failed to copy auth-server-dir cmdline string");
                 break;
             case '3':
                 if (conf->auth_client_dir)
                     free (conf->auth_client_dir);
                 if (!(conf->auth_client_dir = strdup (optarg)))
                     log_errno (EMUNGE_NO_MEMORY, LOG_ERR,
-                        "Cannot dup auth-client-dir cmdline string");
+                        "Failed to copy auth-client-dir cmdline string");
                 break;
 #endif /* AUTH_METHOD_RECVFD_MKFIFO || AUTH_METHOD_RECVFD_MKNOD */
             case '4':
@@ -346,7 +349,7 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                 }
                 else {
                     log_err (EMUNGE_SNAFU, LOG_ERR,
-                        "Unable to process command-line");
+                        "Failed to process command-line");
                 }
                 break;
             case ':':
@@ -362,7 +365,7 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                 }
                 else {
                     log_err (EMUNGE_SNAFU, LOG_ERR,
-                        "Unable to process command-line");
+                        "Failed to process command-line");
                 }
                 break;
             default:
@@ -468,25 +471,25 @@ create_subkeys (conf_t conf)
      */
     if ((conf->dek_key_len = md_size (MUNGE_MAC_SHA1)) <= 0) {
         log_err (EMUNGE_NO_MEMORY, LOG_ERR,
-            "Unable to determine dek key length");
+            "Failed to determine DEK key length");
     }
     if (!(conf->dek_key = malloc (conf->dek_key_len))) {
         log_err (EMUNGE_NO_MEMORY, LOG_ERR,
-            "Unable to allocate %d bytes for cipher subkey",
+            "Failed to allocate %d bytes for cipher subkey",
             conf->dek_key_len);
     }
     if ((conf->mac_key_len = md_size (MUNGE_MAC_SHA1)) <= 0) {
         log_err (EMUNGE_NO_MEMORY, LOG_ERR,
-            "Unable to determine mac key length");
+            "Failed to determine MAC key length");
     }
     if (!(conf->mac_key = malloc (conf->mac_key_len))) {
         log_err (EMUNGE_NO_MEMORY, LOG_ERR,
-            "Unable to allocate %d bytes for mac subkey",
+            "Failed to allocate %d bytes for MAC subkey",
             conf->mac_key_len);
     }
     if (md_init (&dek_ctx, MUNGE_MAC_SHA1) < 0) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
-            "Unable to compute subkeys: Cannot init md ctx");
+            "Failed to compute subkeys: Cannot init md ctx");
     }
     /*  Compute keyfile's message digest.
      */
@@ -502,14 +505,15 @@ create_subkeys (conf_t conf)
             continue;
         if (n < 0)
             log_errno (EMUNGE_SNAFU, LOG_ERR,
-                "Unable to read keyfile \"%s\"", conf->key_name);
+                "Failed to read keyfile \"%s\"", conf->key_name);
         if (md_update (&dek_ctx, buf, n) < 0)
-            log_err (EMUNGE_SNAFU, LOG_ERR, "Unable to compute subkeys");
+            log_err (EMUNGE_SNAFU, LOG_ERR,
+                "Failed to compute subkeys: Cannot update md ctx");
         n_total += n;
     }
     if (close (fd) < 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR,
-            "Unable to close keyfile \"%s\"", conf->key_name);
+            "Failed to close keyfile \"%s\"", conf->key_name);
     }
     if (n_total < MUNGE_MINIMUM_SECRET_KEY_LEN) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
@@ -517,7 +521,7 @@ create_subkeys (conf_t conf)
     }
     if (md_copy (&mac_ctx, &dek_ctx) < 0) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
-            "Unable to compute subkeys: Cannot copy md ctx");
+            "Failed to compute subkeys: Cannot copy md ctx");
     }
     /*  Append "1" to keyfile in order to compute cipher subkey.
      */
@@ -525,7 +529,7 @@ create_subkeys (conf_t conf)
     if ( (md_update (&dek_ctx, "1", 1) < 0)
       || (md_final (&dek_ctx, conf->dek_key, &n) < 0)
       || (md_cleanup (&dek_ctx) < 0) ) {
-        log_err (EMUNGE_SNAFU, LOG_ERR, "Unable to compute cipher subkey");
+        log_err (EMUNGE_SNAFU, LOG_ERR, "Failed to compute cipher subkey");
     }
     assert (n <= conf->dek_key_len);
 
@@ -535,7 +539,7 @@ create_subkeys (conf_t conf)
     if ( (md_update (&mac_ctx, "2", 1) < 0)
       || (md_final (&mac_ctx, conf->mac_key, &n) < 0)
       || (md_cleanup (&mac_ctx) < 0) ) {
-        log_err (EMUNGE_SNAFU, LOG_ERR, "Unable to compute mac subkey");
+        log_err (EMUNGE_SNAFU, LOG_ERR, "Failed to compute MAC subkey");
     }
     assert (n <= conf->mac_key_len);
 
@@ -551,7 +555,7 @@ lookup_ip_addr (conf_t conf)
     struct hostent *hptr;
 
     if (gethostname (hostname, sizeof (hostname)) < 0) {
-        log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to determine hostname");
+        log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to determine hostname");
     }
     /*  The man page doesn't say what happens if the buffer is overrun,
      *    so guarantee buffer NUL-termination just in case.
@@ -566,13 +570,13 @@ lookup_ip_addr (conf_t conf)
      */
     if (!(hptr = gethostbyname (hostname))) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
-            "Unable to resolve host \"%s\"", hostname);
+            "Failed to resolve host \"%s\"", hostname);
     }
     assert (sizeof (conf->addr) == hptr->h_length);
     memcpy (&conf->addr, hptr->h_addr_list[0], sizeof (conf->addr));
 
     if (!inet_ntop (AF_INET, &conf->addr, ip_buf, sizeof (ip_buf))) {
-        log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to determine ip address");
+        log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to determine IP address");
     }
     log_msg (LOG_NOTICE, "Running on \"%s\" (%s)", hptr->h_name, ip_buf);
     return;
@@ -604,7 +608,7 @@ _conf_open_keyfile (const char *keyfile, int got_force)
 
     if (stat (keyfile, &st) < 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR,
-            "Cannot check keyfile \"%s\"", keyfile);
+            "Failed to check keyfile \"%s\"", keyfile);
     }
     if (!S_ISREG (st.st_mode) || got_symlink) {
         if (!got_force)
@@ -619,11 +623,11 @@ _conf_open_keyfile (const char *keyfile, int got_force)
     if (st.st_uid != geteuid ()) {
         if (!got_force)
             log_err (EMUNGE_SNAFU, LOG_ERR,
-                "Keyfile is insecure: \"%s\" should be owned by uid=%u",
+                "Keyfile is insecure: \"%s\" should be owned by UID %u",
                 keyfile, (unsigned) geteuid ());
         else
             log_msg (LOG_WARNING,
-                "Keyfile is insecure: \"%s\" should be owned by uid=%u",
+                "Keyfile is insecure: \"%s\" should be owned by UID %u",
                 keyfile, (unsigned) geteuid ());
     }
     if (st.st_mode & (S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH)) {
@@ -640,12 +644,12 @@ _conf_open_keyfile (const char *keyfile, int got_force)
      */
     if (path_dirname (keyfile, keydir, sizeof (keydir)) < 0) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
-            "Cannot determine dirname of keyfile \"%s\"", keyfile);
+            "Failed to determine dirname of keyfile \"%s\"", keyfile);
     }
     n = path_is_secure (keydir, ebuf, sizeof (ebuf));
     if (n < 0) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
-            "Cannot check keyfile dir \"%s\": %s", keydir, ebuf);
+            "Failed to check keyfile dir \"%s\": %s", keydir, ebuf);
     }
     else if ((n == 0) && (!got_force)) {
         log_err (EMUNGE_SNAFU, LOG_ERR, "Keyfile is insecure: %s", ebuf);
@@ -657,7 +661,7 @@ _conf_open_keyfile (const char *keyfile, int got_force)
      */
     if ((fd = open (keyfile, O_RDONLY)) < 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR,
-            "Unable to open keyfile \"%s\"", keyfile);
+            "Failed to open keyfile \"%s\"", keyfile);
     }
     return (fd);
 }

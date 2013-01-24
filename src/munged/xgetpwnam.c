@@ -264,7 +264,7 @@ restart:
 #elif HAVE_GETPWNAM
     if ((rv_mutex = pthread_mutex_lock (&mutex)) != 0) {
         errno = rv_mutex;
-        log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to lock xgetpwnam mutex");
+        log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to lock xgetpwnam mutex");
     }
     rv_pwp = getpwnam (user);
     /*
@@ -292,7 +292,7 @@ restart:
     }
     if ((rv_mutex = pthread_mutex_unlock (&mutex)) != 0) {
         errno = rv_mutex;
-        log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to unlock xgetpwnam mutex");
+        log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to unlock xgetpwnam mutex");
     }
     if (rv_copy < 0) {
         return (-1);

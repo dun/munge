@@ -84,44 +84,44 @@ auth_send (m_msg_t m)
     char *estr;
 
     if (_recv_auth_req (m->sd, &pipe_name, &file_dir) < 0) {
-        estr = strdup ("Unable to receive auth request");
+        estr = strdup ("Failed to receive auth request");
         goto err;
     }
     assert (pipe_name != NULL);
     if (_name_auth_file (pipe_name, file_dir, &file_name) < 0) {
-        estr = strdup ("Unable to name auth file");
+        estr = strdup ("Failed to name auth file");
         goto err;
     }
     assert (file_name != NULL);
     unlink (file_name);                 /* in case it already exists */
 
     if ((file_fd= open (file_name, O_RDONLY | O_CREAT | O_EXCL, S_IRUSR)) <0) {
-        estr = strdupf ("Unable to open auth file \"%s\": %s",
+        estr = strdupf ("Failed to open auth file \"%s\": %s",
             file_name, strerror (errno));
         goto err;
     }
     if (unlink (file_name) < 0) {
-        estr = strdupf ("Unable to remove auth file \"%s\": %s",
+        estr = strdupf ("Failed to remove auth file \"%s\": %s",
             file_name, strerror (errno));
         goto err;
     }
     if ((pipe_fd = open (pipe_name, O_WRONLY)) < 0) {
-        estr = strdupf ("Unable to open auth pipe \"%s\": %s",
+        estr = strdupf ("Failed to open auth pipe \"%s\": %s",
             pipe_name, strerror (errno));
         goto err;
     }
     if (ioctl (pipe_fd, I_SENDFD, file_fd) < 0) {
-        estr = strdupf ("Unable to send client identity: %s",
+        estr = strdupf ("Failed to send client identity: %s",
             strerror (errno));
         goto err;
     }
     if (close (pipe_fd) < 0) {
-        estr = strdupf ("Unable to close auth pipe \"%s\": %s",
+        estr = strdupf ("Failed to close auth pipe \"%s\": %s",
             pipe_name, strerror (errno));
         goto err;
     }
     if (close (file_fd) < 0) {
-        estr = strdupf ("Unable to close auth file \"%s\": %s",
+        estr = strdupf ("Failed to close auth file \"%s\": %s",
             file_name, strerror (errno));
         goto err;
     }

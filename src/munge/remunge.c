@@ -168,7 +168,7 @@ void    output_msg (const char *format, ...);
     do {                                                                      \
         if (gettimeofday ((&TV), NULL) == -1) {                               \
             log_errno (EMUNGE_SNAFU, LOG_ERR,                                 \
-                "Unable to get the current time");                            \
+                "Failed to query current time");                              \
         }                                                                     \
     } while (0)
 
@@ -189,21 +189,21 @@ main (int argc, char *argv[])
     /*  FIXME: Revamp signal handlers.
      */
     if (posignal (SIGHUP, SIG_IGN) == SIG_ERR) {
-        log_err (EMUNGE_SNAFU, LOG_ERR, "Unable to ignore signal=%d", SIGHUP);
+        log_err (EMUNGE_SNAFU, LOG_ERR, "Failed to ignore signal=%d", SIGHUP);
     }
     if (posignal (SIGPIPE, SIG_IGN) == SIG_ERR) {
-        log_err (EMUNGE_SNAFU, LOG_ERR, "Unable to ignore signal=%d", SIGPIPE);
+        log_err (EMUNGE_SNAFU, LOG_ERR, "Failed to ignore signal=%d", SIGPIPE);
     }
     /*  Close stdin since it is not used.
      */
     if (close (STDIN_FILENO) < 0) {
-        log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to close standard input");
+        log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to close standard input");
     }
     /*  Set stdout to be line buffered.
      */
     if (setvbuf (stdout, NULL, _IOLBF, 0) < 0) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
-            "Unable to line-buffer standard output");
+            "Failed to line-buffer standard output");
     }
     log_open_file (stderr, argv[0], LOG_INFO, LOG_OPT_PRIORITY);
     conf = create_conf ();
@@ -228,16 +228,16 @@ create_conf (void)
     int    n;
 
     if (!(conf = malloc (sizeof (*conf)))) {
-        log_errno (EMUNGE_NO_MEMORY, LOG_ERR, "Unable to create conf");
+        log_errno (EMUNGE_NO_MEMORY, LOG_ERR, "Failed to allocate conf");
     }
     if (!(conf->ctx = munge_ctx_create ())) {
-        log_errno (EMUNGE_NO_MEMORY, LOG_ERR, "Unable to create conf ctx");
+        log_errno (EMUNGE_NO_MEMORY, LOG_ERR, "Failed to create conf ctx");
     }
     if ((errno = pthread_mutex_init (&conf->mutex, NULL)) != 0) {
-        log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to init mutex");
+        log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to init mutex");
     }
     if ((errno = pthread_cond_init (&conf->cond_done, NULL)) != 0) {
-        log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to init condition");
+        log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to init condition");
     }
     conf->do_decode = DEF_DO_DECODE;
     conf->payload = NULL;
@@ -260,11 +260,11 @@ create_conf (void)
     errno = 0;
     if (((n = sysconf (_SC_OPEN_MAX)) == -1) && (errno != 0)) {
         log_errno (EMUNGE_SNAFU, LOG_ERR,
-            "Unable to determine the maximum number of open files");
+            "Failed to determine maximum number of open files");
     }
     if ((conf->max_threads = n - 2 - 2) < 1) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
-            "Unable to compute the maximum number of threads");
+            "Failed to compute maximum number of threads");
     }
     return (conf);
 }
@@ -282,10 +282,10 @@ destroy_conf (conf_t conf)
         free (conf->payload);
     }
     if ((errno = pthread_cond_destroy (&conf->cond_done)) != 0) {
-        log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to destroy condition");
+        log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to destroy condition");
     }
     if ((errno = pthread_mutex_destroy (&conf->mutex)) != 0) {
-        log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to destroy mutex");
+        log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to destroy mutex");
     }
     munge_ctx_destroy (conf->ctx);
     free (conf->tids);
@@ -307,7 +307,8 @@ create_tdata (conf_t conf)
     assert (conf != NULL);
 
     if (!(tdata = malloc (sizeof (*tdata)))) {
-        log_errno (EMUNGE_NO_MEMORY, LOG_ERR, "Unable to create thread data");
+        log_errno (EMUNGE_NO_MEMORY, LOG_ERR,
+            "Failed to allocate thread data");
     }
     tdata->conf = conf;
     /*
@@ -320,10 +321,10 @@ create_tdata (conf_t conf)
      *    munge socket (which may have been set in the conf).
      */
     if (!(tdata->ectx = munge_ctx_copy (conf->ctx))) {
-        log_err (EMUNGE_SNAFU, LOG_ERR, "Unable to copy munge encode context");
+        log_err (EMUNGE_SNAFU, LOG_ERR, "Failed to copy munge encode context");
     }
     if ((conf->do_decode) && !(tdata->dctx = munge_ctx_copy (conf->ctx))) {
-        log_err (EMUNGE_SNAFU, LOG_ERR, "Unable to copy munge decode context");
+        log_err (EMUNGE_SNAFU, LOG_ERR, "Failed to copy munge decode context");
     }
     return (tdata);
 }
@@ -394,7 +395,7 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                 e = munge_ctx_set (conf->ctx, MUNGE_OPT_CIPHER_TYPE, i);
                 if (e != EMUNGE_SUCCESS) {
                     log_err (EMUNGE_SNAFU, LOG_ERR,
-                        "Unable to set cipher type: %s",
+                        "Failed to set cipher type: %s",
                         munge_ctx_strerror (conf->ctx));
                 }
                 break;
@@ -406,12 +407,12 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                 i = munge_enum_str_to_int (MUNGE_ENUM_MAC, optarg);
                 if ((i < 0) || !munge_enum_is_valid (MUNGE_ENUM_MAC, i)) {
                     log_err (EMUNGE_SNAFU, LOG_ERR,
-                        "Invalid message auth code type \"%s\"", optarg);
+                        "Invalid MAC type \"%s\"", optarg);
                 }
                 e = munge_ctx_set (conf->ctx, MUNGE_OPT_MAC_TYPE, i);
                 if (e != EMUNGE_SUCCESS) {
                     log_err (EMUNGE_SNAFU, LOG_ERR,
-                        "Unable to set message auth code type: %s",
+                        "Failed to set MAC type: %s",
                         munge_ctx_strerror (conf->ctx));
                 }
                 break;
@@ -428,7 +429,7 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                 e = munge_ctx_set (conf->ctx, MUNGE_OPT_ZIP_TYPE, i);
                 if (e != EMUNGE_SUCCESS) {
                     log_err (EMUNGE_SNAFU, LOG_ERR,
-                        "Unable to set compression type: %s",
+                        "Failed to set compression type: %s",
                         munge_ctx_strerror (conf->ctx));
                 }
                 break;
@@ -483,7 +484,7 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                 e = munge_ctx_set (conf->ctx, MUNGE_OPT_UID_RESTRICTION, i);
                 if (e != EMUNGE_SUCCESS) {
                     log_err (EMUNGE_SNAFU, LOG_ERR,
-                        "Unable to set uid restriction: %s",
+                        "Failed to set UID restriction: %s",
                         munge_ctx_strerror (conf->ctx));
                 }
                 break;
@@ -506,7 +507,7 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                 e = munge_ctx_set (conf->ctx, MUNGE_OPT_GID_RESTRICTION, i);
                 if (e != EMUNGE_SUCCESS) {
                     log_err (EMUNGE_SNAFU, LOG_ERR,
-                        "Unable to set gid restriction: %s",
+                        "Failed to set GID restriction: %s",
                         munge_ctx_strerror (conf->ctx));
                 }
                 break;
@@ -528,7 +529,7 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                 e = munge_ctx_set (conf->ctx, MUNGE_OPT_TTL, (int) l);
                 if (e != EMUNGE_SUCCESS) {
                     log_err (EMUNGE_SNAFU, LOG_ERR,
-                        "Unable to set time-to-live: %s",
+                        "Failed to set time-to-live: %s",
                         munge_ctx_strerror (conf->ctx));
                 }
                 break;
@@ -536,7 +537,7 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                 e = munge_ctx_set (conf->ctx, MUNGE_OPT_SOCKET, optarg);
                 if (e != EMUNGE_SUCCESS) {
                     log_err (EMUNGE_SNAFU, LOG_ERR,
-                        "Unable to set munge socket name: %s",
+                        "Failed to set munge socket name: %s",
                         munge_ctx_strerror (conf->ctx));
                 }
                 break;
@@ -626,7 +627,7 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                 }
                 else {
                     log_err (EMUNGE_SNAFU, LOG_ERR,
-                        "Unable to process command-line");
+                        "Failed to process command-line");
                 }
                 break;
             case ':':
@@ -642,7 +643,7 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                 }
                 else {
                     log_err (EMUNGE_SNAFU, LOG_ERR,
-                        "Unable to process command-line");
+                        "Failed to process command-line");
                 }
                 break;
             default:
@@ -667,7 +668,7 @@ parse_cmdline (conf_t conf, int argc, char **argv)
     if (conf->num_payload > 0) {
         if (!(conf->payload = malloc (conf->num_payload + 1))) {
             log_err (EMUNGE_NO_MEMORY, LOG_ERR,
-                "Unable to allocate credential payload of %d byte%s",
+                "Failed to allocate credential payload of %d byte%s",
                 conf->num_payload, (conf->num_payload == 1 ? "" : "s"));
         }
         for (i = 0, c = 'A'; i < conf->num_payload; i++) {
@@ -743,7 +744,7 @@ display_help (char *prog)
             "Specify time-to-live (in seconds; 0=dfl -1=max)");
 
     printf ("  %*s %s\n", w, "-S, --socket=STRING",
-            "Specify local domain socket for daemon");
+            "Specify local domain socket for munged");
 
     printf ("\n");
 
@@ -866,14 +867,14 @@ start_threads (conf_t conf)
     int            i;
 
     if (!(conf->tids = malloc (sizeof (*conf->tids) * conf->num_threads))) {
-        log_err (EMUNGE_NO_MEMORY, LOG_ERR, "Unable to allocate tid array");
+        log_err (EMUNGE_NO_MEMORY, LOG_ERR, "Failed to allocate tid array");
     }
     if ((errno = pthread_attr_init (&tattr)) != 0) {
-        log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to init thread attribute");
+        log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to init thread attribute");
     }
 #ifdef _POSIX_THREAD_ATTR_STACKSIZE
     if ((errno = pthread_attr_setstacksize (&tattr, stacksize)) != 0) {
-        log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to set thread stacksize");
+        log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to set thread stacksize");
     }
 #endif /* _POSIX_THREAD_ATTR_STACKSIZE */
     /*
@@ -882,7 +883,7 @@ start_threads (conf_t conf)
      *    pthread_cond_timedwait().
      */
     if ((errno = pthread_mutex_lock (&conf->mutex)) != 0) {
-        log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to lock mutex");
+        log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to lock mutex");
     }
     /*  The purpose of the num_running count is for signaling the main thread
      *    when the last worker thread has exited in order to interrupt the
@@ -905,12 +906,12 @@ start_threads (conf_t conf)
         if ((errno = pthread_create
                     (&conf->tids[i], &tattr, (thread_f) remunge, conf)) != 0) {
             log_errno (EMUNGE_SNAFU, LOG_ERR,
-                "Unable to create thread #%d", i+1);
+                "Failed to create thread #%d", i+1);
         }
     }
     if ((errno = pthread_attr_destroy (&tattr)) != 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR,
-            "Unable to destroy thread attribute");
+            "Failed to destroy thread attribute");
     }
     return;
 }
@@ -994,7 +995,7 @@ process_creds (conf_t conf)
             continue;
         }
         else {
-            log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to wait on condition");
+            log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to wait on condition");
         }
     }
     return;
@@ -1014,19 +1015,19 @@ stop_threads (conf_t conf)
      *    (via remunge_cleanup()) once they are canceled/finished.
      */
     if ((errno = pthread_mutex_unlock (&conf->mutex)) != 0) {
-        log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to unlock mutex");
+        log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to unlock mutex");
     }
     for (i = 0; i < conf->num_threads; i++) {
         errno = pthread_cancel (conf->tids[i]);
         if ((errno != 0) && (errno != ESRCH)) {
             log_errno (EMUNGE_SNAFU, LOG_ERR,
-                "Unable to cancel thread #%d", i+1);
+                "Failed to cancel thread #%d", i+1);
         }
     }
     for (i = 0; i < conf->num_threads; i++) {
         if ((errno = pthread_join (conf->tids[i], NULL)) != 0) {
             log_errno (EMUNGE_SNAFU, LOG_ERR,
-                "Unable to join thread #%d", i+1);
+                "Failed to join thread #%d", i+1);
         }
         conf->tids[i] = 0;
     }
@@ -1096,7 +1097,7 @@ remunge (conf_t conf)
     pthread_cleanup_push ((thread_cleanup_f) remunge_cleanup, tdata);
 
     if ((errno = pthread_mutex_lock (&conf->mutex)) != 0) {
-        log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to lock mutex");
+        log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to lock mutex");
     }
     while (conf->num_creds - conf->shared.num_creds_done > 0) {
 
@@ -1105,12 +1106,12 @@ remunge (conf_t conf)
         if ((errno = pthread_setcancelstate
                     (PTHREAD_CANCEL_DISABLE, &cancel_state)) != 0) {
             log_errno (EMUNGE_SNAFU, LOG_ERR,
-                "Unable to disable thread cancellation");
+                "Failed to disable thread cancellation");
         }
         n = ++conf->shared.num_creds_done;
 
         if ((errno = pthread_mutex_unlock (&conf->mutex)) != 0) {
-            log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to unlock mutex");
+            log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to unlock mutex");
         }
         got_encode_err = 0;
         got_decode_err = 0;
@@ -1193,10 +1194,10 @@ remunge (conf_t conf)
         if ((errno = pthread_setcancelstate
                     (cancel_state, &cancel_state)) != 0) {
             log_errno (EMUNGE_SNAFU, LOG_ERR,
-                "Unable to enable thread cancellation");
+                "Failed to enable thread cancellation");
         }
         if ((errno = pthread_mutex_lock (&conf->mutex)) != 0) {
-            log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to lock mutex");
+            log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to lock mutex");
         }
         conf->shared.num_encode_errs += got_encode_err;
         conf->shared.num_decode_errs += got_decode_err;
@@ -1214,11 +1215,11 @@ remunge_cleanup (tdata_t tdata)
  */
     if (--tdata->conf->num_running == 0) {
         if ((errno = pthread_cond_signal (&tdata->conf->cond_done)) != 0) {
-            log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to signal condition");
+            log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to signal condition");
         }
     }
     if ((errno = pthread_mutex_unlock (&tdata->conf->mutex)) != 0) {
-        log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to unlock mutex");
+        log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to unlock mutex");
     }
     destroy_tdata (tdata);
     return;
@@ -1244,7 +1245,7 @@ output_msg (const char *format, ...)
         return;
     }
     if (time (&t) == ((time_t) -1)) {
-        log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to get current time");
+        log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to query current time");
     }
 #if HAVE_LOCALTIME_R
     tm_ptr = localtime_r (&t, &tm);

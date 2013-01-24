@@ -103,41 +103,41 @@ work_init (work_func_t f, int n_threads)
      */
     if (!(wp = malloc (sizeof (work_t)))) {
         log_errno (EMUNGE_NO_MEMORY, LOG_ERR,
-            "Unable to allocate work thread struct");
+            "Failed to allocate work thread struct");
     }
     if (!(wp->workers = malloc (sizeof (*wp->workers) * n_threads))) {
         log_errno (EMUNGE_NO_MEMORY, LOG_ERR,
-            "Unable to allocate tid array for work thread struct");
+            "Failed to allocate tid array for work thread struct");
     }
     /*  Initialize struct.
      */
     if ((errno = pthread_attr_init (&tattr)) != 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR,
-            "Unable to init work thread attribute");
+            "Failed to init work thread attribute");
     }
 #ifdef _POSIX_THREAD_ATTR_STACKSIZE
     if ((errno = pthread_attr_setstacksize (&tattr, stacksize)) != 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR,
-            "Unable to set work thread stacksize");
+            "Failed to set work thread stacksize");
     }
     if ((errno = pthread_attr_getstacksize (&tattr, &stacksize)) != 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR,
-            "Unable to get work thread stacksize");
+            "Failed to get work thread stacksize");
     }
     log_msg (LOG_DEBUG, "Set work thread stacksize to %d", (int) stacksize);
 #endif /* _POSIX_THREAD_ATTR_STACKSIZE */
 
     if ((errno = pthread_mutex_init (&wp->lock, NULL)) != 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR,
-            "Unable to init work thread mutex");
+            "Failed to init work thread mutex");
     }
     if ((errno = pthread_cond_init (&wp->received_work, NULL)) != 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR,
-            "Unable to init work thread condition for received-work");
+            "Failed to init work thread condition for received work");
     }
     if ((errno = pthread_cond_init (&wp->finished_work, NULL)) != 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR,
-            "Unable to init work thread condition for finished-work");
+            "Failed to init work thread condition for finished work");
     }
     wp->work_func = f;
     wp->work_head = wp->work_tail = NULL;
@@ -151,14 +151,14 @@ work_init (work_func_t f, int n_threads)
         if ((errno = pthread_create
                     (&wp->workers[i], &tattr, _work_exec, wp)) != 0) {
             log_errno (EMUNGE_SNAFU, LOG_ERR,
-                "Unable to create worker thread #%d", i+1);
+                "Failed to create work thread #%d", i+1);
         }
     }
     /*  Cleanup.
      */
     if ((errno = pthread_attr_destroy (&tattr)) != 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR,
-            "Unable to destroy work thread attribute");
+            "Failed to destroy work thread attribute");
     }
     return (wp);
 }
@@ -175,7 +175,7 @@ work_fini (work_p wp, int do_wait)
     }
     if ((errno = pthread_mutex_lock (&wp->lock)) != 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR,
-            "Unable to lock work thread mutex");
+            "Failed to lock work thread mutex");
     }
     /*  Prevent new work from being queued.
      */
@@ -192,7 +192,7 @@ work_fini (work_p wp, int do_wait)
             if ((errno = pthread_cond_wait
                         (&wp->finished_work, &wp->lock)) != 0) {
                 log_errno (EMUNGE_SNAFU, LOG_ERR,
-                    "Unable to wait on work thread for finished work");
+                    "Failed to wait on work thread for finished work");
             }
         }
     }
@@ -204,23 +204,23 @@ work_fini (work_p wp, int do_wait)
      */
     if ((errno = pthread_mutex_unlock (&wp->lock)) != 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR,
-            "Unable to unlock work thread mutex");
+            "Failed to unlock work thread mutex");
     }
     for (i = 0; i < wp->n_workers; i++) {
         if ((errno = pthread_cancel (wp->workers[i])) != 0) {
             log_errno (EMUNGE_SNAFU, LOG_ERR,
-                "Unable to cancel worker thread #%d", i+1);
+                "Failed to cancel work thread #%d", i+1);
         }
     }
     for (i = 0; i < wp->n_workers; i++) {
         void *result;
         if ((errno = pthread_join (wp->workers[i], &result)) != 0) {
             log_errno (EMUNGE_SNAFU, LOG_ERR,
-                "Unable to join worker thread #%d", i+1);
+                "Failed to join work thread #%d", i+1);
         }
         if (result != PTHREAD_CANCELED) {
             log_err (EMUNGE_SNAFU, LOG_ERR,
-                "Worker thread #%d was not canceled", i+1);
+                "Work thread #%d was not canceled", i+1);
         }
         wp->workers[i] = 0;
     }
@@ -228,17 +228,17 @@ work_fini (work_p wp, int do_wait)
      */
     if ((errno = pthread_cond_destroy (&wp->finished_work)) != 0) {
         log_msg (LOG_ERR,
-            "Unable to destroy work thread condition for finished-work: %s",
+            "Failed to destroy work thread condition for finished work: %s",
             strerror (errno));
     }
     if ((errno = pthread_cond_destroy (&wp->received_work)) != 0) {
         log_msg (LOG_ERR,
-            "Unable to destroy work thread condition for received-work: %s",
+            "Failed to destroy work thread condition for received work: %s",
             strerror (errno));
     }
     if ((errno = pthread_mutex_destroy (&wp->lock)) != 0) {
         log_msg (LOG_ERR,
-            "Unable to destroy work thread mutex: %s", strerror (errno));
+            "Failed to destroy work thread mutex: %s", strerror (errno));
     }
     free (wp->workers);
     free (wp);
@@ -258,7 +258,7 @@ work_queue (work_p wp, void *work)
     }
     if ((errno = pthread_mutex_lock (&wp->lock)) != 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR,
-            "Unable to lock work thread mutex");
+            "Failed to lock work thread mutex");
     }
     if (wp->got_fini) {
         errno = EPERM;
@@ -277,12 +277,12 @@ work_queue (work_p wp, void *work)
     }
     if ((errno = pthread_mutex_unlock (&wp->lock)) != 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR,
-            "Unable to unlock work thread mutex");
+            "Failed to unlock work thread mutex");
     }
     if (do_signal) {
         if ((errno = pthread_cond_signal (&wp->received_work)) != 0) {
             log_errno (EMUNGE_SNAFU, LOG_ERR,
-                "Unable to signal work thread for received work");
+                "Failed to signal work thread for received work");
         }
     }
     return (rc);
@@ -298,19 +298,19 @@ work_wait (work_p wp)
     }
     if ((errno = pthread_mutex_lock (&wp->lock)) != 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR,
-            "Unable to lock work thread mutex");
+            "Failed to lock work thread mutex");
     }
     /*  Wait until all the queued work is finished.
      */
     while ((wp->n_working != 0) && (wp->work_head != NULL)) {
         if ((errno = pthread_cond_wait (&wp->finished_work, &wp->lock)) != 0) {
             log_errno (EMUNGE_SNAFU, LOG_ERR,
-                "Unable to wait on work thread for finished work");
+                "Failed to wait on work thread for finished work");
         }
     }
     if ((errno = pthread_mutex_unlock (&wp->lock)) != 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR,
-            "Unable to unlock work thread mutex");
+            "Failed to unlock work thread mutex");
     }
     return;
 }
@@ -335,14 +335,14 @@ _work_exec (void *arg)
     wp = arg;
 
     if (sigfillset (&sigset)) {
-        log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to init work thread sigset");
+        log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to init work thread sigset");
     }
     if (pthread_sigmask (SIG_SETMASK, &sigset, NULL) != 0) {
-        log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to set work thread sigset");
+        log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to set work thread sigset");
     }
     if ((errno = pthread_mutex_lock (&wp->lock)) != 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR,
-            "Unable to lock work thread mutex");
+            "Failed to lock work thread mutex");
     }
     pthread_cleanup_push (_work_exec_cleanup, wp);
 
@@ -356,7 +356,7 @@ _work_exec (void *arg)
             if ((errno = pthread_cond_wait
                         (&wp->received_work, &wp->lock)) != 0) {
                 log_errno (EMUNGE_SNAFU, LOG_ERR,
-                    "Unable to wait on work thread for received work");
+                    "Failed to wait on work thread for received work");
             }
         }
         /*  Disable the thread's cancellation state.
@@ -364,7 +364,7 @@ _work_exec (void *arg)
         if ((errno = pthread_setcancelstate
                     (PTHREAD_CANCEL_DISABLE, &cancel_state)) != 0) {
             log_errno (EMUNGE_SNAFU, LOG_ERR,
-                "Unable to disable work thread cancellation");
+                "Failed to disable work thread cancellation");
         }
         /*  Process the work.
          */
@@ -375,13 +375,13 @@ _work_exec (void *arg)
 
         if ((errno = pthread_mutex_unlock (&wp->lock)) != 0) {
             log_errno (EMUNGE_SNAFU, LOG_ERR,
-                "Unable to unlock work thread mutex");
+                "Failed to unlock work thread mutex");
         }
         wp->work_func (work);
 
         if ((errno = pthread_mutex_lock (&wp->lock)) != 0) {
             log_errno (EMUNGE_SNAFU, LOG_ERR,
-                "Unable to lock work thread mutex");
+                "Failed to lock work thread mutex");
         }
         wp->n_working--;
         /*
@@ -394,14 +394,14 @@ _work_exec (void *arg)
         if ((errno = pthread_setcancelstate
                     (cancel_state, &cancel_state)) != 0) {
             log_errno (EMUNGE_SNAFU, LOG_ERR,
-                "Unable to enable work thread cancellation");
+                "Failed to enable work thread cancellation");
         }
         /*  Check to see if all the queued work is now finished.
          */
         if ((wp->n_working == 0) && (!wp->work_head)) {
             if ((errno = pthread_cond_signal (&wp->finished_work)) != 0) {
                 log_errno (EMUNGE_SNAFU, LOG_ERR,
-                    "Unable to signal work thread for finished work");
+                    "Failed to signal work thread for finished work");
             }
         }
     }
@@ -424,7 +424,7 @@ _work_exec_cleanup (void *arg)
 
     if ((errno = pthread_mutex_unlock (&wp->lock)) != 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR,
-            "Unable to unlock work thread mutex");
+            "Failed to unlock work thread mutex");
     }
     return;
 }
@@ -446,8 +446,7 @@ _work_enqueue (work_p wp, void *work)
         return (NULL);
     }
     if (!(wap = malloc (sizeof (*wap)))) {
-        log_errno (EMUNGE_NO_MEMORY, LOG_ERR,
-            "Unable to enqueue work element");
+        log_errno (EMUNGE_NO_MEMORY, LOG_ERR, "Failed to enqueue work");
     }
     wap->next = NULL;
     wap->arg = work;

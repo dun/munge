@@ -179,7 +179,7 @@ dec_timestamp (munge_cred_t c)
      */
     if (time (&now) == ((time_t) -1)) {
         return (m_msg_set_err (m, EMUNGE_SNAFU,
-            strdup ("Unable to query current time")));
+            strdup ("Failed to query current time")));
     }
     m->time0 = 0;
     m->time1 = now;                     /* potential 64b value for 32b var */
@@ -203,7 +203,7 @@ dec_authenticate (munge_cred_t c)
      */
     if (auth_recv (m, p_uid, p_gid) != EMUNGE_SUCCESS) {
         return (m_msg_set_err (m, EMUNGE_SNAFU,
-            strdup ("Unable to determine identity of client")));
+            strdup ("Failed to determine client identity")));
     }
     return (0);
 }
@@ -223,7 +223,7 @@ dec_check_retry (munge_cred_t c)
     }
     if (m->retry > MUNGE_SOCKET_RETRY_ATTEMPTS) {
         return (m_msg_set_err (m, EMUNGE_SOCKET,
-            strdupf ("Exceeded maximum transaction retry attempts")));
+            strdupf ("Exceeded maximum number of decode attempts")));
     }
     return (0);
 }
@@ -265,7 +265,7 @@ dec_unarmor (munge_cred_t c)
     if (prefix_len > 0) {
         if (strncmp ((char *) base64_ptr, MUNGE_CRED_PREFIX, prefix_len)) {
             return (m_msg_set_err (m, EMUNGE_BAD_CRED,
-                strdup ("Unable to match armor prefix")));
+                strdup ("Failed to match armor prefix")));
         }
         base64_ptr += prefix_len;
         base64_len -= prefix_len;
@@ -291,7 +291,7 @@ dec_unarmor (munge_cred_t c)
         }
         if (base64_tmp < base64_ptr) {
             return (m_msg_set_err (m, EMUNGE_BAD_CRED,
-                strdup ("Unable to match armor suffix")));
+                strdup ("Failed to match armor suffix")));
         }
         base64_len = base64_tmp - base64_ptr;
     }
@@ -305,7 +305,7 @@ dec_unarmor (munge_cred_t c)
      */
     if (base64_decode_block (c->outer_mem, &n, base64_ptr, base64_len) < 0) {
         return (m_msg_set_err (m, EMUNGE_BAD_CRED,
-            strdup ("Unable to base64-decode credential")));
+            strdup ("Failed to base64-decode credential")));
     }
     assert (n < c->outer_mem_len);
 
@@ -368,7 +368,7 @@ dec_unpack_outer (munge_cred_t c)
     c->version = *p;
     if (c->version != MUNGE_CRED_VERSION) {
         return (m_msg_set_err (m, EMUNGE_BAD_VERSION,
-            strdupf ("Unsupported credential version %d", c->version)));
+            strdupf ("Invalid credential version %d", c->version)));
     }
     p += n;
     len -= n;
@@ -379,7 +379,7 @@ dec_unpack_outer (munge_cred_t c)
     assert (n == 1);
     if (n > len) {
         return (m_msg_set_err (m, EMUNGE_BAD_CRED,
-            strdup ("Truncated credential cipher type")));
+            strdup ("Truncated cipher type")));
     }
     m->cipher = *p;
     if (m->cipher == MUNGE_CIPHER_NONE) {
@@ -393,7 +393,7 @@ dec_unpack_outer (munge_cred_t c)
         c->iv_len = cipher_iv_size (m->cipher);
         if (c->iv_len < 0) {
             return (m_msg_set_err (m, EMUNGE_SNAFU,
-                strdupf ("Unable to determine iv length for cipher type %d",
+                strdupf ("Failed to determine IV length for cipher type %d",
                 m->cipher)));
         }
         assert (c->iv_len <= sizeof (c->iv));
@@ -407,17 +407,17 @@ dec_unpack_outer (munge_cred_t c)
     assert (n == 1);
     if (n > len) {
         return (m_msg_set_err (m, EMUNGE_BAD_CRED,
-            strdup ("Truncated credential mac type")));
+            strdup ("Truncated MAC type")));
     }
     m->mac = *p;
     if (mac_map_enum (m->mac, NULL) < 0) {
         return (m_msg_set_err (m, EMUNGE_BAD_MAC,
-            strdupf ("Invalid mac type %d", m->mac)));
+            strdupf ("Invalid MAC type %d", m->mac)));
     }
     c->mac_len = mac_size (m->mac);
     if (c->mac_len <= 0) {
         return (m_msg_set_err (m, EMUNGE_SNAFU,
-            strdupf ("Unable to determine digest length for mac type %d",
+            strdupf ("Failed to determine digest length for MAC type %d",
             m->mac)));
     }
     assert (c->mac_len <= sizeof (c->mac));
@@ -430,7 +430,7 @@ dec_unpack_outer (munge_cred_t c)
      */
     if (mac_size (m->mac) < cipher_key_size (m->cipher)) {
         return (m_msg_set_err (m, EMUNGE_BAD_MAC,
-            strdupf ("Invalid mac type %d with cipher type %d",
+            strdupf ("Invalid MAC type %d with cipher type %d",
             m->mac, m->cipher)));
     }
     /*
@@ -440,7 +440,7 @@ dec_unpack_outer (munge_cred_t c)
     assert (n == 1);
     if (n > len) {
         return (m_msg_set_err (m, EMUNGE_BAD_CRED,
-            strdup ("Truncated credential compression type")));
+            strdup ("Truncated compression type")));
     }
     m->zip = *p;
     if (m->zip == MUNGE_ZIP_NONE) {
@@ -461,7 +461,7 @@ dec_unpack_outer (munge_cred_t c)
     assert (n == 1);
     if (n > len) {
         return (m_msg_set_err (m, EMUNGE_BAD_CRED,
-            strdup ("Truncated credential realm length")));
+            strdup ("Truncated security realm length")));
     }
     m->realm_len = *p;
     p += n;
@@ -473,7 +473,7 @@ dec_unpack_outer (munge_cred_t c)
     if (m->realm_len > 0) {
         if (m->realm_len > len) {
             return (m_msg_set_err (m, EMUNGE_BAD_CRED,
-                strdup ("Truncated credential realm string")));
+                strdup ("Truncated security realm string")));
         }
         c->realm_mem_len = m->realm_len + 1;
         /*
@@ -500,7 +500,7 @@ dec_unpack_outer (munge_cred_t c)
     if (c->iv_len > 0) {
         if (c->iv_len > len) {
             return (m_msg_set_err (m, EMUNGE_BAD_CRED,
-                strdup ("Truncated credential iv")));
+                strdup ("Truncated cipher IV")));
         }
         assert (c->iv_len <= sizeof (c->iv));
         memcpy (c->iv, p, c->iv_len);
@@ -563,7 +563,7 @@ dec_decrypt (munge_cred_t c)
     c->dek_len = mac_size (m->mac);
     if (c->dek_len <= 0) {
         return (m_msg_set_err (m, EMUNGE_SNAFU,
-            strdupf ("Unable to determine dek key length for mac type %d",
+            strdupf ("Failed to determine DEK key length for MAC type %d",
                 m->mac)));
     }
     assert (c->dek_len <= sizeof (c->dek));
@@ -572,7 +572,7 @@ dec_decrypt (munge_cred_t c)
     if (mac_block (m->mac, conf->dek_key, conf->dek_key_len,
             c->dek, &n, c->mac, c->mac_len) < 0) {
         return (m_msg_set_err (m, EMUNGE_SNAFU,
-            strdup ("Unable to compute dek")));
+            strdup ("Failed to compute DEK")));
     }
     assert (n <= c->dek_len);
     assert (n >= cipher_key_size (m->cipher));
@@ -583,7 +583,7 @@ dec_decrypt (munge_cred_t c)
     n = cipher_block_size (m->cipher);
     if (n <= 0) {
         return (m_msg_set_err (m, EMUNGE_SNAFU,
-            strdupf ("Unable to determine block size for cipher type %d",
+            strdupf ("Failed to determine block size for cipher type %d",
                 m->cipher)));
     }
     buf_len = c->inner_len + n;
@@ -631,7 +631,7 @@ err:
     memset (buf, 0, buf_len);
     free (buf);
     return (m_msg_set_err (m, EMUNGE_SNAFU,
-        strdup ("Unable to decrypt credential")));
+        strdup ("Failed to decrypt credential")));
 }
 
 
@@ -683,7 +683,7 @@ err_cleanup:
     mac_cleanup (&x);
 err:
     return (m_msg_set_err (m, EMUNGE_SNAFU,
-        strdup ("Unable to mac credential")));
+        strdup ("Failed to MAC credential")));
 }
 
 
@@ -740,7 +740,7 @@ dec_decompress (munge_cred_t c)
 
 err:
     return (m_msg_set_err (m, EMUNGE_SNAFU,
-        strdup ("Unable to decompress credential")));
+        strdup ("Failed to decompress credential")));
 }
 
 
@@ -780,7 +780,7 @@ dec_unpack_inner (munge_cred_t c)
     assert (c->salt_len <= sizeof (c->salt));
     if (c->salt_len > len) {
         return (m_msg_set_err (m, EMUNGE_BAD_CRED,
-            strdup ("Truncated credential salt")));
+            strdup ("Truncated salt")));
     }
     memcpy (c->salt, p, c->salt_len);
     if (m->cipher != MUNGE_CIPHER_NONE) {
@@ -795,7 +795,7 @@ dec_unpack_inner (munge_cred_t c)
     assert (n == 1);
     if (n > len) {
         return (m_msg_set_err (m, EMUNGE_BAD_CRED,
-            strdup ("Truncated credential origin ip addr length")));
+            strdup ("Truncated origin IP addr length")));
     }
     m->addr_len = *p;                   /* a single byte is always aligned */
     p += n;
@@ -805,11 +805,11 @@ dec_unpack_inner (munge_cred_t c)
      */
     if (m->addr_len != sizeof (m->addr)) {
         return (m_msg_set_err (m, EMUNGE_BAD_CRED,
-            strdup ("Invalid credential origin ip addr length")));
+            strdup ("Invalid origin IP addr length")));
     }
     if (m->addr_len > len) {
         return (m_msg_set_err (m, EMUNGE_BAD_CRED,
-            strdup ("Truncated credential origin ip addr")));
+            strdup ("Truncated origin IP addr")));
     }
     memcpy (&m->addr, p, m->addr_len);
     p += m->addr_len;
@@ -821,7 +821,7 @@ dec_unpack_inner (munge_cred_t c)
     assert (n == 4);
     if (n > len) {
         return (m_msg_set_err (m, EMUNGE_BAD_CRED,
-            strdup ("Truncated credential encode time")));
+            strdup ("Truncated encode time")));
     }
     memcpy (&u, p, n);                  /* ensure proper byte-alignment */
     m->time0 = ntohl (u);
@@ -834,7 +834,7 @@ dec_unpack_inner (munge_cred_t c)
     assert (n == 4);
     if (n > len) {
         return (m_msg_set_err (m, EMUNGE_BAD_CRED,
-            strdup ("Truncated credential time-to-live")));
+            strdup ("Truncated time-to-live")));
     }
     memcpy (&u, p, n);                  /* ensure proper byte-alignment */
     m->ttl = ntohl (u);
@@ -847,7 +847,7 @@ dec_unpack_inner (munge_cred_t c)
     assert (n == 4);
     if (n > len) {
         return (m_msg_set_err (m, EMUNGE_BAD_CRED,
-            strdup ("Truncated credential uid")));
+            strdup ("Truncated UID")));
     }
     memcpy (&u, p, n);                  /* ensure proper byte-alignment */
     m->cred_uid = ntohl (u);
@@ -860,7 +860,7 @@ dec_unpack_inner (munge_cred_t c)
     assert (n == 4);
     if (n > len) {
         return (m_msg_set_err (m, EMUNGE_BAD_CRED,
-            strdup ("Truncated credential gid")));
+            strdup ("Truncated GID")));
     }
     memcpy (&u, p, n);                  /* ensure proper byte-alignment */
     m->cred_gid = ntohl (u);
@@ -873,7 +873,7 @@ dec_unpack_inner (munge_cred_t c)
     assert (n == 4);
     if (n > len) {
         return (m_msg_set_err (m, EMUNGE_BAD_CRED,
-            strdup ("Truncated uid restriction")));
+            strdup ("Truncated UID restriction")));
     }
     memcpy (&u, p, n);                  /* ensure proper byte-alignment */
     m->auth_uid = ntohl (u);
@@ -886,7 +886,7 @@ dec_unpack_inner (munge_cred_t c)
     assert (n == 4);
     if (n > len) {
         return (m_msg_set_err (m, EMUNGE_BAD_CRED,
-            strdup ("Truncated gid restriction")));
+            strdup ("Truncated GID restriction")));
     }
     memcpy (&u, p, n);                  /* ensure proper byte-alignment */
     m->auth_gid = ntohl (u);
@@ -899,7 +899,7 @@ dec_unpack_inner (munge_cred_t c)
     assert (n == 4);
     if (n > len) {
         return (m_msg_set_err (m, EMUNGE_BAD_CRED,
-            strdup ("Truncated credential data length")));
+            strdup ("Truncated data length")));
     }
     memcpy (&u, p, n);                  /* ensure proper byte-alignment */
     m->data_len = ntohl (u);
@@ -913,7 +913,7 @@ dec_unpack_inner (munge_cred_t c)
     if (m->data_len > 0) {
         if (m->data_len > len) {
             return (m_msg_set_err (m, EMUNGE_BAD_CRED,
-                strdup ("Truncated credential data")));
+                strdup ("Truncated data")));
         }
         m->data = p;                    /* data resides in (inner|outer)_mem */
         p += m->data_len;
@@ -953,7 +953,7 @@ dec_validate_auth (munge_cred_t c)
 
 unauthorized:
     return (m_msg_set_err (m, EMUNGE_CRED_UNAUTHORIZED,
-        strdupf ("Unauthorized credential for client uid=%d gid=%d",
+        strdupf ("Unauthorized credential for client UID=%d GID=%d",
             m->client_uid, m->client_gid)));
 }
 
@@ -1012,7 +1012,7 @@ dec_validate_replay (munge_cred_t c)
                 && (m->retry > 0)
                 && (m->retry <= MUNGE_SOCKET_RETRY_ATTEMPTS)) {
             log_msg (LOG_NOTICE,
-                "Allowed credential replay for client uid=%d gid=%d",
+                "Allowed credential replay for client UID=%d GID=%d",
                 m->client_uid, m->client_gid);
             return (0);
         }

@@ -253,7 +253,7 @@ restart:
 #elif HAVE_GETGRENT
     if ((rv_mutex = pthread_mutex_lock (&mutex)) != 0) {
         errno = rv_mutex;
-        log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to lock xgetgrent mutex");
+        log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to lock xgetgrent mutex");
     }
     rv_grp = getgrent ();
     if (rv_grp == NULL) {
@@ -269,7 +269,7 @@ restart:
     }
     if ((rv_mutex = pthread_mutex_unlock (&mutex)) != 0) {
         errno = rv_mutex;
-        log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to unlock xgetgrent mutex");
+        log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to unlock xgetgrent mutex");
     }
     if (rv_copy < 0) {
         return (-1);

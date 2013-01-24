@@ -131,7 +131,7 @@ random_init (const char *seed)
         }
         else if (st.st_uid != geteuid ()) {
             log_msg (LOG_WARNING,
-                "Ignoring PRNG seed \"%s\": not owned by uid=%u",
+                "Ignoring PRNG seed \"%s\": not owned by UID %u",
                 seed, (unsigned) geteuid ());
         }
         else if (st.st_mode & (S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH)) {
@@ -146,12 +146,12 @@ random_init (const char *seed)
          */
         if (path_dirname (seed, seed_dir, sizeof (seed_dir)) < 0) {
             log_err (EMUNGE_SNAFU, LOG_ERR,
-                "Cannot determine dirname of PRNG seed \"%s\"", seed);
+                "Failed to determine dirname of PRNG seed \"%s\"", seed);
         }
         n = path_is_secure (seed_dir, ebuf, sizeof (ebuf));
         if (n < 0) {
             log_err (EMUNGE_SNAFU, LOG_ERR,
-                "Cannot check PRNG seed dir \"%s\": %s", seed_dir, ebuf);
+                "Failed to check PRNG seed dir \"%s\": %s", seed_dir, ebuf);
         }
         else if ((n == 0) && (!conf->got_force)) {
             log_err (EMUNGE_SNAFU, LOG_ERR,
@@ -165,7 +165,7 @@ random_init (const char *seed)
          */
         if (do_unlink && (unlink (seed) < 0)) {
             log_msg (LOG_WARNING,
-                "Unable to remove insecure PRNG seed \"%s\"", seed);
+                "Failed to remove insecure PRNG seed \"%s\"", seed);
             rc = -1;
         }
         else if (do_unlink) {
@@ -193,10 +193,10 @@ random_init (const char *seed)
     if (rnd_bytes_needed > 0) {
         if (!conf->got_force)
             log_err (EMUNGE_SNAFU, LOG_ERR,
-                "Unable to seed PRNG with sufficient entropy");
+                "Failed to seed PRNG with sufficient entropy");
         else
             log_msg (LOG_WARNING,
-                "Unable to seed PRNG with sufficient entropy");
+                "Failed to seed PRNG with sufficient entropy");
     }
     else {
         rc = 1;
@@ -218,7 +218,7 @@ random_init (const char *seed)
             RANDOM_SEED_STIR_MIN_SECS * 1000);
 
     if (_random_timer_id < 0) {
-        log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to set PRNG stir timer");
+        log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to set PRNG stir timer");
     }
     return (rc);
 }
@@ -334,7 +334,7 @@ _random_read_seed (const char *filename, int num_bytes)
         if (errno == ENOENT) {
             return (0);
         }
-        log_msg (LOG_WARNING, "Unable to open PRNG seed \"%s\": %s",
+        log_msg (LOG_WARNING, "Failed to open PRNG seed \"%s\": %s",
             filename, strerror (errno));
         return (-1);
     }
@@ -343,7 +343,7 @@ _random_read_seed (const char *filename, int num_bytes)
         num_want = (num_left < sizeof (buf)) ? num_left : sizeof (buf);
         n = fd_read_n (fd, buf, num_want);
         if (n < 0) {
-            log_msg (LOG_WARNING, "Unable to read from PRNG seed \"%s\": %s",
+            log_msg (LOG_WARNING, "Failed to read from PRNG seed \"%s\": %s",
                 filename, strerror (errno));
             break;
         }
@@ -353,14 +353,14 @@ _random_read_seed (const char *filename, int num_bytes)
         e = gcry_random_add_bytes (buf, n, -1);
         if (e) {
             log_msg (LOG_WARNING,
-                "Unable to add %d byte%s to entropy pool: %s",
+                "Failed to add %d byte%s to entropy pool: %s",
                 n, (n == 1 ? "" : "s"), gcry_strerror (e));
             break;
         }
         num_left -= n;
     }
     if (close (fd) < 0) {
-        log_msg (LOG_WARNING, "Unable to close PRNG seed \"%s\": %s",
+        log_msg (LOG_WARNING, "Failed to close PRNG seed \"%s\": %s",
             filename, strerror (errno));
     }
     gcry_fast_random_poll ();
@@ -382,7 +382,7 @@ _random_write_seed (const char *filename, int num_bytes)
 
     (void) unlink (filename);
     if ((fd = open (filename, O_WRONLY | O_CREAT | O_TRUNC, 0600)) < 0) {
-        log_msg (LOG_WARNING, "Unable to create PRNG seed \"%s\": %s",
+        log_msg (LOG_WARNING, "Failed to create PRNG seed \"%s\": %s",
             filename, strerror (errno));
         return (-1);
     }
@@ -392,14 +392,14 @@ _random_write_seed (const char *filename, int num_bytes)
         gcry_create_nonce (buf, num_want);
         n = fd_write_n (fd, buf, num_want);
         if (n < 0) {
-            log_msg (LOG_WARNING, "Unable to write to PRNG seed \"%s\": %s",
+            log_msg (LOG_WARNING, "Failed to write to PRNG seed \"%s\": %s",
                 filename, strerror (errno));
             break;
         }
         num_left -= n;
     }
     if (close (fd) < 0) {
-        log_msg (LOG_WARNING, "Unable to close PRNG seed \"%s\": %s",
+        log_msg (LOG_WARNING, "Failed to close PRNG seed \"%s\": %s",
             filename, strerror (errno));
     }
     return (num_bytes - num_left);
@@ -423,7 +423,7 @@ _random_add (const void *buf, int n)
 
     e = gcry_random_add_bytes (buf, n, -1);
     if (e) {
-        log_msg (LOG_WARNING, "Unable to add %d byte%s to entropy pool: %s",
+        log_msg (LOG_WARNING, "Failed to add %d byte%s to entropy pool: %s",
             n, (n == 1 ? "" : "s"), gcry_strerror (e));
     }
     gcry_fast_random_poll ();
@@ -489,7 +489,7 @@ _random_write_seed (const char *filename, int num_bytes)
             "PRNG seed \"%s\" generated with insufficient entropy", filename);
     }
     else if (n == 0) {
-        log_msg (LOG_WARNING, "Unable to create PRNG seed \"%s\"", filename);
+        log_msg (LOG_WARNING, "Failed to create PRNG seed \"%s\"", filename);
     }
     return (n);
 }
@@ -599,7 +599,7 @@ _random_seed_stir_callback (void *_arg_not_used_)
             (callback_f) _random_seed_stir_callback, NULL, msecs);
 
     if (_random_timer_id < 0) {
-        log_errno (EMUNGE_SNAFU, LOG_ERR, "Unable to set PRNG stir timer");
+        log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to set PRNG stir timer");
     }
     return;
 }

@@ -232,13 +232,14 @@ m_msg_send (m_msg_t m, m_msg_type_t type, int maxlen)
         assert (m->pkt_is_copy == 0);
         if ((n = _msg_length (m, type)) <= 0) {
             m_msg_set_err (m, EMUNGE_NO_MEMORY,
-                strdupf ("Invalid length of %d returned for message type %d",
-                    n, type));
+                strdupf ("Failed to compute length for message type %d n=%d",
+                    type, n));
             return (EMUNGE_SNAFU);
         }
         if (!(m->pkt = malloc (n))) {
             m_msg_set_err (m, EMUNGE_NO_MEMORY,
-                strdupf ("Unable to malloc %d bytes for message send", n));
+                strdupf ("Failed to allocate %d bytes for sending message",
+                    n));
             return (EMUNGE_NO_MEMORY);
         }
         m->pkt_len = n;
@@ -246,7 +247,7 @@ m_msg_send (m_msg_t m, m_msg_type_t type, int maxlen)
         e = _msg_pack (m, type, m->pkt, m->pkt_len);
         if (e != EMUNGE_SUCCESS) {
             m_msg_set_err (m, e,
-                strdup ("Unable to pack message body"));
+                strdup ("Failed to pack message body"));
             return (e);
         }
     }
@@ -254,7 +255,7 @@ m_msg_send (m_msg_t m, m_msg_type_t type, int maxlen)
      */
     if ((maxlen > 0) && (m->pkt_len > maxlen)) {
         m_msg_set_err (m, EMUNGE_SOCKET,
-            strdupf ("Unable to send message: "
+            strdupf ("Failed to send message: "
                 "length of %d exceeds max of %d", m->pkt_len, maxlen));
         return (EMUNGE_BAD_LENGTH);
     }
@@ -263,7 +264,7 @@ m_msg_send (m_msg_t m, m_msg_type_t type, int maxlen)
     e = _msg_pack (m, MUNGE_MSG_HDR, hdr, sizeof (hdr));
     if (e != EMUNGE_SUCCESS) {
         m_msg_set_err (m, e,
-            strdup ("Unable to pack message header"));
+            strdup ("Failed to pack message header"));
         return (e);
     }
     /*  Compute iovec for response header + body.
@@ -282,12 +283,12 @@ m_msg_send (m_msg_t m, m_msg_type_t type, int maxlen)
      */
     if ((errno = 0, n = fd_timed_write_iov (m->sd, iov, 2, &tv, 1)) < 0) {
         m_msg_set_err (m, EMUNGE_SOCKET,
-            strdupf ("Unable to send message: %s", strerror (errno)));
+            strdupf ("Failed to send message: %s", strerror (errno)));
         return (EMUNGE_SOCKET);
     }
     else if (errno == ETIMEDOUT) {
         m_msg_set_err (m, EMUNGE_SOCKET,
-            strdup ("Unable to send message: Timed-out"));
+            strdup ("Failed to send message: Timed-out"));
         return (EMUNGE_SOCKET);
     }
     else if (n != nsend) {
@@ -333,13 +334,13 @@ m_msg_recv (m_msg_t m, m_msg_type_t type, int maxlen)
     nrecv = sizeof (hdr);
     if ((errno = 0, n = fd_timed_read_n (m->sd, &hdr, nrecv, &tv, 1)) < 0) {
         m_msg_set_err (m, EMUNGE_SOCKET,
-            strdupf ("Unable to receive message header: %s",
+            strdupf ("Failed to receive message header: %s",
                 strerror (errno)));
         return (EMUNGE_SOCKET);
     }
     else if (errno == ETIMEDOUT) {
         m_msg_set_err (m, EMUNGE_SOCKET,
-            strdup ("Unable to receive message header: Timed-out"));
+            strdup ("Failed to receive message header: Timed-out"));
         return (EMUNGE_SOCKET);
     }
     else if (n != nrecv) {
@@ -351,7 +352,7 @@ m_msg_recv (m_msg_t m, m_msg_type_t type, int maxlen)
     else if (_msg_unpack (m, MUNGE_MSG_HDR, hdr, sizeof (hdr))
             != EMUNGE_SUCCESS) {
         m_msg_set_err (m, EMUNGE_SOCKET,
-            strdup ("Unable to unpack message header"));
+            strdup ("Failed to unpack message header"));
         return (EMUNGE_SOCKET);
     }
     else if ((type != MUNGE_MSG_UNDEF) && (m->type != type)) {
@@ -362,24 +363,24 @@ m_msg_recv (m_msg_t m, m_msg_type_t type, int maxlen)
     }
     else if ((maxlen > 0) && (m->pkt_len > maxlen)) {
         m_msg_set_err (m, EMUNGE_SOCKET,
-            strdupf ("Unable to receive message: "
+            strdupf ("Failed to receive message: "
                 "length of %d exceeds max of %d", m->pkt_len, maxlen));
         return (EMUNGE_BAD_LENGTH);
     }
     else if (!(m->pkt = malloc (m->pkt_len))) {
         m_msg_set_err (m, EMUNGE_NO_MEMORY,
-            strdupf ("Unable to malloc %d bytes for message recv", n));
+            strdupf ("Failed to allocate %d bytes for receiving message", n));
         return (EMUNGE_NO_MEMORY);
     }
     else if ((errno = 0,
               n = fd_timed_read_n (m->sd, m->pkt, m->pkt_len, &tv, 1)) < 0) {
         m_msg_set_err (m, EMUNGE_SOCKET,
-            strdupf ("Unable to receive message body: %s", strerror (errno)));
+            strdupf ("Failed to receive message body: %s", strerror (errno)));
         return (EMUNGE_SOCKET);
     }
     else if (errno == ETIMEDOUT) {
         m_msg_set_err (m, EMUNGE_SOCKET,
-            strdup ("Unable to receive message body: Timed-out"));
+            strdup ("Failed to receive message body: Timed-out"));
         return (EMUNGE_SOCKET);
     }
     else if (n != m->pkt_len) {
@@ -390,7 +391,7 @@ m_msg_recv (m_msg_t m, m_msg_type_t type, int maxlen)
     }
     else if (_msg_unpack (m, m->type, m->pkt, m->pkt_len) != EMUNGE_SUCCESS) {
         m_msg_set_err (m, EMUNGE_SOCKET,
-            strdup ("Unable to unpack message body"));
+            strdup ("Failed to unpack message body"));
         return (EMUNGE_SOCKET);
     }
     /*  The packed message can be discarded now that it's been unpacked.
@@ -618,7 +619,7 @@ _msg_pack (m_msg_t m, m_msg_type_t type, void *dst, int dstlen)
 
 err:
     m_msg_set_err (m, EMUNGE_SNAFU,
-        strdupf ("Unable to pack message type %d", type));
+        strdupf ("Failed to pack message type %d", type));
     return (EMUNGE_SNAFU);
 }
 
@@ -731,7 +732,7 @@ _msg_unpack (m_msg_t m, m_msg_type_t type, const void *src, int srclen)
 
 err:
     m_msg_set_err (m, EMUNGE_SNAFU,
-        strdupf ("Unable to unpack message type %d", type));
+        strdupf ("Failed to unpack message type %d", type));
     return (EMUNGE_SNAFU);
 
 nomem:
