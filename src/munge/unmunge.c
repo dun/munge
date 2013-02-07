@@ -596,13 +596,16 @@ display_meta (conf_t conf)
             munge_strerror (conf->status), conf->status);
     }
     if (conf->key[MUNGE_KEY_ENCODE_HOST]) {
+        const struct in_addr addr_sentinel = {0};
         e = munge_ctx_get (conf->ctx, MUNGE_OPT_ADDR4, &addr);
         if (e != EMUNGE_SUCCESS) {
             log_err (EMUNGE_SNAFU, LOG_ERR,
                 "Failed to retrieve origin IP address: %s",
                 munge_ctx_strerror (conf->ctx));
         }
-        hptr = gethostbyaddr ((char *) &addr, sizeof (addr), AF_INET);
+        hptr = (memcmp (&addr, &addr_sentinel, sizeof (addr)))
+            ? gethostbyaddr ((char *) &addr, sizeof (addr), AF_INET)
+            : NULL;
         if (!inet_ntop (AF_INET, &addr, ip_buf, sizeof (ip_buf))) {
             log_err (EMUNGE_SNAFU, LOG_ERR,
                 "Failed to convert IP address string");

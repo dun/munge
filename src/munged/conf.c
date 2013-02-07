@@ -153,6 +153,7 @@ create_conf (void)
     conf->dek_key_len = 0;
     conf->mac_key = NULL;
     conf->mac_key_len = 0;
+    memset (&conf->addr, 0, sizeof (conf->addr));
     conf->gids = NULL;
     conf->gids_update_secs = MUNGE_GROUP_UPDATE_SECS;
     conf->nthreads = MUNGE_THREADS;
@@ -560,34 +561,45 @@ void
 lookup_ip_addr (conf_t conf)
 {
     char hostname [MAXHOSTNAMELEN];
-    char ip_buf [INET_ADDRSTRLEN];
+    char ip_addr_buf [INET_ADDRSTRLEN];
     struct hostent *hptr;
 
     if (gethostname (hostname, sizeof (hostname)) < 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to determine hostname");
     }
-    /*  The man page doesn't say what happens if the buffer is overrun,
-     *    so guarantee buffer NUL-termination just in case.
-     */
     hostname [sizeof (hostname) - 1] = '\0';
-    /*
-     *  The gethostbyname() call is not reentrant, but that's ok because:
+
+    /*  The origin IP address is embedded within the credential metadata,
+     *    but is informational and not required for successful authentication.
+     *    The in_addr is zeroed here so that if name resolution fails, the IPv4
+     *    address will be set to 0.0.0.0.
+     */
+    memset (&conf->addr, 0, sizeof (conf->addr));
+
+    /*  The gethostbyname() call is not reentrant, but that's ok because:
      *    1. there is only one thread active at this point, and
      *    2. this is the only call to gethostbyname().
-     *
      *  Note that gethostbyname() DOES NOT set errno.
      */
     if (!(hptr = gethostbyname (hostname))) {
-        log_err (EMUNGE_SNAFU, LOG_ERR,
-            "Failed to resolve host \"%s\"", hostname);
+        log_msg (LOG_WARNING, "Failed to resolve host \"%s\"", hostname);
     }
-    assert (sizeof (conf->addr) == hptr->h_length);
-    memcpy (&conf->addr, hptr->h_addr_list[0], sizeof (conf->addr));
+    else if (sizeof (conf->addr) != hptr->h_length) {
+        log_msg (LOG_WARNING,
+                "Failed to resolve host \"%s\": not an IPv4 address (len=%d)",
+                hostname, hptr->h_length);
+    }
+    else {
+        memcpy (&conf->addr, hptr->h_addr_list[0], sizeof (conf->addr));
+    }
 
-    if (!inet_ntop (AF_INET, &conf->addr, ip_buf, sizeof (ip_buf))) {
-        log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to determine IP address");
+    if (!inet_ntop (AF_INET, &conf->addr, ip_addr_buf, sizeof (ip_addr_buf))) {
+        log_errno (EMUNGE_SNAFU, LOG_ERR,
+                "Failed to convert IP address for \"%s\"", hostname);
     }
-    log_msg (LOG_NOTICE, "Running on \"%s\" (%s)", hptr->h_name, ip_buf);
+
+    log_msg (LOG_NOTICE, "Running on \"%s\" (%s)",
+            (hptr && hptr->h_name) ? hptr->h_name : hostname, ip_addr_buf);
     return;
 }
 
