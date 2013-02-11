@@ -5,7 +5,7 @@ Release:	1%{?dist}
 Summary:	MUNGE Uid 'N' Gid Emporium
 Group:		System Environment/Daemons
 License:	GPLv3+ and LGPLv3+
-URL:		http://munge.googlecode.com/
+URL:		https://munge.googlecode.com/
 
 %if 0%{?suse_version} >= 1100
 BuildRequires:	libbz2-devel

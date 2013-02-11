@@ -5,7 +5,7 @@
  *  UCRL-CODE-155910.
  *
  *  This file is part of the MUNGE Uid 'N' Gid Emporium (MUNGE).
- *  For details, see <http://munge.googlecode.com/>.
+ *  For details, see <https://munge.googlecode.com/>.
  *
  *  MUNGE is free software: you can redistribute it and/or modify it under
  *  the terms of the GNU General Public License as published by the Free
@@ -40,7 +40,7 @@
  */
 static const char *license_text[] = { \
     "Welcome to the MUNGE Uid 'N' Gid Emporium (MUNGE).",
-    "http://munge.googlecode.com/",
+    "https://munge.googlecode.com/",
     "",
     "Written by Chris Dunlap <cdunlap@llnl.gov>.",
     "Copyright (C) 2007-2013 Lawrence Livermore National Security, LLC.",
