@@ -143,13 +143,13 @@ if [ -x /sbin/chkconfig ]; then /sbin/chkconfig --add munge; fi
 if [ -x /sbin/ldconfig ]; then /sbin/ldconfig %{_libdir}; fi
 
 %preun
-if [ "$1" = 0 ]; then
+if [ $1 -eq 0 ]; then
   %{_sysconfdir}/init.d/munge stop >/dev/null 2>&1 || :
   if [ -x /sbin/chkconfig ]; then /sbin/chkconfig --del munge; fi
 fi
 
 %postun
-if [ "$1" -ge 1 ]; then
+if [ $1 -ge 1 ]; then
   %{_sysconfdir}/init.d/munge condrestart >/dev/null 2>&1 || :
 fi
 
