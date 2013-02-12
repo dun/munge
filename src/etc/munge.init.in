@@ -6,17 +6,17 @@
 # UCRL-CODE-155910.
 ###############################################################################
 # chkconfig:          - 66 33
-# Description:        Start/Stop the MUNGE authentication service.
+# description:        MUNGE Uid 'N' Gid Emporium authentication service
 ###############################################################################
 ### BEGIN INIT INFO
 # Provides:           munge
-# Required-Start:     $remote_fs $time
-# Required-Stop:      $remote_fs $time
+# Required-Start:     $local_fs $remote_fs $network $time
+# Required-Stop:      $local_fs $remote_fs
 # Should-Start:       $named $syslog
 # Should-Stop:        $named $syslog
-# Short-Description:  Start/Stop the MUNGE authentication service.
 # Default-Start:
 # Default-Stop:
+# Short-Description:  MUNGE Uid 'N' Gid Emporium authentication service
 # Description:        MUNGE (MUNGE Uid 'N' Gid Emporium) is a highly scalable
 #                     authentication service for creating and validating
 #                     credentials.
