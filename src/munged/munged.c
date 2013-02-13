@@ -236,9 +236,9 @@ daemonize_init (char *progname)
                 log_open_file (stderr, progname, priority, LOG_OPT_PRIORITY);
                 log_msg (priority, "%s", ebuf);
             }
-            exit (1);
+            exit (EXIT_FAILURE);
         }
-        exit (0);
+        exit (EXIT_SUCCESS);
     }
     if (close (fds[0]) < 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR,
@@ -265,7 +265,7 @@ daemonize_init (char *progname)
             "Failed to create grandchild process");
     }
     else if (pid > 0) {
-        exit (0);
+        exit (EXIT_SUCCESS);
     }
     return (fds[1]);
 }
