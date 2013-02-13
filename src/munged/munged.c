@@ -65,6 +65,7 @@
  *  Prototypes
  *****************************************************************************/
 
+static void disable_core_dumps (void);
 static int daemonize_init (char *progname);
 static void daemonize_fini (int fd);
 static void open_logfile (const char *logfile, int priority, int got_force);
@@ -105,6 +106,7 @@ main (int argc, char *argv[])
 #endif /* NDEBUG */
     log_open_file (stderr, log_identity, log_priority, log_options);
 
+    disable_core_dumps ();
     conf = create_conf ();
     parse_cmdline (conf, argc, argv);
     auth_recv_init (conf->auth_server_dir, conf->auth_client_dir,
@@ -160,6 +162,25 @@ main (int argc, char *argv[])
 }
 
 
+static void
+disable_core_dumps (void)
+{
+/*  Disable creation of core dump files.
+ */
+#ifdef NDEBUG
+    struct rlimit limit;
+
+    limit.rlim_cur = 0;
+    limit.rlim_max = 0;
+    if (setrlimit (RLIMIT_CORE, &limit) < 0) {
+        log_errno (EMUNGE_SNAFU, LOG_ERR,
+            "Failed to disable core dumps");
+    }
+#endif /* NDEBUG */
+    return;
+}
+
+
 static int
 daemonize_init (char *progname)
 {
@@ -168,25 +189,16 @@ daemonize_init (char *progname)
  *    will not be returned to the shell until daemonize_fini() is called.
  *  Returns an 'fd' to pass to daemonize_fini() to complete the daemonization.
  */
-    struct rlimit limit;
-    int           fds [2];
-    pid_t         pid;
-    int           n;
-    signed char   priority;
-    char          ebuf [1024];
+    int         fds [2];
+    pid_t       pid;
+    int         n;
+    signed char priority;
+    char        ebuf [1024];
 
     /*  Clear file mode creation mask.
      */
     umask (0);
 
-    /*  Disable creation of core files.
-     */
-    limit.rlim_cur = 0;
-    limit.rlim_max = 0;
-    if (setrlimit (RLIMIT_CORE, &limit) < 0) {
-        log_errno (EMUNGE_SNAFU, LOG_ERR,
-            "Failed to disable core dumps");
-    }
     /*  Create pipe for IPC so parent process will wait to terminate until
      *    signaled by grandchild process.  This allows messages written to
      *    stdout/stderr by the grandchild to be properly displayed before
