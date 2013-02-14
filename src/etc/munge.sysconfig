@@ -15,4 +15,4 @@
 ##
 # Execute the daemon under another username.
 ##
-# USER="daemon"
+# USER="munge"

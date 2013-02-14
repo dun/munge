@@ -125,7 +125,7 @@ MUNGE Installation Guide
    the daemon; for example, this can be used to override the location
    of the secret key (--key-file) or set the number of worker threads
    (--num-threads).  If the init script is invoked by root, the USER variable
-   causes the daemon to execute under the specified username; the "daemon"
+   causes the daemon to execute under the specified username; the "munge"
    user is used by default.
 
 

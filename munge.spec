@@ -26,6 +26,8 @@ BuildRoot:	%{_tmppath}/%{name}-%{version}
 
 Source0:	%{name}-%{version}.tar.bz2
 
+Requires(pre):  shadow-utils
+
 %package devel
 Requires:	%{name} = %{version}-%{release}
 Summary:	Headers and libraries for developing applications using MUNGE
@@ -130,13 +132,25 @@ DESTDIR="$RPM_BUILD_ROOT" make install
 %clean
 rm -rf "$RPM_BUILD_ROOT"
 
+%pre
+/usr/bin/getent group munge >/dev/null 2>&1 || \
+  /usr/sbin/groupadd -r munge
+/usr/bin/getent passwd munge >/dev/null 2>&1 || \
+  /usr/sbin/useradd -c "MUNGE Uid 'N' Gid Emporium" \
+  -d "%{_sysconfdir}/munge" -g munge -s /bin/false -r munge
+
 %post
 if [ ! -e %{_sysconfdir}/munge/munge.key -a -c /dev/urandom ]; then
   /bin/dd if=/dev/urandom bs=1 count=1024 \
     >%{_sysconfdir}/munge/munge.key 2>/dev/null
-  /bin/chown daemon %{_sysconfdir}/munge/munge.key
+  /bin/chown munge:munge %{_sysconfdir}/munge/munge.key
   /bin/chmod 0400 %{_sysconfdir}/munge/munge.key
 fi
+##
+# Fix files for munge user when upgrading to 0.5.11.
+/bin/egrep '^[ 	]*USER=' %{_sysconfdir}/sysconfig/munge >/dev/null 2>&1 || \
+  /bin/chown munge:munge %{_sysconfdir}/munge/* %{_localstatedir}/*/munge/* \
+  >/dev/null 2>&1
 ##
 # Fix subsys lockfile name when upgrading to 0.5.11.
 if [ -f /var/lock/subsys/munged ]; then
@@ -175,11 +189,11 @@ if [ -x /sbin/ldconfig ]; then /sbin/ldconfig %{_libdir}; fi
 %doc QUICKSTART
 %doc README*
 %doc doc/*
-%dir %attr(0700,daemon,root) %config %{_sysconfdir}/munge
+%dir %attr(0700,munge,munge) %config %{_sysconfdir}/munge
 %config(noreplace) %{_sysconfdir}/*/*
-%dir %attr(0711,daemon,root) %config %{_localstatedir}/lib/munge
-%dir %attr(0700,daemon,root) %config %{_localstatedir}/log/munge
-%dir %attr(0755,daemon,root) %config %{_localstatedir}/run/munge
+%dir %attr(0711,munge,munge) %config %{_localstatedir}/lib/munge
+%dir %attr(0700,munge,munge) %config %{_localstatedir}/log/munge
+%dir %attr(0755,munge,munge) %config %{_localstatedir}/run/munge
 %{_bindir}/*
 %{_sbindir}/*
 %{_mandir}/*[^3]/*
