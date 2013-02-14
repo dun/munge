@@ -23,7 +23,7 @@
 ### END INIT INFO
 ###############################################################################
 
-unset DESC DAEMON CONFIG DAEMON_ARGS PIDFILE NICE USER SIGHUP_RELOAD
+unset DESC DAEMON CONFIG DAEMON_ARGS PIDFILE NICE USER SIGHUP_RELOAD VARRUNDIR
 
 prefix="@prefix@"
 exec_prefix="@exec_prefix@"
@@ -39,6 +39,7 @@ PIDFILE="$localstatedir/run/munge/munged.pid"
 #NICE=
 USER="daemon"
 #SIGHUP_RELOAD=#_NOT_SUPPORTED_#
+VARRUNDIR="$localstatedir/run/munge"
 
 ###############################################################################
 
@@ -120,8 +121,7 @@ service_start ()
 ##
   log_init "Starting $DESC" "$DAEMON_NAME"
 
-  VARRUNDIR="$localstatedir/run/munge"
-  if [ ! -d "$VARRUNDIR" ]; then
+  if [ -n "$VARRUNDIR" -a ! -d "$VARRUNDIR" ]; then
     mkdir -m 755 -p "$VARRUNDIR"
     [ -n "$USER" ] && chown "$USER" "$VARRUNDIR"
   fi
