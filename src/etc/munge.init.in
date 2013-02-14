@@ -23,7 +23,8 @@
 ### END INIT INFO
 ###############################################################################
 
-unset DESC DAEMON CONFIG DAEMON_ARGS PIDFILE NICE USER SIGHUP_RELOAD VARRUNDIR
+unset SERVICE_NAME DAEMON_EXEC DAEMON_ARGS CONFIG PIDFILE NICE USER \
+  SIGHUP_RELOAD VARRUNDIR
 
 prefix="@prefix@"
 exec_prefix="@exec_prefix@"
@@ -31,10 +32,10 @@ sbindir="@sbindir@"
 sysconfdir="@sysconfdir@"
 localstatedir="@localstatedir@"
 
-DESC="MUNGE"
-DAEMON="$sbindir/munged"
-#CONFIG=#_NOT_SUPPORTED_#
+SERVICE_NAME="MUNGE"
+DAEMON_EXEC="$sbindir/munged"
 #DAEMON_ARGS=
+#CONFIG=#_NOT_SUPPORTED_#
 PIDFILE="$localstatedir/run/munge/munged.pid"
 #NICE=
 USER="daemon"
@@ -51,8 +52,8 @@ service_init ()
 #   this function in order for SuSE to initialize its environment properly.
 ##
   PATH=/sbin:/usr/sbin:/bin:/usr/bin
-  DAEMON_NAME="`basename \"$DAEMON\"`"
-  SCRIPT_NAME="`basename \"$0\" .init | sed 's/^[SK][0-9][0-9]*//'`"
+  INIT_NAME="`basename \"$0\" .init | sed 's/^[SK][0-9][0-9]*//'`"
+  DAEMON_NAME="`basename \"$DAEMON_EXEC\"`"
   SIGTERM_TIMEOUT="3"
   STATUS=0
 
@@ -60,7 +61,7 @@ service_init ()
   #   $CONFIG, $DAEMON_ARGS, $PIDFILE, $USER, $NICE, $SIGHUP_RELOAD
   ##
   for dir in "$sysconfdir/default" "$sysconfdir/sysconfig"; do
-    [ -r "$dir/$SCRIPT_NAME" ] && . "$dir/$SCRIPT_NAME"
+    [ -r "$dir/$INIT_NAME" ] && . "$dir/$INIT_NAME"
   done
   [ -z "$DAEMON_ARGS" -a -n "$OPTIONS" ] && DAEMON_ARGS="$OPTIONS"
   [ "`id | sed 's/^uid=\([0-9]*\).*/\1/'`" -ne 0 ] && unset USER
@@ -70,14 +71,14 @@ service_init ()
 
   if [ -f /etc/debian_version -a -x /sbin/start-stop-daemon ]; then
     SYSTEM="DEBIAN"
-    [ -x "$DAEMON" ] || exit 0                  # pkg removed but not purged
+    [ -x "$DAEMON_EXEC" ] || exit 0             # pkg removed but not purged
     [ -r /etc/default/rcS ] && . /etc/default/rcS
     [ -r /lib/init/vars.sh ] && . /lib/init/vars.sh
     [ -r /lib/lsb/init-functions ] && . /lib/lsb/init-functions
-  elif [ -f /etc/redhat-release -a -r /etc/init.d/functions ]; then
+  elif [ -f /etc/redhat-release -a -r /etc/rc.d/init.d/functions ]; then
     SYSTEM="REDHAT"
-    . /etc/init.d/functions
-    RH_SUBSYS="/var/lock/subsys/$DAEMON_NAME"
+    . /etc/rc.d/init.d/functions
+    RH_LOCK="/var/lock/subsys/$INIT_NAME"
   elif [ -f /etc/SuSE-release -a -r /etc/rc.status ]; then
     SYSTEM="SUSE"
     . /etc/rc.status
@@ -91,7 +92,7 @@ service_init ()
 
   # Exit if the package has been removed.
   ##
-  [ -x "$DAEMON" ] || exit 5                    # LSB: program not installed
+  [ -x "$DAEMON_EXEC" ] || exit 5               # LSB: program not installed
 
   # Exit if the configuration has been removed.
   ##
@@ -119,7 +120,7 @@ service_start ()
 # Required by LSB, where running "start" on a service already running should be
 #   considered successful.
 ##
-  log_init "Starting $DESC" "$DAEMON_NAME"
+  log_init "Starting $SERVICE_NAME" "$DAEMON_NAME"
 
   if [ -n "$VARRUNDIR" -a ! -d "$VARRUNDIR" ]; then
     mkdir -m 755 -p "$VARRUNDIR"
@@ -135,7 +136,7 @@ service_start ()
           ${NICE:+"--nicelevel"} ${NICE:+"$NICE"} \
           ${USER:+"--chuid"} ${USER:+"$USER"} \
           ${PIDFILE:+"--pidfile"} ${PIDFILE:+"$PIDFILE"} \
-          --exec "$DAEMON" -- $DAEMON_ARGS 2>&1`
+          --exec "$DAEMON_EXEC" -- $DAEMON_ARGS 2>&1`
         STATUS=$?
       fi
       ;;
@@ -144,16 +145,16 @@ service_start ()
         STATUS=0
       else
         daemon ${NICE:+"$NICE"} ${USER:+"--user"} ${USER:+"$USER"} \
-          "$DAEMON" $DAEMON_ARGS
+          "$DAEMON_EXEC" $DAEMON_ARGS
         STATUS=$?
       fi
-      [ $STATUS -eq 0 ] && touch "$RH_SUBSYS" >/dev/null 2>&1
+      [ $STATUS -eq 0 ] && touch "$RH_LOCK" >/dev/null 2>&1
       ;;
     SUSE)
       ERRMSG=`startproc ${NICE:+"-n"} ${NICE:+"$NICE"} \
         ${USER:+"-u"} ${USER:+"$USER"} \
         ${PIDFILE:+"-p"} ${PIDFILE:+"$PIDFILE"} \
-        "$DAEMON" $DAEMON_ARGS 2>&1`
+        "$DAEMON_EXEC" $DAEMON_ARGS 2>&1`
       rc_status -v
       STATUS=$?
       ;;
@@ -162,10 +163,11 @@ service_start ()
         ERRMSG=`su "$USER" -c "/sbin/start_daemon \
           ${NICE:+\"-n\"} ${NICE:+\"$NICE\"} \
           ${PIDFILE:+\"-p\"} ${PIDFILE:+\"$PIDFILE\"} \
-          \"$DAEMON\" $DAEMON_ARGS" 2>&1`
+          \"$DAEMON_EXEC\" $DAEMON_ARGS" 2>&1`
       else
         ERRMSG=`start_daemon ${NICE:+"-n"} ${NICE:+"$NICE"} \
-          ${PIDFILE:+"-p"} ${PIDFILE:+"$PIDFILE"} "$DAEMON" $DAEMON_ARGS 2>&1`
+          ${PIDFILE:+"-p"} ${PIDFILE:+"$PIDFILE"} \
+          "$DAEMON_EXEC" $DAEMON_ARGS 2>&1`
       fi
       STATUS=$?
       ;;
@@ -175,9 +177,9 @@ service_start ()
       else
         [ -n "$NICE" ] && nice="nice -n $NICE"
         if [ -n "$USER" ]; then
-          ERRMSG=`su "$USER" -c "$nice \"$DAEMON\" $DAEMON_ARGS" 2>&1`
+          ERRMSG=`su "$USER" -c "$nice \"$DAEMON_EXEC\" $DAEMON_ARGS" 2>&1`
         else
-          ERRMSG=`$nice "$DAEMON" $DAEMON_ARGS 2>&1`
+          ERRMSG=`$nice "$DAEMON_EXEC" $DAEMON_ARGS 2>&1`
         fi
         STATUS=$?
       fi
@@ -193,7 +195,7 @@ service_stop ()
 # Required by LSB, where running "stop" on a service already stopped or not
 #   running should be considered successful.
 ##
-  log_init "Stopping $DESC" "$DAEMON_NAME"
+  log_init "Stopping $SERVICE_NAME" "$DAEMON_NAME"
   case $SYSTEM in
     DEBIAN)
       if ! $0 status >/dev/null 2>&1; then
@@ -210,23 +212,23 @@ service_stop ()
       if ! $0 status >/dev/null 2>&1; then
         STATUS=0
       else
-        killproc "$DAEMON"
+        killproc "$DAEMON_EXEC"
         STATUS=$?
       fi
-      [ $STATUS -eq 0 ] && rm -f "$RH_SUBSYS" >/dev/null 2>&1
+      [ $STATUS -eq 0 ] && rm -f "$RH_LOCK" >/dev/null 2>&1
       ;;
     SUSE)
       killproc ${PIDFILE:+"-p"} ${PIDFILE:+"$PIDFILE"} \
         ${SIGTERM_TIMEOUT:+"-t"} ${SIGTERM_TIMEOUT:+"$SIGTERM_TIMEOUT"} \
-        "$DAEMON"
+        "$DAEMON_EXEC"
       rc_status -v
       ;;
     LSB)
-      killproc ${PIDFILE:+"-p"} ${PIDFILE:+"$PIDFILE"} "$DAEMON"
+      killproc ${PIDFILE:+"-p"} ${PIDFILE:+"$PIDFILE"} "$DAEMON_EXEC"
       STATUS=$?
       ;;
     *)
-      signal_process "$DAEMON"
+      signal_process "$DAEMON_EXEC"
       rc=$?
       [ $rc -eq 0 -o $rc -eq 2 ] && STATUS=0 || STATUS=1
       ;;
@@ -269,7 +271,7 @@ service_try_restart ()
 ##
   case $SYSTEM in
     REDHAT)
-      [ -f "$RH_SUBSYS" ] && $0 restart || :
+      [ -f "$RH_LOCK" ] && $0 restart || :
       STATUS=$?
       ;;
     SUSE)
@@ -291,7 +293,7 @@ service_reload ()
 ##
   [ -z "$RELOAD" ] && STATUS=3          # LSB: unimplemented feature
 
-  log_init "Reloading $DESC" "$DAEMON_NAME"
+  log_init "Reloading $SERVICE_NAME" "$DAEMON_NAME"
   case $SYSTEM in
     DEBIAN)
       if [ -n "$RELOAD" ]; then
@@ -303,7 +305,7 @@ service_reload ()
       ;;
     REDHAT)
       if [ -n "$RELOAD" ]; then
-        killproc "$DAEMON" -HUP
+        killproc "$DAEMON_EXEC" -HUP
         STATUS=$?
       else
         echo_failure
@@ -311,7 +313,7 @@ service_reload ()
       ;;
     SUSE)
       if [ -n "$RELOAD" ]; then
-        killproc -HUP ${PIDFILE:+"-p"} ${PIDFILE:+"$PIDFILE"} "$DAEMON"
+        killproc -HUP ${PIDFILE:+"-p"} ${PIDFILE:+"$PIDFILE"} "$DAEMON_EXEC"
       else
         rc_failed $STATUS
       fi
@@ -319,13 +321,13 @@ service_reload ()
       ;;
     LSB)
       if [ -n "$RELOAD" ]; then
-        killproc ${PIDFILE:+"-p"} ${PIDFILE:+"$PIDFILE"} "$DAEMON" -HUP
+        killproc ${PIDFILE:+"-p"} ${PIDFILE:+"$PIDFILE"} "$DAEMON_EXEC" -HUP
         STATUS=$?
       fi
       ;;
     *)
       if [ -n "$RELOAD" ]; then
-        signal_process "$DAEMON" "HUP"
+        signal_process "$DAEMON_EXEC" "HUP"
         STATUS=$?
       fi
       ;;
@@ -365,18 +367,18 @@ service_status ()
 ##
   case $SYSTEM in
     REDHAT)
-      status "$DAEMON"
+      status "$DAEMON_EXEC"
       STATUS=$?
       ;;
     SUSE)
-      printf "Checking for service $DESC: "
-      checkproc ${PIDFILE:+"-p"} ${PIDFILE:+"$PIDFILE"} "$DAEMON"
+      printf "Checking for service $SERVICE_NAME: "
+      checkproc ${PIDFILE:+"-p"} ${PIDFILE:+"$PIDFILE"} "$DAEMON_EXEC"
       rc_status -v
       ;;
     LSB)
-      printf "Checking status of $DESC: "
+      printf "Checking status of $SERVICE_NAME: "
       pids=`pidofproc ${PIDFILE:+"-p"} ${PIDFILE:+"$PIDFILE"} \
-        "$DAEMON" 2>/dev/null`
+        "$DAEMON_EXEC" 2>/dev/null`
       STATUS=$?
       if [ $STATUS -eq 0 -a -n "$pids" ]; then
         echo "running."
@@ -387,8 +389,8 @@ service_status ()
       fi
       ;;
     DEBIAN|*)
-      printf "Checking status of $DESC: "
-      pids=`query_pids "$DAEMON" "$PIDFILE"`
+      printf "Checking status of $SERVICE_NAME: "
+      pids=`query_pids "$DAEMON_EXEC" "$PIDFILE"`
       rc=$?
       if [ $rc -eq 0 -a -n "$pids" ]; then
         echo "running."
@@ -450,20 +452,20 @@ signal_process ()
   PROCNAME="$1"
   SIGNUM="$2"
 
-  pids=`query_pids "$DAEMON" "$PIDFILE"`
+  pids=`query_pids "$DAEMON_EXEC" "$PIDFILE"`
   [ $? -ne 0 -o -z "$pids" ] && return 2
 
   kill ${SIGNUM:+"-$SIGNUM"} $pids >/dev/null 2>&1
   [ $? -ne 0 ] && return 1
   [ -n "$SIGNUM" ] && return 0
 
-  pids=`query_pids "$DAEMON" "$PIDFILE"`
+  pids=`query_pids "$DAEMON_EXEC" "$PIDFILE"`
   [ $? -ne 0 -o -z "$pids" ] && return 0
   [ -z "$SIGTERM_TIMEOUT" ] && return 1
 
   sleep "$SIGTERM_TIMEOUT"
   kill -KILL $pids >/dev/null 2>&1
-  pids=`query_pids "$DAEMON" "$PIDFILE"`
+  pids=`query_pids "$DAEMON_EXEC" "$PIDFILE"`
   [ $? -ne 0 -o -z "$pids" ] && return 0
   return 1
 }
