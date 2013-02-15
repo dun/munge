@@ -168,7 +168,6 @@ if [ -x /sbin/ldconfig ]; then /sbin/ldconfig %{_libdir}; fi
 %doc PLATFORMS
 %doc QUICKSTART
 %doc README*
-%doc TODO
 %doc doc/*
 %dir %attr(0700,daemon,root) %config %{_sysconfdir}/munge
 %config(noreplace) %{_sysconfdir}/*/*
