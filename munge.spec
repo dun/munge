@@ -150,7 +150,7 @@ fi
 
 %postun
 if [ $1 -ge 1 ]; then
-  %{_sysconfdir}/init.d/munge condrestart >/dev/null 2>&1 || :
+  %{_sysconfdir}/init.d/munge try-restart >/dev/null 2>&1 || :
 fi
 
 %postun libs
