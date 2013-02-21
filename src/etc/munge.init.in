@@ -212,7 +212,7 @@ service_stop ()
       if ! $0 status >/dev/null 2>&1; then
         STATUS=0
       else
-        killproc "$DAEMON_EXEC"
+        killproc ${PIDFILE:+"-p"} ${PIDFILE:+"$PIDFILE"} "$DAEMON_EXEC"
         STATUS=$?
       fi
       [ $STATUS -eq 0 ] && rm -f "$RH_LOCK" >/dev/null 2>&1
@@ -305,7 +305,7 @@ service_reload ()
       ;;
     REDHAT)
       if [ -n "$RELOAD" ]; then
-        killproc "$DAEMON_EXEC" -HUP
+        killproc ${PIDFILE:+"-p"} ${PIDFILE:+"$PIDFILE"} "$DAEMON_EXEC" -HUP
         STATUS=$?
       else
         echo_failure
@@ -367,7 +367,7 @@ service_status ()
 ##
   case $SYSTEM in
     REDHAT)
-      status "$DAEMON_EXEC"
+      status ${PIDFILE:+"-p"} ${PIDFILE:+"$PIDFILE"} "$DAEMON_EXEC"
       STATUS=$?
       ;;
     SUSE)
