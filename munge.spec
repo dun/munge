@@ -137,6 +137,12 @@ if [ ! -e %{_sysconfdir}/munge/munge.key -a -c /dev/urandom ]; then
   /bin/chown daemon %{_sysconfdir}/munge/munge.key
   /bin/chmod 0400 %{_sysconfdir}/munge/munge.key
 fi
+##
+# Fix subsys lockfile name when upgrading to 0.5.11.
+if [ -f /var/lock/subsys/munged ]; then
+  /bin/mv /var/lock/subsys/munged /var/lock/subsys/munge
+fi
+##
 if [ -x /sbin/chkconfig ]; then /sbin/chkconfig --add munge; fi
 
 %post libs
