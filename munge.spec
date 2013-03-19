@@ -6,6 +6,7 @@ Summary:	MUNGE Uid 'N' Gid Emporium
 Group:		System Environment/Daemons
 License:	GPLv3+ and LGPLv3+
 URL:		https://munge.googlecode.com/
+Requires:	%{name}-libs = %{version}-%{release}
 
 %if 0%{?suse_version} >= 1100
 BuildRequires:	libbz2-devel
@@ -29,14 +30,14 @@ Source0:	%{name}-%{version}.tar.bz2
 Requires(pre):  shadow-utils
 
 %package devel
-Requires:	%{name} = %{version}-%{release}
 Summary:	Headers and libraries for developing applications using MUNGE
 Group:		Development/Libraries
+Requires:	%{name}-libs = %{version}-%{release}
 
 %package libs
-Requires:	%{name} = %{version}-%{release}
 Summary:	Libraries for applications using MUNGE
 Group:		System Environment/Libraries
+Requires:	%{name} = %{version}-%{release}
 
 %description
 MUNGE (MUNGE Uid 'N' Gid Emporium) is an authentication service for creating
