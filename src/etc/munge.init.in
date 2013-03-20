@@ -23,7 +23,7 @@
 ### END INIT INFO
 ###############################################################################
 
-unset SERVICE_NAME DAEMON_EXEC DAEMON_ARGS CONFIG PIDFILE NICE USER \
+unset SERVICE_NAME DAEMON_EXEC DAEMON_ARGS CONFIG PIDFILE NICE USER GROUP \
   SIGHUP_RELOAD VARRUNDIR
 
 prefix="@prefix@"
@@ -39,6 +39,7 @@ DAEMON_EXEC="$sbindir/munged"
 PIDFILE="$localstatedir/run/munge/munged.pid"
 #NICE=
 USER="munge"
+GROUP="munge"
 #SIGHUP_RELOAD=#_NOT_SUPPORTED_#
 VARRUNDIR="$localstatedir/run/munge"
 
@@ -125,6 +126,7 @@ service_start ()
   if [ -n "$VARRUNDIR" -a ! -d "$VARRUNDIR" ]; then
     mkdir -m 755 -p "$VARRUNDIR"
     [ -n "$USER" ] && chown "$USER" "$VARRUNDIR"
+    [ -n "$GROUP" ] && chgrp "$GROUP" "$VARRUNDIR"
   fi
 
   case $SYSTEM in

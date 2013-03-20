@@ -16,3 +16,8 @@
 # Execute the daemon under another username.
 ##
 # USER="munge"
+
+##
+# Execute the daemon under another groupname.
+##
+# GROUP="munge"
