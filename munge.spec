@@ -190,11 +190,11 @@ if [ -x /sbin/ldconfig ]; then /sbin/ldconfig %{_libdir}; fi
 %doc QUICKSTART
 %doc README*
 %doc doc/*
-%dir %attr(0700,munge,munge) %config %{_sysconfdir}/munge
+%dir %attr(0700,munge,munge) %{_sysconfdir}/munge
 %config(noreplace) %{_sysconfdir}/*/*
-%dir %attr(0711,munge,munge) %config %{_localstatedir}/lib/munge
-%dir %attr(0700,munge,munge) %config %{_localstatedir}/log/munge
-%dir %attr(0755,munge,munge) %config %{_localstatedir}/run/munge
+%dir %attr(0711,munge,munge) %{_localstatedir}/lib/munge
+%dir %attr(0700,munge,munge) %{_localstatedir}/log/munge
+%dir %attr(0755,munge,munge) %{_localstatedir}/run/munge
 %{_bindir}/*
 %{_sbindir}/*
 %{_mandir}/*[^3]/*
