@@ -126,6 +126,10 @@ make
 rm -rf "$RPM_BUILD_ROOT"
 mkdir -p "$RPM_BUILD_ROOT"
 DESTDIR="$RPM_BUILD_ROOT" make install
+touch "$RPM_BUILD_ROOT"/%{_sysconfdir}/munge/munge.key
+touch "$RPM_BUILD_ROOT"/%{_localstatedir}/lib/munge/munge.seed
+touch "$RPM_BUILD_ROOT"/%{_localstatedir}/log/munge/munged.log
+touch "$RPM_BUILD_ROOT"/%{_localstatedir}/run/munge/munged.pid
 %ifos aix5.3 aix5.2 aix5.1 aix5.0 aix4.3
 [ -f "libmunge.a" ] && cp "libmunge.a" "$RPM_BUILD_ROOT"%{_libdir}
 %endif
@@ -191,10 +195,14 @@ if [ -x /sbin/ldconfig ]; then /sbin/ldconfig %{_libdir}; fi
 %doc README*
 %doc doc/*
 %dir %attr(0700,munge,munge) %{_sysconfdir}/munge
+%attr(0600,munge,munge) %config(noreplace) %ghost %{_sysconfdir}/munge/munge.key
 %config(noreplace) %{_sysconfdir}/*/*
 %dir %attr(0711,munge,munge) %{_localstatedir}/lib/munge
+%attr(0600,munge,munge) %ghost %{_localstatedir}/lib/munge/munge.seed
 %dir %attr(0700,munge,munge) %{_localstatedir}/log/munge
+%attr(0640,munge,munge) %ghost %{_localstatedir}/log/munge/munged.log
 %dir %attr(0755,munge,munge) %ghost %{_localstatedir}/run/munge
+%attr(0644,munge,munge) %ghost %{_localstatedir}/run/munge/munged.pid
 %{_bindir}/*
 %{_sbindir}/*
 %{_mandir}/*[^3]/*
