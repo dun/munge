@@ -37,6 +37,7 @@
 #include <signal.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/mman.h>
 #include <sys/time.h>                   /* include before resource.h for bsd */
 #include <sys/resource.h>
 #include <sys/socket.h>
@@ -125,6 +126,18 @@ main (int argc, char *argv[])
     handle_signals ();
     lookup_ip_addr (conf);
     write_pidfile (conf->pidfile_name, conf->got_force);
+
+    if (conf->got_mlockall){
+#ifdef _POSIX_MEMLOCK
+        if (mlockall(MCL_CURRENT|MCL_FUTURE) < 0) {
+            log_msg (LOG_ERR, "%s (pid %d) could not lock pages",
+                     META_ALIAS, (int) getpid ());
+        }
+#else
+        log_msg (LOG_ERR, "%s (pid %d) does not appear to have mlockall()",
+                     META_ALIAS, (int) getpid ());
+#endif /* _POSIX_MEMLOCK */
+    }
 
     crypto_init ();
     if (random_init (conf->seed_name) < 0) {

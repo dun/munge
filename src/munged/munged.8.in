@@ -76,6 +76,10 @@ file/directory permissions.
 .BI "-F, --foreground"
 Run the daemon in the foreground.
 .TP
+.BI "-M, --mlockall"
+Lock all pages into memory upon daemon startup.  This can help keep munged
+responsive when the system is under heavy memory pressure.
+.TP
 .BI "-S, --socket " path
 Specify the local domain socket for communicating with clients.
 .TP

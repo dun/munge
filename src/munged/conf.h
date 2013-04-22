@@ -49,6 +49,7 @@ struct conf {
     unsigned        got_root_auth:1;    /* flag if root can decode any cred  */
     unsigned        got_socket_retry:1; /* flag for allowing decode retries  */
     unsigned        got_syslog:1;       /* flag if logging to syslog instead */
+    unsigned        got_mlockall:1;     /* flag if munged should lock mem    */
     munge_cipher_t  def_cipher;         /* default cipher type               */
     munge_zip_t     def_zip;            /* default compression type          */
     munge_mac_t     def_mac;            /* default message auth code type    */
