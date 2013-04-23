@@ -157,9 +157,11 @@ create_conf (void)
     conf->gids = NULL;
     conf->gids_update_secs = MUNGE_GROUP_UPDATE_SECS;
     conf->nthreads = MUNGE_THREADS;
+    conf->auth_server_dir = NULL;
+    conf->auth_client_dir = NULL;
+    conf->auth_rnd_bytes = MUNGE_AUTH_RND_BYTES;
 
 #if defined(AUTH_METHOD_RECVFD_MKFIFO) || defined(AUTH_METHOD_RECVFD_MKNOD)
-
     if (!(conf->auth_server_dir = strdup (MUNGE_AUTH_SERVER_DIR))) {
         log_errno (EMUNGE_NO_MEMORY, LOG_ERR,
             "Failed to copy auth-server-dir default string");
@@ -169,8 +171,6 @@ create_conf (void)
             "Failed to copy auth-client-dir default string");
     }
 #endif /* AUTH_METHOD_RECVFD_MKFIFO || AUTH_METHOD_RECVFD_MKNOD */
-
-    conf->auth_rnd_bytes = MUNGE_AUTH_RND_BYTES;
 
     return (conf);
 }
