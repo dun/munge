@@ -114,8 +114,8 @@ create_conf (void)
     conf->got_force = 0;
     conf->got_foreground = 0;
     conf->got_group_stat = !! MUNGE_GROUP_STAT_FLAG;
-    conf->got_socket_retry = !! MUNGE_SOCKET_RETRY_FLAG;
     conf->got_root_auth = !! MUNGE_AUTH_ROOT_ALLOW_FLAG;
+    conf->got_socket_retry = !! MUNGE_SOCKET_RETRY_FLAG;
     conf->got_syslog = 0;
     conf->def_cipher = MUNGE_DEFAULT_CIPHER;
     conf->def_zip = zip_select_default_type (MUNGE_DEFAULT_ZIP);

@@ -46,8 +46,8 @@ struct conf {
     unsigned        got_force:1;        /* flag for FORCE option             */
     unsigned        got_foreground:1;   /* flag for FOREGROUND option        */
     unsigned        got_group_stat:1;   /* flag for gids stat'ing /etc/group */
-    unsigned        got_socket_retry:1; /* flag for allowing decode retries  */
     unsigned        got_root_auth:1;    /* flag if root can decode any cred  */
+    unsigned        got_socket_retry:1; /* flag for allowing decode retries  */
     unsigned        got_syslog:1;       /* flag if logging to syslog instead */
     munge_cipher_t  def_cipher;         /* default cipher type               */
     munge_zip_t     def_zip;            /* default compression type          */
