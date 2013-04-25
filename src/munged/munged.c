@@ -37,7 +37,9 @@
 #include <signal.h>
 #include <stdlib.h>
 #include <string.h>
+#if HAVE_MLOCKALL
 #include <sys/mman.h>
+#endif /* HAVE_MLOCKALL */
 #include <sys/time.h>                   /* include before resource.h for bsd */
 #include <sys/resource.h>
 #include <sys/socket.h>
@@ -75,6 +77,7 @@ static void hup_handler (int signum);
 static void exit_handler (int signum);
 static void segv_handler (int signum);
 static void write_pidfile (const char *pidfile, int got_force);
+static void lock_memory (void);
 static void sock_create (conf_t conf);
 static void sock_lock (conf_t conf);
 static int set_file_lock (int fd);
@@ -126,19 +129,9 @@ main (int argc, char *argv[])
     handle_signals ();
     lookup_ip_addr (conf);
     write_pidfile (conf->pidfile_name, conf->got_force);
-
-    if (conf->got_mlockall){
-#ifdef _POSIX_MEMLOCK
-        if (mlockall(MCL_CURRENT|MCL_FUTURE) < 0) {
-            log_msg (LOG_ERR, "%s (pid %d) could not lock pages",
-                     META_ALIAS, (int) getpid ());
-        }
-#else
-        log_msg (LOG_ERR, "%s (pid %d) does not appear to have mlockall()",
-                     META_ALIAS, (int) getpid ());
-#endif /* _POSIX_MEMLOCK */
+    if (conf->got_mlockall) {
+        lock_memory ();
     }
-
     crypto_init ();
     if (random_init (conf->seed_name) < 0) {
         if (conf->seed_name) {
@@ -554,6 +547,39 @@ write_pidfile (const char *pidfile, int got_force)
     }
     (void) unlink (pidfile);
     return;                             /* failure */
+}
+
+
+static void
+lock_memory (void)
+{
+/*  Lock all current and future pages in the virtual memory address space.
+ *    Access to locked pages will never be delayed by a page fault.
+ *  EAGAIN is tested for up to max_tries in case this is a transient error.
+ *    Should there be a nanosleep() between attempts?
+ */
+#if ! HAVE_MLOCKALL
+    errno = ENOSYS;
+    log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to lock pages in memory");
+#else
+    int       rv;
+    int       i = 0;
+    const int max_tries = 10;
+
+    while (1) {
+        i++;
+        rv = mlockall (MCL_CURRENT | MCL_FUTURE);
+        if (rv == 0) {
+            break;
+        }
+        if ((errno == EAGAIN) && (i < max_tries)) {
+            continue;
+        }
+        log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to lock pages in memory");
+    }
+    log_msg (LOG_INFO, "Locked all pages in memory");
+#endif /* ! HAVE_MLOCKALL */
+    return;
 }
 
 

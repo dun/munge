@@ -13059,6 +13059,7 @@ fi
 ##
 for ac_func in \
   localtime_r \
+  mlockall \
   sysconf \
 
 do :
