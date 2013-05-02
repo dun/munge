@@ -111,6 +111,9 @@
 /* Define to 1 if you have the <memory.h> header file. */
 #undef HAVE_MEMORY_H
 
+/* Define to 1 if you have the `mlockall' function. */
+#undef HAVE_MLOCKALL
+
 /* Define to 1 if you want to use the OpenSSL cryptographic library. */
 #undef HAVE_OPENSSL
 

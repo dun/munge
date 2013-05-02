@@ -76,6 +76,13 @@ file/directory permissions.
 .BI "-F, --foreground"
 Run the daemon in the foreground.
 .TP
+.BI "-M, --mlockall"
+Lock all current and future pages in the virtual memory address space.
+Access to locked pages will never be delayed by a page fault.  This can
+improve performance and help the daemon remain responsive when the system
+is under heavy memory pressure.  This typically requires root privileges
+or the CAP_IPC_LOCK capability.
+.TP
 .BI "-S, --socket " path
 Specify the local domain socket for communicating with clients.
 .TP

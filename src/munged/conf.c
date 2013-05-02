@@ -59,7 +59,7 @@
  *  Command-Line Options
  *****************************************************************************/
 
-const char * const short_opts = ":hLVfFS:";
+const char * const short_opts = ":hLVfFMS:";
 
 #include <getopt.h>
 struct option long_opts[] = {
@@ -68,6 +68,7 @@ struct option long_opts[] = {
     { "version",           no_argument,       NULL, 'V' },
     { "force",             no_argument,       NULL, 'f' },
     { "foreground",        no_argument,       NULL, 'F' },
+    { "mlockall",          no_argument,       NULL, 'M' },
     { "socket",            required_argument, NULL, 'S' },
     { "advice",            no_argument,       NULL, 'A' },
     { "key-file",          required_argument, NULL, '0' },
@@ -114,6 +115,7 @@ create_conf (void)
     conf->got_force = 0;
     conf->got_foreground = 0;
     conf->got_group_stat = !! MUNGE_GROUP_STAT_FLAG;
+    conf->got_mlockall = 0;
     conf->got_root_auth = !! MUNGE_AUTH_ROOT_ALLOW_FLAG;
     conf->got_socket_retry = !! MUNGE_SOCKET_RETRY_FLAG;
     conf->got_syslog = 0;
@@ -274,6 +276,9 @@ parse_cmdline (conf_t conf, int argc, char **argv)
             case 'F':
                 conf->got_foreground = 1;
                 break;
+            case 'M':
+                conf->got_mlockall = 1;
+                break;
             case 'S':
                 if (conf->socket_name)
                     free (conf->socket_name);
@@ -423,6 +428,9 @@ display_help (char *prog)
 
     printf ("  %*s %s\n", w, "-F, --foreground",
             "Run process in the foreground (do not fork)");
+
+    printf ("  %*s %s\n", w, "-M, --mlockall",
+            "Lock all pages in memory");
 
     printf ("  %*s %s [%s]\n", w, "-S, --socket=PATH",
             "Specify local socket", MUNGE_SOCKET_NAME);

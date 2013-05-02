@@ -115,6 +115,7 @@ AC_CHECK_TYPES(socklen_t, [], [], [#include <sys/types.h>
 ##
 AC_CHECK_FUNCS( \
   localtime_r \
+  mlockall \
   sysconf \
 )
 AC_REPLACE_FUNCS( \
