@@ -718,10 +718,14 @@ sock_lock (conf_t conf)
             "Failed to create \"%s\"", conf->lockfile_name);
     }
     if ((rv = set_file_lock (conf->lockfile_fd)) < 0) {
-        log_errno (EMUNGE_SNAFU, LOG_ERR,
-            "Failed to lock \"%s\"", conf->lockfile_name);
+        if (!conf->got_force)
+            log_errno (EMUNGE_SNAFU, LOG_ERR,
+                "Failed to lock \"%s\"", conf->lockfile_name);
+        else
+            log_msg (LOG_WARNING,
+                "Failed to lock \"%s\"", conf->lockfile_name);
     }
-    if (rv > 0) {
+    else if (rv > 0) {
 
         pid_t pid = is_file_locked (conf->lockfile_fd);
 
