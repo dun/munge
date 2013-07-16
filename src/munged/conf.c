@@ -59,28 +59,38 @@
  *  Command-Line Options
  *****************************************************************************/
 
+#define OPT_ADVICE              256
+#define OPT_KEY_FILE            257
+#define OPT_NUM_THREADS         258
+#define OPT_AUTH_SERVER         259
+#define OPT_AUTH_CLIENT         260
+#define OPT_GROUP_CHECK         261
+#define OPT_GROUP_UPDATE        262
+#define OPT_SYSLOG              263
+#define OPT_LAST                264
+
 const char * const short_opts = ":hLVfFMS:";
 
 #include <getopt.h>
 struct option long_opts[] = {
-    { "help",              no_argument,       NULL, 'h' },
-    { "license",           no_argument,       NULL, 'L' },
-    { "version",           no_argument,       NULL, 'V' },
-    { "force",             no_argument,       NULL, 'f' },
-    { "foreground",        no_argument,       NULL, 'F' },
-    { "mlockall",          no_argument,       NULL, 'M' },
-    { "socket",            required_argument, NULL, 'S' },
-    { "advice",            no_argument,       NULL, 'A' },
-    { "key-file",          required_argument, NULL, '0' },
-    { "num-threads",       required_argument, NULL, '1' },
+    { "help",              no_argument,       NULL, 'h'              },
+    { "license",           no_argument,       NULL, 'L'              },
+    { "version",           no_argument,       NULL, 'V'              },
+    { "force",             no_argument,       NULL, 'f'              },
+    { "foreground",        no_argument,       NULL, 'F'              },
+    { "mlockall",          no_argument,       NULL, 'M'              },
+    { "socket",            required_argument, NULL, 'S'              },
+    { "advice",            no_argument,       NULL, OPT_ADVICE       },
+    { "key-file",          required_argument, NULL, OPT_KEY_FILE     },
+    { "num-threads",       required_argument, NULL, OPT_NUM_THREADS  },
 #if defined(AUTH_METHOD_RECVFD_MKFIFO) || defined(AUTH_METHOD_RECVFD_MKNOD)
-    { "auth-server-dir",   required_argument, NULL, '2' },
-    { "auth-client-dir",   required_argument, NULL, '3' },
+    { "auth-server-dir",   required_argument, NULL, OPT_AUTH_SERVER  },
+    { "auth-client-dir",   required_argument, NULL, OPT_AUTH_CLIENT  },
 #endif /* AUTH_METHOD_RECVFD_MKFIFO || AUTH_METHOD_RECVFD_MKNOD */
-    { "group-check-mtime", required_argument, NULL, '4' },
-    { "group-update-time", required_argument, NULL, '5' },
-    { "syslog",            no_argument,       NULL, '6' },
-    {  NULL,               0,                 NULL,  0  }
+    { "group-check-mtime", required_argument, NULL, OPT_GROUP_CHECK  },
+    { "group-update-time", required_argument, NULL, OPT_GROUP_UPDATE },
+    { "syslog",            no_argument,       NULL, OPT_SYSLOG       },
+    {  NULL,               0,                 NULL,  0               }
 };
 
 
@@ -286,18 +296,17 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                     log_errno (EMUNGE_NO_MEMORY, LOG_ERR,
                         "Failed to copy socket name string");
                 break;
-            case 'A':
+            case OPT_ADVICE:
                 printf ("Don't Panic!\n");
                 exit (42);
-            /* Begin deprecated cmdline opts */
-            case '0':
+            case OPT_KEY_FILE:
                 if (conf->key_name)
                     free (conf->key_name);
                 if (!(conf->key_name = strdup (optarg)))
                     log_errno (EMUNGE_NO_MEMORY, LOG_ERR,
                         "Failed to copy key-file name string");
                 break;
-            case '1':
+            case OPT_NUM_THREADS:
                 errno = 0;
                 l = strtol (optarg, &p, 10);
                 if (((errno == ERANGE) && ((l == LONG_MIN) || (l == LONG_MAX)))
@@ -309,14 +318,14 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                 conf->nthreads = l;
                 break;
 #if defined(AUTH_METHOD_RECVFD_MKFIFO) || defined(AUTH_METHOD_RECVFD_MKNOD)
-            case '2':
+            case OPT_AUTH_SERVER:
                 if (conf->auth_server_dir)
                     free (conf->auth_server_dir);
                 if (!(conf->auth_server_dir = strdup (optarg)))
                     log_errno (EMUNGE_NO_MEMORY, LOG_ERR,
                         "Failed to copy auth-server-dir cmdline string");
                 break;
-            case '3':
+            case OPT_AUTH_CLIENT:
                 if (conf->auth_client_dir)
                     free (conf->auth_client_dir);
                 if (!(conf->auth_client_dir = strdup (optarg)))
@@ -324,7 +333,7 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                         "Failed to copy auth-client-dir cmdline string");
                 break;
 #endif /* AUTH_METHOD_RECVFD_MKFIFO || AUTH_METHOD_RECVFD_MKNOD */
-            case '4':
+            case OPT_GROUP_CHECK:
                 errno = 0;
                 l = strtol (optarg, &p, 10);
                 if (((errno == ERANGE) && ((l == LONG_MIN) || (l == LONG_MAX)))
@@ -334,7 +343,7 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                 }
                 conf->got_group_stat = !! l;
                 break;
-            case '5':
+            case OPT_GROUP_UPDATE:
                 errno = 0;
                 l = strtol (optarg, &p, 10);
                 if (((errno == ERANGE) && ((l == LONG_MIN) || (l == LONG_MAX)))
@@ -345,10 +354,9 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                 }
                 conf->gids_update_secs = l;
                 break;
-            case '6':
+            case OPT_SYSLOG:
                 conf->got_syslog = 1;
                 break;
-            /* End deprecated cmdline opts */
             case '?':
                 if (optopt > 0) {
                     log_err (EMUNGE_SNAFU, LOG_ERR,
@@ -435,8 +443,6 @@ display_help (char *prog)
     printf ("  %*s %s [%s]\n", w, "-S, --socket=PATH",
             "Specify local socket", MUNGE_SOCKET_NAME);
 
-    /* Begin deprecated cmdline opts
-     */
     printf ("\n");
 
 #if defined(AUTH_METHOD_RECVFD_MKFIFO) || defined(AUTH_METHOD_RECVFD_MKNOD)
@@ -464,8 +470,6 @@ display_help (char *prog)
     printf ("  %*s %s\n", w, "--syslog",
             "Redirect log messages to syslog");
 
-    /* End deprecated cmdline opts
-     */
     printf ("\n");
     return;
 }
