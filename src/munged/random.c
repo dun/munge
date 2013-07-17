@@ -213,6 +213,10 @@ random_init (const char *seed)
      *    so random_stir() is still needed above to stir the initial state of
      *    the entropy pool before the PRNG is used.
      */
+    if (conf->got_benchmark) {
+        log_msg (LOG_INFO, "Disabled PRNG entropy pool stirring");
+        return (rc);
+    }
     _random_timer_id = timer_set_relative (
             (callback_f) _random_seed_stir_callback, NULL,
             RANDOM_SEED_STIR_MIN_SECS * 1000);

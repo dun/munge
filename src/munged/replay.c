@@ -35,6 +35,7 @@
 #include <pthread.h>
 #include <string.h>
 #include <time.h>
+#include "conf.h"
 #include "cred.h"
 #include "hash.h"
 #include "log.h"
@@ -108,7 +109,11 @@ replay_init (void)
     hash_cmp_f cmpf = (hash_cmp_f) replay_cmp_f;
     hash_del_f delf = (hash_del_f) replay_free;
 
-    if ((replay_hash)) {
+    if (replay_hash != NULL) {
+        return;
+    }
+    if (conf->got_benchmark) {
+        log_msg (LOG_INFO, "Disabled replay hash");
         return;
     }
     if (!(replay_hash = hash_create (REPLAY_HASH_SIZE, keyf, cmpf, delf))) {
@@ -127,7 +132,7 @@ replay_fini (void)
 {
 /*  Terminates the replay detection engine.
  *
- *  XXX: Race conditions may result if the replay hash is removed while
+ *  Race conditions may result if the replay hash is removed while
  *    replay_purge() timers are active.  Consequently, the timer thread
  *    is canceled via timer_fini() as soon as munged's event loop is exited.
  *    And shortly _thereafter_, this routine is invoked.
@@ -157,6 +162,8 @@ replay_insert (munge_cred_t c)
     replay_t  r;
 
     if (!replay_hash) {
+        if (conf->got_benchmark)
+            return (0);
         errno = EPERM;
         return (-1);
     }
@@ -197,6 +204,8 @@ replay_remove (munge_cred_t c)
     replay_t          r;
 
     if (!replay_hash) {
+        if (conf->got_benchmark)
+            return (0);
         errno = EPERM;
         return (-1);
     }

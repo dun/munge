@@ -98,6 +98,11 @@ to authenticate themselves to the daemon.  The recommended permissions
 for this directory are 1733.  This option is only valid on platforms where
 client authentication is performed via a file-descriptor passing mechanism.
 .TP
+.BI "--benchmark"
+Disable recurring timers in order to reduce some noise while benchmarking.
+This affects the PRNG entropy pool, supplementary group mapping, and
+credential replay hash.  Do not enable this option when running in production.
+.TP
 .BI "--group-check-mtime " boolean
 Specify whether the modification time of \fI/etc/group\fR should be checked
 before updating the supplementary group membership mapping.  If this value

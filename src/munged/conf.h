@@ -42,6 +42,7 @@
 
 struct conf {
     int             ld;                 /* listening socket descriptor       */
+    unsigned        got_benchmark:1;    /* flag for BENCHMARK option         */
     unsigned        got_clock_skew:1;   /* flag for allowing clock skew      */
     unsigned        got_force:1;        /* flag for FORCE option             */
     unsigned        got_foreground:1;   /* flag for FOREGROUND option        */

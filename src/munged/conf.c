@@ -64,10 +64,11 @@
 #define OPT_NUM_THREADS         258
 #define OPT_AUTH_SERVER         259
 #define OPT_AUTH_CLIENT         260
+#define OPT_BENCHMARK           264
 #define OPT_GROUP_CHECK         261
 #define OPT_GROUP_UPDATE        262
 #define OPT_SYSLOG              263
-#define OPT_LAST                264
+#define OPT_LAST                265
 
 const char * const short_opts = ":hLVfFMS:";
 
@@ -87,6 +88,7 @@ struct option long_opts[] = {
     { "auth-server-dir",   required_argument, NULL, OPT_AUTH_SERVER  },
     { "auth-client-dir",   required_argument, NULL, OPT_AUTH_CLIENT  },
 #endif /* AUTH_METHOD_RECVFD_MKFIFO || AUTH_METHOD_RECVFD_MKNOD */
+    { "benchmark",         no_argument,       NULL, OPT_BENCHMARK    },
     { "group-check-mtime", required_argument, NULL, OPT_GROUP_CHECK  },
     { "group-update-time", required_argument, NULL, OPT_GROUP_UPDATE },
     { "syslog",            no_argument,       NULL, OPT_SYSLOG       },
@@ -121,6 +123,7 @@ create_conf (void)
         log_errno (EMUNGE_NO_MEMORY, LOG_ERR, "Failed to allocate conf");
     }
     conf->ld = -1;
+    conf->got_benchmark = 0;
     conf->got_clock_skew = 1;
     conf->got_force = 0;
     conf->got_foreground = 0;
@@ -333,6 +336,9 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                         "Failed to copy auth-client-dir cmdline string");
                 break;
 #endif /* AUTH_METHOD_RECVFD_MKFIFO || AUTH_METHOD_RECVFD_MKNOD */
+            case OPT_BENCHMARK:
+                conf->got_benchmark = 1;
+                break;
             case OPT_GROUP_CHECK:
                 errno = 0;
                 l = strtol (optarg, &p, 10);
@@ -452,6 +458,9 @@ display_help (char *prog)
     printf ("  %*s %s [%s]\n", w, "--auth-client-dir=DIR",
             "Specify auth-client directory", MUNGE_AUTH_CLIENT_DIR);
 #endif /* AUTH_METHOD_RECVFD_MKFIFO || AUTH_METHOD_RECVFD_MKNOD */
+
+    printf ("  %*s %s\n", w, "--benchmark",
+            "Disable timers to reduce noise while benchmarking");
 
     printf ("  %*s Specify whether to check \"%s\" mtime [%d]\n",
             w, "--group-check-mtime=BOOL", GIDS_GROUP_FILE,

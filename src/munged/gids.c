@@ -42,6 +42,7 @@
 #include <sys/stat.h>
 #include <sys/time.h>
 #include <munge.h>
+#include "conf.h"
 #include "gids.h"
 #include "hash.h"
 #include "log.h"
@@ -145,9 +146,7 @@ gids_create (int interval, int do_group_stat)
 {
     gids_t gids;
 
-    /*  If the GIDs update interval is negative, disable the GIDs mapping.
-     */
-    if (interval < 0) {
+    if ((interval < 0) || (conf->got_benchmark)) {
         log_msg (LOG_INFO, "Disabled supplementary group mapping");
         return (NULL);
     }
