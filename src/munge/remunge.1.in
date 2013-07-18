@@ -53,6 +53,10 @@ Display license information.
 .BI "-V, --version"
 Display version information.
 .TP
+.BI "-q, --quiet"
+Display only the creds/sec numeric result.  This is useful for producing
+input files for \fBministat\fR.
+.TP
 .BI "-c, --cipher " string
 Specify the cipher type, either by name or number.
 .TP

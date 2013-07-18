@@ -65,13 +65,14 @@
  *  Command-Line Options
  *****************************************************************************/
 
-const char * const short_opts = ":hLVc:Cm:Mz:Zedl:u:g:t:S:D:N:T:W:";
+const char * const short_opts = ":hLVqc:Cm:Mz:Zedl:u:g:t:S:D:N:T:W:";
 
 #include <getopt.h>
 struct option long_opts[] = {
     { "help",         no_argument,       NULL, 'h' },
     { "license",      no_argument,       NULL, 'L' },
     { "version",      no_argument,       NULL, 'V' },
+    { "quiet",        no_argument,       NULL, 'q' },
     { "cipher",       required_argument, NULL, 'c' },
     { "list-ciphers", no_argument,       NULL, 'C' },
     { "mac",          required_argument, NULL, 'm' },
@@ -137,6 +138,13 @@ typedef struct thread_data * tdata_t;
 
 typedef void * (*thread_f) (void *);
 typedef void   (*thread_cleanup_f) (void *);
+
+
+/*****************************************************************************
+ *  Global Variables
+ *****************************************************************************/
+
+int g_got_quiet = 0;
 
 
 /*****************************************************************************
@@ -385,6 +393,9 @@ parse_cmdline (conf_t conf, int argc, char **argv)
             case 'V':
                 display_version ();
                 exit (EMUNGE_SUCCESS);
+                break;
+            case 'q':
+                g_got_quiet = 1;
                 break;
             case 'c':
                 i = munge_enum_str_to_int (MUNGE_ENUM_CIPHER, optarg);
@@ -703,6 +714,9 @@ display_help (char *prog)
     printf ("  %*s %s\n", w, "-V, --version",
             "Display version information");
 
+    printf ("  %*s %s\n", w, "-q, --quiet",
+            "Display only the creds/sec numeric result");
+
     printf ("\n");
 
     printf ("  %*s %s\n", w, "-c, --cipher=STRING",
@@ -1010,6 +1024,7 @@ stop_threads (conf_t conf)
     int           i;
     unsigned long n;
     double        delta;
+    double        rate;
 
     /*  The mutex must be unlocked here in order to let the threads clean up
      *    (via remunge_cleanup()) once they are canceled/finished.
@@ -1058,11 +1073,15 @@ stop_threads (conf_t conf)
     /*  Subtract the errors from the number of credentials processed.
      */
     n = conf->shared.num_creds_done
-        - conf->shared.num_encode_errs - conf->shared.num_decode_errs;
+        - conf->shared.num_encode_errs
+        - conf->shared.num_decode_errs;
+    rate = n / delta;
     output_msg ("Processed %lu credential%s in %0.3fs (%0.0f creds/sec)",
-        n, ((n == 1) ? "" : "s"), delta, (n / delta));
-    /*
-     *  Check for minimum duration time interval.
+        n, ((n == 1) ? "" : "s"), delta, rate);
+    if (g_got_quiet) {
+        printf ("%0.0f\n", rate);
+    }
+    /*  Check for minimum duration time interval.
      */
     if (delta < MIN_DURATION) {
         printf ("\nWARNING: Results based on such a short time interval "
@@ -1241,6 +1260,9 @@ output_msg (const char *format, ...)
     int        n;
     va_list    vargs;
 
+    if (g_got_quiet) {
+        return;
+    }
     if (!format) {
         return;
     }
