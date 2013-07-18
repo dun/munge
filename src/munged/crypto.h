@@ -38,6 +38,8 @@
 #  error "Libgcrypt and OpenSSL are mutually-exclusive"
 #endif
 
+#include <sys/types.h>
+
 
 void crypto_init (void);
 /*
@@ -47,6 +49,14 @@ void crypto_init (void);
 void crypto_fini (void);
 /*
  *  Shuts down the cryptographic subsystem.
+ */
+
+int crypto_memcmp (const void *s1, const void *s2, size_t n);
+/*
+ *  Compares the first [n] bytes of the memory regions [s1] and [s2] in an
+ *    amount of time dependent upon the length [n], but independent of the
+ *    contents of either [s1] or [s2].
+ *  Returns 0 if the memory regions are equal, or non-zero otherwise.
  */
 
 

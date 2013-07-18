@@ -668,7 +668,7 @@ dec_validate_mac (munge_cred_t c)
 
     /*  Validate new computed MAC against old received MAC.
      */
-    if ((n != c->mac_len) || (memcmp (mac, c->mac, c->mac_len) != 0)) {
+    if ((n != c->mac_len) || (crypto_memcmp (mac, c->mac, c->mac_len) != 0)) {
         return (m_msg_set_err (m, EMUNGE_CRED_INVALID, NULL));
     }
     /*  Ensure an invalid cred error from before is caught

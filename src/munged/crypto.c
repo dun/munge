@@ -322,3 +322,22 @@ openssl_log_msg (int priority)
 
 
 #endif /* HAVE_OPENSSL */
+
+
+/*****************************************************************************
+ *  Common Functions
+ *****************************************************************************/
+
+int
+crypto_memcmp (const void *s1, const void *s2, size_t n)
+{
+    const unsigned char *a = s1;
+    const unsigned char *b = s2;
+    size_t               i;
+    unsigned char        x;
+
+    for (i = 0, x = 0; i < n; i++) {
+        x |= a[i] ^ b[i];
+    }
+    return (x != 0);
+}
