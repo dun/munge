@@ -438,10 +438,10 @@ display_help (char *prog)
     printf ("\n");
 
     printf ("  %*s %s\n", w, "-f, --force",
-            "Force process to run if possible");
+            "Force daemon to run if possible");
 
     printf ("  %*s %s\n", w, "-F, --foreground",
-            "Run process in the foreground (do not fork)");
+            "Run daemon in the foreground (do not fork)");
 
     printf ("  %*s %s\n", w, "-M, --mlockall",
             "Lock all pages in memory");
