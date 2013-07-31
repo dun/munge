@@ -153,9 +153,11 @@ if [ ! -e %{_sysconfdir}/munge/munge.key -a -c /dev/urandom ]; then
 fi
 ##
 # Fix files for munge user when upgrading to 0.5.11.
-/bin/egrep '^[ 	]*USER=' %{_sysconfdir}/sysconfig/munge >/dev/null 2>&1 || \
+if ! /bin/egrep '^[ 	]*USER=' %{_sysconfdir}/sysconfig/munge \
+    >/dev/null 2>&1; then
   /bin/chown munge:munge %{_sysconfdir}/munge/* %{_localstatedir}/*/munge/* \
-  >/dev/null 2>&1
+    %{_localstatedir}/run/munge >/dev/null 2>&1
+fi
 ##
 # Fix subsys lockfile name when upgrading to 0.5.11.
 if [ -f /var/lock/subsys/munged ]; then
