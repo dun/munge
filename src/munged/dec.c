@@ -43,6 +43,7 @@
 #include "cipher.h"
 #include "conf.h"
 #include "cred.h"
+#include "crypto.h"
 #include "dec.h"
 #include "gids.h"
 #include "log.h"
