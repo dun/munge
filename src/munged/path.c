@@ -181,7 +181,6 @@ path_is_secure (const char *path, char *errbuf, size_t errbuflen)
     struct stat  st;
     char        *p;
     uid_t        euid;
-    gid_t        egid;
 
     n = path_canonicalize (path, buf, sizeof (buf));
     if (n < 0) {
@@ -203,7 +202,6 @@ path_is_secure (const char *path, char *errbuf, size_t errbuflen)
         }
     }
     euid = geteuid ();
-    egid = getegid ();
 
     while (buf[0] != '\0') {
         if (lstat (buf, &st) < 0) {
