@@ -463,6 +463,7 @@ signal_process ()
   [ $? -ne 0 ] && return 1
   [ -n "$SIGNUM" ] && return 0
 
+  sleep 1
   pids=`query_pids "$DAEMON_EXEC" "$PIDFILE"`
   [ $? -ne 0 -o -z "$pids" ] && return 0
   [ -z "$SIGTERM_TIMEOUT" ] && return 1
