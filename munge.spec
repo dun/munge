@@ -27,7 +27,15 @@ BuildRoot:	%{_tmppath}/%{name}-%{version}
 
 Source0:	%{name}-%{version}.tar.bz2
 
+%if 0%{?suse_version} >= 1230
+Requires(pre):  shadow
+%else
+%if 0%{?suse_version}
+Requires(pre):  pwdutils
+%else
 Requires(pre):  shadow-utils
+%endif
+%endif
 
 %package devel
 Summary:	Headers and libraries for developing applications using MUNGE
