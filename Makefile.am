@@ -34,5 +34,17 @@ AUTOMAKE_OPTIONS =		foreign
 CONFIG_STATUS_DEPENDENCIES =	META
 DISTCLEANFILES =		$(META_NAME)-*
 EXTRA_DIST =			AUTHORS COPYING DISCLAIMER HISTORY INSTALL \
-				JARGON NEWS PLATFORMS README munge.spec
+				JARGON NEWS PLATFORMS README munge.pc \
+				munge.spec
 SUBDIRS =			src
+
+noinst_DATA = \
+	munge.pc
+
+install-data-local:
+	if test -d "$(libdir)/pkgconfig"; then \
+	  $(INSTALL) -m 0755 \
+	    -d "$(DESTDIR)$(libdir)/pkgconfig"; \
+	  $(INSTALL) -m 0644 \
+	    "$(builddir)/munge.pc" "$(DESTDIR)$(libdir)/pkgconfig/munge.pc"; \
+	fi

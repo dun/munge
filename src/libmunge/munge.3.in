@@ -42,7 +42,7 @@ munge_encode, munge_decode, munge_strerror \- MUNGE core functions
 .sp
 .BI "const char * munge_strerror (munge_err_t " e );
 .sp
-.B cc ... -lmunge
+.B cc `pkg-config --cflags --libs munge` -o foo foo.c
 .fi
 
 .SH DESCRIPTION

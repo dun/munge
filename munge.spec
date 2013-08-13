@@ -33,6 +33,11 @@ Requires(pre):  shadow-utils
 Summary:	Headers and libraries for developing applications using MUNGE
 Group:		Development/Libraries
 Requires:	%{name}-libs = %{version}-%{release}
+%if 0%{?suse_version}
+BuildRequires:	pkg-config
+%else
+BuildRequires:	pkgconfig
+%endif
 
 %package libs
 Summary:	Libraries for applications using MUNGE
@@ -214,6 +219,7 @@ if [ -x /sbin/ldconfig ]; then /sbin/ldconfig %{_libdir}; fi
 %defattr(-,root,root,0755)
 %{_includedir}/*
 %{_libdir}/*.la
+%{_libdir}/pkgconfig/*.pc
 %{_mandir}/*3/*
 %ifnos aix5.3 aix5.2 aix5.1 aix5.0 aix4.3
 %{_libdir}/*.a
