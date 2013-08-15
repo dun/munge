@@ -71,7 +71,8 @@ Display version information.
 .BI "-f, --force"
 Force the daemon to run if at all possible.  This overrides warnings for an
 existing local domain socket, a lack of entropy for the PRNG, and insecure
-file/directory permissions.
+file/directory permissions.  Use with caution as overriding these warnings
+can affect security.
 .TP
 .BI "-F, --foreground"
 Run the daemon in the foreground.
