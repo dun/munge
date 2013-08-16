@@ -72,57 +72,6 @@ A shared library for applications using MUNGE.
 %setup
 
 %build
-%ifos aix5.3 aix5.2 aix5.1 aix5.0 aix4.3
-##
-# Add the following to the rpm command line to specify 32-bit/64-bit builds:
-#   --define 'bitarch all'      (build 32-bit executables & multiarch library)
-#   --define 'bitarch 32'       (build 32-bit executables & library)
-#   --define 'bitarch 64'       (build 64-bit executables & library)
-#
-# Add the following to the rpm command line to specify shared/static libraries:
-#   --define 'linkage all'      (build both shared & static libraries)
-#   --define 'linkage shared'   (build shared libraries only)
-#   --define 'linkage static'   (build static libraries only)
-##
-%{?bitarch:BITARCH="%{bitarch}"}
-case "$BITARCH" in
-  32) BITARCH="32" ;;
-  64) BITARCH="64" ;;
-  32_64|all|any|both|"") BITARCH="64 32" ;;
-  *) echo "bitarch must be one of [ all | 32 | 64 ]" 1>&2; exit 1 ;;
-esac
-%{?linkage:LINKAGE="%{linkage}"}
-case "$LINKAGE" in
-  shared|dynamic) LINKAGE="shared" ;;
-  static) LINKAGE="static" ;;
-  all|any|both|"") LINKAGE="static shared" ;;
-  *) echo "linkage must be one of [ all | shared | static ]" 1>&2; exit 1 ;;
-esac
-TOP="`pwd`"
-TMP="$TOP/tmp-$$"
-OBJECT_MODE="32"
-export OBJECT_MODE
-for linkage in $LINKAGE; do
-  [ "$linkage" = "static" ] && nonlinkage="shared" || nonlinkage="static"
-  for bitarch in $BITARCH; do
-    %configure -C --enable-arch="$bitarch" \
-      --enable-"$linkage" --disable-"$nonlinkage" \
-      --program-prefix=%{?_program_prefix:%{_program_prefix}}
-    rm -rf "$TMP/$linkage-$bitarch"
-    mkdir -p "$TMP/$linkage-$bitarch"
-    ( cd src/libmunge && make install DESTDIR="$TMP/$linkage-$bitarch" )
-    make clean
-    rm -rf "$TMP/$linkage-$bitarch-lib"
-    mkdir -p "$TMP/$linkage-$bitarch-lib"
-    ( cd "$TMP/$linkage-$bitarch-lib" && \
-      ar -X"$bitarch" x "$TMP/$linkage-$bitarch%{_libdir}/libmunge.a" )
-  done
-done
-rm -f "libmunge.a"
-( cd "$TMP" && ar -Xany cr "$TOP/libmunge.a" *-lib/* )
-rm -rf "$TMP"
-make
-%else
 ##
 # Add the following to the rpm command line to specify 32-bit/64-bit builds:
 #   --with arch32               (build 32-bit executables & library)
@@ -133,7 +82,6 @@ make
   %{?_with_arch64: --enable-arch=64} \
   --program-prefix=%{?_program_prefix:%{_program_prefix}}
 make
-%endif
 
 %install
 rm -rf "$RPM_BUILD_ROOT"
@@ -143,9 +91,6 @@ touch "$RPM_BUILD_ROOT"/%{_sysconfdir}/munge/munge.key
 touch "$RPM_BUILD_ROOT"/%{_localstatedir}/lib/munge/munge.seed
 touch "$RPM_BUILD_ROOT"/%{_localstatedir}/log/munge/munged.log
 touch "$RPM_BUILD_ROOT"/%{_localstatedir}/run/munge/munged.pid
-%ifos aix5.3 aix5.2 aix5.1 aix5.0 aix4.3
-[ -f "libmunge.a" ] && cp "libmunge.a" "$RPM_BUILD_ROOT"%{_libdir}
-%endif
 
 %clean
 rm -rf "$RPM_BUILD_ROOT"
@@ -229,15 +174,9 @@ if [ -x /sbin/ldconfig ]; then /sbin/ldconfig %{_libdir}; fi
 %{_libdir}/*.la
 %{_libdir}/pkgconfig/*.pc
 %{_mandir}/*3/*
-%ifnos aix5.3 aix5.2 aix5.1 aix5.0 aix4.3
 %{_libdir}/*.a
 %{_libdir}/*.so
-%endif
 
 %files libs
 %defattr(-,root,root,0755)
-%ifnos aix5.3 aix5.2 aix5.1 aix5.0 aix4.3
 %{_libdir}/*.so.*
-%else
-%{_libdir}/*.a
-%endif
