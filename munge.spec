@@ -2,7 +2,7 @@ Name:		munge
 Version:	0.5.10
 Release:	1%{?dist}
 
-Summary:	MUNGE Uid 'N' Gid Emporium
+Summary:	MUNGE authentication service
 Group:		System Environment/Daemons
 License:	GPLv3+ and LGPLv3+
 URL:		https://munge.googlecode.com/
@@ -99,7 +99,7 @@ rm -rf "$RPM_BUILD_ROOT"
 /usr/bin/getent group munge >/dev/null 2>&1 || \
   /usr/sbin/groupadd -r munge
 /usr/bin/getent passwd munge >/dev/null 2>&1 || \
-  /usr/sbin/useradd -c "MUNGE Uid 'N' Gid Emporium" \
+  /usr/sbin/useradd -c "MUNGE authentication service" \
   -d "%{_sysconfdir}/munge" -g munge -s /bin/false -r munge
 
 %post
