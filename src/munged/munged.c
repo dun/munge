@@ -75,7 +75,6 @@ static void open_logfile (const char *logfile, int priority, int got_force);
 static void handle_signals (void);
 static void hup_handler (int signum);
 static void exit_handler (int signum);
-static void segv_handler (int signum);
 static void write_pidfile (const char *pidfile, int got_force);
 static void lock_memory (void);
 static void sock_create (conf_t conf);
@@ -439,9 +438,6 @@ handle_signals (void)
     if (posignal (SIGTERM, exit_handler) == SIG_ERR) {
         log_err (EMUNGE_SNAFU, LOG_ERR, "Failed to handle signal=%d", SIGTERM);
     }
-    if (posignal (SIGSEGV, segv_handler) == SIG_ERR) {
-        log_err (EMUNGE_SNAFU, LOG_ERR, "Failed to handle signal=%d", SIGSEGV);
-    }
     if (posignal (SIGPIPE, SIG_IGN) == SIG_ERR) {
         log_err (EMUNGE_SNAFU, LOG_ERR, "Failed to ignore signal=%d", SIGPIPE);
     }
@@ -465,16 +461,6 @@ exit_handler (int signum)
     if (!done) {
         done = signum;
     }
-    return;
-}
-
-
-static void
-segv_handler (int signum)
-{
-    log_err (EMUNGE_SNAFU, LOG_CRIT,
-        "Exiting on signal=%d (segfault)", signum);
-    assert (1);                         /* not reached */
     return;
 }
 
