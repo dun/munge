@@ -51,6 +51,24 @@ install-data-local:
 	  $(INSTALL) -m 0644 \
 	    "$(builddir)/munge.pc" "$(DESTDIR)$(libdir)/pkgconfig/munge.pc"; \
 	fi
+	if test -d "$(prefix)/lib/systemd/system"; then \
+	  UNITDIR="$(prefix)/lib/systemd/system"; \
+	elif test -d "/lib/systemd/system"; then \
+	  UNITDIR="/lib/systemd/system"; \
+	fi; \
+	if test -n "$${UNITDIR}"; then \
+	  $(INSTALL) -m 0755 \
+	    -d "$(DESTDIR)$${UNITDIR}"; \
+	  $(INSTALL) -m 0644 \
+	    "$(srcdir)/munge.service" "$(DESTDIR)$${UNITDIR}/munge.service"; \
+	fi
+	if test -d "$(prefix)/lib/tmpfiles.d"; then \
+	  $(INSTALL) -m 0755 \
+	    -d "$(DESTDIR)$(prefix)/lib/tmpfiles.d"; \
+	  $(INSTALL) -m 0644 \
+	    "$(srcdir)/munge-tmpfiles.conf" \
+	    "$(DESTDIR)$(prefix)/lib/tmpfiles.d/munge.conf"; \
+	fi
 	$(INSTALL) -m 0755 -d "$(DESTDIR)$(sysconfdir)"
 	$(INSTALL) -m 0700 -d "$(DESTDIR)$(sysconfdir)/munge"
 	$(INSTALL) -m 0755 -d "$(DESTDIR)$(localstatedir)"

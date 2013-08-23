@@ -1,0 +1,17 @@
+[Unit]
+Description=MUNGE authentication service
+Documentation=man:munged(8)
+After=network.target
+After=syslog.target
+After=time-sync.target
+
+[Service]
+Type=forking
+ExecStart=/usr/sbin/munged
+PIDFile=/var/run/munge/munged.pid
+User=munge
+Group=munge
+Restart=on-abort
+
+[Install]
+WantedBy=multi-user.target
