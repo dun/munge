@@ -14,7 +14,6 @@
 # PARTICULAR PURPOSE.
 
 @SET_MAKE@
-
 VPATH = @srcdir@
 am__make_dryrun = \
   { \
@@ -52,8 +51,7 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 DIST_COMMON = README $(am__configure_deps) $(srcdir)/Makefile.am \
-	$(srcdir)/Makefile.in $(srcdir)/munge.pc.in \
-	$(top_srcdir)/config/Make-inc.mk \
+	$(srcdir)/Makefile.in $(top_srcdir)/config/Make-inc.mk \
 	$(top_srcdir)/config/config.h.in $(top_srcdir)/configure \
 	AUTHORS COPYING COPYING.LESSER INSTALL NEWS TODO \
 	config/compile config/config.guess config/config.sub \
@@ -91,7 +89,7 @@ am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
  configure.lineno config.status.lineno
 mkinstalldirs = $(SHELL) $(top_srcdir)/config/mkinstalldirs
 CONFIG_HEADER = $(top_builddir)/config/config.h
-CONFIG_CLEAN_FILES = munge.pc
+CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 SOURCES =
 DIST_SOURCES =
@@ -107,7 +105,6 @@ am__can_run_installinfo = \
     n|no|NO) false;; \
     *) (install-info --version) >/dev/null 2>&1;; \
   esac
-DATA = $(noinst_DATA)
 RECURSIVE_CLEAN_TARGETS = mostlyclean-recursive clean-recursive	\
   distclean-recursive maintainer-clean-recursive
 AM_RECURSIVE_TARGETS = $(RECURSIVE_TARGETS:-recursive=) \
@@ -312,13 +309,9 @@ AUTOMAKE_OPTIONS = foreign
 CONFIG_STATUS_DEPENDENCIES = META
 DISTCLEANFILES = $(META_NAME)-*
 EXTRA_DIST = AUTHORS COPYING DISCLAIMER HISTORY INSTALL \
-				JARGON NEWS PLATFORMS README munge.pc \
-				munge.spec
+				JARGON NEWS PLATFORMS README munge.spec
 
 SUBDIRS = src
-noinst_DATA = \
-	munge.pc
-
 all: all-recursive
 
 .SUFFIXES:
@@ -372,8 +365,6 @@ $(top_srcdir)/config/config.h.in: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
 
 distclean-hdr:
 	-rm -f config/config.h config/stamp-h1
-munge.pc: $(top_builddir)/config.status $(srcdir)/munge.pc.in
-	cd $(top_builddir) && $(SHELL) ./config.status $@
 
 mostlyclean-libtool:
 	-rm -f *.lo
@@ -708,7 +699,7 @@ distcleancheck: distclean
 	       exit 1; } >&2
 check-am: all-am
 check: check-recursive
-all-am: Makefile $(DATA)
+all-am: Makefile
 installdirs: installdirs-recursive
 installdirs-am:
 install: install-recursive
@@ -764,7 +755,7 @@ info: info-recursive
 
 info-am:
 
-install-data-am: install-data-local
+install-data-am:
 
 install-dvi: install-dvi-recursive
 
@@ -823,14 +814,14 @@ uninstall-am:
 	distclean-libtool distclean-local distclean-tags \
 	distcleancheck distdir distuninstallcheck dvi dvi-am html \
 	html-am info info-am install install-am install-data \
-	install-data-am install-data-local install-dvi install-dvi-am \
-	install-exec install-exec-am install-html install-html-am \
-	install-info install-info-am install-man install-pdf \
-	install-pdf-am install-ps install-ps-am install-strip \
-	installcheck installcheck-am installdirs installdirs-am \
-	maintainer-clean maintainer-clean-generic mostlyclean \
-	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
-	tags tags-recursive uninstall uninstall-am
+	install-data-am install-dvi install-dvi-am install-exec \
+	install-exec-am install-html install-html-am install-info \
+	install-info-am install-man install-pdf install-pdf-am \
+	install-ps install-ps-am install-strip installcheck \
+	installcheck-am installdirs installdirs-am maintainer-clean \
+	maintainer-clean-generic mostlyclean mostlyclean-generic \
+	mostlyclean-libtool pdf pdf-am ps ps-am tags tags-recursive \
+	uninstall uninstall-am
 
 
 # Dependencies to ensure libraries get rebuilt.
@@ -850,14 +841,6 @@ force-dependency-check:
 #
 distclean-local::
 	-rm -f *~ \#* .\#* cscope*.out core core.* tags TAGS
-
-install-data-local:
-	if test -d "$(libdir)/pkgconfig"; then \
-	  $(INSTALL) -m 0755 \
-	    -d "$(DESTDIR)$(libdir)/pkgconfig"; \
-	  $(INSTALL) -m 0644 \
-	    "$(builddir)/munge.pc" "$(DESTDIR)$(libdir)/pkgconfig/munge.pc"; \
-	fi
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

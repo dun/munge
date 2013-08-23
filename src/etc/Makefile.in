@@ -52,7 +52,8 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
-	$(srcdir)/munge.init.in $(top_srcdir)/config/Make-inc.mk
+	$(srcdir)/munge.init.in $(srcdir)/munge.pc.in \
+	$(top_srcdir)/config/Make-inc.mk
 subdir = src/etc
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/config/libtool.m4 \
@@ -83,7 +84,7 @@ am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(SHELL) $(top_srcdir)/config/mkinstalldirs
 CONFIG_HEADER = $(top_builddir)/config/config.h
-CONFIG_CLEAN_FILES = munge.init
+CONFIG_CLEAN_FILES = munge.init munge.pc
 CONFIG_CLEAN_VPATH_FILES =
 SOURCES =
 DIST_SOURCES =
@@ -284,6 +285,8 @@ $(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
 $(am__aclocal_m4_deps):
 munge.init: $(top_builddir)/config.status $(srcdir)/munge.init.in
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
+munge.pc: $(top_builddir)/config.status $(srcdir)/munge.pc.in
+	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
 
 mostlyclean-libtool:
 	-rm -f *.lo
@@ -473,6 +476,12 @@ install-data-local:
 	  $(INSTALL) -m 0755 -d "$(DESTDIR)$${CONFDIR}"; \
 	  $(INSTALL) -m 0644 \
 	    "$(srcdir)/munge.sysconfig" "$(DESTDIR)$${CONFDIR}/munge"
+	if test -d "$(libdir)/pkgconfig"; then \
+	  $(INSTALL) -m 0755 \
+	    -d "$(DESTDIR)$(libdir)/pkgconfig"; \
+	  $(INSTALL) -m 0644 \
+	    "$(builddir)/munge.pc" "$(DESTDIR)$(libdir)/pkgconfig/munge.pc"; \
+	fi
 	$(INSTALL) -m 0755 -d "$(DESTDIR)$(sysconfdir)"
 	$(INSTALL) -m 0700 -d "$(DESTDIR)$(sysconfdir)/munge"
 	$(INSTALL) -m 0755 -d "$(DESTDIR)$(localstatedir)"

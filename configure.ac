@@ -142,10 +142,10 @@ X_AC_SELECT_AUTH_METHOD
 ##
 AC_CONFIG_FILES( \
   Makefile \
-  munge.pc \
   src/Makefile \
   src/etc/Makefile \
   src/etc/munge.init \
+  src/etc/munge.pc \
   src/libcommon/Makefile \
   src/libcommon/munge.7 \
   src/libmissing/Makefile \
