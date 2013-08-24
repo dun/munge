@@ -125,7 +125,7 @@ fi
 if [ -x /sbin/chkconfig ]; then /sbin/chkconfig --add munge; fi
 
 %post libs
-if [ -x /sbin/ldconfig ]; then /sbin/ldconfig %{_libdir}; fi
+/sbin/ldconfig %{_libdir}
 
 %preun
 if [ $1 -eq 0 ]; then
@@ -139,7 +139,7 @@ if [ $1 -ge 1 ]; then
 fi
 
 %postun libs
-if [ -x /sbin/ldconfig ]; then /sbin/ldconfig %{_libdir}; fi
+/sbin/ldconfig %{_libdir}
 
 %files
 %defattr(-,root,root,0755)
