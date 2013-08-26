@@ -11,7 +11,7 @@ munge-0.5.9 (2010-03-23):
 - Fixed bug with failed Linux builds under glibc-2.8+.
 - Fixed bug with failed daemon starts after clearing /var/run.
 - Moved selection of authentication method into configure script.
-- Added support for LOCAL_PEERCRED authentication (BSD, Darwin, GNU/kFreeBSD).
+- Added support for LOCAL_PEERCRED auth (Darwin, FreeBSD, GNU/kFreeBSD).
 - Added support for SHA-512 message digest.
 
 munge-0.5.8 (2007-02-05):
@@ -20,7 +20,7 @@ munge-0.5.8 (2007-02-05):
 munge-0.5.7 (2006-12-23):
 - Improved performance of caching supplementary group info.
 - Added munged sighup handler to update supplementary group info.
-- Added --group-check-mtime and --group-update-time munged cmdline opts.
+- Added --group-check-mtime and --group-update-time cmdline opts to munged.
 - Made errors at exit nonfatal to work around Debian libc6 bug #400960.
 
 munge-0.5.6 (2006-11-22):
@@ -46,7 +46,7 @@ munge-0.5.4 (2006-09-26):
 - Changed ownership & permissions of munged directories.
 - Added ownership & permission checks for files & directories.
 - Added compile-time defaults to munged help message.
-- Added support for Solaris 10 (getpeerucred).
+- Added support for SunOS 5.10 (getpeerucred).
 - Added support for Darwin (Mac OS X).
 - Improved security of file-descriptor-passing authentication mechanism.
 - Replaced --auth-pipe-dir with --auth-server-dir & --auth-client-dir opts.
@@ -56,7 +56,7 @@ munge-0.5.3 (2006-05-17):
 - Improved multilib support for AIX.
 - Added support for AIX (32-bit, 64-bit, multiarch) to RPM spec file.
 - Added support for configure installation dir vars to alter defaults.
-- Added support for AIX, Debian, FreeBSD, and Solaris to init script.
+- Added support for AIX, Debian, FreeBSD, and SunOS to init script.
 
 munge-0.5.2 (2006-03-07):
 - Fixed RPM spec file so munge-devel & munge-libs files are properly perm'd.
@@ -69,7 +69,7 @@ munge-0.5 (2006-01-24):
 - Fixed bug with credential compression header not being protected by MAC.
 - Changed credential format to v3.
 - Changed client/server protocol (apps will need to relink).
-- Fixed miscellaneous bugs (now coverity clean).
+- Fixed miscellaneous bugs.
 - Changed default cipher to AES-128 if present.
 
 munge-0.4.3 (2005-10-31):
@@ -88,7 +88,7 @@ munge-0.4 (2004-12-07):
 - Added persistent pool of threads.
 - Added retry for failed requests.
 - Added libtool version-info.
-- Added --key-file, --num-threads, and --auth-pipe-dir munged cmdline opts.
+- Added --key-file, --num-threads, and --auth-pipe-dir cmdline opts to munged.
 - Added munge_ctx opt to limit maximum request length.
 - Added timer to periodically re-parse group info.
 - Added remunge benchmark/stress-test utility.
@@ -105,7 +105,7 @@ munge-0.4 (2004-12-07):
 - Changed client/server protocol (apps will need to relink).
 
 munge-0.3 (2004-04-30):
-- Added support for AIX, FreeBSD, and Solaris.
+- Added support for AIX, FreeBSD, and SunOS.
 - Added compression (bzlib, zlib).
 - Added replay detection/prevention.
 - Added ability to restrict decoding based on UID/GID.
