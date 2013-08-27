@@ -1,3 +1,24 @@
+munge-0.5.11 (2013-08-27):
+- Added --mlockall cmdline opt to munged.
+- Added --syslog cmdline opt to munged.
+- Added --uid and --gid cmdline opts to munge.
+- Added numeric timezone to unmunge timestamp output.
+- Added timer to munged for periodically stirring PRNG entropy pool.
+- Added support for pkg-config.
+- Added support for systemd.
+- Changed timer thread to better accommodate misbehaving system clocks.
+- Changed behavior of munge --string cmdline opt to not append newline.
+- Changed init script chkconfig priority levels to start after ntpd/ntpdate.
+- Changed init script so munged runs as munge user by default.
+- Fixed HMAC validation timing attack vulnerability.
+- Fixed bug with munged being unable to restart if daemon not cleanly shutdown.
+- Fixed bug with large groups triggering "numerical result out of range" error.
+- Fixed bug causing high CPU utilization on FreeBSD when processing group info.
+- Fixed bug causing IPv6-only hosts to exit due to failed hostname resolution.
+- Fixed autoconf check that was not portable across shells.
+- Fixed init script LSB Header on openSUSE.
+- Replaced perl build-time dependency with awk.
+
 munge-0.5.10 (2011-02-25):
 - Changed project homepage to <http://munge.googlecode.com/>.
 - Fixed bug where munged could deadlock if clients blocked.
