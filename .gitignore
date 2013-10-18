@@ -11,6 +11,7 @@
 /libtool
 /src/*/*.[1-9]
 /src/etc/munge.init
+/src/etc/munge.pc
 /src/munge/munge
 /src/munge/remunge
 /src/munge/unmunge
