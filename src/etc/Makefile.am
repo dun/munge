@@ -47,12 +47,10 @@ install-data-local:
 	  $(INSTALL) -m 0644 \
 	    "$(srcdir)/munge.sysconfig" "$(DESTDIR)$${CONFDIR}/munge"
 	:
-	if test -d "$(libdir)/pkgconfig"; then \
-	  $(INSTALL) -m 0755 \
-	    -d "$(DESTDIR)$(libdir)/pkgconfig"; \
-	  $(INSTALL) -m 0644 \
-	    "$(builddir)/munge.pc" "$(DESTDIR)$(libdir)/pkgconfig/munge.pc"; \
-	fi
+	PKGCONFIGDIR="$(libdir)/pkgconfig"; \
+	$(INSTALL) -m 0755 -d "$(DESTDIR)$${PKGCONFIGDIR}"; \
+	$(INSTALL) -m 0644 \
+	  "$(builddir)/munge.pc" "$(DESTDIR)$${PKGCONFIGDIR}/munge.pc"
 	:
 	if test -d "$(prefix)/lib/systemd/system"; then \
 	  UNITDIR="$(prefix)/lib/systemd/system"; \
