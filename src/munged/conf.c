@@ -69,7 +69,8 @@
 #define OPT_SYSLOG              263
 #define OPT_BENCHMARK           264
 #define OPT_MAX_TTL             265
-#define OPT_LAST                266
+#define OPT_PID_FILE            266
+#define OPT_LAST                267
 
 const char * const short_opts = ":hLVfFMS:";
 
@@ -93,6 +94,7 @@ struct option long_opts[] = {
     { "group-check-mtime", required_argument, NULL, OPT_GROUP_CHECK  },
     { "group-update-time", required_argument, NULL, OPT_GROUP_UPDATE },
     { "max-ttl",           required_argument, NULL, OPT_MAX_TTL      },
+    { "pid-file",          required_argument, NULL, OPT_PID_FILE     },
     { "syslog",            no_argument,       NULL, OPT_SYSLOG       },
     {  NULL,               0,                 NULL,  0               }
 };
@@ -372,6 +374,13 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                 }
                 conf->max_ttl = l;
                 break;
+            case OPT_PID_FILE:
+                if (conf->pidfile_name)
+                    free (conf->pidfile_name);
+                if (!(conf->pidfile_name = strdup (optarg)))
+                    log_errno (EMUNGE_NO_MEMORY, LOG_ERR,
+                        "Failed to copy pidfile name string");
+                break;
             case OPT_SYSLOG:
                 conf->got_syslog = 1;
                 break;
@@ -490,6 +499,9 @@ display_help (char *prog)
 
     printf ("  %*s %s [%d]\n", w, "--num-threads=INT",
             "Specify number of threads to spawn", MUNGE_THREADS);
+
+    printf ("  %*s %s [%s]\n", w, "--pid-file=PATH",
+            "Specify PID file", MUNGED_PIDFILE);
 
     printf ("  %*s %s\n", w, "--syslog",
             "Redirect log messages to syslog");

@@ -129,6 +129,9 @@ with minimal skew.
 .BI "\-\-num\-threads " integer
 Specify the number of threads to spawn for processing credential requests.
 .TP
+.BI "\-\-pid\-file " path
+Specify an alternate pathname for storing the Process ID of the daemon.
+.TP
 .BI "\-\-syslog"
 Redirect log messages to syslog when the daemon is running in the background.
 
