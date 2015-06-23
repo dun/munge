@@ -830,7 +830,7 @@ $(top_builddir)/src/libcommon/libcommon.la \
 $(top_builddir)/src/libmissing/libmissing.la \
 $(top_builddir)/src/libmunge/libmunge.la \
 : force-dependency-check
-	@cd `dirname $@` && make `basename $@`
+	@cd `dirname $@` && $(MAKE) `basename $@`
 
 force-dependency-check:
 
