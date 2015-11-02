@@ -1,6 +1,6 @@
 /*****************************************************************************
  *  Written by Chris Dunlap <cdunlap@llnl.gov>.
- *  Copyright (C) 2007-2013 Lawrence Livermore National Security, LLC.
+ *  Copyright (C) 2007-2015 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2002-2007 The Regents of the University of California.
  *  UCRL-CODE-155910.
  *
@@ -43,7 +43,7 @@ static const char *license_text[] = { \
     "https://dun.github.io/munge/",
     "",
     "Written by Chris Dunlap <cdunlap@llnl.gov>.",
-    "Copyright (C) 2007-2013 Lawrence Livermore National Security, LLC.",
+    "Copyright (C) 2007-2015 Lawrence Livermore National Security, LLC.",
     "Copyright (C) 2002-2007 The Regents of the University of California.",
     "",
     "MUNGE is free software: you can redistribute it and/or modify it under",
