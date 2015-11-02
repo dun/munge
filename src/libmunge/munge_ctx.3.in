@@ -5,7 +5,7 @@
 .\" UCRL-CODE-155910.
 .\"
 .\" This file is part of the MUNGE Uid 'N' Gid Emporium (MUNGE).
-.\" For details, see <https://munge.googlecode.com/>.
+.\" For details, see <https://dun.github.io/munge/>.
 .\"
 .\" MUNGE is free software: you can redistribute it and/or modify it under
 .\" the terms of the GNU General Public License as published by the Free
@@ -344,4 +344,4 @@ or (at your option) any later version.
 .BR munge (7),
 .BR munged (8).
 .PP
-\fBhttps://munge.googlecode.com/\fR
+\fBhttps://dun.github.io/munge/\fR

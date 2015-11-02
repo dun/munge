@@ -5,7 +5,7 @@
 ## UCRL-CODE-155910.
 ##
 ## This file is part of the MUNGE Uid 'N' Gid Emporium (MUNGE).
-## For details, see <https://munge.googlecode.com/>.
+## For details, see <https://dun.github.io/munge/>.
 ##
 ## MUNGE is free software: you can redistribute it and/or modify it under
 ## the terms of the GNU General Public License as published by the Free

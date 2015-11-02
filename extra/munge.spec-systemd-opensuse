@@ -8,7 +8,7 @@ Release:	1%{?dist}
 Summary:	MUNGE authentication service
 Group:		System Environment/Daemons
 License:	GPLv3+ and LGPLv3+
-URL:		https://munge.googlecode.com/
+URL:		https://dun.github.io/munge/
 Requires:	%{name}-libs = %{version}-%{release}
 
 BuildRequires:	systemd
