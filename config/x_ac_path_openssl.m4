@@ -44,7 +44,7 @@ AC_DEFUN([X_AC_PATH_OPENSSL], [
       _x_ac_path_openssl_libs_save="$LIBS"
       LIBS="-L$d/lib -lcrypto $LIBS"
       AC_LINK_IFELSE(
-        AC_LANG_CALL([], RAND_status),
+        [AC_LANG_CALL([], RAND_status)],
         x_ac_path_openssl_prefix="$d")
       LIBS="$_x_ac_path_openssl_libs_save"
       test "$x_ac_path_openssl_prefix" != "no" && break
