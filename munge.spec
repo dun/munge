@@ -8,44 +8,20 @@ License:	GPLv3+ and LGPLv3+
 URL:		https://dun.github.io/munge/
 Requires:	%{name}-libs = %{version}-%{release}
 
-%if 0%{?suse_version} >= 1100
-BuildRequires:	libbz2-devel
-BuildRequires:	libopenssl-devel
-BuildRequires:	zlib-devel
-%else
-%if 0%{?sles_version} || 0%{?suse_version}
-BuildRequires:	bzip2
-BuildRequires:	openssl-devel
-BuildRequires:	zlib-devel
-%else
 BuildRequires:	bzip2-devel
 BuildRequires:	openssl-devel
 BuildRequires:	zlib-devel
-%endif
-%endif
 BuildRoot:	%{_tmppath}/%{name}-%{version}
 
 Source0:	%{name}-%{version}.tar.bz2
 
-%if 0%{?suse_version} >= 1230
-Requires(pre):	shadow
-%else
-%if 0%{?suse_version}
-Requires(pre):	pwdutils
-%else
 Requires(pre):	shadow-utils
-%endif
-%endif
 
 %package devel
 Summary:	Headers and libraries for developing applications using MUNGE
 Group:		Development/Libraries
 Requires:	%{name}-libs = %{version}-%{release}
-%if 0%{?suse_version}
-BuildRequires:	pkg-config
-%else
 BuildRequires:	pkgconfig
-%endif
 
 %package libs
 Summary:	Libraries for applications using MUNGE
