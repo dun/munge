@@ -40,7 +40,7 @@ munge_enum_is_valid, munge_enum_int_to_str, munge_enum_str_to_int \- MUNGE enume
 .sp
 .BI "int munge_enum_str_to_int (munge_enum_t " type ", const char *" str );
 .sp
-.B cc `pkg-config --cflags --libs munge` -o foo foo.c
+.B cc `pkg\-config \-\-cflags \-\-libs munge` \-o foo foo.c
 .fi
 
 .SH DESCRIPTION

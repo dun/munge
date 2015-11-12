@@ -59,70 +59,70 @@ metadata and payload are returned to the client.
 
 .SH OPTIONS
 .TP
-.BI "-h, --help"
+.BI "\-h, \-\-help"
 Display a summary of the command-line options.
 .TP
-.BI "-L, --license"
+.BI "\-L, \-\-license"
 Display license information.
 .TP
-.BI "-V, --version"
+.BI "\-V, \-\-version"
 Display version information.
 .TP
-.BI "-f, --force"
+.BI "\-f, \-\-force"
 Force the daemon to run if at all possible.  This overrides warnings for an
 existing local domain socket, a lack of entropy for the PRNG, and insecure
 file/directory permissions.  Use with caution as overriding these warnings
 can affect security.
 .TP
-.BI "-F, --foreground"
+.BI "\-F, \-\-foreground"
 Run the daemon in the foreground.
 .TP
-.BI "-M, --mlockall"
+.BI "\-M, \-\-mlockall"
 Lock all current and future pages in the virtual memory address space.
 Access to locked pages will never be delayed by a page fault.  This can
 improve performance and help the daemon remain responsive when the system
 is under heavy memory pressure.  This typically requires root privileges
 or the CAP_IPC_LOCK capability.
 .TP
-.BI "-S, --socket " path
+.BI "\-S, \-\-socket " path
 Specify the local domain socket for communicating with clients.
 .TP
-.BI "--auth-server-dir " directory
+.BI "\-\-auth\-server\-dir " directory
 Specify an alternate directory in which the daemon will create the pipe used
 to authenticate clients.  The recommended permissions for this directory
 are 0711.  This option is only valid on platforms where client authentication
 is performed via a file-descriptor passing mechanism.
 .TP
-.BI "--auth-client-dir " directory
+.BI "\-\-auth\-client\-dir " directory
 Specify an alternate directory in which clients will create the file used
 to authenticate themselves to the daemon.  The recommended permissions
 for this directory are 1733.  This option is only valid on platforms where
 client authentication is performed via a file-descriptor passing mechanism.
 .TP
-.BI "--benchmark"
+.BI "\-\-benchmark"
 Disable recurring timers in order to reduce some noise while benchmarking.
 This affects the PRNG entropy pool, supplementary group mapping, and
 credential replay hash.  Do not enable this option when running in production.
 .TP
-.BI "--group-check-mtime " boolean
+.BI "\-\-group\-check\-mtime " boolean
 Specify whether the modification time of \fI/etc/group\fR should be checked
 before updating the supplementary group membership mapping.  If this value
 is non-zero, the check will be enabled and the mapping will not be updated
 unless the file has been modified since the last update.
 .TP
-.BI "--group-update-time " integer
+.BI "\-\-group\-update\-time " integer
 Specify the number of seconds between updates to the supplementary group
 membership mapping; this mapping is used when restricting credentials by GID.
 A value of 0 causes it to be computed initially but never updated (unless
 triggered by a \fBSIGHUP\fR).  A value of \-1 causes it to be disabled.
 .TP
-.BI "--key-file " file
+.BI "\-\-key\-file " file
 Specify an alternate secret key file.
 .TP
-.BI "--num-threads " integer
+.BI "\-\-num\-threads " integer
 Specify the number of threads to spawn for processing credential requests.
 .TP
-.BI "--syslog"
+.BI "\-\-syslog"
 Redirect log messages to syslog when the daemon is running in the background.
 
 .SH SIGNALS

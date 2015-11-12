@@ -46,7 +46,7 @@ munge_ctx_create, munge_ctx_copy, munge_ctx_destroy, munge_ctx_strerror, munge_c
 .sp
 .BI "munge_err_t munge_ctx_set (munge_ctx_t " ctx ", munge_opt_t " opt ", ...);"
 .sp
-.B cc `pkg-config --cflags --libs munge` -o foo foo.c
+.B cc `pkg\-config \-\-cflags \-\-libs munge` \-o foo foo.c
 .fi
 
 .SH DESCRIPTION

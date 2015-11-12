@@ -47,70 +47,70 @@ to stdout.
 
 .SH OPTIONS
 .TP
-.BI "-h, --help"
+.BI "\-h, \-\-help"
 Display a summary of the command-line options.
 .TP
-.BI "-L, --license"
+.BI "\-L, \-\-license"
 Display license information.
 .TP
-.BI "-V, --version"
+.BI "\-V, \-\-version"
 Display version information.
 .TP
-.BI "-n, --no-input"
+.BI "\-n, \-\-no\-input"
 Discard all input for the payload.
 .TP
-.BI "-s, --string " string
+.BI "\-s, \-\-string " string
 Input payload from the specified string.
 .TP
-.BI "-i, --input " file
+.BI "\-i, \-\-input " file
 Input payload from the specified file.
 .TP
-.BI "-o, --output " file
+.BI "\-o, \-\-output " file
 Output the credential to the specified file.
 .TP
-.BI "-c, --cipher " string
+.BI "\-c, \-\-cipher " string
 Specify the cipher type, either by name or number.
 .TP
-.BI "-C, --list-ciphers"
+.BI "\-C, \-\-list\-ciphers"
 Display a list of supported cipher types.
 .TP
-.BI "-m, --mac " string
+.BI "\-m, \-\-mac " string
 Specify the MAC type, either by name or number.
 .TP
-.BI "-M, --list-macs"
+.BI "\-M, \-\-list\-macs"
 Display a list of supported MAC types.
 .TP
-.BI "-z, --zip " string
+.BI "\-z, \-\-zip " string
 Specify the compression type, either by name or number.
 .TP
-.BI "-Z, --list-zips"
+.BI "\-Z, \-\-list\-zips"
 Display a list of supported compression types.
 .TP
-.BI "-u, --restrict-uid " uid
+.BI "\-u, \-\-restrict\-uid " uid
 Specify the user name or UID allowed to decode the credential.  This will
 be matched against the effective user ID of the process requesting the
 credential decode.
 .TP
-.BI "-U, --uid " uid
+.BI "\-U, \-\-uid " uid
 Specify the user name or UID under which to request the credential.
 This requires root privileges or the CAP_SETUID capability.
 .TP
-.BI "-g, --restrict-gid " gid
+.BI "\-g, \-\-restrict\-gid " gid
 Specify the group name or GID allowed to decode the credential.  This will
 be matched against the effective group ID of the process requesting the
 credential decode, as well as each supplementary group of which the effective
 user ID of that process is a member.
 .TP
-.BI "-G, --gid " gid
+.BI "\-G, \-\-gid " gid
 Specify the group name or GID under which to request the credential.
 This requires root privileges or the CAP_SETGID capability.
 .TP
-.BI "-t, --ttl " integer
+.BI "\-t, \-\-ttl " integer
 Specify the time-to-live (in seconds).  This controls how long the credential
 is valid once it has been encoded.  A value of 0 selects the default TTL.
 A value of \-1 selects the maximum allowed TTL.
 .TP
-.BI "-S, --socket " path
+.BI "\-S, \-\-socket " path
 Specify the local domain socket for connecting with \fBmunged\fR.
 
 .SH "EXIT STATUS"

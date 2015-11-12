@@ -44,82 +44,82 @@ By default, credentials are encoded for one second using a single thread.
 
 .SH OPTIONS
 .TP
-.BI "-h, --help"
+.BI "\-h, \-\-help"
 Display a summary of the command-line options.
 .TP
-.BI "-L, --license"
+.BI "\-L, \-\-license"
 Display license information.
 .TP
-.BI "-V, --version"
+.BI "\-V, \-\-version"
 Display version information.
 .TP
-.BI "-q, --quiet"
+.BI "\-q, \-\-quiet"
 Display only the creds/sec numeric result.  This is useful for producing
 input files for \fBministat\fR.
 .TP
-.BI "-c, --cipher " string
+.BI "\-c, \-\-cipher " string
 Specify the cipher type, either by name or number.
 .TP
-.BI "-C, --list-ciphers"
+.BI "\-C, \-\-list\-ciphers"
 Display a list of supported cipher types.
 .TP
-.BI "-m, --mac " string
+.BI "\-m, \-\-mac " string
 Specify the MAC type, either by name or number.
 .TP
-.BI "-M, --list-macs"
+.BI "\-M, \-\-list\-macs"
 Display a list of supported MAC types.
 .TP
-.BI "-z, --zip " string
+.BI "\-z, \-\-zip " string
 Specify the compression type, either by name or number.
 .TP
-.BI "-Z, --list-zips"
+.BI "\-Z, \-\-list\-zips"
 Display a list of supported compression types.
 .TP
-.BI "-e, --encode"
+.BI "\-e, \-\-encode"
 Encode (but do not decode) each credential.  By bypassing the decode
 operation, the credential is not stored in the replay cache.
 .TP
-.BI "-d, --decode"
+.BI "\-d, \-\-decode"
 Encode and decode each credential.
 .TP
-.BI "-l, --length " integer
+.BI "\-l, \-\-length " integer
 Specify an arbitrary payload length (in bytes).  The integer may be followed
 by a single-character modifier: k=kilobytes, m=megabytes, g=gigabytes;
 K=kibibytes, M=mebibytes, G=gibibytes.
 .TP
-.BI "-u, --restrict-uid " uid
+.BI "\-u, \-\-restrict\-uid " uid
 Specify the user name or UID allowed to decode the credential.  This will
 be matched against the effective user ID of the process requesting the
 credential decode.
 .TP
-.BI "-g, --restrict-gid " gid
+.BI "\-g, \-\-restrict\-gid " gid
 Specify the group name or GID allowed to decode the credential.  This will
 be matched against the effective group ID of the process requesting the
 credential decode, as well as each supplementary group of which the effective
 user ID of that process is a member.
 .TP
-.BI "-t, --ttl " integer
+.BI "\-t, \-\-ttl " integer
 Specify the time-to-live (in seconds).  This controls how long the credential
 is valid once it has been encoded.  A value of 0 selects the default TTL.
 A value of \-1 selects the maximum allowed TTL.
 .TP
-.BI "-S, --socket " path
+.BI "\-S, \-\-socket " path
 Specify the local domain socket for connecting with \fBmunged\fR.
 .TP
-.BI "-D, --duration " integer
+.BI "\-D, \-\-duration " integer
 Specify the test duration (in seconds).  The default duration is one second.
 A value of \-1 selects the maximum duration.  The integer may be followed
 by a single-character modifier: s=seconds, m=minutes, h=hours, d=days.
 .TP
-.BI "-N, --num-creds " integer
+.BI "\-N, \-\-num\-creds " integer
 Specify the number of credentials to generate.  The integer may be followed
 by a single-character modifier: k=kilobytes, m=megabytes, g=gigabytes;
 K=kibibytes, M=mebibytes, G=gibibytes.
 .TP
-.BI "-T, --num-threads " integer
+.BI "\-T, \-\-num\-threads " integer
 Specify the number of threads to spawn for processing credentials.
 .TP
-.BI "-W, --warn-time " integer
+.BI "\-W, \-\-warn\-time " integer
 Specify the maximum number of seconds to allow for a given
 \fBmunge_encode\fR() or \fBmunge_decode\fR() operation before issuing
 a warning.

@@ -44,38 +44,38 @@ same stream, they are separated by a blank line.
 
 .SH OPTIONS
 .TP
-.BI "-h, --help"
+.BI "\-h, \-\-help"
 Display a summary of the command-line options.
 .TP
-.BI "-L, --license"
+.BI "\-L, \-\-license"
 Display license information.
 .TP
-.BI "-V, --version"
+.BI "\-V, \-\-version"
 Display version information.
 .TP
-.BI "-i, --input " file
+.BI "\-i, \-\-input " file
 Input the credential from the specified file.
 .TP
-.BI "-n, --no-output"
+.BI "\-n, \-\-no\-output"
 Discard all output.
 .TP
-.BI "-m, --metadata " file
+.BI "\-m, \-\-metadata " file
 Output metadata to the specified file.
 .TP
-.BI "-o, --output " file
+.BI "\-o, \-\-output " file
 Output the payload to the specified file.
 .TP
-.BI "-k, --keys " string
+.BI "\-k, \-\-keys " string
 Specify a subset of metadata keys to output.  The keys are case-insensitive
 and delimited by whitespace, commas, semicolons, or periods -- as long as
 the string is treated as a single argument by the shell (e.g., enclosed
 by quotes).  If a subset is not specified, all available keys are selected
 by default.
 .TP
-.BI "-K, --list-keys"
+.BI "\-K, \-\-list\-keys"
 Display a list of metadata keys.
 .TP
-.BI "-S, --socket " path
+.BI "\-S, \-\-socket " path
 Specify the local domain socket for connecting with \fBmunged\fR.
 
 .SH "METADATA KEYS"
