@@ -11,11 +11,15 @@ Requires:	%{name}-libs = %{version}-%{release}
 BuildRequires:	bzip2-devel
 BuildRequires:	openssl-devel
 BuildRequires:	zlib-devel
+BuildRequires:	systemd
 BuildRoot:	%{_tmppath}/%{name}-%{version}
 
 Source0:	%{name}-%{version}.tar.bz2
 
 Requires(pre):	shadow-utils
+Requires(post): systemd
+Requires(preun): systemd
+Requires(postun): systemd
 
 %package devel
 Summary:	Headers and libraries for developing applications using MUNGE
@@ -67,6 +71,8 @@ touch "$RPM_BUILD_ROOT"/%{_sysconfdir}/munge/munge.key
 touch "$RPM_BUILD_ROOT"/%{_localstatedir}/lib/munge/munge.seed
 touch "$RPM_BUILD_ROOT"/%{_localstatedir}/log/munge/munged.log
 touch "$RPM_BUILD_ROOT"/%{_localstatedir}/run/munge/munged.pid
+rm -f "$RPM_BUILD_ROOT"/%{_sysconfdir}/sysconfig/munge
+rm -f "$RPM_BUILD_ROOT"/%{_initddir}/munge
 
 %clean
 rm -rf "$RPM_BUILD_ROOT"
@@ -98,21 +104,16 @@ if [ -f /var/lock/subsys/munged ]; then
   /bin/mv /var/lock/subsys/munged /var/lock/subsys/munge
 fi
 ##
-if [ -x /sbin/chkconfig ]; then /sbin/chkconfig --add munge; fi
+%systemd_post munge.service
 
 %post libs
 /sbin/ldconfig %{_libdir}
 
 %preun
-if [ $1 -eq 0 ]; then
-  %{_sysconfdir}/init.d/munge stop >/dev/null 2>&1 || :
-  if [ -x /sbin/chkconfig ]; then /sbin/chkconfig --del munge; fi
-fi
+%systemd_preun munge.service
 
 %postun
-if [ $1 -ge 1 ]; then
-  %{_sysconfdir}/init.d/munge try-restart >/dev/null 2>&1 || :
-fi
+%systemd_postun_with_restart munge.service
 
 %postun libs
 /sbin/ldconfig %{_libdir}
@@ -132,17 +133,17 @@ fi
 %doc doc/*
 %dir %attr(0700,munge,munge) %{_sysconfdir}/munge
 %attr(0600,munge,munge) %config(noreplace) %ghost %{_sysconfdir}/munge/munge.key
-%config(noreplace) %{_sysconfdir}/sysconfig/munge
-%{?_initddir:%{_initddir}}%{!?_initddir:%{_initrddir}}/munge
 %dir %attr(0711,munge,munge) %{_localstatedir}/lib/munge
 %attr(0600,munge,munge) %ghost %{_localstatedir}/lib/munge/munge.seed
 %dir %attr(0700,munge,munge) %{_localstatedir}/log/munge
 %attr(0640,munge,munge) %ghost %{_localstatedir}/log/munge/munged.log
-%dir %attr(0755,munge,munge) %ghost %{_localstatedir}/run/munge
+%dir %attr(0755,munge,munge) %{_localstatedir}/run/munge
 %attr(0644,munge,munge) %ghost %{_localstatedir}/run/munge/munged.pid
 %{_bindir}/*
 %{_sbindir}/*
 %{_mandir}/*[^3]/*
+%{_tmpfilesdir}/munge.conf
+%{_unitdir}/munge.service
 
 %files devel
 %defattr(-,root,root,0755)
