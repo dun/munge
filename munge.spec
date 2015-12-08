@@ -6,16 +6,13 @@ Summary:	MUNGE authentication service
 Group:		System Environment/Daemons
 License:	GPLv3+ and LGPLv3+
 URL:		https://dun.github.io/munge/
-Requires:	%{name}-libs = %{version}-%{release}
+Source0:	https://github.com/dun/munge/releases/download/%{name}-%{version}/%{name}-%{version}.tar.bz2
 
 BuildRequires:	bzip2-devel
 BuildRequires:	openssl-devel
 BuildRequires:	zlib-devel
 BuildRequires:	systemd
-BuildRoot:	%{_tmppath}/%{name}-%{version}
-
-Source0:	%{name}-%{version}.tar.bz2
-
+Requires:	%{name}-libs = %{version}-%{release}
 Requires(pre):	shadow-utils
 Requires(post): systemd
 Requires(preun): systemd
@@ -24,7 +21,7 @@ Requires(postun): systemd
 %package devel
 Summary:	Headers and libraries for developing applications using MUNGE
 Group:		Development/Libraries
-Requires:	%{name}-libs = %{version}-%{release}
+Requires:	%{name}-libs%{?_isa} = %{version}-%{release}
 BuildRequires:	pkgconfig
 
 %package libs
@@ -49,65 +46,53 @@ A header file and static library for developing applications using MUNGE.
 A shared library for applications using MUNGE.
 
 %prep
-%setup
+%setup -q
 
 %build
 ##
 # Add the following to the rpm command line to specify 32-bit/64-bit builds:
-#   --with arch32               (build 32-bit executables & library)
-#   --with arch64               (build 64-bit executables & library)
+#   --with arch32  (build 32-bit executables & library)
+#   --with arch64  (build 64-bit executables & library)
 ##
-%configure \
-  %{?_with_arch32: --enable-arch=32} \
-  %{?_with_arch64: --enable-arch=64} \
-  --program-prefix=%{?_program_prefix:%{_program_prefix}}
-make
+%configure --disable-static \
+    %{?_with_arch32: --enable-arch=32} \
+    %{?_with_arch64: --enable-arch=64} \
+    --program-prefix=%{?_program_prefix:%{_program_prefix}}
+sed -i 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g' libtool
+sed -i 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' libtool
+make %{?_smp_mflags}
 
 %install
-rm -rf "$RPM_BUILD_ROOT"
-mkdir -p "$RPM_BUILD_ROOT"
-DESTDIR="$RPM_BUILD_ROOT" make install
-touch "$RPM_BUILD_ROOT"/%{_sysconfdir}/munge/munge.key
-touch "$RPM_BUILD_ROOT"/%{_localstatedir}/lib/munge/munge.seed
-touch "$RPM_BUILD_ROOT"/%{_localstatedir}/log/munge/munged.log
-touch "$RPM_BUILD_ROOT"/%{_localstatedir}/run/munge/munged.pid
-rm -f "$RPM_BUILD_ROOT"/%{_sysconfdir}/sysconfig/munge
-rm -f "$RPM_BUILD_ROOT"/%{_initddir}/munge
+rm -rf %{buildroot}
+make install DESTDIR=%{buildroot}
+touch %{buildroot}/%{_sysconfdir}/munge/munge.key
+touch %{buildroot}/%{_localstatedir}/lib/munge/munge.seed
+touch %{buildroot}/%{_localstatedir}/log/munge/munged.log
+touch %{buildroot}/%{_localstatedir}/run/munge/munged.pid
+rm -f %{buildroot}/%{_sysconfdir}/sysconfig/munge
+rm -f %{buildroot}/%{_initddir}/munge
 
 %clean
-rm -rf "$RPM_BUILD_ROOT"
+rm -rf %{buildroot}
 
 %pre
-/usr/bin/getent group munge >/dev/null 2>&1 || \
-  /usr/sbin/groupadd -r munge
-/usr/bin/getent passwd munge >/dev/null 2>&1 || \
-  /usr/sbin/useradd -c "MUNGE authentication service" \
-  -d "%{_sysconfdir}/munge" -g munge -s /bin/false -r munge
+getent group munge >/dev/null || \
+    groupadd -r munge
+getent passwd munge >/dev/null || \
+    useradd -c "MUNGE authentication service" -d "%{_sysconfdir}/munge" \
+    -g munge -s /sbin/nologin -r munge
+exit 0
 
 %post
 if [ ! -e %{_sysconfdir}/munge/munge.key -a -c /dev/urandom ]; then
-  /bin/dd if=/dev/urandom bs=1 count=1024 \
-    >%{_sysconfdir}/munge/munge.key 2>/dev/null
-  /bin/chown munge:munge %{_sysconfdir}/munge/munge.key
-  /bin/chmod 0400 %{_sysconfdir}/munge/munge.key
+    dd if=/dev/urandom bs=1 count=1024 \
+        >%{_sysconfdir}/munge/munge.key 2>/dev/null
+    chown munge:munge %{_sysconfdir}/munge/munge.key
+    chmod 0400 %{_sysconfdir}/munge/munge.key
 fi
-##
-# Fix files for munge user when upgrading to 0.5.11.
-if ! /bin/egrep '^[ 	]*USER=' %{_sysconfdir}/sysconfig/munge \
-    >/dev/null 2>&1; then
-  /bin/chown munge:munge %{_sysconfdir}/munge/* %{_localstatedir}/*/munge/* \
-    %{_localstatedir}/run/munge >/dev/null 2>&1
-fi
-##
-# Fix subsys lockfile name when upgrading to 0.5.11.
-if [ -f /var/lock/subsys/munged ]; then
-  /bin/mv /var/lock/subsys/munged /var/lock/subsys/munge
-fi
-##
 %systemd_post munge.service
 
-%post libs
-/sbin/ldconfig %{_libdir}
+%post libs -p /sbin/ldconfig
 
 %preun
 %systemd_preun munge.service
@@ -115,21 +100,19 @@ fi
 %postun
 %systemd_postun_with_restart munge.service
 
-%postun libs
-/sbin/ldconfig %{_libdir}
+%postun libs -p /sbin/ldconfig
 
 %files
-%defattr(-,root,root,0755)
+%{!?_licensedir:%global license %doc}
+%license COPYING*
 %doc AUTHORS
-%doc COPYING
 %doc DISCLAIMER*
 %doc HISTORY
-%doc INSTALL
 %doc JARGON
 %doc NEWS
 %doc PLATFORMS
 %doc QUICKSTART
-%doc README*
+%doc README
 %doc doc/*
 %dir %attr(0700,munge,munge) %{_sysconfdir}/munge
 %attr(0600,munge,munge) %config(noreplace) %ghost %{_sysconfdir}/munge/munge.key
@@ -146,14 +129,11 @@ fi
 %{_unitdir}/munge.service
 
 %files devel
-%defattr(-,root,root,0755)
 %{_includedir}/*
 %{_libdir}/*.la
+%{_libdir}/*.so
 %{_libdir}/pkgconfig/*.pc
 %{_mandir}/*3/*
-%{_libdir}/*.a
-%{_libdir}/*.so
 
 %files libs
-%defattr(-,root,root,0755)
 %{_libdir}/*.so.*
