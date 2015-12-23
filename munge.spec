@@ -6,7 +6,7 @@ Summary:	MUNGE authentication service
 Group:		System Environment/Daemons
 License:	GPLv3+ and LGPLv3+
 URL:		https://dun.github.io/munge/
-Source0:	https://github.com/dun/munge/releases/download/%{name}-%{version}/%{name}-%{version}.tar.bz2
+Source0:	https://github.com/dun/munge/releases/download/%{name}-%{version}/%{name}-%{version}.tar.xz
 
 BuildRequires:	bzip2-devel
 BuildRequires:	openssl-devel
