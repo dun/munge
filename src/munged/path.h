@@ -42,6 +42,12 @@
 #endif /* !PATH_MAX */
 
 
+typedef enum path_security_flags {
+    PATH_SECURITY_NO_FLAGS =            0x00,
+    PATH_SECURITY_IGNORE_GROUP_WRITE =  0x01,
+} path_security_flag_t;
+
+
 int path_canonicalize (const char *src, char *dst, int dstlen);
 /*
  *  Canonicalizes the path [src], returning an absolute pathname in the
@@ -70,7 +76,8 @@ int path_is_accessible (const char *path, char *errbuf, size_t errbuflen);
  *    will be written to the buffer [errbuf] of length [errbuflen].
  */
 
-int path_is_secure (const char *path, char *errbuf, size_t errbuflen);
+int path_is_secure (const char *path, char *errbuf, size_t errbuflen,
+    path_security_flag_t flags);
 /*
  *  Checks if the specified [path] is secure, ensuring that the base directory
  *    cannot be modified by anyone other than the current user or root.

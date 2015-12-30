@@ -148,7 +148,8 @@ random_init (const char *seed)
             log_err (EMUNGE_SNAFU, LOG_ERR,
                 "Failed to determine dirname of PRNG seed \"%s\"", seed);
         }
-        n = path_is_secure (seed_dir, ebuf, sizeof (ebuf));
+        n = path_is_secure (seed_dir, ebuf, sizeof (ebuf),
+            PATH_SECURITY_NO_FLAGS);
         if (n < 0) {
             log_err (EMUNGE_SNAFU, LOG_ERR,
                 "Failed to check PRNG seed dir \"%s\": %s", seed_dir, ebuf);

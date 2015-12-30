@@ -688,7 +688,7 @@ _conf_open_keyfile (const char *keyfile, int got_force)
         log_err (EMUNGE_SNAFU, LOG_ERR,
             "Failed to determine dirname of keyfile \"%s\"", keyfile);
     }
-    n = path_is_secure (keydir, ebuf, sizeof (ebuf));
+    n = path_is_secure (keydir, ebuf, sizeof (ebuf), PATH_SECURITY_NO_FLAGS);
     if (n < 0) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
             "Failed to check keyfile dir \"%s\": %s", keydir, ebuf);

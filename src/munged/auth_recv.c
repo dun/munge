@@ -116,7 +116,7 @@ _check_auth_server_dir (const char *dir, int got_force)
     }
     /*  Ensure auth server dir is secure against modification by others.
      */
-    n = path_is_secure (dir, ebuf, sizeof (ebuf));
+    n = path_is_secure (dir, ebuf, sizeof (ebuf), PATH_SECURITY_NO_FLAGS);
     if (n < 0) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
             "Failed to check auth server dir \"%s\": %s", dir, ebuf);
@@ -202,7 +202,7 @@ _check_auth_client_dir (const char *dir, int got_force)
         log_err (EMUNGE_SNAFU, LOG_ERR,
             "Failed to determine dirname of auth client dir \"%s\"", dir);
     }
-    n = path_is_secure (dirdir, ebuf, sizeof (ebuf));
+    n = path_is_secure (dirdir, ebuf, sizeof (ebuf), PATH_SECURITY_NO_FLAGS);
     if (n < 0) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
             "Failed to check auth client parent dir \"%s\": %s", dirdir, ebuf);

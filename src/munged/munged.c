@@ -397,7 +397,8 @@ open_logfile (const char *logfile, int priority, int got_force)
         log_err (EMUNGE_SNAFU, LOG_ERR,
             "Failed to determine dirname of logfile \"%s\"", logfile);
     }
-    n = path_is_secure (logdir, ebuf, sizeof (ebuf));
+    n = path_is_secure (logdir, ebuf, sizeof (ebuf),
+        PATH_SECURITY_IGNORE_GROUP_WRITE);
     if (n < 0) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
             "Failed to check logfile dir \"%s\": %s", logdir, ebuf);
@@ -493,7 +494,7 @@ write_pidfile (const char *pidfile, int got_force)
         log_err (EMUNGE_SNAFU, LOG_ERR,
             "Failed to determine dirname of pidfile \"%s\"", pidfile);
     }
-    n = path_is_secure (piddir, ebuf, sizeof (ebuf));
+    n = path_is_secure (piddir, ebuf, sizeof (ebuf), PATH_SECURITY_NO_FLAGS);
     if (n < 0) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
             "Failed to check pidfile dir \"%s\": %s", piddir, ebuf);
@@ -591,7 +592,7 @@ sock_create (conf_t conf)
         log_err (EMUNGE_SNAFU, LOG_ERR,
             "Failed to determine dirname of socket \"%s\"", conf->socket_name);
     }
-    n = path_is_secure (sockdir, ebuf, sizeof (ebuf));
+    n = path_is_secure (sockdir, ebuf, sizeof (ebuf), PATH_SECURITY_NO_FLAGS);
     if (n < 0) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
             "Failed to check socket dir \"%s\": %s", sockdir, ebuf);

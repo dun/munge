@@ -174,7 +174,8 @@ path_is_accessible (const char *path, char *errbuf, size_t errbuflen)
 
 
 int
-path_is_secure (const char *path, char *errbuf, size_t errbuflen)
+path_is_secure (const char *path, char *errbuf, size_t errbuflen,
+                path_security_flag_t flags)
 {
     int          n;
     char         buf [PATH_MAX];
@@ -217,7 +218,10 @@ path_is_secure (const char *path, char *errbuf, size_t errbuflen)
             return (_path_set_err (0, errbuf, errbuflen,
                 "invalid ownership of \"%s\"", buf));
         }
-        if ((st.st_mode & S_IWGRP) && !(st.st_mode & S_ISVTX)) {
+        if (!(flags & PATH_SECURITY_IGNORE_GROUP_WRITE) &&
+             (st.st_mode & S_IWGRP)                     &&
+            !(st.st_mode & S_ISVTX))
+        {
             return (_path_set_err (0, errbuf, errbuflen,
                 "group-writable permissions set on \"%s\"", buf));
         }
