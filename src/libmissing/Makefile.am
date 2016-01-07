@@ -2,7 +2,7 @@
 ## Process this file with automake to produce Makefile.in.
 ##*****************************************************************************
 ## Written by Chris Dunlap <cdunlap@llnl.gov>.
-## Copyright (C) 2007-2015 Lawrence Livermore National Security, LLC.
+## Copyright (C) 2007-2016 Lawrence Livermore National Security, LLC.
 ## Copyright (C) 2002-2007 The Regents of the University of California.
 ## UCRL-CODE-155910.
 ##
