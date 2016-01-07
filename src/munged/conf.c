@@ -64,11 +64,12 @@
 #define OPT_NUM_THREADS         258
 #define OPT_AUTH_SERVER         259
 #define OPT_AUTH_CLIENT         260
-#define OPT_BENCHMARK           264
 #define OPT_GROUP_CHECK         261
 #define OPT_GROUP_UPDATE        262
 #define OPT_SYSLOG              263
-#define OPT_LAST                265
+#define OPT_BENCHMARK           264
+#define OPT_MAX_TTL             265
+#define OPT_LAST                266
 
 const char * const short_opts = ":hLVfFMS:";
 
@@ -91,6 +92,7 @@ struct option long_opts[] = {
     { "benchmark",         no_argument,       NULL, OPT_BENCHMARK    },
     { "group-check-mtime", required_argument, NULL, OPT_GROUP_CHECK  },
     { "group-update-time", required_argument, NULL, OPT_GROUP_UPDATE },
+    { "max-ttl",           required_argument, NULL, OPT_MAX_TTL      },
     { "syslog",            no_argument,       NULL, OPT_SYSLOG       },
     {  NULL,               0,                 NULL,  0               }
 };
@@ -360,6 +362,16 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                 }
                 conf->gids_update_secs = l;
                 break;
+            case OPT_MAX_TTL:
+                l = strtol (optarg, &p, 10);
+                if (((errno == ERANGE) && ((l == LONG_MIN) || (l == LONG_MAX)))
+                        || (optarg == p) || (*p != '\0')
+                        || (l < 1) || (l > MUNGE_MAXIMUM_TTL)) {
+                    log_err (EMUNGE_SNAFU, LOG_ERR,
+                        "Invalid value \"%s\" for max-ttl", optarg);
+                }
+                conf->max_ttl = l;
+                break;
             case OPT_SYSLOG:
                 conf->got_syslog = 1;
                 break;
@@ -472,6 +484,9 @@ display_help (char *prog)
 
     printf ("  %*s %s [%s]\n", w, "--key-file=PATH",
             "Specify secret key file", MUNGED_SECRET_KEY);
+
+    printf ("  %*s %s [%d]\n", w, "--max-ttl=INT",
+            "Specify maximum time-to-live (in seconds)", MUNGE_MAXIMUM_TTL);
 
     printf ("  %*s %s [%d]\n", w, "--num-threads=INT",
             "Specify number of threads to spawn", MUNGE_THREADS);

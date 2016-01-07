@@ -119,6 +119,13 @@ triggered by a \fBSIGHUP\fR).  A value of \-1 causes it to be disabled.
 .BI "\-\-key\-file " file
 Specify an alternate secret key file.
 .TP
+.BI "\-\-max\-ttl " integer
+Specify the maximum allowable time-to-live value (in seconds) for a credential.
+This setting has an upper-bound imposed by the hard-coded MUNGE_MAXIMUM_TTL
+value.  Reducing it will limit the maximum growth of the credential replay
+cache.  This is viable if clocks within the MUNGE realm can be kept in sync
+with minimal skew.
+.TP
 .BI "\-\-num\-threads " integer
 Specify the number of threads to spawn for processing credential requests.
 .TP
