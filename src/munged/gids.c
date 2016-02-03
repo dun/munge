@@ -64,8 +64,7 @@
  *    should be ok here since they are only called in/from _gids_hash_create(),
  *    and only one instance of that routine can be running at a time within
  *    munged.  However, crashes have been traced to the use of getgrent() here
- *    (cf, <http://code.google.com/p/munge/issues/detail?id=2>) so the
- *    reentrant functions are now used.
+ *    (cf, Issue 2) so the reentrant functions are now used.
  */
 
 
