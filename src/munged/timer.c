@@ -51,15 +51,6 @@
 
 
 /*****************************************************************************
- *  Debugging
- *****************************************************************************/
-
-#ifndef _TIMER_CLOCK_CHECK
-#define _TIMER_CLOCK_CHECK      0
-#endif /* !_TIMER_CLOCK_CHECK */
-
-
-/*****************************************************************************
  *  Private Data Types
  *****************************************************************************/
 
@@ -126,10 +117,6 @@ timer_init (void)
     if (_timer_tid != 0) {
         return;
     }
-#if _TIMER_CLOCK_CHECK
-    log_msg (LOG_INFO, "Enabled timer clock check");
-#endif /* _TIMER_CLOCK_CHECK */
-
     if ((errno = pthread_attr_init (&tattr)) != 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR,
                 "Failed to init timer thread attribute");
@@ -350,10 +337,6 @@ _timer_thread (void *arg)
     timer_p         *t_prev_ptr;
     timer_p          timer_expired;
 
-#if _TIMER_CLOCK_CHECK
-    struct timespec  ts_prev = {0, 0};
-#endif /* _TIMER_CLOCK_CHECK */
-
     if (sigfillset (&sigset)) {
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to init timer sigset");
     }
@@ -388,18 +371,6 @@ _timer_thread (void *arg)
                     "Failed to disable timer thread cancellation");
         }
         _timer_get_timespec (&ts_now);
-
-#if _TIMER_CLOCK_CHECK
-        /*  Check if the clock jumps backwards.
-         */
-        if (!_timer_is_timespec_ge (&ts_now, &ts_prev)) {
-            log_msg (LOG_WARNING,
-                    "Timer clock rewound from %ld.%ld to %ld.%ld",
-                    ts_prev.tv_sec, ts_prev.tv_nsec,
-                    ts_now.tv_sec, ts_now.tv_nsec);
-        }
-        ts_prev = ts_now;
-#endif /* _TIMER_CLOCK_CHECK */
 
         /*  Select expired timers.
          */
