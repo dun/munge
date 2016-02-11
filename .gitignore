@@ -3,10 +3,12 @@
 *.o
 .deps/
 .libs/
+/autom4te.cache
 /config.cache
 /config.log
 /config.status
 /config/config.h
+/config/config.h.in~
 /config/stamp-h1
 /libtool
 /src/*/*.[1-9]
