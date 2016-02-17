@@ -29,6 +29,20 @@
 
 include $(top_srcdir)/config/Make-inc.mk
 
+LOCALFILES = \
+	$(sysconfdir)/rc.d/init.d/munge \
+	$(sysconfdir)/init.d/munge \
+	$(sysconfdir)/sysconfig/munge \
+	$(sysconfdir)/default/munge \
+	$(libdir)/pkgconfig/munge.pc \
+	$(prefix)/lib/systemd/system/munge.service \
+	$(prefix)/lib/tmpfiles.d/munge.conf
+
+EXTRA_DIST = \
+	munge-tmpfiles.conf \
+	munge.service \
+	munge.sysconfig
+
 noinst_DATA = \
 	munge.init
 
@@ -72,3 +86,12 @@ install-data-local:
 	$(INSTALL) -m 0700 -d "$(DESTDIR)$(localstatedir)/log/munge"
 	$(INSTALL) -m 0755 -d "$(DESTDIR)$(localstatedir)/run"
 	$(INSTALL) -m 0755 -d "$(DESTDIR)$(localstatedir)/run/munge"
+
+uninstall-local:
+	@for p in ${LOCALFILES}; do \
+	  test -f "$(DESTDIR)$${p}" || continue; \
+	  d=`dirname "$${p}"`; \
+	  f=`basename "$${p}"`; \
+	  echo " ( cd '$(DESTDIR)$${d}' && rm -f '$${f}' )"; \
+	  cd "$(DESTDIR)$${d}" && rm -f "$${f}"; \
+	done

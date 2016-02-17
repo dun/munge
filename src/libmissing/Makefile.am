@@ -40,3 +40,11 @@ libmissing_la_SOURCES = \
 	getopt.c \
 	getopt1.c \
 	missing.h
+
+EXTRA_libmissing_la_SOURCES = \
+	inet_ntop.h \
+	strlcat.h \
+	strlcpy.h
+
+EXTRA_DIST = \
+	URL

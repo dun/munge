@@ -155,8 +155,8 @@ AM_V_CCLD = $(am__v_CCLD_@AM_V@)
 am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
-SOURCES = $(libmissing_la_SOURCES)
-DIST_SOURCES = $(libmissing_la_SOURCES)
+SOURCES = $(libmissing_la_SOURCES) $(EXTRA_libmissing_la_SOURCES)
+DIST_SOURCES = $(libmissing_la_SOURCES) $(EXTRA_libmissing_la_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -345,6 +345,14 @@ libmissing_la_SOURCES = \
 	getopt.c \
 	getopt1.c \
 	missing.h
+
+EXTRA_libmissing_la_SOURCES = \
+	inet_ntop.h \
+	strlcat.h \
+	strlcpy.h
+
+EXTRA_DIST = \
+	URL
 
 all: all-am
 

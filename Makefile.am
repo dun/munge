@@ -30,9 +30,35 @@
 include $(top_srcdir)/config/Make-inc.mk
 
 ACLOCAL_AMFLAGS =		-I config
-AUTOMAKE_OPTIONS =		foreign
+
+AUTOMAKE_OPTIONS =		dist-xz foreign no-dist-gzip
+
 CONFIG_STATUS_DEPENDENCIES =	META
-DISTCLEANFILES =		$(META_NAME)-*
-EXTRA_DIST =			AUTHORS COPYING DISCLAIMER HISTORY INSTALL \
-				JARGON NEWS PLATFORMS README munge.spec
+
+DISTCLEANFILES = \
+				config/*~ \
+				$(PACKAGE)-*.tar*
+
+EXTRA_DIST = \
+				AUTHORS \
+				COPYING \
+				COPYING.LESSER \
+				DISCLAIMER.LLNS \
+				DISCLAIMER.UC \
+				HISTORY \
+				INSTALL \
+				JARGON \
+				META \
+				NEWS \
+				PLATFORMS \
+				QUICKSTART \
+				README \
+				README.AIX \
+				README.MULTILIB \
+				TODO \
+				bootstrap \
+				doc \
+				extra \
+				munge.spec
+
 SUBDIRS =			src

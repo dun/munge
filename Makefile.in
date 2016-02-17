@@ -214,9 +214,9 @@ am__relativize = \
     dir1=`echo "$$dir1" | sed -e "$$sed_rest"`; \
   done; \
   reldir="$$dir2"
-DIST_ARCHIVES = $(distdir).tar.gz
 GZIP_ENV = --best
-DIST_TARGETS = dist-gzip
+DIST_ARCHIVES = $(distdir).tar.xz
+DIST_TARGETS = dist-xz
 distuninstallcheck_listfiles = find . -type f -print
 am__distuninstallcheck_listfiles = $(distuninstallcheck_listfiles) \
   | sed 's|^\./|$(prefix)/|' | grep -v '$(infodir)/dir$$'
@@ -374,11 +374,33 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 ACLOCAL_AMFLAGS = -I config
-AUTOMAKE_OPTIONS = foreign
+AUTOMAKE_OPTIONS = dist-xz foreign no-dist-gzip
 CONFIG_STATUS_DEPENDENCIES = META
-DISTCLEANFILES = $(META_NAME)-*
-EXTRA_DIST = AUTHORS COPYING DISCLAIMER HISTORY INSTALL \
-				JARGON NEWS PLATFORMS README munge.spec
+DISTCLEANFILES = \
+				config/*~ \
+				$(PACKAGE)-*.tar*
+
+EXTRA_DIST = \
+				AUTHORS \
+				COPYING \
+				COPYING.LESSER \
+				DISCLAIMER.LLNS \
+				DISCLAIMER.UC \
+				HISTORY \
+				INSTALL \
+				JARGON \
+				META \
+				NEWS \
+				PLATFORMS \
+				QUICKSTART \
+				README \
+				README.AIX \
+				README.MULTILIB \
+				TODO \
+				bootstrap \
+				doc \
+				extra \
+				munge.spec
 
 SUBDIRS = src
 all: all-recursive
@@ -625,7 +647,6 @@ dist-bzip2: distdir
 dist-lzip: distdir
 	tardir=$(distdir) && $(am__tar) | lzip -c $${LZIP_OPT--9} >$(distdir).tar.lz
 	$(am__post_remove_distdir)
-
 dist-xz: distdir
 	tardir=$(distdir) && $(am__tar) | XZ_OPT=$${XZ_OPT--e} xz -c >$(distdir).tar.xz
 	$(am__post_remove_distdir)

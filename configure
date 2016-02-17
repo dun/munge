@@ -708,8 +708,6 @@ AUTOHEADER
 AUTOMAKE
 AUTOCONF
 ACLOCAL
-VERSION
-PACKAGE
 CYGPATH_W
 am__isrc
 INSTALL_DATA
@@ -745,7 +743,9 @@ META_DATE
 META_ALIAS
 META_RELEASE
 META_VERSION
+VERSION
 META_NAME
+PACKAGE
 AWK
 target_alias
 host_alias
@@ -2357,6 +2357,8 @@ $as_echo_n "checking metadata... " >&6; }
 
     META_NAME=`$AWK -F ':[ \t]+' '$1 ~ /^ *(Name|Project|Package)$/ { print $2; exit }' $META`;
     if test -n "$META_NAME"; then
+      PACKAGE="$META_NAME"
+
 
 cat >>confdefs.h <<_ACEOF
 #define META_NAME "$META_NAME"
@@ -2367,6 +2369,8 @@ _ACEOF
 
     META_VERSION=`$AWK -F ':[ \t]+' '$1 ~ /^ *Version$/ { print $2; exit }' $META`;
     if test -n "$META_VERSION"; then
+      VERSION="$META_VERSION"
+
 
 cat >>confdefs.h <<_ACEOF
 #define META_VERSION "$META_VERSION"
@@ -3261,6 +3265,15 @@ fi
  PACKAGE=$PACKAGE
  VERSION=$VERSION
 
+
+cat >>confdefs.h <<_ACEOF
+#define PACKAGE "$PACKAGE"
+_ACEOF
+
+
+cat >>confdefs.h <<_ACEOF
+#define VERSION "$VERSION"
+_ACEOF
 
 # Some tools Automake needs.
 

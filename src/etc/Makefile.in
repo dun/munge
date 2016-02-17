@@ -287,6 +287,20 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
+LOCALFILES = \
+	$(sysconfdir)/rc.d/init.d/munge \
+	$(sysconfdir)/init.d/munge \
+	$(sysconfdir)/sysconfig/munge \
+	$(sysconfdir)/default/munge \
+	$(libdir)/pkgconfig/munge.pc \
+	$(prefix)/lib/systemd/system/munge.service \
+	$(prefix)/lib/tmpfiles.d/munge.conf
+
+EXTRA_DIST = \
+	munge-tmpfiles.conf \
+	munge.service \
+	munge.sysconfig
+
 noinst_DATA = \
 	munge.init
 
@@ -469,7 +483,7 @@ ps: ps-am
 
 ps-am:
 
-uninstall-am:
+uninstall-am: uninstall-local
 
 .MAKE: install-am install-strip
 
@@ -484,7 +498,7 @@ uninstall-am:
 	installcheck installcheck-am installdirs maintainer-clean \
 	maintainer-clean-generic mostlyclean mostlyclean-generic \
 	mostlyclean-libtool pdf pdf-am ps ps-am tags-am uninstall \
-	uninstall-am
+	uninstall-am uninstall-local
 
 
 # Dependencies to ensure libraries get rebuilt.
@@ -545,6 +559,15 @@ install-data-local:
 	$(INSTALL) -m 0700 -d "$(DESTDIR)$(localstatedir)/log/munge"
 	$(INSTALL) -m 0755 -d "$(DESTDIR)$(localstatedir)/run"
 	$(INSTALL) -m 0755 -d "$(DESTDIR)$(localstatedir)/run/munge"
+
+uninstall-local:
+	@for p in ${LOCALFILES}; do \
+	  test -f "$(DESTDIR)$${p}" || continue; \
+	  d=`dirname "$${p}"`; \
+	  f=`basename "$${p}"`; \
+	  echo " ( cd '$(DESTDIR)$${d}' && rm -f '$${f}' )"; \
+	  cd "$(DESTDIR)$${d}" && rm -f "$${f}"; \
+	done
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

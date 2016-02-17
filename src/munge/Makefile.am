@@ -46,7 +46,8 @@ munge_LDADD = \
 
 munge_SOURCES = \
 	munge.c \
-	read.c
+	read.c \
+	read.h
 
 unmunge_LDADD = \
 	$(top_builddir)/src/libcommon/libcommon.la \
@@ -55,7 +56,8 @@ unmunge_LDADD = \
 
 unmunge_SOURCES = \
 	unmunge.c \
-	read.c
+	read.c \
+	read.h
 
 remunge_LDADD = \
 	$(top_builddir)/src/libcommon/libcommon.la \

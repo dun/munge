@@ -41,7 +41,7 @@ X_AC_EXPAND_INSTALL_DIRS
 ##
 # Automake support.
 ##
-AM_INIT_AUTOMAKE([$PACKAGE], [$VERSION], [check-news dist-bzip2 gnu no-define])
+AM_INIT_AUTOMAKE([$PACKAGE], [$VERSION])
 AC_CONFIG_HEADERS([config/config.h])
 AM_MAINTAINER_MODE
 

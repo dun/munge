@@ -41,6 +41,8 @@ AC_DEFUN([X_AC_META], [
 
     META_NAME=_X_AC_META_GETVAL([(Name|Project|Package)]);
     if test -n "$META_NAME"; then
+      PACKAGE="$META_NAME"
+      AC_SUBST([PACKAGE])
       AC_DEFINE_UNQUOTED([META_NAME], ["$META_NAME"],
         [Define the project name.]
       )
@@ -49,6 +51,8 @@ AC_DEFUN([X_AC_META], [
 
     META_VERSION=_X_AC_META_GETVAL([Version]);
     if test -n "$META_VERSION"; then
+      VERSION="$META_VERSION"
+      AC_SUBST([VERSION])
       AC_DEFINE_UNQUOTED([META_VERSION], ["$META_VERSION"],
         [Define the project version.]
       )
