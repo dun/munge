@@ -48,6 +48,7 @@ EXTRA_DIST = \
 				HISTORY \
 				INSTALL \
 				JARGON \
+				KEYS \
 				META \
 				NEWS \
 				PLATFORMS \

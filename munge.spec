@@ -109,6 +109,7 @@ fi
 %doc DISCLAIMER*
 %doc HISTORY
 %doc JARGON
+%doc KEYS
 %doc NEWS
 %doc PLATFORMS
 %doc QUICKSTART
