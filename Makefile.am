@@ -55,6 +55,7 @@ EXTRA_DIST = \
 				README \
 				README.AIX \
 				README.MULTILIB \
+				THANKS \
 				TODO \
 				bootstrap \
 				doc \

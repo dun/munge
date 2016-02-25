@@ -113,6 +113,7 @@ fi
 %doc PLATFORMS
 %doc QUICKSTART
 %doc README
+%doc THANKS
 %doc doc/*
 %dir %attr(0700,munge,munge) %{_sysconfdir}/munge
 %attr(0600,munge,munge) %config(noreplace) %ghost %{_sysconfdir}/munge/munge.key

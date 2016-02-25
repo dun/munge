@@ -81,7 +81,7 @@ DIST_COMMON = $(top_srcdir)/config/Make-inc.mk $(srcdir)/Makefile.in \
 	$(srcdir)/Makefile.am $(top_srcdir)/configure \
 	$(am__configure_deps) $(top_srcdir)/config/config.h.in \
 	$(top_srcdir)/config/mkinstalldirs AUTHORS COPYING \
-	COPYING.LESSER INSTALL NEWS README TODO config/compile \
+	COPYING.LESSER INSTALL NEWS README THANKS TODO config/compile \
 	config/config.guess config/config.sub config/depcomp \
 	config/install-sh config/missing config/mkinstalldirs \
 	config/ltmain.sh $(top_srcdir)/config/compile \
@@ -396,6 +396,7 @@ EXTRA_DIST = \
 				README \
 				README.AIX \
 				README.MULTILIB \
+				THANKS \
 				TODO \
 				bootstrap \
 				doc \
