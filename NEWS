@@ -1,3 +1,14 @@
+munge-0.5.12 (2016-02-25):
+- Changed project homepage to <https://dun.github.io/munge/>.
+- Changed RPM specfile from sysvinit to systemd. (#33)
+- Added --max-ttl cmdline opt to munged. (#28)
+- Added --pid-file cmdline opt to munged. (#41)
+- Added support for "make dist" and "make distcheck". (#45)
+- Fixed group-writable permissions error for logfile on Ubuntu. (#31)
+- Fixed packaging with missing pkgconfig munge.pc file. (#25)
+- Fixed packaging with missing systemd service & tmpfiles.d config. (#34)
+- Fixed recursive make command in makefiles. (#40)
+
 munge-0.5.11 (2013-08-27):
 - Added --mlockall cmdline opt to munged.
 - Added --syslog cmdline opt to munged.
