@@ -40,6 +40,7 @@ DISTCLEANFILES = \
 				$(PACKAGE)-*.tar*
 
 EXTRA_DIST = \
+				.gitignore \
 				AUTHORS \
 				COPYING \
 				COPYING.LESSER \
