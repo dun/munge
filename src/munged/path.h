@@ -44,7 +44,7 @@
 
 typedef enum path_security_flags {
     PATH_SECURITY_NO_FLAGS =            0x00,
-    PATH_SECURITY_IGNORE_GROUP_WRITE =  0x01,
+    PATH_SECURITY_IGNORE_GROUP_WRITE =  0x01
 } path_security_flag_t;
 
 
