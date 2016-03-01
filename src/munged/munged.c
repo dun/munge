@@ -308,7 +308,7 @@ daemonize_fini (int fd)
         log_errno (EMUNGE_SNAFU, LOG_ERR,
             "Failed to dup \"/dev/null\" onto stderr");
     }
-    if (close (dev_null) < 0) {
+    if ((dev_null > STDERR_FILENO) && (close (dev_null)) < 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to close \"/dev/null\"");
     }
     /*  Clear the fd used by log_err() to return status back to the parent.
