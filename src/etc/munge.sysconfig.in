@@ -5,7 +5,7 @@
 ##
 # Pass additional command-line options to the daemon.
 ##
-# DAEMON_ARGS="--key-file /etc/munge/munge.key --num-threads 1"
+# DAEMON_ARGS="--key-file @sysconfdir@/munge/munge.key --num-threads 1"
 
 ##
 # Adjust the scheduling priority of the daemon.

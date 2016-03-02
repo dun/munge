@@ -79,8 +79,7 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 DIST_COMMON = $(top_srcdir)/config/Make-inc.mk $(srcdir)/Makefile.in \
-	$(srcdir)/Makefile.am $(top_srcdir)/config/mkinstalldirs \
-	$(srcdir)/munge.init.in $(srcdir)/munge.pc.in
+	$(srcdir)/Makefile.am $(top_srcdir)/config/mkinstalldirs
 subdir = src/etc
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/config/libtool.m4 \
@@ -111,7 +110,7 @@ am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(SHELL) $(top_srcdir)/config/mkinstalldirs
 CONFIG_HEADER = $(top_builddir)/config/config.h
-CONFIG_CLEAN_FILES = munge.init munge.pc
+CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
@@ -287,7 +286,50 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-LOCALFILES = \
+
+# Perform autoconf-style variable substitution on stdin.
+# Fully expands autoconf variables that depend on other autoconf variables.
+#
+subst = $(SED) \
+	-e 's,[@]META_ALIAS[@],$(META_ALIAS),g' \
+	-e 's,[@]META_AUTHOR[@],$(META_AUTHOR),g' \
+	-e 's,[@]META_DATE[@],$(META_DATE),g' \
+	-e 's,[@]META_NAME[@],$(META_NAME),g' \
+	-e 's,[@]META_RELEASE[@],$(META_RELEASE),g' \
+	-e 's,[@]META_VERSION[@],$(META_VERSION),g' \
+	-e 's,[@]bindir[@],$(bindir),g' \
+	-e 's,[@]datadir[@],$(datadir),g' \
+	-e 's,[@]datarootdir[@],$(datarootdir),g' \
+	-e 's,[@]docdir[@],$(docdir),g' \
+	-e 's,[@]exec_prefix[@],$(exec_prefix),g' \
+	-e 's,[@]includedir[@],$(includedir),g' \
+	-e 's,[@]infodir[@],$(infodir),g' \
+	-e 's,[@]libdir[@],$(libdir),g' \
+	-e 's,[@]libexecdir[@],$(libexecdir),g' \
+	-e 's,[@]localedir[@],$(localedir),g' \
+	-e 's,[@]localstatedir[@],$(localstatedir),g' \
+	-e 's,[@]mandir[@],$(mandir),g' \
+	-e 's,[@]oldincludedir[@],$(oldincludedir),g' \
+	-e 's,[@]prefix[@],$(prefix),g' \
+	-e 's,[@]sbindir[@],$(sbindir),g' \
+	-e 's,[@]sharedstatedir[@],$(sharedstatedir),g' \
+	-e 's,[@]sysconfdir[@],$(sysconfdir),g'
+
+TEMPLATE_FILES = \
+	munge.init.in \
+	munge.pc.in \
+	munge.service.in \
+	munge.sysconfig.in \
+	munge.tmpfiles.conf.in
+
+SUBSTITUTE_FILES = \
+	munge.init \
+	munge.pc \
+	munge.service \
+	munge.sysconfig \
+	munge.tmpfiles.conf
+
+UNINSTALL_FILES = \
 	$(sysconfdir)/rc.d/init.d/munge \
 	$(sysconfdir)/init.d/munge \
 	$(sysconfdir)/sysconfig/munge \
@@ -296,14 +338,9 @@ LOCALFILES = \
 	$(prefix)/lib/systemd/system/munge.service \
 	$(prefix)/lib/tmpfiles.d/munge.conf
 
-EXTRA_DIST = \
-	munge-tmpfiles.conf \
-	munge.service \
-	munge.sysconfig
-
-noinst_DATA = \
-	munge.init
-
+noinst_DATA = $(SUBSTITUTE_FILES)
+CLEANFILES = $(SUBSTITUTE_FILES)
+EXTRA_DIST = $(TEMPLATE_FILES)
 all: all-am
 
 .SUFFIXES:
@@ -338,10 +375,6 @@ $(top_srcdir)/configure: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
 $(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
 $(am__aclocal_m4_deps):
-munge.init: $(top_builddir)/config.status $(srcdir)/munge.init.in
-	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
-munge.pc: $(top_builddir)/config.status $(srcdir)/munge.pc.in
-	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
 
 mostlyclean-libtool:
 	-rm -f *.lo
@@ -411,6 +444,7 @@ install-strip:
 mostlyclean-generic:
 
 clean-generic:
+	-test -z "$(CLEANFILES)" || rm -f $(CLEANFILES)
 
 distclean-generic:
 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
@@ -519,6 +553,15 @@ force-dependency-check:
 distclean-local::
 	-rm -f *~ \#* .\#* cscope*.out core core.* tags TAGS
 
+$(SUBSTITUTE_FILES): Makefile
+	$(subst) < "$(srcdir)/$@.in" > "$(builddir)/$@"
+
+munge.init: munge.init.in
+munge.pc: munge.pc.in
+munge.service: munge.service.in
+munge.sysconfig: munge.sysconfig.in
+munge.tmpfiles.conf: munge.tmpfiles.conf.in
+
 install-data-local:
 	test -d "/etc/rc.d/init.d" \
 	    && INITDIR="$(sysconfdir)/rc.d/init.d" \
@@ -532,7 +575,7 @@ install-data-local:
 	    || CONFDIR="$(sysconfdir)/default"; \
 	  $(INSTALL) -m 0755 -d "$(DESTDIR)$${CONFDIR}"; \
 	  $(INSTALL) -m 0644 \
-	    "$(srcdir)/munge.sysconfig" "$(DESTDIR)$${CONFDIR}/munge"
+	    "$(builddir)/munge.sysconfig" "$(DESTDIR)$${CONFDIR}/munge"
 	:
 	PKGCONFIGDIR="$(libdir)/pkgconfig"; \
 	$(INSTALL) -m 0755 -d "$(DESTDIR)$${PKGCONFIGDIR}"; \
@@ -542,12 +585,12 @@ install-data-local:
 	UNITDIR="$(prefix)/lib/systemd/system"; \
 	$(INSTALL) -m 0755 -d "$(DESTDIR)$${UNITDIR}"; \
 	$(INSTALL) -m 0644 \
-	  "$(srcdir)/munge.service" "$(DESTDIR)$${UNITDIR}/munge.service"
+	  "$(builddir)/munge.service" "$(DESTDIR)$${UNITDIR}/munge.service"
 	:
 	TMPFILESDIR="$(prefix)/lib/tmpfiles.d"; \
 	$(INSTALL) -m 0755 -d "$(DESTDIR)$${TMPFILESDIR}"; \
 	$(INSTALL) -m 0644 \
-	  "$(srcdir)/munge-tmpfiles.conf" \
+	  "$(builddir)/munge.tmpfiles.conf" \
 	  "$(DESTDIR)$${TMPFILESDIR}/munge.conf"
 	:
 	$(INSTALL) -m 0755 -d "$(DESTDIR)$(sysconfdir)"
@@ -561,7 +604,7 @@ install-data-local:
 	$(INSTALL) -m 0755 -d "$(DESTDIR)$(localstatedir)/run/munge"
 
 uninstall-local:
-	@for p in ${LOCALFILES}; do \
+	@for p in $(UNINSTALL_FILES); do \
 	  test -f "$(DESTDIR)$${p}" || continue; \
 	  d=`dirname "$${p}"`; \
 	  f=`basename "$${p}"`; \

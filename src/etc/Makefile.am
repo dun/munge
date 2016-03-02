@@ -29,7 +29,21 @@
 
 include $(top_srcdir)/config/Make-inc.mk
 
-LOCALFILES = \
+TEMPLATE_FILES = \
+	munge.init.in \
+	munge.pc.in \
+	munge.service.in \
+	munge.sysconfig.in \
+	munge.tmpfiles.conf.in
+
+SUBSTITUTE_FILES = \
+	munge.init \
+	munge.pc \
+	munge.service \
+	munge.sysconfig \
+	munge.tmpfiles.conf
+
+UNINSTALL_FILES = \
 	$(sysconfdir)/rc.d/init.d/munge \
 	$(sysconfdir)/init.d/munge \
 	$(sysconfdir)/sysconfig/munge \
@@ -38,13 +52,20 @@ LOCALFILES = \
 	$(prefix)/lib/systemd/system/munge.service \
 	$(prefix)/lib/tmpfiles.d/munge.conf
 
-EXTRA_DIST = \
-	munge-tmpfiles.conf \
-	munge.service \
-	munge.sysconfig
+noinst_DATA = $(SUBSTITUTE_FILES)
 
-noinst_DATA = \
-	munge.init
+CLEANFILES = $(SUBSTITUTE_FILES)
+
+EXTRA_DIST = $(TEMPLATE_FILES)
+
+$(SUBSTITUTE_FILES): Makefile
+	$(subst) < "$(srcdir)/$@.in" > "$(builddir)/$@"
+
+munge.init: munge.init.in
+munge.pc: munge.pc.in
+munge.service: munge.service.in
+munge.sysconfig: munge.sysconfig.in
+munge.tmpfiles.conf: munge.tmpfiles.conf.in
 
 install-data-local:
 	test -d "/etc/rc.d/init.d" \
@@ -59,7 +80,7 @@ install-data-local:
 	    || CONFDIR="$(sysconfdir)/default"; \
 	  $(INSTALL) -m 0755 -d "$(DESTDIR)$${CONFDIR}"; \
 	  $(INSTALL) -m 0644 \
-	    "$(srcdir)/munge.sysconfig" "$(DESTDIR)$${CONFDIR}/munge"
+	    "$(builddir)/munge.sysconfig" "$(DESTDIR)$${CONFDIR}/munge"
 	:
 	PKGCONFIGDIR="$(libdir)/pkgconfig"; \
 	$(INSTALL) -m 0755 -d "$(DESTDIR)$${PKGCONFIGDIR}"; \
@@ -69,12 +90,12 @@ install-data-local:
 	UNITDIR="$(prefix)/lib/systemd/system"; \
 	$(INSTALL) -m 0755 -d "$(DESTDIR)$${UNITDIR}"; \
 	$(INSTALL) -m 0644 \
-	  "$(srcdir)/munge.service" "$(DESTDIR)$${UNITDIR}/munge.service"
+	  "$(builddir)/munge.service" "$(DESTDIR)$${UNITDIR}/munge.service"
 	:
 	TMPFILESDIR="$(prefix)/lib/tmpfiles.d"; \
 	$(INSTALL) -m 0755 -d "$(DESTDIR)$${TMPFILESDIR}"; \
 	$(INSTALL) -m 0644 \
-	  "$(srcdir)/munge-tmpfiles.conf" \
+	  "$(builddir)/munge.tmpfiles.conf" \
 	  "$(DESTDIR)$${TMPFILESDIR}/munge.conf"
 	:
 	$(INSTALL) -m 0755 -d "$(DESTDIR)$(sysconfdir)"
@@ -88,7 +109,7 @@ install-data-local:
 	$(INSTALL) -m 0755 -d "$(DESTDIR)$(localstatedir)/run/munge"
 
 uninstall-local:
-	@for p in ${LOCALFILES}; do \
+	@for p in $(UNINSTALL_FILES); do \
 	  test -f "$(DESTDIR)$${p}" || continue; \
 	  d=`dirname "$${p}"`; \
 	  f=`basename "$${p}"`; \

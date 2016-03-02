@@ -14,6 +14,9 @@
 /src/*/*.[1-9]
 /src/etc/munge.init
 /src/etc/munge.pc
+/src/etc/munge.service
+/src/etc/munge.sysconfig
+/src/etc/munge.tmpfiles.conf
 /src/munge/munge
 /src/munge/remunge
 /src/munge/unmunge

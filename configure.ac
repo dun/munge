@@ -144,8 +144,6 @@ AC_CONFIG_FILES( \
   Makefile \
   src/Makefile \
   src/etc/Makefile \
-  src/etc/munge.init \
-  src/etc/munge.pc \
   src/libcommon/Makefile \
   src/libcommon/munge.7 \
   src/libmissing/Makefile \
