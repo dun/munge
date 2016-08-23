@@ -3,6 +3,9 @@
 #endif /* HAVE_CONFIG_H */
 
 #if !HAVE_STRLCPY
+
+#define strlcpy libmissing_strlcpy
+
 size_t strlcpy(char *dst, const char *src, size_t siz);
 /*
  *  Copy src to string dst of size siz.  At most siz-1 characters
