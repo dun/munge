@@ -65,7 +65,6 @@ auth_send (m_msg_t m)
 #include <sys/ioctl.h>                  /* ioctl */
 #include <sys/stat.h>                   /* I_IRUSR */
 #include <unistd.h>                     /* unlink, close */
-#include "missing.h"
 #include "munge_defs.h"
 #include "str.h"
 

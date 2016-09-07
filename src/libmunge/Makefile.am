@@ -36,16 +36,14 @@ lib_LTLIBRARIES = \
 	libmunge.la
 
 AM_CPPFLAGS = \
-	-I$(top_srcdir)/src/libcommon \
-	-I$(top_srcdir)/src/libmissing
+	-I$(top_srcdir)/src/libcommon
 
 libmunge_la_LDFLAGS = \
 	-export-symbols-regex "^munge_.*" \
 	-version-info $(META_LT_CURRENT):$(META_LT_REVISION):$(META_LT_AGE)
 
 libmunge_la_LIBADD = \
-	$(top_builddir)/src/libcommon/libcommon.la \
-	$(top_builddir)/src/libmissing/libmissing.la
+	$(top_builddir)/src/libcommon/libcommon.la
 
 libmunge_la_SOURCES = \
 	auth_send.c \

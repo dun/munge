@@ -42,7 +42,6 @@
 #include "auth_send.h"
 #include "ctx.h"
 #include "fd.h"
-#include "missing.h"
 #include "m_msg.h"
 #include "m_msg_client.h"
 #include "munge_defs.h"
@@ -192,8 +191,9 @@ _m_msg_client_connect (m_msg_t m, char *path)
     }
     memset (&addr, 0, sizeof (addr));
     addr.sun_family = AF_UNIX;
-    n = strlcpy (addr.sun_path, path, sizeof (addr.sun_path));
-    if (n >= sizeof (addr.sun_path)) {
+    addr.sun_path[ sizeof (addr.sun_path) - 1 ] = '\0';
+    strncpy (addr.sun_path, path, sizeof (addr.sun_path));
+    if (addr.sun_path[ sizeof (addr.sun_path) - 1 ] != '\0') {
         close (sd);
         m_msg_set_err (m, EMUNGE_OVERFLOW,
             strdup ("Exceeded maximum length of socket pathname"));
