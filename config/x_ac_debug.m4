@@ -43,7 +43,7 @@ AC_DEFUN([X_AC_DEBUG], [
       )
       AS_IF(
         [test "AS_VAR_GET(GCC)" = yes],
-        [DEBUGCFLAGS="$DEBUGCFLAGS -Wall -pedantic"]
+        [DEBUGCFLAGS="$DEBUGCFLAGS -Wall -pedantic -std=c99"]
       )
       AM_CFLAGS="$AM_CFLAGS \$(DEBUGCFLAGS)"
       AC_SUBST([AM_CFLAGS])

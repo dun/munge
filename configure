@@ -12891,7 +12891,7 @@ fi
 
 fi
       if test "$GCC" = yes; then :
-  DEBUGCFLAGS="$DEBUGCFLAGS -Wall -pedantic"
+  DEBUGCFLAGS="$DEBUGCFLAGS -Wall -pedantic -std=c99"
 
 fi
       AM_CFLAGS="$AM_CFLAGS \$(DEBUGCFLAGS)"
