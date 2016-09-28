@@ -35,5 +35,9 @@ addons:
     build_command: "make"
     branch_pattern: coverity_scan
 
+before_install:
+- test "${TRAVIS_BRANCH}" != 'coverity_scan' -o "${TRAVIS_JOB_NUMBER##*.}" = '1' || exit 0
+
 script:
-- if [ "${COVERITY_SCAN_BRANCH}" != 1 ]; then ./configure ${CONFIGURE_OPTS} && colormake -e -k && colormake -e distcheck; fi
+- test "${TRAVIS_BRANCH}" != 'coverity_scan' || exit 0
+- ./configure ${CONFIGURE_OPTS} && colormake -e -k && colormake -e distcheck
