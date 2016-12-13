@@ -49,6 +49,7 @@
 #include <munge.h>
 #include "common.h"
 #include "license.h"
+#include "log.h"
 #include "missing.h"                    /* for inet_ntop()                   */
 #include "read.h"
 #include "version.h"

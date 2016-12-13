@@ -44,6 +44,7 @@
 #include <munge.h>
 #include "common.h"
 #include "license.h"
+#include "log.h"
 #include "read.h"
 #include "version.h"
 
