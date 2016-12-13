@@ -29,7 +29,7 @@ RATIONALE
   of reserved ports available on a given host directly limits scalability.
   Third, root privileges are required in order to bind to a reserved port.
   Finally, the remote daemons have no means of determining whether the
-  client identity is authentic.
+  client identity is authentic.  MUNGE solves all of these problems.
 
 
 USAGE
