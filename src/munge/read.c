@@ -32,85 +32,123 @@
 
 #include <assert.h>
 #include <errno.h>
+#include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <munge.h>
+#include "log.h"
+#include "munge_defs.h"
 
 
-#define INIT_BUFSIZ 4096
+#define INITIAL_BUFFER_SIZE     4096
+#define MAXIMUM_BUFFER_SIZE     MUNGE_MAXIMUM_REQ_LEN
+/*
+ *  MUNGE_MAXIMUM_REQ_LEN (in munge_defs.h) specifies the maximum size of a
+ *    request message transmitted over the unix domain socket.  Since messages
+ *    greater than this length will be rejected, MAXIMUM_BUFFER_SIZE is used to
+ *    limit the size of the memory allocation for bufmem.
+ */
 
 
-int
+void
 read_data_from_file (FILE *fp, void **buf, int *len)
 {
     unsigned char *bufmem;              /* base ptr to buffer memory         */
-    unsigned char *buftmp;              /* tmp ptr to bufmem for realloc()   */
     unsigned char *bufptr;              /* current ptr to unused bufmem      */
-    int            buflen;              /* num bytes of unused bufmem        */
-    int            bufsiz;              /* size allocated for bufmem         */
-    int            n;
+    unsigned char *buftmp;              /* tmp ptr to bufmem for realloc()   */
+    size_t         bufsiz;              /* size allocated for bufmem         */
+    size_t         buflen;              /* num bytes of unused bufmem        */
+    size_t         bufuse;              /* num bytes of used bufmem          */
+    size_t         n;
 
     assert (fp != NULL);
     assert (buf != NULL);
     assert (len != NULL);
 
-    *buf = NULL;
-    *len = 0;
-    errno = 0;
+    bufsiz = INITIAL_BUFFER_SIZE;
+    bufmem = bufptr = malloc (bufsiz);
+    if (bufmem == NULL) {
+        log_errno (EMUNGE_NO_MEMORY, LOG_ERR,
+            "Failed to allocate %lu bytes", bufsiz);
+    }
+    buflen = bufsiz;
 
-    if (!(bufmem = bufptr = malloc (INIT_BUFSIZ)))
-        return (-1);
-    buflen = bufsiz = INIT_BUFSIZ;
-
+    /*  Since this reads from a standard I/O stream, there is no guarantee that
+     *    the stream provides random access (e.g., when reading from a pipe).
+     *    As such, it cannot rely on seeking to the end of the stream to
+     *    determine the file length before seeking back to the beginning to
+     *    start reading.  Consequently, this routine realloc()s the buffer to
+     *    grow it as needed while reading from the fp steam.
+     */
     for (;;) {
         n = fread (bufptr, 1, buflen, fp);
         bufptr += n;
         buflen -= n;
         if (buflen > 0) {
-            if (feof (fp))
+            if (feof (fp)) {
                 break;
+            }
             else if (ferror (fp)) {
-                if (!errno)             /* XXX: Can errno be trusted here? */
-                    errno = EIO;
-                goto err;
+                log_err (EMUNGE_SNAFU, LOG_ERR,
+                    "Failed to read from file");
+            }
+            else {
+                log_err (EMUNGE_SNAFU, LOG_ERR,
+                    "Failed to read from file: Unexpected short count");
             }
         }
-        else {
-            if (!(buftmp = realloc (bufmem, bufsiz * 2)))
-                goto err;
-            bufmem = buftmp;
-            bufptr = bufmem + bufsiz;
-            buflen = bufsiz;
-            bufsiz *= 2;
+        assert (buflen == 0);
+        assert (bufsiz == bufptr - bufmem);
+        bufuse = bufsiz;
+        bufsiz *= 2;
+        if (bufsiz > MAXIMUM_BUFFER_SIZE) {
+            free (bufmem);
+            log_errno (EMUNGE_SNAFU, LOG_ERR,
+                "Exceeded maximum memory allocation");
         }
+        buftmp = realloc (bufmem, bufsiz);
+        if (buftmp == NULL) {
+            free (bufmem);
+            log_errno (EMUNGE_NO_MEMORY, LOG_ERR,
+                "Failed to allocate %lu bytes", bufsiz);
+        }
+        buflen = bufsiz - bufuse;
+        bufptr = buftmp + bufuse;
+        bufmem = buftmp;
     }
     n = bufptr - bufmem;
-    if (!n) {
+    if (n == 0) {
         free (bufmem);
-        return (0);
+        *buf = NULL;
+        *len = 0;
+        return;
     }
-    /*  Adjust size of buf so it will be only 1 byte greater than len.
-     *  Then NUL-terminate that last byte so it may be used as a string.
-     *  This NUL is not included in len because it is not part of the file.
+    /*  If the fp has exactly 'len' bytes remaining, fread (ptr, 1, len, fp)
+     *    will return a value equal to 'len'.  But the EOF will not be detected
+     *    until the next fread() which will return a value of 0.  Consequently,
+     *    realloc() will double the buffer before this final iteration of the
+     *    loop thereby guaranteeing (buflen > 0).  The if-guard here is just
+     *    for safety/paranoia.
      */
-    if (!(buftmp = realloc (bufmem, n + 1)))
-        goto err;
-    buftmp[n] = '\0';
-    *buf = buftmp;
-    *len = n;
-    return (n);
-
-err:
-    free (bufmem);
-    return (-1);
+    assert (buflen > 0);
+    if (buflen > 0) {
+        bufmem[n] = '\0';
+    }
+    if (n > INT_MAX) {
+        log_err (EMUNGE_SNAFU, LOG_ERR, "Exceeded maximum file size");
+    }
+    *buf = bufmem;
+    *len = (int) n;
+    return;
 }
 
 
-int
+void
 read_data_from_string (const char *s, void **buf, int *len)
 {
-    char *p;
-    int   n;
+    size_t  n;
+    char   *p;
 
     assert (buf != NULL);
     assert (len != NULL);
@@ -118,18 +156,25 @@ read_data_from_string (const char *s, void **buf, int *len)
     *buf = NULL;
     *len = 0;
 
-    if (!s)
-        return (0);
+    if (s == NULL) {
+        return;
+    }
     n = strlen (s);
-    if (n == 0)
-        return (0);
+    if (n == 0) {
+        return;
+    }
+    p = malloc (n + 1);
+    if (p == NULL) {
+        log_errno (EMUNGE_NO_MEMORY, LOG_ERR,
+            "Failed to allocate %lu bytes", n + 1);
+    }
+    strncpy (p, s, n + 1);
+    p[n] = '\0';        /* null termination here is technically unnecessary */
 
-    if (!(p = malloc (n + 1)))          /* reserve space for terminating NUL */
-        return (-1);
-    strcpy (p, s);                      /* strcpy() is safe to use here */
-    p[n] = '\0';
-
+    if (n > INT_MAX) {
+        log_err (EMUNGE_SNAFU, LOG_ERR, "Exceeded maximum string size");
+    }
     *buf = p;
-    *len = n;
-    return (n);
+    *len = (int) n;
+    return;
 }

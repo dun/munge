@@ -190,16 +190,8 @@ main (int argc, char *argv[])
     parse_cmdline (conf, argc, argv);
     open_files (conf);
 
-    rc = read_data_from_file (conf->fp_in,
-        (void **) &conf->cred, &conf->clen);
-    if (rc < 0) {
-        if (errno == ENOMEM) {
-            log_errno (EMUNGE_NO_MEMORY, LOG_ERR, "Failed to read input");
-        }
-        else {
-            log_err (EMUNGE_SNAFU, LOG_ERR, "Read error");
-        }
-    }
+    read_data_from_file (conf->fp_in, (void **) &conf->cred, &conf->clen);
+
     conf->status = munge_decode (conf->cred, conf->ctx,
         &conf->data, &conf->dlen, &conf->uid, &conf->gid);
 

@@ -126,9 +126,8 @@ void   display_cred (conf_t conf);
 int
 main (int argc, char *argv[])
 {
-    conf_t       conf;
-    int          rc = 0;
-    const char  *p;
+    conf_t      conf;
+    const char *p;
 
     if (posignal (SIGPIPE, SIG_IGN) == SIG_ERR) {
         log_err (EMUNGE_SNAFU, LOG_ERR, "Failed to ignore signal=%d", SIGPIPE);
@@ -139,18 +138,10 @@ main (int argc, char *argv[])
     open_files (conf);
 
     if (conf->string) {
-        rc = read_data_from_string (conf->string, &conf->data, &conf->dlen);
+        read_data_from_string (conf->string, &conf->data, &conf->dlen);
     }
     else if (conf->fn_in) {
-        rc = read_data_from_file (conf->fp_in, &conf->data, &conf->dlen);
-    }
-    if (rc < 0) {
-        if (errno == ENOMEM) {
-            log_errno (EMUNGE_NO_MEMORY, LOG_ERR, "Failed to read input");
-        }
-        else {
-            log_err (EMUNGE_SNAFU, LOG_ERR, "Read error");
-        }
+        read_data_from_file (conf->fp_in, &conf->data, &conf->dlen);
     }
     if (encode_cred (conf) < 0) {
         if (!(p = munge_ctx_strerror (conf->ctx))) {
