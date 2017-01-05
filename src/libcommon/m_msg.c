@@ -84,14 +84,10 @@ m_msg_create (m_msg_t *pm)
 
     assert (pm != NULL);
 
-    if (!(m = malloc (sizeof (*m)))) {
+    if (!(m = calloc (1, sizeof (*m)))) {
         *pm = NULL;
         return (EMUNGE_NO_MEMORY);
     }
-    /*  Initialize ints to 0, ptrs to NULL.
-     */
-    memset (m, 0, sizeof (*m));
-
     m->sd = -1;
     m->type = MUNGE_MSG_UNDEF;
 

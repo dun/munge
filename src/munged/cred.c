@@ -46,14 +46,10 @@ cred_create (m_msg_t m)
 
     assert (m != NULL);
 
-    if (!(c = malloc (sizeof (*c)))) {
+    if (!(c = calloc (1, sizeof (*c)))) {
         m_msg_set_err (m, EMUNGE_NO_MEMORY, NULL);
         return (NULL);
     }
-    /*  Init ints to 0, chars to \0, ptrs to NULL.
-     */
-    memset (c, 0, sizeof (*c));
-
     c->version = MUNGE_CRED_VERSION;
     c->msg = m;
     return (c);
