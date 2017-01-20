@@ -37,6 +37,7 @@
 #include <sys/socket.h>
 #include <sys/stat.h>
 #include <sys/un.h>
+#include <time.h>
 #include <unistd.h>
 #include <munge.h>
 #include "auth_send.h"
@@ -54,6 +55,7 @@
 
 static munge_err_t _m_msg_client_connect (m_msg_t m, char *path);
 static munge_err_t _m_msg_client_disconnect (m_msg_t m);
+static munge_err_t _m_msg_client_millisleep (m_msg_t m, unsigned long msecs);
 
 
 /*****************************************************************************
@@ -69,7 +71,7 @@ m_msg_client_xfer (m_msg_t *pm, m_msg_type_t mreq_type, munge_ctx_t ctx)
     m_msg_t       mreq, mrsp;
     m_msg_type_t  mrsp_type;
 
-    assert (MUNGE_SOCKET_RETRY_ATTEMPTS * MUNGE_SOCKET_RETRY_USECS < 1000000);
+    assert (MUNGE_SOCKET_RETRY_ATTEMPTS * MUNGE_SOCKET_RETRY_MSECS < 1000);
 
     if (!pm || !*pm) {
         return (EMUNGE_SNAFU);
@@ -133,7 +135,10 @@ m_msg_client_xfer (m_msg_t *pm, m_msg_type_t mreq_type, munge_ctx_t ctx)
             mreq->sd = -1;
         }
         mreq->retry = i;
-        usleep (i * MUNGE_SOCKET_RETRY_USECS);
+        e = _m_msg_client_millisleep (mreq, i * MUNGE_SOCKET_RETRY_MSECS);
+        if (e != EMUNGE_SUCCESS) {
+            break;
+        }
         i++;
     }
     if (mrsp) {
@@ -157,7 +162,7 @@ _m_msg_client_connect (m_msg_t m, char *path)
     int                 sd;
     int                 n;
     int                 i;
-    int                 delay;
+    unsigned long       delay_msecs;
 
     assert (m != NULL);
     assert (m->sd < 0);
@@ -200,7 +205,6 @@ _m_msg_client_connect (m_msg_t m, char *path)
         return (EMUNGE_OVERFLOW);
     }
     i = 1;
-    delay = 1;
     while (1) {
         /*
          * If a call to connect() for a Unix domain stream socket finds that
@@ -222,8 +226,10 @@ _m_msg_client_connect (m_msg_t m, char *path)
         if (i >= MUNGE_SOCKET_CONNECT_ATTEMPTS) {
             break;
         }
-        sleep (delay);
-        delay++;
+        delay_msecs = i * MUNGE_SOCKET_CONNECT_RETRY_MSECS;
+        if (_m_msg_client_millisleep (m, delay_msecs) != EMUNGE_SUCCESS) {
+            break;
+        }
         i++;
     }
     if (n < 0) {
@@ -255,4 +261,35 @@ _m_msg_client_disconnect (m_msg_t m) {
     }
     m->sd = -1;
     return (e);
+}
+
+
+static munge_err_t
+_m_msg_client_millisleep (m_msg_t m, unsigned long msecs)
+{
+/*  Sleeps for 'msecs' milliseconds.
+ *  Returns EMUNGE_SUCCESS on success,
+ *    or EMUNGE_SNAFU on error (with additional info if 'm' is not NULL).
+ */
+    struct timespec ts;
+    int rv;
+
+    ts.tv_sec = msecs / 1000;
+    ts.tv_nsec = (msecs % 1000) * 1000 * 1000;
+
+    while (1) {
+        rv = nanosleep (&ts, &ts);
+        if (rv == 0) {
+            break;
+        }
+        else if (errno == EINTR) {
+            continue;
+        }
+        else if (m != NULL) {
+            m_msg_set_err (m, EMUNGE_SNAFU,
+                strdupf ("Failed nanosleep: %s", strerror (errno)));
+        }
+        return (EMUNGE_SNAFU);
+    }
+    return (EMUNGE_SUCCESS);
 }

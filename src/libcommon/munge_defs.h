@@ -136,6 +136,12 @@
  */
 #define MUNGE_SOCKET_CONNECT_ATTEMPTS   5
 
+/*  Number of milliseconds for the start of the linear back-off where the
+ *    client sleeps between attempts at retrying a connection to the unix
+ *    domain socket.
+ */
+#define MUNGE_SOCKET_CONNECT_RETRY_MSECS        1000
+
 /*  Flag to allow previously-decoded credentials to be retried.
  *  If the client receives a socket error while communicating with the
  *    server, it will retry the transaction up to MUNGE_SOCKET_RETRY_ATTEMPTS.
@@ -151,11 +157,11 @@
  */
 #define MUNGE_SOCKET_RETRY_ATTEMPTS     5
 
-/*  Number of microseconds for the start of the linear back-off where the
+/*  Number of milliseconds for the start of the linear back-off where the
  *    client sleeps between attempts at retrying a credential transaction.
- *  Ensure (MUNGE_SOCKET_RETRY_ATTEMPTS * MUNGE_SOCKET_RETRY_USECS) < 1e6.
+ *  Ensure (MUNGE_SOCKET_RETRY_ATTEMPTS * MUNGE_SOCKET_RETRY_MSECS) < 1000.
  */
-#define MUNGE_SOCKET_RETRY_USECS        10000
+#define MUNGE_SOCKET_RETRY_MSECS        10
 
 /*  Number of milliseconds until a client connection is timed-out.
  */
