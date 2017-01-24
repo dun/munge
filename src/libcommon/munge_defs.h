@@ -134,13 +134,13 @@
 
 /*  Number of attempts a client makes connecting to the server before failing.
  */
-#define MUNGE_SOCKET_CONNECT_ATTEMPTS   5
+#define MUNGE_SOCKET_CONNECT_ATTEMPTS   10
 
 /*  Number of milliseconds for the start of the linear back-off where the
  *    client sleeps between attempts at retrying a connection to the unix
  *    domain socket.
  */
-#define MUNGE_SOCKET_CONNECT_RETRY_MSECS        1000
+#define MUNGE_SOCKET_CONNECT_RETRY_MSECS        50
 
 /*  Flag to allow previously-decoded credentials to be retried.
  *  If the client receives a socket error while communicating with the
@@ -159,13 +159,12 @@
 
 /*  Number of milliseconds for the start of the linear back-off where the
  *    client sleeps between attempts at retrying a credential transaction.
- *  Ensure (MUNGE_SOCKET_RETRY_ATTEMPTS * MUNGE_SOCKET_RETRY_MSECS) < 1000.
  */
 #define MUNGE_SOCKET_RETRY_MSECS        10
 
-/*  Number of milliseconds until a client connection is timed-out.
+/*  Number of milliseconds until a socket read/write is timed-out.
  */
-#define MUNGE_SOCKET_TIMEOUT_MSECS      3000
+#define MUNGE_SOCKET_TIMEOUT_MSECS      2000
 
 /*  Number of threads to create for processing credential requests.
  */

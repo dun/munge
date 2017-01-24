@@ -71,8 +71,6 @@ m_msg_client_xfer (m_msg_t *pm, m_msg_type_t mreq_type, munge_ctx_t ctx)
     m_msg_t       mreq, mrsp;
     m_msg_type_t  mrsp_type;
 
-    assert (MUNGE_SOCKET_RETRY_ATTEMPTS * MUNGE_SOCKET_RETRY_MSECS < 1000);
-
     if (!pm || !*pm) {
         return (EMUNGE_SNAFU);
     }
