@@ -137,6 +137,30 @@ X_AC_DARWIN
 ##
 X_AC_SELECT_AUTH_METHOD
 
+
+# Hardening options
+# See e.g.
+# https://wiki.debian.org/Hardening
+# https://fedoraproject.org/wiki/Changes/Harden_All_Packages
+#
+# -Wl,-z,relro,now linker flags are not enabled since they can cause
+# problems for users who load libmunge.so at runtime.
+AC_ARG_ENABLE([hardening],
+        AS_HELP_STRING([--disable-hardening], [Disable hardening features]))
+
+AS_IF([test "x$enable_hardening" != "xno"], [
+        CFLAGS_HARDENING=""
+        AX_APPEND_COMPILE_FLAGS([-D_FORTIFY_SOURCE=2 -Werror=format-security -fPIC -pie], [CFLAGS_HARDENING])
+        AX_CHECK_COMPILE_FLAG(-fstack-protector-strong, [HAVE_FSTACK_PROTECTOR_STRONG=yes], [HAVE_FSTACK_PROTECTOR_STRONG=no])
+        AS_IF([test "x$HAVE_FSTACK_PROTECTOR_STRONG" = "xyes"], [
+                CFLAGS_HARDENING="$CFLAGS_HARDENING -fstack-protector-strong"
+        ],[
+                AX_APPEND_COMPILE_FLAGS([-fstack-protector], [CFLAGS_HARDENING])
+        ])
+        AM_CFLAGS="$AM_CFLAGS $CFLAGS_HARDENING"
+])
+
+
 ##
 # Epilogue.
 ##

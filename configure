@@ -803,6 +803,7 @@ enable_debug
 with_libgcrypt_prefix
 with_openssl_prefix
 with_crypto_lib
+enable_hardening
 '
       ac_precious_vars='build_alias
 host_alias
@@ -1445,6 +1446,7 @@ Optional Features:
                           optimize for fast installation [default=yes]
   --disable-libtool-lock  avoid locking (might break parallel builds)
   --enable-debug          enable debugging for code development
+  --disable-hardening     Disable hardening features
 
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
@@ -2990,8 +2992,8 @@ test "$program_suffix" != NONE &&
 ac_script='s/[\\$]/&&/g;s/;s,x,x,$//'
 program_transform_name=`$as_echo "$program_transform_name" | sed "$ac_script"`
 
-# Expand $ac_aux_dir to an absolute path.
-am_aux_dir=`cd "$ac_aux_dir" && pwd`
+# expand $ac_aux_dir to an absolute path
+am_aux_dir=`cd $ac_aux_dir && pwd`
 
 if test x"${MISSING+set}" != xset; then
   case $am_aux_dir in
@@ -3355,7 +3357,6 @@ END
     as_fn_error $? "Your 'rm' program is bad, sorry." "$LINENO" 5
   fi
 fi
-
 ac_config_headers="$ac_config_headers config/config.h"
 
 
@@ -14859,6 +14860,221 @@ $as_echo "failed" >&6; }
   fi
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: $AUTH_METHOD" >&5
 $as_echo "$AUTH_METHOD" >&6; }
+
+
+
+# Hardening options
+# See e.g.
+# https://wiki.debian.org/Hardening
+# https://fedoraproject.org/wiki/Changes/Harden_All_Packages
+#
+# -Wl,-z,relro,now linker flags are not enabled since they can cause
+# problems for users who load libmunge.so at runtime.
+# Check whether --enable-hardening was given.
+if test "${enable_hardening+set}" = set; then :
+  enableval=$enable_hardening;
+fi
+
+
+if test "x$enable_hardening" != "xno"; then :
+
+        CFLAGS_HARDENING=""
+
+
+
+
+for flag in -D_FORTIFY_SOURCE=2 -Werror=format-security -fPIC -pie; do
+  as_CACHEVAR=`$as_echo "ax_cv_check_cflags__$flag" | $as_tr_sh`
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether C compiler accepts $flag" >&5
+$as_echo_n "checking whether C compiler accepts $flag... " >&6; }
+if eval \${$as_CACHEVAR+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+
+  ax_check_save_flags=$CFLAGS
+  CFLAGS="$CFLAGS  $flag"
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+int
+main ()
+{
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"; then :
+  eval "$as_CACHEVAR=yes"
+else
+  eval "$as_CACHEVAR=no"
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+  CFLAGS=$ax_check_save_flags
+fi
+eval ac_res=\$$as_CACHEVAR
+	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+$as_echo "$ac_res" >&6; }
+if eval test \"x\$"$as_CACHEVAR"\" = x"yes"; then :
+
+if ${CFLAGS_HARDENING+:} false; then :
+
+  case " $CFLAGS_HARDENING " in #(
+  *" $flag "*) :
+    { { $as_echo "$as_me:${as_lineno-$LINENO}: : CFLAGS_HARDENING already contains \$flag"; } >&5
+  (: CFLAGS_HARDENING already contains $flag) 2>&5
+  ac_status=$?
+  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; } ;; #(
+  *) :
+
+     as_fn_append CFLAGS_HARDENING " $flag"
+     { { $as_echo "$as_me:${as_lineno-$LINENO}: : CFLAGS_HARDENING=\"\$CFLAGS_HARDENING\""; } >&5
+  (: CFLAGS_HARDENING="$CFLAGS_HARDENING") 2>&5
+  ac_status=$?
+  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; }
+     ;;
+esac
+
+else
+
+  CFLAGS_HARDENING=$flag
+  { { $as_echo "$as_me:${as_lineno-$LINENO}: : CFLAGS_HARDENING=\"\$CFLAGS_HARDENING\""; } >&5
+  (: CFLAGS_HARDENING="$CFLAGS_HARDENING") 2>&5
+  ac_status=$?
+  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; }
+
+fi
+
+else
+  :
+fi
+
+done
+
+        { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether C compiler accepts -fstack-protector-strong" >&5
+$as_echo_n "checking whether C compiler accepts -fstack-protector-strong... " >&6; }
+if ${ax_cv_check_cflags___fstack_protector_strong+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+
+  ax_check_save_flags=$CFLAGS
+  CFLAGS="$CFLAGS  -fstack-protector-strong"
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+int
+main ()
+{
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"; then :
+  ax_cv_check_cflags___fstack_protector_strong=yes
+else
+  ax_cv_check_cflags___fstack_protector_strong=no
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+  CFLAGS=$ax_check_save_flags
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ax_cv_check_cflags___fstack_protector_strong" >&5
+$as_echo "$ax_cv_check_cflags___fstack_protector_strong" >&6; }
+if test "x$ax_cv_check_cflags___fstack_protector_strong" = xyes; then :
+  HAVE_FSTACK_PROTECTOR_STRONG=yes
+else
+  HAVE_FSTACK_PROTECTOR_STRONG=no
+fi
+
+        if test "x$HAVE_FSTACK_PROTECTOR_STRONG" = "xyes"; then :
+
+                CFLAGS_HARDENING="$CFLAGS_HARDENING -fstack-protector-strong"
+
+else
+
+
+
+
+
+for flag in -fstack-protector; do
+  as_CACHEVAR=`$as_echo "ax_cv_check_cflags__$flag" | $as_tr_sh`
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether C compiler accepts $flag" >&5
+$as_echo_n "checking whether C compiler accepts $flag... " >&6; }
+if eval \${$as_CACHEVAR+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+
+  ax_check_save_flags=$CFLAGS
+  CFLAGS="$CFLAGS  $flag"
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+int
+main ()
+{
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"; then :
+  eval "$as_CACHEVAR=yes"
+else
+  eval "$as_CACHEVAR=no"
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+  CFLAGS=$ax_check_save_flags
+fi
+eval ac_res=\$$as_CACHEVAR
+	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+$as_echo "$ac_res" >&6; }
+if eval test \"x\$"$as_CACHEVAR"\" = x"yes"; then :
+
+if ${CFLAGS_HARDENING+:} false; then :
+
+  case " $CFLAGS_HARDENING " in #(
+  *" $flag "*) :
+    { { $as_echo "$as_me:${as_lineno-$LINENO}: : CFLAGS_HARDENING already contains \$flag"; } >&5
+  (: CFLAGS_HARDENING already contains $flag) 2>&5
+  ac_status=$?
+  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; } ;; #(
+  *) :
+
+     as_fn_append CFLAGS_HARDENING " $flag"
+     { { $as_echo "$as_me:${as_lineno-$LINENO}: : CFLAGS_HARDENING=\"\$CFLAGS_HARDENING\""; } >&5
+  (: CFLAGS_HARDENING="$CFLAGS_HARDENING") 2>&5
+  ac_status=$?
+  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; }
+     ;;
+esac
+
+else
+
+  CFLAGS_HARDENING=$flag
+  { { $as_echo "$as_me:${as_lineno-$LINENO}: : CFLAGS_HARDENING=\"\$CFLAGS_HARDENING\""; } >&5
+  (: CFLAGS_HARDENING="$CFLAGS_HARDENING") 2>&5
+  ac_status=$?
+  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; }
+
+fi
+
+else
+  :
+fi
+
+done
+
+
+fi
+        AM_CFLAGS="$AM_CFLAGS $CFLAGS_HARDENING"
+
+fi
 
 
 ##
