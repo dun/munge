@@ -97,7 +97,7 @@ void _random_seed_stir_callback (void *_arg_not_used_);
  *****************************************************************************/
 
 int
-random_init (const char *seed)
+random_init (const char *seed, path_security_flag_t base_pathsec)
 {
     int          rnd_bytes_needed       = RANDOM_SEED_BYTES;
     int          rc                     = 0;
@@ -149,7 +149,7 @@ random_init (const char *seed)
                 "Failed to determine dirname of PRNG seed \"%s\"", seed);
         }
         n = path_is_secure (seed_dir, ebuf, sizeof (ebuf),
-            PATH_SECURITY_NO_FLAGS);
+            PATH_SECURITY_NO_FLAGS | base_pathsec);
         if (n < 0) {
             log_err (EMUNGE_SNAFU, LOG_ERR,
                 "Failed to check PRNG seed dir \"%s\": %s", seed_dir, ebuf);

@@ -70,7 +70,8 @@
 #define OPT_BENCHMARK           264
 #define OPT_MAX_TTL             265
 #define OPT_PID_FILE            266
-#define OPT_LAST                267
+#define OPT_PATHSEC             267
+#define OPT_LAST                268
 
 const char * const short_opts = ":hLVfFMS:";
 
@@ -96,6 +97,7 @@ struct option long_opts[] = {
     { "max-ttl",           required_argument, NULL, OPT_MAX_TTL      },
     { "pid-file",          required_argument, NULL, OPT_PID_FILE     },
     { "syslog",            no_argument,       NULL, OPT_SYSLOG       },
+    { "pathsec",           required_argument, NULL, OPT_PATHSEC      },
     {  NULL,               0,                 NULL,  0               }
 };
 
@@ -104,7 +106,8 @@ struct option long_opts[] = {
  *  Internal Prototypes
  *****************************************************************************/
 
-static int _conf_open_keyfile (const char *keyfile, int got_force);
+static int _conf_open_keyfile (const char *keyfile, int got_force, path_security_flag_t base_pathsec);
+static int _conf_parse_pathsec_component (const char *arg, const char **out_endp, int *out_kind, path_security_flag_t *out_base_pathsec);
 
 
 /*****************************************************************************
@@ -122,7 +125,8 @@ conf_t
 create_conf (void)
 {
     conf_t conf;
-
+    int i;
+    
     if (!(conf = malloc (sizeof (struct conf)))) {
         log_errno (EMUNGE_NO_MEMORY, LOG_ERR, "Failed to allocate conf");
     }
@@ -141,6 +145,10 @@ create_conf (void)
     conf->def_mac = MUNGE_DEFAULT_MAC;
     conf->def_ttl = MUNGE_DEFAULT_TTL;
     conf->max_ttl = MUNGE_MAXIMUM_TTL;
+    
+    for ( i = pathsec_path_kind_all; i < pathsec_path_kind_max; i++ )
+      conf->base_pathsec[i] = PATH_SECURITY_NO_FLAGS;
+    
     /*
      *  FIXME: Add support for default realm.
      */
@@ -384,6 +392,26 @@ parse_cmdline (conf_t conf, int argc, char **argv)
             case OPT_SYSLOG:
                 conf->got_syslog = 1;
                 break;
+            case OPT_PATHSEC:
+                if (optarg && *optarg) {
+                    const char              *arg = optarg, *endp = NULL;
+                    int                     kind;
+                    path_security_flag_t    base_pathsec;
+                    
+                    while ( *arg ) {
+                        if ( _conf_parse_pathsec_component(arg, &endp, &kind, &base_pathsec) ) {
+                            conf->base_pathsec[kind] = base_pathsec;
+                            arg = endp;
+                        } else {
+                            log_err (EMUNGE_SNAFU, LOG_ERR,
+                                "Invalid value \"%s\" for pathsec", arg);
+                        }
+                    }
+                } else {
+                    log_err (EMUNGE_SNAFU, LOG_ERR,
+                        "No path security level provided with pathsec");
+                }
+                break;
             case '?':
                 if (optopt > 0) {
                     log_err (EMUNGE_SNAFU, LOG_ERR,
@@ -506,6 +534,24 @@ display_help (char *prog)
     printf ("  %*s %s\n", w, "--syslog",
             "Redirect log messages to syslog");
 
+    printf ("  %*s %s\n", w, "--pathsec=<sec-list>",
+            "Set the strictness of path security checks (see below)");
+            
+    printf ("\n"
+            "  Path security checks can be:\n"
+            "\n"
+            "    strict             all directories must satisfy criteria\n"
+            "    loose              final directory must satisfy criteria\n"
+            "\n"
+            "  A <sec-list> can have one or more specifications of\n"
+            "\n"
+            "    {kind:}(strict|loose)\n"
+            "\n"
+            "  separated with commas.  The path kinds are:\n"
+            "\n"
+            "    all|keyfile|randomseed|logfile|pidfile|socket|server_dir|client_dir\n"
+            "\n");
+
     printf ("\n");
     return;
 }
@@ -551,7 +597,8 @@ create_subkeys (conf_t conf)
     }
     /*  Compute keyfile's message digest.
      */
-    fd = _conf_open_keyfile (conf->key_name, conf->got_force);
+    fd = _conf_open_keyfile (conf->key_name, conf->got_force,
+              conf->base_pathsec[pathsec_path_kind_all] | conf->base_pathsec[pathsec_path_kind_keyfile]);
     assert (fd >= 0);
 
     n_total = 0;
@@ -657,7 +704,7 @@ lookup_ip_addr (conf_t conf)
  *****************************************************************************/
 
 static int
-_conf_open_keyfile (const char *keyfile, int got_force)
+_conf_open_keyfile (const char *keyfile, int got_force, path_security_flag_t base_pathsec)
 {
 /*  Returns a valid file-descriptor to the opened [keyfile], or dies trying.
  */
@@ -715,7 +762,7 @@ _conf_open_keyfile (const char *keyfile, int got_force)
         log_err (EMUNGE_SNAFU, LOG_ERR,
             "Failed to determine dirname of keyfile \"%s\"", keyfile);
     }
-    n = path_is_secure (keydir, ebuf, sizeof (ebuf), PATH_SECURITY_NO_FLAGS);
+    n = path_is_secure (keydir, ebuf, sizeof (ebuf), PATH_SECURITY_NO_FLAGS | base_pathsec);
     if (n < 0) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
             "Failed to check keyfile dir \"%s\": %s", keydir, ebuf);
@@ -733,4 +780,77 @@ _conf_open_keyfile (const char *keyfile, int got_force)
             "Failed to open keyfile \"%s\"", keyfile);
     }
     return (fd);
+}
+
+
+static int
+_conf_parse_pathsec_component (const char *arg, const char **out_endp, int *out_kind, 
+    path_security_flag_t *out_base_pathsec)
+{
+    char                  *p1 = (char*)arg, *p2;
+    int                   kind = pathsec_path_kind_all, n;
+    path_security_flag_t  base_pathsec;
+    int                   base_pathsec_found = 0;
+    
+    static const char* kind_strs[] = {
+        "default",
+        "keyfile",
+        "randomseed",
+        "logfile",
+        "pidfile",
+        "socket",
+        "server_dir",
+        "client_dir"
+      };
+    
+    /* Is there a colon, indicating a kind was specified? */
+    p2 = strchr(p1, ':');
+    if ( p2 ) {
+        n = p2 - p1;
+        
+        /* n == 0 implies the kind was the null string, which = default */
+        if ( n > 0 ) {
+            int       i = 0;
+            
+            while ( i < pathsec_path_kind_max ) {
+                if ( strncmp(p1, kind_strs[i], n) == 0 ) {
+                    kind = i;
+                    break;
+                }
+                i++;
+            }
+            if ( i == pathsec_path_kind_max )
+                return 0;
+        }
+        
+        /* Skip past the colon: */
+        p1 = p2 + 1;
+    }
+    
+    /* Locate the NUL or a comma: */
+    p2 = p1;
+    while ( *p2 && (*p2 != ',') ) p2++;
+    n = p2 - p1;
+    
+    /* Check for strictness: */
+    if ( strncmp(p1, "strict", n) == 0 ) {
+        base_pathsec = PATH_SECURITY_NO_FLAGS;
+        base_pathsec_found = 1;
+    }
+    else if ( strncmp(p1, "loose", n) == 0 ) {
+        base_pathsec = PATH_SECURITY_FINAL_DIR_ONLY;
+        base_pathsec_found = 1;
+    }
+    
+    /* Skip the comma when returning out_endp: */
+    if ( *p2 == ',' ) p2++;
+    
+    if ( base_pathsec_found ) {
+        *out_kind = kind;
+        *out_base_pathsec = base_pathsec;
+        *out_endp = p2;
+        return 1;
+    }
+    
+    return 0;
 }

@@ -71,13 +71,13 @@
 static void disable_core_dumps (void);
 static int daemonize_init (char *progname);
 static void daemonize_fini (int fd);
-static void open_logfile (const char *logfile, int priority, int got_force);
+static void open_logfile (const char *logfile, int priority, int got_force, path_security_flag_t base_pathsec);
 static void handle_signals (void);
 static void hup_handler (int signum);
 static void exit_handler (int signum);
-static void write_pidfile (const char *pidfile, int got_force);
+static void write_pidfile (const char *pidfile, int got_force, path_security_flag_t base_pathsec);
 static void lock_memory (void);
-static void sock_create (conf_t conf);
+static void sock_create (conf_t conf, path_security_flag_t base_pathsec);
 static void sock_lock (conf_t conf);
 static int set_file_lock (int fd);
 static pid_t is_file_locked (int fd);
@@ -113,7 +113,9 @@ main (int argc, char *argv[])
     conf = create_conf ();
     parse_cmdline (conf, argc, argv);
     auth_recv_init (conf->auth_server_dir, conf->auth_client_dir,
-        conf->got_force);
+        conf->got_force,
+        conf->base_pathsec[pathsec_path_kind_all] | conf->base_pathsec[pathsec_path_kind_server_dir],
+        conf->base_pathsec[pathsec_path_kind_all] | conf->base_pathsec[pathsec_path_kind_client_dir]);
 
     if (!conf->got_foreground) {
         fd = daemonize_init (argv[0]);
@@ -122,17 +124,19 @@ main (int argc, char *argv[])
             log_open_syslog (log_identity, LOG_DAEMON);
         }
         else {
-            open_logfile (conf->logfile_name, log_priority, conf->got_force);
+            open_logfile (conf->logfile_name, log_priority, conf->got_force,
+                  conf->base_pathsec[pathsec_path_kind_all] | conf->base_pathsec[pathsec_path_kind_logfile]);
         }
     }
     handle_signals ();
     lookup_ip_addr (conf);
-    write_pidfile (conf->pidfile_name, conf->got_force);
+    write_pidfile (conf->pidfile_name, conf->got_force,
+          conf->base_pathsec[pathsec_path_kind_all] | conf->base_pathsec[pathsec_path_kind_pidfile]);
     if (conf->got_mlockall) {
         lock_memory ();
     }
     crypto_init ();
-    if (random_init (conf->seed_name) < 0) {
+    if (random_init (conf->seed_name, conf->base_pathsec[pathsec_path_kind_all] | conf->base_pathsec[pathsec_path_kind_randomseed]) < 0) {
         if (conf->seed_name) {
             free (conf->seed_name);
             conf->seed_name = NULL;
@@ -142,7 +146,7 @@ main (int argc, char *argv[])
     conf->gids = gids_create (conf->gids_update_secs, conf->got_group_stat);
     replay_init ();
     timer_init ();
-    sock_create (conf);
+    sock_create (conf, conf->base_pathsec[pathsec_path_kind_all] | conf->base_pathsec[pathsec_path_kind_socket]);
 
     if (!conf->got_foreground) {
         daemonize_fini (fd);
@@ -326,7 +330,7 @@ daemonize_fini (int fd)
 
 
 static void
-open_logfile (const char *logfile, int priority, int got_force)
+open_logfile (const char *logfile, int priority, int got_force, path_security_flag_t base_pathsec)
 {
     int          got_symlink;
     struct stat  st;
@@ -398,7 +402,7 @@ open_logfile (const char *logfile, int priority, int got_force)
             "Failed to determine dirname of logfile \"%s\"", logfile);
     }
     n = path_is_secure (logdir, ebuf, sizeof (ebuf),
-        PATH_SECURITY_IGNORE_GROUP_WRITE);
+        PATH_SECURITY_IGNORE_GROUP_WRITE | base_pathsec);
     if (n < 0) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
             "Failed to check logfile dir \"%s\": %s", logdir, ebuf);
@@ -467,7 +471,7 @@ exit_handler (int signum)
 
 
 static void
-write_pidfile (const char *pidfile, int got_force)
+write_pidfile (const char *pidfile, int got_force, path_security_flag_t base_pathsec)
 {
 /*  Creates the specified pidfile.
  *  The pidfile must be created after the daemon has finished forking.
@@ -494,7 +498,7 @@ write_pidfile (const char *pidfile, int got_force)
         log_err (EMUNGE_SNAFU, LOG_ERR,
             "Failed to determine dirname of pidfile \"%s\"", pidfile);
     }
-    n = path_is_secure (piddir, ebuf, sizeof (ebuf), PATH_SECURITY_NO_FLAGS);
+    n = path_is_secure (piddir, ebuf, sizeof (ebuf), PATH_SECURITY_NO_FLAGS | base_pathsec);
     if (n < 0) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
             "Failed to check pidfile dir \"%s\": %s", piddir, ebuf);
@@ -571,7 +575,7 @@ lock_memory (void)
 
 
 static void
-sock_create (conf_t conf)
+sock_create (conf_t conf, path_security_flag_t base_pathsec)
 {
     char                sockdir [PATH_MAX];
     char                ebuf [1024];
@@ -592,7 +596,7 @@ sock_create (conf_t conf)
         log_err (EMUNGE_SNAFU, LOG_ERR,
             "Failed to determine dirname of socket \"%s\"", conf->socket_name);
     }
-    n = path_is_secure (sockdir, ebuf, sizeof (ebuf), PATH_SECURITY_NO_FLAGS);
+    n = path_is_secure (sockdir, ebuf, sizeof (ebuf), PATH_SECURITY_NO_FLAGS | base_pathsec);
     if (n < 0) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
             "Failed to check socket dir \"%s\": %s", sockdir, ebuf);

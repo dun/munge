@@ -229,6 +229,14 @@ path_is_secure (const char *path, char *errbuf, size_t errbuflen,
             return (_path_set_err (0, errbuf, errbuflen,
                 "world-writable permissions set on \"%s\"", buf));
         }
+
+        /* If the check is supposed to be against just the final directory on the
+         * path, then break out of the loop immediately:
+         */
+        if ( (flags & PATH_SECURITY_FINAL_DIR_ONLY) ) {
+            break;
+        }
+
         if (!(p = strrchr (buf, '/'))) {
             errno = EINVAL;
             return (_path_set_err (-1, errbuf, errbuflen,

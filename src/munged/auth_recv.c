@@ -44,11 +44,12 @@
  *  initialization
  *****************************************************************************/
 
-static void _check_auth_server_dir (const char *dir, int got_force);
-static void _check_auth_client_dir (const char *dir, int got_force);
+static void _check_auth_server_dir (const char *dir, int got_force, path_security_flag_t base_pathsec);
+static void _check_auth_client_dir (const char *dir, int got_force, path_security_flag_t base_pathsec);
 
 void
-auth_recv_init (const char *srvrdir, const char *clntdir, int got_force)
+auth_recv_init (const char *srvrdir, const char *clntdir, int got_force,
+    path_security_flag_t base_pathsec_server, path_security_flag_t base_pathsec_client)
 {
 #ifdef AUTH_METHOD_RECVFD_MKNOD
     if (geteuid () != 0) {
@@ -57,14 +58,14 @@ auth_recv_init (const char *srvrdir, const char *clntdir, int got_force)
     }
 #endif /* AUTH_METHOD_RECVFD_MKNOD */
 
-    _check_auth_server_dir (srvrdir, got_force);
-    _check_auth_client_dir (clntdir, got_force);
+    _check_auth_server_dir (srvrdir, got_force, base_pathsec_server);
+    _check_auth_client_dir (clntdir, got_force, base_pathsec_client);
 
     return;
 }
 
 static void
-_check_auth_server_dir (const char *dir, int got_force)
+_check_auth_server_dir (const char *dir, int got_force, path_security_flag_t base_pathsec)
 {
 #if defined(AUTH_METHOD_RECVFD_MKFIFO) || defined(AUTH_METHOD_RECVFD_MKNOD)
     int          got_symlink;
@@ -116,7 +117,7 @@ _check_auth_server_dir (const char *dir, int got_force)
     }
     /*  Ensure auth server dir is secure against modification by others.
      */
-    n = path_is_secure (dir, ebuf, sizeof (ebuf), PATH_SECURITY_NO_FLAGS);
+    n = path_is_secure (dir, ebuf, sizeof (ebuf), PATH_SECURITY_NO_FLAGS | base_pathsec);
     if (n < 0) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
             "Failed to check auth server dir \"%s\": %s", dir, ebuf);
@@ -149,7 +150,7 @@ _check_auth_server_dir (const char *dir, int got_force)
 }
 
 static void
-_check_auth_client_dir (const char *dir, int got_force)
+_check_auth_client_dir (const char *dir, int got_force, path_security_flag_t base_pathsec)
 {
 #if defined(AUTH_METHOD_RECVFD_MKFIFO) || defined(AUTH_METHOD_RECVFD_MKNOD)
     int          got_symlink;
@@ -202,7 +203,7 @@ _check_auth_client_dir (const char *dir, int got_force)
         log_err (EMUNGE_SNAFU, LOG_ERR,
             "Failed to determine dirname of auth client dir \"%s\"", dir);
     }
-    n = path_is_secure (dirdir, ebuf, sizeof (ebuf), PATH_SECURITY_NO_FLAGS);
+    n = path_is_secure (dirdir, ebuf, sizeof (ebuf), PATH_SECURITY_NO_FLAGS | base_pathsec);
     if (n < 0) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
             "Failed to check auth client parent dir \"%s\": %s", dirdir, ebuf);
