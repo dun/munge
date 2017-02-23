@@ -191,8 +191,10 @@ Specify the SHA-1 algorithm designed by the National Security Agency
 and published in 1995; this is the successor to the original Secure Hash
 Algorithm (now called SHA-0) published in 1993.  This algorithm has a 160-bit
 message digest.  In 2005, successful collision attacks were demonstrated
-against SHA-1.  But since a pre-image attack has not yet been demonstrated,
-SHA-1 should still be safe to use within MUNGE.
+against SHA-1.  In 2017, a successful identical-prefix collision attack
+(SHAttered) was announced.  Since a pre-image attack has not yet been
+demonstrated, SHA-1 should still be safe to use within MUNGE; however,
+use of a SHA-2 hash function (such as SHA-256 or SHA-512) should be preferred.
 .TP
 .B MUNGE_MAC_RIPEMD160
 Specify the RIPEMD-160 (RACE Integrity Primitives Evaluation Message Digest)

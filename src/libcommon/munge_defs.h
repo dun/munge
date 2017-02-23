@@ -65,7 +65,11 @@
 /*  Default munge_mac_t for validating credentials.
  *    This should NEVER be set to MUNGE_MAC_NONE.
  */
-#define MUNGE_DEFAULT_MAC               MUNGE_MAC_SHA1
+#if HAVE_OPENSSL && !HAVE_EVP_SHA256
+#  define MUNGE_DEFAULT_MAC             MUNGE_MAC_SHA1
+#else  /* !HAVE_OPENSSL || HAVE_EVP_SHA256 */
+#  define MUNGE_DEFAULT_MAC             MUNGE_MAC_SHA256
+#endif /* !HAVE_OPENSSL || HAVE_EVP_SHA256 */
 
 /*  Default munge_zip_t for compressing credentials.
  *    Compression incurs a substantial performance penalty.
