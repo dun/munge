@@ -140,6 +140,12 @@ Specify an alternate pathname to the PRNG seed file.
 .TP
 .BI "\-\-syslog"
 Redirect log messages to syslog when the daemon is running in the background.
+.TP
+.BI "\-\-trusted\-group " group
+Specify the group name or GID of the "trusted group".  This is used for
+permission checks on a directory hierarchy.  Directories with group write
+permissions are allowed if they are owned by the trusted group (or the sticky
+bit is set).
 
 .SH SIGNALS
 .TP

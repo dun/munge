@@ -35,6 +35,7 @@
 #include <assert.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <limits.h>
 #include <munge.h>
 #include <netdb.h>                      /* for gethostbyname() */
 #include <stdlib.h>
@@ -72,35 +73,37 @@
 #define OPT_PID_FILE            266
 #define OPT_LOG_FILE            267
 #define OPT_SEED_FILE           268
-#define OPT_LAST                269
+#define OPT_TRUSTED_GROUP       269
+#define OPT_LAST                270
 
 const char * const short_opts = ":hLVfFMS:";
 
 #include <getopt.h>
 struct option long_opts[] = {
-    { "help",              no_argument,       NULL, 'h'              },
-    { "license",           no_argument,       NULL, 'L'              },
-    { "version",           no_argument,       NULL, 'V'              },
-    { "force",             no_argument,       NULL, 'f'              },
-    { "foreground",        no_argument,       NULL, 'F'              },
-    { "mlockall",          no_argument,       NULL, 'M'              },
-    { "socket",            required_argument, NULL, 'S'              },
-    { "advice",            no_argument,       NULL, OPT_ADVICE       },
+    { "help",              no_argument,       NULL, 'h'               },
+    { "license",           no_argument,       NULL, 'L'               },
+    { "version",           no_argument,       NULL, 'V'               },
+    { "force",             no_argument,       NULL, 'f'               },
+    { "foreground",        no_argument,       NULL, 'F'               },
+    { "mlockall",          no_argument,       NULL, 'M'               },
+    { "socket",            required_argument, NULL, 'S'               },
+    { "advice",            no_argument,       NULL, OPT_ADVICE        },
 #if defined(AUTH_METHOD_RECVFD_MKFIFO) || defined(AUTH_METHOD_RECVFD_MKNOD)
-    { "auth-server-dir",   required_argument, NULL, OPT_AUTH_SERVER  },
-    { "auth-client-dir",   required_argument, NULL, OPT_AUTH_CLIENT  },
+    { "auth-server-dir",   required_argument, NULL, OPT_AUTH_SERVER   },
+    { "auth-client-dir",   required_argument, NULL, OPT_AUTH_CLIENT   },
 #endif /* AUTH_METHOD_RECVFD_MKFIFO || AUTH_METHOD_RECVFD_MKNOD */
-    { "benchmark",         no_argument,       NULL, OPT_BENCHMARK    },
-    { "group-check-mtime", required_argument, NULL, OPT_GROUP_CHECK  },
-    { "group-update-time", required_argument, NULL, OPT_GROUP_UPDATE },
-    { "key-file",          required_argument, NULL, OPT_KEY_FILE     },
-    { "log-file",          required_argument, NULL, OPT_LOG_FILE     },
-    { "max-ttl",           required_argument, NULL, OPT_MAX_TTL      },
-    { "num-threads",       required_argument, NULL, OPT_NUM_THREADS  },
-    { "pid-file",          required_argument, NULL, OPT_PID_FILE     },
-    { "seed-file",         required_argument, NULL, OPT_SEED_FILE    },
-    { "syslog",            no_argument,       NULL, OPT_SYSLOG       },
-    {  NULL,               0,                 NULL,  0               }
+    { "benchmark",         no_argument,       NULL, OPT_BENCHMARK     },
+    { "group-check-mtime", required_argument, NULL, OPT_GROUP_CHECK   },
+    { "group-update-time", required_argument, NULL, OPT_GROUP_UPDATE  },
+    { "key-file",          required_argument, NULL, OPT_KEY_FILE      },
+    { "log-file",          required_argument, NULL, OPT_LOG_FILE      },
+    { "max-ttl",           required_argument, NULL, OPT_MAX_TTL       },
+    { "num-threads",       required_argument, NULL, OPT_NUM_THREADS   },
+    { "pid-file",          required_argument, NULL, OPT_PID_FILE      },
+    { "seed-file",         required_argument, NULL, OPT_SEED_FILE     },
+    { "syslog",            no_argument,       NULL, OPT_SYSLOG        },
+    { "trusted-group",     required_argument, NULL, OPT_TRUSTED_GROUP },
+    {  NULL,               0,                 NULL, 0                 }
 };
 
 
@@ -402,6 +405,12 @@ parse_cmdline (conf_t conf, int argc, char **argv)
             case OPT_SYSLOG:
                 conf->got_syslog = 1;
                 break;
+            case OPT_TRUSTED_GROUP:
+                if (path_set_trusted_group (optarg) < 0) {
+                    log_err (EMUNGE_SNAFU, LOG_ERR,
+                        "Invalid value \"%s\" for trusted-group", optarg);
+                }
+                break;
             case '?':
                 if (optopt > 0) {
                     log_err (EMUNGE_SNAFU, LOG_ERR,
@@ -529,6 +538,9 @@ display_help (char *prog)
 
     printf ("  %*s %s\n", w, "--syslog",
             "Redirect log messages to syslog");
+
+    printf ("  %*s %s\n", w, "--trusted-group=GROUP",
+            "Specify trusted group/GID for directory checks");
 
     printf ("\n");
     return;

@@ -33,15 +33,23 @@
 #endif /* HAVE_CONFIG_H */
 
 #include <errno.h>
-#include <limits.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include "common.h"
 #include "path.h"
+#include "query.h"
 #include "strlcpy.h"
+
+
+/*****************************************************************************
+ *  Internal Variables
+ *****************************************************************************/
+
+static gid_t _path_trusted_gid = GID_SENTINEL;
 
 
 /*****************************************************************************
@@ -220,8 +228,9 @@ path_is_secure (const char *path, char *errbuf, size_t errbuflen,
         }
         if (!(flags & PATH_SECURITY_IGNORE_GROUP_WRITE) &&
              (st.st_mode & S_IWGRP)                     &&
-            !(st.st_mode & S_ISVTX))
-        {
+            !(st.st_mode & S_ISVTX)                     &&
+             ((st.st_gid != _path_trusted_gid) ||
+              (_path_trusted_gid == GID_SENTINEL))) {
             return (_path_set_err (0, errbuf, errbuflen,
                 "group-writable permissions without sticky bit set on \"%s\"",
                 buf));
@@ -242,6 +251,31 @@ path_is_secure (const char *path, char *errbuf, size_t errbuflen,
         *p = '\0';
     }
     return (1);
+}
+
+
+int
+path_get_trusted_group (gid_t *gid_ptr)
+{
+    if (_path_trusted_gid == GID_SENTINEL) {
+        errno = ERANGE;
+        return (-1);
+    }
+    if (gid_ptr != NULL) {
+        *gid_ptr = _path_trusted_gid;
+    }
+    return (0);
+}
+
+
+int
+path_set_trusted_group (const char *group)
+{
+    if (group == NULL) {
+        _path_trusted_gid = GID_SENTINEL;
+        return (0);
+    }
+    return (query_gid (group, &_path_trusted_gid));
 }
 
 

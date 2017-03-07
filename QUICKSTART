@@ -75,12 +75,15 @@ MUNGE Installation Guide
       This directory must allow execute permissions for all.  The recommended
       permissions for it are 0755.
 
-   These directories must be owned by the user that the munged daemon will
-   run as.  They cannot allow write permissions for group or other (unless
-   the sticky-bit is set).  In addition, all of their parent directories in
-   the path on up to the root directory must be owned by either root or the
-   user that the munged daemon will run as.  None of them can allow write
-   permissions for group or other (unless the sticky-bit is set).
+   These directories must be owned by the same user as the munged daemon
+   process.  They cannot allow write permissions for group unless the sticky
+   bit is set or the directory is owned by the trusted group; and they
+   cannot allow write permissions for other unless the sticky bit is set.
+   In addition, all of their parent directories in the path on up to the root
+   directory must be owned by either root or the same user as the munged
+   daemon process.  They cannot allow write permissions for group unless
+   the sticky bit is set or the directory is owned by the trusted group; and
+   they cannot allow write permissions for other unless the sticky bit is set.
 
 
 3. Creating a Secret Key
