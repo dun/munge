@@ -223,11 +223,13 @@ path_is_secure (const char *path, char *errbuf, size_t errbuflen,
             !(st.st_mode & S_ISVTX))
         {
             return (_path_set_err (0, errbuf, errbuflen,
-                "group-writable permissions set on \"%s\"", buf));
+                "group-writable permissions without sticky bit set on \"%s\"",
+                buf));
         }
         if ((st.st_mode & S_IWOTH) && !(st.st_mode & S_ISVTX)) {
             return (_path_set_err (0, errbuf, errbuflen,
-                "world-writable permissions set on \"%s\"", buf));
+                "world-writable permissions without sticky bit set on \"%s\"",
+                buf));
         }
         if (!(p = strrchr (buf, '/'))) {
             errno = EINVAL;
