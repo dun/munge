@@ -519,12 +519,13 @@ _gids_user_to_uid (hash_t uid_hash, char *user, uid_t *uidp, xpwbuf_p pwbufp)
         uid = pw.pw_uid;
         if (!(u = _gids_uid_alloc (user, uid))) {
             log_msg (LOG_WARNING,
-                "Failed to allocate uid node for %s/%d",
-                user, uid);
+                "Failed to allocate uid node for %s/%u",
+                user, (unsigned int) uid);
         }
         else if (!hash_insert (uid_hash, u->user, u)) {
             log_msg (LOG_WARNING,
-                "Failed to insert uid node for %s/%d into hash", user, uid);
+                "Failed to insert uid node for %s/%u into hash",
+                user, (unsigned int) uid);
             _gids_uid_del (u);
         }
     }
@@ -726,9 +727,9 @@ _gids_dump_gid_node (gids_gid_t g, uid_t *uidp, void *null)
 
     assert (g->uid == *uidp);
 
-    printf (" %5d:", g->uid);
+    printf (" %5u:", (unsigned int) g->uid);
     for (node = g->next; node; node = node->next) {
-        printf (" %d", node->gid);
+        printf (" %u", (unsigned int) node->gid);
     }
     printf ("\n");
     return;
@@ -752,7 +753,7 @@ _gids_dump_uid_node (gids_uid_t u, char *user, void *null)
 {
     assert (u->user == user);
 
-    printf (" %5d: %s\n", u->uid, u->user);
+    printf (" %5u: %s\n", (unsigned int) u->uid, u->user);
     return;
 }
 

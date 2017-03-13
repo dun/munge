@@ -707,15 +707,15 @@ display_meta (conf_t conf)
         pw_ptr = getpwuid (conf->uid);
         s = key_val_to_str (MUNGE_KEY_UID);
         w = pad - strlen (s);
-        fprintf (conf->fp_meta, "%s:%*c%s (%d)\n", s, w, 0x20,
-            (pw_ptr ? pw_ptr->pw_name : "???"), (int) conf->uid);
+        fprintf (conf->fp_meta, "%s:%*c%s (%u)\n", s, w, 0x20,
+            (pw_ptr ? pw_ptr->pw_name : "???"), (unsigned int) conf->uid);
     }
     if (conf->key[MUNGE_KEY_GID]) {
         gr_ptr = getgrgid (conf->gid);
         s = key_val_to_str (MUNGE_KEY_GID);
         w = pad - strlen (s);
-        fprintf (conf->fp_meta, "%s:%*c%s (%d)\n", s, w, 0x20,
-            (gr_ptr ? gr_ptr->gr_name : "???"), (int) conf->gid);
+        fprintf (conf->fp_meta, "%s:%*c%s (%u)\n", s, w, 0x20,
+            (gr_ptr ? gr_ptr->gr_name : "???"), (unsigned int) conf->gid);
     }
     if (conf->key[MUNGE_KEY_UID_RESTRICTION]) {
         e = munge_ctx_get (conf->ctx, MUNGE_OPT_UID_RESTRICTION, &i);
@@ -728,8 +728,8 @@ display_meta (conf_t conf)
             pw_ptr = getpwuid (i);
             s = key_val_to_str (MUNGE_KEY_UID_RESTRICTION);
             w = pad - strlen (s);
-            fprintf (conf->fp_meta, "%s:%*c%s (%d)\n", s, w, 0x20,
-                (pw_ptr ? pw_ptr->pw_name : "???"), i);
+            fprintf (conf->fp_meta, "%s:%*c%s (%u)\n", s, w, 0x20,
+                (pw_ptr ? pw_ptr->pw_name : "???"), (unsigned int) i);
         }
     }
     if (conf->key[MUNGE_KEY_GID_RESTRICTION]) {
@@ -743,8 +743,8 @@ display_meta (conf_t conf)
             gr_ptr = getgrgid (i);
             s = key_val_to_str (MUNGE_KEY_GID_RESTRICTION);
             w = pad - strlen (s);
-            fprintf (conf->fp_meta, "%s:%*c%s (%d)\n", s, w, 0x20,
-                (gr_ptr ? gr_ptr->gr_name : "???"), i);
+            fprintf (conf->fp_meta, "%s:%*c%s (%u)\n", s, w, 0x20,
+                (gr_ptr ? gr_ptr->gr_name : "???"), (unsigned int) i);
         }
     }
     if (conf->key[MUNGE_KEY_LENGTH]) {
