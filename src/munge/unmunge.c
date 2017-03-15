@@ -244,8 +244,8 @@ create_conf (void)
     conf->cred = NULL;
     conf->dlen = 0;
     conf->data = NULL;
-    conf->uid = -1;
-    conf->gid = -1;
+    conf->uid = UID_SENTINEL;
+    conf->gid = GID_SENTINEL;
     for (i=0, maxlen=0; i<MUNGE_KEY_LAST; i++) {
         conf->key[i] = 0;
         len = strlen (key_val_to_str (i));

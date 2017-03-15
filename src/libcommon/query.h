@@ -26,46 +26,27 @@
  *****************************************************************************/
 
 
-#ifndef MUNGE_COMMON_H
-#define MUNGE_COMMON_H
+#ifndef MUNGE_QUERY_H
+#define MUNGE_QUERY_H
 
-
-#if HAVE_CONFIG_H
-#  include <config.h>
-#endif /* HAVE_CONFIG_H */
-
-#include "fd.h"
-#include "license.h"
-#include "log.h"
-#include "m_msg.h"
-#include "munge_defs.h"
-#include "posignal.h"
-#include "query.h"
-#include "str.h"
-
-
-#if HAVE_BZLIB_H && HAVE_LIBBZ2
-#  define HAVE_PKG_BZLIB 1
-#endif
-
-#if HAVE_ZLIB_H && HAVE_LIBZ
-#  define HAVE_PKG_ZLIB 1
-#endif
-
-#ifndef MAX
-#  define MAX(a,b) ((a >= b) ? (a) : (b))
-#endif /* !MAX */
-
-#ifndef MIN
-#  define MIN(a,b) ((a <= b) ? (a) : (b))
-#endif /* !MIN */
-
-#include <stdint.h>
 #include <unistd.h>
-#define UID_MAXIMUM     (UINT32_MAX - 1)
-#define UID_SENTINEL    ((uid_t) -1)
-#define GID_MAXIMUM     (UINT32_MAX - 1)
-#define GID_SENTINEL    ((gid_t) -1)
 
 
-#endif /* !MUNGE_COMMON_H */
+int query_uid (const char *user, uid_t *uid_ptr);
+/*
+ *  Queries for the User ID using the [user] string which can specify the
+ *    user name or UID number.
+ *  Returns 0 on success with the UID stored at [uid_ptr] (if non-NULL).
+ *    Returns -1 on error without updating [uid_ptr].
+ */
+
+int query_gid (const char *group, gid_t *gid_ptr);
+/*
+ *  Queries for the Group ID using the [group] string which can specify the
+ *    group name or GID number.
+ *  Returns 0 on success with the GID stored at [gid_ptr] (if non-NULL).
+ *    Returns -1 on error without updating [gid_ptr].
+ */
+
+
+#endif /* !MUNGE_QUERY_H */
