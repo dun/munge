@@ -32,9 +32,11 @@
 
 #include <sys/types.h>
 #include "m_msg.h"
+#include "path.h"
 
 
-void auth_recv_init (const char *srvrdir, const char *clntdir, int got_force);
+void auth_recv_init (const char *srvrdir, const char *clntdir, int got_force,
+          path_security_flag_t base_pathsec_server, path_security_flag_t base_pathsec_client);
 /*
  *  Checks for required privileges needed to perform client authentication.
  */

@@ -40,6 +40,18 @@
  *  Data Types
  *****************************************************************************/
 
+enum pathsec_path_kind {
+  pathsec_path_kind_all                 = 0,
+  pathsec_path_kind_keyfile,
+  pathsec_path_kind_randomseed,
+  pathsec_path_kind_logfile,
+  pathsec_path_kind_pidfile,
+  pathsec_path_kind_socket,
+  pathsec_path_kind_server_dir,
+  pathsec_path_kind_client_dir,
+  pathsec_path_kind_max
+};
+
 struct conf {
     int             ld;                 /* listening socket descriptor       */
     unsigned        got_benchmark:1;    /* flag for BENCHMARK option         */
@@ -75,6 +87,11 @@ struct conf {
     char           *auth_server_dir;    /* dir in which to create auth pipe  */
     char           *auth_client_dir;    /* dir in which to create auth file  */
     int             auth_rnd_bytes;     /* num rnd bytes in auth pipe name   */
+                                        /* each specific kind of path for    
+                                         * path_is_secure can have a base
+                                         * strictness:
+                                         */
+    int             base_pathsec[pathsec_path_kind_max];
 };
 
 typedef struct conf * conf_t;

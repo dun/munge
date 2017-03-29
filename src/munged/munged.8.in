@@ -134,6 +134,10 @@ Specify an alternate pathname for storing the Process ID of the daemon.
 .TP
 .BI "\-\-syslog"
 Redirect log messages to syslog when the daemon is running in the background.
+.TP
+.BI "\-\-pathsec " sec-list
+Specify the security level(s) to apply to security checks of specific paths used by \fBmunged\fR.  The list is comprised of one or more specifications of "kind:level" separated by commas.  The kind of path should be one of:  all, keyfile, randomseed, logfile, pidfile, socket, server_dir, client_dir.  The level can be strict (all directories must satisfy security criteria) or loose (only the final directory on the path must satisfy security criteria).  Omitting the "kind:" implies the all kind.
+For example, the sec-list "all:strict,keyfile:loose" requests strict security checks of all paths except that of the key file.
 
 .SH SIGNALS
 .TP

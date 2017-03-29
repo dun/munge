@@ -29,8 +29,10 @@
 #ifndef RANDOM_H
 #define RANDOM_H
 
+#include "path.h"
 
-int random_init (const char *seed);
+
+int random_init (const char *seed, path_security_flag_t base_pathsec);
 /*
  *  Initializes the PRNG from the [seed] file.
  *  If [seed] does not exist or provide sufficient entropy,
