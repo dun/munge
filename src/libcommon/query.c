@@ -39,42 +39,53 @@
 #include <sys/types.h>
 #include "common.h"
 #include "query.h"
+#include "xgetpwnam.h"
 
 
 int
 query_uid (const char *user, uid_t *uid_ptr)
 {
-    struct passwd *pw_ptr;
+    xpwbuf_p       pwbufp;
+    struct passwd  pw;
     uid_t          uid;
     long int       l;
     char          *end_ptr;
+    int            rv;
 
     if (user == NULL) {
         errno = EINVAL;
         return (-1);
     }
-    pw_ptr = getpwnam (user);
-    if (pw_ptr != NULL) {
-        uid = pw_ptr->pw_uid;
+    pwbufp = xgetpwnam_buf_create (0);
+    if (pwbufp == NULL) {
+        return (-1);
+    }
+    if (xgetpwnam (user, &pw, pwbufp) == 0) {
+        uid = pw.pw_uid;
+        rv = 0;
     }
     else {
         errno = 0;
         l = strtol (user, &end_ptr, 10);
         if ((errno == ERANGE) && ((l == LONG_MIN) || (l == LONG_MAX))) {
-            return (-1);
+            rv = -1;
         }
-        if ((user == end_ptr) || (*end_ptr != '\0')) {
-            return (-1);
+        else if ((user == end_ptr) || (*end_ptr != '\0')) {
+            rv = -1;
         }
-        if ((l < 0) || ((unsigned int) l > UID_MAXIMUM)) {
-            return (-1);
+        else if ((l < 0) || ((unsigned int) l > UID_MAXIMUM)) {
+            rv = -1;
         }
-        uid = (uid_t) l;
+        else {
+            uid = (uid_t) l;
+            rv = 0;
+        }
     }
-    if (uid_ptr != NULL) {
+    if ((uid_ptr != NULL) && (rv == 0)) {
         *uid_ptr = uid;
     }
-    return (0);
+    xgetpwnam_buf_destroy (pwbufp);
+    return (rv);
 }
 
 

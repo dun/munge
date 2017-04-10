@@ -117,7 +117,8 @@ CONFIG_CLEAN_FILES = munge.1 remunge.1 unmunge.1
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)" "$(DESTDIR)$(man1dir)"
 PROGRAMS = $(bin_PROGRAMS)
-am_munge_OBJECTS = munge.$(OBJEXT) read.$(OBJEXT)
+am_munge_OBJECTS = munge-munge.$(OBJEXT) munge-read.$(OBJEXT) \
+	munge-query.$(OBJEXT) munge-xgetpwnam.$(OBJEXT)
 munge_OBJECTS = $(am_munge_OBJECTS)
 munge_DEPENDENCIES = $(top_builddir)/src/libcommon/libcommon.la \
 	$(top_builddir)/src/libmissing/libmissing.la \
@@ -126,13 +127,14 @@ AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
 am__v_lt_0 = --silent
 am__v_lt_1 = 
-am_remunge_OBJECTS = remunge.$(OBJEXT)
+am_remunge_OBJECTS = remunge-remunge.$(OBJEXT) remunge-query.$(OBJEXT) \
+	remunge-xgetpwnam.$(OBJEXT)
 remunge_OBJECTS = $(am_remunge_OBJECTS)
 am__DEPENDENCIES_1 =
 remunge_DEPENDENCIES = $(top_builddir)/src/libcommon/libcommon.la \
 	$(top_builddir)/src/libmissing/libmissing.la \
 	$(top_builddir)/src/libmunge/libmunge.la $(am__DEPENDENCIES_1)
-am_unmunge_OBJECTS = unmunge.$(OBJEXT) read.$(OBJEXT)
+am_unmunge_OBJECTS = unmunge-unmunge.$(OBJEXT) unmunge-read.$(OBJEXT)
 unmunge_OBJECTS = $(am_unmunge_OBJECTS)
 unmunge_DEPENDENCIES = $(top_builddir)/src/libcommon/libcommon.la \
 	$(top_builddir)/src/libmissing/libmissing.la \
@@ -414,6 +416,10 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/src/libmissing \
 	-I$(top_srcdir)/src/libmunge
 
+munge_CPPFLAGS = \
+	-I$(top_srcdir)/src/munged \
+	$(AM_CPPFLAGS)
+
 munge_LDADD = \
 	$(top_builddir)/src/libcommon/libcommon.la \
 	$(top_builddir)/src/libmissing/libmissing.la \
@@ -422,7 +428,14 @@ munge_LDADD = \
 munge_SOURCES = \
 	munge.c \
 	read.c \
-	read.h
+	read.h \
+	$(top_srcdir)/src/libcommon/query.c \
+	$(top_srcdir)/src/libcommon/query.h \
+	$(top_srcdir)/src/munged/xgetpwnam.c \
+	$(top_srcdir)/src/munged/xgetpwnam.h
+
+unmunge_CPPFLAGS = \
+	$(AM_CPPFLAGS)
 
 unmunge_LDADD = \
 	$(top_builddir)/src/libcommon/libcommon.la \
@@ -434,6 +447,11 @@ unmunge_SOURCES = \
 	read.c \
 	read.h
 
+remunge_CPPFLAGS = \
+	-DWITH_PTHREADS \
+	-I$(top_srcdir)/src/munged \
+	$(AM_CPPFLAGS)
+
 remunge_LDADD = \
 	$(top_builddir)/src/libcommon/libcommon.la \
 	$(top_builddir)/src/libmissing/libmissing.la \
@@ -441,7 +459,11 @@ remunge_LDADD = \
 	$(LIBPTHREAD)
 
 remunge_SOURCES = \
-	remunge.c
+	remunge.c \
+	$(top_srcdir)/src/libcommon/query.c \
+	$(top_srcdir)/src/libcommon/query.h \
+	$(top_srcdir)/src/munged/xgetpwnam.c \
+	$(top_srcdir)/src/munged/xgetpwnam.h
 
 man_MANS = \
 	munge.1 \
@@ -557,10 +579,15 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/munge.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/read.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/remunge.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/unmunge.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/munge-munge.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/munge-query.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/munge-read.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/munge-xgetpwnam.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/remunge-query.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/remunge-remunge.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/remunge-xgetpwnam.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/unmunge-read.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/unmunge-unmunge.Po@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -582,6 +609,132 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LTCOMPILE) -c -o $@ $<
+
+munge-munge.o: munge.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(munge_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT munge-munge.o -MD -MP -MF $(DEPDIR)/munge-munge.Tpo -c -o munge-munge.o `test -f 'munge.c' || echo '$(srcdir)/'`munge.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/munge-munge.Tpo $(DEPDIR)/munge-munge.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='munge.c' object='munge-munge.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(munge_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o munge-munge.o `test -f 'munge.c' || echo '$(srcdir)/'`munge.c
+
+munge-munge.obj: munge.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(munge_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT munge-munge.obj -MD -MP -MF $(DEPDIR)/munge-munge.Tpo -c -o munge-munge.obj `if test -f 'munge.c'; then $(CYGPATH_W) 'munge.c'; else $(CYGPATH_W) '$(srcdir)/munge.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/munge-munge.Tpo $(DEPDIR)/munge-munge.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='munge.c' object='munge-munge.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(munge_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o munge-munge.obj `if test -f 'munge.c'; then $(CYGPATH_W) 'munge.c'; else $(CYGPATH_W) '$(srcdir)/munge.c'; fi`
+
+munge-read.o: read.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(munge_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT munge-read.o -MD -MP -MF $(DEPDIR)/munge-read.Tpo -c -o munge-read.o `test -f 'read.c' || echo '$(srcdir)/'`read.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/munge-read.Tpo $(DEPDIR)/munge-read.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='read.c' object='munge-read.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(munge_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o munge-read.o `test -f 'read.c' || echo '$(srcdir)/'`read.c
+
+munge-read.obj: read.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(munge_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT munge-read.obj -MD -MP -MF $(DEPDIR)/munge-read.Tpo -c -o munge-read.obj `if test -f 'read.c'; then $(CYGPATH_W) 'read.c'; else $(CYGPATH_W) '$(srcdir)/read.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/munge-read.Tpo $(DEPDIR)/munge-read.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='read.c' object='munge-read.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(munge_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o munge-read.obj `if test -f 'read.c'; then $(CYGPATH_W) 'read.c'; else $(CYGPATH_W) '$(srcdir)/read.c'; fi`
+
+munge-query.o: $(top_srcdir)/src/libcommon/query.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(munge_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT munge-query.o -MD -MP -MF $(DEPDIR)/munge-query.Tpo -c -o munge-query.o `test -f '$(top_srcdir)/src/libcommon/query.c' || echo '$(srcdir)/'`$(top_srcdir)/src/libcommon/query.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/munge-query.Tpo $(DEPDIR)/munge-query.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='$(top_srcdir)/src/libcommon/query.c' object='munge-query.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(munge_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o munge-query.o `test -f '$(top_srcdir)/src/libcommon/query.c' || echo '$(srcdir)/'`$(top_srcdir)/src/libcommon/query.c
+
+munge-query.obj: $(top_srcdir)/src/libcommon/query.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(munge_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT munge-query.obj -MD -MP -MF $(DEPDIR)/munge-query.Tpo -c -o munge-query.obj `if test -f '$(top_srcdir)/src/libcommon/query.c'; then $(CYGPATH_W) '$(top_srcdir)/src/libcommon/query.c'; else $(CYGPATH_W) '$(srcdir)/$(top_srcdir)/src/libcommon/query.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/munge-query.Tpo $(DEPDIR)/munge-query.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='$(top_srcdir)/src/libcommon/query.c' object='munge-query.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(munge_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o munge-query.obj `if test -f '$(top_srcdir)/src/libcommon/query.c'; then $(CYGPATH_W) '$(top_srcdir)/src/libcommon/query.c'; else $(CYGPATH_W) '$(srcdir)/$(top_srcdir)/src/libcommon/query.c'; fi`
+
+munge-xgetpwnam.o: $(top_srcdir)/src/munged/xgetpwnam.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(munge_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT munge-xgetpwnam.o -MD -MP -MF $(DEPDIR)/munge-xgetpwnam.Tpo -c -o munge-xgetpwnam.o `test -f '$(top_srcdir)/src/munged/xgetpwnam.c' || echo '$(srcdir)/'`$(top_srcdir)/src/munged/xgetpwnam.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/munge-xgetpwnam.Tpo $(DEPDIR)/munge-xgetpwnam.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='$(top_srcdir)/src/munged/xgetpwnam.c' object='munge-xgetpwnam.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(munge_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o munge-xgetpwnam.o `test -f '$(top_srcdir)/src/munged/xgetpwnam.c' || echo '$(srcdir)/'`$(top_srcdir)/src/munged/xgetpwnam.c
+
+munge-xgetpwnam.obj: $(top_srcdir)/src/munged/xgetpwnam.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(munge_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT munge-xgetpwnam.obj -MD -MP -MF $(DEPDIR)/munge-xgetpwnam.Tpo -c -o munge-xgetpwnam.obj `if test -f '$(top_srcdir)/src/munged/xgetpwnam.c'; then $(CYGPATH_W) '$(top_srcdir)/src/munged/xgetpwnam.c'; else $(CYGPATH_W) '$(srcdir)/$(top_srcdir)/src/munged/xgetpwnam.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/munge-xgetpwnam.Tpo $(DEPDIR)/munge-xgetpwnam.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='$(top_srcdir)/src/munged/xgetpwnam.c' object='munge-xgetpwnam.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(munge_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o munge-xgetpwnam.obj `if test -f '$(top_srcdir)/src/munged/xgetpwnam.c'; then $(CYGPATH_W) '$(top_srcdir)/src/munged/xgetpwnam.c'; else $(CYGPATH_W) '$(srcdir)/$(top_srcdir)/src/munged/xgetpwnam.c'; fi`
+
+remunge-remunge.o: remunge.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(remunge_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT remunge-remunge.o -MD -MP -MF $(DEPDIR)/remunge-remunge.Tpo -c -o remunge-remunge.o `test -f 'remunge.c' || echo '$(srcdir)/'`remunge.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/remunge-remunge.Tpo $(DEPDIR)/remunge-remunge.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='remunge.c' object='remunge-remunge.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(remunge_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o remunge-remunge.o `test -f 'remunge.c' || echo '$(srcdir)/'`remunge.c
+
+remunge-remunge.obj: remunge.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(remunge_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT remunge-remunge.obj -MD -MP -MF $(DEPDIR)/remunge-remunge.Tpo -c -o remunge-remunge.obj `if test -f 'remunge.c'; then $(CYGPATH_W) 'remunge.c'; else $(CYGPATH_W) '$(srcdir)/remunge.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/remunge-remunge.Tpo $(DEPDIR)/remunge-remunge.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='remunge.c' object='remunge-remunge.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(remunge_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o remunge-remunge.obj `if test -f 'remunge.c'; then $(CYGPATH_W) 'remunge.c'; else $(CYGPATH_W) '$(srcdir)/remunge.c'; fi`
+
+remunge-query.o: $(top_srcdir)/src/libcommon/query.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(remunge_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT remunge-query.o -MD -MP -MF $(DEPDIR)/remunge-query.Tpo -c -o remunge-query.o `test -f '$(top_srcdir)/src/libcommon/query.c' || echo '$(srcdir)/'`$(top_srcdir)/src/libcommon/query.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/remunge-query.Tpo $(DEPDIR)/remunge-query.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='$(top_srcdir)/src/libcommon/query.c' object='remunge-query.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(remunge_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o remunge-query.o `test -f '$(top_srcdir)/src/libcommon/query.c' || echo '$(srcdir)/'`$(top_srcdir)/src/libcommon/query.c
+
+remunge-query.obj: $(top_srcdir)/src/libcommon/query.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(remunge_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT remunge-query.obj -MD -MP -MF $(DEPDIR)/remunge-query.Tpo -c -o remunge-query.obj `if test -f '$(top_srcdir)/src/libcommon/query.c'; then $(CYGPATH_W) '$(top_srcdir)/src/libcommon/query.c'; else $(CYGPATH_W) '$(srcdir)/$(top_srcdir)/src/libcommon/query.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/remunge-query.Tpo $(DEPDIR)/remunge-query.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='$(top_srcdir)/src/libcommon/query.c' object='remunge-query.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(remunge_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o remunge-query.obj `if test -f '$(top_srcdir)/src/libcommon/query.c'; then $(CYGPATH_W) '$(top_srcdir)/src/libcommon/query.c'; else $(CYGPATH_W) '$(srcdir)/$(top_srcdir)/src/libcommon/query.c'; fi`
+
+remunge-xgetpwnam.o: $(top_srcdir)/src/munged/xgetpwnam.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(remunge_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT remunge-xgetpwnam.o -MD -MP -MF $(DEPDIR)/remunge-xgetpwnam.Tpo -c -o remunge-xgetpwnam.o `test -f '$(top_srcdir)/src/munged/xgetpwnam.c' || echo '$(srcdir)/'`$(top_srcdir)/src/munged/xgetpwnam.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/remunge-xgetpwnam.Tpo $(DEPDIR)/remunge-xgetpwnam.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='$(top_srcdir)/src/munged/xgetpwnam.c' object='remunge-xgetpwnam.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(remunge_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o remunge-xgetpwnam.o `test -f '$(top_srcdir)/src/munged/xgetpwnam.c' || echo '$(srcdir)/'`$(top_srcdir)/src/munged/xgetpwnam.c
+
+remunge-xgetpwnam.obj: $(top_srcdir)/src/munged/xgetpwnam.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(remunge_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT remunge-xgetpwnam.obj -MD -MP -MF $(DEPDIR)/remunge-xgetpwnam.Tpo -c -o remunge-xgetpwnam.obj `if test -f '$(top_srcdir)/src/munged/xgetpwnam.c'; then $(CYGPATH_W) '$(top_srcdir)/src/munged/xgetpwnam.c'; else $(CYGPATH_W) '$(srcdir)/$(top_srcdir)/src/munged/xgetpwnam.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/remunge-xgetpwnam.Tpo $(DEPDIR)/remunge-xgetpwnam.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='$(top_srcdir)/src/munged/xgetpwnam.c' object='remunge-xgetpwnam.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(remunge_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o remunge-xgetpwnam.obj `if test -f '$(top_srcdir)/src/munged/xgetpwnam.c'; then $(CYGPATH_W) '$(top_srcdir)/src/munged/xgetpwnam.c'; else $(CYGPATH_W) '$(srcdir)/$(top_srcdir)/src/munged/xgetpwnam.c'; fi`
+
+unmunge-unmunge.o: unmunge.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unmunge_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT unmunge-unmunge.o -MD -MP -MF $(DEPDIR)/unmunge-unmunge.Tpo -c -o unmunge-unmunge.o `test -f 'unmunge.c' || echo '$(srcdir)/'`unmunge.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/unmunge-unmunge.Tpo $(DEPDIR)/unmunge-unmunge.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='unmunge.c' object='unmunge-unmunge.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unmunge_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o unmunge-unmunge.o `test -f 'unmunge.c' || echo '$(srcdir)/'`unmunge.c
+
+unmunge-unmunge.obj: unmunge.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unmunge_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT unmunge-unmunge.obj -MD -MP -MF $(DEPDIR)/unmunge-unmunge.Tpo -c -o unmunge-unmunge.obj `if test -f 'unmunge.c'; then $(CYGPATH_W) 'unmunge.c'; else $(CYGPATH_W) '$(srcdir)/unmunge.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/unmunge-unmunge.Tpo $(DEPDIR)/unmunge-unmunge.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='unmunge.c' object='unmunge-unmunge.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unmunge_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o unmunge-unmunge.obj `if test -f 'unmunge.c'; then $(CYGPATH_W) 'unmunge.c'; else $(CYGPATH_W) '$(srcdir)/unmunge.c'; fi`
+
+unmunge-read.o: read.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unmunge_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT unmunge-read.o -MD -MP -MF $(DEPDIR)/unmunge-read.Tpo -c -o unmunge-read.o `test -f 'read.c' || echo '$(srcdir)/'`read.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/unmunge-read.Tpo $(DEPDIR)/unmunge-read.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='read.c' object='unmunge-read.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unmunge_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o unmunge-read.o `test -f 'read.c' || echo '$(srcdir)/'`read.c
+
+unmunge-read.obj: read.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unmunge_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT unmunge-read.obj -MD -MP -MF $(DEPDIR)/unmunge-read.Tpo -c -o unmunge-read.obj `if test -f 'read.c'; then $(CYGPATH_W) 'read.c'; else $(CYGPATH_W) '$(srcdir)/read.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/unmunge-read.Tpo $(DEPDIR)/unmunge-read.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='read.c' object='unmunge-read.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unmunge_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o unmunge-read.obj `if test -f 'read.c'; then $(CYGPATH_W) 'read.c'; else $(CYGPATH_W) '$(srcdir)/read.c'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo

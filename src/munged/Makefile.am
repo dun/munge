@@ -55,6 +55,7 @@ munged_LDADD = \
 	$(CRYPTO_LIBS)
 
 munged_SOURCES = \
+	munged.c \
 	auth_recv.c \
 	auth_recv.h \
 	base64.c \
@@ -99,7 +100,8 @@ munged_SOURCES = \
 	xgetpwnam.h \
 	zip.c \
 	zip.h \
-	munged.c
+	$(top_srcdir)/src/libcommon/query.c \
+	$(top_srcdir)/src/libcommon/query.h
 
 man_MANS = \
 	munged.8

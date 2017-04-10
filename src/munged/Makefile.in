@@ -127,17 +127,18 @@ AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
 am__v_lt_0 = --silent
 am__v_lt_1 = 
-am_munged_OBJECTS = munged-auth_recv.$(OBJEXT) munged-base64.$(OBJEXT) \
-	munged-cipher.$(OBJEXT) munged-conf.$(OBJEXT) \
-	munged-cred.$(OBJEXT) munged-crypto.$(OBJEXT) \
-	munged-dec.$(OBJEXT) munged-enc.$(OBJEXT) \
-	munged-gids.$(OBJEXT) munged-hash.$(OBJEXT) \
-	munged-job.$(OBJEXT) munged-mac.$(OBJEXT) munged-md.$(OBJEXT) \
-	munged-path.$(OBJEXT) munged-random.$(OBJEXT) \
-	munged-replay.$(OBJEXT) munged-thread.$(OBJEXT) \
-	munged-timer.$(OBJEXT) munged-work.$(OBJEXT) \
-	munged-xgetgrent.$(OBJEXT) munged-xgetpwnam.$(OBJEXT) \
-	munged-zip.$(OBJEXT) munged-munged.$(OBJEXT)
+am_munged_OBJECTS = munged-munged.$(OBJEXT) munged-auth_recv.$(OBJEXT) \
+	munged-base64.$(OBJEXT) munged-cipher.$(OBJEXT) \
+	munged-conf.$(OBJEXT) munged-cred.$(OBJEXT) \
+	munged-crypto.$(OBJEXT) munged-dec.$(OBJEXT) \
+	munged-enc.$(OBJEXT) munged-gids.$(OBJEXT) \
+	munged-hash.$(OBJEXT) munged-job.$(OBJEXT) \
+	munged-mac.$(OBJEXT) munged-md.$(OBJEXT) munged-path.$(OBJEXT) \
+	munged-random.$(OBJEXT) munged-replay.$(OBJEXT) \
+	munged-thread.$(OBJEXT) munged-timer.$(OBJEXT) \
+	munged-work.$(OBJEXT) munged-xgetgrent.$(OBJEXT) \
+	munged-xgetpwnam.$(OBJEXT) munged-zip.$(OBJEXT) \
+	munged-query.$(OBJEXT)
 munged_OBJECTS = $(am_munged_OBJECTS)
 am__DEPENDENCIES_1 =
 munged_DEPENDENCIES = $(top_builddir)/src/libcommon/libcommon.la \
@@ -620,6 +621,7 @@ munged_LDADD = \
 	$(CRYPTO_LIBS)
 
 munged_SOURCES = \
+	munged.c \
 	auth_recv.c \
 	auth_recv.h \
 	base64.c \
@@ -664,7 +666,8 @@ munged_SOURCES = \
 	xgetpwnam.h \
 	zip.c \
 	zip.h \
-	munged.c
+	$(top_srcdir)/src/libcommon/query.c \
+	$(top_srcdir)/src/libcommon/query.h
 
 man_MANS = \
 	munged.8
@@ -801,6 +804,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/munged-md.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/munged-munged.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/munged-path.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/munged-query.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/munged-random.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/munged-replay.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/munged-thread.Po@am__quote@
@@ -830,6 +834,20 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LTCOMPILE) -c -o $@ $<
+
+munged-munged.o: munged.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(munged_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -MT munged-munged.o -MD -MP -MF $(DEPDIR)/munged-munged.Tpo -c -o munged-munged.o `test -f 'munged.c' || echo '$(srcdir)/'`munged.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/munged-munged.Tpo $(DEPDIR)/munged-munged.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='munged.c' object='munged-munged.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(munged_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -c -o munged-munged.o `test -f 'munged.c' || echo '$(srcdir)/'`munged.c
+
+munged-munged.obj: munged.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(munged_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -MT munged-munged.obj -MD -MP -MF $(DEPDIR)/munged-munged.Tpo -c -o munged-munged.obj `if test -f 'munged.c'; then $(CYGPATH_W) 'munged.c'; else $(CYGPATH_W) '$(srcdir)/munged.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/munged-munged.Tpo $(DEPDIR)/munged-munged.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='munged.c' object='munged-munged.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(munged_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -c -o munged-munged.obj `if test -f 'munged.c'; then $(CYGPATH_W) 'munged.c'; else $(CYGPATH_W) '$(srcdir)/munged.c'; fi`
 
 munged-auth_recv.o: auth_recv.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(munged_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -MT munged-auth_recv.o -MD -MP -MF $(DEPDIR)/munged-auth_recv.Tpo -c -o munged-auth_recv.o `test -f 'auth_recv.c' || echo '$(srcdir)/'`auth_recv.c
@@ -1139,19 +1157,19 @@ munged-zip.obj: zip.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(munged_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -c -o munged-zip.obj `if test -f 'zip.c'; then $(CYGPATH_W) 'zip.c'; else $(CYGPATH_W) '$(srcdir)/zip.c'; fi`
 
-munged-munged.o: munged.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(munged_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -MT munged-munged.o -MD -MP -MF $(DEPDIR)/munged-munged.Tpo -c -o munged-munged.o `test -f 'munged.c' || echo '$(srcdir)/'`munged.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/munged-munged.Tpo $(DEPDIR)/munged-munged.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='munged.c' object='munged-munged.o' libtool=no @AMDEPBACKSLASH@
+munged-query.o: $(top_srcdir)/src/libcommon/query.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(munged_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -MT munged-query.o -MD -MP -MF $(DEPDIR)/munged-query.Tpo -c -o munged-query.o `test -f '$(top_srcdir)/src/libcommon/query.c' || echo '$(srcdir)/'`$(top_srcdir)/src/libcommon/query.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/munged-query.Tpo $(DEPDIR)/munged-query.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='$(top_srcdir)/src/libcommon/query.c' object='munged-query.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(munged_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -c -o munged-munged.o `test -f 'munged.c' || echo '$(srcdir)/'`munged.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(munged_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -c -o munged-query.o `test -f '$(top_srcdir)/src/libcommon/query.c' || echo '$(srcdir)/'`$(top_srcdir)/src/libcommon/query.c
 
-munged-munged.obj: munged.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(munged_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -MT munged-munged.obj -MD -MP -MF $(DEPDIR)/munged-munged.Tpo -c -o munged-munged.obj `if test -f 'munged.c'; then $(CYGPATH_W) 'munged.c'; else $(CYGPATH_W) '$(srcdir)/munged.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/munged-munged.Tpo $(DEPDIR)/munged-munged.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='munged.c' object='munged-munged.obj' libtool=no @AMDEPBACKSLASH@
+munged-query.obj: $(top_srcdir)/src/libcommon/query.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(munged_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -MT munged-query.obj -MD -MP -MF $(DEPDIR)/munged-query.Tpo -c -o munged-query.obj `if test -f '$(top_srcdir)/src/libcommon/query.c'; then $(CYGPATH_W) '$(top_srcdir)/src/libcommon/query.c'; else $(CYGPATH_W) '$(srcdir)/$(top_srcdir)/src/libcommon/query.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/munged-query.Tpo $(DEPDIR)/munged-query.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='$(top_srcdir)/src/libcommon/query.c' object='munged-query.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(munged_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -c -o munged-munged.obj `if test -f 'munged.c'; then $(CYGPATH_W) 'munged.c'; else $(CYGPATH_W) '$(srcdir)/munged.c'; fi`
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(munged_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -c -o munged-query.obj `if test -f '$(top_srcdir)/src/libcommon/query.c'; then $(CYGPATH_W) '$(top_srcdir)/src/libcommon/query.c'; else $(CYGPATH_W) '$(srcdir)/$(top_srcdir)/src/libcommon/query.c'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo

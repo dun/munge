@@ -48,8 +48,6 @@ libcommon_la_SOURCES = \
 	munge_defs.h \
 	posignal.c \
 	posignal.h \
-	query.c \
-	query.h \
 	str.c \
 	str.h \
 	version.c \

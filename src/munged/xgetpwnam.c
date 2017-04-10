@@ -39,7 +39,9 @@
 #elif HAVE_GETPWNAM_R_SUN
 #undef _POSIX_PTHREAD_SEMANTICS
 #elif HAVE_GETPWNAM
+#ifdef WITH_PTHREADS
 #include <pthread.h>
+#endif /* WITH_PTHREADS */
 #else
 #error "getpwnam() not supported"
 #endif
@@ -175,11 +177,13 @@ xgetpwnam (const char *user, struct passwd *pwp, xpwbuf_p pwbufp)
 #elif HAVE_GETPWNAM_R_SUN
     struct passwd          *rv_pwp;
 #elif HAVE_GETPWNAM
+#ifdef WITH_PTHREADS
     static pthread_mutex_t  mutex = PTHREAD_MUTEX_INITIALIZER;
     int                     rv_mutex;
+#endif /* WITH_PTHREADS */
     int                     rv_copy;
     struct passwd          *rv_pwp;
-#endif
+#endif /* HAVE_GETPWNAM */
     int                     rv;
     int                     got_err;
     int                     got_none;
@@ -262,10 +266,12 @@ restart:
         }
     }
 #elif HAVE_GETPWNAM
+#ifdef WITH_PTHREADS
     if ((rv_mutex = pthread_mutex_lock (&mutex)) != 0) {
         errno = rv_mutex;
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to lock xgetpwnam mutex");
     }
+#endif /* WITH_PTHREADS */
     rv_pwp = getpwnam (user);
     /*
      *  The initial test for (errno != 0), while redundant, allows for the
@@ -290,14 +296,16 @@ restart:
     else {
         rv_copy = _xgetpwnam_copy (rv_pwp, pwp, pwbufp);
     }
+#ifdef WITH_PTHREADS
     if ((rv_mutex = pthread_mutex_unlock (&mutex)) != 0) {
         errno = rv_mutex;
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to unlock xgetpwnam mutex");
     }
+#endif /* WITH_PTHREADS */
     if (rv_copy < 0) {
         return (-1);
     }
-#endif
+#endif /* HAVE_GETPWNAM */
 
     if (got_none) {
         errno = ENOENT;

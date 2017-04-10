@@ -39,6 +39,10 @@ bin_PROGRAMS = \
 	unmunge \
 	remunge
 
+munge_CPPFLAGS = \
+	-I$(top_srcdir)/src/munged \
+	$(AM_CPPFLAGS)
+
 munge_LDADD = \
 	$(top_builddir)/src/libcommon/libcommon.la \
 	$(top_builddir)/src/libmissing/libmissing.la \
@@ -47,7 +51,14 @@ munge_LDADD = \
 munge_SOURCES = \
 	munge.c \
 	read.c \
-	read.h
+	read.h \
+	$(top_srcdir)/src/libcommon/query.c \
+	$(top_srcdir)/src/libcommon/query.h \
+	$(top_srcdir)/src/munged/xgetpwnam.c \
+	$(top_srcdir)/src/munged/xgetpwnam.h
+
+unmunge_CPPFLAGS = \
+	$(AM_CPPFLAGS)
 
 unmunge_LDADD = \
 	$(top_builddir)/src/libcommon/libcommon.la \
@@ -59,6 +70,11 @@ unmunge_SOURCES = \
 	read.c \
 	read.h
 
+remunge_CPPFLAGS = \
+	-DWITH_PTHREADS \
+	-I$(top_srcdir)/src/munged \
+	$(AM_CPPFLAGS)
+
 remunge_LDADD = \
 	$(top_builddir)/src/libcommon/libcommon.la \
 	$(top_builddir)/src/libmissing/libmissing.la \
@@ -66,7 +82,11 @@ remunge_LDADD = \
 	$(LIBPTHREAD)
 
 remunge_SOURCES = \
-	remunge.c
+	remunge.c \
+	$(top_srcdir)/src/libcommon/query.c \
+	$(top_srcdir)/src/libcommon/query.h \
+	$(top_srcdir)/src/munged/xgetpwnam.c \
+	$(top_srcdir)/src/munged/xgetpwnam.h
 
 man_MANS = \
 	munge.1 \

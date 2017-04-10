@@ -40,7 +40,6 @@
 #include "m_msg.h"
 #include "munge_defs.h"
 #include "posignal.h"
-#include "query.h"
 #include "str.h"
 
 
