@@ -39,8 +39,11 @@ sbin_PROGRAMS = \
 
 munged_CFLAGS = \
 	$(AM_CFLAGS) \
-	-DWITH_PTHREADS \
 	$(CRYPTO_CFLAGS)
+
+munged_CPPFLAGS = \
+	-DWITH_PTHREADS \
+	$(AM_CPPFLAGS)
 
 munged_LDADD = \
 	$(top_builddir)/src/libcommon/libcommon.la \
