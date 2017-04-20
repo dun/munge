@@ -54,7 +54,7 @@
 #include <unistd.h>
 #include <munge.h>
 #include "log.h"
-#include "xgetgrent.h"
+#include "xgetgr.h"
 
 
 /*****************************************************************************

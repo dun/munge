@@ -43,6 +43,7 @@ munged_CFLAGS = \
 
 munged_CPPFLAGS = \
 	-DWITH_PTHREADS \
+	-I$(top_srcdir)/src/common \
 	$(AM_CPPFLAGS)
 
 munged_LDADD = \
@@ -94,14 +95,14 @@ munged_SOURCES = \
 	timer.h \
 	work.c \
 	work.h \
-	xgetgrent.c \
-	xgetgrent.h \
-	xgetpwnam.c \
-	xgetpwnam.h \
 	zip.c \
 	zip.h \
-	$(top_srcdir)/src/libcommon/query.c \
-	$(top_srcdir)/src/libcommon/query.h
+	$(top_srcdir)/src/common/query.c \
+	$(top_srcdir)/src/common/query.h \
+	$(top_srcdir)/src/common/xgetgr.c \
+	$(top_srcdir)/src/common/xgetgr.h \
+	$(top_srcdir)/src/common/xgetpw.c \
+	$(top_srcdir)/src/common/xgetpw.h
 
 man_MANS = \
 	munged.8

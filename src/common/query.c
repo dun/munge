@@ -39,7 +39,7 @@
 #include <sys/types.h>
 #include "common.h"
 #include "query.h"
-#include "xgetpwnam.h"
+#include "xgetpw.h"
 
 
 int

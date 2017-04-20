@@ -26,8 +26,8 @@
  *****************************************************************************/
 
 
-#ifndef XGETGRENT_H
-#define XGETGRENT_H
+#ifndef XGETGR_H
+#define XGETGR_H
 
 #include <grp.h>
 #include <stddef.h>
@@ -57,4 +57,4 @@ int xgetgrent (struct group *grp, xgrbuf_p grbufp);
 void xgetgrent_fini (void);
 
 
-#endif /* !XGETGRENT_H */
+#endif /* !XGETGR_H */

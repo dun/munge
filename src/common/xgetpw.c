@@ -56,7 +56,7 @@
 #include <unistd.h>
 #include <munge.h>
 #include "log.h"
-#include "xgetpwnam.h"
+#include "xgetpw.h"
 
 
 /*****************************************************************************

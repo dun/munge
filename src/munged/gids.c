@@ -48,8 +48,8 @@
 #include "log.h"
 #include "munge_defs.h"
 #include "timer.h"
-#include "xgetgrent.h"
-#include "xgetpwnam.h"
+#include "xgetgr.h"
+#include "xgetpw.h"
 
 
 /*****************************************************************************
