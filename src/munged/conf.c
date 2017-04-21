@@ -70,7 +70,9 @@
 #define OPT_BENCHMARK           264
 #define OPT_MAX_TTL             265
 #define OPT_PID_FILE            266
-#define OPT_LAST                267
+#define OPT_LOG_FILE            267
+#define OPT_SEED_FILE           268
+#define OPT_LAST                269
 
 const char * const short_opts = ":hLVfFMS:";
 
@@ -92,9 +94,11 @@ struct option long_opts[] = {
     { "group-check-mtime", required_argument, NULL, OPT_GROUP_CHECK  },
     { "group-update-time", required_argument, NULL, OPT_GROUP_UPDATE },
     { "key-file",          required_argument, NULL, OPT_KEY_FILE     },
+    { "log-file",          required_argument, NULL, OPT_LOG_FILE     },
     { "max-ttl",           required_argument, NULL, OPT_MAX_TTL      },
     { "num-threads",       required_argument, NULL, OPT_NUM_THREADS  },
     { "pid-file",          required_argument, NULL, OPT_PID_FILE     },
+    { "seed-file",         required_argument, NULL, OPT_SEED_FILE    },
     { "syslog",            no_argument,       NULL, OPT_SYSLOG       },
     {  NULL,               0,                 NULL,  0               }
 };
@@ -353,6 +357,13 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                     log_errno (EMUNGE_NO_MEMORY, LOG_ERR,
                         "Failed to copy key-file name string");
                 break;
+            case OPT_LOG_FILE:
+                if (conf->logfile_name)
+                    free (conf->logfile_name);
+                if (!(conf->logfile_name = strdup (optarg)))
+                    log_errno (EMUNGE_NO_MEMORY, LOG_ERR,
+                        "Failed to copy log-file name string");
+                break;
             case OPT_MAX_TTL:
                 l = strtol (optarg, &p, 10);
                 if (((errno == ERANGE) && ((l == LONG_MIN) || (l == LONG_MAX)))
@@ -380,6 +391,13 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                 if (!(conf->pidfile_name = strdup (optarg)))
                     log_errno (EMUNGE_NO_MEMORY, LOG_ERR,
                         "Failed to copy pid-file name string");
+                break;
+            case OPT_SEED_FILE:
+                if (conf->seed_name)
+                    free (conf->seed_name);
+                if (!(conf->seed_name = strdup (optarg)))
+                    log_errno (EMUNGE_NO_MEMORY, LOG_ERR,
+                        "Failed to copy seed-file name string");
                 break;
             case OPT_SYSLOG:
                 conf->got_syslog = 1;
@@ -494,6 +512,9 @@ display_help (char *prog)
     printf ("  %*s %s [%s]\n", w, "--key-file=PATH",
             "Specify key file", MUNGED_SECRET_KEY);
 
+    printf ("  %*s %s [%s]\n", w, "--log-file=PATH",
+            "Specify log file", MUNGED_LOGFILE);
+
     printf ("  %*s %s [%d]\n", w, "--max-ttl=INT",
             "Specify maximum time-to-live (in seconds)", MUNGE_MAXIMUM_TTL);
 
@@ -502,6 +523,9 @@ display_help (char *prog)
 
     printf ("  %*s %s [%s]\n", w, "--pid-file=PATH",
             "Specify PID file", MUNGED_PIDFILE);
+
+    printf ("  %*s %s [%s]\n", w, "--seed-file=PATH",
+            "Specify PRNG seed file", MUNGED_RANDOM_SEED);
 
     printf ("  %*s %s\n", w, "--syslog",
             "Redirect log messages to syslog");

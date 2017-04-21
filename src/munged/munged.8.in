@@ -119,6 +119,9 @@ triggered by a \fBSIGHUP\fR).  A value of \-1 causes it to be disabled.
 .BI "\-\-key\-file " path
 Specify an alternate pathname to the key file.
 .TP
+.BI "\-\-log\-file " path
+Specify an alternate pathname to the log file.
+.TP
 .BI "\-\-max\-ttl " integer
 Specify the maximum allowable time-to-live value (in seconds) for a credential.
 This setting has an upper-bound imposed by the hard-coded MUNGE_MAXIMUM_TTL
@@ -131,6 +134,9 @@ Specify the number of threads to spawn for processing credential requests.
 .TP
 .BI "\-\-pid\-file " path
 Specify an alternate pathname for storing the Process ID of the daemon.
+.TP
+.BI "\-\-seed\-file " path
+Specify an alternate pathname to the PRNG seed file.
 .TP
 .BI "\-\-syslog"
 Redirect log messages to syslog when the daemon is running in the background.
