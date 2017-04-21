@@ -117,7 +117,7 @@ A value of 0 causes it to be computed initially but never updated (unless
 triggered by a \fBSIGHUP\fR).  A value of \-1 causes it to be disabled.
 .TP
 .BI "\-\-key\-file " path
-Specify an alternate pathname to the secret key file.
+Specify an alternate pathname to the key file.
 .TP
 .BI "\-\-max\-ttl " integer
 Specify the maximum allowable time-to-live value (in seconds) for a credential.

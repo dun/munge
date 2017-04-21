@@ -84,8 +84,6 @@ struct option long_opts[] = {
     { "mlockall",          no_argument,       NULL, 'M'              },
     { "socket",            required_argument, NULL, 'S'              },
     { "advice",            no_argument,       NULL, OPT_ADVICE       },
-    { "key-file",          required_argument, NULL, OPT_KEY_FILE     },
-    { "num-threads",       required_argument, NULL, OPT_NUM_THREADS  },
 #if defined(AUTH_METHOD_RECVFD_MKFIFO) || defined(AUTH_METHOD_RECVFD_MKNOD)
     { "auth-server-dir",   required_argument, NULL, OPT_AUTH_SERVER  },
     { "auth-client-dir",   required_argument, NULL, OPT_AUTH_CLIENT  },
@@ -93,7 +91,9 @@ struct option long_opts[] = {
     { "benchmark",         no_argument,       NULL, OPT_BENCHMARK    },
     { "group-check-mtime", required_argument, NULL, OPT_GROUP_CHECK  },
     { "group-update-time", required_argument, NULL, OPT_GROUP_UPDATE },
+    { "key-file",          required_argument, NULL, OPT_KEY_FILE     },
     { "max-ttl",           required_argument, NULL, OPT_MAX_TTL      },
+    { "num-threads",       required_argument, NULL, OPT_NUM_THREADS  },
     { "pid-file",          required_argument, NULL, OPT_PID_FILE     },
     { "syslog",            no_argument,       NULL, OPT_SYSLOG       },
     {  NULL,               0,                 NULL,  0               }
@@ -306,24 +306,6 @@ parse_cmdline (conf_t conf, int argc, char **argv)
             case OPT_ADVICE:
                 printf ("Don't Panic!\n");
                 exit (42);
-            case OPT_KEY_FILE:
-                if (conf->key_name)
-                    free (conf->key_name);
-                if (!(conf->key_name = strdup (optarg)))
-                    log_errno (EMUNGE_NO_MEMORY, LOG_ERR,
-                        "Failed to copy key-file name string");
-                break;
-            case OPT_NUM_THREADS:
-                errno = 0;
-                l = strtol (optarg, &p, 10);
-                if (((errno == ERANGE) && ((l == LONG_MIN) || (l == LONG_MAX)))
-                        || (optarg == p) || (*p != '\0')
-                        || (l <= 0) || (l > INT_MAX)) {
-                    log_err (EMUNGE_SNAFU, LOG_ERR,
-                        "Invalid value \"%s\" for num-threads", optarg);
-                }
-                conf->nthreads = l;
-                break;
 #if defined(AUTH_METHOD_RECVFD_MKFIFO) || defined(AUTH_METHOD_RECVFD_MKNOD)
             case OPT_AUTH_SERVER:
                 if (conf->auth_server_dir)
@@ -364,6 +346,13 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                 }
                 conf->gids_update_secs = l;
                 break;
+            case OPT_KEY_FILE:
+                if (conf->key_name)
+                    free (conf->key_name);
+                if (!(conf->key_name = strdup (optarg)))
+                    log_errno (EMUNGE_NO_MEMORY, LOG_ERR,
+                        "Failed to copy key-file name string");
+                break;
             case OPT_MAX_TTL:
                 l = strtol (optarg, &p, 10);
                 if (((errno == ERANGE) && ((l == LONG_MIN) || (l == LONG_MAX)))
@@ -374,12 +363,23 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                 }
                 conf->max_ttl = l;
                 break;
+            case OPT_NUM_THREADS:
+                errno = 0;
+                l = strtol (optarg, &p, 10);
+                if (((errno == ERANGE) && ((l == LONG_MIN) || (l == LONG_MAX)))
+                        || (optarg == p) || (*p != '\0')
+                        || (l <= 0) || (l > INT_MAX)) {
+                    log_err (EMUNGE_SNAFU, LOG_ERR,
+                        "Invalid value \"%s\" for num-threads", optarg);
+                }
+                conf->nthreads = l;
+                break;
             case OPT_PID_FILE:
                 if (conf->pidfile_name)
                     free (conf->pidfile_name);
                 if (!(conf->pidfile_name = strdup (optarg)))
                     log_errno (EMUNGE_NO_MEMORY, LOG_ERR,
-                        "Failed to copy pidfile name string");
+                        "Failed to copy pid-file name string");
                 break;
             case OPT_SYSLOG:
                 conf->got_syslog = 1;
@@ -492,7 +492,7 @@ display_help (char *prog)
             MUNGE_GROUP_UPDATE_SECS);
 
     printf ("  %*s %s [%s]\n", w, "--key-file=PATH",
-            "Specify secret key file", MUNGED_SECRET_KEY);
+            "Specify key file", MUNGED_SECRET_KEY);
 
     printf ("  %*s %s [%d]\n", w, "--max-ttl=INT",
             "Specify maximum time-to-live (in seconds)", MUNGE_MAXIMUM_TTL);
