@@ -410,11 +410,11 @@ _gids_hash_create (void)
      *    is used, but allocating it here allows the same buffer to be reused
      *    throughout a given GIDs creation cycle.
      */
-    if (!(grbufp = xgetgrent_buf_create (grbuflen))) {
+    if (!(grbufp = xgetgrbuf_create (grbuflen))) {
         log_msg (LOG_ERR, "Failed to allocate group entry buffer");
         goto err;
     }
-    if (!(pwbufp = xgetpwnam_buf_create (pwbuflen))) {
+    if (!(pwbufp = xgetpwbuf_create (pwbuflen))) {
         log_msg (LOG_ERR, "Failed to allocate password entry buffer");
         goto err;
     }
@@ -457,10 +457,10 @@ restart:
      *    This allows subsequent scans to start with buffers that will
      *    generally not need to be realloc()d.
      */
-    pwbuflen = xgetpwnam_buf_get_len (pwbufp);
-    xgetpwnam_buf_destroy (pwbufp);
-    grbuflen = xgetgrent_buf_get_len (grbufp);
-    xgetgrent_buf_destroy (grbufp);
+    pwbuflen = xgetpwbuf_get_len (pwbufp);
+    xgetpwbuf_destroy (pwbufp);
+    grbuflen = xgetgrbuf_get_len (grbufp);
+    xgetgrbuf_destroy (grbufp);
 
     if (gettimeofday (&t_stop, NULL) < 0) {
         log_msg (LOG_ERR, "Failed to query current time");
@@ -487,10 +487,10 @@ err:
         xgetgrent_fini ();
     }
     if (pwbufp != NULL) {
-        xgetpwnam_buf_destroy (pwbufp);
+        xgetpwbuf_destroy (pwbufp);
     }
     if (grbufp != NULL) {
-        xgetgrent_buf_destroy (grbufp);
+        xgetgrbuf_destroy (grbufp);
     }
     if (uid_hash != NULL) {
         hash_destroy (uid_hash);

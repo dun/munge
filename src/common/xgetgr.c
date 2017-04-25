@@ -98,14 +98,14 @@ static FILE *_gr_fp;
  *  Private Prototypes
  *****************************************************************************/
 
-static size_t _xgetgrent_buf_get_sys_size (void);
+static size_t _xgetgrbuf_get_sys_size (void);
 
-static int _xgetgrent_buf_grow (xgrbuf_p grbufp, size_t minlen);
+static int _xgetgrbuf_grow (xgrbuf_p grbufp, size_t minlen);
 
-static int _xgetgrent_copy (const struct group *src, struct group *dst,
+static int _xgetgrbuf_copy_struct (const struct group *src, struct group *dst,
     xgrbuf_p grbufp) _UNUSED_;
 
-static int _xgetgrent_copy_str (const char *src, char **dstp,
+static int _xgetgrbuf_copy_string (const char *src, char **dstp,
     char **bufp, size_t *buflenp) _UNUSED_;
 
 
@@ -114,7 +114,7 @@ static int _xgetgrent_copy_str (const char *src, char **dstp,
  *****************************************************************************/
 
 xgrbuf_p
-xgetgrent_buf_create (size_t len)
+xgetgrbuf_create (size_t len)
 {
 /*  Allocates a buffer for xgetgrent().  [len] specifies a suggested size
  *    for the buffer; if 0, the system recommended size will be used.
@@ -123,7 +123,7 @@ xgetgrent_buf_create (size_t len)
     xgrbuf_p grbufp;
 
     if (len == 0) {
-        len = _xgetgrent_buf_get_sys_size ();
+        len = _xgetgrbuf_get_sys_size ();
     }
     grbufp = malloc (sizeof (struct xgrbuf_t));
     if (grbufp == NULL) {
@@ -141,7 +141,7 @@ xgetgrent_buf_create (size_t len)
 
 
 void
-xgetgrent_buf_destroy (xgrbuf_p grbufp)
+xgetgrbuf_destroy (xgrbuf_p grbufp)
 {
 /*  Destroys the buffer [grbufp].
  */
@@ -156,7 +156,7 @@ xgetgrent_buf_destroy (xgrbuf_p grbufp)
 
 
 size_t
-xgetgrent_buf_get_len (xgrbuf_p grbufp)
+xgetgrbuf_get_len (xgrbuf_p grbufp)
 {
 /*  Returns the current size of the allocated buffer within [grbufp],
  *    or 0 on error (with errno).
@@ -265,7 +265,7 @@ restart:
         }
     }
     else {
-        rv_copy = _xgetgrent_copy (rv_grp, grp, grbufp);
+        rv_copy = _xgetgrbuf_copy_struct (rv_grp, grp, grbufp);
     }
     if ((rv_mutex = pthread_mutex_unlock (&mutex)) != 0) {
         errno = rv_mutex;
@@ -282,7 +282,7 @@ restart:
     }
     if (got_err) {
         if (errno == ERANGE) {
-            rv = _xgetgrent_buf_grow (grbufp, 0);
+            rv = _xgetgrbuf_grow (grbufp, 0);
 #if ! HAVE_GETGRENT_R_ERANGE_BROKEN
             if (rv == 0) {
                 goto restart;
@@ -310,9 +310,9 @@ xgetgrent_fini (void)
  *****************************************************************************/
 
 static size_t
-_xgetgrent_buf_get_sys_size (void)
+_xgetgrbuf_get_sys_size (void)
 {
-/*  Returns the system recommended size for the xgetgrent() buffer.
+/*  Returns the system recommended size for the xgetgr buffer.
  */
     long   n = -1;
     size_t len;
@@ -329,7 +329,7 @@ _xgetgrent_buf_get_sys_size (void)
 
 
 static int
-_xgetgrent_buf_grow (xgrbuf_p grbufp, size_t minlen)
+_xgetgrbuf_grow (xgrbuf_p grbufp, size_t minlen)
 {
 /*  Grows the buffer [grbufp] to be at least as large as the length [minlen].
  *  Returns 0 on success, or -1 on error (with errno).
@@ -364,9 +364,10 @@ _xgetgrent_buf_grow (xgrbuf_p grbufp, size_t minlen)
 
 
 static int
-_xgetgrent_copy (const struct group *src, struct group *dst, xgrbuf_p grbufp)
+_xgetgrbuf_copy_struct (const struct group *src, struct group *dst,
+                        xgrbuf_p grbufp)
 {
-/*  Copies the group entry [src] into [dst], placing additional strings and
+/*  Copies the struct group [src] into [dst], placing additional strings and
  *    whatnot into the buffer [grbufp].
  *  Returns 0 on success, or -1 on error (with errno).
  */
@@ -402,7 +403,7 @@ _xgetgrent_copy (const struct group *src, struct group *dst, xgrbuf_p grbufp)
     /*  Ensure requisite buffer space.
      */
     if (grbufp->len < num_bytes) {
-        if (_xgetgrent_buf_grow (grbufp, num_bytes) < 0) {
+        if (_xgetgrbuf_grow (grbufp, num_bytes) < 0) {
             return (-1);
         }
     }
@@ -420,16 +421,16 @@ _xgetgrent_copy (const struct group *src, struct group *dst, xgrbuf_p grbufp)
     p += n;
     num_bytes -= n;
 
-    if (_xgetgrent_copy_str
+    if (_xgetgrbuf_copy_string
             (src->gr_name, &(dst->gr_name), &p, &num_bytes) < 0) {
         goto err;
     }
-    if (_xgetgrent_copy_str
+    if (_xgetgrbuf_copy_string
             (src->gr_passwd, &(dst->gr_passwd), &p, &num_bytes) < 0) {
         goto err;
     }
     for (i = 0; i < num_ptrs; i++) {
-        if (_xgetgrent_copy_str
+        if (_xgetgrbuf_copy_string
                 (src->gr_mem [i], &(dst->gr_mem [i]), &p, &num_bytes) < 0) {
             goto err;
         }
@@ -446,8 +447,8 @@ err:
 
 
 static int
-_xgetgrent_copy_str (const char *src, char **dstp,
-                     char **bufp, size_t *buflenp)
+_xgetgrbuf_copy_string (const char *src, char **dstp,
+                        char **bufp, size_t *buflenp)
 {
 /*  Copies the string [src] into the buffer [bufp] of size [buflenp],
  *    setting the pointer [dstp] to the newly-copied string.  The values

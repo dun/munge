@@ -44,11 +44,11 @@ typedef struct xgrbuf_t * xgrbuf_p;
  *  Functions
  *****************************************************************************/
 
-xgrbuf_p xgetgrent_buf_create (size_t len);
+xgrbuf_p xgetgrbuf_create (size_t len);
 
-void xgetgrent_buf_destroy (xgrbuf_p grbufp);
+void xgetgrbuf_destroy (xgrbuf_p grbufp);
 
-size_t xgetgrent_buf_get_len (xgrbuf_p grbufp);
+size_t xgetgrbuf_get_len (xgrbuf_p grbufp);
 
 void xgetgrent_init (void);
 

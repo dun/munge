@@ -91,14 +91,14 @@ struct xpwbuf_t {
  *  Private Prototypes
  *****************************************************************************/
 
-static size_t _xgetpwnam_buf_get_sys_size (void);
+static size_t _xgetpwbuf_get_sys_size (void);
 
-static int _xgetpwnam_buf_grow (xpwbuf_p pwbufp, size_t minlen);
+static int _xgetpwbuf_grow (xpwbuf_p pwbufp, size_t minlen);
 
-static int _xgetpwnam_copy (const struct passwd *src, struct passwd *dst,
-    xpwbuf_p pwbufp) _UNUSED_;
+static int _xgetpwbuf_copy_struct (const struct passwd *src,
+    struct passwd *dst, xpwbuf_p pwbufp) _UNUSED_;
 
-static int _xgetpwnam_copy_str (const char *src, char **dstp,
+static int _xgetpwbuf_copy_string (const char *src, char **dstp,
     char **bufp, size_t *buflenp) _UNUSED_;
 
 
@@ -107,7 +107,7 @@ static int _xgetpwnam_copy_str (const char *src, char **dstp,
  *****************************************************************************/
 
 xpwbuf_p
-xgetpwnam_buf_create (size_t len)
+xgetpwbuf_create (size_t len)
 {
 /*  Allocates a buffer for xgetpwnam().  [len] specifies a suggested size
  *    for the buffer; if 0, the system recommended size will be used.
@@ -116,7 +116,7 @@ xgetpwnam_buf_create (size_t len)
     xpwbuf_p pwbufp;
 
     if (len == 0) {
-        len = _xgetpwnam_buf_get_sys_size ();
+        len = _xgetpwbuf_get_sys_size ();
     }
     pwbufp = malloc (sizeof (struct xpwbuf_t));
     if (pwbufp == NULL) {
@@ -134,7 +134,7 @@ xgetpwnam_buf_create (size_t len)
 
 
 void
-xgetpwnam_buf_destroy (xpwbuf_p pwbufp)
+xgetpwbuf_destroy (xpwbuf_p pwbufp)
 {
 /*  Destroys the buffer [pwbufp].
  */
@@ -149,7 +149,7 @@ xgetpwnam_buf_destroy (xpwbuf_p pwbufp)
 
 
 size_t
-xgetpwnam_buf_get_len (xpwbuf_p pwbufp)
+xgetpwbuf_get_len (xpwbuf_p pwbufp)
 {
 /*  Returns the current size of the allocated buffer within [pwbufp],
  *    or 0 on error (with errno).
@@ -294,7 +294,7 @@ restart:
         }
     }
     else {
-        rv_copy = _xgetpwnam_copy (rv_pwp, pwp, pwbufp);
+        rv_copy = _xgetpwbuf_copy_struct (rv_pwp, pwp, pwbufp);
     }
 #ifdef WITH_PTHREADS
     if ((rv_mutex = pthread_mutex_unlock (&mutex)) != 0) {
@@ -316,7 +316,7 @@ restart:
             goto restart;
         }
         if (errno == ERANGE) {
-            rv = _xgetpwnam_buf_grow (pwbufp, 0);
+            rv = _xgetpwbuf_grow (pwbufp, 0);
             if (rv == 0) {
                 goto restart;
             }
@@ -335,9 +335,9 @@ restart:
  *****************************************************************************/
 
 static size_t
-_xgetpwnam_buf_get_sys_size (void)
+_xgetpwbuf_get_sys_size (void)
 {
-/*  Returns the system recommended size for the xgetpwnam() buffer.
+/*  Returns the system recommended size for the xgetpw buffer.
  */
     long   n = -1;
     size_t len;
@@ -354,7 +354,7 @@ _xgetpwnam_buf_get_sys_size (void)
 
 
 static int
-_xgetpwnam_buf_grow (xpwbuf_p pwbufp, size_t minlen)
+_xgetpwbuf_grow (xpwbuf_p pwbufp, size_t minlen)
 {
 /*  Grows the buffer [pwbufp] to be at least as large as the length [minlen].
  *  Returns 0 on success, or -1 on error (with errno).
@@ -389,9 +389,10 @@ _xgetpwnam_buf_grow (xpwbuf_p pwbufp, size_t minlen)
 
 
 static int
-_xgetpwnam_copy (const struct passwd *src, struct passwd *dst, xpwbuf_p pwbufp)
+_xgetpwbuf_copy_struct (const struct passwd *src, struct passwd *dst,
+                        xpwbuf_p pwbufp)
 {
-/*  Copies the passwd entry [src] into [dst], placing additional strings
+/*  Copies the struct passwd [src] into [dst], placing additional strings
  *    and whatnot into buffer [pwbuf].
  *  Returns 0 on success, or -1 on error (with errno).
  */
@@ -425,7 +426,7 @@ _xgetpwnam_copy (const struct passwd *src, struct passwd *dst, xpwbuf_p pwbufp)
     /*  Ensure requisite buffer space.
      */
     if (pwbufp->len < num_bytes) {
-        if (_xgetpwnam_buf_grow (pwbufp, num_bytes) < 0) {
+        if (_xgetpwbuf_grow (pwbufp, num_bytes) < 0) {
             return (-1);
         }
     }
@@ -435,23 +436,23 @@ _xgetpwnam_copy (const struct passwd *src, struct passwd *dst, xpwbuf_p pwbufp)
     memset (dst, 0, sizeof (*dst));
     p = pwbufp->buf;
 
-    if (_xgetpwnam_copy_str
+    if (_xgetpwbuf_copy_string
             (src->pw_name, &(dst->pw_name), &p, &num_bytes) < 0) {
         goto err;
     }
-    if (_xgetpwnam_copy_str
+    if (_xgetpwbuf_copy_string
             (src->pw_passwd, &(dst->pw_passwd), &p, &num_bytes) < 0) {
         goto err;
     }
-    if (_xgetpwnam_copy_str
+    if (_xgetpwbuf_copy_string
             (src->pw_gecos, &(dst->pw_gecos), &p, &num_bytes) < 0) {
         goto err;
     }
-    if (_xgetpwnam_copy_str
+    if (_xgetpwbuf_copy_string
             (src->pw_dir, &(dst->pw_dir), &p, &num_bytes) < 0) {
         goto err;
     }
-    if (_xgetpwnam_copy_str
+    if (_xgetpwbuf_copy_string
             (src->pw_shell, &(dst->pw_shell), &p, &num_bytes) < 0) {
         goto err;
     }
@@ -468,8 +469,8 @@ err:
 
 
 static int
-_xgetpwnam_copy_str (const char *src, char **dstp,
-                     char **bufp, size_t *buflenp)
+_xgetpwbuf_copy_string (const char *src, char **dstp,
+                        char **bufp, size_t *buflenp)
 {
 /*  Copies the string [src] into the buffer [bufp] of size [buflenp],
  *    setting the pointer [dstp] to the newly-copied string.  The values

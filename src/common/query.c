@@ -56,7 +56,7 @@ query_uid (const char *user, uid_t *uid_ptr)
         errno = EINVAL;
         return (-1);
     }
-    pwbufp = xgetpwnam_buf_create (0);
+    pwbufp = xgetpwbuf_create (0);
     if (pwbufp == NULL) {
         return (-1);
     }
@@ -84,7 +84,7 @@ query_uid (const char *user, uid_t *uid_ptr)
     if ((uid_ptr != NULL) && (rv == 0)) {
         *uid_ptr = uid;
     }
-    xgetpwnam_buf_destroy (pwbufp);
+    xgetpwbuf_destroy (pwbufp);
     return (rv);
 }
 
