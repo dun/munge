@@ -238,6 +238,7 @@ restart:
     got_err = 0;
 
 #if   HAVE_GETGRENT_R_GNU
+    rv_grp = NULL;
     rv = getgrent_r (grp, grbufp->buf, grbufp->len, &rv_grp);
     if (((rv == ENOENT) || (rv == 0)) && (rv_grp == NULL)) {
         got_eof = 1;

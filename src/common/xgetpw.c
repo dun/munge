@@ -205,6 +205,7 @@ restart:
     got_none = 0;
 
 #if   HAVE_GETPWNAM_R_POSIX
+    rv_pwp = NULL;
     rv = getpwnam_r (name, pwp, pwbufp->buf, pwbufp->len, &rv_pwp);
     /*
      *  POSIX.1-2001 does not call "name not found" an error, so the return
