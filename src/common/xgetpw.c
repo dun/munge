@@ -163,13 +163,13 @@ xgetpwbuf_get_len (xpwbuf_p pwbufp)
 
 
 int
-xgetpwnam (const char *user, struct passwd *pwp, xpwbuf_p pwbufp)
+xgetpwnam (const char *name, struct passwd *pwp, xpwbuf_p pwbufp)
 {
 /*  Portable encapsulation of getpwnam_r().
- *  Queries the password database for [user], storing the struct passwd result
+ *  Queries the password database for [name], storing the struct passwd result
  *    in [pwp] and additional strings in the buffer [pwbufp].
  *  Returns 0 on success, or -1 on error (with errno).
- *    Returns -1 with ENOENT when [user] is not found.
+ *    Returns -1 with ENOENT when [name] is not found.
  */
 #if   HAVE_GETPWNAM_R_POSIX
     struct passwd          *rv_pwp;
@@ -188,8 +188,8 @@ xgetpwnam (const char *user, struct passwd *pwp, xpwbuf_p pwbufp)
     int                     got_err;
     int                     got_none;
 
-    if ((user == NULL)    ||
-        (user[0] == '\0') ||
+    if ((name == NULL)    ||
+        (name[0] == '\0') ||
         (pwp == NULL)     ||
         (pwbufp == NULL))
     {
@@ -205,9 +205,9 @@ restart:
     got_none = 0;
 
 #if   HAVE_GETPWNAM_R_POSIX
-    rv = getpwnam_r (user, pwp, pwbufp->buf, pwbufp->len, &rv_pwp);
+    rv = getpwnam_r (name, pwp, pwbufp->buf, pwbufp->len, &rv_pwp);
     /*
-     *  POSIX.1-2001 does not call "user not found" an error, so the return
+     *  POSIX.1-2001 does not call "name not found" an error, so the return
      *    value of getpwnam_r() is of limited value.  When errors do occur,
      *    some systems return them via the retval, some via errno, and some
      *    return no indication whatsoever.
@@ -219,7 +219,7 @@ restart:
         if ((rv < 0) && (errno != 0)) {
             rv = errno;
         }
-        /*  Likely that the user was not found.
+        /*  Likely that the name was not found.
          */
         if ((rv == 0)      ||
             (rv == ENOENT) ||
@@ -239,14 +239,14 @@ restart:
             got_err = 1;
             errno = rv;
         }
-        /*  Unable to distinguish "user not found" from error.
+        /*  Unable to distinguish "name not found" from error.
          */
         else {
             got_none = 1;
         }
     }
 #elif HAVE_GETPWNAM_R_AIX
-    rv = getpwnam_r (user, pwp, pwbufp->buf, pwbufp->len);
+    rv = getpwnam_r (name, pwp, pwbufp->buf, pwbufp->len);
     if (rv != 0) {
         if (errno == ESRCH) {
             got_none = 1;
@@ -256,7 +256,7 @@ restart:
         }
     }
 #elif HAVE_GETPWNAM_R_SUN
-    rv_pwp = getpwnam_r (user, pwp, pwbufp->buf, pwbufp->len);
+    rv_pwp = getpwnam_r (name, pwp, pwbufp->buf, pwbufp->len);
     if (rv_pwp == NULL) {
         if (errno == 0) {
             got_none = 1;
@@ -272,10 +272,10 @@ restart:
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to lock xgetpwnam mutex");
     }
 #endif /* WITH_PTHREADS */
-    rv_pwp = getpwnam (user);
+    rv_pwp = getpwnam (name);
     /*
      *  The initial test for (errno != 0), while redundant, allows for the
-     *    "user not found" case to short-circuit the rest of the if-condition
+     *    "name not found" case to short-circuit the rest of the if-condition
      *    on many systems.
      */
     if (rv_pwp == NULL) {

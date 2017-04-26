@@ -50,7 +50,7 @@ void xgetpwbuf_destroy (xpwbuf_p pwbufp);
 
 size_t xgetpwbuf_get_len (xpwbuf_p pwbufp);
 
-int xgetpwnam (const char *user, struct passwd *pwp, xpwbuf_p pwbufp);
+int xgetpwnam (const char *name, struct passwd *pwp, xpwbuf_p pwbufp);
 
 
 #endif /* !XGETPW_H */
