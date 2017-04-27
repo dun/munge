@@ -54,6 +54,8 @@ munge_SOURCES = \
 	read.h \
 	$(top_srcdir)/src/common/query.c \
 	$(top_srcdir)/src/common/query.h \
+	$(top_srcdir)/src/common/xgetgr.c \
+	$(top_srcdir)/src/common/xgetgr.h \
 	$(top_srcdir)/src/common/xgetpw.c \
 	$(top_srcdir)/src/common/xgetpw.h
 
@@ -85,6 +87,8 @@ remunge_SOURCES = \
 	remunge.c \
 	$(top_srcdir)/src/common/query.c \
 	$(top_srcdir)/src/common/query.h \
+	$(top_srcdir)/src/common/xgetgr.c \
+	$(top_srcdir)/src/common/xgetgr.h \
 	$(top_srcdir)/src/common/xgetpw.c \
 	$(top_srcdir)/src/common/xgetpw.h
 

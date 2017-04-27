@@ -102,6 +102,7 @@ am__aclocal_m4_deps = $(top_srcdir)/config/libtool.m4 \
 	$(top_srcdir)/config/x_ac_debug.m4 \
 	$(top_srcdir)/config/x_ac_expand_install_dirs.m4 \
 	$(top_srcdir)/config/x_ac_getgrent.m4 \
+	$(top_srcdir)/config/x_ac_getgrnam.m4 \
 	$(top_srcdir)/config/x_ac_getpwnam.m4 \
 	$(top_srcdir)/config/x_ac_humor.m4 \
 	$(top_srcdir)/config/x_ac_meta.m4 \
@@ -118,7 +119,8 @@ CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)" "$(DESTDIR)$(man1dir)"
 PROGRAMS = $(bin_PROGRAMS)
 am_munge_OBJECTS = munge-munge.$(OBJEXT) munge-read.$(OBJEXT) \
-	munge-query.$(OBJEXT) munge-xgetpw.$(OBJEXT)
+	munge-query.$(OBJEXT) munge-xgetgr.$(OBJEXT) \
+	munge-xgetpw.$(OBJEXT)
 munge_OBJECTS = $(am_munge_OBJECTS)
 munge_DEPENDENCIES = $(top_builddir)/src/libcommon/libcommon.la \
 	$(top_builddir)/src/libmissing/libmissing.la \
@@ -128,7 +130,7 @@ am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
 am__v_lt_0 = --silent
 am__v_lt_1 = 
 am_remunge_OBJECTS = remunge-remunge.$(OBJEXT) remunge-query.$(OBJEXT) \
-	remunge-xgetpw.$(OBJEXT)
+	remunge-xgetgr.$(OBJEXT) remunge-xgetpw.$(OBJEXT)
 remunge_OBJECTS = $(am_remunge_OBJECTS)
 am__DEPENDENCIES_1 =
 remunge_DEPENDENCIES = $(top_builddir)/src/libcommon/libcommon.la \
@@ -431,6 +433,8 @@ munge_SOURCES = \
 	read.h \
 	$(top_srcdir)/src/common/query.c \
 	$(top_srcdir)/src/common/query.h \
+	$(top_srcdir)/src/common/xgetgr.c \
+	$(top_srcdir)/src/common/xgetgr.h \
 	$(top_srcdir)/src/common/xgetpw.c \
 	$(top_srcdir)/src/common/xgetpw.h
 
@@ -462,6 +466,8 @@ remunge_SOURCES = \
 	remunge.c \
 	$(top_srcdir)/src/common/query.c \
 	$(top_srcdir)/src/common/query.h \
+	$(top_srcdir)/src/common/xgetgr.c \
+	$(top_srcdir)/src/common/xgetgr.h \
 	$(top_srcdir)/src/common/xgetpw.c \
 	$(top_srcdir)/src/common/xgetpw.h
 
@@ -582,9 +588,11 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/munge-munge.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/munge-query.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/munge-read.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/munge-xgetgr.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/munge-xgetpw.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/remunge-query.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/remunge-remunge.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/remunge-xgetgr.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/remunge-xgetpw.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/unmunge-read.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/unmunge-unmunge.Po@am__quote@
@@ -652,6 +660,20 @@ munge-query.obj: $(top_srcdir)/src/common/query.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(munge_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o munge-query.obj `if test -f '$(top_srcdir)/src/common/query.c'; then $(CYGPATH_W) '$(top_srcdir)/src/common/query.c'; else $(CYGPATH_W) '$(srcdir)/$(top_srcdir)/src/common/query.c'; fi`
 
+munge-xgetgr.o: $(top_srcdir)/src/common/xgetgr.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(munge_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT munge-xgetgr.o -MD -MP -MF $(DEPDIR)/munge-xgetgr.Tpo -c -o munge-xgetgr.o `test -f '$(top_srcdir)/src/common/xgetgr.c' || echo '$(srcdir)/'`$(top_srcdir)/src/common/xgetgr.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/munge-xgetgr.Tpo $(DEPDIR)/munge-xgetgr.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='$(top_srcdir)/src/common/xgetgr.c' object='munge-xgetgr.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(munge_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o munge-xgetgr.o `test -f '$(top_srcdir)/src/common/xgetgr.c' || echo '$(srcdir)/'`$(top_srcdir)/src/common/xgetgr.c
+
+munge-xgetgr.obj: $(top_srcdir)/src/common/xgetgr.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(munge_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT munge-xgetgr.obj -MD -MP -MF $(DEPDIR)/munge-xgetgr.Tpo -c -o munge-xgetgr.obj `if test -f '$(top_srcdir)/src/common/xgetgr.c'; then $(CYGPATH_W) '$(top_srcdir)/src/common/xgetgr.c'; else $(CYGPATH_W) '$(srcdir)/$(top_srcdir)/src/common/xgetgr.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/munge-xgetgr.Tpo $(DEPDIR)/munge-xgetgr.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='$(top_srcdir)/src/common/xgetgr.c' object='munge-xgetgr.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(munge_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o munge-xgetgr.obj `if test -f '$(top_srcdir)/src/common/xgetgr.c'; then $(CYGPATH_W) '$(top_srcdir)/src/common/xgetgr.c'; else $(CYGPATH_W) '$(srcdir)/$(top_srcdir)/src/common/xgetgr.c'; fi`
+
 munge-xgetpw.o: $(top_srcdir)/src/common/xgetpw.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(munge_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT munge-xgetpw.o -MD -MP -MF $(DEPDIR)/munge-xgetpw.Tpo -c -o munge-xgetpw.o `test -f '$(top_srcdir)/src/common/xgetpw.c' || echo '$(srcdir)/'`$(top_srcdir)/src/common/xgetpw.c
 @am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/munge-xgetpw.Tpo $(DEPDIR)/munge-xgetpw.Po
@@ -693,6 +715,20 @@ remunge-query.obj: $(top_srcdir)/src/common/query.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='$(top_srcdir)/src/common/query.c' object='remunge-query.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(remunge_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o remunge-query.obj `if test -f '$(top_srcdir)/src/common/query.c'; then $(CYGPATH_W) '$(top_srcdir)/src/common/query.c'; else $(CYGPATH_W) '$(srcdir)/$(top_srcdir)/src/common/query.c'; fi`
+
+remunge-xgetgr.o: $(top_srcdir)/src/common/xgetgr.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(remunge_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT remunge-xgetgr.o -MD -MP -MF $(DEPDIR)/remunge-xgetgr.Tpo -c -o remunge-xgetgr.o `test -f '$(top_srcdir)/src/common/xgetgr.c' || echo '$(srcdir)/'`$(top_srcdir)/src/common/xgetgr.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/remunge-xgetgr.Tpo $(DEPDIR)/remunge-xgetgr.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='$(top_srcdir)/src/common/xgetgr.c' object='remunge-xgetgr.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(remunge_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o remunge-xgetgr.o `test -f '$(top_srcdir)/src/common/xgetgr.c' || echo '$(srcdir)/'`$(top_srcdir)/src/common/xgetgr.c
+
+remunge-xgetgr.obj: $(top_srcdir)/src/common/xgetgr.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(remunge_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT remunge-xgetgr.obj -MD -MP -MF $(DEPDIR)/remunge-xgetgr.Tpo -c -o remunge-xgetgr.obj `if test -f '$(top_srcdir)/src/common/xgetgr.c'; then $(CYGPATH_W) '$(top_srcdir)/src/common/xgetgr.c'; else $(CYGPATH_W) '$(srcdir)/$(top_srcdir)/src/common/xgetgr.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/remunge-xgetgr.Tpo $(DEPDIR)/remunge-xgetgr.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='$(top_srcdir)/src/common/xgetgr.c' object='remunge-xgetgr.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(remunge_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o remunge-xgetgr.obj `if test -f '$(top_srcdir)/src/common/xgetgr.c'; then $(CYGPATH_W) '$(top_srcdir)/src/common/xgetgr.c'; else $(CYGPATH_W) '$(srcdir)/$(top_srcdir)/src/common/xgetgr.c'; fi`
 
 remunge-xgetpw.o: $(top_srcdir)/src/common/xgetpw.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(remunge_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT remunge-xgetpw.o -MD -MP -MF $(DEPDIR)/remunge-xgetpw.Tpo -c -o remunge-xgetpw.o `test -f '$(top_srcdir)/src/common/xgetpw.c' || echo '$(srcdir)/'`$(top_srcdir)/src/common/xgetpw.c

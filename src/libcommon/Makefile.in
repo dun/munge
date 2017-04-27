@@ -100,6 +100,7 @@ am__aclocal_m4_deps = $(top_srcdir)/config/libtool.m4 \
 	$(top_srcdir)/config/x_ac_debug.m4 \
 	$(top_srcdir)/config/x_ac_expand_install_dirs.m4 \
 	$(top_srcdir)/config/x_ac_getgrent.m4 \
+	$(top_srcdir)/config/x_ac_getgrnam.m4 \
 	$(top_srcdir)/config/x_ac_getpwnam.m4 \
 	$(top_srcdir)/config/x_ac_humor.m4 \
 	$(top_srcdir)/config/x_ac_meta.m4 \

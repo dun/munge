@@ -14336,6 +14336,112 @@ fi
 
 
 
+  for ac_func in getgrnam
+do :
+  ac_fn_c_check_func "$LINENO" "getgrnam" "ac_cv_func_getgrnam"
+if test "x$ac_cv_func_getgrnam" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_GETGRNAM 1
+_ACEOF
+
+fi
+done
+
+
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for getgrnam_r (POSIX)" >&5
+$as_echo_n "checking for getgrnam_r (POSIX)... " >&6; }
+if ${x_ac_cv_have_getgrnam_r_posix+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+
+    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+
+#define _POSIX_PTHREAD_SEMANTICS 1      /* for SunOS */
+#include <grp.h>
+
+int
+main ()
+{
+
+int rv;
+char *name;
+struct group gr, *gr_ptr;
+char gr_buf [1024];
+rv = getgrnam_r (name, &gr, gr_buf, sizeof (gr_buf), &gr_ptr);
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  x_ac_cv_have_getgrnam_r_posix=yes
+else
+  x_ac_cv_have_getgrnam_r_posix=no
+
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $x_ac_cv_have_getgrnam_r_posix" >&5
+$as_echo "$x_ac_cv_have_getgrnam_r_posix" >&6; }
+  if test $x_ac_cv_have_getgrnam_r_posix = yes; then :
+
+$as_echo "#define HAVE_GETGRNAM_R_POSIX 1" >>confdefs.h
+
+
+fi
+
+
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for getgrnam_r (SunOS)" >&5
+$as_echo_n "checking for getgrnam_r (SunOS)... " >&6; }
+if ${x_ac_cv_have_getgrnam_r_sun+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+
+    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+
+#undef _POSIX_PTHREAD_SEMANTICS         /* for overriding POSIX getgrnam_r */
+#include <grp.h>
+
+int
+main ()
+{
+
+char *name;
+struct group gr, *gr_ptr;
+char gr_buf [1024];
+gr_ptr = getgrnam_r (name, &gr, gr_buf, sizeof (gr_buf));
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  x_ac_cv_have_getgrnam_r_sun=yes
+else
+  x_ac_cv_have_getgrnam_r_sun=no
+
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $x_ac_cv_have_getgrnam_r_sun" >&5
+$as_echo "$x_ac_cv_have_getgrnam_r_sun" >&6; }
+  if test $x_ac_cv_have_getgrnam_r_sun = yes; then :
+
+$as_echo "#define HAVE_GETGRNAM_R_SUN 1" >>confdefs.h
+
+
+fi
+
+
+
   for ac_func in getpwnam
 do :
   ac_fn_c_check_func "$LINENO" "getpwnam" "ac_cv_func_getpwnam"

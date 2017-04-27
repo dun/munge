@@ -56,5 +56,7 @@ int xgetgrent (struct group *grp, xgrbuf_p grbufp);
 
 void xgetgrent_fini (void);
 
+int xgetgrnam (const char *name, struct group *grp, xgrbuf_p grbufp);
+
 
 #endif /* !XGETGR_H */

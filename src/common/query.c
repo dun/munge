@@ -39,6 +39,7 @@
 #include <sys/types.h>
 #include "common.h"
 #include "query.h"
+#include "xgetgr.h"
 #include "xgetpw.h"
 
 
@@ -92,35 +93,45 @@ query_uid (const char *user, uid_t *uid_ptr)
 int
 query_gid (const char *group, gid_t *gid_ptr)
 {
-    struct group  *gr_ptr;
+    xgrbuf_p       grbufp;
+    struct group   gr;
     gid_t          gid;
     long int       l;
     char          *end_ptr;
+    int            rv;
 
     if (group == NULL) {
         errno = EINVAL;
         return (-1);
     }
-    gr_ptr = getgrnam (group);
-    if (gr_ptr != NULL) {
-        gid = gr_ptr->gr_gid;
+    grbufp = xgetgrbuf_create (0);
+    if (grbufp == NULL) {
+        return (-1);
+    }
+    if (xgetgrnam (group, &gr, grbufp) == 0) {
+        gid = gr.gr_gid;
+        rv = 0;
     }
     else {
         errno = 0;
         l = strtol (group, &end_ptr, 10);
         if ((errno == ERANGE) && ((l == LONG_MIN) || (l == LONG_MAX))) {
-            return (-1);
+            rv = -1;
         }
-        if ((group == end_ptr) || (*end_ptr != '\0')) {
-            return (-1);
+        else if ((group == end_ptr) || (*end_ptr != '\0')) {
+            rv = -1;
         }
-        if ((l < 0) || ((unsigned int) l > GID_MAXIMUM)) {
-            return (-1);
+        else if ((l < 0) || ((unsigned int) l > GID_MAXIMUM)) {
+            rv = -1;
         }
-        gid = (gid_t) l;
+        else {
+            gid = (gid_t) l;
+            rv = 0;
+        }
     }
-    if (gid_ptr != NULL) {
+    if ((gid_ptr != NULL) && (rv == 0)) {
         *gid_ptr = gid;
     }
-    return (0);
+    xgetgrbuf_destroy (grbufp);
+    return (rv);
 }

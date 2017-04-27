@@ -66,6 +66,15 @@
 /* Define to 1 if you have the `getgrent_r' function from SunOS. */
 #undef HAVE_GETGRENT_R_SUN
 
+/* Define to 1 if you have the `getgrnam' function. */
+#undef HAVE_GETGRNAM
+
+/* Define to 1 if you have the `getgrnam_r' function from POSIX. */
+#undef HAVE_GETGRNAM_R_POSIX
+
+/* Define to 1 if you have the `getgrnam_r' function from SunOS. */
+#undef HAVE_GETGRNAM_R_SUN
+
 /* Define to 1 if you have the `getpeereid' function. */
 #undef HAVE_GETPEEREID
 
