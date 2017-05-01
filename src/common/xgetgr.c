@@ -39,7 +39,9 @@
 #elif HAVE_GETGRENT_R_SUN
 #define HAVE_GETGRENT_R_ERANGE_BROKEN 1
 #elif HAVE_GETGRENT
+#ifdef WITH_PTHREADS
 #include <pthread.h>
+#endif /* WITH_PTHREADS */
 #else
 #error "getgrent() not supported"
 #endif
@@ -201,11 +203,13 @@ xgetgrent (struct group *grp, xgrbuf_p grbufp)
 #elif HAVE_GETGRENT_R_SUN
     struct group           *rv_grp;
 #elif HAVE_GETGRENT
+#ifdef WITH_PTHREADS
     static pthread_mutex_t  mutex = PTHREAD_MUTEX_INITIALIZER;
     int                     rv_mutex;
+#endif /* WITH_PTHREADS */
     int                     rv_copy;
     struct group           *rv_grp;
-#endif
+#endif /* HAVE_GETGRENT */
     int                     got_eof;
     int                     got_err;
 
@@ -251,10 +255,12 @@ restart:
         }
     }
 #elif HAVE_GETGRENT
+#ifdef WITH_PTHREADS
     if ((rv_mutex = pthread_mutex_lock (&mutex)) != 0) {
         errno = rv_mutex;
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to lock xgetgrent mutex");
     }
+#endif /* WITH_PTHREADS */
     rv_grp = getgrent ();
     if (rv_grp == NULL) {
         if ((errno == 0) || (errno == ENOENT)) {
@@ -267,14 +273,16 @@ restart:
     else {
         rv_copy = _xgetgrbuf_copy_struct (rv_grp, grp, grbufp);
     }
+#ifdef WITH_PTHREADS
     if ((rv_mutex = pthread_mutex_unlock (&mutex)) != 0) {
         errno = rv_mutex;
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to unlock xgetgrent mutex");
     }
+#endif /* WITH_PTHREADS */
     if (rv_copy < 0) {
         return (-1);
     }
-#endif
+#endif /* HAVE_GETGRENT */
 
     if (got_eof) {
         errno = ENOENT;
