@@ -3,6 +3,9 @@
 #endif /* HAVE_CONFIG_H */
 
 #if !HAVE_STRLCAT
+
+#define strlcat libmissing_strlcat
+
 size_t strlcat(char *dst, const char *src, size_t siz);
 /*
  *  Appends src to string dst of size siz (unlike strncat, siz is the

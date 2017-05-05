@@ -41,6 +41,9 @@
 #  include <arpa/inet.h>
 #else  /* !HAVE_INET_NTOP */
 #  include <sys/socket.h>
+
+#define inet_ntop libmissing_inet_ntop
+
 const char *inet_ntop (int af, const void *src, char *dst, socklen_t cnt);
 #endif /* !HAVE_INET_NTOP */
 
