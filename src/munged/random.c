@@ -468,6 +468,8 @@ _random_pseudo_bytes (unsigned char *buf, int n)
 #if HAVE_OPENSSL
 
 #include <assert.h>
+#include <openssl/err.h>
+#include <openssl/opensslv.h>
 #include <openssl/rand.h>
 
 int
@@ -503,7 +505,10 @@ _random_write_seed (const char *filename, int num_bytes)
 void
 _random_cleanup (void)
 {
+#if HAVE_RAND_CLEANUP
+    /*  OpenSSL < 1.1.0  */
     RAND_cleanup ();
+#endif /* HAVE_RAND_CLEANUP */
     return;
 }
 
@@ -530,10 +535,12 @@ _random_bytes (unsigned char *buf, int n)
     rc = RAND_bytes (buf, n);
     if (rc == -1) {
         log_msg (LOG_ERR,
-            "RAND_bytes not supported by OpenSSL RAND method");
+            "RAND_bytes failed: not supported by OpenSSL RAND method");
     }
     else if (rc == 0) {
-        openssl_log_msg (LOG_WARNING);
+        unsigned long e = ERR_get_error ();
+        log_msg (LOG_WARNING,
+            "RAND_bytes failed: %s", ERR_reason_error_string (e));
     }
     return;
 }
@@ -547,14 +554,31 @@ _random_pseudo_bytes (unsigned char *buf, int n)
     assert (buf != NULL);
     assert (n > 0);
 
+    /*  RAND_pseudo_bytes() was deprecated in OpenSSL 1.1.0.  Unfortunately,
+     *    AC_CHECK_FUNCS(RAND_pseudo_bytes) still sets HAVE_RAND_PSEUDO_BYTES
+     *    since the function exists (albeit with the "deprecated" attribute).
+     *    This results in a deprecated-declarations warning when compiling
+     *    against OpenSSL >1.1.0.  And that warning will break the build if
+     *    "-Werror" is specified (as is the case for the Travis CI build).
+     *  The check for OPENSSL_VERSION_NUMBER from <openssl/opensslv.h>
+     *    handles this case.
+     */
+#if HAVE_RAND_PSEUDO_BYTES && (OPENSSL_VERSION_NUMBER < 0x10100000L)
+    /*  OpenSSL >= 0.9.5, < 1.1.0  */
     rc = RAND_pseudo_bytes (buf, n);
     if (rc == -1) {
         log_msg (LOG_ERR,
-            "RAND_pseudo_bytes not supported by OpenSSL RAND method");
+            "RAND_pseudo_bytes failed: not supported by OpenSSL RAND method");
     }
     else if (rc == 0) {
-        openssl_log_msg (LOG_WARNING);
+        unsigned long e = ERR_get_error ();
+        log_msg (LOG_WARNING,
+            "RAND_pseudo_bytes failed: %s", ERR_reason_error_string (e));
     }
+#else  /* !HAVE_RAND_PSEUDO_BYTES */
+    _random_bytes (buf, n);
+    (void) rc;                          /* suppress unused-variable warning */
+#endif /* !HAVE_RAND_PSEUDO_BYTES */
     return;
 }
 

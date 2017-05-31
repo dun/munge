@@ -60,17 +60,4 @@ int crypto_memcmp (const void *s1, const void *s2, size_t n);
  */
 
 
-#if HAVE_OPENSSL
-
-#include "log.h"
-
-void openssl_log_msg (int priority);
-/*
- *  Logs all OpenSSL errors in this thread's error queue (should any exist)
- *    at the specified [priority] level.
- */
-
-#endif /* HAVE_OPENSSL */
-
-
 #endif /* !CRYPTO_H */

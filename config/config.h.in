@@ -27,11 +27,26 @@
 /* Define to 1 if the system has the type `CRYPTO_dynlock'. */
 #undef HAVE_CRYPTO_DYNLOCK
 
+/* Define to 1 if you have the `CRYPTO_num_locks' function. */
+#undef HAVE_CRYPTO_NUM_LOCKS
+
+/* Define to 1 if you have the `CRYPTO_set_id_callback' function. */
+#undef HAVE_CRYPTO_SET_ID_CALLBACK
+
+/* Define to 1 if you have the `CRYPTO_set_locking_callback' function. */
+#undef HAVE_CRYPTO_SET_LOCKING_CALLBACK
+
+/* Define to 1 if you have the `CRYPTO_THREADID_set_callback' function. */
+#undef HAVE_CRYPTO_THREADID_SET_CALLBACK
+
 /* Define to 1 if you have the <dlfcn.h> header file. */
 #undef HAVE_DLFCN_H
 
-/* Define to 1 if you have the `ERR_error_string_n' function. */
-#undef HAVE_ERR_ERROR_STRING_N
+/* Define to 1 if you have the `ERR_free_strings' function. */
+#undef HAVE_ERR_FREE_STRINGS
+
+/* Define to 1 if you have the `ERR_load_crypto_strings' function. */
+#undef HAVE_ERR_LOAD_CRYPTO_STRINGS
 
 /* Define to 1 if you have the `EVP_aes_128_cbc' function. */
 #undef HAVE_EVP_AES_128_CBC
@@ -39,11 +54,83 @@
 /* Define to 1 if you have the `EVP_aes_256_cbc' function. */
 #undef HAVE_EVP_AES_256_CBC
 
+/* Define to 1 if you have the `EVP_CipherFinal' function. */
+#undef HAVE_EVP_CIPHERFINAL
+
+/* Define to 1 if you have the `EVP_CipherFinal_ex' function. */
+#undef HAVE_EVP_CIPHERFINAL_EX
+
+/* Define to 1 if you have the `EVP_CipherInit' function. */
+#undef HAVE_EVP_CIPHERINIT
+
 /* Define to 1 if you have the `EVP_CipherInit_ex' function. */
 #undef HAVE_EVP_CIPHERINIT_EX
 
+/* Define to 1 if the `EVP_CipherInit' function returns int. */
+#undef HAVE_EVP_CIPHERINIT_RETURN_INT
+
+/* Define to 1 if you have the `EVP_CipherUpdate' function. */
+#undef HAVE_EVP_CIPHERUPDATE
+
+/* Define to 1 if the `EVP_CipherUpdate' function returns int. */
+#undef HAVE_EVP_CIPHERUPDATE_RETURN_INT
+
+/* Define to 1 if you have the `EVP_CIPHER_CTX_cleanup' function. */
+#undef HAVE_EVP_CIPHER_CTX_CLEANUP
+
+/* Define to 1 if the `EVP_CIPHER_CTX_cleanup' function returns int. */
+#undef HAVE_EVP_CIPHER_CTX_CLEANUP_RETURN_INT
+
+/* Define to 1 if you have the `EVP_CIPHER_CTX_free' function. */
+#undef HAVE_EVP_CIPHER_CTX_FREE
+
+/* Define to 1 if you have the `EVP_CIPHER_CTX_init' function. */
+#undef HAVE_EVP_CIPHER_CTX_INIT
+
+/* Define to 1 if you have the `EVP_CIPHER_CTX_new' function. */
+#undef HAVE_EVP_CIPHER_CTX_NEW
+
+/* Define to 1 if you have the `EVP_DigestFinal' function. */
+#undef HAVE_EVP_DIGESTFINAL
+
+/* Define to 1 if you have the `EVP_DigestFinal_ex' function. */
+#undef HAVE_EVP_DIGESTFINAL_EX
+
+/* Define to 1 if you have the `EVP_DigestInit' function. */
+#undef HAVE_EVP_DIGESTINIT
+
 /* Define to 1 if you have the `EVP_DigestInit_ex' function. */
 #undef HAVE_EVP_DIGESTINIT_EX
+
+/* Define to 1 if you have the `EVP_DigestUpdate' function. */
+#undef HAVE_EVP_DIGESTUPDATE
+
+/* Define to 1 if the `EVP_DigestUpdate' function returns int. */
+#undef HAVE_EVP_DIGESTUPDATE_RETURN_INT
+
+/* Define to 1 if you have the `EVP_MD_CTX_cleanup' function. */
+#undef HAVE_EVP_MD_CTX_CLEANUP
+
+/* Define to 1 if you have the `EVP_MD_CTX_copy' function. */
+#undef HAVE_EVP_MD_CTX_COPY
+
+/* Define to 1 if you have the `EVP_MD_CTX_copy_ex' function. */
+#undef HAVE_EVP_MD_CTX_COPY_EX
+
+/* Define to 1 if you have the `EVP_MD_CTX_create' function. */
+#undef HAVE_EVP_MD_CTX_CREATE
+
+/* Define to 1 if you have the `EVP_MD_CTX_destroy' function. */
+#undef HAVE_EVP_MD_CTX_DESTROY
+
+/* Define to 1 if you have the `EVP_MD_CTX_free' function. */
+#undef HAVE_EVP_MD_CTX_FREE
+
+/* Define to 1 if you have the `EVP_MD_CTX_init' function. */
+#undef HAVE_EVP_MD_CTX_INIT
+
+/* Define to 1 if you have the `EVP_MD_CTX_new' function. */
+#undef HAVE_EVP_MD_CTX_NEW
 
 /* Define to 1 if you have the `EVP_sha256' function. */
 #undef HAVE_EVP_SHA256
@@ -93,8 +180,41 @@
 /* Define to 1 if you have the `getpwnam_r' function from SunOS. */
 #undef HAVE_GETPWNAM_R_SUN
 
+/* Define to 1 if you have the `HMAC_cleanup' function. */
+#undef HAVE_HMAC_CLEANUP
+
+/* Define to 1 if you have the `HMAC_CTX_cleanup' function. */
+#undef HAVE_HMAC_CTX_CLEANUP
+
+/* Define to 1 if you have the `HMAC_CTX_free' function. */
+#undef HAVE_HMAC_CTX_FREE
+
+/* Define to 1 if you have the `HMAC_CTX_init' function. */
+#undef HAVE_HMAC_CTX_INIT
+
+/* Define to 1 if you have the `HMAC_CTX_new' function. */
+#undef HAVE_HMAC_CTX_NEW
+
+/* Define to 1 if you have the `HMAC_Final' function. */
+#undef HAVE_HMAC_FINAL
+
+/* Define to 1 if the `HMAC_Final' function returns int. */
+#undef HAVE_HMAC_FINAL_RETURN_INT
+
+/* Define to 1 if you have the `HMAC_Init' function. */
+#undef HAVE_HMAC_INIT
+
 /* Define to 1 if you have the `HMAC_Init_ex' function. */
 #undef HAVE_HMAC_INIT_EX
+
+/* Define to 1 if the `HMAC_Init_ex' function returns int. */
+#undef HAVE_HMAC_INIT_EX_RETURN_INT
+
+/* Define to 1 if you have the `HMAC_Update' function. */
+#undef HAVE_HMAC_UPDATE
+
+/* Define to 1 if the `HMAC_Update' function returns int. */
+#undef HAVE_HMAC_UPDATE_RETURN_INT
 
 /* Define to 1 if you have the `inet_ntop' function. */
 #undef HAVE_INET_NTOP
@@ -125,6 +245,12 @@
 
 /* Define to 1 if you want to use the OpenSSL cryptographic library. */
 #undef HAVE_OPENSSL
+
+/* Define to 1 if you have the `RAND_cleanup' function. */
+#undef HAVE_RAND_CLEANUP
+
+/* Define to 1 if you have the `RAND_pseudo_bytes' function. */
+#undef HAVE_RAND_PSEUDO_BYTES
 
 /* Define to 1 if the system has the type `socklen_t'. */
 #undef HAVE_SOCKLEN_T

@@ -105,19 +105,57 @@ crypto_fini (void)
 #include <openssl/crypto.h>
 #include <openssl/err.h>
 #include <string.h>
-#include "str.h"
+
+static void _openssl_thread_setup (void);
+static void _openssl_thread_cleanup (void);
 
 
-#define OPENSSL_LOG_MAX_ERR_LEN         1024
+#if OPENSSL_VERSION_NUMBER < 0x10100000L
 
+static pthread_mutex_t * openssl_mutex_array = NULL;
+static int openssl_mutex_array_num_locks = 0;
 
-static pthread_mutex_t *openssl_mutex_array = NULL;
+#if HAVE_CRYPTO_THREADID_SET_CALLBACK
 
+static void
+_openssl_thread_threadid_cb (CRYPTO_THREADID *id)
+{
+    CRYPTO_THREADID_set_numeric (id, (unsigned long) pthread_self ());
+}
 
-static unsigned long _openssl_thread_id (void);
-static void _openssl_thread_locking (int mode, int n,
-    const char *file, int line);
+#elif HAVE_CRYPTO_SET_ID_CALLBACK
 
+static unsigned long
+_openssl_thread_id_cb (void)
+{
+    return ((unsigned long) pthread_self ());
+}
+
+#endif /* HAVE_CRYPTO_SET_ID_CALLBACK */
+
+static void
+_openssl_thread_lock_cb (int mode, int n, const char *file, int line)
+{
+    int rv;
+
+    if (mode & CRYPTO_LOCK) {
+        rv = pthread_mutex_lock (&openssl_mutex_array[n]);
+        if (rv != 0) {
+            errno = rv;
+            log_errno (EMUNGE_SNAFU, LOG_ERR,
+                "Failed to lock OpenSSL mutex #%d", n);
+        }
+    }
+    else {
+        rv = pthread_mutex_unlock (&openssl_mutex_array[n]);
+        if (rv != 0) {
+            errno = rv;
+            log_errno (EMUNGE_SNAFU, LOG_ERR,
+                "Failed to unlock OpenSSL mutex #%d", n);
+        }
+    }
+    return;
+}
 
 #if HAVE_CRYPTO_DYNLOCK
 
@@ -125,152 +163,44 @@ struct CRYPTO_dynlock_value {
     pthread_mutex_t mutex;
 };
 
-static struct CRYPTO_dynlock_value * _openssl_thread_dynlock_create (
-    const char *file, int line);
-static void _openssl_thread_dynlock_lock (
-    int mode, struct CRYPTO_dynlock_value *lock, const char *file, int line);
-static void _openssl_thread_dynlock_destroy (
-    struct CRYPTO_dynlock_value *lock, const char *file, int line);
-
-#endif /* HAVE_CRYPTO_DYNLOCK */
-
-
-void
-crypto_init (void)
-{
-    int n;
-    int i;
-
-    if (openssl_mutex_array) {
-        return;
-    }
-    if ((n = CRYPTO_num_locks ()) <= 0) {
-        log_err (EMUNGE_SNAFU, LOG_ERR,
-            "Failed to determine requisite number of OpenSSL locks");
-    }
-    if (!(openssl_mutex_array = malloc (n * sizeof (pthread_mutex_t)))) {
-        log_err (EMUNGE_SNAFU, LOG_ERR,
-            "Failed to allocate %d OpenSSL locks", n);
-    }
-    for (i = 0; i < n; i++) {
-        errno = pthread_mutex_init (&openssl_mutex_array[i], NULL);
-        if (errno != 0) {
-            log_errno (EMUNGE_SNAFU, LOG_ERR,
-                "Failed to init OpenSSL mutex %d", i);
-        }
-    }
-    CRYPTO_set_id_callback (_openssl_thread_id);
-    CRYPTO_set_locking_callback (_openssl_thread_locking);
-
-#if HAVE_CRYPTO_DYNLOCK
-    CRYPTO_set_dynlock_create_callback (_openssl_thread_dynlock_create);
-    CRYPTO_set_dynlock_lock_callback (_openssl_thread_dynlock_lock);
-    CRYPTO_set_dynlock_destroy_callback (_openssl_thread_dynlock_destroy);
-#endif /* HAVE_CRYPTO_DYNLOCK */
-
-    cipher_init_subsystem ();
-    md_init_subsystem ();
-    return;
-}
-
-
-void
-crypto_fini (void)
-{
-    int n;
-    int i;
-
-    if (!openssl_mutex_array) {
-        return;
-    }
-    CRYPTO_set_id_callback (NULL);
-    CRYPTO_set_locking_callback (NULL);
-
-#if HAVE_CRYPTO_DYNLOCK
-    CRYPTO_set_dynlock_create_callback (NULL);
-    CRYPTO_set_dynlock_lock_callback (NULL);
-    CRYPTO_set_dynlock_destroy_callback (NULL);
-#endif /* HAVE_CRYPTO_DYNLOCK */
-
-    if ((n = CRYPTO_num_locks ()) <= 0) {
-        log_err (EMUNGE_SNAFU, LOG_ERR,
-            "Failed to determine requisite number of OpenSSL locks");
-    }
-    for (i = 0; i < n; i++) {
-        errno = pthread_mutex_destroy (&openssl_mutex_array[i]);
-        if (errno != 0) {
-            log_msg (LOG_ERR,
-                "Failed to destroy OpenSSL mutex %d: %s", i, strerror (errno));
-        }
-    }
-    free (openssl_mutex_array);
-    openssl_mutex_array = NULL;
-    return;
-}
-
-
-static unsigned long
-_openssl_thread_id (void)
-{
-    return ((unsigned long) pthread_self ());
-}
-
-
-static void
-_openssl_thread_locking (int mode, int n, const char *file, int line)
-{
-    if (mode & CRYPTO_LOCK) {
-        errno = pthread_mutex_lock (&openssl_mutex_array[n]);
-        if (errno != 0) {
-            log_errno (EMUNGE_SNAFU, LOG_ERR,
-                "Failed to lock OpenSSL mutex %d", n);
-        }
-    }
-    else {
-        errno = pthread_mutex_unlock (&openssl_mutex_array[n]);
-        if (errno != 0) {
-            log_errno (EMUNGE_SNAFU, LOG_ERR,
-                "Failed to unlock OpenSSL mutex %d", n);
-        }
-    }
-    return;
-}
-
-
-#if HAVE_CRYPTO_DYNLOCK
-
 static struct CRYPTO_dynlock_value *
-_openssl_thread_dynlock_create (const char *file, int line)
+_openssl_thread_dynlock_create_cb (const char *file, int line)
 {
     struct CRYPTO_dynlock_value *lock;
+    int rv;
 
-    if (!(lock = malloc (sizeof (struct CRYPTO_dynlock_value)))) {
+    lock = malloc (sizeof (struct CRYPTO_dynlock_value));
+    if (lock == NULL) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
-            "Failed to allocate OpenSSL dynamic lock");
+            "Failed to allocate OpenSSL dynamic mutex");
     }
-    errno = pthread_mutex_init (&lock->mutex, NULL);
-    if (errno != 0) {
+    rv = pthread_mutex_init (&lock->mutex, NULL);
+    if (rv != 0) {
+        errno = rv;
         log_errno (EMUNGE_SNAFU, LOG_ERR,
-            "Failed to init OpenSSL dynamic mutex");
+            "Failed to initialize OpenSSL dynamic mutex");
     }
     return (lock);
 }
 
-
 static void
-_openssl_thread_dynlock_lock (int mode, struct CRYPTO_dynlock_value *lock,
-                              const char *file, int line)
+_openssl_thread_dynlock_lock_cb (
+    int mode, struct CRYPTO_dynlock_value *lock, const char *file, int line)
 {
+    int rv;
+
     if (mode & CRYPTO_LOCK) {
-        errno = pthread_mutex_lock (&lock->mutex);
-        if (errno != 0) {
+        rv = pthread_mutex_lock (&lock->mutex);
+        if (rv != 0) {
+            errno = rv;
             log_errno (EMUNGE_SNAFU, LOG_ERR,
                 "Failed to lock OpenSSL dynamic mutex");
         }
     }
     else {
-        errno = pthread_mutex_unlock (&lock->mutex);
-        if (errno != 0) {
+        rv = pthread_mutex_unlock (&lock->mutex);
+        if (rv != 0) {
+            errno = rv;
             log_errno (EMUNGE_SNAFU, LOG_ERR,
                 "Failed to unlock OpenSSL dynamic mutex");
         }
@@ -278,47 +208,163 @@ _openssl_thread_dynlock_lock (int mode, struct CRYPTO_dynlock_value *lock,
     return;
 }
 
-
 static void
-_openssl_thread_dynlock_destroy (struct CRYPTO_dynlock_value *lock,
-                                 const char *file, int line)
+_openssl_thread_dynlock_destroy_cb (
+    struct CRYPTO_dynlock_value *lock, const char *file, int line)
 {
-    errno = pthread_mutex_destroy (&lock->mutex);
-    if (errno != 0) {
+    int rv;
+
+    rv = pthread_mutex_destroy (&lock->mutex);
+    if (rv != 0) {
+        errno = rv;
         log_msg (LOG_ERR,
-            "Failed to destroy OpenSSL dynamic mutex: %s", strerror (errno));
+            "Failed to destroy OpenSSL dynamic mutex: %s", strerror (rv));
     }
     free (lock);
     return;
 }
 
+#endif /* HAVE_CRYPTO_DYNLOCK */
+
+#endif /* OPENSSL_VERSION_NUMBER < 0x10100000L */
+
 
 void
-openssl_log_msg (int priority)
+crypto_init (void)
 {
-    int         e;
-    const char *data;
-    int         flags;
-    char        buf [OPENSSL_LOG_MAX_ERR_LEN];
-
+#if HAVE_ERR_LOAD_CRYPTO_STRINGS
+    /*  OpenSSL < 1.1.0  */
     ERR_load_crypto_strings ();
-    while ((e = ERR_get_error_line_data (NULL, NULL, &data, &flags)) != 0) {
-#if HAVE_ERR_ERROR_STRING_N
-        ERR_error_string_n (e, buf, sizeof (buf));
-#else  /* !HAVE_ERR_ERROR_STRING_N */
-        assert (sizeof (buf) >= 120);
-        ERR_error_string (e, buf);
-#endif /* !HAVE_ERR_ERROR_STRING_N */
-        if (data && (flags & ERR_TXT_STRING)) {
-            (void) strcatf (buf, sizeof (buf), ":%s", data);
-        }
-        log_msg (priority, "%s", buf);
-    }
-    ERR_free_strings ();
+#endif /* HAVE_ERR_LOAD_CRYPTO_STRINGS */
+
+    _openssl_thread_setup ();
+    cipher_init_subsystem ();
+    md_init_subsystem ();
+
     return;
 }
 
+
+void
+crypto_fini (void)
+{
+    _openssl_thread_cleanup ();
+
+#if HAVE_ERR_FREE_STRINGS
+    /*  OpenSSL < 1.1.0  */
+    ERR_free_strings ();
+#endif /* HAVE_ERR_FREE_STRINGS */
+
+    return;
+}
+
+
+static void
+_openssl_thread_setup (void)
+{
+#if OPENSSL_VERSION_NUMBER < 0x10100000L
+    int i;
+    int rv;
+
+    if (openssl_mutex_array) {
+        return;
+    }
+#if HAVE_CRYPTO_NUM_LOCKS
+    /*  OpenSSL >= 0.9.4, < 1.1.0  */
+    openssl_mutex_array_num_locks = CRYPTO_num_locks ();
+#endif /* HAVE_CRYPTO_NUM_LOCKS */
+
+    if (openssl_mutex_array_num_locks <= 0) {
+        log_err (EMUNGE_SNAFU, LOG_ERR,
+            "Failed to determine requisite number of OpenSSL mutex locks");
+    }
+    openssl_mutex_array = calloc (openssl_mutex_array_num_locks,
+        sizeof (pthread_mutex_t));
+    if (openssl_mutex_array == NULL) {
+        log_err (EMUNGE_SNAFU, LOG_ERR,
+            "Failed to allocate memory for %d OpenSSL mutex%s",
+            openssl_mutex_array_num_locks,
+            (openssl_mutex_array_num_locks == 1) ? "" : "es");
+    }
+    for (i = 0; i < openssl_mutex_array_num_locks; i++) {
+        rv = pthread_mutex_init (&openssl_mutex_array[i], NULL);
+        if (rv != 0) {
+            errno = rv;
+            log_errno (EMUNGE_SNAFU, LOG_ERR,
+                "Failed to initialize OpenSSL mutex #%d", i);
+        }
+    }
+#if HAVE_CRYPTO_THREADID_SET_CALLBACK
+    /*  OpenSSL >= 1.0.0, < 1.1.0  */
+    CRYPTO_THREADID_set_callback (_openssl_thread_threadid_cb);
+#elif HAVE_CRYPTO_SET_ID_CALLBACK
+    /*  OpenSSL < 1.0.0  */
+    CRYPTO_set_id_callback (_openssl_thread_id_cb);
+#endif /* HAVE_CRYPTO_SET_ID_CALLBACK */
+
+#if HAVE_CRYPTO_SET_LOCKING_CALLBACK
+    /*  OpenSSL < 1.1.0  */
+    CRYPTO_set_locking_callback (_openssl_thread_lock_cb);
+#endif /* HAVE_CRYPTO_SET_LOCKING_CALLBACK */
+
+#if HAVE_CRYPTO_DYNLOCK
+    /*  OpenSSL >= 0.9.5b-dev, < 1.1.0  */
+    CRYPTO_set_dynlock_create_callback (_openssl_thread_dynlock_create_cb);
+    CRYPTO_set_dynlock_lock_callback (_openssl_thread_dynlock_lock_cb);
+    CRYPTO_set_dynlock_destroy_callback (_openssl_thread_dynlock_destroy_cb);
 #endif /* HAVE_CRYPTO_DYNLOCK */
+
+#endif /* OPENSSL_VERSION_NUMBER < 0x10100000L */
+    return;
+}
+
+
+static void
+_openssl_thread_cleanup (void)
+{
+#if OPENSSL_VERSION_NUMBER < 0x10100000L
+    int i;
+    int rv;
+
+    if (!openssl_mutex_array) {
+        return;
+    }
+#if HAVE_CRYPTO_THREADID_SET_CALLBACK
+    /*  OpenSSL >= 1.0.0, < 1.1.0  */
+    CRYPTO_THREADID_set_callback (NULL);
+#elif HAVE_CRYPTO_SET_ID_CALLBACK
+    /*  OpenSSL < 1.0.0  */
+    CRYPTO_set_id_callback (NULL);
+#endif /* HAVE_CRYPTO_SET_ID_CALLBACK */
+
+#if HAVE_CRYPTO_SET_LOCKING_CALLBACK
+    /*  OpenSSL < 1.1.0  */
+    CRYPTO_set_locking_callback (NULL);
+#endif /* HAVE_CRYPTO_SET_LOCKING_CALLBACK */
+
+#if HAVE_CRYPTO_DYNLOCK
+    /*  OpenSSL >= 0.9.5b-dev, < 1.1.0  */
+    CRYPTO_set_dynlock_create_callback (NULL);
+    CRYPTO_set_dynlock_lock_callback (NULL);
+    CRYPTO_set_dynlock_destroy_callback (NULL);
+#endif /* HAVE_CRYPTO_DYNLOCK */
+
+    for (i = 0; i < openssl_mutex_array_num_locks; i++) {
+        rv = pthread_mutex_destroy (&openssl_mutex_array[i]);
+        if (rv != 0) {
+            errno = rv;
+            log_msg (LOG_ERR,
+                "Failed to destroy OpenSSL mutex #%d: %s",
+                i, strerror (errno));
+        }
+    }
+    free (openssl_mutex_array);
+    openssl_mutex_array = NULL;
+    openssl_mutex_array_num_locks = 0;
+
+#endif /* OPENSSL_VERSION_NUMBER < 0x10100000L */
+    return;
+}
 
 
 #endif /* HAVE_OPENSSL */

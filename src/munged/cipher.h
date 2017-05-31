@@ -66,7 +66,7 @@ typedef struct {
 #include <openssl/evp.h>
 
 typedef struct {
-    EVP_CIPHER_CTX      ctx;
+    EVP_CIPHER_CTX     *ctx;
 #ifndef NDEBUG
     int                 magic;
     int                 finalized;
@@ -87,7 +87,7 @@ enum {
  *****************************************************************************/
 
 void cipher_init_subsystem (void);
-/*  
+/*
  *  Initializes the cipher subsystem.
  *  WARNING: This routine is *NOT* guaranteed to be thread-safe.
  */

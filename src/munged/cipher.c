@@ -550,23 +550,10 @@ _cipher_map_enum (munge_cipher_t cipher, void *dst)
 /*****************************************************************************
  *  Private Functions (OpenSSL)
  *****************************************************************************/
-/*
- *  EVP_CipherInit() implicitly initializes the EVP_CIPHER_CTX.
- *    This call has been deprecated as of OpenSSL 0.9.7.
- *  EVP_CipherInit(), EVP_CipherUpdate(), and EVP_CIPHER_CTX_cleanup()
- *    return void in OpenSSL 0.9.5a and earlier versions, and int in later
- *    versions.  I'm using EVP_CipherInit_ex() as my test for this behavior.
- *    This probably isn't the best test since it fails for OpenSSL 0.9.6b.
- *    But this isn't as bad as it sounds since software versions of these
- *    functions will never return errors (unless there is a programming error),
- *    and hardware versions require the EVP_CipherInit_ex() interface provided
- *    by OpenSSL 0.9.7.
- *  If EVP_CipherInit_ex() exists, so should EVP_CIPHER_CTX_init().
- *    But EVP_CIPHER_CTX_cleanup() exists in the versions of which I'm aware.
- */
 
 #if HAVE_OPENSSL
 
+#include <openssl/crypto.h>
 #include <openssl/evp.h>
 
 static const EVP_CIPHER *_cipher_map [MUNGE_CIPHER_LAST_ITEM];
@@ -601,17 +588,47 @@ _cipher_init (cipher_ctx *x, munge_cipher_t cipher,
 {
     EVP_CIPHER *algo;
 
+    assert (x != NULL);
+    assert (key != NULL);
+    assert (iv != NULL);
+    assert ((enc == 0) || (enc == 1));
+
     if (_cipher_map_enum (cipher, &algo) < 0) {
         return (-1);
     }
-#if HAVE_EVP_CIPHERINIT_EX
-    EVP_CIPHER_CTX_init (&(x->ctx));
-    if (!(EVP_CipherInit_ex (&(x->ctx), algo, NULL, key, iv, enc))) {
+#if HAVE_EVP_CIPHER_CTX_NEW
+    /*  OpenSSL >= 0.9.8b  */
+    x->ctx = EVP_CIPHER_CTX_new ();
+#else  /* !HAVE_EVP_CIPHER_CTX_NEW */
+    x->ctx = OPENSSL_malloc (sizeof (EVP_CIPHER_CTX));
+#endif /* !HAVE_EVP_CIPHER_CTX_NEW */
+    if (x->ctx == NULL) {
         return (-1);
     }
-#else  /* !HAVE_EVP_CIPHERINIT_EX */
-    EVP_CipherInit (&(x->ctx), algo, key, iv, enc);
-#endif /* !HAVE_EVP_CIPHERINIT_EX */
+
+#if HAVE_EVP_CIPHERINIT_EX
+#if HAVE_EVP_CIPHER_CTX_INIT
+    /*  OpenSSL >= 0.9.7, < 1.1.0  */
+    EVP_CIPHER_CTX_init (x->ctx);
+#endif /* HAVE_EVP_CIPHER_CTX_INIT */
+    /*  OpenSSL >= 0.9.7  */
+    if (EVP_CipherInit_ex (x->ctx, algo, NULL, key, iv, enc) != 1) {
+        return (-1);
+    }
+#elif HAVE_EVP_CIPHERINIT_RETURN_INT
+    /*  EVP_CipherInit() implicitly initializes the EVP_CIPHER_CTX.  */
+    /*  OpenSSL > 0.9.5a  */
+    if (EVP_CipherInit (x->ctx, algo, key, iv, enc) != 1) {
+        return (-1);
+    }
+#elif HAVE_EVP_CIPHERINIT
+    /*  EVP_CipherInit() implicitly initializes the EVP_CIPHER_CTX.  */
+    /*  OpenSSL <= 0.9.5a  */
+    EVP_CipherInit (x->ctx, algo, key, iv, enc);
+#else  /* !HAVE_EVP_CIPHERINIT */
+#error "No OpenSSL EVP_CipherInit"
+#endif /* !HAVE_EVP_CIPHERINIT */
+
     return (0);
 }
 
@@ -620,13 +637,25 @@ static int
 _cipher_update (cipher_ctx *x, void *dst, int *dstlen,
                 const void *src, int srclen)
 {
-#if HAVE_EVP_CIPHERINIT_EX
-    if (!(EVP_CipherUpdate (&(x->ctx), dst, dstlen, (void *) src, srclen))) {
+    assert (x != NULL);
+    assert (x->ctx != NULL);
+    assert (dst != NULL);
+    assert (dstlen != NULL);
+    assert (src != NULL);
+    assert (srclen >= 0);
+
+#if HAVE_EVP_CIPHERUPDATE_RETURN_INT
+    /*  OpenSSL > 0.9.5a  */
+    if (EVP_CipherUpdate (x->ctx, dst, dstlen, (void *) src, srclen) != 1) {
         return (-1);
     }
-#else  /* !HAVE_EVP_CIPHERINIT_EX */
-    EVP_CipherUpdate (&(x->ctx), dst, dstlen, (void *) src, srclen);
-#endif /* !HAVE_EVP_CIPHERINIT_EX */
+#elif HAVE_EVP_CIPHERUPDATE
+    /*  OpenSSL <= 0.9.5a  */
+    EVP_CipherUpdate (x->ctx, dst, dstlen, (void *) src, srclen);
+#else  /* !HAVE_EVP_CIPHERUPDATE */
+#error "No OpenSSL EVP_CipherUpdate"
+#endif /* !HAVE_EVP_CIPHERUPDATE */
+
     return (0);
 }
 
@@ -634,15 +663,24 @@ _cipher_update (cipher_ctx *x, void *dst, int *dstlen,
 static int
 _cipher_final (cipher_ctx *x, void *dst, int *dstlen)
 {
-#if HAVE_EVP_CIPHERINIT_EX
-    if (!(EVP_CipherFinal_ex (&(x->ctx), dst, dstlen))) {
+    assert (x != NULL);
+    assert (x->ctx != NULL);
+    assert (dst != NULL);
+    assert (dstlen != NULL);
+
+#if HAVE_EVP_CIPHERFINAL_EX
+    /*  OpenSSL >= 0.9.7  */
+    if (EVP_CipherFinal_ex (x->ctx, dst, dstlen) != 1) {
         return (-1);
     }
-#else  /* !HAVE_EVP_CIPHERINIT_EX */
-    if (!(EVP_CipherFinal (&(x->ctx), dst, dstlen))) {
+#elif HAVE_EVP_CIPHERFINAL
+    if (EVP_CipherFinal (x->ctx, dst, dstlen) != 1) {
         return (-1);
     }
-#endif /* !HAVE_EVP_CIPHERINIT_EX */
+#else  /* !HAVE_EVP_CIPHERFINAL */
+#error "No OpenSSL EVP_CipherFinal"
+#endif /* !HAVE_EVP_CIPHERFINAL */
+
     return (0);
 }
 
@@ -650,14 +688,29 @@ _cipher_final (cipher_ctx *x, void *dst, int *dstlen)
 static int
 _cipher_cleanup (cipher_ctx *x)
 {
-#if HAVE_EVP_CIPHERINIT_EX
-    if (!(EVP_CIPHER_CTX_cleanup (&(x->ctx)))) {
-        return (-1);
+    int rv = 0;
+
+    assert (x != NULL);
+    assert (x->ctx != NULL);
+
+#if HAVE_EVP_CIPHER_CTX_FREE
+    /*  OpenSSL >= 0.9.8b  */
+    EVP_CIPHER_CTX_free (x->ctx);
+#else  /* !HAVE_EVP_CIPHER_CTX_FREE */
+#if HAVE_EVP_CIPHER_CTX_CLEANUP_RETURN_INT
+    /*  OpenSSL > 0.9.5a, < 1.1.0  */
+    if (EVP_CIPHER_CTX_cleanup (x->ctx) != 1) {
+        rv = -1;
     }
-#else  /* !HAVE_EVP_CIPHERINIT_EX */
-    EVP_CIPHER_CTX_cleanup (&(x->ctx));
-#endif /* !HAVE_EVP_CIPHERINIT_EX */
-    return (0);
+#elif HAVE_EVP_CIPHER_CTX_CLEANUP
+    /*  OpenSSL <= 0.9.5a  */
+    EVP_CIPHER_CTX_cleanup (x->ctx);
+#endif /* HAVE_EVP_CIPHER_CTX_CLEANUP */
+    OPENSSL_free (x->ctx);
+#endif /* !HAVE_EVP_CIPHER_CTX_FREE */
+
+    x->ctx = NULL;
+    return (rv);
 }
 
 

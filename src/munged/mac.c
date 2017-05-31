@@ -277,14 +277,10 @@ _mac_block (munge_mac_t md, const void *key, int keylen,
 /*****************************************************************************
  *  Private Functions (OpenSSL)
  *****************************************************************************/
-/*
- *  HMAC_Init() implicitly initializes the HMAC_CTX.
- *    This call has been deprecated as of OpenSSL 0.9.7.
- *  If HMAC_Init_ex() exists, so should HMAC_CTX_init() & HMAC_CTX_cleanup().
- */
 
 #if HAVE_OPENSSL
 
+#include <openssl/crypto.h>
 #include <openssl/evp.h>
 #include <openssl/hmac.h>
 
@@ -293,15 +289,45 @@ _mac_init (mac_ctx *x, munge_mac_t md, const void *key, int keylen)
 {
     EVP_MD *algo;
 
+    assert (x != NULL);
+    assert (key != NULL);
+    assert (keylen >= 0);
+
     if (md_map_enum (md, &algo) < 0) {
         return (-1);
     }
-#if HAVE_HMAC_INIT_EX
-    HMAC_CTX_init (&(x->ctx));
-    HMAC_Init_ex (&(x->ctx), key, keylen, algo, NULL);
-#else  /* !HAVE_HMAC_INIT_EX */
-    HMAC_Init (&(x->ctx), key, keylen, algo);
-#endif /* !HAVE_HMAC_INIT_EX */
+#if HAVE_HMAC_CTX_NEW
+    /*  OpenSSL >= 1.1.0  */
+    x->ctx = HMAC_CTX_new ();
+#else  /* !HAVE_HMAC_CTX_NEW */
+    x->ctx = OPENSSL_malloc (sizeof (HMAC_CTX));
+#if HAVE_HMAC_CTX_INIT
+    /*  OpenSSL >= 0.9.7, < 1.1.0  */
+    if (x->ctx != NULL) {
+        HMAC_CTX_init (x->ctx);
+    }
+#endif /* HAVE_HMAC_CTX_INIT */
+#endif /* !HAVE_HMAC_CTX_NEW */
+    if (x->ctx == NULL) {
+        return (-1);
+    }
+
+#if HAVE_HMAC_INIT_EX_RETURN_INT
+    /*  OpenSSL >= 1.0.0  */
+    if (HMAC_Init_ex (x->ctx, key, keylen, algo, NULL) != 1) {
+        return (-1);
+    }
+#elif HAVE_HMAC_INIT_EX
+    /*  OpenSSL >= 0.9.7, < 1.0.0  */
+    HMAC_Init_ex (x->ctx, key, keylen, algo, NULL);
+#elif HAVE_HMAC_INIT
+    /*  HMAC_Init() implicitly initializes the HMAC_CTX.  */
+    /*  OpenSSL >= 0.9.0  */
+    HMAC_Init (x->ctx, key, keylen, algo);
+#else  /* !HAVE_HMAC_INIT */
+#error "No OpenSSL HMAC_Init"
+#endif /* !HAVE_HMAC_INIT */
+
     x->diglen = EVP_MD_size (algo);
     return (0);
 }
@@ -310,7 +336,23 @@ _mac_init (mac_ctx *x, munge_mac_t md, const void *key, int keylen)
 static int
 _mac_update (mac_ctx *x, const void *src, int srclen)
 {
-    HMAC_Update (&(x->ctx), src, srclen);
+    assert (x != NULL);
+    assert (x->ctx != NULL);
+    assert (src != NULL);
+    assert (srclen >= 0);
+
+#if HAVE_HMAC_UPDATE_RETURN_INT
+    /*  OpenSSL >= 1.0.0  */
+    if (HMAC_Update (x->ctx, src, srclen) != 1) {
+        return (-1);
+    }
+#elif HAVE_HMAC_UPDATE
+    /*  OpenSSL >= 0.9.0, < 1.0.0  */
+    HMAC_Update (x->ctx, src, srclen);
+#else  /* !HAVE_HMAC_UPDATE */
+#error "No OpenSSL HMAC_Update"
+#endif /* !HAVE_HMAC_UPDATE */
+
     return (0);
 }
 
@@ -318,10 +360,26 @@ _mac_update (mac_ctx *x, const void *src, int srclen)
 static int
 _mac_final (mac_ctx *x, void *dst, int *dstlen)
 {
+    assert (x != NULL);
+    assert (x->ctx != NULL);
+    assert (dst != NULL);
+    assert (dstlen != NULL);
+
     if (*dstlen < x->diglen) {
         return (-1);
     }
-    HMAC_Final (&(x->ctx), dst, (unsigned int *) dstlen);
+#if HAVE_HMAC_FINAL_RETURN_INT
+    /*  OpenSSL >= 1.0.0  */
+    if (HMAC_Final (x->ctx, dst, (unsigned int *) dstlen) != 1) {
+        return (-1);
+    }
+#elif HAVE_HMAC_FINAL
+    /*  OpenSSL >= 0.9.0, < 1.0.0  */
+    HMAC_Final (x->ctx, dst, (unsigned int *) dstlen);
+#else  /* !HAVE_HMAC_FINAL */
+#error "No OpenSSL HMAC_Final"
+#endif /* !HAVE_HMAC_FINAL */
+
     return (0);
 }
 
@@ -329,11 +387,24 @@ _mac_final (mac_ctx *x, void *dst, int *dstlen)
 static int
 _mac_cleanup (mac_ctx *x)
 {
-#if HAVE_HMAC_INIT_EX
-    HMAC_CTX_cleanup (&(x->ctx));
-#else  /* !HAVE_HMAC_INIT_EX */
-    HMAC_cleanup (&(x->ctx));
-#endif /* !HAVE_HMAC_INIT_EX */
+    assert (x != NULL);
+    assert (x->ctx != NULL);
+
+#if HAVE_HMAC_CTX_FREE
+    /*  OpenSSL >= 1.1.0  */
+    HMAC_CTX_free (x->ctx);
+#else  /* !HAVE_HMAC_CTX_FREE */
+#if HAVE_HMAC_CTX_CLEANUP
+    /*  OpenSSL >= 0.9.7, < 1.1.0  */
+    HMAC_CTX_cleanup (x->ctx);
+#elif HAVE_HMAC_CLEANUP
+    /*  OpenSSL >= 0.9.0, < 0.9.7  */
+    HMAC_cleanup (x->ctx);
+#endif /* HAVE_HMAC_CLEANUP */
+    OPENSSL_free (x->ctx);
+#endif /* !HAVE_HMAC_CTX_FREE */
+
+    x->ctx = NULL;
     return (0);
 }
 
@@ -344,13 +415,20 @@ _mac_block (munge_mac_t md, const void *key, int keylen,
 {
     EVP_MD *algo;
 
+    assert (dst != NULL);
+    assert (dstlen != NULL);
+    assert (src != NULL);
+    assert (srclen >= 0);
+
     if (md_map_enum (md, &algo) < 0) {
         return (-1);
     }
     if (*dstlen < EVP_MD_size (algo)) {
         return (-1);
     }
-    HMAC (algo, key, keylen, src, srclen, dst, (unsigned int *) dstlen);
+    if (!HMAC (algo, key, keylen, src, srclen, dst, (unsigned int *) dstlen)) {
+        return (-1);
+    }
     return (0);
 }
 

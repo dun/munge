@@ -319,20 +319,14 @@ _md_map_enum (munge_mac_t md, void *dst)
 /*****************************************************************************
  *  Private Functions (OpenSSL)
  *****************************************************************************/
-/*
- *  EVP_DigestInit() & EVP_DigestCopy() implicitly initialize the EVP_MD_CTX.
- *    These calls have been deprecated as of OpenSSL 0.9.7.
- *  EVP_DigestUpdate() returns void in versions prior to OpenSSL 0.9.7.
- *    I'm using EVP_DigestInit_ex() as my test for this behavior.
- *  If EVP_DigestInit_ex() exists, so should
- *    EVP_MD_CTX_init() & EVP_MD_CTX_cleanup().
- */
 
 #if HAVE_OPENSSL
 
 #include <openssl/evp.h>
 
 static const EVP_MD * _md_map [MUNGE_MAC_LAST_ITEM];
+
+static int _md_ctx_create (md_ctx *x);
 
 
 static void
@@ -364,18 +358,55 @@ _md_init (md_ctx *x, munge_mac_t md)
 {
     EVP_MD *algo;
 
+    assert (x != NULL);
+
     if (_md_map_enum (md, &algo) < 0) {
         return (-1);
     }
-#if HAVE_EVP_DIGESTINIT_EX
-    EVP_MD_CTX_init (&(x->ctx));
-    if (!(EVP_DigestInit_ex (&(x->ctx), algo, NULL))) {
+    if (_md_ctx_create (x) < 0) {
         return (-1);
     }
-#else  /* !HAVE_EVP_DIGESTINIT_EX */
-    EVP_DigestInit (&(x->ctx), algo);
-#endif /* !HAVE_EVP_DIGESTINIT_EX */
+#if HAVE_EVP_DIGESTINIT_EX
+    /*  OpenSSL >= 0.9.7  */
+    if (EVP_DigestInit_ex (x->ctx, algo, NULL) != 1) {
+        return (-1);
+    }
+#elif HAVE_EVP_DIGESTINIT
+    /*  EVP_DigestInit() implicitly initializes the EVP_MD_CTX.  */
+    /*  OpenSSL < 0.9.7  */
+    EVP_DigestInit (x->ctx, algo);
+#else  /* !HAVE_EVP_DIGESTINIT */
+#error "No OpenSSL EVP_DigestInit"
+#endif /* !HAVE_EVP_DIGESTINIT */
+
     x->diglen = EVP_MD_size (algo);
+    return (0);
+}
+
+
+static int
+_md_ctx_create (md_ctx *x)
+{
+    assert (x != NULL);
+
+#if HAVE_EVP_MD_CTX_NEW
+    /*  OpenSSL >= 1.1.0  */
+    x->ctx = EVP_MD_CTX_new ();                         /* alloc & init */
+#elif HAVE_EVP_MD_CTX_CREATE
+    /*  OpenSSL >= 0.9.7, < 1.1.0  */
+    x->ctx = EVP_MD_CTX_create ();                      /* alloc & init */
+#else  /* !HAVE_EVP_MD_CTX_CREATE */
+    x->ctx = OPENSSL_malloc (sizeof (EVP_MD_CTX));      /* allocate */
+#if HAVE_EVP_MD_CTX_INIT
+    /*  OpenSSL >= 0.9.7, < 1.1.0  */
+    if (x->ctx != NULL ) {
+        EVP_MD_CTX_init (x->ctx);                       /* initialize */
+    }
+#endif /* HAVE_EVP_MD_CTX_INIT */
+#endif /* !HAVE_EVP_MD_CTX_CREATE */
+    if (x->ctx == NULL) {
+        return (-1);
+    }
     return (0);
 }
 
@@ -383,16 +414,23 @@ _md_init (md_ctx *x, munge_mac_t md)
 static int
 _md_update (md_ctx *x, const void *src, int srclen)
 {
-/*  Since [srclen] will always be positive due to the check in md_update(),
- *    the cast to unsigned int is safe.
- */
-#if HAVE_EVP_DIGESTINIT_EX
-    if (!(EVP_DigestUpdate (&(x->ctx), src, (unsigned int) srclen))) {
+    assert (x != NULL);
+    assert (x->ctx != NULL);
+    assert (src != NULL);
+    assert (srclen >= 0);
+
+#if HAVE_EVP_DIGESTUPDATE_RETURN_INT
+    /*  OpenSSL >= 0.9.7  */
+    if (EVP_DigestUpdate (x->ctx, src, (unsigned int) srclen) != 1) {
         return (-1);
     }
-#else  /* !HAVE_EVP_DIGESTINIT_EX */
-    EVP_DigestUpdate (&(x->ctx), src, (unsigned int) srclen);
-#endif /* !HAVE_EVP_DIGESTINIT_EX */
+#elif HAVE_EVP_DIGESTUPDATE
+    /*  OpenSSL < 0.9.7  */
+    EVP_DigestUpdate (x->ctx, src, (unsigned int) srclen);
+#else  /* !HAVE_EVP_DIGESTUPDATE */
+#error "No OpenSSL EVP_DigestUpdate"
+#endif /* !HAVE_EVP_DIGESTUPDATE */
+
     return (0);
 }
 
@@ -400,16 +438,26 @@ _md_update (md_ctx *x, const void *src, int srclen)
 static int
 _md_final (md_ctx *x, void *dst, int *dstlen)
 {
+    assert (x != NULL);
+    assert (x->ctx != NULL);
+    assert (dst != NULL);
+    assert (dstlen != NULL);
+
     if (*dstlen < x->diglen) {
         return (-1);
     }
-#if HAVE_EVP_DIGESTINIT_EX
-    if (!(EVP_DigestFinal_ex (&(x->ctx), dst, (unsigned int *) dstlen))) {
+#if HAVE_EVP_DIGESTFINAL_EX
+    /*  OpenSSL >= 0.9.7  */
+    if (!(EVP_DigestFinal_ex (x->ctx, dst, (unsigned int *) dstlen))) {
         return (-1);
     }
-#else  /* !HAVE_EVP_DIGESTINIT_EX */
-    EVP_DigestFinal (&(x->ctx), dst, (unsigned int *) dstlen);
-#endif /* !HAVE_EVP_DIGESTINIT_EX */
+#elif HAVE_EVP_DIGESTFINAL
+    /*  OpenSSL < 0.9.7  */
+    EVP_DigestFinal (x->ctx, dst, (unsigned int *) dstlen);
+#else  /* !HAVE_EVP_DIGESTFINAL */
+#error "No OpenSSL EVP_DigestFinal"
+#endif /* !HAVE_EVP_DIGESTFINAL */
+
     return (0);
 }
 
@@ -417,28 +465,55 @@ _md_final (md_ctx *x, void *dst, int *dstlen)
 static int
 _md_cleanup (md_ctx *x)
 {
-#if HAVE_EVP_DIGESTINIT_EX
-    if (!(EVP_MD_CTX_cleanup (&(x->ctx)))) {
-        return (-1);
+    int rv = 0;
+
+    assert (x != NULL);
+    assert (x->ctx != NULL);
+
+#if HAVE_EVP_MD_CTX_FREE
+    /*  OpenSSL >= 1.1.0  */
+    EVP_MD_CTX_free (x->ctx);
+#elif HAVE_EVP_MD_CTX_DESTROY
+    /*  OpenSSL >= 0.9.7, < 1.1.0  */
+    EVP_MD_CTX_destroy (x->ctx);
+#else  /* !HAVE_EVP_MD_CTX_DESTROY */
+#if HAVE_EVP_MD_CTX_CLEANUP
+    /*  OpenSSL >= 0.9.7, < 1.1.0  */
+    if (EVP_MD_CTX_cleanup (x->ctx) != 1) {
+        rv = -1;
     }
-#endif /* HAVE_EVP_DIGESTINIT_EX */
-    return (0);
+#endif /* HAVE_EVP_MD_CTX_CLEANUP */
+    OPENSSL_free (x->ctx);
+#endif /* !HAVE_EVP_MD_CTX_DESTROY */
+
+    x->ctx = NULL;
+    return (rv);
 }
 
 
 static int
 _md_copy (md_ctx *xdst, md_ctx *xsrc)
 {
-#if HAVE_EVP_DIGESTINIT_EX
-    EVP_MD_CTX_init (&(xdst->ctx));
-    if (!(EVP_MD_CTX_copy_ex (&(xdst->ctx), &(xsrc->ctx)))) {
+    assert (xdst != NULL);
+    assert (xsrc != NULL);
+
+    if (_md_ctx_create (xdst) < 0) {
         return (-1);
     }
-#else  /* !HAVE_EVP_DIGESTINIT_EX */
-    if (!(EVP_MD_CTX_copy (&(xdst->ctx), &(xsrc->ctx)))) {
+#if HAVE_EVP_MD_CTX_COPY_EX
+    /*  OpenSSL >= 0.9.7  */
+    if (!(EVP_MD_CTX_copy_ex (xdst->ctx, xsrc->ctx))) {
         return (-1);
     }
-#endif /* !HAVE_EVP_DIGESTINIT_EX */
+#elif HAVE_EVP_MD_CTX_COPY
+    /*  EVP_MD_CTX_copy() implicitly initializes the EVP_MD_CTX for xdst.  */
+    if (!(EVP_MD_CTX_copy (xdst->ctx, xsrc->ctx))) {
+        return (-1);
+    }
+#else  /* !HAVE_EVP_MD_CTX_COPY */
+#error "No OpenSSL EVP_MD_CTX_copy"
+#endif /* !HAVE_EVP_MD_CTX_COPY */
+
     return (0);
 }
 

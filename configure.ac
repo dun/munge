@@ -67,29 +67,7 @@ AC_SEARCH_LIBS(socket, socket)
 AM_PATH_LIBGCRYPT
 X_AC_PATH_OPENSSL
 X_AC_SELECT_CRYPTO_LIB
-
-##
-# Checks for OpenSSL.
-##
-if test "$CRYPTO_PKG" = "openssl"; then
-  ac_save_CFLAGS="$CFLAGS"
-  ac_save_LIBS="$LIBS"
-  CFLAGS="$CFLAGS $OPENSSL_CFLAGS"
-  LIBS="$LIBS $OPENSSL_LIBS"
-  AC_CHECK_FUNCS( \
-    ERR_error_string_n \
-    EVP_CipherInit_ex \
-    EVP_DigestInit_ex \
-    EVP_aes_128_cbc \
-    EVP_aes_256_cbc \
-    EVP_sha256 \
-    EVP_sha512 \
-    HMAC_Init_ex \
-  )
-  AC_CHECK_TYPES(CRYPTO_dynlock, [], [], [#include <openssl/crypto.h>])
-  CFLAGS="$ac_save_CFLAGS"
-  LIBS="$ac_save_LIBS"
-fi
+test "${CRYPTO_PKG}" = "openssl" && X_AC_CHECK_OPENSSL
 
 ##
 # Checks for header files.

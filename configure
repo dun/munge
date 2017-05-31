@@ -13587,24 +13587,55 @@ $as_echo "failed" >&6; }
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: $CRYPTO_PKG" >&5
 $as_echo "$CRYPTO_PKG" >&6; }
 
-
-##
-# Checks for OpenSSL.
-##
-if test "$CRYPTO_PKG" = "openssl"; then
-  ac_save_CFLAGS="$CFLAGS"
-  ac_save_LIBS="$LIBS"
-  CFLAGS="$CFLAGS $OPENSSL_CFLAGS"
-  LIBS="$LIBS $OPENSSL_LIBS"
+test "${CRYPTO_PKG}" = "openssl" &&
+  ac_save_CFLAGS="${CFLAGS}"
+  ac_save_LIBS="${LIBS}"
+  CFLAGS="${CFLAGS} ${OPENSSL_CFLAGS}"
+  LIBS="${LIBS} ${OPENSSL_LIBS}"
   for ac_func in \
-    ERR_error_string_n \
+    CRYPTO_THREADID_set_callback \
+    CRYPTO_num_locks \
+    CRYPTO_set_id_callback \
+    CRYPTO_set_locking_callback \
+    ERR_free_strings \
+    ERR_load_crypto_strings \
+    EVP_CIPHER_CTX_cleanup \
+    EVP_CIPHER_CTX_free \
+    EVP_CIPHER_CTX_init \
+    EVP_CIPHER_CTX_new \
+    EVP_CipherFinal \
+    EVP_CipherFinal_ex \
+    EVP_CipherInit \
     EVP_CipherInit_ex \
+    EVP_CipherUpdate \
+    EVP_DigestFinal \
+    EVP_DigestFinal_ex \
+    EVP_DigestInit \
     EVP_DigestInit_ex \
+    EVP_DigestUpdate \
+    EVP_MD_CTX_cleanup \
+    EVP_MD_CTX_copy \
+    EVP_MD_CTX_copy_ex \
+    EVP_MD_CTX_create \
+    EVP_MD_CTX_destroy \
+    EVP_MD_CTX_free \
+    EVP_MD_CTX_init \
+    EVP_MD_CTX_new \
     EVP_aes_128_cbc \
     EVP_aes_256_cbc \
     EVP_sha256 \
     EVP_sha512 \
+    HMAC_CTX_cleanup \
+    HMAC_CTX_free \
+    HMAC_CTX_init \
+    HMAC_CTX_new \
+    HMAC_Final \
+    HMAC_Init \
     HMAC_Init_ex \
+    HMAC_Update \
+    HMAC_cleanup \
+    RAND_cleanup \
+    RAND_pseudo_bytes \
 
 do :
   as_ac_var=`$as_echo "ac_cv_func_$ac_func" | $as_tr_sh`
@@ -13617,6 +13648,314 @@ _ACEOF
 fi
 done
 
+
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking if EVP_CIPHER_CTX_cleanup returns int" >&5
+$as_echo_n "checking if EVP_CIPHER_CTX_cleanup returns int... " >&6; }
+if ${ac_cv_func_EVP_CIPHER_CTX_cleanup_returns_int+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+
+    ac_cv_func_EVP_CIPHER_CTX_cleanup_returns_int=no
+    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+
+#include <openssl/evp.h>
+
+#undef EVP_CIPHER_CTX_cleanup
+
+int
+main ()
+{
+int rv = EVP_CIPHER_CTX_cleanup (NULL);
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_func_EVP_CIPHER_CTX_cleanup_returns_int=yes
+else
+  ac_cv_func_EVP_CIPHER_CTX_cleanup_returns_int=no
+
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_func_EVP_CIPHER_CTX_cleanup_returns_int" >&5
+$as_echo "$ac_cv_func_EVP_CIPHER_CTX_cleanup_returns_int" >&6; }
+  if test $ac_cv_func_EVP_CIPHER_CTX_cleanup_returns_int = yes; then :
+
+$as_echo "#define HAVE_EVP_CIPHER_CTX_CLEANUP_RETURN_INT 1" >>confdefs.h
+
+
+fi
+
+
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking if EVP_CipherInit returns int" >&5
+$as_echo_n "checking if EVP_CipherInit returns int... " >&6; }
+if ${ac_cv_func_EVP_CipherInit_returns_int+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+
+    ac_cv_func_EVP_CipherInit_returns_int=no
+    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+
+#include <openssl/evp.h>
+
+#undef EVP_CipherInit
+
+int
+main ()
+{
+int rv = EVP_CipherInit (NULL, NULL, NULL, NULL, 0);
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_func_EVP_CipherInit_returns_int=yes
+else
+  ac_cv_func_EVP_CipherInit_returns_int=no
+
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_func_EVP_CipherInit_returns_int" >&5
+$as_echo "$ac_cv_func_EVP_CipherInit_returns_int" >&6; }
+  if test $ac_cv_func_EVP_CipherInit_returns_int = yes; then :
+
+$as_echo "#define HAVE_EVP_CIPHERINIT_RETURN_INT 1" >>confdefs.h
+
+
+fi
+
+
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking if EVP_CipherUpdate returns int" >&5
+$as_echo_n "checking if EVP_CipherUpdate returns int... " >&6; }
+if ${ac_cv_func_EVP_CipherUpdate_returns_int+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+
+    ac_cv_func_EVP_CipherUpdate_returns_int=no
+    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+
+#include <openssl/evp.h>
+
+#undef EVP_CipherUpdate
+
+int
+main ()
+{
+int rv = EVP_CipherUpdate (NULL, NULL, NULL, NULL, 0);
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_func_EVP_CipherUpdate_returns_int=yes
+else
+  ac_cv_func_EVP_CipherUpdate_returns_int=no
+
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_func_EVP_CipherUpdate_returns_int" >&5
+$as_echo "$ac_cv_func_EVP_CipherUpdate_returns_int" >&6; }
+  if test $ac_cv_func_EVP_CipherUpdate_returns_int = yes; then :
+
+$as_echo "#define HAVE_EVP_CIPHERUPDATE_RETURN_INT 1" >>confdefs.h
+
+
+fi
+
+
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking if EVP_DigestUpdate returns int" >&5
+$as_echo_n "checking if EVP_DigestUpdate returns int... " >&6; }
+if ${ac_cv_func_EVP_DigestUpdate_returns_int+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+
+    ac_cv_func_EVP_DigestUpdate_returns_int=no
+    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+
+#include <openssl/evp.h>
+
+#undef EVP_DigestUpdate
+
+int
+main ()
+{
+int rv = EVP_DigestUpdate (NULL, NULL, 0);
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_func_EVP_DigestUpdate_returns_int=yes
+else
+  ac_cv_func_EVP_DigestUpdate_returns_int=no
+
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_func_EVP_DigestUpdate_returns_int" >&5
+$as_echo "$ac_cv_func_EVP_DigestUpdate_returns_int" >&6; }
+  if test $ac_cv_func_EVP_DigestUpdate_returns_int = yes; then :
+
+$as_echo "#define HAVE_EVP_DIGESTUPDATE_RETURN_INT 1" >>confdefs.h
+
+
+fi
+
+
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking if HMAC_Final returns int" >&5
+$as_echo_n "checking if HMAC_Final returns int... " >&6; }
+if ${ac_cv_func_HMAC_Final_returns_int+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+
+    ac_cv_func_HMAC_Final_returns_int=no
+    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+
+#include <openssl/hmac.h>
+
+#undef HMAC_Final
+
+int
+main ()
+{
+int rv = HMAC_Final (NULL, NULL, NULL);
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_func_HMAC_Final_returns_int=yes
+else
+  ac_cv_func_HMAC_Final_returns_int=no
+
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_func_HMAC_Final_returns_int" >&5
+$as_echo "$ac_cv_func_HMAC_Final_returns_int" >&6; }
+  if test $ac_cv_func_HMAC_Final_returns_int = yes; then :
+
+$as_echo "#define HAVE_HMAC_FINAL_RETURN_INT 1" >>confdefs.h
+
+
+fi
+
+
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking if HMAC_Init_ex returns int" >&5
+$as_echo_n "checking if HMAC_Init_ex returns int... " >&6; }
+if ${ac_cv_func_HMAC_Init_ex_returns_int+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+
+    ac_cv_func_HMAC_Init_ex_returns_int=no
+    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+
+#include <openssl/hmac.h>
+
+#undef HMAC_Init_ex
+
+int
+main ()
+{
+int rv = HMAC_Init_ex (NULL, NULL, 0, NULL, NULL);
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_func_HMAC_Init_ex_returns_int=yes
+else
+  ac_cv_func_HMAC_Init_ex_returns_int=no
+
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_func_HMAC_Init_ex_returns_int" >&5
+$as_echo "$ac_cv_func_HMAC_Init_ex_returns_int" >&6; }
+  if test $ac_cv_func_HMAC_Init_ex_returns_int = yes; then :
+
+$as_echo "#define HAVE_HMAC_INIT_EX_RETURN_INT 1" >>confdefs.h
+
+
+fi
+
+
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking if HMAC_Update returns int" >&5
+$as_echo_n "checking if HMAC_Update returns int... " >&6; }
+if ${ac_cv_func_HMAC_Update_returns_int+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+
+    ac_cv_func_HMAC_Update_returns_int=no
+    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+
+#include <openssl/hmac.h>
+
+#undef HMAC_Update
+
+int
+main ()
+{
+int rv = HMAC_Update (NULL, NULL, 0);
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_func_HMAC_Update_returns_int=yes
+else
+  ac_cv_func_HMAC_Update_returns_int=no
+
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_func_HMAC_Update_returns_int" >&5
+$as_echo "$ac_cv_func_HMAC_Update_returns_int" >&6; }
+  if test $ac_cv_func_HMAC_Update_returns_int = yes; then :
+
+$as_echo "#define HAVE_HMAC_UPDATE_RETURN_INT 1" >>confdefs.h
+
+
+fi
+
   ac_fn_c_check_type "$LINENO" "CRYPTO_dynlock" "ac_cv_type_CRYPTO_dynlock" "#include <openssl/crypto.h>
 "
 if test "x$ac_cv_type_CRYPTO_dynlock" = xyes; then :
@@ -13628,9 +13967,10 @@ _ACEOF
 
 fi
 
-  CFLAGS="$ac_save_CFLAGS"
-  LIBS="$ac_save_LIBS"
-fi
+  CFLAGS="${ac_save_CFLAGS}"
+  LIBS="${ac_save_LIBS}"
+
+
 
 ##
 # Checks for header files.

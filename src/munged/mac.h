@@ -63,7 +63,7 @@ typedef struct {
 #include <openssl/hmac.h>
 
 typedef struct {
-    HMAC_CTX            ctx;
+    HMAC_CTX           *ctx;
     int                 diglen;
 #ifndef NDEBUG
     int                 magic;
