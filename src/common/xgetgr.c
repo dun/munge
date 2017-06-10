@@ -282,6 +282,7 @@ restart:
         else {
             got_err = 1;
         }
+        rv_copy = 0;
     }
     else {
         rv_copy = _xgetgrbuf_copy_struct (rv_grp, grp, grbufp);
@@ -441,6 +442,7 @@ restart:
         else {
             got_none = 1;
         }
+        rv_copy = 0;
     }
     else {
         rv_copy = _xgetgrbuf_copy_struct (rv_grp, grp, grbufp);

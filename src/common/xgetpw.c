@@ -293,6 +293,7 @@ restart:
         else {
             got_none = 1;
         }
+        rv_copy = 0;
     }
     else {
         rv_copy = _xgetpwbuf_copy_struct (rv_pwp, pwp, pwbufp);
