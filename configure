@@ -13587,7 +13587,8 @@ $as_echo "failed" >&6; }
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: $CRYPTO_PKG" >&5
 $as_echo "$CRYPTO_PKG" >&6; }
 
-test "${CRYPTO_PKG}" = "openssl" &&
+if test "${CRYPTO_PKG}" = "openssl"; then
+
   ac_save_CFLAGS="${CFLAGS}"
   ac_save_LIBS="${LIBS}"
   CFLAGS="${CFLAGS} ${OPENSSL_CFLAGS}"
@@ -13971,6 +13972,7 @@ fi
   LIBS="${ac_save_LIBS}"
 
 
+fi
 
 ##
 # Checks for header files.

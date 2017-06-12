@@ -67,7 +67,9 @@ AC_SEARCH_LIBS(socket, socket)
 AM_PATH_LIBGCRYPT
 X_AC_PATH_OPENSSL
 X_AC_SELECT_CRYPTO_LIB
-test "${CRYPTO_PKG}" = "openssl" && X_AC_CHECK_OPENSSL
+if test "${CRYPTO_PKG}" = "openssl"; then
+  X_AC_CHECK_OPENSSL
+fi
 
 ##
 # Checks for header files.
