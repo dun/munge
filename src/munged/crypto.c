@@ -56,17 +56,24 @@ void
 crypto_init (void)
 {
     gcry_error_t e;
+    const char  *v;
 
+    /*  GCRYCTL_SET_THREAD_CBS must be set before any other Libcrypt function.
+     *  Obsolete since Libgcrypt 1.6.
+     */
     e = gcry_control (GCRYCTL_SET_THREAD_CBS, &gcry_threads_pthread);
     if (e) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
             "Failed to set Libgcrypt thread callbacks: %s", gcry_strerror (e));
     }
-    /*  Initialize subsystems, but omit the Libgcrypt version check.
+    /*  gcry_check_version() must be called before any other Libgcrypt function
+     *    (except the GCRYCTL_SET_THREAD_CBS command prior to Libgcrypt 1.6).
      */
-    if (!gcry_check_version (NULL)) {
+    v = gcry_check_version (GCRYPT_VERSION);
+    if (v == NULL) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
-            "Failed to start Libgcrypt initialization");
+            "Failed to initialize Libgcrypt: version mismatch: expected %s",
+            GCRYPT_VERSION);
     }
     e = gcry_control (GCRYCTL_DISABLE_SECMEM, 0);
     if (e) {
@@ -77,8 +84,7 @@ crypto_init (void)
     e = gcry_control (GCRYCTL_INITIALIZATION_FINISHED, 0);
     if (e) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
-            "Failed to finish Libgcrypt initialization: %s",
-            gcry_strerror (e));
+            "Failed to initialize Libgcrypt: %s", gcry_strerror (e));
     }
     cipher_init_subsystem ();
     md_init_subsystem ();
