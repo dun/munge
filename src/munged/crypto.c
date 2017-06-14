@@ -110,6 +110,7 @@ crypto_fini (void)
 #include <assert.h>
 #include <openssl/crypto.h>
 #include <openssl/err.h>
+#include <openssl/opensslv.h>
 #include <string.h>
 
 static void _openssl_thread_setup (void);
