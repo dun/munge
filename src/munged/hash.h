@@ -26,8 +26,8 @@
  *****************************************************************************/
 
 
-#ifndef LSD_HASH_H
-#define LSD_HASH_H
+#ifndef HASH_H
+#define HASH_H
 
 
 /*****************************************************************************
@@ -39,16 +39,6 @@
  *
  *  If NDEBUG is not defined, internal debug code will be enabled; this is
  *  intended for development use only.  Production code should define NDEBUG.
- *
- *  If WITH_LSD_FATAL_ERROR_FUNC is defined, the linker will expect to
- *  find an external lsd_fatal_error(file,line,mesg) function.  By default,
- *  lsd_fatal_error(file,line,mesg) is a macro definition that aborts.
- *  This macro may be redefined to invoke another routine instead.
- *
- *  If WITH_LSD_NOMEM_ERROR_FUNC is defined, the linker will expect to
- *  find an external lsd_nomem_error(file,line,mesg) function.  By default,
- *  lsd_nomem_error(file,line,mesg) is a macro definition that returns NULL.
- *  This macro may be redefined to invoke another routine instead.
  *
  *  If WITH_PTHREADS is defined, these routines will be thread-safe.
  */
@@ -195,4 +185,4 @@ void hash_drop_memory (void);
  */
 
 
-#endif /* !LSD_HASH_H */
+#endif /* !HASH_H */

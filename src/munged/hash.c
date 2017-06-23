@@ -36,9 +36,8 @@
 #include <errno.h>
 #include <stdlib.h>
 #include <string.h>
-
-#include "thread.h"
 #include "hash.h"
+#include "thread.h"
 
 
 /*****************************************************************************
@@ -115,29 +114,6 @@ static pthread_mutex_t hash_free_list_lock = PTHREAD_MUTEX_INITIALIZER;
 
 
 /*****************************************************************************
- *  Macros
- *****************************************************************************/
-
-#ifdef WITH_LSD_FATAL_ERROR_FUNC
-#  undef lsd_fatal_error
-   extern void lsd_fatal_error (char *file, int line, char *mesg);
-#else /* !WITH_LSD_FATAL_ERROR_FUNC */
-#  ifndef lsd_fatal_error
-#    define lsd_fatal_error(file, line, mesg) (abort ())
-#  endif /* !lsd_fatal_error */
-#endif /* !WITH_LSD_FATAL_ERROR_FUNC */
-
-#ifdef WITH_LSD_NOMEM_ERROR_FUNC
-#  undef lsd_nomem_error
-   extern void * lsd_nomem_error (char *file, int line, char *mesg);
-#else /* !WITH_LSD_NOMEM_ERROR_FUNC */
-#  ifndef lsd_nomem_error
-#    define lsd_nomem_error(file, line, mesg) (NULL)
-#  endif /* !lsd_nomem_error */
-#endif /* !WITH_LSD_NOMEM_ERROR_FUNC */
-
-
-/*****************************************************************************
  *  Functions
  *****************************************************************************/
 
@@ -154,11 +130,11 @@ hash_create (int size, hash_key_f key_f, hash_cmp_f cmp_f, hash_del_f del_f)
         size = HASH_DEF_SIZE;
     }
     if (!(h = malloc (sizeof (*h)))) {
-        return (lsd_nomem_error (__FILE__, __LINE__, "hash_create"));
+        return (NULL);
     }
     if (!(h->table = calloc (size, sizeof (struct hash_node *)))) {
         free (h);
-        return (lsd_nomem_error (__FILE__, __LINE__, "hash_create"));
+        return (NULL);
     }
     h->count = 0;
     h->size = size;
@@ -319,7 +295,7 @@ hash_insert (hash_t h, const void *key, void *data)
         break;
     }
     if (!(p = hash_node_alloc ())) {
-        data = lsd_nomem_error (__FILE__, __LINE__, "hash_insert");
+        data = NULL;
         goto end;
     }
     p->hkey = key;
