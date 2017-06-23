@@ -183,5 +183,14 @@ unsigned int hash_key_string (const char *str);
  *  A hash_key_f function that hashes the string [str].
  */
 
+void hash_drop_memory (void);
+/*
+ *  Frees memory that has been internally allocated.  No reference counting is
+ *    performed to determine whether memory regions are still in use.
+ *  This may be useful for explicitly de-allocating memory before program
+ *    termination when checking for memory leaks.
+ *  WARNING: Do not call this routine until ALL hashes have been destroyed.
+ */
+
 
 #endif /* !LSD_HASH_H */

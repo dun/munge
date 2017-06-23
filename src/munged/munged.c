@@ -52,6 +52,7 @@
 #include "conf.h"
 #include "crypto.h"
 #include "gids.h"
+#include "hash.h"
 #include "job.h"
 #include "log.h"
 #include "missing.h"
@@ -156,6 +157,7 @@ main (int argc, char *argv[])
     timer_fini ();
     replay_fini ();
     gids_destroy (conf->gids);
+    hash_drop_memory ();
     random_fini (conf->seed_name);
     crypto_fini ();
     destroy_conf (conf);

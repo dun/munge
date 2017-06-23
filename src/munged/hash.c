@@ -45,9 +45,9 @@
  *  Constants
  *****************************************************************************/
 
-#define HASH_ALLOC      1024
-#define HASH_DEF_SIZE   1213
-#define HASH_MAGIC      0xDEADBEEF
+#define HASH_DEF_SIZE           1213
+#define HASH_NODE_ALLOC_NUM     1024
+#define HASH_MAGIC              0xDEADBEEF
 
 
 /*****************************************************************************
@@ -89,10 +89,28 @@ static void hash_node_free (struct hash_node *node);
  *  Variables
  *****************************************************************************/
 
+static struct hash_node *hash_mem_list = NULL;
+/*
+ *  Singly-linked list for tracking memory allocations from hash_node_alloc()
+ *    for eventual de-allocation via hash_drop_memory().  Each block allocation
+ *    begins with a pointer for chaining these allocations together.  The block
+ *    is broken up into individual hash_node structs and placed on the
+ *    hash_free_list.
+ */
+
 static struct hash_node *hash_free_list = NULL;
+/*
+ *  Singly-linked list of hash_node structs available for use.  These are
+ *    allocated via hash_node_alloc() in blocks of HASH_NODE_ALLOC_NUM.  This
+ *    bulk approach uses less RAM and CPU than allocating/de-allocating objects
+ *    individually as needed.
+ */
 
 #if WITH_PTHREADS
-static pthread_mutex_t hash_free_lock = PTHREAD_MUTEX_INITIALIZER;
+static pthread_mutex_t hash_free_list_lock = PTHREAD_MUTEX_INITIALIZER;
+/*
+ *  Mutex for protecting access to hash_mem_list and hash_free_list.
+ */
 #endif /* WITH_PTHREADS */
 
 
@@ -394,6 +412,23 @@ hash_for_each (hash_t h, hash_arg_f arg_f, void *arg)
 }
 
 
+void
+hash_drop_memory (void)
+{
+    struct hash_node *p;
+
+    lsd_mutex_lock (&hash_free_list_lock);
+    while (hash_mem_list != NULL) {
+        p = hash_mem_list;
+        hash_mem_list = p->next;
+        free (p);
+    }
+    hash_free_list = NULL;
+    lsd_mutex_unlock (&hash_free_list_lock);
+    return;
+}
+
+
 /*****************************************************************************
  *  Hash Functions
  *****************************************************************************/
@@ -420,29 +455,40 @@ static struct hash_node *
 hash_node_alloc (void)
 {
 /*  Allocates a hash node from the freelist.
- *  Memory is allocated in chunks of HASH_ALLOC.
  *  Returns a ptr to the object, or NULL if memory allocation fails.
  */
+    size_t size;
+    struct hash_node *p;
     int i;
-    struct hash_node *p = NULL;
 
-    assert (HASH_ALLOC > 0);
-    lsd_mutex_lock (&hash_free_lock);
+    assert (HASH_NODE_ALLOC_NUM > 0);
+    lsd_mutex_lock (&hash_free_list_lock);
+
     if (!hash_free_list) {
-        if ((hash_free_list = malloc (HASH_ALLOC * sizeof (*p)))) {
-            for (i = 0; i < HASH_ALLOC - 1; i++)
+        size = sizeof (p) + (HASH_NODE_ALLOC_NUM * sizeof (*p));
+        p = malloc (size);
+
+        if (p != NULL) {
+            p->next = hash_mem_list;
+            hash_mem_list = p;
+            hash_free_list = (struct hash_node *)
+                    ((unsigned char *) p + sizeof (p));
+
+            for (i = 0; i < HASH_NODE_ALLOC_NUM - 1; i++) {
                 hash_free_list[i].next = &hash_free_list[i+1];
+            }
             hash_free_list[i].next = NULL;
         }
     }
     if (hash_free_list) {
         p = hash_free_list;
         hash_free_list = p->next;
+        memset (p, 0, sizeof (*p));
     }
     else {
         errno = ENOMEM;
     }
-    lsd_mutex_unlock (&hash_free_lock);
+    lsd_mutex_unlock (&hash_free_list_lock);
     return (p);
 }
 
@@ -453,10 +499,9 @@ hash_node_free (struct hash_node *node)
 /*  De-allocates the object [node], returning it to the freelist.
  */
     assert (node != NULL);
-    memset (node, 0, sizeof (*node));
-    lsd_mutex_lock (&hash_free_lock);
+    lsd_mutex_lock (&hash_free_list_lock);
     node->next = hash_free_list;
     hash_free_list = node;
-    lsd_mutex_unlock (&hash_free_lock);
+    lsd_mutex_unlock (&hash_free_list_lock);
     return;
 }
