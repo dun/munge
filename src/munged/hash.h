@@ -37,9 +37,6 @@
  *  If an item's key is modified after insertion, the hash will be unable to
  *  locate it if the new key should hash to a different slot in the table.
  *
- *  If NDEBUG is not defined, internal debug code will be enabled; this is
- *  intended for development use only.  Production code should define NDEBUG.
- *
  *  If WITH_PTHREADS is defined, these routines will be thread-safe.
  */
 

@@ -46,7 +46,6 @@
 
 #define HASH_DEF_SIZE           1213
 #define HASH_NODE_ALLOC_NUM     1024
-#define HASH_MAGIC              0xDEADBEEF
 
 
 /*****************************************************************************
@@ -69,9 +68,6 @@ struct hash {
 #if WITH_PTHREADS
     pthread_mutex_t     mutex;          /* mutex to protect access to hash   */
 #endif /* WITH_PTHREADS */
-#ifndef NDEBUG
-    unsigned int        magic;          /* sentinel for asserting validity   */
-#endif /* NDEBUG */
 };
 
 
@@ -142,7 +138,6 @@ hash_create (int size, hash_key_f key_f, hash_cmp_f cmp_f, hash_del_f del_f)
     h->del_f = del_f;
     h->key_f = key_f;
     lsd_mutex_init (&h->mutex);
-    assert (h->magic = HASH_MAGIC);     /* set magic via assert abuse */
     return (h);
 }
 
@@ -158,7 +153,6 @@ hash_destroy (hash_t h)
         return;
     }
     lsd_mutex_lock (&h->mutex);
-    assert (h->magic == HASH_MAGIC);
     for (i = 0; i < h->size; i++) {
         for (p = h->table[i]; p != NULL; p = q) {
             q = p->next;
@@ -167,7 +161,6 @@ hash_destroy (hash_t h)
             hash_node_free (p);
         }
     }
-    assert (h->magic = ~HASH_MAGIC);    /* clear magic via assert abuse */
     lsd_mutex_unlock (&h->mutex);
     lsd_mutex_destroy (&h->mutex);
     free (h->table);
@@ -186,7 +179,6 @@ void hash_reset (hash_t h)
         return;
     }
     lsd_mutex_lock (&h->mutex);
-    assert (h->magic == HASH_MAGIC);
     for (i = 0; i < h->size; i++) {
         for (p = h->table[i]; p != NULL; p = q) {
             q = p->next;
@@ -212,7 +204,6 @@ hash_is_empty (hash_t h)
         return (0);
     }
     lsd_mutex_lock (&h->mutex);
-    assert (h->magic == HASH_MAGIC);
     n = h->count;
     lsd_mutex_unlock (&h->mutex);
     return (n == 0);
@@ -229,7 +220,6 @@ hash_count (hash_t h)
         return (0);
     }
     lsd_mutex_lock (&h->mutex);
-    assert (h->magic == HASH_MAGIC);
     n = h->count;
     lsd_mutex_unlock (&h->mutex);
     return (n);
@@ -250,7 +240,6 @@ hash_find (hash_t h, const void *key)
     }
     errno = 0;
     lsd_mutex_lock (&h->mutex);
-    assert (h->magic == HASH_MAGIC);
     slot = h->key_f (key) % h->size;
     for (p = h->table[slot]; p != NULL; p = p->next) {
         cmpval = h->cmp_f (p->hkey, key);
@@ -280,7 +269,6 @@ hash_insert (hash_t h, const void *key, void *data)
         return (NULL);
     }
     lsd_mutex_lock (&h->mutex);
-    assert (h->magic == HASH_MAGIC);
     slot = h->key_f (key) % h->size;
     for (pp = &(h->table[slot]); (p = *pp) != NULL; pp = &(p->next)) {
         cmpval = h->cmp_f (p->hkey, key);
@@ -325,7 +313,6 @@ hash_remove (hash_t h, const void *key)
     }
     errno = 0;
     lsd_mutex_lock (&h->mutex);
-    assert (h->magic == HASH_MAGIC);
     slot = h->key_f (key) % h->size;
     for (pp = &(h->table[slot]); (p = *pp) != NULL; pp = &(p->next)) {
         cmpval = h->cmp_f (p->hkey, key);
@@ -358,7 +345,6 @@ hash_delete_if (hash_t h, hash_arg_f arg_f, void *arg)
         return (-1);
     }
     lsd_mutex_lock (&h->mutex);
-    assert (h->magic == HASH_MAGIC);
     for (i = 0; i < h->size; i++) {
         pp = &(h->table[i]);
         while ((p = *pp) != NULL) {
@@ -392,7 +378,6 @@ hash_for_each (hash_t h, hash_arg_f arg_f, void *arg)
         return (-1);
     }
     lsd_mutex_lock (&h->mutex);
-    assert (h->magic == HASH_MAGIC);
     for (i = 0; i < h->size; i++) {
         for (p = h->table[i]; p != NULL; p = p->next) {
             if (arg_f (p->data, p->hkey, arg) > 0) {
