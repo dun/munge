@@ -50,6 +50,7 @@
  *  Private Constants
  *****************************************************************************/
 
+#define REPLAY_HASH_SIZE        65537
 #define REPLAY_NODE_ALLOC_NUM   1024
 
 
@@ -57,17 +58,17 @@
  *  Private Data Types
  *****************************************************************************/
 
-union replay_key {
+union replay_node {
     struct {
-      union replay_key  *next;          /* ptr for chaining by allocator     */
-    }                    alloc;
+        union replay_node *next;        /* ptr for chaining by allocator     */
+    } alloc;
     struct {
-      time_t             t_expired;     /* time after which cred expires     */
-      unsigned char      mac[MUNGE_MINIMUM_MD_LEN];     /* msg auth code     */
-    }                    data;
+        time_t             t_expired;   /* time after which cred expires     */
+        unsigned char      mac [MUNGE_MINIMUM_MD_LEN];  /* msg auth code     */
+    } data;
 };
 
-typedef union replay_key * replay_t;
+typedef union replay_node * replay_t;
 
 
 /*****************************************************************************
@@ -182,7 +183,7 @@ replay_insert (munge_cred_t c)
  *    Returns 1 if the credential is already present (ie, replay).
  *    Returns -1 on error with errno set.
  */
-    m_msg_t   m = c->msg;
+    m_msg_t   m;
     int       e;
     replay_t  r;
 
@@ -192,6 +193,12 @@ replay_insert (munge_cred_t c)
         errno = EPERM;
         return (-1);
     }
+    if (c == NULL) {
+        errno = EINVAL;
+        return (-1);
+    }
+    m = c->msg;
+
     if (!(r = replay_alloc ())) {
         return (-1);
     }
@@ -223,10 +230,9 @@ replay_remove (munge_cred_t c)
 {
 /*  Removes the credential [c] from the replay hash.
  */
-    m_msg_t           m = c->msg;
-    union replay_key  rkey_st;
-    replay_t          rkey = &rkey_st;
-    replay_t          r;
+    m_msg_t            m;
+    union replay_node  rnode;
+    replay_t           r;
 
     if (!replay_hash) {
         if (conf->got_benchmark)
@@ -234,13 +240,20 @@ replay_remove (munge_cred_t c)
         errno = EPERM;
         return (-1);
     }
+    if (c == NULL) {
+        errno = EINVAL;
+        return (-1);
+    }
+    m = c->msg;
+
     /*  Compute the cred's "hash key".
      */
-    rkey->data.t_expired = (time_t) (m->time0 + m->ttl);
-    assert (c->mac_len >= sizeof (rkey->data.mac));
-    memcpy (rkey->data.mac, c->mac, sizeof (rkey->data.mac));
+    rnode.data.t_expired = (time_t) (m->time0 + m->ttl);
+    assert (c->mac_len >= sizeof (rnode.data.mac));
+    memcpy (rnode.data.mac, c->mac, sizeof (rnode.data.mac));
 
-    if ((r = hash_remove (replay_hash, rkey))) {
+    r = hash_remove (replay_hash, &rnode);
+    if (r != NULL) {
         replay_free (r);
     }
     return (r ? 0 : -1);
