@@ -50,7 +50,7 @@
  *  Private Constants
  *****************************************************************************/
 
-#define REPLAY_ALLOC    1024
+#define REPLAY_NODE_ALLOC_NUM   1024
 
 
 /*****************************************************************************
@@ -84,16 +84,40 @@ static replay_t replay_alloc (void);
 
 static void replay_free (replay_t r);
 
+static void replay_drop_memory (void);
+
 
 /*****************************************************************************
  *  Private Variables
  *****************************************************************************/
 
 static hash_t replay_hash = NULL;
+/*
+ *  Hash table for tracking decoded credentials until they have expired
+ *    in order to prevent reuse.
+ */
+
+static replay_t replay_mem_list = NULL;
+/*
+ *  Singly-linked list for tracking memory allocations from replay_alloc() for
+ *    eventual de-allocation via replay_drop_memory().  Each block allocation
+ *    begins with a pointer for chaining these allocations together.  The block
+ *    is broken up into individual replay_t objects and placed on the
+ *    replay_free_list.
+ */
 
 static replay_t replay_free_list = NULL;
+/*
+ *  Singly-linked list of replay_t objects available for use.  These are
+ *    allocated via replay_alloc() in blocks of REPLAY_NODE_ALLOC_NUM.  This
+ *    bulk approach uses less RAM and CPU than allocating/de-allocating objects
+ *    individually as needed.
+ */
 
-static pthread_mutex_t replay_free_lock = PTHREAD_MUTEX_INITIALIZER;
+static pthread_mutex_t replay_free_list_lock = PTHREAD_MUTEX_INITIALIZER;
+/*
+ *  Mutex for protecting access to replay_mem_list and replay_free_list.
+ */
 
 
 /*****************************************************************************
@@ -142,6 +166,7 @@ replay_fini (void)
     }
     hash_destroy (replay_hash);
     replay_hash = NULL;
+    replay_drop_memory ();
     return;
 }
 
@@ -174,7 +199,7 @@ replay_insert (munge_cred_t c)
     assert (c->mac_len >= sizeof (r->data.mac));
     memcpy (r->data.mac, c->mac, sizeof (r->data.mac));
     /*
-     *  The replay hash key is just the replay struct itself.
+     *  The replay hash key is just the replay_t object itself.
      */
     if (hash_insert (replay_hash, r, r) != NULL) {
         return (0);
@@ -291,7 +316,7 @@ replay_cmp_f (const replay_t r1, const replay_t r2)
 static int
 replay_is_expired (replay_t r, void *key, time_t *pnow)
 {
-/*  Returns true if the replay struct [r] has expired based on the time [pnow].
+/*  Returns true if replay_t object [r] has expired based on the time [pnow].
  */
     if (r->data.t_expired < *pnow) {
         return (1);
@@ -303,29 +328,40 @@ replay_is_expired (replay_t r, void *key, time_t *pnow)
 static replay_t
 replay_alloc (void)
 {
-/*  Allocates a replay struct.
+/*  Allocates a replay_t object.
  *  Returns a ptr to the object, or NULL if memory allocation fails.
  */
-    int         i;
-    replay_t    r;
+    size_t    size;
+    replay_t  r;
+    int       i;
 
-    assert (REPLAY_ALLOC > 0);
+    assert (REPLAY_NODE_ALLOC_NUM > 0);
+    lsd_mutex_lock (&replay_free_list_lock);
 
-    lsd_mutex_lock (&replay_free_lock);
     if (!replay_free_list) {
-        if ((replay_free_list = malloc (REPLAY_ALLOC * sizeof (*r)))) {
-            for (i = 0; i < REPLAY_ALLOC - 1; i++)
+        size = sizeof (r) + (REPLAY_NODE_ALLOC_NUM * sizeof (*r));
+        r = malloc (size);
+
+        if (r != NULL) {
+            r->alloc.next = replay_mem_list;
+            replay_mem_list = r;
+            replay_free_list = (replay_t) ((unsigned char *) r + sizeof (r));
+
+            for (i = 0; i < REPLAY_NODE_ALLOC_NUM - 1; i++) {
                 replay_free_list[i].alloc.next = &replay_free_list[i+1];
+            }
             replay_free_list[i].alloc.next = NULL;
         }
     }
-    if ((r = replay_free_list)) {
+    if (replay_free_list) {
+        r = replay_free_list;
         replay_free_list = r->alloc.next;
+        memset (r, 0, sizeof (*r));
     }
     else {
         errno = ENOMEM;
     }
-    lsd_mutex_unlock (&replay_free_lock);
+    lsd_mutex_unlock (&replay_free_list_lock);
     return (r);
 }
 
@@ -333,13 +369,33 @@ replay_alloc (void)
 static void
 replay_free (replay_t r)
 {
-/*  De-allocates the replay struct [r].
+/*  De-allocates the replay_t object [r].
  */
     assert (r != NULL);
-
-    lsd_mutex_lock (&replay_free_lock);
+    lsd_mutex_lock (&replay_free_list_lock);
     r->alloc.next = replay_free_list;
     replay_free_list = r;
-    lsd_mutex_unlock (&replay_free_lock);
+    lsd_mutex_unlock (&replay_free_list_lock);
+    return;
+}
+
+
+static void
+replay_drop_memory (void)
+{
+/*  Frees memory that has been internally allocated for replay_t objects.
+ *  This routine should only be called via replay_fini() after replay_hash
+ *    has been destroyed.
+ */
+    replay_t r;
+
+    lsd_mutex_lock (&replay_free_list_lock);
+    while (replay_mem_list != NULL) {
+        r = replay_mem_list;
+        replay_mem_list = r->alloc.next;
+        free (r);
+    }
+    replay_free_list = NULL;
+    lsd_mutex_unlock (&replay_free_list_lock);
     return;
 }
