@@ -268,15 +268,21 @@ replay_key_f (const replay_t r)
 static int
 replay_cmp_f (const replay_t r1, const replay_t r2)
 {
-/*  Returns zero if both replay structs [r1] and [r2] are equal.
- *    This return code may seem counter-intuitive, but it mirrors
- *    the various *cmp() functions that return zero on equality.
+/*  Returns an integer that is less than zero if [r1] is less than [r2],
+ *    equal to zero if [r1] is equal to [r2], and greater than zero
+ *    if [r1] is greater than [r2].
  */
-    if (r1->data.t_expired != r2->data.t_expired) {
+    int cmpval;
+
+    cmpval = memcmp (r1->data.mac, r2->data.mac, sizeof (r1->data.mac));
+    if (cmpval != 0) {
+        return (cmpval);
+    }
+    if (r1->data.t_expired < r2->data.t_expired) {
         return (-1);
     }
-    if (memcmp (r1->data.mac, r2->data.mac, sizeof (r2->data.mac))) {
-        return (-1);
+    if (r1->data.t_expired > r2->data.t_expired) {
+        return (1);
     }
     return (0);
 }

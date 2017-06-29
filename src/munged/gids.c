@@ -641,7 +641,13 @@ _gids_node_cmp (uid_t *uid1p, uid_t *uid2p)
 {
 /*  Used by the hash routines to compare hash keys [uid1p] and [uid2p].
  */
-    return (!(*uid1p == *uid2p));
+    if (*uid1p < *uid2p) {
+        return (-1);
+    }
+    if (*uid1p > *uid2p) {
+        return (1);
+    }
+    return (0);
 }
 
 

@@ -72,7 +72,9 @@ typedef unsigned int (*hash_key_f) (const void *key);
 typedef int (*hash_cmp_f) (const void *key1, const void *key2);
 /*
  *  Function prototype for comparing two keys.
- *  Returns zero if both keys are equal; o/w, returns nonzero.
+ *  Returns an integer that is less than zero if [key1] is less than [key2],
+ *    equal to zero if [key1] is equal to [key2], and greater than zero if
+ *    [key1] is greater than [key2].
  */
 
 typedef void (*hash_del_f) (void *data);

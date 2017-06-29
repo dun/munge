@@ -264,6 +264,7 @@ void *
 hash_find (hash_t h, const void *key)
 {
     unsigned int slot;
+    int cmpval;
     struct hash_node *p;
     void *data = NULL;
 
@@ -276,10 +277,14 @@ hash_find (hash_t h, const void *key)
     assert (h->magic == HASH_MAGIC);
     slot = h->key_f (key) % h->size;
     for (p = h->table[slot]; p != NULL; p = p->next) {
-        if (!h->cmp_f (p->hkey, key)) {
-            data = p->data;
-            break;
+        cmpval = h->cmp_f (p->hkey, key);
+        if (cmpval < 0) {
+            continue;
         }
+        if (cmpval == 0) {
+            data = p->data;
+        }
+        break;
     }
     lsd_mutex_unlock (&h->mutex);
     return (data);
@@ -289,8 +294,10 @@ hash_find (hash_t h, const void *key)
 void *
 hash_insert (hash_t h, const void *key, void *data)
 {
-    struct hash_node *p;
     unsigned int slot;
+    int cmpval;
+    struct hash_node **pp;
+    struct hash_node *p;
 
     if (!h || !key || !data) {
         errno = EINVAL;
@@ -299,12 +306,17 @@ hash_insert (hash_t h, const void *key, void *data)
     lsd_mutex_lock (&h->mutex);
     assert (h->magic == HASH_MAGIC);
     slot = h->key_f (key) % h->size;
-    for (p = h->table[slot]; p != NULL; p = p->next) {
-        if (!h->cmp_f (p->hkey, key)) {
+    for (pp = &(h->table[slot]); (p = *pp) != NULL; pp = &(p->next)) {
+        cmpval = h->cmp_f (p->hkey, key);
+        if (cmpval < 0) {
+            continue;
+        }
+        if (cmpval == 0) {
             errno = EEXIST;
             data = NULL;
             goto end;
         }
+        break;
     }
     if (!(p = hash_node_alloc ())) {
         data = lsd_nomem_error (__FILE__, __LINE__, "hash_insert");
@@ -312,8 +324,8 @@ hash_insert (hash_t h, const void *key, void *data)
     }
     p->hkey = key;
     p->data = data;
-    p->next = h->table[slot];
-    h->table[slot] = p;
+    p->next = *pp;
+    *pp = p;
     h->count++;
 
 end:
@@ -325,9 +337,10 @@ end:
 void *
 hash_remove (hash_t h, const void *key)
 {
+    unsigned int slot;
+    int cmpval;
     struct hash_node **pp;
     struct hash_node *p;
-    unsigned int slot;
     void *data = NULL;
 
     if (!h || !key) {
@@ -338,14 +351,18 @@ hash_remove (hash_t h, const void *key)
     lsd_mutex_lock (&h->mutex);
     assert (h->magic == HASH_MAGIC);
     slot = h->key_f (key) % h->size;
-    for (pp = &(h->table[slot]); (p = *pp) != NULL; pp = &((*pp)->next)) {
-        if (!h->cmp_f (p->hkey, key)) {
+    for (pp = &(h->table[slot]); (p = *pp) != NULL; pp = &(p->next)) {
+        cmpval = h->cmp_f (p->hkey, key);
+        if (cmpval < 0) {
+            continue;
+        }
+        if (cmpval == 0) {
             data = p->data;
             *pp = p->next;
             hash_node_free (p);
             h->count--;
-            break;
         }
+        break;
     }
     lsd_mutex_unlock (&h->mutex);
     return (data);
