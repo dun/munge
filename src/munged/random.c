@@ -54,13 +54,32 @@
  *  Constants
  *****************************************************************************/
 
-#ifndef RANDOM_SEED_BYTES
-#  define RANDOM_SEED_BYTES             1024
-#endif /* !RANDOM_SEED_BYTES */
+/*  String specifying the pathname of the random number source device.
+ */
+#define RANDOM_SOURCE_PATH              "/dev/urandom"
 
-#ifndef RANDOM_SEED_DEVICE
-#  define RANDOM_SEED_DEVICE            "/dev/urandom"
-#endif /* !RANDOM_SEED_DEVICE */
+/*  Integer for the number of bytes to read from the random number source
+ *    device when seeding the PRNG entropy pool.
+ */
+#define RANDOM_SOURCE_BYTES             128
+
+/*  Integer for the number of bytes to read from (and write to) the seed file.
+ *  Note that OpenSSL ignores this value when writing the seed file.
+ *    RAND_write_file() will write 1024 bytes regardless.
+ */
+#define RANDOM_SEED_BYTES               1024
+
+/*  Integer for the minimum number of bytes needed to adequately seed the
+ *    PRNG entropy pool.
+ */
+#define RANDOM_BYTES_MIN                128
+
+/*  Integer for the minimum number of bytes wanted to seed the PRNG entropy
+ *    pool.  This is set such that "enhanced stirring" (i.e., starting the PRNG
+ *    stir timer's exponential backoff interval at 1) will be enabled unless
+ *    there is entropy from both the kernel source and the seed file.
+ */
+#define RANDOM_BYTES_WANTED             1152
 
 /*  Integer for the maximum number of seconds between stirrings of the PRNG
  *    entropy pool.  If set to 0, entropy pool stirrings will be disabled.
@@ -81,6 +100,9 @@ static int  _random_stir_secs;          /* secs between entropy pool stirs   */
  *  Private Prototypes
  *****************************************************************************/
 
+static int  _random_read_entropy_from_kernel (void);
+static int  _random_read_entropy_from_file (const char *path);
+static int  _random_read_entropy_from_process (void);
 static void _random_stir_entropy (void *_arg_not_used_);
 
 static int  _random_read_seed (const char *filename, int num_bytes);
@@ -98,117 +120,51 @@ static void _random_pseudo_bytes (void *buf, int n);
 int
 random_init (const char *seed_path)
 {
-    int          rnd_bytes_needed       = RANDOM_SEED_BYTES;
-    int          rc                     = 0;
-    int          do_unlink              = 1;
-    int          got_symlink;
-    struct stat  st;
-    int          n;
-    char         seed_dir [PATH_MAX];
-    char         ebuf [1024];
+    int num_bytes_entropy = 0;
+    int got_bad_seed = 0;
+    int n;
 
-    /*  Load entropy from seed file.
+    /*  Fill the entropy pool.
      */
-    if ((rnd_bytes_needed > 0) &&
-        (seed_path != NULL)    &&
-        (*seed_path != '\0')) {
-        /*
-         *  Check file permissions and whatnot.
-         */
-        got_symlink = (lstat (seed_path, &st) == 0) ? S_ISLNK (st.st_mode) : 0;
-
-        if (((n = stat (seed_path, &st)) < 0) && (errno == ENOENT)) {
-            if (!got_symlink) {
-                do_unlink = 0; /* A missing seed is not considered an error. */
-            }
+    n = _random_read_entropy_from_kernel ();
+    if (n > 0) {
+        num_bytes_entropy += n;
+    }
+    if (seed_path) {
+        n = _random_read_entropy_from_file (seed_path);
+        if (n > 0) {
+            num_bytes_entropy += n;
         }
         else if (n < 0) {
-            log_msg (LOG_WARNING, "Ignoring PRNG seed \"%s\": %s",
-                    seed_path, strerror (errno));
+            got_bad_seed = 1;
         }
-        else if (!S_ISREG (st.st_mode) || got_symlink) {
-            log_msg (LOG_WARNING,
-                    "Ignoring PRNG seed \"%s\": not a regular file",
-                    seed_path);
-        }
-        else if (st.st_uid != geteuid ()) {
-            log_msg (LOG_WARNING,
-                    "Ignoring PRNG seed \"%s\": not owned by UID %u",
-                    seed_path, (unsigned) geteuid ());
-        }
-        else if (st.st_mode & (S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH)) {
-            log_msg (LOG_WARNING, "Ignoring PRNG seed \"%s\": "
-                    "cannot be readable or writable by group or world",
-                    seed_path);
+    }
+    n = _random_read_entropy_from_process ();
+    if (n > 0) {
+        num_bytes_entropy += n;
+    }
+    if (num_bytes_entropy < RANDOM_BYTES_MIN) {
+        if (!conf->got_force) {
+            log_err (EMUNGE_SNAFU, LOG_ERR,
+                    "Failed to seed PRNG with sufficient entropy");
         }
         else {
-            do_unlink = 0;
-        }
-        /*  Ensure seed dir is secure against modification by others.
-         */
-        if (path_dirname (seed_path, seed_dir, sizeof (seed_dir)) < 0) {
-            log_err (EMUNGE_SNAFU, LOG_ERR,
-                    "Failed to determine dirname of PRNG seed \"%s\"",
-                    seed_path);
-        }
-        n = path_is_secure (seed_dir, ebuf, sizeof (ebuf),
-                PATH_SECURITY_NO_FLAGS);
-        if (n < 0) {
-            log_err (EMUNGE_SNAFU, LOG_ERR,
-                    "Failed to check PRNG seed dir \"%s\": %s",
-                    seed_dir, ebuf);
-        }
-        else if ((n == 0) && (!conf->got_force)) {
-            log_err (EMUNGE_SNAFU, LOG_ERR,
-                    "PRNG seed dir is insecure: %s", ebuf);
-        }
-        else if (n == 0) {
-            log_msg (LOG_WARNING, "PRNG seed dir is insecure: %s", ebuf);
-        }
-        /*  Remove the existing seed if it is insecure; o/w, load it.
-         */
-        if (do_unlink && (unlink (seed_path) < 0)) {
-            log_msg (LOG_WARNING, "Failed to remove insecure PRNG seed \"%s\"",
-                    seed_path);
-            rc = -1;
-        }
-        else if (do_unlink) {
-            log_msg (LOG_INFO, "Removed insecure PRNG seed \"%s\"", seed_path);
-        }
-        else if ((n = _random_read_seed (seed_path, rnd_bytes_needed)) > 0) {
-            log_msg (LOG_INFO, "PRNG seeded with %d bytes from \"%s\"",
-                    n, seed_path);
-            rnd_bytes_needed -= n;
-        }
-    }
-    /*  Load entropy from default source if more is needed.
-     */
-    if (rnd_bytes_needed > 0) {
-        n = _random_read_seed (RANDOM_SEED_DEVICE, rnd_bytes_needed);
-        if (n > 0) {
-            log_msg (LOG_INFO, "PRNG seeded with %d bytes from \"%s\"",
-                    n, RANDOM_SEED_DEVICE);
-            rnd_bytes_needed -= n;
-        }
-    }
-    /*  Warn if sufficient entropy is not available.
-     */
-    if (rnd_bytes_needed > 0) {
-        if (!conf->got_force)
-            log_err (EMUNGE_SNAFU, LOG_ERR,
-                    "Failed to seed PRNG with sufficient entropy");
-        else
             log_msg (LOG_WARNING,
                     "Failed to seed PRNG with sufficient entropy");
-    }
-    else {
-        rc = 1;
+        }
     }
     /*  Compute the initial time interval for stirring the entropy pool.
+     *  If the desired amount of entropy is not available, increase the
+     *    initial rate of stirring to mix stuff up.  Otherwise, just stir
+     *    at the max interval.
      */
     if (conf->got_benchmark || (RANDOM_STIR_MAX_SECS <= 0)) {
         _random_stir_secs = 0;
         log_msg (LOG_INFO, "Disabled PRNG entropy pool stirring");
+    }
+    else if (num_bytes_entropy < RANDOM_BYTES_WANTED) {
+        _random_stir_secs = 1;
+        log_msg (LOG_INFO, "Enabled PRNG entropy pool enhanced stirring");
     }
     else {
         _random_stir_secs = RANDOM_STIR_MAX_SECS;
@@ -220,7 +176,13 @@ random_init (const char *seed_path)
         _random_stir_entropy (NULL);
     }
 
-    return (rc);
+    if (got_bad_seed) {
+        return (-1);
+    }
+    if (num_bytes_entropy < RANDOM_BYTES_WANTED) {
+        return (0);
+    }
+    return (1);
 }
 
 
@@ -281,6 +243,154 @@ random_pseudo_bytes (void *buf, int n)
     }
     _random_pseudo_bytes (buf, n);
     return;
+}
+
+
+/*****************************************************************************
+ *  Private Functions (Common)
+ *****************************************************************************/
+
+static int
+_random_read_entropy_from_kernel (void)
+{
+/*  Reads entropy from the kernel's CSPRNG.
+ *  Returns the number of bytes of entropy added, or -1 on error.
+ */
+    int           n = -1;
+    int           fd;
+    unsigned char buf [RANDOM_SOURCE_BYTES];
+
+    fd = open (RANDOM_SOURCE_PATH, O_RDONLY | O_NONBLOCK);
+    if (fd < 0) {
+        log_msg (LOG_WARNING, "Failed to open \"%s\": %s",
+                RANDOM_SOURCE_PATH, strerror (errno));
+    }
+    else {
+        n = fd_read_n (fd, buf, sizeof (buf));
+        if (n < 0) {
+            log_msg (LOG_WARNING, "Failed to read from \"%s\": %s",
+                    RANDOM_SOURCE_PATH, strerror (errno));
+        }
+        if (close (fd) < 0) {
+            log_msg (LOG_WARNING, "Failed to close \"%s\": %s",
+                    RANDOM_SOURCE_PATH, strerror (errno));
+        }
+    }
+
+    if (n > 0) {
+        _random_add (buf, n);
+        log_msg (LOG_INFO, "PRNG seeded with %d byte%s from \"%s\"",
+                n, (n == 1 ? "" : "s"), RANDOM_SOURCE_PATH);
+    }
+    return (n);
+}
+
+
+static int
+_random_read_entropy_from_file (const char *path)
+{
+/*  Reads entropy from the seed file specified by 'path'.
+ *  Returns the number of bytes of entropy added, or -1 on error.
+ */
+    int         do_unlink = 1;
+    int         is_symlink;
+    int         n;
+    struct stat st;
+    char        dir [PATH_MAX];
+    char        ebuf [1024];
+
+    if ((path == NULL) || (path[0] == '\0')) {
+        errno = EINVAL;
+        return (-1);
+    }
+    /*  Check seed file permissions.
+     */
+    is_symlink = (lstat (path, &st) == 0) ? S_ISLNK (st.st_mode) : 0;
+
+    n = stat (path, &st);
+    if ((n < 0) && (errno == ENOENT) && (!is_symlink)) {
+        do_unlink = 0;                  /* A missing seed is not an error. */
+    }
+    else if (n < 0) {
+        log_msg (LOG_WARNING, "Ignoring PRNG seed \"%s\": %s",
+                path, strerror (errno));
+    }
+    else if (!S_ISREG (st.st_mode) || is_symlink) {
+        log_msg (LOG_WARNING, "Ignoring PRNG seed \"%s\": not a regular file",
+                path);
+    }
+    else if (st.st_uid != geteuid ()) {
+        log_msg (LOG_WARNING, "Ignoring PRNG seed \"%s\": not owned by UID %u",
+                path, (unsigned) geteuid ());
+    }
+    else if (st.st_mode & (S_IRGRP | S_IROTH)) {
+        log_msg (LOG_WARNING,
+                "Ignoring PRNG seed \"%s\": readable by group or other", path);
+    }
+    else if (st.st_mode & (S_IWGRP | S_IWOTH)) {
+        log_msg (LOG_WARNING,
+                "Ignoring PRNG seed \"%s\": writable by group or other", path);
+    }
+    else {
+        do_unlink = 0;                  /* File perms OK, so keep seed file. */
+    }
+
+    /*  Check seed dir permissions.
+     */
+    if (path_dirname (path, dir, sizeof (dir)) < 0) {
+        log_err (EMUNGE_SNAFU, LOG_ERR,
+                "Failed to determine dirname of PRNG seed \"%s\"", path);
+    }
+
+    n = path_is_secure (dir, ebuf, sizeof (ebuf), PATH_SECURITY_NO_FLAGS);
+    if (n < 0) {
+        log_err (EMUNGE_SNAFU, LOG_ERR,
+                "Failed to check PRNG seed dir \"%s\": %s", dir, ebuf);
+    }
+    else if ((n == 0) && (!conf->got_force)) {
+        log_err (EMUNGE_SNAFU, LOG_ERR, "PRNG seed dir is insecure: %s", ebuf);
+    }
+    else if (n == 0) {
+        log_msg (LOG_WARNING, "PRNG seed dir is insecure: %s", ebuf);
+    }
+
+    /*  Remove the existing seed file if it is insecure; otherwise, load it.
+     */
+    if (do_unlink && (unlink (path) < 0)) {
+        log_msg (LOG_WARNING,
+                "Failed to remove insecure PRNG seed \"%s\"", path);
+        n = -1;
+    }
+    else if (do_unlink) {
+        log_msg (LOG_INFO, "Removed insecure PRNG seed \"%s\"", path);
+        n = 0;
+    }
+    else if ((n = _random_read_seed (path, RANDOM_SEED_BYTES)) > 0) {
+        log_msg (LOG_INFO, "PRNG seeded with %d byte%s from \"%s\"",
+                n, (n == 1 ? "" : "s"), path);
+    }
+    return (n);
+}
+
+
+static int
+_random_read_entropy_from_process (void)
+{
+/*  Reads entropy from sources related to the process.
+ *  Returns the number of bytes of entropy added, or -1 on error.
+ */
+    pid_t  pid;
+    time_t now;
+
+    pid = getpid ();
+    _random_add (&pid, sizeof (pid));
+
+    if (time (&now) != (time_t) -1) {
+        _random_add (&now, sizeof (now));
+    }
+    /*  Since these sources do not provide much entropy, return 0.
+     */
+    return (0);
 }
 
 

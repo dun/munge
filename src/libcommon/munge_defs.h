@@ -213,10 +213,5 @@
  */
 #define MUNGED_SECRET_KEY               X_SYSCONFDIR "/munge/munge.key"
 
-/*  String specifying the pathname of the random number source device to use
- *    in case the MUNGED_RANDOM_SEED file contains insufficient entropy.
- */
-#define RANDOM_SEED_DEVICE              "/dev/urandom"
-
 
 #endif /* !MUNGE_DEFS_H */
