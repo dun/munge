@@ -36,6 +36,9 @@
 #include <munge.h>
 #include <stdint.h>
 #include <string.h>
+#if HAVE_SYS_RANDOM_H
+#include <sys/random.h>
+#endif /* HAVE_SYS_RANDOM_H */
 #include <sys/stat.h>
 #include <sys/time.h>
 #include <time.h>
@@ -60,6 +63,8 @@
 
 /*  Integer for the number of bytes to read from the random number source
  *    device when seeding the PRNG entropy pool.
+ *  Note that an upper limit of 256 bytes is imposed when using either
+ *    getentropy() or getrandom().
  */
 #define RANDOM_SOURCE_BYTES             128
 
@@ -256,31 +261,70 @@ _random_read_entropy_from_kernel (void)
 /*  Reads entropy from the kernel's CSPRNG.
  *  Returns the number of bytes of entropy added, or -1 on error.
  */
-    int           n = -1;
-    int           fd;
-    unsigned char buf [RANDOM_SOURCE_BYTES];
+    int            n = -1;
+    int            fd;
+    size_t         len;
+    const char    *src;
+    unsigned char  buf [RANDOM_SOURCE_BYTES];
 
-    fd = open (RANDOM_SOURCE_PATH, O_RDONLY | O_NONBLOCK);
-    if (fd < 0) {
-        log_msg (LOG_WARNING, "Failed to open \"%s\": %s",
-                RANDOM_SOURCE_PATH, strerror (errno));
+#if HAVE_GETRANDOM
+    /*
+     * If the urandom source has been initialized, reads of up to 256 bytes
+     *   will always return as many bytes as requested and not be interrupted
+     *   by signals.  No such guarantees apply for larger buffer sizes.
+     */
+    src = "getrandom()";
+    len = MIN(256, sizeof (buf));
+retry_getrandom:
+    n = getrandom (buf, len, 0);
+    if (n < 0) {
+        if (errno == EINTR) {
+            goto retry_getrandom;
+        }
+        log_msg (LOG_WARNING, "Failed to fill buffer via getrandom(): %s",
+                strerror (errno));
     }
-    else {
-        n = fd_read_n (fd, buf, sizeof (buf));
-        if (n < 0) {
-            log_msg (LOG_WARNING, "Failed to read from \"%s\": %s",
+#elif HAVE_GETENTROPY
+    /*
+     *  The maximum buffer size permitted is 256 bytes.
+     */
+    src = "getentropy()";
+    len = MIN(256, sizeof (buf));
+    n = getentropy (buf, len);
+    if (n < 0) {
+        log_msg (LOG_WARNING, "Failed to fill buffer via getentropy(): %s",
+                strerror (errno));
+    }
+    else if (n == 0) {
+        n = len;
+    }
+#endif /* HAVE_GETENTROPY */
+
+    if (n < 0) {
+        fd = open (RANDOM_SOURCE_PATH, O_RDONLY | O_NONBLOCK);
+        if (fd < 0) {
+            log_msg (LOG_WARNING, "Failed to open \"%s\": %s",
                     RANDOM_SOURCE_PATH, strerror (errno));
         }
-        if (close (fd) < 0) {
-            log_msg (LOG_WARNING, "Failed to close \"%s\": %s",
-                    RANDOM_SOURCE_PATH, strerror (errno));
+        else {
+            src = "\"" RANDOM_SOURCE_PATH "\"";
+            len = sizeof (buf);
+            n = fd_read_n (fd, buf, len);
+            if (n < 0) {
+                log_msg (LOG_WARNING, "Failed to read from \"%s\": %s",
+                        RANDOM_SOURCE_PATH, strerror (errno));
+            }
+            if (close (fd) < 0) {
+                log_msg (LOG_WARNING, "Failed to close \"%s\": %s",
+                        RANDOM_SOURCE_PATH, strerror (errno));
+            }
         }
     }
 
     if (n > 0) {
         _random_add (buf, n);
-        log_msg (LOG_INFO, "PRNG seeded with %d byte%s from \"%s\"",
-                n, (n == 1 ? "" : "s"), RANDOM_SOURCE_PATH);
+        log_msg (LOG_INFO, "PRNG seeded with %d byte%s from %s",
+                n, (n == 1 ? "" : "s"), src);
     }
     return (n);
 }

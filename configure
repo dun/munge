@@ -14092,6 +14092,7 @@ fi
 for ac_header in \
   bzlib.h \
   standards.h \
+  sys/random.h \
   zlib.h \
 
 do :
@@ -14462,6 +14463,8 @@ fi
 # Checks for library functions.
 ##
 for ac_func in \
+  getentropy \
+  getrandom \
   localtime_r \
   mlockall \
   sysconf \

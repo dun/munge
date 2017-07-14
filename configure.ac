@@ -78,6 +78,7 @@ AC_HEADER_STDC
 AC_CHECK_HEADERS( \
   bzlib.h \
   standards.h \
+  sys/random.h \
   zlib.h \
 )
 
@@ -94,6 +95,8 @@ AC_CHECK_TYPES(socklen_t, [], [], [#include <sys/types.h>
 # Checks for library functions.
 ##
 AC_CHECK_FUNCS( \
+  getentropy \
+  getrandom \
   localtime_r \
   mlockall \
   sysconf \

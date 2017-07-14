@@ -141,6 +141,9 @@
 /* Define to 1 if file descriptors can be passed over a fifo. */
 #undef HAVE_FIFO_RECVFD
 
+/* Define to 1 if you have the `getentropy' function. */
+#undef HAVE_GETENTROPY
+
 /* Define to 1 if you have the `getgrent' function. */
 #undef HAVE_GETGRENT
 
@@ -179,6 +182,9 @@
 
 /* Define to 1 if you have the `getpwnam_r' function from SunOS. */
 #undef HAVE_GETPWNAM_R_SUN
+
+/* Define to 1 if you have the `getrandom' function. */
+#undef HAVE_GETRANDOM
 
 /* Define to 1 if you have the `HMAC_cleanup' function. */
 #undef HAVE_HMAC_CLEANUP
@@ -290,6 +296,9 @@
 
 /* Define to 1 if you have the `sysconf' function. */
 #undef HAVE_SYSCONF
+
+/* Define to 1 if you have the <sys/random.h> header file. */
+#undef HAVE_SYS_RANDOM_H
 
 /* Define to 1 if you have the <sys/stat.h> header file. */
 #undef HAVE_SYS_STAT_H
