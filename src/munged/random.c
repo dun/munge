@@ -69,8 +69,6 @@
 #define RANDOM_SOURCE_BYTES             128
 
 /*  Integer for the number of bytes to read from (and write to) the seed file.
- *  Note that OpenSSL ignores this value when writing the seed file.
- *    RAND_write_file() will write 1024 bytes regardless.
  */
 #define RANDOM_SEED_BYTES               1024
 
@@ -108,10 +106,10 @@ static int  _random_stir_secs;          /* secs between entropy pool stirs   */
 static int  _random_read_entropy_from_kernel (void);
 static int  _random_read_entropy_from_file (const char *path);
 static int  _random_read_entropy_from_process (void);
+static int  _random_read_seed (const char *path, int num_bytes);
+static int  _random_write_seed (const char *path, int num_bytes);
 static void _random_stir_entropy (void *_arg_not_used_);
 
-static int  _random_read_seed (const char *filename, int num_bytes);
-static int  _random_write_seed (const char *filename, int num_bytes);
 static void _random_cleanup (void);
 static void _random_add (const void *buf, int n);
 static void _random_bytes (void *buf, int n);
@@ -194,24 +192,11 @@ random_init (const char *seed_path)
 void
 random_fini (const char *seed_path)
 {
-    mode_t mask;
-    int    n;
-
     if (_random_timer_id > 0) {
         timer_cancel (_random_timer_id);
     }
-
     if (seed_path != NULL) {
-
-        mask = umask (0);
-        umask (mask | 077);
-        n = _random_write_seed (seed_path, RANDOM_SEED_BYTES);
-        umask (mask);
-
-        if (n > 0) {
-            log_msg (LOG_INFO, "Wrote %d byte%s to PRNG seed \"%s\"",
-                    n, (n == 1 ? "" : "s"), seed_path);
-        }
+        (void) _random_write_seed (seed_path, RANDOM_SEED_BYTES);
     }
     _random_cleanup ();
     return;
@@ -409,9 +394,8 @@ _random_read_entropy_from_file (const char *path)
         log_msg (LOG_INFO, "Removed insecure PRNG seed \"%s\"", path);
         n = 0;
     }
-    else if ((n = _random_read_seed (path, RANDOM_SEED_BYTES)) > 0) {
-        log_msg (LOG_INFO, "PRNG seeded with %d byte%s from \"%s\"",
-                n, (n == 1 ? "" : "s"), path);
+    else {
+        n = _random_read_seed (path, RANDOM_SEED_BYTES);
     }
     return (n);
 }
@@ -435,6 +419,109 @@ _random_read_entropy_from_process (void)
     /*  Since these sources do not provide much entropy, return 0.
      */
     return (0);
+}
+
+
+static int
+_random_read_seed (const char *path, int num_bytes)
+{
+/*  Reads up to 'num_bytes' from the seed file specified by 'path',
+ *    and adds them to the PRNG entropy pool.
+ *  Returns the number of bytes read, or -1 on error.
+ */
+    int            fd;
+    int            num_left;
+    int            num_want;
+    int            n;
+    unsigned char  buf [RANDOM_SEED_BYTES];
+
+    assert (path != NULL);
+    assert (num_bytes > 0);
+
+    fd = open (path, O_RDONLY);
+    if (fd < 0) {
+        if (errno == ENOENT) {
+            return (0);
+        }
+        log_msg (LOG_WARNING, "Failed to open PRNG seed \"%s\": %s",
+                path, strerror (errno));
+        return (-1);
+    }
+    num_left = num_bytes;
+    while (num_left > 0) {
+        num_want = (num_left < sizeof (buf)) ? num_left : sizeof (buf);
+        n = fd_read_n (fd, buf, num_want);
+        if (n < 0) {
+            log_msg (LOG_WARNING, "Failed to read from PRNG seed \"%s\": %s",
+                    path, strerror (errno));
+            break;
+        }
+        if (n == 0) {
+            break;
+        }
+        _random_add (buf, n);
+        num_left -= n;
+    }
+    if (close (fd) < 0) {
+        log_msg (LOG_WARNING, "Failed to close PRNG seed \"%s\": %s",
+                path, strerror (errno));
+    }
+    n = num_bytes - num_left;
+    if (n > 0) {
+        log_msg (LOG_INFO, "PRNG seeded with %d byte%s from \"%s\"",
+                n, (n == 1 ? "" : "s"), path);
+    }
+    return (n);
+}
+
+
+static int
+_random_write_seed (const char *path, int num_bytes)
+{
+/*  Writes 'num_bytes' of random bytes to the seed file specified by 'path'.
+ *  Returns the number of bytes written, or -1 on error.
+ */
+    int            fd;
+    int            num_left;
+    int            num_want;
+    int            n;
+    unsigned char  buf [RANDOM_SEED_BYTES];
+
+    assert (path != NULL);
+    assert (num_bytes > 0);
+
+    if ((unlink (path) < 0) && (errno != ENOENT)) {
+        log_msg (LOG_WARNING, "Failed to unlink old PRNG seed \"%s\": %s",
+                path, strerror (errno));
+    }
+    fd = open (path, O_WRONLY | O_CREAT | O_TRUNC, 0600);
+    if (fd < 0) {
+        log_msg (LOG_WARNING, "Failed to create PRNG seed \"%s\": %s",
+                path, strerror (errno));
+        return (-1);
+    }
+    num_left = num_bytes;
+    while (num_left > 0) {
+        num_want = (num_left < sizeof (buf)) ? num_left : sizeof (buf);
+        _random_bytes (buf, num_want);
+        n = fd_write_n (fd, buf, num_want);
+        if (n < 0) {
+            log_msg (LOG_WARNING, "Failed to write to PRNG seed \"%s\": %s",
+                    path, strerror (errno));
+            break;
+        }
+        num_left -= n;
+    }
+    if (close (fd) < 0) {
+        log_msg (LOG_WARNING, "Failed to close PRNG seed \"%s\": %s",
+                path, strerror (errno));
+    }
+    n = num_bytes - num_left;
+    if (n > 0) {
+        log_msg (LOG_INFO, "Wrote %d byte%s to PRNG seed \"%s\"",
+                n, (n == 1 ? "" : "s"), path);
+    }
+    return (n);
 }
 
 
@@ -499,95 +586,6 @@ _random_stir_entropy (void *_arg_not_used_)
 #include <gcrypt.h>
 #include "fd.h"
 
-static int
-_random_read_seed (const char *filename, int num_bytes)
-{
-    int            fd;
-    int            num_left;
-    int            num_want;
-    int            n;
-    unsigned char  buf [RANDOM_SEED_BYTES];
-    gcry_error_t   e;
-
-    assert (filename != NULL);
-    assert (num_bytes > 0);
-
-    if ((fd = open (filename, O_RDONLY)) < 0) {
-        if (errno == ENOENT) {
-            return (0);
-        }
-        log_msg (LOG_WARNING, "Failed to open PRNG seed \"%s\": %s",
-                filename, strerror (errno));
-        return (-1);
-    }
-    num_left = num_bytes;
-    while (num_left > 0) {
-        num_want = (num_left < sizeof (buf)) ? num_left : sizeof (buf);
-        n = fd_read_n (fd, buf, num_want);
-        if (n < 0) {
-            log_msg (LOG_WARNING, "Failed to read from PRNG seed \"%s\": %s",
-                    filename, strerror (errno));
-            break;
-        }
-        if (n == 0) {
-            break;
-        }
-        e = gcry_random_add_bytes (buf, n, -1);
-        if (e) {
-            log_msg (LOG_WARNING,
-                    "Failed to add %d byte%s to entropy pool: %s",
-                    n, (n == 1 ? "" : "s"), gcry_strerror (e));
-            break;
-        }
-        num_left -= n;
-    }
-    if (close (fd) < 0) {
-        log_msg (LOG_WARNING, "Failed to close PRNG seed \"%s\": %s",
-                filename, strerror (errno));
-    }
-    gcry_fast_random_poll ();
-    return (num_bytes - num_left);
-}
-
-
-static int
-_random_write_seed (const char *filename, int num_bytes)
-{
-    int            fd;
-    int            num_left;
-    int            num_want;
-    int            n;
-    unsigned char  buf [RANDOM_SEED_BYTES];
-
-    assert (filename != NULL);
-    assert (num_bytes > 0);
-
-    (void) unlink (filename);
-    if ((fd = open (filename, O_WRONLY | O_CREAT | O_TRUNC, 0600)) < 0) {
-        log_msg (LOG_WARNING, "Failed to create PRNG seed \"%s\": %s",
-                filename, strerror (errno));
-        return (-1);
-    }
-    num_left = num_bytes;
-    while (num_left > 0) {
-        num_want = (num_left < sizeof (buf)) ? num_left : sizeof (buf);
-        gcry_create_nonce (buf, num_want);
-        n = fd_write_n (fd, buf, num_want);
-        if (n < 0) {
-            log_msg (LOG_WARNING, "Failed to write to PRNG seed \"%s\": %s",
-                    filename, strerror (errno));
-            break;
-        }
-        num_left -= n;
-    }
-    if (close (fd) < 0) {
-        log_msg (LOG_WARNING, "Failed to close PRNG seed \"%s\": %s",
-                filename, strerror (errno));
-    }
-    return (num_bytes - num_left);
-}
-
-
 static void
 _random_cleanup (void)
 {
@@ -647,40 +645,6 @@ _random_pseudo_bytes (void *buf, int n)
 #include <openssl/err.h>
 #include <openssl/opensslv.h>
 #include <openssl/rand.h>
-
-static int
-_random_read_seed (const char *filename, int num_bytes)
-{
-    assert (filename != NULL);
-    assert (num_bytes > 0);
-
-    return (RAND_load_file (filename, num_bytes));
-}
-
-
-static int
-_random_write_seed (const char *filename, int num_bytes)
-{
-/*  Writes 1024 random bytes to the file 'filename'.
- *  Note that 'num_bytes' is ignored.
- */
-    int n;
-
-    assert (filename != NULL);
-    assert (num_bytes > 0);
-
-    n = RAND_write_file (filename);
-    if (n < 0) {
-        log_msg (LOG_WARNING,
-                "PRNG seed \"%s\" generated with insufficient entropy",
-                filename);
-    }
-    else if (n == 0) {
-        log_msg (LOG_WARNING, "Failed to create PRNG seed \"%s\"", filename);
-    }
-    return (n);
-}
-
 
 static void
 _random_cleanup (void)
