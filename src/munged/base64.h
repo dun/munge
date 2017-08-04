@@ -106,15 +106,15 @@ int base64_cleanup (base64_ctx *x);
 
 int base64_encode_block (void *dst, int *dstlen, const void *src, int srclen);
 /*
- *  Base64-encodes [srclen] bytes from the contiguous [src] into [dst].
- *    If [dstlen] is not NULL, it will be set to the number of bytes written.
+ *  Base64-encodes [srclen] bytes from the contiguous [src] into [dst],
+ *    and sets [dstlen] to the number of bytes written.
  *  Returns 0 on success, or -1 on error.
  */
 
 int base64_decode_block (void *dst, int *dstlen, const void *src, int srclen);
 /*
- *  Base64-decodes [srclen] bytes from the contiguous [src] into [dst].
- *    If [dstlen] is not NULL, it will be set to the number of bytes written.
+ *  Base64-decodes [srclen] bytes from the contiguous [src] into [dst],
+ *    and sets [dstlen] to the number of bytes written.
  *  Returns 0 on success, or -1 on error.
  */
 
