@@ -250,6 +250,7 @@ _random_read_entropy_from_kernel (void)
     int            fd;
     size_t         len;
     const char    *src;
+    struct stat    st;
     unsigned char  buf [RANDOM_SOURCE_BYTES];
 
 #if HAVE_GETRANDOM
@@ -292,12 +293,23 @@ retry_getrandom:
                     RANDOM_SOURCE_PATH, strerror (errno));
         }
         else {
-            src = "\"" RANDOM_SOURCE_PATH "\"";
-            len = sizeof (buf);
-            n = fd_read_n (fd, buf, len);
-            if (n < 0) {
-                log_msg (LOG_WARNING, "Failed to read from \"%s\": %s",
+            if (fstat (fd, &st) < 0) {
+                log_msg (LOG_WARNING, "Failed to stat \"%s\": %s",
                         RANDOM_SOURCE_PATH, strerror (errno));
+            }
+            else if (!S_ISCHR (st.st_mode)) {
+                log_msg (LOG_WARNING, "Failed to validate \"%s\": "
+                        "not a character device (mode=0x%x)",
+                        RANDOM_SOURCE_PATH, (st.st_mode & S_IFMT));
+            }
+            else {
+                src = "\"" RANDOM_SOURCE_PATH "\"";
+                len = sizeof (buf);
+                n = fd_read_n (fd, buf, len);
+                if (n < 0) {
+                    log_msg (LOG_WARNING, "Failed to read from \"%s\": %s",
+                            RANDOM_SOURCE_PATH, strerror (errno));
+                }
             }
             if (close (fd) < 0) {
                 log_msg (LOG_WARNING, "Failed to close \"%s\": %s",
