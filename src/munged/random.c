@@ -83,13 +83,13 @@ static long _random_timer_id = 0;       /* ID for scheduled stir fn callback */
  *  Private Prototypes
  *****************************************************************************/
 
-int  _random_read_seed (const char *filename, int num_bytes);
-int  _random_write_seed (const char *filename, int num_bytes);
-void _random_cleanup (void);
-void _random_add (const void *buf, int n);
-void _random_bytes (unsigned char *buf, int n);
-void _random_pseudo_bytes (unsigned char *buf, int n);
-void _random_seed_stir_callback (void *_arg_not_used_);
+static int  _random_read_seed (const char *filename, int num_bytes);
+static int  _random_write_seed (const char *filename, int num_bytes);
+static void _random_cleanup (void);
+static void _random_add (const void *buf, int n);
+static void _random_bytes (unsigned char *buf, int n);
+static void _random_pseudo_bytes (unsigned char *buf, int n);
+static void _random_seed_stir_callback (void *_arg_not_used_);
 
 
 /*****************************************************************************
@@ -326,7 +326,7 @@ random_stir (void)
 #include <gcrypt.h>
 #include "fd.h"
 
-int
+static int
 _random_read_seed (const char *filename, int num_bytes)
 {
     int            fd;
@@ -377,7 +377,7 @@ _random_read_seed (const char *filename, int num_bytes)
 }
 
 
-int
+static int
 _random_write_seed (const char *filename, int num_bytes)
 {
     int            fd;
@@ -415,14 +415,14 @@ _random_write_seed (const char *filename, int num_bytes)
 }
 
 
-void
+static void
 _random_cleanup (void)
 {
     return;
 }
 
 
-void
+static void
 _random_add (const void *buf, int n)
 {
     gcry_error_t e;
@@ -440,7 +440,7 @@ _random_add (const void *buf, int n)
 }
 
 
-void
+static void
 _random_bytes (unsigned char *buf, int n)
 {
     assert (buf != NULL);
@@ -452,7 +452,7 @@ _random_bytes (unsigned char *buf, int n)
 }
 
 
-void
+static void
 _random_pseudo_bytes (unsigned char *buf, int n)
 {
     assert (buf != NULL);
@@ -476,7 +476,7 @@ _random_pseudo_bytes (unsigned char *buf, int n)
 #include <openssl/opensslv.h>
 #include <openssl/rand.h>
 
-int
+static int
 _random_read_seed (const char *filename, int num_bytes)
 {
     assert (filename != NULL);
@@ -486,7 +486,7 @@ _random_read_seed (const char *filename, int num_bytes)
 }
 
 
-int
+static int
 _random_write_seed (const char *filename, int num_bytes)
 {
 /*  Writes 1024 random bytes to the file 'filename'.
@@ -510,7 +510,7 @@ _random_write_seed (const char *filename, int num_bytes)
 }
 
 
-void
+static void
 _random_cleanup (void)
 {
 #if HAVE_RAND_CLEANUP
@@ -521,7 +521,7 @@ _random_cleanup (void)
 }
 
 
-void
+static void
 _random_add (const void *buf, int n)
 {
     assert (buf != NULL);
@@ -532,7 +532,7 @@ _random_add (const void *buf, int n)
 }
 
 
-void
+static void
 _random_bytes (unsigned char *buf, int n)
 {
     int rc;
@@ -554,7 +554,7 @@ _random_bytes (unsigned char *buf, int n)
 }
 
 
-void
+static void
 _random_pseudo_bytes (unsigned char *buf, int n)
 {
     int rc;
@@ -597,7 +597,7 @@ _random_pseudo_bytes (unsigned char *buf, int n)
  *  Private Functions (Common)
  *****************************************************************************/
 
-void
+static void
 _random_seed_stir_callback (void *_arg_not_used_)
 {
     static int      timeout_secs = RANDOM_SEED_STIR_MIN_SECS;
