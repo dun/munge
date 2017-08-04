@@ -87,8 +87,8 @@ static int  _random_read_seed (const char *filename, int num_bytes);
 static int  _random_write_seed (const char *filename, int num_bytes);
 static void _random_cleanup (void);
 static void _random_add (const void *buf, int n);
-static void _random_bytes (unsigned char *buf, int n);
-static void _random_pseudo_bytes (unsigned char *buf, int n);
+static void _random_bytes (void *buf, int n);
+static void _random_pseudo_bytes (void *buf, int n);
 static void _random_seed_stir_callback (void *_arg_not_used_);
 
 
@@ -272,7 +272,7 @@ random_add (const void *buf, int n)
 
 
 void
-random_bytes (unsigned char *buf, int n)
+random_bytes (void *buf, int n)
 {
     if (!buf || (n <= 0)) {
         return;
@@ -283,7 +283,7 @@ random_bytes (unsigned char *buf, int n)
 
 
 void
-random_pseudo_bytes (unsigned char *buf, int n)
+random_pseudo_bytes (void *buf, int n)
 {
     if (!buf || (n <= 0)) {
         return;
@@ -441,7 +441,7 @@ _random_add (const void *buf, int n)
 
 
 static void
-_random_bytes (unsigned char *buf, int n)
+_random_bytes (void *buf, int n)
 {
     assert (buf != NULL);
     assert (n > 0);
@@ -453,7 +453,7 @@ _random_bytes (unsigned char *buf, int n)
 
 
 static void
-_random_pseudo_bytes (unsigned char *buf, int n)
+_random_pseudo_bytes (void *buf, int n)
 {
     assert (buf != NULL);
     assert (n > 0);
@@ -533,7 +533,7 @@ _random_add (const void *buf, int n)
 
 
 static void
-_random_bytes (unsigned char *buf, int n)
+_random_bytes (void *buf, int n)
 {
     int rc;
 
@@ -555,7 +555,7 @@ _random_bytes (unsigned char *buf, int n)
 
 
 static void
-_random_pseudo_bytes (unsigned char *buf, int n)
+_random_pseudo_bytes (void *buf, int n)
 {
     int rc;
 

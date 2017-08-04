@@ -47,12 +47,12 @@ void random_add (const void *buf, int n);
  *  Adds [n] bytes of entropy from [buf] to the PRNG entropy pool.
  */
 
-void random_bytes (unsigned char *buf, int n);
+void random_bytes (void *buf, int n);
 /*
  *  Places [n] bytes of cryptographically-strong pseudo-random data into [buf].
  */
 
-void random_pseudo_bytes (unsigned char *buf, int n);
+void random_pseudo_bytes (void *buf, int n);
 /*
  *  Places [n] bytes of pseudo-random data into [buf].
  *  This should not be used for purposes such as key generation.
