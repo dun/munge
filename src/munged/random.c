@@ -108,6 +108,7 @@ static int  _random_read_entropy_from_file (const char *path);
 static int  _random_read_entropy_from_process (void);
 static int  _random_read_seed (const char *path, int num_bytes);
 static int  _random_write_seed (const char *path, int num_bytes);
+static int  _random_check_entropy (unsigned char *buf, int n);
 static void _random_stir_entropy (void *_arg_not_used_);
 
 static void _random_cleanup (void);
@@ -319,9 +320,22 @@ retry_getrandom:
     }
 
     if (n > 0) {
-        _random_add (buf, n);
-        log_msg (LOG_INFO, "PRNG seeded with %d byte%s from %s",
-                n, (n == 1 ? "" : "s"), src);
+        if (n > sizeof (buf)) {
+            log_msg (LOG_WARNING, "Ignoring entropy from \"%s\":"
+                    " read %d byte%s into a %d-byte buffer",
+                    RANDOM_SOURCE_PATH, n, (n == 1 ? "" : "s"), sizeof (buf));
+            n = 0;
+        }
+        else if (_random_check_entropy (buf, n) < 0) {
+            log_msg (LOG_WARNING, "Ignoring entropy from \"%s\":"
+                    " does not appear random", RANDOM_SOURCE_PATH);
+            n = 0;
+        }
+        else {
+            _random_add (buf, n);
+            log_msg (LOG_INFO, "PRNG seeded with %d byte%s from %s",
+                    n, (n == 1 ? "" : "s"), src);
+        }
     }
     return (n);
 }
@@ -534,6 +548,38 @@ _random_write_seed (const char *path, int num_bytes)
                 n, (n == 1 ? "" : "s"), path);
     }
     return (n);
+}
+
+
+static int
+_random_check_entropy (unsigned char *buf, int n)
+{
+/*  Checks if the buffer 'buf' of length 'n' contains sufficient entropy.
+ *    This is just a simple approximation to guard against an egregiously
+ *    broken or fraudulent entropy source.
+ *  Returns 0 if entropy appears sufficient; o/w returns -1.
+ */
+    unsigned char c;
+    int           i;
+    int           cnt;
+    int           lim;
+
+    assert (buf != NULL);
+    assert (n > 0);
+
+    c = buf[0];
+    for (i = 0, cnt = 0; i < n; i++) {
+        if (buf[i] == c) {
+            cnt++;
+        }
+    }
+    /*  This just checks if 'buf' is entirely filled with the same byte.
+     */
+    lim = n;
+    if (cnt >= lim) {
+        return (-1);
+    }
+    return (0);
 }
 
 
