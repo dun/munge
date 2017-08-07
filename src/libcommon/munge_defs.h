@@ -218,21 +218,5 @@
  */
 #define RANDOM_SEED_DEVICE              "/dev/urandom"
 
-/*  Integer for the number of bytes to read from the RANDOM_SEED_DEVICE when
- *    stirring the PRNG entropy pool.
- */
-#define RANDOM_SEED_STIR_BYTES          16
-
-/*  Integer for the maximum number of seconds between stirrings of the PRNG
- *    entropy pool once the exponential backoff completes.
- */
-#define RANDOM_SEED_STIR_MAX_SECS       3600
-
-/*  Integer for the minimum number of seconds between stirrings of the PRNG
- *    entropy pool from which the exponential backoff starts.
- *  If set to 0, the timer for repeated stirrings will be disabled.
- */
-#define RANDOM_SEED_STIR_MIN_SECS       1
-
 
 #endif /* !MUNGE_DEFS_H */

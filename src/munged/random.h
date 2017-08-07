@@ -58,10 +58,5 @@ void random_pseudo_bytes (void *buf, int n);
  *  This should not be used for purposes such as key generation.
  */
 
-void random_stir (void);
-/*
- *  Stirs the PRNG entropy pool.
- */
-
 
 #endif /* !RANDOM_H */

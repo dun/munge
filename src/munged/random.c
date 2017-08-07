@@ -30,12 +30,15 @@
 #  include <config.h>
 #endif /* HAVE_CONFIG_H */
 
+#include <assert.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <munge.h>
+#include <stdint.h>
 #include <string.h>
 #include <sys/stat.h>
 #include <sys/time.h>
+#include <time.h>
 #include <unistd.h>
 #include "common.h"
 #include "conf.h"
@@ -59,29 +62,26 @@
 #  define RANDOM_SEED_DEVICE            "/dev/urandom"
 #endif /* !RANDOM_SEED_DEVICE */
 
-#ifndef RANDOM_SEED_STIR_BYTES
-#  define RANDOM_SEED_STIR_BYTES        16
-#endif /* !RANDOM_SEED_STIR_BYTES */
-
-#ifndef RANDOM_SEED_STIR_MAX_SECS
-#  define RANDOM_SEED_STIR_MAX_SECS     3600
-#endif /* !RANDOM_SEED_STIR_MAX_SECS */
-
-#ifndef RANDOM_SEED_STIR_MIN_SECS
-#  define RANDOM_SEED_STIR_MIN_SECS     1
-#endif /* !RANDOM_SEED_STIR_MIN_SECS */
+/*  Integer for the maximum number of seconds between stirrings of the PRNG
+ *    entropy pool.  If set to 0, entropy pool stirrings will be disabled.
+ */
+#define RANDOM_STIR_MAX_SECS            32768
 
 
 /*****************************************************************************
  *  Private Data
  *****************************************************************************/
 
-static long _random_timer_id = 0;       /* ID for scheduled stir fn callback */
+static long _random_timer_id = 0;       /* timer ID for entropy pool stir    */
+
+static int  _random_stir_secs;          /* secs between entropy pool stirs   */
 
 
 /*****************************************************************************
  *  Private Prototypes
  *****************************************************************************/
+
+static void _random_stir_entropy (void *_arg_not_used_);
 
 static int  _random_read_seed (const char *filename, int num_bytes);
 static int  _random_write_seed (const char *filename, int num_bytes);
@@ -89,7 +89,6 @@ static void _random_cleanup (void);
 static void _random_add (const void *buf, int n);
 static void _random_bytes (void *buf, int n);
 static void _random_pseudo_bytes (void *buf, int n);
-static void _random_seed_stir_callback (void *_arg_not_used_);
 
 
 /*****************************************************************************
@@ -205,29 +204,22 @@ random_init (const char *seed_path)
     else {
         rc = 1;
     }
-    /*  Stir the initial state of the entropy pool.  This helps to protect
-     *    against multiple instances starting with the same seed: for example,
-     *    starting after a previous instance that did not shutdown gracefully
-     *    (so its final seed state was not written), or cloning a VM.
+    /*  Compute the initial time interval for stirring the entropy pool.
      */
-    random_stir ();
-    /*
-     *  Schedule repeated stirrings of the entropy pool.
-     *  The callback won't run until after timer_init() is invoked in main(),
-     *    so random_stir() is still needed above to stir the initial state of
-     *    the entropy pool before the PRNG is used.
-     */
-    if (conf->got_benchmark) {
+    if (conf->got_benchmark || (RANDOM_STIR_MAX_SECS <= 0)) {
+        _random_stir_secs = 0;
         log_msg (LOG_INFO, "Disabled PRNG entropy pool stirring");
-        return (rc);
     }
-    _random_timer_id = timer_set_relative (
-            (callback_f) _random_seed_stir_callback, NULL,
-            RANDOM_SEED_STIR_MIN_SECS * 1000);
+    else {
+        _random_stir_secs = RANDOM_STIR_MAX_SECS;
+    }
 
-    if (_random_timer_id < 0) {
-        log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to set PRNG stir timer");
+    /*  Schedule repeated stirring of the entropy pool.
+     */
+    if (_random_stir_secs > 0) {
+        _random_stir_entropy (NULL);
     }
+
     return (rc);
 }
 
@@ -241,7 +233,6 @@ random_fini (const char *seed_path)
     if (_random_timer_id > 0) {
         timer_cancel (_random_timer_id);
     }
-    random_stir ();
 
     if (seed_path != NULL) {
 
@@ -293,24 +284,53 @@ random_pseudo_bytes (void *buf, int n)
 }
 
 
-void
-random_stir (void)
+static void
+_random_stir_entropy (void *_arg_not_used_)
 {
-    int            fd;
-    int            n;
-    unsigned char  stir_buf [RANDOM_SEED_STIR_BYTES];
+/*  Periodically stirs the entropy pool by mixing in new entropy.
+ */
+    static uint32_t cnt;
+    clock_t         cpu;
+    struct timeval  tv;
+    int             msecs;
+
+    assert (RANDOM_STIR_MAX_SECS > 0);
+
+    if (_random_stir_secs <= 0) {
+        return;
+    }
+    if (cnt == 0) {
+        _random_bytes (&cnt, sizeof (cnt));
+    }
+    _random_timer_id = 0;
 
     log_msg (LOG_DEBUG, "Stirring PRNG entropy pool");
 
-    /*  Stir the entropy pool with some pseudorandom data.
+    cpu = clock ();
+    if (cpu != (clock_t) -1) {
+        cnt += (uint32_t) cpu;
+    }
+    if (gettimeofday (&tv, NULL) == 0) {
+        cnt += (uint32_t) (tv.tv_sec + tv.tv_usec);
+    }
+    _random_add (&cnt, sizeof (cnt));
+
+    /*  Perform an exponential backoff up to the maximum timeout.  This allows
+     *    for vigorous stirring of the entropy pool when the daemon is started.
      */
-    fd = open (RANDOM_SEED_DEVICE, O_RDONLY | O_NONBLOCK);
-    if (fd >= 0) {
-        n = read (fd, stir_buf, sizeof (stir_buf));
-        if (n > 0) {
-            _random_add (stir_buf, n);
-        }
-        (void) close (fd);
+    if (_random_stir_secs < RANDOM_STIR_MAX_SECS) {
+        _random_stir_secs = MIN(_random_stir_secs * 2, RANDOM_STIR_MAX_SECS);
+    }
+    /*  The 10 low-order bits of the current time are used to mix things up and
+     *    stagger subsequent timer callbacks by up to 1023ms.
+     */
+    msecs = (_random_stir_secs * 1000) + (tv.tv_usec & 0x3FF);
+
+    _random_timer_id = timer_set_relative (
+            (callback_f) _random_stir_entropy, NULL, msecs);
+
+    if (_random_timer_id < 0) {
+        log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to set PRNG stir timer");
     }
     return;
 }
@@ -322,7 +342,6 @@ random_stir (void)
 
 #if HAVE_LIBGCRYPT
 
-#include <assert.h>
 #include <gcrypt.h>
 #include "fd.h"
 
@@ -471,7 +490,6 @@ _random_pseudo_bytes (void *buf, int n)
 
 #if HAVE_OPENSSL
 
-#include <assert.h>
 #include <openssl/err.h>
 #include <openssl/opensslv.h>
 #include <openssl/rand.h>
@@ -591,52 +609,3 @@ _random_pseudo_bytes (void *buf, int n)
 }
 
 #endif /* HAVE_OPENSSL */
-
-
-/*****************************************************************************
- *  Private Functions (Common)
- *****************************************************************************/
-
-static void
-_random_seed_stir_callback (void *_arg_not_used_)
-{
-    static int      timeout_secs = RANDOM_SEED_STIR_MIN_SECS;
-    struct timeval  tv;
-    int             msecs;
-
-    _random_timer_id = 0;
-
-    /*  Disable repeated stirrings if the mininum timeout is set to 0.
-     */
-    if (timeout_secs <= 0) {
-        return;
-    }
-    random_stir ();
-
-    /*  Stir the entropy pool with the current time.  There should be some
-     *    entropy in the tv_usec component -- up to 20 bits, but probably more
-     *    in the range of 5-10 bits.  The entropy arises from the uncertainty
-     *    as to precisely when the callback executes.
-     */
-    if (gettimeofday (&tv, NULL) == 0) {
-        _random_add (&tv.tv_usec, sizeof (tv.tv_usec));
-    }
-    /*  Perform an exponential backoff up to the maximum timeout.  This allows
-     *    for vigorous stirring of the entropy pool when the daemon is started.
-     */
-    if (timeout_secs < RANDOM_SEED_STIR_MAX_SECS) {
-        timeout_secs = MIN(timeout_secs * 2, RANDOM_SEED_STIR_MAX_SECS);
-    }
-    /*  The 10 low-order bits of the current time are used to mix things up and
-     *    stagger subsequent callbacks by up to 1023ms.
-     */
-    msecs = (timeout_secs * 1000) + (tv.tv_usec & 0x3FF);
-
-    _random_timer_id = timer_set_relative (
-            (callback_f) _random_seed_stir_callback, NULL, msecs);
-
-    if (_random_timer_id < 0) {
-        log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to set PRNG stir timer");
-    }
-    return;
-}
