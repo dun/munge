@@ -97,7 +97,7 @@ void _random_seed_stir_callback (void *_arg_not_used_);
  *****************************************************************************/
 
 int
-random_init (const char *seed)
+random_init (const char *seed_path)
 {
     int          rnd_bytes_needed       = RANDOM_SEED_BYTES;
     int          rc                     = 0;
@@ -110,72 +110,75 @@ random_init (const char *seed)
 
     /*  Load entropy from seed file.
      */
-    if ((rnd_bytes_needed > 0) && (seed != NULL) && (*seed != '\0')) {
+    if ((rnd_bytes_needed > 0) &&
+        (seed_path != NULL)    &&
+        (*seed_path != '\0')) {
         /*
          *  Check file permissions and whatnot.
          */
-        got_symlink = (lstat (seed, &st) == 0) ? S_ISLNK (st.st_mode) : 0;
+        got_symlink = (lstat (seed_path, &st) == 0) ? S_ISLNK (st.st_mode) : 0;
 
-        if (((n = stat (seed, &st)) < 0) && (errno == ENOENT)) {
+        if (((n = stat (seed_path, &st)) < 0) && (errno == ENOENT)) {
             if (!got_symlink) {
                 do_unlink = 0; /* A missing seed is not considered an error. */
             }
         }
         else if (n < 0) {
-            log_msg (LOG_WARNING,
-                "Ignoring PRNG seed \"%s\": %s", seed, strerror (errno));
+            log_msg (LOG_WARNING, "Ignoring PRNG seed \"%s\": %s",
+                    seed_path, strerror (errno));
         }
         else if (!S_ISREG (st.st_mode) || got_symlink) {
             log_msg (LOG_WARNING,
-                "Ignoring PRNG seed \"%s\": not a regular file", seed);
+                    "Ignoring PRNG seed \"%s\": not a regular file",
+                    seed_path);
         }
         else if (st.st_uid != geteuid ()) {
             log_msg (LOG_WARNING,
-                "Ignoring PRNG seed \"%s\": not owned by UID %u",
-                seed, (unsigned) geteuid ());
+                    "Ignoring PRNG seed \"%s\": not owned by UID %u",
+                    seed_path, (unsigned) geteuid ());
         }
         else if (st.st_mode & (S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH)) {
-            log_msg (LOG_WARNING,
-                "Ignoring PRNG seed \"%s\": "
-                "cannot be readable or writable by group or world", seed);
+            log_msg (LOG_WARNING, "Ignoring PRNG seed \"%s\": "
+                    "cannot be readable or writable by group or world",
+                    seed_path);
         }
         else {
             do_unlink = 0;
         }
         /*  Ensure seed dir is secure against modification by others.
          */
-        if (path_dirname (seed, seed_dir, sizeof (seed_dir)) < 0) {
+        if (path_dirname (seed_path, seed_dir, sizeof (seed_dir)) < 0) {
             log_err (EMUNGE_SNAFU, LOG_ERR,
-                "Failed to determine dirname of PRNG seed \"%s\"", seed);
+                    "Failed to determine dirname of PRNG seed \"%s\"",
+                    seed_path);
         }
         n = path_is_secure (seed_dir, ebuf, sizeof (ebuf),
-            PATH_SECURITY_NO_FLAGS);
+                PATH_SECURITY_NO_FLAGS);
         if (n < 0) {
             log_err (EMUNGE_SNAFU, LOG_ERR,
-                "Failed to check PRNG seed dir \"%s\": %s", seed_dir, ebuf);
+                    "Failed to check PRNG seed dir \"%s\": %s",
+                    seed_dir, ebuf);
         }
         else if ((n == 0) && (!conf->got_force)) {
             log_err (EMUNGE_SNAFU, LOG_ERR,
-                "PRNG seed dir is insecure: %s", ebuf);
+                    "PRNG seed dir is insecure: %s", ebuf);
         }
         else if (n == 0) {
-            log_msg (LOG_WARNING,
-                "PRNG seed dir is insecure: %s", ebuf);
+            log_msg (LOG_WARNING, "PRNG seed dir is insecure: %s", ebuf);
         }
         /*  Remove the existing seed if it is insecure; o/w, load it.
          */
-        if (do_unlink && (unlink (seed) < 0)) {
-            log_msg (LOG_WARNING,
-                "Failed to remove insecure PRNG seed \"%s\"", seed);
+        if (do_unlink && (unlink (seed_path) < 0)) {
+            log_msg (LOG_WARNING, "Failed to remove insecure PRNG seed \"%s\"",
+                    seed_path);
             rc = -1;
         }
         else if (do_unlink) {
-            log_msg (LOG_INFO,
-                "Removed insecure PRNG seed \"%s\"", seed);
+            log_msg (LOG_INFO, "Removed insecure PRNG seed \"%s\"", seed_path);
         }
-        else if ((n = _random_read_seed (seed, rnd_bytes_needed)) > 0) {
-            log_msg (LOG_INFO,
-                "PRNG seeded with %d bytes from \"%s\"", n, seed);
+        else if ((n = _random_read_seed (seed_path, rnd_bytes_needed)) > 0) {
+            log_msg (LOG_INFO, "PRNG seeded with %d bytes from \"%s\"",
+                    n, seed_path);
             rnd_bytes_needed -= n;
         }
     }
@@ -185,7 +188,7 @@ random_init (const char *seed)
         n = _random_read_seed (RANDOM_SEED_DEVICE, rnd_bytes_needed);
         if (n > 0) {
             log_msg (LOG_INFO, "PRNG seeded with %d bytes from \"%s\"",
-                n, RANDOM_SEED_DEVICE);
+                    n, RANDOM_SEED_DEVICE);
             rnd_bytes_needed -= n;
         }
     }
@@ -194,10 +197,10 @@ random_init (const char *seed)
     if (rnd_bytes_needed > 0) {
         if (!conf->got_force)
             log_err (EMUNGE_SNAFU, LOG_ERR,
-                "Failed to seed PRNG with sufficient entropy");
+                    "Failed to seed PRNG with sufficient entropy");
         else
             log_msg (LOG_WARNING,
-                "Failed to seed PRNG with sufficient entropy");
+                    "Failed to seed PRNG with sufficient entropy");
     }
     else {
         rc = 1;
@@ -230,25 +233,26 @@ random_init (const char *seed)
 
 
 void
-random_fini (const char *seed)
+random_fini (const char *seed_path)
 {
-    mode_t  mask;
-    int     n;
+    mode_t mask;
+    int    n;
 
     if (_random_timer_id > 0) {
         timer_cancel (_random_timer_id);
     }
     random_stir ();
 
-    if (seed != NULL) {
+    if (seed_path != NULL) {
 
         mask = umask (0);
         umask (mask | 077);
-        n = _random_write_seed (seed, RANDOM_SEED_BYTES);
+        n = _random_write_seed (seed_path, RANDOM_SEED_BYTES);
         umask (mask);
 
         if (n > 0) {
-            log_msg (LOG_INFO, "Wrote %d bytes to PRNG seed \"%s\"", n, seed);
+            log_msg (LOG_INFO, "Wrote %d byte%s to PRNG seed \"%s\"",
+                    n, (n == 1 ? "" : "s"), seed_path);
         }
     }
     _random_cleanup ();
@@ -340,7 +344,7 @@ _random_read_seed (const char *filename, int num_bytes)
             return (0);
         }
         log_msg (LOG_WARNING, "Failed to open PRNG seed \"%s\": %s",
-            filename, strerror (errno));
+                filename, strerror (errno));
         return (-1);
     }
     num_left = num_bytes;
@@ -349,7 +353,7 @@ _random_read_seed (const char *filename, int num_bytes)
         n = fd_read_n (fd, buf, num_want);
         if (n < 0) {
             log_msg (LOG_WARNING, "Failed to read from PRNG seed \"%s\": %s",
-                filename, strerror (errno));
+                    filename, strerror (errno));
             break;
         }
         if (n == 0) {
@@ -358,15 +362,15 @@ _random_read_seed (const char *filename, int num_bytes)
         e = gcry_random_add_bytes (buf, n, -1);
         if (e) {
             log_msg (LOG_WARNING,
-                "Failed to add %d byte%s to entropy pool: %s",
-                n, (n == 1 ? "" : "s"), gcry_strerror (e));
+                    "Failed to add %d byte%s to entropy pool: %s",
+                    n, (n == 1 ? "" : "s"), gcry_strerror (e));
             break;
         }
         num_left -= n;
     }
     if (close (fd) < 0) {
         log_msg (LOG_WARNING, "Failed to close PRNG seed \"%s\": %s",
-            filename, strerror (errno));
+                filename, strerror (errno));
     }
     gcry_fast_random_poll ();
     return (num_bytes - num_left);
@@ -388,7 +392,7 @@ _random_write_seed (const char *filename, int num_bytes)
     (void) unlink (filename);
     if ((fd = open (filename, O_WRONLY | O_CREAT | O_TRUNC, 0600)) < 0) {
         log_msg (LOG_WARNING, "Failed to create PRNG seed \"%s\": %s",
-            filename, strerror (errno));
+                filename, strerror (errno));
         return (-1);
     }
     num_left = num_bytes;
@@ -398,14 +402,14 @@ _random_write_seed (const char *filename, int num_bytes)
         n = fd_write_n (fd, buf, num_want);
         if (n < 0) {
             log_msg (LOG_WARNING, "Failed to write to PRNG seed \"%s\": %s",
-                filename, strerror (errno));
+                    filename, strerror (errno));
             break;
         }
         num_left -= n;
     }
     if (close (fd) < 0) {
         log_msg (LOG_WARNING, "Failed to close PRNG seed \"%s\": %s",
-            filename, strerror (errno));
+                filename, strerror (errno));
     }
     return (num_bytes - num_left);
 }
@@ -429,7 +433,7 @@ _random_add (const void *buf, int n)
     e = gcry_random_add_bytes (buf, n, -1);
     if (e) {
         log_msg (LOG_WARNING, "Failed to add %d byte%s to entropy pool: %s",
-            n, (n == 1 ? "" : "s"), gcry_strerror (e));
+                n, (n == 1 ? "" : "s"), gcry_strerror (e));
     }
     gcry_fast_random_poll ();
     return;
@@ -485,6 +489,9 @@ _random_read_seed (const char *filename, int num_bytes)
 int
 _random_write_seed (const char *filename, int num_bytes)
 {
+/*  Writes 1024 random bytes to the file 'filename'.
+ *  Note that 'num_bytes' is ignored.
+ */
     int n;
 
     assert (filename != NULL);
@@ -493,7 +500,8 @@ _random_write_seed (const char *filename, int num_bytes)
     n = RAND_write_file (filename);
     if (n < 0) {
         log_msg (LOG_WARNING,
-            "PRNG seed \"%s\" generated with insufficient entropy", filename);
+                "PRNG seed \"%s\" generated with insufficient entropy",
+                filename);
     }
     else if (n == 0) {
         log_msg (LOG_WARNING, "Failed to create PRNG seed \"%s\"", filename);
@@ -535,12 +543,12 @@ _random_bytes (unsigned char *buf, int n)
     rc = RAND_bytes (buf, n);
     if (rc == -1) {
         log_msg (LOG_ERR,
-            "RAND_bytes failed: not supported by OpenSSL RAND method");
+                "RAND_bytes failed: not supported by OpenSSL RAND method");
     }
     else if (rc == 0) {
         unsigned long e = ERR_get_error ();
         log_msg (LOG_WARNING,
-            "RAND_bytes failed: %s", ERR_reason_error_string (e));
+                "RAND_bytes failed: %s", ERR_reason_error_string (e));
     }
     return;
 }
@@ -567,13 +575,13 @@ _random_pseudo_bytes (unsigned char *buf, int n)
     /*  OpenSSL >= 0.9.5, < 1.1.0  */
     rc = RAND_pseudo_bytes (buf, n);
     if (rc == -1) {
-        log_msg (LOG_ERR,
-            "RAND_pseudo_bytes failed: not supported by OpenSSL RAND method");
+        log_msg (LOG_ERR, "RAND_pseudo_bytes failed: "
+                "not supported by OpenSSL RAND method");
     }
     else if (rc == 0) {
         unsigned long e = ERR_get_error ();
-        log_msg (LOG_WARNING,
-            "RAND_pseudo_bytes failed: %s", ERR_reason_error_string (e));
+        log_msg (LOG_WARNING, "RAND_pseudo_bytes failed: %s",
+                ERR_reason_error_string (e));
     }
 #else  /* !HAVE_RAND_PSEUDO_BYTES */
     _random_bytes (buf, n);

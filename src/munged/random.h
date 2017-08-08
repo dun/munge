@@ -30,29 +30,26 @@
 #define RANDOM_H
 
 
-int random_init (const char *seed);
+int random_init (const char *seed_path);
 /*
- *  Initializes the PRNG from the [seed] file.
- *  If [seed] does not exist or provide sufficient entropy,
- *    the PRNG will be seeded from a secure source.
- *  Returns 1 if [seed] provides sufficient entropy, 0 if it provides
- *    insufficient entropy but no errors were detected, or -1 on error.
+ *  Initializes the PRNG from [seed_path] and other sources.
+ *  Returns 1 if sufficient entropy is gathered, 0 if insufficient entropy
+ *    is gathered but no errors were detected, or -1 on error.
  */
 
-void random_fini (const char *seed);
+void random_fini (const char *seed_path);
 /*
- *  Cleans-up the PRNG, writing the current state out to the [seed] file
- *    if one is specified.
+ *  Shuts down the PRNG, writing the state of the entropy pool to [seed_path].
  */
 
 void random_add (const void *buf, int n);
 /*
- *  Adds [n] bytes of entropy from [buf] to the PRNG state.
+ *  Adds [n] bytes of entropy from [buf] to the PRNG entropy pool.
  */
 
 void random_bytes (unsigned char *buf, int n);
 /*
- *  Places [n] bytes of cryptographically strong pseudo-random data into [buf].
+ *  Places [n] bytes of cryptographically-strong pseudo-random data into [buf].
  */
 
 void random_pseudo_bytes (unsigned char *buf, int n);
