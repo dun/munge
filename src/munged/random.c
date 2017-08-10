@@ -288,8 +288,12 @@ retry_getrandom:
 #endif /* HAVE_GETENTROPY */
 
     if (n < 0) {
+retry_open:
         fd = open (RANDOM_SOURCE_PATH, O_RDONLY | O_NONBLOCK);
         if (fd < 0) {
+            if (errno == EINTR) {
+                goto retry_open;
+            }
             log_msg (LOG_WARNING, "Failed to open \"%s\": %s",
                     RANDOM_SOURCE_PATH, strerror (errno));
         }
@@ -464,8 +468,12 @@ _random_read_seed (const char *path, int num_bytes)
     assert (path != NULL);
     assert (num_bytes > 0);
 
+retry_open:
     fd = open (path, O_RDONLY);
     if (fd < 0) {
+        if (errno == EINTR) {
+            goto retry_open;
+        }
         if (errno == ENOENT) {
             return (0);
         }
@@ -520,8 +528,12 @@ _random_write_seed (const char *path, int num_bytes)
         log_msg (LOG_WARNING, "Failed to unlink old PRNG seed \"%s\": %s",
                 path, strerror (errno));
     }
+retry_open:
     fd = open (path, O_WRONLY | O_CREAT | O_TRUNC, 0600);
     if (fd < 0) {
+        if (errno == EINTR) {
+            goto retry_open;
+        }
         log_msg (LOG_WARNING, "Failed to create PRNG seed \"%s\": %s",
                 path, strerror (errno));
         return (-1);
