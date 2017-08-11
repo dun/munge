@@ -351,51 +351,16 @@ _random_read_entropy_from_file (const char *path)
 /*  Reads entropy from the seed file specified by 'path'.
  *  Returns the number of bytes of entropy added, or -1 on error.
  */
-    int         do_unlink = 1;
-    int         is_symlink;
-    int         n;
-    struct stat st;
-    char        dir [PATH_MAX];
-    char        ebuf [1024];
+    int  is_path_secure = 0;
+    int  n;
+    char dir [PATH_MAX];
+    char ebuf [1024];
 
     if ((path == NULL) || (path[0] == '\0')) {
         errno = EINVAL;
         return (-1);
     }
-    /*  Check seed file permissions.
-     */
-    is_symlink = (lstat (path, &st) == 0) ? S_ISLNK (st.st_mode) : 0;
 
-    n = stat (path, &st);
-    if ((n < 0) && (errno == ENOENT) && (!is_symlink)) {
-        do_unlink = 0;                  /* A missing seed is not an error. */
-    }
-    else if (n < 0) {
-        log_msg (LOG_WARNING, "Ignoring PRNG seed \"%s\": %s",
-                path, strerror (errno));
-    }
-    else if (!S_ISREG (st.st_mode) || is_symlink) {
-        log_msg (LOG_WARNING, "Ignoring PRNG seed \"%s\": not a regular file",
-                path);
-    }
-    else if (st.st_uid != geteuid ()) {
-        log_msg (LOG_WARNING, "Ignoring PRNG seed \"%s\": not owned by UID %u",
-                path, (unsigned) geteuid ());
-    }
-    else if (st.st_mode & (S_IRGRP | S_IROTH)) {
-        log_msg (LOG_WARNING,
-                "Ignoring PRNG seed \"%s\": readable by group or other", path);
-    }
-    else if (st.st_mode & (S_IWGRP | S_IWOTH)) {
-        log_msg (LOG_WARNING,
-                "Ignoring PRNG seed \"%s\": writable by group or other", path);
-    }
-    else {
-        do_unlink = 0;                  /* File perms OK, so keep seed file. */
-    }
-
-    /*  Check seed dir permissions.
-     */
     if (path_dirname (path, dir, sizeof (dir)) < 0) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
                 "Failed to determine dirname of PRNG seed \"%s\"", path);
@@ -412,22 +377,24 @@ _random_read_entropy_from_file (const char *path)
     else if (n == 0) {
         log_msg (LOG_WARNING, "PRNG seed dir is insecure: %s", ebuf);
     }
-
-    /*  Remove the existing seed file if it is insecure; otherwise, load it.
-     */
-    if (do_unlink && (unlink (path) < 0)) {
-        log_msg (LOG_WARNING,
-                "Failed to remove insecure PRNG seed \"%s\"", path);
-        n = -1;
+    else {
+        is_path_secure = 1;
     }
-    else if (do_unlink) {
-        log_msg (LOG_INFO, "Removed insecure PRNG seed \"%s\"", path);
+
+    n = _random_read_seed (path, RANDOM_SEED_BYTES);
+    if (n < 0) {
+        if (unlink (path) < 0) {
+            if (errno != ENOENT) {
+                log_msg (LOG_WARNING,
+                        "Failed to remove insecure PRNG seed \"%s\"", path);
+            }
+        }
+        else {
+            log_msg (LOG_INFO, "Removed insecure PRNG seed \"%s\"", path);
+        }
         n = 0;
     }
-    else {
-        n = _random_read_seed (path, RANDOM_SEED_BYTES);
-    }
-    return (n);
+    return (!is_path_secure ? -1 : n);
 }
 
 
@@ -459,14 +426,28 @@ _random_read_seed (const char *path, int num_bytes)
  *    and adds them to the PRNG entropy pool.
  *  Returns the number of bytes read, or -1 on error.
  */
-    int            fd;
-    int            num_left;
-    int            num_want;
-    int            n;
-    unsigned char  buf [RANDOM_SEED_BYTES];
+    int           fd;
+    int           is_symlink;
+    int           is_valid = 0;
+    int           num_left = num_bytes;
+    int           num_want;
+    int           n;
+    struct stat   st;
+    unsigned char buf [RANDOM_SEED_BYTES];
 
     assert (path != NULL);
     assert (num_bytes > 0);
+
+    /*  Do not allow symbolic links in 'path' since the parent directories in
+     *    the path of the actual file have not been checked to ensure they are
+     *    secure.
+     */
+    is_symlink = (lstat (path, &st) == 0) ? S_ISLNK (st.st_mode) : 0;
+    if (is_symlink) {
+        log_msg (LOG_WARNING,
+                "Ignoring PRNG seed \"%s\": symbolic link not allowed", path);
+        return (-1);
+    }
 
 retry_open:
     fd = open (path, O_RDONLY);
@@ -481,20 +462,46 @@ retry_open:
                 path, strerror (errno));
         return (-1);
     }
-    num_left = num_bytes;
-    while (num_left > 0) {
-        num_want = (num_left < sizeof (buf)) ? num_left : sizeof (buf);
-        n = fd_read_n (fd, buf, num_want);
-        if (n < 0) {
-            log_msg (LOG_WARNING, "Failed to read from PRNG seed \"%s\": %s",
-                    path, strerror (errno));
-            break;
+    /*  File is now open.  Do not prematurely return until it has been closed.
+     */
+    if (fstat (fd, &st) < 0) {
+        log_msg (LOG_WARNING, "Failed to stat PRNG seed \"%s\": %s",
+                path, strerror (errno));
+    }
+    else if (!S_ISREG (st.st_mode)) {
+        log_msg (LOG_WARNING,
+                "Ignoring PRNG seed \"%s\": not a regular file (mode=0x%x)",
+                path, (st.st_mode & S_IFMT));
+    }
+    else if (st.st_uid != geteuid ()) {
+        log_msg (LOG_WARNING, "Ignoring PRNG seed \"%s\": not owned by UID %u",
+                path, (unsigned) geteuid ());
+    }
+    else if (st.st_mode & (S_IRGRP | S_IROTH)) {
+        log_msg (LOG_WARNING,
+                "Ignoring PRNG seed \"%s\": readable by group or other", path);
+    }
+    else if (st.st_mode & (S_IWGRP | S_IWOTH)) {
+        log_msg (LOG_WARNING,
+                "Ignoring PRNG seed \"%s\": writable by group or other", path);
+    }
+    else {
+        is_valid = 1;
+        while (num_left > 0) {
+            num_want = (num_left < sizeof (buf)) ? num_left : sizeof (buf);
+            n = fd_read_n (fd, buf, num_want);
+            if (n < 0) {
+                log_msg (LOG_WARNING,
+                        "Failed to read from PRNG seed \"%s\": %s",
+                        path, strerror (errno));
+                break;
+            }
+            if (n == 0) {
+                break;
+            }
+            _random_add (buf, n);
+            num_left -= n;
         }
-        if (n == 0) {
-            break;
-        }
-        _random_add (buf, n);
-        num_left -= n;
     }
     if (close (fd) < 0) {
         log_msg (LOG_WARNING, "Failed to close PRNG seed \"%s\": %s",
@@ -505,7 +512,7 @@ retry_open:
         log_msg (LOG_INFO, "PRNG seeded with %d byte%s from \"%s\"",
                 n, (n == 1 ? "" : "s"), path);
     }
-    return (n);
+    return (!is_valid ? -1 : n);
 }
 
 
