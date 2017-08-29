@@ -81,6 +81,12 @@ crypto_init (void)
             "Failed to disable Libgcrypt secure memory: %s",
             gcry_strerror (e));
     }
+    e = gcry_control (GCRYCTL_ENABLE_QUICK_RANDOM, 0);
+    if (e) {
+        log_err (EMUNGE_SNAFU, LOG_ERR,
+            "Failed to enable Libgcrypt quick random: %s",
+            gcry_strerror (e));
+    }
     e = gcry_control (GCRYCTL_INITIALIZATION_FINISHED, 0);
     if (e) {
         log_err (EMUNGE_SNAFU, LOG_ERR,

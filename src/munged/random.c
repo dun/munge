@@ -447,7 +447,7 @@ _random_bytes (void *buf, int n)
     assert (n > 0);
 
     gcry_fast_random_poll ();
-    gcry_randomize (buf, n, GCRY_VERY_STRONG_RANDOM);
+    gcry_randomize (buf, n, GCRY_STRONG_RANDOM);
     return;
 }
 
