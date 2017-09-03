@@ -49,7 +49,9 @@
 #include <gcrypt.h>
 
 
+#if GCRYPT_VERSION_NUMBER < 0x010600
 GCRY_THREAD_OPTION_PTHREAD_IMPL;
+#endif /* GCRYPT_VERSION_NUMBER */
 
 
 void
@@ -58,6 +60,7 @@ crypto_init (void)
     gcry_error_t e;
     const char  *v;
 
+#if GCRYPT_VERSION_NUMBER < 0x010600
     /*  GCRYCTL_SET_THREAD_CBS must be set before any other Libcrypt function.
      *  Obsolete since Libgcrypt 1.6.
      */
@@ -66,6 +69,8 @@ crypto_init (void)
         log_err (EMUNGE_SNAFU, LOG_ERR,
             "Failed to set Libgcrypt thread callbacks: %s", gcry_strerror (e));
     }
+#endif /* GCRYPT_VERSION_NUMBER */
+
     /*  gcry_check_version() must be called before any other Libgcrypt function
      *    (except the GCRYCTL_SET_THREAD_CBS command prior to Libgcrypt 1.6).
      */
