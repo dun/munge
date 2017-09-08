@@ -155,7 +155,7 @@ munge_ctx_strerror (munge_ctx_t ctx)
 
 
 munge_err_t
-munge_ctx_get (munge_ctx_t ctx, munge_opt_t opt, ...)
+munge_ctx_get (munge_ctx_t ctx, int opt, ...)
 {
     int             *p2int;
     char           **p2str;
@@ -229,7 +229,7 @@ munge_ctx_get (munge_ctx_t ctx, munge_opt_t opt, ...)
 
 
 munge_err_t
-munge_ctx_set (munge_ctx_t ctx, munge_opt_t opt, ...)
+munge_ctx_set (munge_ctx_t ctx, int opt, ...)
 {
     char        *str;
     char        *p;
