@@ -83,7 +83,11 @@ DIST_COMMON = $(top_srcdir)/config/Make-inc.mk $(srcdir)/Makefile.in \
 	$(srcdir)/munge.7.in $(top_srcdir)/config/depcomp
 subdir = src/libcommon
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/config/libtool.m4 \
+am__aclocal_m4_deps = $(top_srcdir)/config/ax_append_compile_flags.m4 \
+	$(top_srcdir)/config/ax_append_flag.m4 \
+	$(top_srcdir)/config/ax_check_compile_flag.m4 \
+	$(top_srcdir)/config/ax_require_defined.m4 \
+	$(top_srcdir)/config/libtool.m4 \
 	$(top_srcdir)/config/ltoptions.m4 \
 	$(top_srcdir)/config/ltsugar.m4 \
 	$(top_srcdir)/config/ltversion.m4 \
@@ -437,9 +441,9 @@ $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(top_srcdir
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign src/libcommon/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu src/libcommon/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --foreign src/libcommon/Makefile
+	  $(AUTOMAKE) --gnu src/libcommon/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
