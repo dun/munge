@@ -1,16 +1,17 @@
-MUNGE 0.5.12 has been built and tested on the following systems:
+MUNGE 0.5.13 has been built and tested on the following systems:
 
-- CentOS 7.2.1511
-- Debian 8.3
-- Debian GNU/kFreeBSD 7.9
-- Fedora 23
-- FreeBSD 10.2
-- NetBSD 6.0
-- OpenBSD 5.8
-- Ubuntu 15.10
+- CentOS 6.9
+- CentOS 7.4.1708
+- Debian 9.1
+- Fedora 26
+- FreeBSD 11.1
+- NetBSD 7.1
+- OpenBSD 6.1
+- Ubuntu 16.04.3
+- Ubuntu 17.04
 
 
 RPMs have been built and tested on the following systems:
 
-- CentOS 7.2.1511
-- Fedora 23
+- CentOS 7.4.1708
+- Fedora 26

@@ -1,3 +1,16 @@
+munge-0.5.13 (2017-09-26):
+- Added support for OpenSSL 1.1.0. (#54)
+- Added support for UID/GID values >= 2^31.
+- Added support for getentropy() and getrandom().
+- Added --trusted-group cmdline opt to munged.
+- Added --log-file and --seed-file cmdline opts to munged. (#57)
+- Changed default MAC algorithm to SHA-256.
+- Fixed autoconf installation directory variable substitution. (#47)
+- Fixed all gcc, clang, and valgrind warnings.
+- Improved resilience and unpredictability of PRNG.
+- Improved hash table performance.
+- Removed libmissing dependency from libmunge. (#49)
+
 munge-0.5.12 (2016-02-25):
 - Changed project homepage to <https://dun.github.io/munge/>.
 - Changed RPM specfile from sysvinit to systemd. (#33)
