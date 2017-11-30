@@ -44,4 +44,4 @@ EXTRA_DIST = \
 
 clean-local:
 	-rm -rf test-results
-	-rm -rf trash\ directory.*
+	-rm -rf trash-directory.*

@@ -915,7 +915,7 @@ distclean-local::
 
 clean-local:
 	-rm -rf test-results
-	-rm -rf trash\ directory.*
+	-rm -rf trash-directory.*
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
