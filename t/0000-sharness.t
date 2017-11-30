@@ -19,7 +19,7 @@
 
 test_description='Test Sharness itself'
 
-. ./sharness.sh
+. $(dirname "$0")/sharness.sh
 
 ret="$?"
 
@@ -35,7 +35,7 @@ test_expect_failure 'pretend we have a known breakage' '
 '
 
 test_terminal () {
-	perl "$SHARNESS_TEST_DIRECTORY"/test-terminal.perl "$@"
+	perl "$SHARNESS_TEST_SRCDIR"/test-terminal.perl "$@"
 }
 
 # If test_terminal works, then set a PERL_AND_TTY prereq for future tests:
