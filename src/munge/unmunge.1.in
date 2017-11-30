@@ -57,7 +57,7 @@ Display version information.
 Input the credential from the specified file.
 .TP
 .BI "\-n, \-\-no\-output"
-Discard all output.
+Discard all output, both metadata and payload.
 .TP
 .BI "\-m, \-\-metadata " file
 Output metadata to the specified file.
@@ -69,8 +69,8 @@ Output the payload to the specified file.
 Specify a subset of metadata keys to output.  The keys are case-insensitive
 and delimited by whitespace, commas, semicolons, or periods -- as long as
 the string is treated as a single argument by the shell (e.g., enclosed
-by quotes).  If a subset is not specified, all available keys are selected
-by default.
+by quotes).  Invalid keys are ignored.  If a subset is not specified,
+all available keys are selected by default.
 .TP
 .BI "\-K, \-\-list\-keys"
 Display a list of metadata keys.

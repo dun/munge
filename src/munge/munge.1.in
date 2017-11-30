@@ -108,7 +108,9 @@ This requires root privileges or the CAP_SETGID capability.
 .BI "\-t, \-\-ttl " integer
 Specify the time-to-live (in seconds).  This controls how long the credential
 is valid once it has been encoded.  A value of 0 selects the default TTL.
-A value of \-1 selects the maximum allowed TTL.
+A value of \-1 selects the maximum allowed TTL.  Note that \fBmunged\fR
+can impose a maximum allowable TTL for all credentials which may be smaller
+than this value.
 .TP
 .BI "\-S, \-\-socket " path
 Specify the local domain socket for connecting with \fBmunged\fR.
