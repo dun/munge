@@ -188,7 +188,8 @@ am__DIST_COMMON = $(srcdir)/Makefile.in \
 	$(top_srcdir)/config/config.sub \
 	$(top_srcdir)/config/install-sh $(top_srcdir)/config/ltmain.sh \
 	$(top_srcdir)/config/missing \
-	$(top_srcdir)/config/mkinstalldirs AUTHORS COPYING \
+	$(top_srcdir)/config/mkinstalldirs \
+	$(top_srcdir)/config/tap-driver.sh AUTHORS COPYING \
 	COPYING.LESSER INSTALL NEWS README THANKS TODO config/compile \
 	config/config.guess config/config.sub config/install-sh \
 	config/ltmain.sh config/missing config/mkinstalldirs
@@ -449,7 +450,10 @@ EXTRA_DIST = \
 				extra \
 				munge.spec
 
-SUBDIRS = src
+SUBDIRS = \
+				src \
+				t
+
 all: all-recursive
 
 .SUFFIXES:

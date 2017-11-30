@@ -34,6 +34,7 @@ AC_INIT
 X_AC_META
 AC_CONFIG_AUX_DIR([config])
 AC_CONFIG_SRCDIR([src/libmunge/munge.h])
+AC_REQUIRE_AUX_FILE([tap-driver.sh])
 X_AC_CANONICAL
 X_AC_HUMOR
 X_AC_EXPAND_INSTALL_DIRS
@@ -141,5 +142,6 @@ AC_CONFIG_FILES( \
   src/munge/unmunge.1 \
   src/munged/Makefile \
   src/munged/munged.8 \
+  t/Makefile \
 )
 AC_OUTPUT

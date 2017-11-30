@@ -29,41 +29,19 @@
 
 include $(top_srcdir)/config/Make-inc.mk
 
-ACLOCAL_AMFLAGS =		-I config
+TEST_EXTENSIONS = .t
 
-AUTOMAKE_OPTIONS =		dist-xz foreign no-dist-gzip
+T_LOG_DRIVER = \
+	env AM_TAP_AWK='$(AWK)' $(SHELL) $(top_srcdir)/config/tap-driver.sh
 
-CONFIG_STATUS_DEPENDENCIES =	META
-
-DISTCLEANFILES = \
-				config/*~ \
-				$(PACKAGE)-*.tar*
+TESTS = \
+	0000-sharness.t
 
 EXTRA_DIST = \
-				.gitignore \
-				AUTHORS \
-				COPYING \
-				COPYING.LESSER \
-				DISCLAIMER.LLNS \
-				DISCLAIMER.UC \
-				HISTORY \
-				INSTALL \
-				JARGON \
-				KEYS \
-				META \
-				NEWS \
-				PLATFORMS \
-				QUICKSTART \
-				README \
-				README.AIX \
-				README.MULTILIB \
-				THANKS \
-				TODO \
-				bootstrap \
-				doc \
-				extra \
-				munge.spec
+	$(TESTS) \
+	sharness.sh \
+	test-terminal.perl
 
-SUBDIRS = \
-				src \
-				t
+clean-local:
+	-rm -rf test-results
+	-rm -rf trash\ directory.*
