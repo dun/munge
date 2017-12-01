@@ -13395,6 +13395,7 @@ fi
   CFLAGS=
 
 fi
+      DEBUGCFLAGS="$DEBUGCFLAGS -O0"
       if test "$ac_cv_prog_cc_g" = yes; then :
   DEBUGCFLAGS="$DEBUGCFLAGS -g"
 
