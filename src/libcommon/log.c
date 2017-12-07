@@ -97,12 +97,8 @@ log_open_file (FILE *fp, char *identity, int priority, int options)
     char *p;
 
     if (!fp) {
-        if (log_ctx.fp) {
-            (void) fclose (log_ctx.fp);
-        }
-        log_ctx.fp = NULL;
-        log_ctx.got_init = 1;
-        return (0);
+        errno = EINVAL;
+        return (-1);
     }
     if (ferror (fp)) {
         return (-1);
@@ -121,7 +117,18 @@ log_open_file (FILE *fp, char *identity, int priority, int options)
     log_ctx.priority = (priority > 0) ? priority : 0;
     log_ctx.options = options;
     log_ctx.got_init = 1;
-    return (1);
+    return (0);
+}
+
+
+void
+log_close_file (void)
+{
+    if (log_ctx.fp) {
+        (void) fclose (log_ctx.fp);
+        log_ctx.fp = NULL;
+    }
+    return;
 }
 
 
@@ -130,19 +137,37 @@ log_open_syslog (char *identity, int facility)
 {
     char *p;
 
-    if (identity) {
-        if ((p = strrchr (identity, '/'))) {
-            identity = p + 1;
-        }
-        openlog (identity, LOG_NDELAY | LOG_PID, facility);
-        log_ctx.got_syslog = 1;
+    if (!identity) {
+        errno = EINVAL;
+        return (-1);
     }
-    else {
+    if ((p = strrchr (identity, '/'))) {
+        identity = p + 1;
+    }
+    openlog (identity, LOG_NDELAY | LOG_PID, facility);
+    log_ctx.got_syslog = 1;
+    log_ctx.got_init = 1;
+    return (0);
+}
+
+
+void
+log_close_syslog (void)
+{
+    if (log_ctx.got_syslog) {
         closelog ();
         log_ctx.got_syslog = 0;
     }
-    log_ctx.got_init = 1;
-    return (log_ctx.got_syslog);
+    return;
+}
+
+
+void
+log_close_all (void)
+{
+    log_close_file ();
+    log_close_syslog ();
+    return;
 }
 
 

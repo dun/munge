@@ -119,7 +119,7 @@ main (int argc, char *argv[])
     if (!conf->got_foreground) {
         fd = daemonize_init (argv[0], conf);
         if (conf->got_syslog) {
-            log_open_file (NULL, NULL, 0, 0);
+            log_close_file ();
             log_open_syslog (log_identity, LOG_DAEMON);
         }
         else {
@@ -164,6 +164,7 @@ main (int argc, char *argv[])
 
     log_msg (LOG_NOTICE, "Stopping %s daemon (pid %d)",
         META_ALIAS, (int) getpid ());
+    log_close_all ();
 
     exit (EMUNGE_SUCCESS);
 }
@@ -246,6 +247,7 @@ daemonize_init (char *progname, conf_t conf)
             exit (EXIT_FAILURE);
         }
         destroy_conf (conf, 0);
+        log_close_all ();
         exit (EXIT_SUCCESS);
     }
     if (close (fds[0]) < 0) {
@@ -274,6 +276,7 @@ daemonize_init (char *progname, conf_t conf)
     }
     else if (pid > 0) {
         destroy_conf (conf, 0);
+        log_close_all ();
         exit (EXIT_SUCCESS);
     }
     return (fds[1]);

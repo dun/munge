@@ -215,6 +215,7 @@ main (int argc, char *argv[])
 
     rc = conf->status;
     destroy_conf (conf);
+    log_close_file ();
     exit (rc);
 }
 

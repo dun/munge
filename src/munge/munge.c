@@ -151,6 +151,7 @@ main (int argc, char *argv[])
     display_cred (conf);
 
     destroy_conf (conf);
+    log_close_file ();
     exit (EMUNGE_SUCCESS);
 }
 

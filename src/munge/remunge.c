@@ -222,6 +222,7 @@ main (int argc, char *argv[])
     stop_threads (conf);
 
     destroy_conf (conf);
+    log_close_file ();
     exit (EMUNGE_SUCCESS);
 }
 

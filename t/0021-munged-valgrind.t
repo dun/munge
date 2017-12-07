@@ -34,7 +34,7 @@ test_expect_success 'stop munged' '
     munged_stop_daemon
 '
 
-test_expect_failure 'check valgrind log for errors in munged' '
+test_expect_success 'check valgrind log for errors in munged' '
     valgrind_check_log
 '
 
