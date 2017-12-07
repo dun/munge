@@ -93,7 +93,7 @@ extern conf_t conf;                     /* defined in conf.c                 */
 
 conf_t create_conf (void);
 
-void destroy_conf (conf_t conf);
+void destroy_conf (conf_t conf, int do_unlink);
 
 void parse_cmdline (conf_t conf, int argc, char **argv);
 

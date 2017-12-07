@@ -70,7 +70,7 @@
  *****************************************************************************/
 
 static void disable_core_dumps (void);
-static int daemonize_init (char *progname);
+static int daemonize_init (char *progname, conf_t conf);
 static void daemonize_fini (int fd);
 static void open_logfile (const char *logfile, int priority, int got_force);
 static void handle_signals (void);
@@ -117,7 +117,7 @@ main (int argc, char *argv[])
         conf->got_force);
 
     if (!conf->got_foreground) {
-        fd = daemonize_init (argv[0]);
+        fd = daemonize_init (argv[0], conf);
         if (conf->got_syslog) {
             log_open_file (NULL, NULL, 0, 0);
             log_open_syslog (log_identity, LOG_DAEMON);
@@ -160,7 +160,7 @@ main (int argc, char *argv[])
     hash_drop_memory ();
     random_fini (conf->seed_name);
     crypto_fini ();
-    destroy_conf (conf);
+    destroy_conf (conf, 1);
 
     log_msg (LOG_NOTICE, "Stopping %s daemon (pid %d)",
         META_ALIAS, (int) getpid ());
@@ -189,7 +189,7 @@ disable_core_dumps (void)
 
 
 static int
-daemonize_init (char *progname)
+daemonize_init (char *progname, conf_t conf)
 {
 /*  Begins the daemonization of the process.
  *  Despite the fact that this routine backgrounds the process, control
@@ -245,6 +245,7 @@ daemonize_init (char *progname)
             }
             exit (EXIT_FAILURE);
         }
+        destroy_conf (conf, 0);
         exit (EXIT_SUCCESS);
     }
     if (close (fds[0]) < 0) {
@@ -272,6 +273,7 @@ daemonize_init (char *progname)
             "Failed to create grandchild process");
     }
     else if (pid > 0) {
+        destroy_conf (conf, 0);
         exit (EXIT_SUCCESS);
     }
     return (fds[1]);

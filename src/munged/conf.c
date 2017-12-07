@@ -203,7 +203,7 @@ create_conf (void)
 
 
 void
-destroy_conf (conf_t conf)
+destroy_conf (conf_t conf, int do_unlink)
 {
     assert (conf != NULL);
     assert (conf->ld < 0);              /* sock_destroy() already called */
@@ -222,7 +222,9 @@ destroy_conf (conf_t conf)
         conf->logfile_name = NULL;
     }
     if (conf->pidfile_name) {
-        (void) unlink (conf->pidfile_name);
+        if (do_unlink) {
+            (void) unlink (conf->pidfile_name);
+        }
         free (conf->pidfile_name);
         conf->pidfile_name = NULL;
     }
