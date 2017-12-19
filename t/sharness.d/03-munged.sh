@@ -18,11 +18,17 @@ munged_create_key()
 # The socket is placed in TMPDIR since NFS can cause problems for the lockfile.
 #   Debian 3.1 returns an incorrect PID for the process holding the lock across
 #   an NFS mount.  FreeBSD cannot create a lockfile across an NFS mount.
+# The first argument (if specified) is used to exec the daemon
+#   (e.g., for running under valgrind and passing in its options).
 # Additional arguments will be appended to the munged command-line options.
 ##
 munged_start_daemon()
 {
-    local MASK=$(umask) SOCKET KEYFILE LOGFILE PIDFILE SEEDFILE &&
+    local EXEC MASK=$(umask) SOCKET KEYFILE LOGFILE PIDFILE SEEDFILE &&
+    if test $# -gt 0; then
+        EXEC=$1
+        shift
+    fi &&
     SOCKET="${TMPDIR:-"/tmp"}/munged.sock.$$" &&
     KEYFILE="munged.key.$$" &&
     LOGFILE="munged.log.$$" &&
@@ -30,7 +36,7 @@ munged_start_daemon()
     SEEDFILE="munged.seed.$$" &&
     umask 022 &&
     munged_create_key "${KEYFILE}" &&
-    "${MUNGED}" \
+    ${EXEC} "${MUNGED}" \
         --socket="${SOCKET}" \
         --key-file="$(pwd)/${KEYFILE}" \
         --log-file="$(pwd)/${LOGFILE}" \

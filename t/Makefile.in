@@ -538,13 +538,17 @@ TESTS = \
 	0010-basic.t \
 	0011-munged-cmdline.t \
 	0012-munge-cmdline.t \
-	0013-unmunge-cmdline.t
+	0013-unmunge-cmdline.t \
+	0021-munged-valgrind.t \
+	0022-munge-valgrind.t \
+	0023-unmunge-valgrind.t
 
 EXTRA_DIST = \
 	$(TESTS) \
 	sharness.d \
 	sharness.sh \
-	test-terminal.perl
+	test-terminal.perl \
+	valgrind.supp
 
 all: all-am
 

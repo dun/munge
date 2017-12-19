@@ -1,0 +1,24 @@
+{
+    crypto_init-libgcrypt-malloc
+    Memcheck:Leak
+    match-leak-kinds: reachable
+    fun:malloc
+    ...
+    obj:*/libgcrypt.so.*
+    fun:crypto_init
+    fun:main
+}
+
+{
+    random_init-gcry_control-malloc
+    Memcheck:Leak
+    match-leak-kinds: reachable
+    fun:malloc
+    ...
+    fun:gcry_control
+    fun:_random_add
+    fun:_random_read_entropy_from_kernel
+    fun:random_init
+    fun:main
+}
+

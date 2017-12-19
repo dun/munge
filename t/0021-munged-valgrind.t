@@ -1,0 +1,41 @@
+#!/bin/sh
+
+test_description='Check munged for resource leaks'
+
+. $(dirname "$0")/sharness.sh
+
+if ! test_have_prereq VALGRIND; then
+    skip_all='skipping valgrind tests; valgrind not installed'
+    test_done
+fi
+
+if ! test_have_prereq EXPENSIVE; then
+    skip_all='skipping valgrind tests; long test not specified'
+    test_done
+fi
+
+test_expect_success 'start munged under valgrind' '
+    munged_start_daemon "${VALGRIND_CMD}"
+'
+
+test_expect_success 'encode credential' '
+    "${MUNGE}" --socket="${MUNGE_SOCKET}" </dev/null >cred.$$
+'
+
+test_expect_success 'decode credential' '
+    "${UNMUNGE}" --socket="${MUNGE_SOCKET}" <cred.$$ >/dev/null
+'
+
+test_expect_success 'replay credential' '
+    test_must_fail "${UNMUNGE}" --socket="${MUNGE_SOCKET}" <cred.$$ >/dev/null
+'
+
+test_expect_success 'stop munged' '
+    munged_stop_daemon
+'
+
+test_expect_failure 'check valgrind log for errors in munged' '
+    valgrind_check_log
+'
+
+test_done
