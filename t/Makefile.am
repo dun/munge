@@ -35,10 +35,16 @@ T_LOG_DRIVER = \
 	env AM_TAP_AWK='$(AWK)' $(SHELL) $(top_srcdir)/config/tap-driver.sh
 
 TESTS = \
-	0000-sharness.t
+	0000-sharness.t \
+	0001-env-vars.t \
+	0010-basic.t \
+	0011-munged-cmdline.t \
+	0012-munge-cmdline.t \
+	0013-unmunge-cmdline.t
 
 EXTRA_DIST = \
 	$(TESTS) \
+	sharness.d \
 	sharness.sh \
 	test-terminal.perl
 
