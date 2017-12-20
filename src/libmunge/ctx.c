@@ -275,8 +275,7 @@ munge_ctx_set (munge_ctx_t ctx, int opt, ...)
             break;
         case MUNGE_OPT_TTL:
             i = va_arg (vargs, int);
-            ctx->ttl = (i < 0) ? -1 : i;
-            /*  Note signed to unsigned conversion here.  */
+            ctx->ttl = (i == -1) ? MUNGE_TTL_MAXIMUM : i;
             break;
         case MUNGE_OPT_SOCKET:
             str = va_arg (vargs, char *);

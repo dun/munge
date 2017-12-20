@@ -502,16 +502,21 @@ parse_cmdline (conf_t conf, int argc, char **argv)
             case 't':
                 errno = 0;
                 l = strtol (optarg, &p, 10);
-                if ((optarg == p) || (*p != '\0')) {
+                if ((optarg == p) || (*p != '\0') || (l < -1)) {
                     log_err (EMUNGE_SNAFU, LOG_ERR,
                         "Invalid time-to-live '%s'", optarg);
                 }
-                if (((errno == ERANGE) && (l == LONG_MAX)) || (l > INT_MAX)) {
+                if ((errno == ERANGE) && (l == LONG_MAX)) {
                     log_err (EMUNGE_SNAFU, LOG_ERR,
-                        "Exceeded maximum time-to-live of %d seconds",
-                        INT_MAX);
+                        "Overflowed maximum time-to-live of %ld seconds",
+                        LONG_MAX);
                 }
-                if (l < 0) {
+                if (l > UINT_MAX) {
+                    log_err (EMUNGE_SNAFU, LOG_ERR,
+                        "Exceeded maximum time-to-live of %u seconds",
+                        UINT_MAX);
+                }
+                if (l == -1) {
                     l = MUNGE_TTL_MAXIMUM;
                 }
                 e = munge_ctx_set (conf->ctx, MUNGE_OPT_TTL, (int) l);

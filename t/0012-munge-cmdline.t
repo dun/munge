@@ -604,7 +604,12 @@ test_expect_success 'munge --ttl for invalid string value' '
             --ttl=invalid
 '
 
-test_expect_failure 'munge --ttl for invalid number' '
+test_expect_success 'munge --ttl for invalid positive number' '
+    test_must_fail "${MUNGE}" --socket="${MUNGE_SOCKET}" --no-input \
+            --ttl=4294967296
+'
+
+test_expect_success 'munge --ttl for invalid negative number' '
     test_must_fail "${MUNGE}" --socket="${MUNGE_SOCKET}" --no-input --ttl=-2
 '
 
