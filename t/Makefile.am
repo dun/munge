@@ -37,6 +37,7 @@ T_LOG_DRIVER = \
 TESTS = \
 	0000-sharness.t \
 	0001-env-vars.t \
+	0002-smiple.t \
 	0010-basic.t \
 	0011-munged-cmdline.t \
 	0012-munge-cmdline.t \

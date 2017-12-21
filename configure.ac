@@ -123,6 +123,11 @@ X_AC_DARWIN
 X_AC_SELECT_AUTH_METHOD
 
 ##
+# Checks for customizations.
+##
+X_AC_WITH_MUNGE_SOCKET
+
+##
 # Epilogue.
 ##
 AC_CONFIG_FILES( \

@@ -806,6 +806,7 @@ enable_debug
 with_libgcrypt_prefix
 with_openssl_prefix
 with_crypto_lib
+with_munge_socket
 '
       ac_precious_vars='build_alias
 host_alias
@@ -1478,6 +1479,8 @@ Optional Packages:
                           specify path to OpenSSL installation
   --with-crypto-lib=(libgcrypt|openssl)
                           specify which cryptographic library to use
+  --with-munge-socket=PATH
+                          specify default MUNGE socket pathname
 
 Some influential environment variables:
   CC          C compiler command
@@ -15778,6 +15781,35 @@ $as_echo "failed" >&6; }
   fi
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: $AUTH_METHOD" >&5
 $as_echo "$AUTH_METHOD" >&6; }
+
+
+##
+# Checks for customizations.
+##
+
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for MUNGE socket pathname" >&5
+$as_echo_n "checking for MUNGE socket pathname... " >&6; }
+
+# Check whether --with-munge-socket was given.
+if test "${with_munge_socket+set}" = set; then :
+  withval=$with_munge_socket; if expr "${withval}" : "\/" >/dev/null 2>&1; then
+       x_ac_with_munge_socket="${withval}";
+     else
+       { $as_echo "$as_me:${as_lineno-$LINENO}: result: failed" >&5
+$as_echo "failed" >&6; }
+       as_fn_error $? "bad value for --with-munge-socket" "$LINENO" 5
+     fi
+fi
+
+  if test -n "${x_ac_with_munge_socket}"; then :
+
+cat >>confdefs.h <<_ACEOF
+#define MUNGE_SOCKET_NAME "${x_ac_with_munge_socket}"
+_ACEOF
+
+fi
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: ${x_ac_with_munge_socket:-default}" >&5
+$as_echo "${x_ac_with_munge_socket:-default}" >&6; }
 
 
 ##

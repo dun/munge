@@ -145,8 +145,11 @@
 #define MUNGE_SOCKET_BACKLOG            256
 
 /*  String specifying the unix domain socket pathname for client-server comms.
+ *  May be overridden in "config.h".
  */
+#ifndef MUNGE_SOCKET_NAME
 #define MUNGE_SOCKET_NAME               X_LOCALSTATEDIR "/run/munge/munge.socket.2"
+#endif /* !MUNGE_SOCKET_NAME */
 
 /*  Number of attempts a client makes connecting to the server before failing.
  */

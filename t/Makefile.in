@@ -114,6 +114,7 @@ am__aclocal_m4_deps = $(top_srcdir)/config/libtool.m4 \
 	$(top_srcdir)/config/x_ac_path_openssl.m4 \
 	$(top_srcdir)/config/x_ac_select_auth_method.m4 \
 	$(top_srcdir)/config/x_ac_select_crypto_lib.m4 \
+	$(top_srcdir)/config/x_ac_with_munge_socket.m4 \
 	$(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
@@ -535,6 +536,7 @@ T_LOG_DRIVER = \
 TESTS = \
 	0000-sharness.t \
 	0001-env-vars.t \
+	0002-smiple.t \
 	0010-basic.t \
 	0011-munged-cmdline.t \
 	0012-munge-cmdline.t \
