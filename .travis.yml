@@ -25,7 +25,7 @@ addons:
     packages:
     - zlib1g-dev
     - libbz2-dev
-    - libgcrypt11-dev
+    - libgcrypt20-dev
     - libssl-dev
     - colormake
     - valgrind
