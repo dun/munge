@@ -473,6 +473,10 @@ restart:
 #endif /* _GIDS_DEBUG */
 
     n_users = hash_count (gid_hash);
+    if (n_users < 0) {
+        log_err (EMUNGE_SNAFU, LOG_ERR,
+            "Failed _gids_hash_create(): invalid gid_hash ptr");
+    }
     n_seconds = (t_stop.tv_sec - t_start.tv_sec)
         + ((t_stop.tv_usec - t_start.tv_usec) / 1e6);
     log_msg (LOG_INFO,
@@ -720,6 +724,10 @@ _gids_dump_gid_hash (hash_t gid_hash)
     int n;
 
     n = hash_count (gid_hash);
+    if (n < 0) {
+        log_err (EMUNGE_SNAFU, LOG_ERR,
+            "Failed _gids_dump_gid_hash(): invalid gid_hash ptr");
+    }
     printf ("* GIDs Dump (%d UID%s):\n", n, ((n == 1) ? "" : "s"));
     hash_for_each (gid_hash, (hash_arg_f) _gids_dump_gid_node, NULL);
     return;
@@ -748,6 +756,10 @@ _gids_dump_uid_hash (hash_t uid_hash)
     int n;
 
     n = hash_count (uid_hash);
+    if (n < 0) {
+        log_err (EMUNGE_SNAFU, LOG_ERR,
+            "Failed _gids_dump_uid_hash(): invalid uid_hash ptr");
+    }
     printf ("* UID Dump (%d user%s):\n", n, ((n == 1) ? "" : "s"));
     hash_for_each (uid_hash, (hash_arg_f) _gids_dump_uid_node, NULL);
     return;

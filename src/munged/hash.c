@@ -201,7 +201,7 @@ hash_is_empty (hash_t h)
 
     if (!h) {
         errno = EINVAL;
-        return (0);
+        return (-1);
     }
     lsd_mutex_lock (&h->mutex);
     n = h->count;
@@ -217,7 +217,7 @@ hash_count (hash_t h)
 
     if (!h) {
         errno = EINVAL;
-        return (0);
+        return (-1);
     }
     lsd_mutex_lock (&h->mutex);
     n = h->count;

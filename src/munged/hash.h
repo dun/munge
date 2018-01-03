@@ -115,12 +115,14 @@ void hash_reset (hash_t h);
 
 int hash_is_empty (hash_t h);
 /*
- *  Returns non-zero if hash table [h] is empty; o/w, returns zero.
+ *  Returns 1 if hash table [h] is empty, or 0 if not empty.
+ *    Returns -1 with errno=EINVAL if [h] is NULL.
  */
 
 int hash_count (hash_t h);
 /*
  *  Returns the number of items in hash table [h].
+ *    Returns -1 with errno=EINVAL if [h] is NULL.
  */
 
 void * hash_find (hash_t h, const void *key);
