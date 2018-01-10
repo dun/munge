@@ -38,14 +38,17 @@
 #include <limits.h>
 #include <munge.h>
 #include <netdb.h>                      /* for gethostbyname() */
+#include <signal.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/param.h>                  /* for MAXHOSTNAMELEN */
 #include <sys/socket.h>                 /* for AF_INET */
 #include <sys/stat.h>
+#include <time.h>
 #include <unistd.h>
 #include "conf.h"
 #include "license.h"
+#include "lock.h"
 #include "log.h"
 #include "md.h"
 #include "missing.h"                    /* for inet_ntop() */
@@ -76,7 +79,7 @@
 #define OPT_TRUSTED_GROUP       269
 #define OPT_LAST                270
 
-const char * const short_opts = ":hLVfFMS:";
+const char * const short_opts = ":hLVfFMsS:v";
 
 #include <getopt.h>
 struct option long_opts[] = {
@@ -86,7 +89,9 @@ struct option long_opts[] = {
     { "force",             no_argument,       NULL, 'f'               },
     { "foreground",        no_argument,       NULL, 'F'               },
     { "mlockall",          no_argument,       NULL, 'M'               },
+    { "stop",              no_argument,       NULL, 's'               },
     { "socket",            required_argument, NULL, 'S'               },
+    { "verbose",           no_argument,       NULL, 'v'               },
     { "advice",            no_argument,       NULL, OPT_ADVICE        },
 #if defined(AUTH_METHOD_RECVFD_MKFIFO) || defined(AUTH_METHOD_RECVFD_MKNOD)
     { "auth-server-dir",   required_argument, NULL, OPT_AUTH_SERVER   },
@@ -110,6 +115,10 @@ struct option long_opts[] = {
 /*****************************************************************************
  *  Internal Prototypes
  *****************************************************************************/
+
+static void _process_stop (conf_t conf);
+
+static int _send_signal (pid_t pid, int signum, int msecs);
 
 static int _conf_open_keyfile (const char *keyfile, int got_force);
 
@@ -139,10 +148,12 @@ create_conf (void)
     conf->got_force = 0;
     conf->got_foreground = 0;
     conf->got_group_stat = !! MUNGE_GROUP_STAT_FLAG;
+    conf->got_stop = 0;
     conf->got_mlockall = 0;
     conf->got_root_auth = !! MUNGE_AUTH_ROOT_ALLOW_FLAG;
     conf->got_socket_retry = !! MUNGE_SOCKET_RETRY_FLAG;
     conf->got_syslog = 0;
+    conf->got_verbose = 0;
     conf->def_cipher = MUNGE_DEFAULT_CIPHER;
     conf->def_zip = zip_select_default_type (MUNGE_DEFAULT_ZIP);
     conf->def_mac = MUNGE_DEFAULT_MAC;
@@ -272,6 +283,8 @@ parse_cmdline (conf_t conf, int argc, char **argv)
     long  l;
     char *p;
 
+    assert (conf != NULL);
+
     opterr = 0;                         /* suppress default getopt err msgs */
 
     prog = (prog = strrchr (argv[0], '/')) ? prog + 1 : argv[0];
@@ -305,12 +318,18 @@ parse_cmdline (conf_t conf, int argc, char **argv)
             case 'M':
                 conf->got_mlockall = 1;
                 break;
+            case 's':
+                conf->got_stop = 1;
+                break;
             case 'S':
                 if (conf->socket_name)
                     free (conf->socket_name);
                 if (!(conf->socket_name = strdup (optarg)))
                     log_errno (EMUNGE_NO_MEMORY, LOG_ERR,
                         "Failed to copy socket name string");
+                break;
+            case 'v':
+                conf->got_verbose = 1;
                 break;
             case OPT_ADVICE:
                 printf ("Don't Panic!\n");
@@ -460,6 +479,9 @@ parse_cmdline (conf_t conf, int argc, char **argv)
         log_err (EMUNGE_SNAFU, LOG_ERR,
             "Unrecognized parameter \"%s\"", argv[optind]);
     }
+    if (conf->got_stop) {
+        _process_stop (conf);
+    }
     return;
 }
 
@@ -496,8 +518,14 @@ display_help (char *prog)
     printf ("  %*s %s\n", w, "-M, --mlockall",
             "Lock all pages in memory");
 
+    printf ("  %*s %s\n", w, "-s, --stop",
+            "Stop daemon bound to socket");
+
     printf ("  %*s %s [%s]\n", w, "-S, --socket=PATH",
             "Specify local socket", MUNGE_SOCKET_NAME);
+
+    printf ("  %*s %s\n", w, "-v, --verbose",
+            "Be verbose");
 
     printf ("\n");
 
@@ -693,6 +721,116 @@ lookup_ip_addr (conf_t conf)
 /*****************************************************************************
  *  Internal Functions
  *****************************************************************************/
+
+static void
+_process_stop (conf_t conf)
+{
+/*  Processes the -s/--stop option.
+ *  A series of SIGTERMs are sent to the process holding the write-lock.
+ *    If the process fails to terminate, a final SIGKILL is sent.
+ */
+    pid_t pid;
+    int   signum;
+    int   msecs;
+    int   i;
+    int   rv;
+
+    assert (conf != NULL);
+    assert (MUNGE_SIGNAL_ATTEMPTS > 0);
+    assert (MUNGE_SIGNAL_DELAY_MSECS > 0);
+
+    pid = lock_query (conf);
+    if (pid <= 0) {
+        if (conf->got_verbose) {
+            log_err (EMUNGE_SNAFU, LOG_ERR,
+                    "Failed to signal daemon bound to \"%s\"",
+                    conf->socket_name);
+        }
+        exit (EXIT_FAILURE);
+    }
+    rv = kill (pid, 0);
+    if (rv < 0) {
+        if (conf->got_verbose) {
+            log_errno (EMUNGE_SNAFU, LOG_ERR,
+                    "Failed to signal daemon bound to \"%s\" (pid %d)",
+                    conf->socket_name, pid);
+        }
+        exit (EXIT_FAILURE);
+    }
+    signum = SIGTERM;
+    msecs = 0;
+    for (i = 0; i < (MUNGE_SIGNAL_ATTEMPTS + 1); i++) {
+        if (i == MUNGE_SIGNAL_ATTEMPTS) {
+            signum = SIGKILL;           /* Kill me harder! */
+        }
+        msecs += MUNGE_SIGNAL_DELAY_MSECS;
+        rv = _send_signal (pid, signum, msecs);
+        if (rv == 0) {
+            if (conf->got_verbose) {
+                log_msg (LOG_NOTICE,
+                        "%s daemon bound to \"%s\" (pid %d)",
+                        (signum == SIGTERM) ? "Terminated" : "Killed",
+                        conf->socket_name, pid);
+            }
+            exit (EXIT_SUCCESS);
+        }
+    }
+    if (conf->got_verbose) {
+        log_err (EMUNGE_SNAFU, LOG_ERR,
+                "Failed to terminate daemon bound to \"%s\" (pid %d)",
+                conf->socket_name, pid);
+    }
+    exit (EXIT_FAILURE);
+}
+
+
+static int
+_send_signal (pid_t pid, int signum, int msecs)
+{
+/*  Sends the signal [signum] to the process specified by [pid].
+ *  Returns 1 if the process is still running after a delay of [msecs],
+ *    or 0 if the process cannot be found.
+ */
+    struct timespec ts;
+    int             rv;
+
+    assert (pid > 0);
+    assert (signum > 0);
+    assert (msecs > 0);
+
+    log_msg (LOG_DEBUG, "Signaling pid %d with sig %d and %dms delay",
+            pid, signum, msecs);
+
+    rv = kill (pid, signum);
+    if (rv < 0) {
+        if (errno == ESRCH) {
+            return (0);
+        }
+        log_errno (EMUNGE_SNAFU, LOG_ERR,
+                "Failed to signal daemon (pid %d, sig %d)", pid, signum);
+    }
+    ts.tv_sec = msecs / 1000;
+    ts.tv_nsec = (msecs % 1000) * 1000 * 1000;
+retry:
+    rv = nanosleep (&ts, &ts);
+    if (rv < 0) {
+        if (errno == EINTR) {
+            goto retry;
+        }
+        log_errno (EMUNGE_SNAFU, LOG_ERR,
+                "Failed to sleep while awaiting signal result");
+    }
+    rv = kill (pid, 0);
+    if (rv < 0) {
+        if (errno == ESRCH) {
+            return (0);
+        }
+        log_errno (EMUNGE_SNAFU, LOG_ERR,
+                "Failed to check daemon (pid %d, sig 0)", pid);
+    }
+    return (1);
+}
+
 
 static int
 _conf_open_keyfile (const char *keyfile, int got_force)

@@ -84,8 +84,17 @@ improve performance and help the daemon remain responsive when the system
 is under heavy memory pressure.  This typically requires root privileges
 or the CAP_IPC_LOCK capability.
 .TP
+.BI "\-s, \-\-stop"
+Stop the daemon bound to the socket and wait for it to shut down.  Use the
+\fB\-\-socket\fR option to target a daemon bound to a non-default socket
+location.  This option exits with a zero status if the specified daemon
+was successfully stopped, or a non-zero status otherwise.
+.TP
 .BI "\-S, \-\-socket " path
 Specify the local domain socket for communicating with clients.
+.TP
+.BI "\-v, \-\-verbose"
+Be verbose.
 .TP
 .BI "\-\-auth\-server\-dir " directory
 Specify an alternate directory in which the daemon will create the pipe used

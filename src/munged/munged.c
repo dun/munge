@@ -54,6 +54,7 @@
 #include "gids.h"
 #include "hash.h"
 #include "job.h"
+#include "lock.h"
 #include "log.h"
 #include "missing.h"
 #include "munge_defs.h"
@@ -79,9 +80,6 @@ static void exit_handler (int signum);
 static void write_pidfile (const char *pidfile, int got_force);
 static void lock_memory (void);
 static void sock_create (conf_t conf);
-static void sock_lock (conf_t conf);
-static int set_file_lock (int fd);
-static pid_t is_file_locked (int fd);
 static void sock_destroy (conf_t conf);
 
 
@@ -625,9 +623,19 @@ sock_create (conf_t conf)
     }
     /*  Create lockfile for exclusive access to the socket.
      */
-    sock_lock (conf);
+    lock_create (conf);
     /*
-     *  Create socket for communicating with clients.
+     *  Remove existing socket from previous instance.
+     */
+    if (unlink (conf->socket_name) == 0) {
+        log_msg (LOG_INFO, "Removed existing socket \"%s\"",
+            conf->socket_name);
+    }
+    else if (errno != ENOENT) {
+        log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to remove \"%s\"",
+            conf->socket_name);
+    }
+    /*  Create socket for communicating with clients.
      */
     if ((sd = socket (PF_UNIX, SOCK_STREAM, 0)) < 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to create socket");
@@ -655,158 +663,6 @@ sock_create (conf_t conf)
     }
     conf->ld = sd;
     return;
-}
-
-
-static void
-sock_lock (conf_t conf)
-{
-/*  Ensures exclusive access to the unix domain socket.
- */
-    struct stat  st;
-    mode_t       mask;
-    int          rv;
-
-    assert (conf != NULL);
-    assert (conf->lockfile_name == NULL);
-    assert (conf->lockfile_fd == -1);
-    assert (conf->socket_name != NULL);
-
-    if (!(conf->lockfile_name = strdupf ("%s.lock", conf->socket_name))) {
-        log_errno (EMUNGE_NO_MEMORY, LOG_ERR,
-            "Failed to create lockfile string");
-    }
-    if (conf->got_force) {
-        if ((unlink (conf->lockfile_name) < 0) && (errno != ENOENT)) {
-            log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to remove \"%s\"",
-                conf->lockfile_name);
-        }
-    }
-    else if (lstat (conf->lockfile_name, &st) < 0) {
-        if (errno != ENOENT) {
-            log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to stat \"%s\"",
-                conf->lockfile_name);
-        }
-    }
-    else if (!S_ISREG(st.st_mode)) {
-        log_err (EMUNGE_SNAFU, LOG_ERR,
-            "Lockfile is suspicious: \"%s\" should be a regular file",
-            conf->lockfile_name);
-    }
-    else if (st.st_uid != geteuid()) {
-        log_err (EMUNGE_SNAFU, LOG_ERR,
-            "Lockfile is suspicious: \"%s\" should be owned by UID %u",
-            conf->lockfile_name, (unsigned) geteuid());
-    }
-    else if ((st.st_mode & 07777) != S_IWUSR) {
-        log_err (EMUNGE_SNAFU, LOG_ERR,
-            "Lockfile is suspicious: \"%s\" should be writable only by user",
-            conf->lockfile_name);
-    }
-    mask = umask (0);
-    conf->lockfile_fd = creat (conf->lockfile_name, S_IWUSR);
-    umask (mask);
-
-    if (conf->lockfile_fd < 0) {
-        log_errno (EMUNGE_SNAFU, LOG_ERR,
-            "Failed to create \"%s\"", conf->lockfile_name);
-    }
-    if ((rv = set_file_lock (conf->lockfile_fd)) < 0) {
-        if (!conf->got_force)
-            log_errno (EMUNGE_SNAFU, LOG_ERR,
-                "Failed to lock \"%s\"", conf->lockfile_name);
-        else
-            log_msg (LOG_WARNING,
-                "Failed to lock \"%s\"", conf->lockfile_name);
-    }
-    else if (rv > 0) {
-
-        pid_t pid = is_file_locked (conf->lockfile_fd);
-
-        if (pid < 0) {
-            log_errno (EMUNGE_SNAFU, LOG_ERR,
-                "Failed to test lock \"%s\"", conf->lockfile_name);
-        }
-        else if (pid > 0) {
-            log_err (EMUNGE_SNAFU, LOG_ERR,
-                "Found pid %d bound to socket \"%s\"", pid, conf->socket_name);
-        }
-        else {
-            log_err (EMUNGE_SNAFU, LOG_ERR,
-                "Found inconsistent state for lock \"%s\"",
-                conf->lockfile_name);
-        }
-    }
-    if (unlink (conf->socket_name) == 0) {
-        log_msg (LOG_INFO, "Removed existing socket \"%s\"",
-            conf->socket_name);
-    }
-    else if (errno != ENOENT) {
-        log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to remove \"%s\"",
-            conf->socket_name);
-    }
-    return;
-}
-
-
-static int
-set_file_lock (int fd)
-{
-/*  Sets an exclusive advisory lock on the open file descriptor 'fd'.
- *  Returns 0 on success, 1 if a conflicting lock is held by another process,
- *    or -1 on error (with errno set).
- */
-    struct flock  fl;
-    int           rv;
-
-    if (fd < 0) {
-        errno = EBADF;
-        return (-1);
-    }
-    fl.l_type = F_WRLCK;
-    fl.l_whence = SEEK_SET;
-    fl.l_start = 0;
-    fl.l_len = 0;
-
-    rv = fcntl (fd, F_SETLK, &fl);
-    if (rv < 0) {
-        if ((errno == EACCES) || (errno == EAGAIN)) {
-            return (1);
-        }
-        return (-1);
-    }
-    return (0);
-}
-
-
-static pid_t
-is_file_locked (int fd)
-{
-/*  Tests whether an exclusive advisory lock could be obtained for the open
- *    file descriptor 'fd'.
- *  Returns 0 if the file is not locked, >0 for the pid of another process
- *    holding a conflicting lock, or -1 on error (with errno set).
- */
-    struct flock  fl;
-    int           rv;
-
-    if (fd < 0) {
-        errno = EBADF;
-        return (-1);
-    }
-    fl.l_type = F_WRLCK;
-    fl.l_whence = SEEK_SET;
-    fl.l_start = 0;
-    fl.l_len = 0;
-
-    rv = fcntl (fd, F_GETLK, &fl);
-    if (rv < 0) {
-        return (-1);
-    }
-    if (fl.l_type == F_UNLCK) {
-        return (0);
-    }
-    return (fl.l_pid);
 }
 
 

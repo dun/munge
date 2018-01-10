@@ -142,12 +142,12 @@ am_munged_OBJECTS = munged-munged.$(OBJEXT) munged-auth_recv.$(OBJEXT) \
 	munged-crypto.$(OBJEXT) munged-dec.$(OBJEXT) \
 	munged-enc.$(OBJEXT) munged-gids.$(OBJEXT) \
 	munged-hash.$(OBJEXT) munged-job.$(OBJEXT) \
-	munged-mac.$(OBJEXT) munged-md.$(OBJEXT) munged-path.$(OBJEXT) \
-	munged-random.$(OBJEXT) munged-replay.$(OBJEXT) \
-	munged-thread.$(OBJEXT) munged-timer.$(OBJEXT) \
-	munged-work.$(OBJEXT) munged-zip.$(OBJEXT) \
-	munged-query.$(OBJEXT) munged-xgetgr.$(OBJEXT) \
-	munged-xgetpw.$(OBJEXT)
+	munged-lock.$(OBJEXT) munged-mac.$(OBJEXT) munged-md.$(OBJEXT) \
+	munged-path.$(OBJEXT) munged-random.$(OBJEXT) \
+	munged-replay.$(OBJEXT) munged-thread.$(OBJEXT) \
+	munged-timer.$(OBJEXT) munged-work.$(OBJEXT) \
+	munged-zip.$(OBJEXT) munged-query.$(OBJEXT) \
+	munged-xgetgr.$(OBJEXT) munged-xgetpw.$(OBJEXT)
 munged_OBJECTS = $(am_munged_OBJECTS)
 am__DEPENDENCIES_1 =
 munged_DEPENDENCIES = $(top_builddir)/src/libcommon/libcommon.la \
@@ -660,6 +660,8 @@ munged_SOURCES = \
 	hash.h \
 	job.c \
 	job.h \
+	lock.c \
+	lock.h \
 	mac.c \
 	mac.h \
 	md.c \
@@ -815,6 +817,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/munged-gids.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/munged-hash.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/munged-job.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/munged-lock.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/munged-mac.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/munged-md.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/munged-munged.Po@am__quote@
@@ -1017,6 +1020,20 @@ munged-job.obj: job.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='job.c' object='munged-job.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(munged_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -c -o munged-job.obj `if test -f 'job.c'; then $(CYGPATH_W) 'job.c'; else $(CYGPATH_W) '$(srcdir)/job.c'; fi`
+
+munged-lock.o: lock.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(munged_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -MT munged-lock.o -MD -MP -MF $(DEPDIR)/munged-lock.Tpo -c -o munged-lock.o `test -f 'lock.c' || echo '$(srcdir)/'`lock.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/munged-lock.Tpo $(DEPDIR)/munged-lock.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='lock.c' object='munged-lock.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(munged_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -c -o munged-lock.o `test -f 'lock.c' || echo '$(srcdir)/'`lock.c
+
+munged-lock.obj: lock.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(munged_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -MT munged-lock.obj -MD -MP -MF $(DEPDIR)/munged-lock.Tpo -c -o munged-lock.obj `if test -f 'lock.c'; then $(CYGPATH_W) 'lock.c'; else $(CYGPATH_W) '$(srcdir)/lock.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/munged-lock.Tpo $(DEPDIR)/munged-lock.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='lock.c' object='munged-lock.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(munged_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -c -o munged-lock.obj `if test -f 'lock.c'; then $(CYGPATH_W) 'lock.c'; else $(CYGPATH_W) '$(srcdir)/lock.c'; fi`
 
 munged-mac.o: mac.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(munged_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -MT munged-mac.o -MD -MP -MF $(DEPDIR)/munged-mac.Tpo -c -o munged-mac.o `test -f 'mac.c' || echo '$(srcdir)/'`mac.c

@@ -79,6 +79,8 @@ munged_SOURCES = \
 	hash.h \
 	job.c \
 	job.h \
+	lock.c \
+	lock.h \
 	mac.c \
 	mac.h \
 	md.c \

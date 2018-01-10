@@ -47,10 +47,12 @@ struct conf {
     unsigned        got_force:1;        /* flag for FORCE option             */
     unsigned        got_foreground:1;   /* flag for FOREGROUND option        */
     unsigned        got_group_stat:1;   /* flag for gids stat'ing /etc/group */
+    unsigned        got_stop:1;         /* flag for stopping daemon          */
     unsigned        got_mlockall:1;     /* flag for locking all memory pages */
     unsigned        got_root_auth:1;    /* flag if root can decode any cred  */
     unsigned        got_socket_retry:1; /* flag for allowing decode retries  */
     unsigned        got_syslog:1;       /* flag if logging to syslog instead */
+    unsigned        got_verbose:1;      /* flag for being verbose            */
     munge_cipher_t  def_cipher;         /* default cipher type               */
     munge_zip_t     def_zip;            /* default compression type          */
     munge_mac_t     def_mac;            /* default message auth code type    */

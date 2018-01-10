@@ -50,15 +50,10 @@ munged_start_daemon()
 
 ##
 # Stop munged and clear env vars.
-# FIXME: The "while kill -s" loop busy-waits until the daemon exits.
 ##
 munged_stop_daemon()
 {
-    local PID &&
-    if test -r "${MUNGE_PIDFILE}"; then
-        PID=$(cat "${MUNGE_PIDFILE}") &&
-        while kill -s TERM "${PID}" 2>/dev/null; do :; done
-    fi &&
+    "${MUNGED}" --stop --socket="${MUNGE_SOCKET}" &&
     unset MUNGE_SOCKET &&
     unset MUNGE_PIDFILE
 }

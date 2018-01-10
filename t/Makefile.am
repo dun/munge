@@ -43,7 +43,8 @@ TESTS = \
 	0013-unmunge-cmdline.t \
 	0021-munged-valgrind.t \
 	0022-munge-valgrind.t \
-	0023-unmunge-valgrind.t
+	0023-unmunge-valgrind.t \
+	0100-munged-lock.t
 
 EXTRA_DIST = \
 	$(TESTS) \

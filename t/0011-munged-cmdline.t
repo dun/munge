@@ -29,6 +29,35 @@ for OPT_VERSION in '-V' '--version'; do
     '
 done
 
+# Check if the stop option succeeds in stopping the process and removing the
+#   socket from the filesystem.
+##
+for OPT_STOP in '-s' '--stop'; do
+    test_expect_success "munged ${OPT_STOP}" '
+        munged_start_daemon &&
+        test -S "${MUNGE_SOCKET}" &&
+        "${MUNGED}" "${OPT_STOP}" --socket="${MUNGE_SOCKET}" &&
+        test ! -S "${MUNGE_SOCKET}" &&
+        unset MUNGE_SOCKET
+    '
+done
+
+# Check if the stop option properly fails to stop a daemon on a non-existent
+#   socket.
+##
+test_expect_success 'munged --stop for missing socket' '
+    test_must_fail "${MUNGED}" --stop --socket=missing.socket.$$
+'
+
+for OPT_VERBOSE in '-v' '--verbose'; do
+    test_expect_success "munged ${OPT_VERBOSE}" '
+        munged_start_daemon &&
+        "${MUNGED}" "${OPT_VERBOSE}" --stop --socket="${MUNGE_SOCKET}" 2>&1 |
+        grep -q "Terminated daemon" &&
+        unset MUNGE_SOCKET
+    '
+done
+
 test_expect_failure 'finish writing tests' '
     false
 '
