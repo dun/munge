@@ -126,53 +126,5 @@ int fd_is_nonblocking (int fd);
  *     0 if not set, or -1 on error (with errno set appropriately).
  */
 
-int fd_get_read_lock (int fd);
-/*
- *  Obtains a read lock on the file specified by [fd].
- *  Returns 0 on success, or -1 if prevented from obtaining the lock.
- */
-
-int fd_get_readw_lock (int fd);
-/*
- *  Obtains a read lock on the file specified by [fd],
- *    blocking until one becomes available.
- *  Returns 0 on success, or -1 on error.
- */
-
-int fd_get_write_lock (int fd);
-/*
- *  Obtains a write lock on the file specified by [fd].
- *  Returns 0 on success, or -1 if prevented from obtaining the lock.
- */
-
-int fd_get_writew_lock (int fd);
-/*
- *  Obtains a write lock on the file specified by [fd],
- *    blocking until one becomes available.
- *  Returns 0 on success, or -1 on error.
- */
-
-int fd_release_lock (int fd);
-/*
- *  Releases a lock held on the file specified by [fd].
- *  Returns 0 on success, or -1 on error.
- */
-
-pid_t fd_is_read_lock_blocked (int fd);
-/*
- *  Checks to see if a lock exists on [fd] that would block a request for a
- *    read-lock (ie, if a write-lock is already being held on the file).
- *  Returns the pid of the process holding the lock, 0 if no lock exists,
- *    or -1 on error.
- */
-
-pid_t fd_is_write_lock_blocked (int fd);
-/*
- *  Checks to see if a lock exists on [fd] that would block a request for a
- *    write-lock (ie, if any lock is already being held on the file).
- *  Returns the pid of the process holding the lock, 0 if no lock exists,
- *    or -1 on error.
- */
-
 
 #endif /* !FD_H */
