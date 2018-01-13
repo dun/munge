@@ -30,15 +30,22 @@ for OPT_VERSION in '-V' '--version'; do
 done
 
 # Check if the stop option succeeds in stopping the process and removing the
-#   socket from the filesystem.
+#   socket and pidfile from the filesystem.
 ##
 for OPT_STOP in '-s' '--stop'; do
     test_expect_success "munged ${OPT_STOP}" '
+        local PID &&
         munged_start_daemon &&
+        test -f "${MUNGE_PIDFILE}" &&
+        PID=$(cat "${MUNGE_PIDFILE}") &&
+        ps -p "${PID}" | grep munged &&
         test -S "${MUNGE_SOCKET}" &&
         "${MUNGED}" "${OPT_STOP}" --socket="${MUNGE_SOCKET}" &&
         test ! -S "${MUNGE_SOCKET}" &&
-        unset MUNGE_SOCKET
+        test ! -f "${MUNGE_PIDFILE}" &&
+        ! ps -p "${PID}" &&
+        unset MUNGE_SOCKET &&
+        unset MUNGE_PIDFILE
     '
 done
 
@@ -54,7 +61,8 @@ for OPT_VERBOSE in '-v' '--verbose'; do
         munged_start_daemon &&
         "${MUNGED}" "${OPT_VERBOSE}" --stop --socket="${MUNGE_SOCKET}" 2>&1 |
         grep -q "Terminated daemon" &&
-        unset MUNGE_SOCKET
+        unset MUNGE_SOCKET &&
+        unset MUNGE_PIDFILE
     '
 done
 

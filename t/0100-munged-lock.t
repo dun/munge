@@ -73,7 +73,7 @@ test_expect_success 'start munged with in-use socket' '
 #   This tests whether the pidfile was corrupted by the preceding attempt
 #   to start a new munged process using a socket that was already in use.
 ##
-test_expect_failure 'check pidfile after munged failure' '
+test_expect_success 'check pidfile after munged failure' '
     ps -p "$(cat "${MUNGE_PIDFILE}")" | grep munged
 '
 

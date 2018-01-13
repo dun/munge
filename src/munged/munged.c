@@ -126,7 +126,6 @@ main (int argc, char *argv[])
     }
     handle_signals ();
     lookup_ip_addr (conf);
-    write_pidfile (conf->pidfile_name, conf->got_force);
     if (conf->got_mlockall) {
         lock_memory ();
     }
@@ -142,6 +141,7 @@ main (int argc, char *argv[])
     replay_init ();
     timer_init ();
     sock_create (conf);
+    write_pidfile (conf->pidfile_name, conf->got_force);
 
     if (!conf->got_foreground) {
         daemonize_fini (fd);
@@ -476,6 +476,10 @@ write_pidfile (const char *pidfile, int got_force)
 {
 /*  Creates the specified pidfile.
  *  The pidfile must be created after the daemon has finished forking.
+ *    It should be written after validation checks that might prevent the
+ *    daemon from starting (e.g., after creating the socket and obtaining
+ *    the lock), but before the original parent process terminates (i.e.,
+ *    before daemonize_fini()).
  */
     char    piddir [PATH_MAX];
     char    ebuf [1024];
