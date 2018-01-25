@@ -666,6 +666,7 @@ sock_create (conf_t conf)
             "Failed to listen on \"%s\"", conf->socket_name);
     }
     conf->ld = sd;
+    log_msg (LOG_NOTICE, "Bound to socket \"%s\"", conf->socket_name);
     return;
 }
 
