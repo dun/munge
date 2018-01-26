@@ -75,6 +75,11 @@ all available keys are selected by default.
 .BI "\-K, \-\-list\-keys"
 Display a list of metadata keys.
 .TP
+.BI "\-N, \-\-numeric"
+Display metadata values numerically.  This omits conversions from IP addresses
+to hostnames, seconds to date and time strings, UIDs to user names, GIDs
+to group names, and cipher/mac/zip type lookups.
+.TP
 .BI "\-S, \-\-socket " path
 Specify the local domain socket for connecting with \fBmunged\fR.
 

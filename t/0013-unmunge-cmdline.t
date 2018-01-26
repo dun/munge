@@ -229,6 +229,16 @@ test_expect_success 'unmunge --keys for each key' '
     test ! -s fail.$$
 '
 
+for OPT_NUMERIC in '-N' '--numeric'; do
+    test_expect_success "unmunge ${OPT_NUMERIC}" '
+        "${MUNGE}" --socket="${MUNGE_SOCKET}" --no-input \
+                --restrict-uid="$(id -u)" --restrict-gid="$(id -g)" |
+        "${UNMUNGE}" --socket="${MUNGE_SOCKET}" "${OPT_NUMERIC}" \
+                --metadata=meta.$$ &&
+        ! grep -q -v "^[A-Z_]*: *[0-9.]*$" meta.$$
+    '
+done
+
 test_expect_success 'stop munged' '
     munged_stop_daemon
 '

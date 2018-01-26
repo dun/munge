@@ -63,35 +63,54 @@
 
 
 /*****************************************************************************
- *  Command-Line Options
+ *  Typedefs
  *****************************************************************************/
 
-const char * const short_opts = ":hLVi:nm:o:k:KS:";
+typedef struct conf * conf_t;
 
-#include <getopt.h>
-struct option long_opts[] = {
-    { "help",      no_argument,       NULL, 'h' },
-    { "license",   no_argument,       NULL, 'L' },
-    { "version",   no_argument,       NULL, 'V' },
-    { "input",     required_argument, NULL, 'i' },
-    { "no-output", no_argument,       NULL, 'n' },
-    { "metadata",  required_argument, NULL, 'm' },
-    { "output",    required_argument, NULL, 'o' },
-    { "keys",      required_argument, NULL, 'k' },
-    { "list-keys", no_argument,       NULL, 'K' },
-    { "socket",    required_argument, NULL, 'S' },
-    {  NULL,       0,                 NULL,  0  }
-};
+typedef void display_func_t (conf_t);
+
+typedef struct {
+    int             val;
+    char           *str;
+    display_func_t *fp;
+} display_key_t;
 
 
 /*****************************************************************************
- *  Metadata Keys
+ *  Prototypes
  *****************************************************************************/
 
-typedef struct {
-    int   val;
-    char *str;
-} strval_t;
+conf_t create_conf (void);
+void destroy_conf (conf_t conf);
+void parse_cmdline (conf_t conf, int argc, char **argv);
+void display_help (char *prog);
+void parse_keys (conf_t conf, char *keys);
+void display_keys (void);
+void open_files (conf_t conf);
+void display_meta (conf_t conf);
+void display_status (conf_t conf);
+void display_encode_host (conf_t conf);
+void display_encode_time (conf_t conf);
+void display_decode_time (conf_t conf);
+void display_time (conf_t conf, int munge_key);
+void display_ttl (conf_t conf);
+void display_cipher_type (conf_t conf);
+void display_mac_type (conf_t conf);
+void display_zip_type (conf_t conf);
+void display_uid (conf_t conf);
+void display_gid (conf_t conf);
+void display_uid_restriction (conf_t conf);
+void display_gid_restriction (conf_t conf);
+void display_length (conf_t conf);
+void display_data (conf_t conf);
+int key_str_to_val (const char *str);
+const char * key_val_to_str (int val);
+
+
+/*****************************************************************************
+ *  MUNGE Keys
+ *****************************************************************************/
 
 typedef enum {
     MUNGE_KEY_STATUS,
@@ -110,21 +129,44 @@ typedef enum {
     MUNGE_KEY_LAST
 } munge_key_t;
 
-strval_t munge_keys[] = {
-    { MUNGE_KEY_STATUS,          "STATUS"          },
-    { MUNGE_KEY_ENCODE_HOST,     "ENCODE_HOST"     },
-    { MUNGE_KEY_ENCODE_TIME,     "ENCODE_TIME"     },
-    { MUNGE_KEY_DECODE_TIME,     "DECODE_TIME"     },
-    { MUNGE_KEY_TTL,             "TTL"             },
-    { MUNGE_KEY_CIPHER_TYPE,     "CIPHER"          },
-    { MUNGE_KEY_MAC_TYPE,        "MAC"             },
-    { MUNGE_KEY_ZIP_TYPE,        "ZIP"             },
-    { MUNGE_KEY_UID,             "UID"             },
-    { MUNGE_KEY_GID,             "GID"             },
-    { MUNGE_KEY_UID_RESTRICTION, "UID_RESTRICTION" },
-    { MUNGE_KEY_GID_RESTRICTION, "GID_RESTRICTION" },
-    { MUNGE_KEY_LENGTH,          "LENGTH"          },
-    { MUNGE_KEY_LAST,             NULL             }
+display_key_t munge_keys[] = {
+    { MUNGE_KEY_STATUS,          "STATUS",          display_status          },
+    { MUNGE_KEY_ENCODE_HOST,     "ENCODE_HOST",     display_encode_host     },
+    { MUNGE_KEY_ENCODE_TIME,     "ENCODE_TIME",     display_encode_time     },
+    { MUNGE_KEY_DECODE_TIME,     "DECODE_TIME",     display_decode_time     },
+    { MUNGE_KEY_TTL,             "TTL",             display_ttl             },
+    { MUNGE_KEY_CIPHER_TYPE,     "CIPHER",          display_cipher_type     },
+    { MUNGE_KEY_MAC_TYPE,        "MAC",             display_mac_type        },
+    { MUNGE_KEY_ZIP_TYPE,        "ZIP",             display_zip_type        },
+    { MUNGE_KEY_UID,             "UID",             display_uid             },
+    { MUNGE_KEY_GID,             "GID",             display_gid             },
+    { MUNGE_KEY_UID_RESTRICTION, "UID_RESTRICTION", display_uid_restriction },
+    { MUNGE_KEY_GID_RESTRICTION, "GID_RESTRICTION", display_gid_restriction },
+    { MUNGE_KEY_LENGTH,          "LENGTH",          display_length          },
+    { MUNGE_KEY_LAST,             NULL,             NULL }
+};
+
+
+/*****************************************************************************
+ *  Command-Line Options
+ *****************************************************************************/
+
+const char * const short_opts = ":hLVi:nm:o:k:KNS:";
+
+#include <getopt.h>
+struct option long_opts[] = {
+    { "help",      no_argument,       NULL, 'h' },
+    { "license",   no_argument,       NULL, 'L' },
+    { "version",   no_argument,       NULL, 'V' },
+    { "input",     required_argument, NULL, 'i' },
+    { "no-output", no_argument,       NULL, 'n' },
+    { "metadata",  required_argument, NULL, 'm' },
+    { "output",    required_argument, NULL, 'o' },
+    { "keys",      required_argument, NULL, 'k' },
+    { "list-keys", no_argument,       NULL, 'K' },
+    { "numeric",   no_argument,       NULL, 'N' },
+    { "socket",    required_argument, NULL, 'S' },
+    {  NULL,       0,                 NULL,  0  }
 };
 
 
@@ -147,28 +189,10 @@ struct conf {
     void        *data;                  /* unmunged payload data             */
     uid_t        uid;                   /* process uid according to cred     */
     gid_t        gid;                   /* process gid according to cred     */
-    char         key[MUNGE_KEY_LAST];   /* key flag array (true if enabled)  */
-    int          key_max_str_len;       /* max strlen of any given key       */
+    char         key[ MUNGE_KEY_LAST ]; /* key flag array (true if enabled)  */
+    int          key_width;             /* num chars reserved for key field  */
+    unsigned     got_numeric:1;         /* flag for NUMERIC option           */
 };
-
-typedef struct conf * conf_t;
-
-
-/*****************************************************************************
- *  Prototypes
- *****************************************************************************/
-
-conf_t create_conf (void);
-void destroy_conf (conf_t conf);
-void parse_cmdline (conf_t conf, int argc, char **argv);
-void display_help (char *prog);
-void parse_keys (conf_t conf, char *keys);
-void display_keys (void);
-void open_files (conf_t conf);
-void display_meta (conf_t conf);
-void display_data (conf_t conf);
-int key_str_to_val (char *str);
-char * key_val_to_str (int val);
 
 
 /*****************************************************************************
@@ -252,7 +276,8 @@ create_conf (void)
         len = strlen (key_val_to_str (i));
         maxlen = MAX (maxlen, len);
     }
-    conf->key_max_str_len = maxlen;
+    conf->key_width = maxlen + 1;       /* separate longest key by one space */
+    conf->got_numeric = 0;
 
     return (conf);
 }
@@ -359,6 +384,9 @@ parse_cmdline (conf_t conf, int argc, char **argv)
             case 'K':
                 display_keys ();
                 exit (EMUNGE_SUCCESS);
+                break;
+            case 'N':
+                conf->got_numeric = 1;
                 break;
             case 'S':
                 e = munge_ctx_set (conf->ctx, MUNGE_OPT_SOCKET, optarg);
@@ -467,6 +495,9 @@ display_help (char *prog)
     printf ("  %*s %s\n", w, "-K, --list-keys",
             "Display list of metadata keys");
 
+    printf ("  %*s %s\n", w, "-N, --numeric",
+            "Display metadata values numerically");
+
     printf ("  %*s %s\n", w, "-S, --socket=STRING",
             "Specify local domain socket for munged");
 
@@ -563,195 +594,17 @@ open_files (conf_t conf)
 void
 display_meta (conf_t conf)
 {
-    int             pad;                /* num chars reserved for key field  */
-    char           *s;                  /* key field string                  */
-    int             w;                  /* width of space chars to fill pad  */
-    munge_err_t     e;                  /* munge error condition             */
-    struct in_addr  addr;               /* IPv4 addr                         */
-    struct hostent *hptr;               /* ptr to static hostent struct      */
-    char            ip_buf[INET_ADDRSTRLEN]; /* ip addr string buffer        */
-    time_t          t;                  /* time (seconds since epoch)        */
-    struct tm      *tm_ptr;             /* ptr to broken-down time entry     */
-    int             t_len;              /* length of time string             */
-    char            t_buf[MAX_TIME_STR];/* time string buffer                */
-    int             i;                  /* all-purpose int                   */
-    struct passwd  *pw_ptr;             /* ptr to broken-down password entry */
-    struct group   *gr_ptr;             /* ptr to broken-down group entry    */
+    int i;
 
-    if (!conf->fp_meta) {
+    assert (conf != NULL);
+
+    if (conf->fp_meta == NULL) {
         return;
     }
-    pad = conf->key_max_str_len + 2;
-
-    if (conf->key[MUNGE_KEY_STATUS]) {
-        s = key_val_to_str (MUNGE_KEY_STATUS);
-        w = pad - strlen (s);
-        fprintf (conf->fp_meta, "%s:%*c%s (%d)\n", s, w, 0x20,
-            munge_strerror (conf->status), conf->status);
-    }
-    if (conf->key[MUNGE_KEY_ENCODE_HOST]) {
-        const struct in_addr addr_sentinel = {0};
-        e = munge_ctx_get (conf->ctx, MUNGE_OPT_ADDR4, &addr);
-        if (e != EMUNGE_SUCCESS) {
-            log_err (EMUNGE_SNAFU, LOG_ERR,
-                "Failed to retrieve origin IP address: %s",
-                munge_ctx_strerror (conf->ctx));
+    for (i = 0; i < MUNGE_KEY_LAST; i++) {
+        if (conf->key[i] && munge_keys[i].fp) {
+            (*(munge_keys[i].fp)) (conf);
         }
-        hptr = (memcmp (&addr, &addr_sentinel, sizeof (addr)))
-            ? gethostbyaddr ((char *) &addr, sizeof (addr), AF_INET)
-            : NULL;
-        if (!inet_ntop (AF_INET, &addr, ip_buf, sizeof (ip_buf))) {
-            log_err (EMUNGE_SNAFU, LOG_ERR,
-                "Failed to convert IP address string");
-        }
-        s = key_val_to_str (MUNGE_KEY_ENCODE_HOST);
-        w = pad - strlen (s);
-        fprintf (conf->fp_meta, "%s:%*c%s (%s)\n", s, w, 0x20,
-            (hptr ? hptr->h_name : "???"), ip_buf);
-    }
-    if (conf->key[MUNGE_KEY_ENCODE_TIME]) {
-        e = munge_ctx_get (conf->ctx, MUNGE_OPT_ENCODE_TIME, &t);
-        if (e != EMUNGE_SUCCESS) {
-            log_err (EMUNGE_SNAFU, LOG_ERR,
-                "Failed to retrieve encode time: %s",
-                munge_ctx_strerror (conf->ctx));
-        }
-        tm_ptr = localtime (&t);
-        t_len = strftime (t_buf, sizeof (t_buf),
-                "%Y-%m-%d %H:%M:%S %z", tm_ptr);
-        if ((t_len == 0) || (t_len >= sizeof (t_buf))) {
-            log_err (EMUNGE_OVERFLOW, LOG_ERR,
-                "Overran buffer for encode time");
-        }
-        /*  Since ISO C does not support the '%s' strftime format option ...
-         */
-        if (strcatf (t_buf, sizeof (t_buf), " (%ld)", (long) t) < 0) {
-            log_err (EMUNGE_OVERFLOW, LOG_ERR,
-                "Overran buffer for encode time");
-        }
-        s = key_val_to_str (MUNGE_KEY_ENCODE_TIME);
-        w = pad - strlen (s);
-        fprintf (conf->fp_meta, "%s:%*c%s\n", s, w, 0x20, t_buf);
-    }
-    if (conf->key[MUNGE_KEY_DECODE_TIME]) {
-        e = munge_ctx_get (conf->ctx, MUNGE_OPT_DECODE_TIME, &t);
-        if (e != EMUNGE_SUCCESS) {
-            log_err (EMUNGE_SNAFU, LOG_ERR,
-                "Failed to retrieve decode time: %s",
-                munge_ctx_strerror (conf->ctx));
-        }
-        tm_ptr = localtime (&t);
-        t_len = strftime (t_buf, sizeof (t_buf),
-                "%Y-%m-%d %H:%M:%S %z", tm_ptr);
-        if ((t_len == 0) || (t_len >= sizeof (t_buf))) {
-            log_err (EMUNGE_OVERFLOW, LOG_ERR,
-                "Overran buffer for decode time");
-        }
-        /*  Since ISO C does not support the '%s' strftime format option ...
-         */
-        if (strcatf (t_buf, sizeof (t_buf), " (%ld)", (long) t) < 0) {
-            log_err (EMUNGE_OVERFLOW, LOG_ERR,
-                "Overran buffer for decode time");
-        }
-        s = key_val_to_str (MUNGE_KEY_DECODE_TIME);
-        w = pad - strlen (s);
-        fprintf (conf->fp_meta, "%s:%*c%s\n", s, w, 0x20, t_buf);
-    }
-    if (conf->key[MUNGE_KEY_TTL]) {
-        e = munge_ctx_get (conf->ctx, MUNGE_OPT_TTL, &i);
-        if (e != EMUNGE_SUCCESS) {
-            log_err (EMUNGE_SNAFU, LOG_ERR,
-                "Failed to retrieve time-to-live: %s",
-                munge_ctx_strerror (conf->ctx));
-        }
-        s = key_val_to_str (MUNGE_KEY_TTL);
-        w = pad - strlen (s);
-        fprintf (conf->fp_meta, "%s:%*c%d\n", s, w, 0x20, i);
-    }
-    if (conf->key[MUNGE_KEY_CIPHER_TYPE]) {
-        e = munge_ctx_get (conf->ctx, MUNGE_OPT_CIPHER_TYPE, &i);
-        if (e != EMUNGE_SUCCESS) {
-            log_err (EMUNGE_SNAFU, LOG_ERR,
-                "Failed to retrieve cipher type: %s",
-                munge_ctx_strerror (conf->ctx));
-        }
-        s = key_val_to_str (MUNGE_KEY_CIPHER_TYPE);
-        w = pad - strlen (s);
-        fprintf (conf->fp_meta, "%s:%*c%s (%d)\n", s, w, 0x20,
-            munge_enum_int_to_str (MUNGE_ENUM_CIPHER, i), i);
-    }
-    if (conf->key[MUNGE_KEY_MAC_TYPE]) {
-        e = munge_ctx_get (conf->ctx, MUNGE_OPT_MAC_TYPE, &i);
-        if (e != EMUNGE_SUCCESS) {
-            log_err (EMUNGE_SNAFU, LOG_ERR,
-                "Failed to retrieve MAC type: %s",
-                munge_ctx_strerror (conf->ctx));
-        }
-        s = key_val_to_str (MUNGE_KEY_MAC_TYPE);
-        w = pad - strlen (s);
-        fprintf (conf->fp_meta, "%s:%*c%s (%d)\n", s, w, 0x20,
-            munge_enum_int_to_str (MUNGE_ENUM_MAC, i), i);
-    }
-    if (conf->key[MUNGE_KEY_ZIP_TYPE]) {
-        e = munge_ctx_get (conf->ctx, MUNGE_OPT_ZIP_TYPE, &i);
-        if (e != EMUNGE_SUCCESS) {
-            log_err (EMUNGE_SNAFU, LOG_ERR,
-                "Failed to retrieve compression type: %s",
-                munge_ctx_strerror (conf->ctx));
-        }
-        s = key_val_to_str (MUNGE_KEY_ZIP_TYPE);
-        w = pad - strlen (s);
-        fprintf (conf->fp_meta, "%s:%*c%s (%d)\n", s, w, 0x20,
-            munge_enum_int_to_str (MUNGE_ENUM_ZIP, i), i);
-    }
-    if (conf->key[MUNGE_KEY_UID]) {
-        pw_ptr = getpwuid (conf->uid);
-        s = key_val_to_str (MUNGE_KEY_UID);
-        w = pad - strlen (s);
-        fprintf (conf->fp_meta, "%s:%*c%s (%u)\n", s, w, 0x20,
-            (pw_ptr ? pw_ptr->pw_name : "???"), (unsigned int) conf->uid);
-    }
-    if (conf->key[MUNGE_KEY_GID]) {
-        gr_ptr = getgrgid (conf->gid);
-        s = key_val_to_str (MUNGE_KEY_GID);
-        w = pad - strlen (s);
-        fprintf (conf->fp_meta, "%s:%*c%s (%u)\n", s, w, 0x20,
-            (gr_ptr ? gr_ptr->gr_name : "???"), (unsigned int) conf->gid);
-    }
-    if (conf->key[MUNGE_KEY_UID_RESTRICTION]) {
-        e = munge_ctx_get (conf->ctx, MUNGE_OPT_UID_RESTRICTION, &i);
-        if (e != EMUNGE_SUCCESS) {
-            log_err (EMUNGE_SNAFU, LOG_ERR,
-                "Failed to retrieve UID restriction: %s",
-                munge_ctx_strerror (conf->ctx));
-        }
-        if (i != MUNGE_UID_ANY) {
-            pw_ptr = getpwuid (i);
-            s = key_val_to_str (MUNGE_KEY_UID_RESTRICTION);
-            w = pad - strlen (s);
-            fprintf (conf->fp_meta, "%s:%*c%s (%u)\n", s, w, 0x20,
-                (pw_ptr ? pw_ptr->pw_name : "???"), (unsigned int) i);
-        }
-    }
-    if (conf->key[MUNGE_KEY_GID_RESTRICTION]) {
-        e = munge_ctx_get (conf->ctx, MUNGE_OPT_GID_RESTRICTION, &i);
-        if (e != EMUNGE_SUCCESS) {
-            log_err (EMUNGE_SNAFU, LOG_ERR,
-                "Failed to retrieve GID restriction: %s",
-                munge_ctx_strerror (conf->ctx));
-        }
-        if (i != MUNGE_GID_ANY) {
-            gr_ptr = getgrgid (i);
-            s = key_val_to_str (MUNGE_KEY_GID_RESTRICTION);
-            w = pad - strlen (s);
-            fprintf (conf->fp_meta, "%s:%*c%s (%u)\n", s, w, 0x20,
-                (gr_ptr ? gr_ptr->gr_name : "???"), (unsigned int) i);
-        }
-    }
-    if (conf->key[MUNGE_KEY_LENGTH]) {
-        s = key_val_to_str (MUNGE_KEY_LENGTH);
-        w = pad - strlen (s);
-        fprintf (conf->fp_meta, "%s:%*c%d\n", s, w, 0x20, conf->dlen);
     }
     /*  Since we've been ignoring the return values of fprintf(),
      *    check for errors on fp_meta.
@@ -760,11 +613,422 @@ display_meta (conf_t conf)
         log_err (EMUNGE_SNAFU, LOG_ERR, "Write error");
     }
     /*  Separate metadata from payload with a newline
-     *    if they are both going to the same place.
+     *    if they are being written to the same file stream.
      */
     if (conf->fp_meta == conf->fp_out) {
         fprintf (conf->fp_meta, "\n");
     }
+    return;
+}
+
+
+void
+display_status (conf_t conf)
+{
+    const char *key;
+    int         num_spaces;
+
+    assert (conf != NULL);
+
+    key = key_val_to_str (MUNGE_KEY_STATUS);
+    num_spaces = conf->key_width - strlen (key);
+    if (conf->got_numeric) {
+        fprintf (conf->fp_meta, "%s:%*c%d\n", key, num_spaces, 0x20,
+                conf->status);
+    }
+    else {
+        fprintf (conf->fp_meta, "%s:%*c%s (%d)\n", key, num_spaces, 0x20,
+                munge_strerror (conf->status), conf->status);
+    }
+    return;
+}
+
+
+void
+display_encode_host (conf_t conf)
+{
+    const char           *key;
+    int                   num_spaces;
+    munge_err_t           err;
+    const char           *p;
+    struct in_addr        addr;
+    char                  addr_str[ INET_ADDRSTRLEN ];
+    struct hostent       *hostent_ptr;
+
+    assert (conf != NULL);
+
+    key = key_val_to_str (MUNGE_KEY_ENCODE_HOST);
+    num_spaces = conf->key_width - strlen (key);
+    err = munge_ctx_get (conf->ctx, MUNGE_OPT_ADDR4, &addr);
+    if (err != EMUNGE_SUCCESS) {
+        p = munge_ctx_strerror (conf->ctx);
+        log_err (EMUNGE_SNAFU, LOG_ERR, "Failed to retrieve %s: %s", key,
+                (p ? p : "Unspecified error"));
+    }
+    if (!inet_ntop (AF_INET, &addr, addr_str, sizeof (addr_str))) {
+        log_err (EMUNGE_SNAFU, LOG_ERR,
+                "Failed to convert %s to string: %s", key, strerror (errno));
+    }
+    if (conf->got_numeric) {
+        fprintf (conf->fp_meta, "%s:%*c%s\n", key, num_spaces, 0x20, addr_str);
+    }
+    else {
+        hostent_ptr = gethostbyaddr (&addr, sizeof (addr), AF_INET);
+        fprintf (conf->fp_meta, "%s:%*c%s (%s)\n", key, num_spaces, 0x20,
+                (hostent_ptr ? hostent_ptr->h_name : "???"), addr_str);
+    }
+    return;
+}
+
+
+void
+display_encode_time (conf_t conf)
+{
+    const char  *key;
+    int          num_spaces;
+    munge_err_t  err;
+    const char  *p;
+    time_t       t;
+    struct tm   *tm_ptr;
+    int          t_len;
+    char         t_buf[ MAX_TIME_STR ];
+
+    assert (conf != NULL);
+
+    key = key_val_to_str (MUNGE_KEY_ENCODE_TIME);
+    num_spaces = conf->key_width - strlen (key);
+    err = munge_ctx_get (conf->ctx, MUNGE_OPT_ENCODE_TIME, &t);
+    if (err != EMUNGE_SUCCESS) {
+        p = munge_ctx_strerror (conf->ctx);
+        log_err (EMUNGE_SNAFU, LOG_ERR, "Failed to retrieve %s: %s", key,
+                (p ? p : "Unspecified error"));
+    }
+    if (conf->got_numeric) {
+        fprintf (conf->fp_meta, "%s:%*c%ld\n", key, num_spaces, 0x20,
+                (long) t);
+    }
+    else {
+        tm_ptr = localtime (&t);
+        if (tm_ptr == NULL) {
+            log_err (EMUNGE_SNAFU, LOG_ERR,
+                    "Failed to convert %s to local time", key);
+        }
+        t_len = strftime (t_buf, sizeof (t_buf),
+                "%Y-%m-%d %H:%M:%S %z", tm_ptr);
+        if ((t_len == 0) || (t_len >= sizeof (t_buf))) {
+            log_err (EMUNGE_OVERFLOW, LOG_ERR,
+                    "Failed to format %s: exceeded buffer", key);
+        }
+        /*  Since ISO C does not support the '%s' strftime() format option...
+         */
+        if (strcatf (t_buf, sizeof (t_buf), " (%ld)", (long) t) < 0) {
+            log_err (EMUNGE_OVERFLOW, LOG_ERR,
+                    "Failed to format %s: exceeded buffer", key);
+        }
+        fprintf (conf->fp_meta, "%s:%*c%s\n", key, num_spaces, 0x20, t_buf);
+    }
+    return;
+}
+
+
+void
+display_decode_time (conf_t conf)
+{
+    const char  *key;
+    int          num_spaces;
+    munge_err_t  err;
+    const char  *p;
+    time_t       t;
+    struct tm   *tm_ptr;
+    int          t_len;
+    char         t_buf[ MAX_TIME_STR ];
+
+    assert (conf != NULL);
+
+    key = key_val_to_str (MUNGE_KEY_DECODE_TIME);
+    num_spaces = conf->key_width - strlen (key);
+    err = munge_ctx_get (conf->ctx, MUNGE_OPT_DECODE_TIME, &t);
+    if (err != EMUNGE_SUCCESS) {
+        p = munge_ctx_strerror (conf->ctx);
+        log_err (EMUNGE_SNAFU, LOG_ERR, "Failed to retrieve %s: %s", key,
+                (p ? p : "Unspecified error"));
+    }
+    if (conf->got_numeric) {
+        fprintf (conf->fp_meta, "%s:%*c%ld\n", key, num_spaces, 0x20,
+                (long) t);
+    }
+    else {
+        tm_ptr = localtime (&t);
+        if (tm_ptr == NULL) {
+            log_err (EMUNGE_SNAFU, LOG_ERR,
+                    "Failed to convert %s to local time", key);
+        }
+        t_len = strftime (t_buf, sizeof (t_buf),
+                "%Y-%m-%d %H:%M:%S %z", tm_ptr);
+        if ((t_len == 0) || (t_len >= sizeof (t_buf))) {
+            log_err (EMUNGE_OVERFLOW, LOG_ERR,
+                    "Failed to format %s: exceeded buffer", key);
+        }
+        /*  Since ISO C does not support the '%s' strftime() format option...
+         */
+        if (strcatf (t_buf, sizeof (t_buf), " (%ld)", (long) t) < 0) {
+            log_err (EMUNGE_OVERFLOW, LOG_ERR,
+                    "Failed to format %s: exceeded buffer", key);
+        }
+        fprintf (conf->fp_meta, "%s:%*c%s\n", key, num_spaces, 0x20, t_buf);
+    }
+    return;
+}
+
+
+void
+display_ttl (conf_t conf)
+{
+    const char  *key;
+    int          num_spaces;
+    munge_err_t  err;
+    const char  *p;
+    int          i;
+
+    assert (conf != NULL);
+
+    key = key_val_to_str (MUNGE_KEY_TTL);
+    num_spaces = conf->key_width - strlen (key);
+    err = munge_ctx_get (conf->ctx, MUNGE_OPT_TTL, &i);
+    if (err != EMUNGE_SUCCESS) {
+        p = munge_ctx_strerror (conf->ctx);
+        log_err (EMUNGE_SNAFU, LOG_ERR, "Failed to retrieve %s: %s", key,
+                (p ? p : "Unspecified error"));
+    }
+    fprintf (conf->fp_meta, "%s:%*c%d\n", key, num_spaces, 0x20, i);
+    return;
+}
+
+
+void
+display_cipher_type (conf_t conf)
+{
+    const char  *key;
+    int          num_spaces;
+    munge_err_t  err;
+    const char  *p;
+    int          i;
+
+    assert (conf != NULL);
+
+    key = key_val_to_str (MUNGE_KEY_CIPHER_TYPE);
+    num_spaces = conf->key_width - strlen (key);
+    err = munge_ctx_get (conf->ctx, MUNGE_OPT_CIPHER_TYPE, &i);
+    if (err != EMUNGE_SUCCESS) {
+        p = munge_ctx_strerror (conf->ctx);
+        log_err (EMUNGE_SNAFU, LOG_ERR, "Failed to retrieve %s: %s", key,
+                (p ? p : "Unspecified error"));
+    }
+    if (conf->got_numeric) {
+        fprintf (conf->fp_meta, "%s:%*c%d\n", key, num_spaces, 0x20, i);
+    }
+    else {
+        p = munge_enum_int_to_str (MUNGE_ENUM_CIPHER, i);
+        fprintf (conf->fp_meta, "%s:%*c%s (%d)\n", key, num_spaces, 0x20,
+                (p ? p : "???"), i);
+    }
+    return;
+}
+
+
+void
+display_mac_type (conf_t conf)
+{
+    const char  *key;
+    int          num_spaces;
+    munge_err_t  err;
+    const char  *p;
+    int          i;
+
+    assert (conf != NULL);
+
+    key = key_val_to_str (MUNGE_KEY_MAC_TYPE);
+    num_spaces = conf->key_width - strlen (key);
+    err = munge_ctx_get (conf->ctx, MUNGE_OPT_MAC_TYPE, &i);
+    if (err != EMUNGE_SUCCESS) {
+        p = munge_ctx_strerror (conf->ctx);
+        log_err (EMUNGE_SNAFU, LOG_ERR, "Failed to retrieve %s: %s", key,
+                (p ? p : "Unspecified error"));
+    }
+    if (conf->got_numeric) {
+        fprintf (conf->fp_meta, "%s:%*c%d\n", key, num_spaces, 0x20, i);
+    }
+    else {
+        p = munge_enum_int_to_str (MUNGE_ENUM_MAC, i);
+        fprintf (conf->fp_meta, "%s:%*c%s (%d)\n", key, num_spaces, 0x20,
+                (p ? p : "???"), i);
+    }
+    return;
+}
+
+
+void
+display_zip_type (conf_t conf)
+{
+    const char  *key;
+    int          num_spaces;
+    munge_err_t  err;
+    const char  *p;
+    int          i;
+
+    assert (conf != NULL);
+
+    key = key_val_to_str (MUNGE_KEY_ZIP_TYPE);
+    num_spaces = conf->key_width - strlen (key);
+    err = munge_ctx_get (conf->ctx, MUNGE_OPT_ZIP_TYPE, &i);
+    if (err != EMUNGE_SUCCESS) {
+        p = munge_ctx_strerror (conf->ctx);
+        log_err (EMUNGE_SNAFU, LOG_ERR, "Failed to retrieve %s: %s", key,
+                (p ? p : "Unspecified error"));
+    }
+    if (conf->got_numeric) {
+        fprintf (conf->fp_meta, "%s:%*c%d\n", key, num_spaces, 0x20, i);
+    }
+    else {
+        p = munge_enum_int_to_str (MUNGE_ENUM_ZIP, i);
+        fprintf (conf->fp_meta, "%s:%*c%s (%d)\n", key, num_spaces, 0x20,
+                (p ? p : "???"), i);
+    }
+    return;
+}
+
+
+void
+display_uid (conf_t conf)
+{
+    const char    *key;
+    int            num_spaces;
+    struct passwd *pw_ptr;
+
+    assert (conf != NULL);
+
+    key = key_val_to_str (MUNGE_KEY_UID);
+    num_spaces = conf->key_width - strlen (key);
+    if (conf->got_numeric) {
+        fprintf (conf->fp_meta, "%s:%*c%u\n", key, num_spaces, 0x20,
+                (unsigned int) conf->uid);
+    }
+    else {
+        pw_ptr = getpwuid (conf->uid);
+        fprintf (conf->fp_meta, "%s:%*c%s (%u)\n", key, num_spaces, 0x20,
+                (pw_ptr ? pw_ptr->pw_name : "???"), (unsigned int) conf->uid);
+    }
+    return;
+}
+
+
+void
+display_gid (conf_t conf)
+{
+    const char    *key;
+    int            num_spaces;
+    struct group  *gr_ptr;
+
+    assert (conf != NULL);
+
+    key = key_val_to_str (MUNGE_KEY_GID);
+    num_spaces = conf->key_width - strlen (key);
+    if (conf->got_numeric) {
+        fprintf (conf->fp_meta, "%s:%*c%u\n", key, num_spaces, 0x20,
+                (unsigned int) conf->gid);
+    }
+    else {
+        gr_ptr = getgrgid (conf->gid);
+        fprintf (conf->fp_meta, "%s:%*c%s (%u)\n", key, num_spaces, 0x20,
+                (gr_ptr ? gr_ptr->gr_name : "???"), (unsigned int) conf->gid);
+    }
+    return;
+}
+
+
+void
+display_uid_restriction (conf_t conf)
+{
+    const char    *key;
+    int            num_spaces;
+    munge_err_t    err;
+    const char    *p;
+    int            i;
+    struct passwd *pw_ptr;
+
+    assert (conf != NULL);
+
+    key = key_val_to_str (MUNGE_KEY_UID_RESTRICTION);
+    num_spaces = conf->key_width - strlen (key);
+    err = munge_ctx_get (conf->ctx, MUNGE_OPT_UID_RESTRICTION, &i);
+    if (err != EMUNGE_SUCCESS) {
+        p = munge_ctx_strerror (conf->ctx);
+        log_err (EMUNGE_SNAFU, LOG_ERR, "Failed to retrieve %s: %s", key,
+                (p ? p : "Unspecified error"));
+    }
+    if (i == MUNGE_UID_ANY) {
+        return;
+    }
+    if (conf->got_numeric) {
+        fprintf (conf->fp_meta, "%s:%*c%u\n", key, num_spaces, 0x20,
+                (unsigned int) i);
+    }
+    else {
+        pw_ptr = getpwuid (i);
+        fprintf (conf->fp_meta, "%s:%*c%s (%u)\n", key, num_spaces, 0x20,
+                (pw_ptr ? pw_ptr->pw_name : "???"), (unsigned int) i);
+    }
+    return;
+}
+
+
+void
+display_gid_restriction (conf_t conf)
+{
+    const char    *key;
+    int            num_spaces;
+    munge_err_t    err;
+    const char    *p;
+    int            i;
+    struct group  *gr_ptr;
+
+    assert (conf != NULL);
+
+    key = key_val_to_str (MUNGE_KEY_GID_RESTRICTION);
+    num_spaces = conf->key_width - strlen (key);
+    err = munge_ctx_get (conf->ctx, MUNGE_OPT_GID_RESTRICTION, &i);
+    if (err != EMUNGE_SUCCESS) {
+        p = munge_ctx_strerror (conf->ctx);
+        log_err (EMUNGE_SNAFU, LOG_ERR, "Failed to retrieve %s: %s", key,
+                (p ? p : "Unspecified error"));
+    }
+    if (i == MUNGE_GID_ANY) {
+        return;
+    }
+    if (conf->got_numeric) {
+        fprintf (conf->fp_meta, "%s:%*c%u\n", key, num_spaces, 0x20,
+                (unsigned int) i);
+    }
+    else {
+        gr_ptr = getgrgid (i);
+        fprintf (conf->fp_meta, "%s:%*c%s (%u)\n", key, num_spaces, 0x20,
+                (gr_ptr ? gr_ptr->gr_name : "???"), (unsigned int) i);
+    }
+    return;
+}
+
+
+void
+display_length (conf_t conf)
+{
+    const char *key;
+    int         num_spaces;
+
+    assert (conf != NULL);
+
+    key = key_val_to_str (MUNGE_KEY_LENGTH);
+    num_spaces = conf->key_width - strlen (key);
+    fprintf (conf->fp_meta, "%s:%*c%d\n", key, num_spaces, 0x20, conf->dlen);
     return;
 }
 
@@ -792,14 +1056,14 @@ display_data (conf_t conf)
 
 
 int
-key_str_to_val (char *str)
+key_str_to_val (const char *str)
 {
     int i;
 
-    if (!str || !*str) {
+    if ((str == NULL) || (str[0] == '\0')) {
         return (-1);
     }
-    for (i=0; i<MUNGE_KEY_LAST; i++) {
+    for (i = 0; i < MUNGE_KEY_LAST; i++) {
         if (!strcasecmp (str, munge_keys[i].str)) {
             return (i);
         }
@@ -808,15 +1072,12 @@ key_str_to_val (char *str)
 }
 
 
-char *
+const char *
 key_val_to_str (int val)
 {
-    int i;
+    assert (val >= 0);
+    assert (val < MUNGE_KEY_LAST);
+    assert (munge_keys[val].str != NULL);
 
-    for (i=0; i<MUNGE_KEY_LAST; i++) {
-        if (val == munge_keys[i].val) {
-            return (munge_keys[i].str);
-        }
-    }
-    return (NULL);
+    return (munge_keys[val].str);
 }
