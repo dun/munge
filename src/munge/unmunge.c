@@ -217,23 +217,24 @@ main (int argc, char *argv[])
     read_data_from_file (conf->fp_in, (void **) &conf->cred, &conf->clen);
 
     conf->status = munge_decode (conf->cred, conf->ctx,
-        &conf->data, &conf->dlen, &conf->uid, &conf->gid);
+            &conf->data, &conf->dlen, &conf->uid, &conf->gid);
 
     /*  If the credential is expired, rewound, or replayed, the integrity
      *    of its contents is valid even though the credential itself is not.
      *  As such, display the metadata & payload with an appropriate status
      *    if the integrity checks succeed; o/w, exit out here with an error.
      */
-    if  (  (conf->status != EMUNGE_SUCCESS)
-        && (conf->status != EMUNGE_CRED_EXPIRED)
-        && (conf->status != EMUNGE_CRED_REWOUND)
-        && (conf->status != EMUNGE_CRED_REPLAYED) )
+    if  ((conf->status != EMUNGE_SUCCESS)      &&
+         (conf->status != EMUNGE_CRED_EXPIRED) &&
+         (conf->status != EMUNGE_CRED_REWOUND) &&
+         (conf->status != EMUNGE_CRED_REPLAYED))
     {
-        if (!(p = munge_ctx_strerror (conf->ctx)))
+        p = munge_ctx_strerror (conf->ctx);
+        if (p == NULL) {
             p = munge_strerror (conf->status);
+        }
         log_err (conf->status, LOG_ERR, "%s", p);
     }
-
     display_meta (conf);
     display_data (conf);
 
@@ -271,7 +272,7 @@ create_conf (void)
     conf->data = NULL;
     conf->uid = UID_SENTINEL;
     conf->gid = GID_SENTINEL;
-    for (i=0, maxlen=0; i<MUNGE_KEY_LAST; i++) {
+    for (i = 0, maxlen = 0; i < MUNGE_KEY_LAST; i++) {
         conf->key[i] = 0;
         len = strlen (key_val_to_str (i));
         maxlen = MAX (maxlen, len);
@@ -291,24 +292,25 @@ destroy_conf (conf_t conf)
      */
     if (conf->fp_in != NULL) {
         if (fclose (conf->fp_in) < 0) {
-            log_errno (EMUNGE_SNAFU, LOG_ERR,
-                "Failed to close input file");
+            log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to close input file");
         }
         conf->fp_in = NULL;
     }
     if (conf->fp_meta != NULL) {
         if ((fclose (conf->fp_meta) < 0) && (errno != EPIPE)) {
             log_errno (EMUNGE_SNAFU, LOG_ERR,
-                "Failed to close metadata output file");
+                    "Failed to close metadata output file");
         }
         conf->fp_meta = NULL;
     }
     if (conf->fp_out != NULL) {
-        if (conf->fn_out && conf->fn_meta
-                && strcmp (conf->fn_out, conf->fn_meta)) {
+        if (conf->fn_out                        &&
+            conf->fn_meta                       &&
+            strcmp (conf->fn_out, conf->fn_meta))
+        {
             if ((fclose (conf->fp_out) < 0) && (errno != EPIPE)) {
                 log_errno (EMUNGE_SNAFU, LOG_ERR,
-                    "Failed to close payload output file");
+                        "Failed to close payload output file");
             }
         }
         conf->fp_out = NULL;
@@ -338,6 +340,7 @@ parse_cmdline (conf_t conf, int argc, char **argv)
     char        *prog;
     int          c;
     munge_err_t  e;
+    const char  *p;
     int          i;
 
     opterr = 0;                         /* suppress default getopt err msgs */
@@ -391,62 +394,61 @@ parse_cmdline (conf_t conf, int argc, char **argv)
             case 'S':
                 e = munge_ctx_set (conf->ctx, MUNGE_OPT_SOCKET, optarg);
                 if (e != EMUNGE_SUCCESS) {
+                    p = munge_ctx_strerror (conf->ctx);
                     log_err (EMUNGE_SNAFU, LOG_ERR,
-                        "Failed to set munge socket name: %s",
-                        munge_ctx_strerror (conf->ctx));
+                            "Failed to set munge socket name: %s",
+                            (p ? p : "Unspecified error"));
                 }
                 break;
             case '?':
                 if (optopt > 0) {
                     log_err (EMUNGE_SNAFU, LOG_ERR,
-                        "Invalid option \"-%c\"", optopt);
+                            "Invalid option \"-%c\"", optopt);
                 }
                 else if (optind > 1) {
                     log_err (EMUNGE_SNAFU, LOG_ERR,
-                        "Invalid option \"%s\"", argv[optind - 1]);
+                            "Invalid option \"%s\"", argv[optind - 1]);
                 }
                 else {
                     log_err (EMUNGE_SNAFU, LOG_ERR,
-                        "Failed to process command-line");
+                            "Failed to process command-line");
                 }
                 break;
             case ':':
-                if ((optind > 1)
-                        && (strncmp (argv[optind - 1], "--", 2) == 0)) {
+                if ((optind > 1) && (!strncmp (argv[optind - 1], "--", 2))) {
                     log_err (EMUNGE_SNAFU, LOG_ERR,
-                        "Missing argument for option \"%s\"",
-                        argv[optind - 1]);
+                            "Missing argument for option \"%s\"",
+                            argv[optind - 1]);
                 }
                 else if (optopt > 0) {
                     log_err (EMUNGE_SNAFU, LOG_ERR,
-                        "Missing argument for option \"-%c\"", optopt);
+                            "Missing argument for option \"-%c\"", optopt);
                 }
                 else {
                     log_err (EMUNGE_SNAFU, LOG_ERR,
-                        "Failed to process command-line");
+                            "Failed to process command-line");
                 }
                 break;
             default:
-                if ((optind > 1)
-                        && (strncmp (argv[optind - 1], "--", 2) == 0)) {
+                if ((optind > 1) && (!strncmp (argv[optind - 1], "--", 2))) {
                     log_err (EMUNGE_SNAFU, LOG_ERR,
-                        "Unimplemented option \"%s\"", argv[optind - 1]);
+                            "Unimplemented option \"%s\"", argv[optind - 1]);
                 }
                 else {
                     log_err (EMUNGE_SNAFU, LOG_ERR,
-                        "Unimplemented option \"-%c\"", c);
+                            "Unimplemented option \"-%c\"", c);
                 }
                 break;
         }
     }
     if (argv[optind]) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
-            "Unrecognized parameter \"%s\"", argv[optind]);
+                "Unrecognized parameter \"%s\"", argv[optind]);
     }
     /*  Enable all metadata keys if a subset was not specified.
      */
     if (!got_keys) {
-        for (i=0; i<MUNGE_KEY_LAST; i++) {
+        for (i = 0; i < MUNGE_KEY_LAST; i++) {
             conf->key[i] = 1;
         }
     }
@@ -536,7 +538,7 @@ display_keys (void)
     int i;
 
     printf ("Metadata keys:\n\n");
-    for (i=0; i<MUNGE_KEY_LAST; i++) {
+    for (i = 0; i < MUNGE_KEY_LAST; i++) {
         printf ("  %s\n", munge_keys[i].str);
     }
     printf ("\n");
@@ -553,7 +555,7 @@ open_files (conf_t conf)
         }
         else if (!(conf->fp_in = fopen (conf->fn_in, "r"))) {
             log_errno (EMUNGE_SNAFU, LOG_ERR,
-                "Failed to read from \"%s\"", conf->fn_in);
+                    "Failed to read from \"%s\"", conf->fn_in);
         }
     }
     if (conf->fn_meta) {
@@ -562,12 +564,12 @@ open_files (conf_t conf)
         }
         else if (conf->fn_in && !strcmp (conf->fn_meta, conf->fn_in)) {
             log_err (EMUNGE_SNAFU, LOG_ERR,
-                "Cannot read and write to the same file \"%s\"",
-                conf->fn_meta);
+                    "Cannot read and write to the same file \"%s\"",
+                    conf->fn_meta);
         }
         else if (!(conf->fp_meta = fopen (conf->fn_meta, "w"))) {
             log_errno (EMUNGE_SNAFU, LOG_ERR,
-                "Failed to write to \"%s\"", conf->fn_meta);
+                    "Failed to write to \"%s\"", conf->fn_meta);
         }
     }
     if (conf->fn_out) {
@@ -576,15 +578,15 @@ open_files (conf_t conf)
         }
         else if (conf->fn_in && !strcmp (conf->fn_out, conf->fn_in)) {
             log_err (EMUNGE_SNAFU, LOG_ERR,
-                "Cannot read and write to the same file \"%s\"",
-                conf->fn_out);
+                    "Cannot read and write to the same file \"%s\"",
+                    conf->fn_out);
         }
         else if (conf->fn_meta && !strcmp (conf->fn_out, conf->fn_meta)) {
             conf->fp_out = conf->fp_meta;
         }
         else if (!(conf->fp_out = fopen (conf->fn_out, "w"))) {
             log_errno (EMUNGE_SNAFU, LOG_ERR,
-                "Failed to write to \"%s\"", conf->fn_out);
+                    "Failed to write to \"%s\"", conf->fn_out);
         }
     }
     return;
