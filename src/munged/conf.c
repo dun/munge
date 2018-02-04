@@ -743,8 +743,8 @@ _process_stop (conf_t conf)
     if (pid <= 0) {
         if (conf->got_verbose) {
             log_err (EMUNGE_SNAFU, LOG_ERR,
-                    "Failed to signal daemon bound to \"%s\"",
-                    conf->socket_name);
+                    "Failed to signal daemon bound to socket \"%s\""
+                    ": Lockfile not found", conf->socket_name);
         }
         exit (EXIT_FAILURE);
     }
@@ -752,7 +752,7 @@ _process_stop (conf_t conf)
     if (rv < 0) {
         if (conf->got_verbose) {
             log_errno (EMUNGE_SNAFU, LOG_ERR,
-                    "Failed to signal daemon bound to \"%s\" (pid %d)",
+                    "Failed to signal daemon bound to socket \"%s\" (pid %d)",
                     conf->socket_name, pid);
         }
         exit (EXIT_FAILURE);
@@ -768,7 +768,7 @@ _process_stop (conf_t conf)
         if (rv == 0) {
             if (conf->got_verbose) {
                 log_msg (LOG_NOTICE,
-                        "%s daemon bound to \"%s\" (pid %d)",
+                        "%s daemon bound to socket \"%s\" (pid %d)",
                         (signum == SIGTERM) ? "Terminated" : "Killed",
                         conf->socket_name, pid);
             }
@@ -777,7 +777,7 @@ _process_stop (conf_t conf)
     }
     if (conf->got_verbose) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
-                "Failed to terminate daemon bound to \"%s\" (pid %d)",
+                "Failed to terminate daemon bound to socket \"%s\" (pid %d)",
                 conf->socket_name, pid);
     }
     exit (EXIT_FAILURE);
