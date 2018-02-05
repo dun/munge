@@ -52,6 +52,12 @@ UNINSTALL_FILES = \
 	$(prefix)/lib/systemd/system/munge.service \
 	$(prefix)/lib/tmpfiles.d/munge.conf
 
+UNINSTALL_DIRS = \
+	$(sysconfdir)/munge \
+	$(localstatedir)/lib/munge \
+	$(localstatedir)/log/munge \
+	$(localstatedir)/run/munge
+
 noinst_DATA = $(SUBSTITUTE_FILES)
 
 CLEANFILES = $(SUBSTITUTE_FILES)
@@ -115,4 +121,9 @@ uninstall-local:
 	  f=`basename "$${p}"`; \
 	  echo " ( cd '$(DESTDIR)$${d}' && rm -f '$${f}' )"; \
 	  cd "$(DESTDIR)$${d}" && rm -f "$${f}"; \
+	done
+	@for d in $(UNINSTALL_DIRS); do \
+	  test -d "$(DESTDIR)$${d}" || continue; \
+	  echo "rmdir '$${d}'"; \
+	  rmdir "$(DESTDIR)$${d}" || :; \
 	done

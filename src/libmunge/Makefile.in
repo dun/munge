@@ -826,7 +826,7 @@ ps: ps-am
 ps-am:
 
 uninstall-am: uninstall-includeHEADERS uninstall-libLTLIBRARIES \
-	uninstall-man
+	uninstall-local uninstall-man
 
 uninstall-man: uninstall-man3
 
@@ -847,7 +847,7 @@ uninstall-man: uninstall-man3
 	mostlyclean mostlyclean-compile mostlyclean-generic \
 	mostlyclean-libtool pdf pdf-am ps ps-am tags tags-am uninstall \
 	uninstall-am uninstall-includeHEADERS uninstall-libLTLIBRARIES \
-	uninstall-man uninstall-man3
+	uninstall-local uninstall-man uninstall-man3
 
 .PRECIOUS: Makefile
 
@@ -889,6 +889,17 @@ install-data-local:
 	chmod 755 "$(DESTDIR)$(includedir)"
 	chmod 755 "$(DESTDIR)$(libdir)"
 	chmod 755 "$(DESTDIR)$(mandir)"
+
+uninstall-local:
+	for man in encode decode strerror; do \
+	  rm -f "$(DESTDIR)$(mandir)/man3/munge_$${man}.3"; \
+	done
+	for man in create copy destroy strerror get set; do \
+	  rm -f "$(DESTDIR)$(mandir)/man3/munge_ctx_$${man}.3"; \
+	done
+	for man in is_valid int_to_str str_to_int; do \
+	  rm -f "$(DESTDIR)$(mandir)/man3/munge_enum_$${man}.3"; \
+	done
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

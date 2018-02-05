@@ -82,3 +82,14 @@ install-data-local:
 	chmod 755 "$(DESTDIR)$(includedir)"
 	chmod 755 "$(DESTDIR)$(libdir)"
 	chmod 755 "$(DESTDIR)$(mandir)"
+
+uninstall-local:
+	for man in encode decode strerror; do \
+	  rm -f "$(DESTDIR)$(mandir)/man3/munge_$${man}.3"; \
+	done
+	for man in create copy destroy strerror get set; do \
+	  rm -f "$(DESTDIR)$(mandir)/man3/munge_ctx_$${man}.3"; \
+	done
+	for man in is_valid int_to_str str_to_int; do \
+	  rm -f "$(DESTDIR)$(mandir)/man3/munge_enum_$${man}.3"; \
+	done
