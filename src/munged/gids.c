@@ -117,22 +117,24 @@ typedef struct gids_uid  * gids_uid_t;
 static void         _gids_update (gids_t gids);
 static hash_t       _gids_hash_create (void);
 static int          _gids_user_to_uid (hash_t uid_hash,
-                        char *user, uid_t *uidp, xpwbuf_p pwbufp);
+                        const char *user, uid_t *uidp, xpwbuf_p pwbufp);
 static int          _gids_hash_add (hash_t hash, uid_t uid, gid_t gid);
 static gids_gid_t   _gids_head_alloc (uid_t uid);
 static void         _gids_head_del (gids_gid_t g);
 static gids_node_t  _gids_node_alloc (gid_t gid);
-static int          _gids_node_cmp (uid_t *uid1p, uid_t *uid2p);
+static int          _gids_node_cmp (const uid_t *uid1p, const uid_t *uid2p);
 static unsigned int _gids_node_key (uid_t *uidp);
-static gids_uid_t   _gids_uid_alloc (char *user, uid_t uid);
-static int          _gids_uid_cmp (char *user1, char *user2);
+static gids_uid_t   _gids_uid_alloc (const char *user, uid_t uid);
+static int          _gids_uid_cmp (const char *user1, const char *user2);
 static void         _gids_uid_del (gids_uid_t u);
 
 #if _GIDS_DEBUG
 static void _gids_dump_gid_hash (hash_t gid_hash);
-static void _gids_dump_gid_node (gids_gid_t g, uid_t *uidp, void *null);
+static void _gids_dump_gid_node (gids_gid_t g, const uid_t *uidp,
+        const void *null);
 static void _gids_dump_uid_hash (hash_t uid_hash);
-static void _gids_dump_uid_node (gids_uid_t u, char *user, void *null);
+static void _gids_dump_uid_node (gids_uid_t u, const char *user,
+        const void *null);
 #endif /* _GIDS_DEBUG */
 
 
@@ -507,7 +509,8 @@ err:
 
 
 static int
-_gids_user_to_uid (hash_t uid_hash, char *user, uid_t *uidp, xpwbuf_p pwbufp)
+_gids_user_to_uid (hash_t uid_hash, const char *user, uid_t *uidp,
+        xpwbuf_p pwbufp)
 {
 /*  Returns 0 on success, setting [*uidp] (if non-NULL) to the UID associated
  *    with [user]; o/w, returns -1.
@@ -641,7 +644,7 @@ _gids_node_alloc (gid_t gid)
 
 
 static int
-_gids_node_cmp (uid_t *uid1p, uid_t *uid2p)
+_gids_node_cmp (const uid_t *uid1p, const uid_t *uid2p)
 {
 /*  Used by the hash routines to compare hash keys [uid1p] and [uid2p].
  */
@@ -665,7 +668,7 @@ _gids_node_key (uid_t *uidp)
 
 
 static gids_uid_t
-_gids_uid_alloc (char *user, uid_t uid)
+_gids_uid_alloc (const char *user, uid_t uid)
 {
 /*  Returns an allocated UID node mapping [user] to [uid], or NULL on error.
  */
@@ -687,7 +690,7 @@ _gids_uid_alloc (char *user, uid_t uid)
 
 
 static int
-_gids_uid_cmp (char *user1, char *user2)
+_gids_uid_cmp (const char *user1, const char *user2)
 {
 /*  Used by the hash routines to compare UID node hash keys
  *    [user1] and [user2].
@@ -735,7 +738,7 @@ _gids_dump_gid_hash (hash_t gid_hash)
 
 
 static void
-_gids_dump_gid_node (gids_gid_t g, uid_t *uidp, void *null)
+_gids_dump_gid_node (gids_gid_t g, const uid_t *uidp, const void *null)
 {
     gids_node_t node;
 
@@ -767,7 +770,7 @@ _gids_dump_uid_hash (hash_t uid_hash)
 
 
 static void
-_gids_dump_uid_node (gids_uid_t u, char *user, void *null)
+_gids_dump_uid_node (gids_uid_t u, const char *user, const void *null)
 {
     assert (u->user == user);
 
