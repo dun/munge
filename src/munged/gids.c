@@ -88,7 +88,7 @@ struct gids {
     pthread_mutex_t     mutex;          /* mutex for accessing struct        */
     hash_t              hash;           /* hash of GIDs mappings             */
     long                timer;          /* timer ID for next GIDs map update */
-    int                 interval;       /* seconds between GIDs map updates  */
+    int                 interval_secs;  /* seconds between GIDs map updates  */
     int                 do_group_stat;  /* true if updates stat group file   */
     time_t              t_last_update;  /* time of last good GIDs map update */
 };
@@ -145,11 +145,11 @@ static void _gids_dump_uid_node (uid_node_p u, const char *user,
  *****************************************************************************/
 
 gids_t
-gids_create (int interval, int do_group_stat)
+gids_create (int interval_secs, int do_group_stat)
 {
     gids_t gids;
 
-    if ((interval < 0) || (conf->got_benchmark)) {
+    if ((interval_secs < 0) || (conf->got_benchmark)) {
         log_msg (LOG_INFO, "Disabled supplementary group mapping");
         return (NULL);
     }
@@ -162,18 +162,18 @@ gids_create (int interval, int do_group_stat)
     }
     gids->hash = NULL;
     gids->timer = 0;
-    gids->interval = interval;
+    gids->interval_secs = interval_secs;
     gids->do_group_stat = do_group_stat;
     gids->t_last_update = 0;
     gids_update (gids);
 
-    if (interval == 0) {
+    if (interval_secs == 0) {
         log_msg (LOG_INFO, "Disabled updates to supplementary group mapping");
     }
     else {
         log_msg (LOG_INFO,
             "Updating supplementary group mapping every %d second%s",
-            interval, (interval == 1) ? "" : "s");
+            interval_secs, (interval_secs == 1) ? "" : "s");
     }
     log_msg (LOG_INFO, "%s supplementary group mtime check of \"%s\"",
         (do_group_stat ? "Enabled" : "Disabled"), GIDS_GROUP_FILE);
@@ -349,9 +349,9 @@ _gids_update (gids_t gids)
      *    interval is positive.
      */
     gids->timer = 0;
-    if (gids->interval > 0) {
+    if (gids->interval_secs > 0) {
         gids->timer = timer_set_relative (
-                (callback_f) _gids_update, gids, gids->interval * 1000);
+                (callback_f) _gids_update, gids, gids->interval_secs * 1000);
         if (gids->timer < 0) {
             log_errno (EMUNGE_SNAFU, LOG_ERR,
                 "Failed to reset gids update timer");
