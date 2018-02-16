@@ -22,8 +22,8 @@
     fun:__nss_getent_r
     fun:getgrent_r@@GLIBC_2.2.5
     fun:xgetgrent
-    fun:_gids_hash_create
-    fun:_gids_update
+    fun:_gids_map_create
+    fun:_gids_map_update
     fun:_timer_thread
     fun:start_thread
     fun:clone
