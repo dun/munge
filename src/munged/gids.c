@@ -125,7 +125,6 @@ static gids_node_t  _gids_node_alloc (gid_t gid);
 static int          _gids_node_cmp (const uid_t *uid1p, const uid_t *uid2p);
 static unsigned int _gids_node_key (uid_t *uidp);
 static gids_uid_t   _gids_uid_alloc (const char *user, uid_t uid);
-static int          _gids_uid_cmp (const char *user1, const char *user2);
 static void         _gids_uid_del (gids_uid_t u);
 
 #if _GIDS_DEBUG
@@ -397,7 +396,7 @@ _gids_hash_create (void)
         goto err;
     }
     uid_hash = hash_create (UIDS_HASH_SIZE, (hash_key_f) hash_key_string,
-            (hash_cmp_f) _gids_uid_cmp, (hash_del_f) _gids_uid_del);
+            (hash_cmp_f) strcmp, (hash_del_f) _gids_uid_del);
 
     if (!uid_hash) {
         log_msg (LOG_ERR, "Failed to allocate uids hash");
@@ -686,16 +685,6 @@ _gids_uid_alloc (const char *user, uid_t uid)
     }
     u->uid = uid;
     return (u);
-}
-
-
-static int
-_gids_uid_cmp (const char *user1, const char *user2)
-{
-/*  Used by the hash routines to compare UID node hash keys
- *    [user1] and [user2].
- */
-    return (strcmp (user1, user2));
 }
 
 
