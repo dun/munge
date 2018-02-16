@@ -87,8 +87,8 @@ hash_t hash_create (int size,
     hash_key_f key_f, hash_cmp_f cmp_f, hash_del_f del_f);
 /*
  *  Creates and returns a new hash table on success.
- *    Returns lsd_nomem_error() with errno=ENOMEM if memory allocation fails.
  *    Returns NULL with errno=EINVAL if [keyf] or [cmpf] is not specified.
+ *    Returns NULL with errno=ENOMEM if memory allocation fails.
  *  The [size] is the number of slots in the table; a larger table requires
  *    more memory, but generally provide quicker access times.  If set <= 0,
  *    the default size is used.
@@ -140,7 +140,7 @@ void * hash_insert (hash_t h, const void *key, void *data);
  *  Returns a ptr to the inserted item's data on success.
  *    Returns NULL with errno=EEXIST if [key] already exists in the hash.
  *    Returns NULL with errno=EINVAL if [key] or [data] is not specified.
- *    Returns lsd_nomem_error() with errno=ENOMEM if memory allocation fails.
+ *    Returns NULL with errno=ENOMEM if memory allocation fails.
  */
 
 void * hash_remove (hash_t h, const void *key);
