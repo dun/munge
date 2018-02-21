@@ -86,7 +86,7 @@
 
 struct gids {
     pthread_mutex_t     mutex;          /* mutex for accessing struct        */
-    hash_t              hash;           /* hash of GIDs mappings             */
+    hash_t              gid_hash;       /* hash of GIDs mappings             */
     long                timer;          /* timer ID for next GIDs map update */
     int                 interval_secs;  /* seconds between GIDs map updates  */
     int                 do_group_stat;  /* true if updates stat group file   */
@@ -121,7 +121,7 @@ static void         _gids_map_update (gids_t gids);
 static hash_t       _gids_map_create (void);
 static int          _gids_user_to_uid (hash_t uid_hash,
                         const char *user, uid_t *uid_resultp, xpwbuf_p pwbufp);
-static int          _gids_gid_add (hash_t hash, uid_t uid, gid_t gid);
+static int          _gids_gid_add (hash_t gid_hash, uid_t uid, gid_t gid);
 static gid_head_p   _gids_gid_head_create (uid_t uid);
 static void         _gids_gid_head_destroy (gid_head_p g);
 static int          _gids_gid_head_cmp (
@@ -161,7 +161,7 @@ gids_create (int interval_secs, int do_group_stat)
     if ((errno = pthread_mutex_init (&gids->mutex, NULL)) != 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to init gids mutex");
     }
-    gids->hash = NULL;
+    gids->gid_hash = NULL;
     gids->timer = 0;
     gids->interval_secs = interval_secs;
     gids->do_group_stat = do_group_stat;
@@ -198,8 +198,8 @@ gids_destroy (gids_t gids)
         timer_cancel (gids->timer);
         gids->timer = 0;
     }
-    h = gids->hash;
-    gids->hash = NULL;
+    h = gids->gid_hash;
+    gids->gid_hash = NULL;
 
     if ((errno = pthread_mutex_unlock (&gids->mutex)) != 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to unlock gids mutex");
@@ -260,7 +260,7 @@ gids_is_member (gids_t gids, uid_t uid, gid_t gid)
     if ((errno = pthread_mutex_lock (&gids->mutex)) != 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to lock gids mutex");
     }
-    if ((gids->hash) && (g = hash_find (gids->hash, &uid))) {
+    if ((gids->gid_hash) && (g = hash_find (gids->gid_hash, &uid))) {
         assert (g->uid == uid);
         for (node = g->next; node && node->gid <= gid; node = node->next) {
             if (node->gid == gid) {
@@ -289,7 +289,7 @@ _gids_map_update (gids_t gids)
     time_t          t_last_update;
     time_t          t_now;
     int             do_update = 1;
-    hash_t          hash = NULL;
+    hash_t          gid_hash = NULL;
 
     assert (gids != NULL);
 
@@ -323,18 +323,18 @@ _gids_map_update (gids_t gids)
     /*  Update the GIDs mapping.
      */
     if (do_update) {
-        hash = _gids_map_create ();
+        gid_hash = _gids_map_create ();
     }
     if ((errno = pthread_mutex_lock (&gids->mutex)) != 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to lock gids mutex");
     }
     /*  Replace the old GIDs mapping if the update was successful.
      */
-    if (hash) {
+    if (gid_hash != NULL) {
 
-        hash_t hash_bak = gids->hash;
-        gids->hash = hash;
-        hash = hash_bak;
+        hash_t gid_hash_bak = gids->gid_hash;
+        gids->gid_hash = gid_hash;
+        gid_hash = gid_hash_bak;
 
         gids->t_last_update = t_now;
     }
@@ -364,8 +364,8 @@ _gids_map_update (gids_t gids)
     }
     /*  Clean up.
      */
-    if (hash) {
-        hash_destroy (hash);
+    if (gid_hash != NULL) {
+        hash_destroy (gid_hash);
     }
     return;
 }
@@ -558,22 +558,22 @@ _gids_user_to_uid (hash_t uid_hash, const char *user, uid_t *uid_resultp,
 
 
 static int
-_gids_gid_add (hash_t hash, uid_t uid, gid_t gid)
+_gids_gid_add (hash_t gid_hash, uid_t uid, gid_t gid)
 {
-/*  Adds supplementary group [gid] for user [uid] to the GIDs mapping [gids].
- *  Returns 1 if the entry was added, 0 if the entry already exists,
+/*  Add supplementary group [gid] for user [uid] to the GIDs map [gid_hash].
+ *  Return 1 if the entry was added, 0 if the entry already exists,
  *    or -1 on error.
  */
     gid_head_p  g;
     gid_node_p  node;
     gid_node_p *nodep;
 
-    if (!(g = hash_find (hash, &uid))) {
+    if (!(g = hash_find (gid_hash, &uid))) {
         if (!(g = _gids_gid_head_create (uid))) {
             log_msg (LOG_ERR, "Failed to allocate gid head");
             return (-1);
         }
-        if (!hash_insert (hash, &g->uid, g)) {
+        if (!hash_insert (gid_hash, &g->uid, g)) {
             log_msg (LOG_ERR, "Failed to insert gid head into hash");
             _gids_gid_head_destroy (g);
             return (-1);
