@@ -70,6 +70,15 @@
  *  uid_nodes mapping a unique null-terminated user string to a UID.  It is not
  *  persistent across gid_hash updates.
  *
+ *  The ghost_hash is used to identify when a user first goes missing from the
+ *  passwd file in order for the event to be logged only once; if the user is
+ *  later added, the next gid_hash update will clear this user from the
+ *  ghost_hash thereby allowing the event to be re-logged should the user
+ *  disappear again.  This hash contains unique null-terminated user strings
+ *  from calls to xgetpwnam() that fail with ENOENT.  Users are added when
+ *  xgetpwnam() fails, and removed when xgetpwnam() succeeds.  A mutex is not
+ *  needed when accessing this hash.  It is persistent across gid_hash updates.
+ *
  *  The use of non-reentrant passwd/group functions (i.e., getpwnam & getgrent)
  *  here should not cause problems since they are only called in/from
  *  _gids_map_create(), and only one instance of that routine can be running at
@@ -82,6 +91,7 @@
  *  Constants
  *****************************************************************************/
 
+#define GHOST_HASH_SIZE 1031
 #define GID_HASH_SIZE   2053
 #define UID_HASH_SIZE   4099
 
@@ -97,6 +107,7 @@
 struct gids {
     pthread_mutex_t     mutex;          /* mutex for accessing struct        */
     hash_t              gid_hash;       /* hash of GIDs mappings             */
+    hash_t              ghost_hash;     /* hash of missing users (ghosts!)   */
     long                timer;          /* timer ID for next GIDs map update */
     int                 interval_secs;  /* seconds between GIDs map updates  */
     int                 do_group_stat;  /* true if updates stat group file   */
@@ -128,12 +139,14 @@ typedef struct gid_head * gid_head_p;
  *****************************************************************************/
 
 static void         _gids_map_update (gids_t gids);
-static hash_t       _gids_map_create (void);
-static int          _gids_user_to_uid (hash_t uid_hash,
+static hash_t       _gids_map_create (hash_t ghost_hash);
+static int          _gids_user_to_uid (hash_t uid_hash, hash_t ghost_hash,
                         const char *user, uid_t *uid_resultp, xpwbuf_p pwbufp);
 static int          _gids_gid_add (hash_t gid_hash, uid_t uid, gid_t gid);
 static int          _gids_uid_add (hash_t uid_hash,
                         const char *user, uid_t uid);
+static int          _gids_ghost_add (hash_t ghost_hash, const char *user);
+static int          _gids_ghost_del (hash_t ghost_hash, const char *user);
 static gid_head_p   _gids_gid_head_create (uid_t uid);
 static void         _gids_gid_head_destroy (gid_head_p g);
 static int          _gids_gid_head_cmp (
@@ -149,6 +162,9 @@ static void         _gids_gid_node_dump (gid_head_p g, const uid_t *uidp,
                         const void *null);
 static void         _gids_uid_hash_dump (hash_t uid_hash);
 static void         _gids_uid_node_dump (uid_node_p u, const char *user,
+                        const void *null);
+static void         _gids_ghost_hash_dump (hash_t ghost_hash);
+static void         _gids_ghost_node_dump (const char *data, const char *user,
                         const void *null);
 #endif /* _GIDS_DEBUG */
 
@@ -174,6 +190,13 @@ gids_create (int interval_secs, int do_group_stat)
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to init gids mutex");
     }
     gids->gid_hash = NULL;
+    gids->ghost_hash = hash_create (GHOST_HASH_SIZE,
+            (hash_key_f) hash_key_string,
+            (hash_cmp_f) strcmp,
+            (hash_del_f) free);
+    if (!gids->ghost_hash) {
+        log_errno (EMUNGE_NO_MEMORY, LOG_ERR, "Failed to allocate ghost hash");
+    }
     gids->timer = 0;
     gids->interval_secs = interval_secs;
     gids->do_group_stat = do_group_stat;
@@ -198,8 +221,6 @@ gids_create (int interval_secs, int do_group_stat)
 void
 gids_destroy (gids_t gids)
 {
-    hash_t h;
-
     if (!gids) {
         return;
     }
@@ -210,14 +231,14 @@ gids_destroy (gids_t gids)
         timer_cancel (gids->timer);
         gids->timer = 0;
     }
-    h = gids->gid_hash;
+    hash_destroy (gids->gid_hash);
     gids->gid_hash = NULL;
+    hash_destroy (gids->ghost_hash);
+    gids->ghost_hash = NULL;
 
     if ((errno = pthread_mutex_unlock (&gids->mutex)) != 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to unlock gids mutex");
     }
-    hash_destroy (h);
-
     if ((errno = pthread_mutex_destroy (&gids->mutex)) != 0) {
         log_msg (LOG_ERR, "Failed to destroy gids mutex: %s",
                 strerror (errno));
@@ -335,7 +356,7 @@ _gids_map_update (gids_t gids)
     /*  Update the GIDs mapping without holding the mutex.
      */
     if (do_update) {
-        gid_hash = _gids_map_create ();
+        gid_hash = _gids_map_create (gids->ghost_hash);
     }
     if ((errno = pthread_mutex_lock (&gids->mutex)) != 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to lock gids mutex");
@@ -383,7 +404,7 @@ _gids_map_update (gids_t gids)
 
 
 static hash_t
-_gids_map_create (void)
+_gids_map_create (hash_t ghost_hash)
 {
 /*  Create a new gid_hash to map UIDs to their supplementary groups.
  *  Return a pointer to the new hash on success, or NULL on error.
@@ -465,7 +486,10 @@ restart:
          *    null-terminated user strings belonging to the group.
          */
         for (userp = gr.gr_mem; userp && *userp; userp++) {
-            int rv = _gids_user_to_uid (uid_hash, *userp, &uid, pwbufp);
+
+            int rv = _gids_user_to_uid (uid_hash, ghost_hash,
+                    *userp, &uid, pwbufp);
+
             if (rv == 0) {
                 if (_gids_gid_add (gid_hash, uid, gr.gr_gid) < 0) {
                     goto err;
@@ -492,6 +516,7 @@ restart:
 #if _GIDS_DEBUG
     _gids_uid_hash_dump (uid_hash);
     _gids_gid_hash_dump (gid_hash);
+    _gids_ghost_hash_dump (ghost_hash);
 #endif /* _GIDS_DEBUG */
 
     n_users = hash_count (gid_hash);
@@ -529,8 +554,8 @@ err:
 
 
 static int
-_gids_user_to_uid (hash_t uid_hash, const char *user, uid_t *uid_resultp,
-        xpwbuf_p pwbufp)
+_gids_user_to_uid (hash_t uid_hash, hash_t ghost_hash,
+        const char *user, uid_t *uid_resultp, xpwbuf_p pwbufp)
 {
 /*  Lookup the UID of [user].
  *    [pwbufp] is a pre-allocated buffer for xgetpwnam() (see above comments).
@@ -546,12 +571,16 @@ _gids_user_to_uid (hash_t uid_hash, const char *user, uid_t *uid_resultp,
     else if (xgetpwnam (user, &pw, pwbufp) == 0) {
         uid = pw.pw_uid;
         (void) _gids_uid_add (uid_hash, user, uid);
+        (void) _gids_ghost_del (ghost_hash, user);
     }
     else if (errno == ENOENT) {
         (void) _gids_uid_add (uid_hash, user, uid);
-        log_msg (LOG_INFO,
-                "Failed to query passwd file for \"%s\": User not found",
-                user);
+        if (!hash_find (ghost_hash, user)) {
+            (void) _gids_ghost_add (ghost_hash, user);
+            log_msg (LOG_INFO,
+                    "Failed to query passwd file for \"%s\": User not found",
+                    user);
+        }
     }
     else {
         log_msg (LOG_NOTICE, "Failed to query passwd file for \"%s\": %s",
@@ -635,6 +664,54 @@ _gids_uid_add (hash_t uid_hash, const char *user, uid_t uid)
         return (0);
     }
     return (-1);
+}
+
+
+static int
+_gids_ghost_add (hash_t ghost_hash, const char *user)
+{
+/*  Add [user] to the [ghost_hash].
+ *  Return 0 on success, or -1 on error.
+ */
+    char *p;
+
+    if (!user) {
+        errno = EINVAL;
+    }
+    else if (!(p = strdup (user))) {
+        log_msg (LOG_WARNING, "Failed to copy string for \"%s\": %s",
+                user, strerror (errno));
+    }
+    else if (!hash_insert (ghost_hash, p, p)) {
+        log_msg (LOG_WARNING, "Failed to insert \"%s\" into ghost hash", user);
+        free (p);
+    }
+    else {
+        return (0);
+    }
+    return (-1);
+}
+
+
+static int
+_gids_ghost_del (hash_t ghost_hash, const char *user)
+{
+/*  Remove [user] from the [ghost_hash].
+ *  Return 1 if the entry was removed, 0 if the entry was not found,
+ *    or -1 on error.
+ */
+    char *p;
+
+    if (!user) {
+        errno = EINVAL;
+        return (-1);
+    }
+    p = hash_remove (ghost_hash, user);
+    if (p == NULL) {
+        return (0);
+    }
+    free (p);
+    return (1);
 }
 
 
@@ -814,6 +891,32 @@ _gids_uid_node_dump (uid_node_p u, const char *user, const void *null)
     assert (u->user == user);
 
     printf ("  %-10u: %s\n", (unsigned int) u->uid, u->user);
+    return;
+}
+
+
+static void
+_gids_ghost_hash_dump (hash_t ghost_hash)
+{
+    int n;
+
+    n = hash_count (ghost_hash);
+    if (n < 0) {
+        log_err (EMUNGE_SNAFU, LOG_ERR,
+                "Failed _gids_host_hash_dump: Invalid ghost hash ptr");
+    }
+    printf ("* Ghost Dump (%d user%s):\n", n, ((n == 1) ? "" : "s"));
+    hash_for_each (ghost_hash, (hash_arg_f) _gids_ghost_node_dump, NULL);
+    return;
+}
+
+
+static void
+_gids_ghost_node_dump (const char *data, const char *user, const void *null)
+{
+    assert (data == user);
+
+    printf ("  %s\n", user);
     return;
 }
 
