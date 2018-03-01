@@ -35,8 +35,6 @@
  *****************************************************************************/
 
 #define GIDS_GROUP_FILE         "/etc/group"
-#define GIDS_HASH_SIZE          2053
-#define UIDS_HASH_SIZE          4099
 
 
 /*****************************************************************************
@@ -53,11 +51,11 @@ typedef struct gids * gids_t;
  *  Functions
  *****************************************************************************/
 
-gids_t gids_create (int interval, int do_group_stat);
+gids_t gids_create (int interval_secs, int do_group_stat);
 /*
  *  Creates a list of supplementary GIDs for each UID based on information
  *    from getgrent().
- *  The [interval] is the number of seconds between updates.
+ *  The [interval_secs] is the number of seconds between updates.
  *  The [do_group_stat] flag specifies whether the /etc/group mtime is
  *    checked to determine if updates are needed.
  *  Returns a GIDs mapping or dies trying.
