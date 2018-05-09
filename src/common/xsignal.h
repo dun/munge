@@ -26,24 +26,14 @@
  *****************************************************************************/
 
 
-#ifndef POSIGNAL_H
-#define POSIGNAL_H
+#ifndef XSIGNAL_H
+#define XSIGNAL_H
 
 
-#if HAVE_CONFIG_H
-#  include "config.h"
-#endif /* HAVE_CONFIG_H */
-
-#include <signal.h>
-
-
-typedef void sigfun_t (int);
-
-
-sigfun_t * posignal (int signum, sigfun_t *f);
+void xsignal_ignore (int sig);
 /*
- *  A wrapper for the historical signal() function to do things the Posix way.
+ *  Ignore the signal specified by [sig].
  */
 
 
-#endif /* !POSIGNAL_H */
+#endif /* !XSIGNAL_H */

@@ -59,11 +59,11 @@
 #include "missing.h"
 #include "munge_defs.h"
 #include "path.h"
-#include "posignal.h"
 #include "random.h"
 #include "replay.h"
 #include "str.h"
 #include "timer.h"
+#include "xsignal.h"
 
 
 /*****************************************************************************
@@ -75,8 +75,7 @@ static int daemonize_init (char *progname, conf_t conf);
 static void daemonize_fini (int fd);
 static void open_logfile (const char *logfile, int priority, int got_force);
 static void handle_signals (void);
-static void hup_handler (int signum);
-static void exit_handler (int signum);
+static void sig_handler (int sig);
 static void write_pidfile (const char *pidfile, int got_force);
 static void lock_memory (void);
 static void sock_create (conf_t conf);
@@ -87,7 +86,8 @@ static void sock_destroy (conf_t conf);
  *  Global Variables
  *****************************************************************************/
 
-volatile sig_atomic_t done = 0;         /* global flag set true for exit     */
+volatile sig_atomic_t got_reconfig = 0;     /* signum if HUP received        */
+volatile sig_atomic_t got_terminate = 0;    /* signum if INT/TERM received   */
 
 
 /*****************************************************************************
@@ -262,9 +262,8 @@ daemonize_init (char *progname, conf_t conf)
     /*  Ignore SIGHUP to keep child from terminating when
      *    the session leader (ie, the parent) terminates.
      */
-    if (posignal (SIGHUP, SIG_IGN) == SIG_ERR) {
-        log_err (EMUNGE_SNAFU, LOG_ERR, "Failed to ignore signal=%d", SIGHUP);
-    }
+    xsignal_ignore (SIGHUP);
+
     /*  Abdicate session leader position in order to guarantee
      *    daemon cannot automatically re-acquire a controlling tty.
      */
@@ -435,37 +434,51 @@ open_logfile (const char *logfile, int priority, int got_force)
 static void
 handle_signals (void)
 {
-    if (posignal (SIGHUP, hup_handler) == SIG_ERR) {
-        log_err (EMUNGE_SNAFU, LOG_ERR, "Failed to handle signal=%d", SIGHUP);
+    struct sigaction sa;
+    int              sig;
+    int              rv;
+
+    sa.sa_handler = sig_handler;
+    sa.sa_flags = 0;
+    rv = sigfillset (&sa.sa_mask);
+    if (rv == -1) {
+        log_errno (EMUNGE_SNAFU, LOG_ERR,
+                "Failed to initialize signal set to full");
     }
-    if (posignal (SIGINT, exit_handler) == SIG_ERR) {
-        log_err (EMUNGE_SNAFU, LOG_ERR, "Failed to handle signal=%d", SIGINT);
+    sig = SIGHUP;
+    rv = sigaction (sig, &sa, NULL);
+    if (rv == -1) {
+        log_errno (EMUNGE_SNAFU, LOG_ERR,
+                "Failed to set handler for signal %d (%s)", sig,
+                strsignal (sig));
     }
-    if (posignal (SIGTERM, exit_handler) == SIG_ERR) {
-        log_err (EMUNGE_SNAFU, LOG_ERR, "Failed to handle signal=%d", SIGTERM);
+    sig = SIGINT;
+    rv = sigaction (sig, &sa, NULL);
+    if (rv == -1) {
+        log_errno (EMUNGE_SNAFU, LOG_ERR,
+                "Failed to set handler for signal %d (%s)", sig,
+                strsignal (sig));
     }
-    if (posignal (SIGPIPE, SIG_IGN) == SIG_ERR) {
-        log_err (EMUNGE_SNAFU, LOG_ERR, "Failed to ignore signal=%d", SIGPIPE);
+    sig = SIGTERM;
+    rv = sigaction (sig, &sa, NULL);
+    if (rv == -1) {
+        log_errno (EMUNGE_SNAFU, LOG_ERR,
+                "Failed to set handler for signal %d (%s)", sig,
+                strsignal (sig));
     }
+    xsignal_ignore (SIGPIPE);
     return;
 }
 
 
 static void
-hup_handler (int signum)
+sig_handler (int sig)
 {
-    if (conf) {
-        gids_update (conf->gids);
+    if (sig == SIGHUP) {
+        got_reconfig = sig;
     }
-    return;
-}
-
-
-static void
-exit_handler (int signum)
-{
-    if (!done) {
-        done = signum;
+    else if ((sig == SIGINT) || (sig == SIGTERM)) {
+        got_terminate = sig;
     }
     return;
 }

@@ -57,9 +57,12 @@ munge_SOURCES = \
 	$(top_srcdir)/src/common/xgetgr.c \
 	$(top_srcdir)/src/common/xgetgr.h \
 	$(top_srcdir)/src/common/xgetpw.c \
-	$(top_srcdir)/src/common/xgetpw.h
+	$(top_srcdir)/src/common/xgetpw.h \
+	$(top_srcdir)/src/common/xsignal.c \
+	$(top_srcdir)/src/common/xsignal.h
 
 unmunge_CPPFLAGS = \
+	-I$(top_srcdir)/src/common \
 	$(AM_CPPFLAGS)
 
 unmunge_LDADD = \
@@ -70,7 +73,9 @@ unmunge_LDADD = \
 unmunge_SOURCES = \
 	unmunge.c \
 	read.c \
-	read.h
+	read.h \
+	$(top_srcdir)/src/common/xsignal.c \
+	$(top_srcdir)/src/common/xsignal.h
 
 remunge_CPPFLAGS = \
 	-DWITH_PTHREADS \
@@ -90,7 +95,9 @@ remunge_SOURCES = \
 	$(top_srcdir)/src/common/xgetgr.c \
 	$(top_srcdir)/src/common/xgetgr.h \
 	$(top_srcdir)/src/common/xgetpw.c \
-	$(top_srcdir)/src/common/xgetpw.h
+	$(top_srcdir)/src/common/xgetpw.h \
+	$(top_srcdir)/src/common/xsignal.c \
+	$(top_srcdir)/src/common/xsignal.h
 
 man_MANS = \
 	munge.1 \

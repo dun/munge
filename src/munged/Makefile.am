@@ -104,7 +104,9 @@ munged_SOURCES = \
 	$(top_srcdir)/src/common/xgetgr.c \
 	$(top_srcdir)/src/common/xgetgr.h \
 	$(top_srcdir)/src/common/xgetpw.c \
-	$(top_srcdir)/src/common/xgetpw.h
+	$(top_srcdir)/src/common/xgetpw.h \
+	$(top_srcdir)/src/common/xsignal.c \
+	$(top_srcdir)/src/common/xsignal.h
 
 man_MANS = \
 	munged.8

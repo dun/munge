@@ -39,6 +39,7 @@
 #include <limits.h>
 #include <netdb.h>                      /* for gethostbyaddr()               */
 #include <pwd.h>
+#include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -53,6 +54,7 @@
 #include "missing.h"                    /* for inet_ntop()                   */
 #include "read.h"
 #include "version.h"
+#include "xsignal.h"
 
 
 /*****************************************************************************
@@ -206,9 +208,8 @@ main (int argc, char *argv[])
     int          rc;
     const char  *p;
 
-    if (posignal (SIGPIPE, SIG_IGN) == SIG_ERR) {
-        log_err (EMUNGE_SNAFU, LOG_ERR, "Failed to ignore signal=%d", SIGPIPE);
-    }
+    xsignal_ignore (SIGHUP);
+    xsignal_ignore (SIGPIPE);
     log_open_file (stderr, argv[0], LOG_INFO, LOG_OPT_PRIORITY);
     conf = create_conf ();
     parse_cmdline (conf, argc, argv);

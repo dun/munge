@@ -23,8 +23,6 @@
  *  You should have received a copy of the GNU General Public License
  *  and GNU Lesser General Public License along with MUNGE.  If not, see
  *  <http://www.gnu.org/licenses/>.
- *****************************************************************************
- *  Refer to "posignal.h" for documentation on public functions.
  *****************************************************************************/
 
 
@@ -32,37 +30,30 @@
 #  include "config.h"
 #endif /* HAVE_CONFIG_H */
 
-#include <errno.h>
 #include <signal.h>
-#include "posignal.h"
+#include <string.h>
+#include <munge.h>
+#include "log.h"
+#include "xsignal.h"
 
 
-sigfun_t *
-posignal (int signum, sigfun_t *f)
+void
+xsignal_ignore (int sig)
 {
-/*  A wrapper for the historical signal() function to do things the Posix way.
- *  cf. Stevens UNPv1 figure 5.6.
- */
-    struct sigaction act0, act1;
+    struct sigaction sa;
+    int              rv;
 
-    act1.sa_handler = f;
-    sigemptyset (&act1.sa_mask);
-    act1.sa_flags = 0;
-
-#if 0
-    if (signum == SIGALRM) {
-#ifdef SA_INTERRUPT
-        act1.sa_flags |= SA_INTERRUPT;  /* SunOS 4.x */
-#endif /* SA_INTERRUPT */
+    sa.sa_handler = SIG_IGN;
+    sa.sa_flags = 0;
+    rv = sigfillset (&sa.sa_mask);
+    if (rv == -1) {
+        log_errno (EMUNGE_SNAFU, LOG_ERR,
+                "Failed to initialize signal set to full");
     }
-    else {
-#ifdef SA_RESTART
-        act1.sa_flags |= SA_RESTART;    /* SVR4, 4.4BSD */
-#endif /* SA_RESTART */
+    rv = sigaction (sig, &sa, NULL);
+    if (rv == -1) {
+        log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to ignore signal %d (%s)",
+                sig, strsignal (sig));
     }
-#endif /* 0 */
-
-    if (sigaction (signum, &act1, &act0) < 0)
-        return (SIG_ERR);
-    return (act0.sa_handler);
+    return;
 }

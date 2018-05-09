@@ -35,6 +35,7 @@
 #include <ctype.h>
 #include <errno.h>
 #include <limits.h>
+#include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -46,6 +47,7 @@
 #include "query.h"
 #include "read.h"
 #include "version.h"
+#include "xsignal.h"
 
 
 /*****************************************************************************
@@ -126,9 +128,8 @@ main (int argc, char *argv[])
     conf_t      conf;
     const char *p;
 
-    if (posignal (SIGPIPE, SIG_IGN) == SIG_ERR) {
-        log_err (EMUNGE_SNAFU, LOG_ERR, "Failed to ignore signal=%d", SIGPIPE);
-    }
+    xsignal_ignore (SIGHUP);
+    xsignal_ignore (SIGPIPE);
     log_open_file (stderr, argv[0], LOG_INFO, LOG_OPT_PRIORITY);
     conf = create_conf ();
     parse_cmdline (conf, argc, argv);

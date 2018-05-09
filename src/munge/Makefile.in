@@ -129,7 +129,7 @@ am__installdirs = "$(DESTDIR)$(bindir)" "$(DESTDIR)$(man1dir)"
 PROGRAMS = $(bin_PROGRAMS)
 am_munge_OBJECTS = munge-munge.$(OBJEXT) munge-read.$(OBJEXT) \
 	munge-query.$(OBJEXT) munge-xgetgr.$(OBJEXT) \
-	munge-xgetpw.$(OBJEXT)
+	munge-xgetpw.$(OBJEXT) munge-xsignal.$(OBJEXT)
 munge_OBJECTS = $(am_munge_OBJECTS)
 munge_DEPENDENCIES = $(top_builddir)/src/libcommon/libcommon.la \
 	$(top_builddir)/src/libmissing/libmissing.la \
@@ -139,13 +139,15 @@ am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
 am__v_lt_0 = --silent
 am__v_lt_1 = 
 am_remunge_OBJECTS = remunge-remunge.$(OBJEXT) remunge-query.$(OBJEXT) \
-	remunge-xgetgr.$(OBJEXT) remunge-xgetpw.$(OBJEXT)
+	remunge-xgetgr.$(OBJEXT) remunge-xgetpw.$(OBJEXT) \
+	remunge-xsignal.$(OBJEXT)
 remunge_OBJECTS = $(am_remunge_OBJECTS)
 am__DEPENDENCIES_1 =
 remunge_DEPENDENCIES = $(top_builddir)/src/libcommon/libcommon.la \
 	$(top_builddir)/src/libmissing/libmissing.la \
 	$(top_builddir)/src/libmunge/libmunge.la $(am__DEPENDENCIES_1)
-am_unmunge_OBJECTS = unmunge-unmunge.$(OBJEXT) unmunge-read.$(OBJEXT)
+am_unmunge_OBJECTS = unmunge-unmunge.$(OBJEXT) unmunge-read.$(OBJEXT) \
+	unmunge-xsignal.$(OBJEXT)
 unmunge_OBJECTS = $(am_unmunge_OBJECTS)
 unmunge_DEPENDENCIES = $(top_builddir)/src/libcommon/libcommon.la \
 	$(top_builddir)/src/libmissing/libmissing.la \
@@ -451,9 +453,12 @@ munge_SOURCES = \
 	$(top_srcdir)/src/common/xgetgr.c \
 	$(top_srcdir)/src/common/xgetgr.h \
 	$(top_srcdir)/src/common/xgetpw.c \
-	$(top_srcdir)/src/common/xgetpw.h
+	$(top_srcdir)/src/common/xgetpw.h \
+	$(top_srcdir)/src/common/xsignal.c \
+	$(top_srcdir)/src/common/xsignal.h
 
 unmunge_CPPFLAGS = \
+	-I$(top_srcdir)/src/common \
 	$(AM_CPPFLAGS)
 
 unmunge_LDADD = \
@@ -464,7 +469,9 @@ unmunge_LDADD = \
 unmunge_SOURCES = \
 	unmunge.c \
 	read.c \
-	read.h
+	read.h \
+	$(top_srcdir)/src/common/xsignal.c \
+	$(top_srcdir)/src/common/xsignal.h
 
 remunge_CPPFLAGS = \
 	-DWITH_PTHREADS \
@@ -484,7 +491,9 @@ remunge_SOURCES = \
 	$(top_srcdir)/src/common/xgetgr.c \
 	$(top_srcdir)/src/common/xgetgr.h \
 	$(top_srcdir)/src/common/xgetpw.c \
-	$(top_srcdir)/src/common/xgetpw.h
+	$(top_srcdir)/src/common/xgetpw.h \
+	$(top_srcdir)/src/common/xsignal.c \
+	$(top_srcdir)/src/common/xsignal.h
 
 man_MANS = \
 	munge.1 \
@@ -604,12 +613,15 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/munge-read.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/munge-xgetgr.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/munge-xgetpw.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/munge-xsignal.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/remunge-query.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/remunge-remunge.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/remunge-xgetgr.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/remunge-xgetpw.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/remunge-xsignal.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/unmunge-read.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/unmunge-unmunge.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/unmunge-xsignal.Po@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -702,6 +714,20 @@ munge-xgetpw.obj: $(top_srcdir)/src/common/xgetpw.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(munge_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o munge-xgetpw.obj `if test -f '$(top_srcdir)/src/common/xgetpw.c'; then $(CYGPATH_W) '$(top_srcdir)/src/common/xgetpw.c'; else $(CYGPATH_W) '$(srcdir)/$(top_srcdir)/src/common/xgetpw.c'; fi`
 
+munge-xsignal.o: $(top_srcdir)/src/common/xsignal.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(munge_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT munge-xsignal.o -MD -MP -MF $(DEPDIR)/munge-xsignal.Tpo -c -o munge-xsignal.o `test -f '$(top_srcdir)/src/common/xsignal.c' || echo '$(srcdir)/'`$(top_srcdir)/src/common/xsignal.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/munge-xsignal.Tpo $(DEPDIR)/munge-xsignal.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='$(top_srcdir)/src/common/xsignal.c' object='munge-xsignal.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(munge_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o munge-xsignal.o `test -f '$(top_srcdir)/src/common/xsignal.c' || echo '$(srcdir)/'`$(top_srcdir)/src/common/xsignal.c
+
+munge-xsignal.obj: $(top_srcdir)/src/common/xsignal.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(munge_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT munge-xsignal.obj -MD -MP -MF $(DEPDIR)/munge-xsignal.Tpo -c -o munge-xsignal.obj `if test -f '$(top_srcdir)/src/common/xsignal.c'; then $(CYGPATH_W) '$(top_srcdir)/src/common/xsignal.c'; else $(CYGPATH_W) '$(srcdir)/$(top_srcdir)/src/common/xsignal.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/munge-xsignal.Tpo $(DEPDIR)/munge-xsignal.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='$(top_srcdir)/src/common/xsignal.c' object='munge-xsignal.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(munge_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o munge-xsignal.obj `if test -f '$(top_srcdir)/src/common/xsignal.c'; then $(CYGPATH_W) '$(top_srcdir)/src/common/xsignal.c'; else $(CYGPATH_W) '$(srcdir)/$(top_srcdir)/src/common/xsignal.c'; fi`
+
 remunge-remunge.o: remunge.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(remunge_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT remunge-remunge.o -MD -MP -MF $(DEPDIR)/remunge-remunge.Tpo -c -o remunge-remunge.o `test -f 'remunge.c' || echo '$(srcdir)/'`remunge.c
 @am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/remunge-remunge.Tpo $(DEPDIR)/remunge-remunge.Po
@@ -758,6 +784,20 @@ remunge-xgetpw.obj: $(top_srcdir)/src/common/xgetpw.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(remunge_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o remunge-xgetpw.obj `if test -f '$(top_srcdir)/src/common/xgetpw.c'; then $(CYGPATH_W) '$(top_srcdir)/src/common/xgetpw.c'; else $(CYGPATH_W) '$(srcdir)/$(top_srcdir)/src/common/xgetpw.c'; fi`
 
+remunge-xsignal.o: $(top_srcdir)/src/common/xsignal.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(remunge_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT remunge-xsignal.o -MD -MP -MF $(DEPDIR)/remunge-xsignal.Tpo -c -o remunge-xsignal.o `test -f '$(top_srcdir)/src/common/xsignal.c' || echo '$(srcdir)/'`$(top_srcdir)/src/common/xsignal.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/remunge-xsignal.Tpo $(DEPDIR)/remunge-xsignal.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='$(top_srcdir)/src/common/xsignal.c' object='remunge-xsignal.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(remunge_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o remunge-xsignal.o `test -f '$(top_srcdir)/src/common/xsignal.c' || echo '$(srcdir)/'`$(top_srcdir)/src/common/xsignal.c
+
+remunge-xsignal.obj: $(top_srcdir)/src/common/xsignal.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(remunge_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT remunge-xsignal.obj -MD -MP -MF $(DEPDIR)/remunge-xsignal.Tpo -c -o remunge-xsignal.obj `if test -f '$(top_srcdir)/src/common/xsignal.c'; then $(CYGPATH_W) '$(top_srcdir)/src/common/xsignal.c'; else $(CYGPATH_W) '$(srcdir)/$(top_srcdir)/src/common/xsignal.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/remunge-xsignal.Tpo $(DEPDIR)/remunge-xsignal.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='$(top_srcdir)/src/common/xsignal.c' object='remunge-xsignal.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(remunge_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o remunge-xsignal.obj `if test -f '$(top_srcdir)/src/common/xsignal.c'; then $(CYGPATH_W) '$(top_srcdir)/src/common/xsignal.c'; else $(CYGPATH_W) '$(srcdir)/$(top_srcdir)/src/common/xsignal.c'; fi`
+
 unmunge-unmunge.o: unmunge.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unmunge_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT unmunge-unmunge.o -MD -MP -MF $(DEPDIR)/unmunge-unmunge.Tpo -c -o unmunge-unmunge.o `test -f 'unmunge.c' || echo '$(srcdir)/'`unmunge.c
 @am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/unmunge-unmunge.Tpo $(DEPDIR)/unmunge-unmunge.Po
@@ -785,6 +825,20 @@ unmunge-read.obj: read.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='read.c' object='unmunge-read.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unmunge_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o unmunge-read.obj `if test -f 'read.c'; then $(CYGPATH_W) 'read.c'; else $(CYGPATH_W) '$(srcdir)/read.c'; fi`
+
+unmunge-xsignal.o: $(top_srcdir)/src/common/xsignal.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unmunge_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT unmunge-xsignal.o -MD -MP -MF $(DEPDIR)/unmunge-xsignal.Tpo -c -o unmunge-xsignal.o `test -f '$(top_srcdir)/src/common/xsignal.c' || echo '$(srcdir)/'`$(top_srcdir)/src/common/xsignal.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/unmunge-xsignal.Tpo $(DEPDIR)/unmunge-xsignal.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='$(top_srcdir)/src/common/xsignal.c' object='unmunge-xsignal.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unmunge_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o unmunge-xsignal.o `test -f '$(top_srcdir)/src/common/xsignal.c' || echo '$(srcdir)/'`$(top_srcdir)/src/common/xsignal.c
+
+unmunge-xsignal.obj: $(top_srcdir)/src/common/xsignal.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unmunge_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT unmunge-xsignal.obj -MD -MP -MF $(DEPDIR)/unmunge-xsignal.Tpo -c -o unmunge-xsignal.obj `if test -f '$(top_srcdir)/src/common/xsignal.c'; then $(CYGPATH_W) '$(top_srcdir)/src/common/xsignal.c'; else $(CYGPATH_W) '$(srcdir)/$(top_srcdir)/src/common/xsignal.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/unmunge-xsignal.Tpo $(DEPDIR)/unmunge-xsignal.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='$(top_srcdir)/src/common/xsignal.c' object='unmunge-xsignal.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unmunge_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o unmunge-xsignal.obj `if test -f '$(top_srcdir)/src/common/xsignal.c'; then $(CYGPATH_W) '$(top_srcdir)/src/common/xsignal.c'; else $(CYGPATH_W) '$(srcdir)/$(top_srcdir)/src/common/xsignal.c'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo

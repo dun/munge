@@ -148,7 +148,8 @@ am_munged_OBJECTS = munged-munged.$(OBJEXT) munged-auth_recv.$(OBJEXT) \
 	munged-replay.$(OBJEXT) munged-thread.$(OBJEXT) \
 	munged-timer.$(OBJEXT) munged-work.$(OBJEXT) \
 	munged-zip.$(OBJEXT) munged-query.$(OBJEXT) \
-	munged-xgetgr.$(OBJEXT) munged-xgetpw.$(OBJEXT)
+	munged-xgetgr.$(OBJEXT) munged-xgetpw.$(OBJEXT) \
+	munged-xsignal.$(OBJEXT)
 munged_OBJECTS = $(am_munged_OBJECTS)
 am__DEPENDENCIES_1 =
 munged_DEPENDENCIES = $(top_builddir)/src/libcommon/libcommon.la \
@@ -686,7 +687,9 @@ munged_SOURCES = \
 	$(top_srcdir)/src/common/xgetgr.c \
 	$(top_srcdir)/src/common/xgetgr.h \
 	$(top_srcdir)/src/common/xgetpw.c \
-	$(top_srcdir)/src/common/xgetpw.h
+	$(top_srcdir)/src/common/xgetpw.h \
+	$(top_srcdir)/src/common/xsignal.c \
+	$(top_srcdir)/src/common/xsignal.h
 
 man_MANS = \
 	munged.8
@@ -831,6 +834,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/munged-work.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/munged-xgetgr.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/munged-xgetpw.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/munged-xsignal.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/munged-zip.Po@am__quote@
 
 .c.o:
@@ -1203,6 +1207,20 @@ munged-xgetpw.obj: $(top_srcdir)/src/common/xgetpw.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='$(top_srcdir)/src/common/xgetpw.c' object='munged-xgetpw.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(munged_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -c -o munged-xgetpw.obj `if test -f '$(top_srcdir)/src/common/xgetpw.c'; then $(CYGPATH_W) '$(top_srcdir)/src/common/xgetpw.c'; else $(CYGPATH_W) '$(srcdir)/$(top_srcdir)/src/common/xgetpw.c'; fi`
+
+munged-xsignal.o: $(top_srcdir)/src/common/xsignal.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(munged_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -MT munged-xsignal.o -MD -MP -MF $(DEPDIR)/munged-xsignal.Tpo -c -o munged-xsignal.o `test -f '$(top_srcdir)/src/common/xsignal.c' || echo '$(srcdir)/'`$(top_srcdir)/src/common/xsignal.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/munged-xsignal.Tpo $(DEPDIR)/munged-xsignal.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='$(top_srcdir)/src/common/xsignal.c' object='munged-xsignal.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(munged_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -c -o munged-xsignal.o `test -f '$(top_srcdir)/src/common/xsignal.c' || echo '$(srcdir)/'`$(top_srcdir)/src/common/xsignal.c
+
+munged-xsignal.obj: $(top_srcdir)/src/common/xsignal.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(munged_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -MT munged-xsignal.obj -MD -MP -MF $(DEPDIR)/munged-xsignal.Tpo -c -o munged-xsignal.obj `if test -f '$(top_srcdir)/src/common/xsignal.c'; then $(CYGPATH_W) '$(top_srcdir)/src/common/xsignal.c'; else $(CYGPATH_W) '$(srcdir)/$(top_srcdir)/src/common/xsignal.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/munged-xsignal.Tpo $(DEPDIR)/munged-xsignal.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='$(top_srcdir)/src/common/xsignal.c' object='munged-xsignal.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(munged_CPPFLAGS) $(CPPFLAGS) $(munged_CFLAGS) $(CFLAGS) -c -o munged-xsignal.obj `if test -f '$(top_srcdir)/src/common/xsignal.c'; then $(CYGPATH_W) '$(top_srcdir)/src/common/xsignal.c'; else $(CYGPATH_W) '$(srcdir)/$(top_srcdir)/src/common/xsignal.c'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo

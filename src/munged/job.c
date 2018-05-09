@@ -54,7 +54,8 @@
  *  Extern Variables
  *****************************************************************************/
 
-extern volatile sig_atomic_t done;      /* defined in munged.c               */
+extern volatile sig_atomic_t got_reconfig;      /* defined in munged.c       */
+extern volatile sig_atomic_t got_terminate;     /* defined in munged.c       */
 
 
 /*****************************************************************************
@@ -86,7 +87,13 @@ job_accept (conf_t conf)
     log_msg (LOG_INFO, "Created %d work thread%s", conf->nthreads,
             ((conf->nthreads > 1) ? "s" : ""));
 
-    while (!done) {
+    while (!got_terminate) {
+        if (got_reconfig) {
+            log_msg (LOG_NOTICE, "Processing signal %d (%s)",
+                    got_reconfig, strsignal (got_reconfig));
+            got_reconfig = 0;
+            gids_update (conf->gids);
+        }
         if ((sd = accept (conf->ld, NULL, NULL)) < 0) {
             switch (errno) {
                 case ECONNABORTED:
@@ -136,7 +143,8 @@ job_accept (conf_t conf)
             log_msg (LOG_WARNING, "Failed to queue client request");
         }
     }
-    log_msg (LOG_NOTICE, "Exiting on signal=%d", done);
+    log_msg (LOG_NOTICE, "Exiting on signal %d (%s)",
+            got_terminate, strsignal (got_terminate));
     work_fini (w, 1);
     return;
 }

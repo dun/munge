@@ -34,6 +34,7 @@
 #include <errno.h>
 #include <limits.h>
 #include <pthread.h>
+#include <signal.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -45,9 +46,9 @@
 #include "common.h"
 #include "license.h"
 #include "log.h"
-#include "posignal.h"
 #include "query.h"
 #include "version.h"
+#include "xsignal.h"
 
 
 /*****************************************************************************
@@ -194,14 +195,9 @@ main (int argc, char *argv[])
 {
     conf_t conf;
 
-    /*  FIXME: Revamp signal handlers.
-     */
-    if (posignal (SIGHUP, SIG_IGN) == SIG_ERR) {
-        log_err (EMUNGE_SNAFU, LOG_ERR, "Failed to ignore signal=%d", SIGHUP);
-    }
-    if (posignal (SIGPIPE, SIG_IGN) == SIG_ERR) {
-        log_err (EMUNGE_SNAFU, LOG_ERR, "Failed to ignore signal=%d", SIGPIPE);
-    }
+    xsignal_ignore (SIGHUP);
+    xsignal_ignore (SIGPIPE);
+
     /*  Close stdin since it is not used.
      */
     if (close (STDIN_FILENO) < 0) {

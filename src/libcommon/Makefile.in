@@ -126,8 +126,8 @@ CONFIG_CLEAN_FILES = munge.7
 CONFIG_CLEAN_VPATH_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 libcommon_la_LIBADD =
-am_libcommon_la_OBJECTS = fd.lo license.lo log.lo m_msg.lo posignal.lo \
-	str.lo version.lo
+am_libcommon_la_OBJECTS = fd.lo license.lo log.lo m_msg.lo str.lo \
+	version.lo
 libcommon_la_OBJECTS = $(am_libcommon_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
@@ -428,8 +428,6 @@ libcommon_la_SOURCES = \
 	m_msg.c \
 	m_msg.h \
 	munge_defs.h \
-	posignal.c \
-	posignal.h \
 	str.c \
 	str.h \
 	version.c \
@@ -499,7 +497,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/license.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/log.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/m_msg.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/posignal.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/str.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/version.Plo@am__quote@
 

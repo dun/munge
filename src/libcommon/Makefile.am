@@ -46,8 +46,6 @@ libcommon_la_SOURCES = \
 	m_msg.c \
 	m_msg.h \
 	munge_defs.h \
-	posignal.c \
-	posignal.h \
 	str.c \
 	str.h \
 	version.c \
