@@ -30,6 +30,32 @@
 }
 
 {
+   getpwnam_r-calloc-and-malloc
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   ...
+   fun:dl_open_worker
+   fun:_dl_catch_exception
+   fun:_dl_open
+   fun:do_dlopen
+   fun:_dl_catch_exception
+   fun:_dl_catch_error
+   fun:dlerror_run
+   fun:__libc_dlopen_mode
+   fun:nss_load_library
+   fun:__nss_lookup_function
+   fun:__nss_next2
+   fun:getpwnam_r@@GLIBC_2.2.5
+   fun:xgetpwnam
+   fun:_gids_user_to_uid
+   fun:_gids_map_create
+   fun:_gids_map_update
+   fun:_timer_thread
+   fun:start_thread
+   fun:clone
+}
+
+{
     random_init-gcry_control-malloc
     Memcheck:Leak
     match-leak-kinds: reachable
@@ -41,3 +67,4 @@
     fun:random_init
     fun:main
 }
+
