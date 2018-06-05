@@ -105,10 +105,6 @@
  */
 #define MUNGE_MAXIMUM_REQ_LEN           1048576
 
-/*  Integer for the minimum size (in bytes) of the secret key file.
- */
-#define MUNGE_MINIMUM_SECRET_KEY_LEN    32
-
 /*  Flag to denote whether group information comes from "/etc/group".
  *  If set, group information will not be updated unless this file
  *    modification time changes.  If not set, the file modification time
@@ -212,6 +208,22 @@
  */
 #define MUNGE_AUTH_RND_BYTES            16
 
+/*  Integer for the default length (in bytes) of a key.
+ */
+#define MUNGE_KEY_LEN_DFL_BYTES         128
+
+/*  Integer for the maximum length (in bytes) of a key.
+ */
+#define MUNGE_KEY_LEN_MAX_BYTES         1024
+
+/*  Integer for the minimum length (in bytes) of a key.
+ */
+#define MUNGE_KEY_LEN_MIN_BYTES         32
+
+/*  String specifying the pathname of the daemon's keyfile.
+ */
+#define MUNGE_KEYFILE_PATH              SYSCONFDIR "/munge/munge.key"
+
 /*  String specifying the pathname of the daemon's logfile.
  */
 #define MUNGED_LOGFILE                  LOCALSTATEDIR "/log/munge/munged.log"
@@ -223,10 +235,6 @@
 /*  String specifying the pathname of the random seed file.
  */
 #define MUNGED_RANDOM_SEED              LOCALSTATEDIR "/lib/munge/munge.seed"
-
-/*  String specifying the pathname of the secret key file.
- */
-#define MUNGED_SECRET_KEY               SYSCONFDIR "/munge/munge.key"
 
 
 #endif /* !MUNGE_DEFS_H */

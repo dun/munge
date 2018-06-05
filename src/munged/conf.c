@@ -182,7 +182,7 @@ create_conf (void)
         log_errno (EMUNGE_NO_MEMORY, LOG_ERR,
             "Failed to copy seed name string");
     }
-    if (!(conf->key_name = strdup (MUNGED_SECRET_KEY))) {
+    if (!(conf->key_name = strdup (MUNGE_KEYFILE_PATH))) {
         log_errno (EMUNGE_NO_MEMORY, LOG_ERR,
             "Failed to copy key name string");
     }
@@ -549,7 +549,7 @@ display_help (char *prog)
             MUNGE_GROUP_UPDATE_SECS);
 
     printf ("  %*s %s [%s]\n", w, "--key-file=PATH",
-            "Specify key file", MUNGED_SECRET_KEY);
+            "Specify key file", MUNGE_KEYFILE_PATH);
 
     printf ("  %*s %s [%s]\n", w, "--log-file=PATH",
             "Specify log file", MUNGED_LOGFILE);
@@ -639,9 +639,9 @@ create_subkeys (conf_t conf)
         log_errno (EMUNGE_SNAFU, LOG_ERR,
             "Failed to close keyfile \"%s\"", conf->key_name);
     }
-    if (n_total < MUNGE_MINIMUM_SECRET_KEY_LEN) {
+    if (n_total < MUNGE_KEY_LEN_MIN_BYTES) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
-            "Keyfile must be at least %d bytes", MUNGE_MINIMUM_SECRET_KEY_LEN);
+            "Keyfile must be at least %d bytes", MUNGE_KEY_LEN_MIN_BYTES);
     }
     if (md_copy (&mac_ctx, &dek_ctx) < 0) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
