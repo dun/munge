@@ -11,4 +11,5 @@ SUBDIRS = \
 	libmissing \
 	libmunge \
 	munge \
-	munged
+	munged \
+	mungekey

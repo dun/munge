@@ -119,6 +119,7 @@ AC_CONFIG_FILES( \
   src/libmunge/Makefile \
   src/munge/Makefile \
   src/munged/Makefile \
+  src/mungekey/Makefile \
   t/Makefile \
 )
 AC_OUTPUT

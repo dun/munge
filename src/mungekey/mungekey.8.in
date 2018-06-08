@@ -1,0 +1,111 @@
+.\"****************************************************************************
+.\" Written by Chris Dunlap <cdunlap@llnl.gov>.
+.\" Copyright (C) 2007-2018 Lawrence Livermore National Security, LLC.
+.\" Copyright (C) 2002-2007 The Regents of the University of California.
+.\" UCRL-CODE-155910.
+.\"
+.\" This file is part of the MUNGE Uid 'N' Gid Emporium (MUNGE).
+.\" For details, see <https://dun.github.io/munge/>.
+.\"
+.\" MUNGE is free software: you can redistribute it and/or modify it under
+.\" the terms of the GNU General Public License as published by the Free
+.\" Software Foundation, either version 3 of the License, or (at your option)
+.\" any later version.  Additionally for the MUNGE library (libmunge), you
+.\" can redistribute it and/or modify it under the terms of the GNU Lesser
+.\" General Public License as published by the Free Software Foundation,
+.\" either version 3 of the License, or (at your option) any later version.
+.\"
+.\" MUNGE is distributed in the hope that it will be useful, but WITHOUT
+.\" ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+.\" FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+.\" and GNU Lesser General Public License for more details.
+.\"
+.\" You should have received a copy of the GNU General Public License
+.\" and GNU Lesser General Public License along with MUNGE.  If not, see
+.\" <http://www.gnu.org/licenses/>.
+.\"****************************************************************************
+
+.TH MUNGEKEY 8 "@DATE@" "@PACKAGE@-@VERSION@" "MUNGE Uid 'N' Gid Emporium"
+
+.SH NAME
+mungekey \- MUNGE key management utility
+
+.SH SYNOPSIS
+.B mungekey
+[\fB\-c\fR] [\fB\-b\fR \fIbits\fR] [\fB\-f\fR] [\fB\-k\fR \fIkeyfile\fR]
+[\-\fBv\fR]
+.br
+
+.SH DESCRIPTION
+The \fBmungekey\fR executable is the key management utility for MUNGE.
+It should be run by the same user that starts the \fBmunged\fR daemon.
+.PP
+If no options are specified, \fBmungekey\fR will attempt to create a new
+key using the default settings; this will fail if the keyfile already exists.
+.PP
+All \fBmunged\fR daemons within a security realm must use the same key.
+In other words, all hosts within an administrative group (or cluster)
+using MUNGE for authentication must use the same key; this keyfile can be
+created on one host and then securely copied to all other hosts.
+
+.SH OPTIONS
+.TP
+.BI "\-b, \-\-bits " integer
+Specify the number of bits in the key being created [256-8192].
+.TP
+.BI "\-c, \-\-create "
+Create a new keyfile.
+.TP
+.BI "\-f, \-\-force "
+Force the keyfile to be overwritten if it already exists.
+.TP
+.BI "\-h, \-\-help"
+Display a summary of the command-line options.
+.TP
+.BI "\-k, \-\-keyfile " path
+Specify the keyfile pathname.
+.TP
+.BI "\-L, \-\-license"
+Display license information.
+.TP
+.BI "\-v, \-\-verbose"
+Be verbose.
+.TP
+.BI "\-V, \-\-version"
+Display version information.
+
+.SH FILES
+.I @sysconfdir@/munge/munge.key
+.RS
+Contains the shared cryptographic key for hosts within the security realm.
+.RE
+
+.SH AUTHOR
+Chris Dunlap <cdunlap@llnl.gov>
+
+.SH COPYRIGHT
+Copyright (C) 2007-2018 Lawrence Livermore National Security, LLC.
+.br
+Copyright (C) 2002-2007 The Regents of the University of California.
+.PP
+MUNGE is free software: you can redistribute it and/or modify it under the
+terms of the GNU General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later
+version.
+.PP
+Additionally for the MUNGE library (libmunge), you can redistribute it
+and/or modify it under the terms of the GNU Lesser General Public License as
+published by the Free Software Foundation, either version 3 of the License,
+or (at your option) any later version.
+
+.SH "SEE ALSO"
+.BR munge (1),
+.BR remunge (1),
+.BR unmunge (1),
+.BR munge (3),
+.BR munge_ctx (3),
+.BR munge_enum (3),
+.BR munge (7),
+.BR munged (8).
+.PP
+\fBhttps://dun.github.io/munge/\fR

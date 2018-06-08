@@ -1,16 +1,14 @@
-# Requires MUNGED.
+# Requires MUNGED and MUNGEKEY.
 
 ##
 # Create smallest-allowable key [$1] for munged if it does not already exist.
-# FIXME: Creating the munged key via dd is a lousy cmdline interface.
 ##
 munged_create_key()
 {
     local KEY=$1 &&
     if test ! -r "${KEY}"; then
-        dd if="/dev/urandom" of="${KEY}" bs=32 count=1 >/dev/null 2>&1
-    fi &&
-    chmod 400 "${KEY}"
+        "${MUNGEKEY}" --create --keyfile="${KEY}" --bits=256
+    fi
 }
 
 ##

@@ -35,10 +35,12 @@ munged \- MUNGE daemon
 [\fIOPTION\fR]...
 
 .SH DESCRIPTION
-The \fBmunged\fR daemon is responsible for authenticating local MUNGE clients
-and servicing their credential encode & decode requests.  All \fBmunged\fR
-daemons within a security realm share a secret key.  This key is used to
-protect the contents of a credential.
+The \fBmunged\fR daemon is responsible for authenticating local MUNGE
+clients and servicing their credential encode & decode requests.
+.PP
+All \fBmunged\fR daemons within a security realm share a common key.  The key
+is used to cryptographically protect the credentials.  It is created with
+the \fBmungekey\fR command.
 .PP
 When a credential is created, \fBmunged\fR embeds metadata within it
 including the effective UID and GID of the requesting client (as determined
@@ -201,6 +203,7 @@ or (at your option) any later version.
 .BR munge (3),
 .BR munge_ctx (3),
 .BR munge_enum (3),
-.BR munge (7).
+.BR munge (7),
+.BR mungekey (8).
 .PP
 \fBhttps://dun.github.io/munge/\fR

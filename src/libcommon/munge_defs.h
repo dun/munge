@@ -213,10 +213,12 @@
 #define MUNGE_KEY_LEN_DFL_BYTES         128
 
 /*  Integer for the maximum length (in bytes) of a key.
+ *  Note: Update src/mungekey/mungekey.8.in when changing this value.
  */
 #define MUNGE_KEY_LEN_MAX_BYTES         1024
 
 /*  Integer for the minimum length (in bytes) of a key.
+ *  Note: Update src/mungekey/mungekey.8.in when changing this value.
  */
 #define MUNGE_KEY_LEN_MIN_BYTES         32
 

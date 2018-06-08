@@ -33,6 +33,7 @@
 /src/munge/unmunge
 /src/munged/base64_test
 /src/munged/munged
+/src/mungekey/mungekey
 /stamp-h1
 /t/test-results/
 Makefile

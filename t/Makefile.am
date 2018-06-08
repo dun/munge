@@ -18,9 +18,11 @@ TESTS = \
 	0011-munged-cmdline.t \
 	0012-munge-cmdline.t \
 	0013-unmunge-cmdline.t \
+	0015-mungekey-cmdline.t \
 	0021-munged-valgrind.t \
 	0022-munge-valgrind.t \
 	0023-unmunge-valgrind.t \
+	0025-mungekey-valgrind.t \
 	0100-munged-lock.t
 
 EXTRA_DIST = \

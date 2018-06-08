@@ -132,6 +132,7 @@ or (at your option) any later version.
 .BR munge (3),
 .BR munge_ctx (3),
 .BR munge (7),
-.BR munged (8).
+.BR munged (8),
+.BR mungekey (8).
 .PP
 \fBhttps://dun.github.io/munge/\fR

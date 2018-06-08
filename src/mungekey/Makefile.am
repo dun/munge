@@ -1,0 +1,50 @@
+# MUNGE src/mungekey/Makefile.am
+#
+# This file is part of the MUNGE Uid 'N' Gid Emporium (MUNGE).
+# For details, see <https://dun.github.io/munge/>.
+
+include $(top_srcdir)/Make-inc.mk
+
+TEMPLATE_FILES = \
+	mungekey.8.in
+
+SUBSTITUTE_FILES = \
+	mungekey.8
+
+EXTRA_DIST = \
+	$(TEMPLATE_FILES)
+
+CLEANFILES = \
+	$(SUBSTITUTE_FILES)
+
+$(SUBSTITUTE_FILES): Makefile
+	$(AM_V_GEN)$(substitute) < "$(srcdir)/$@.in" > "$(builddir)/$@"
+
+mungekey.8: mungekey.8.in
+
+sbin_PROGRAMS = \
+	mungekey
+
+mungekey_CPPFLAGS = \
+	-DSYSCONFDIR='"$(sysconfdir)"' \
+	-I$(top_srcdir)/src/common \
+	-I$(top_srcdir)/src/libcommon \
+	-I$(top_srcdir)/src/libmissing \
+	-I$(top_srcdir)/src/libmunge
+
+mungekey_LDADD = \
+	$(top_builddir)/src/libcommon/libcommon.la \
+	$(top_builddir)/src/libmissing/libmissing.la \
+	$(top_builddir)/src/libmunge/libmunge.la
+
+mungekey_SOURCES = \
+	mungekey.c \
+	conf.c \
+	conf.h \
+	key.c \
+	key.h \
+	$(top_srcdir)/src/common/xsignal.c \
+	$(top_srcdir)/src/common/xsignal.h
+
+man_MANS = \
+	mungekey.8

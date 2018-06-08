@@ -54,8 +54,8 @@ MUNGE Installation Guide
    By default, the munged daemon uses the following system directories:
 
    A. /etc/munge/
-      This directory contains the daemon's secret key.  The recommended
-      permissions for it are 0700.
+      This directory contains the daemon's key.  The recommended permissions
+      for it are 0700.
 
    B. /var/lib/munge/
       This directory contains the daemon's PRNG seed file.  It is also
@@ -86,34 +86,21 @@ MUNGE Installation Guide
    they cannot allow write permissions for other unless the sticky bit is set.
 
 
-3. Creating a Secret Key
+3. Creating a Key
 
    A security realm encompasses a group of hosts having common users and
    groups.  It is defined by a shared cryptographic key.  Credentials are
    valid only within a security realm.  All munged daemons within a security
-   realm must possess the same secret key.
+   realm must possess the same key.
 
-   By default, the secret key resides in "/etc/munge/munge.key".  This
-   location can be overridden on the munged command-line or via the init
-   script as detailed in the "Starting the Daemon" section below.
+   You can create a key using the mungekey command.  This command should be
+   run by the same user that will run the munged daemon.  For example:
+      $ sudo -u munge /usr/sbin/mungekey
 
-   You can create a secret key using a variety of methods:
-
-   A. Wait around for some random data (recommended for the paranoid):
-      $ dd if=/dev/random bs=1 count=1024 >/etc/munge/munge.key
-
-   B. Grab some pseudorandom data (recommended for the impatient):
-      $ dd if=/dev/urandom bs=1 count=1024 >/etc/munge/munge.key
-
-   C. Enter the hash of a password:
-      $ echo -n "foo" | sha1sum | cut -d' ' -f1 >/etc/munge/munge.key
-
-   D. Enter a password directly (not recommended):
-      $ echo "foo" >/etc/munge/munge.key
-
-   This file should be permissioned 0400 and owned by the user that the
-   munged daemon will run as.  Securely propagate this file (e.g., via ssh)
-   to all other hosts within the same security realm.
+   By default, the key resides in "/etc/munge/munge.key".  This file should be
+   permissioned 0600 and owned by the user that will run the munged daemon.
+   Securely propagate this file (e.g., via ssh) to all hosts within the
+   security realm.
 
 
 4. Starting the Daemon
@@ -124,12 +111,12 @@ MUNGE Installation Guide
    and /etc/sysconfig/munge (found on RedHat-based systems), if present,
    to set variables recognized by the script.
 
-   The DAEMON_ARGS variable passes additional command-line options to
-   the daemon; for example, this can be used to override the location
-   of the secret key (--key-file) or set the number of worker threads
-   (--num-threads).  If the init script is invoked by root, the USER variable
-   causes the daemon to execute under the specified username; the "munge"
-   user is used by default.
+   The DAEMON_ARGS variable passes additional command-line options to the
+   daemon; for example, this can be used to override the location of the key
+   file (--key-file) or set the number of worker threads (--num-threads).
+   If the init script is invoked by root, the USER variable causes the
+   daemon to execute under the specified username; the "munge" user is used
+   by default.
 
 
 5. Testing the Installation
