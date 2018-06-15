@@ -28,6 +28,15 @@ test_expect_success 'mungekey invalid non-printable short option' '
     grep -q "Failed to process command-line" err.$$
 '
 
+# Check if an unimplemented option is handled.
+# The unimplemented short-option is specified in GETOPT_DEBUG_SHORT_OPTS
+#   when configured with --enable-debug.
+##
+test_expect_success DEBUG 'mungekey unimplemented option' '
+    test_must_fail "${MUNGEKEY}" -8 2>err.$$ &&
+    grep -q "Option \"-8\" is not implemented" err.$$
+'
+
 # Check if a non-option option (i.e., one without a single or double leading
 #   hyphen) is handled.  This tests the case of leftover args in argv[] after
 #   getopt_long() is finished.
@@ -331,9 +340,9 @@ test_expect_success 'mungekey --verbose number of bits' '
 '
 
 # Check that nothing is written to stdout or stderr when successfully creating
-#   a key without --verbose.
+#   a key without --verbose (unless configured with --enable-debug).
 ##
-test_expect_success 'mungekey without --verbose' '
+test_expect_success !DEBUG 'mungekey without --verbose' '
     local KEYFILE=key.$$ &&
     rm -f "${KEYFILE}" &&
     test ! -f "${KEYFILE}" &&

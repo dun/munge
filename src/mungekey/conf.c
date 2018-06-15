@@ -50,7 +50,16 @@
  *  Command-Line Options
  *****************************************************************************/
 
-const char * const short_opts = ":b:cfhk:LvV";
+/*  GETOPT_DEBUG_SHORT_OPTS is defined when configured with --enable-debug
+ *    in order to test the case of a command-line option being unimplemented.
+ */
+#ifdef NDEBUG
+#define GETOPT_DEBUG_SHORT_OPTS ""
+#else  /* !NDEBUG */
+#define GETOPT_DEBUG_SHORT_OPTS "8"
+#endif /* !NDEBUG */
+
+const char * const short_opts = ":b:cfhk:LvV" GETOPT_DEBUG_SHORT_OPTS ;
 
 #include <getopt.h>
 struct option long_opts[] = {
