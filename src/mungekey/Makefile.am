@@ -43,6 +43,8 @@ mungekey_SOURCES = \
 	conf.h \
 	key.c \
 	key.h \
+	$(top_srcdir)/src/common/entropy.c \
+	$(top_srcdir)/src/common/entropy.h \
 	$(top_srcdir)/src/common/xsignal.c \
 	$(top_srcdir)/src/common/xsignal.h
 

@@ -35,6 +35,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include "conf.h"
+#include "entropy.h"
 #include "fd.h"
 #include "log.h"
 #include "munge_defs.h"
@@ -50,13 +51,13 @@
 void
 create_key (conf_t *confp)
 {
-    const char * const random_path = "/dev/urandom";
-    unsigned char      buf [MUNGE_KEY_LEN_MAX_BYTES];
-    int                fd_src;
-    int                fd_dst;
-    int                n_read;
-    int                n_written;
-    int                rv;
+    unsigned char  buf [MUNGE_KEY_LEN_MAX_BYTES];
+    unsigned char *p;
+    int            fd;
+    int            n;
+    int            n_written;
+    int            rv;
+    const char    *src;
 
     assert (confp != NULL);
     assert (confp->key_num_bytes <= MUNGE_KEY_LEN_MAX_BYTES);
@@ -69,36 +70,32 @@ create_key (conf_t *confp)
                     confp->key_path);
         }
     }
-    fd_src = open (random_path, O_RDONLY | O_NONBLOCK);
-    if (fd_src == -1) {
-        log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to open \"%s\"",
-                random_path);
-    }
-    fd_dst = open (confp->key_path, O_WRONLY | O_CREAT | O_EXCL, 0600);
-    if (fd_dst == -1) {
+    fd = open (confp->key_path, O_WRONLY | O_CREAT | O_EXCL, 0600);
+    if (fd == -1) {
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to create \"%s\"",
                 confp->key_path);
     }
-    n_read = fd_read_n (fd_src, buf, confp->key_num_bytes);
-    if (n_read != confp->key_num_bytes) {
-        log_errno (EMUNGE_SNAFU, LOG_ERR,
-                "Failed to read %d bytes from \"%s\"",
-                confp->key_num_bytes, random_path);
+    p = buf;
+    n = confp->key_num_bytes;
+    while (n > 0) {
+        rv = entropy_read (p, n, &src);
+        if (rv <= 0) {
+            break;
+        }
+        p += rv;
+        n -= rv;
+        log_msg (LOG_DEBUG, "Read %d bytes of entropy from %s", rv, src);
     }
-    n_written = fd_write_n (fd_dst, buf, n_read);
-    if (n_written != n_read) {
+    n_written = fd_write_n (fd, buf, confp->key_num_bytes);
+    if (n_written != confp->key_num_bytes) {
         log_errno (EMUNGE_SNAFU, LOG_ERR,
-                "Failed to write %d bytes to \"%s\"", n_read, confp->key_path);
+                "Failed to write %d bytes to \"%s\"",
+                confp->key_num_bytes, confp->key_path);
     }
-    rv = close (fd_dst);
+    rv = close (fd);
     if (rv == -1) {
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to close \"%s\"",
                 confp->key_path);
-    }
-    rv = close (fd_src);
-    if (rv == -1) {
-        log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to close \"%s\"",
-                random_path);
     }
     (void) memburn (buf, 0, sizeof (buf));
     if (confp->do_verbose) {
