@@ -91,6 +91,8 @@ munged_SOURCES = \
 	work.h \
 	zip.c \
 	zip.h \
+	$(top_srcdir)/src/common/entropy.c \
+	$(top_srcdir)/src/common/entropy.h \
 	$(top_srcdir)/src/common/query.c \
 	$(top_srcdir)/src/common/query.h \
 	$(top_srcdir)/src/common/xgetgr.c \

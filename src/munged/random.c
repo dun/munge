@@ -36,9 +36,6 @@
 #include <munge.h>
 #include <stdint.h>
 #include <string.h>
-#if HAVE_SYS_RANDOM_H
-#include <sys/random.h>
-#endif /* HAVE_SYS_RANDOM_H */
 #include <sys/stat.h>
 #include <sys/time.h>
 #include <time.h>
@@ -46,6 +43,7 @@
 #include "common.h"
 #include "conf.h"
 #include "crypto.h"
+#include "entropy.h"
 #include "log.h"
 #include "munge_defs.h"
 #include "path.h"
@@ -56,10 +54,6 @@
 /*****************************************************************************
  *  Constants
  *****************************************************************************/
-
-/*  String specifying the pathname of the random number source device.
- */
-#define RANDOM_SOURCE_PATH              "/dev/urandom"
 
 /*  Integer for the number of bytes to read from the random number source
  *    device when seeding the PRNG entropy pool.
@@ -247,98 +241,21 @@ _random_read_entropy_from_kernel (void)
 /*  Reads entropy from the kernel's CSPRNG.
  *  Returns the number of bytes of entropy added, or -1 on error.
  */
-    int            n = -1;
-    int            fd;
-    size_t         len;
+    int            n;
     const char    *src;
-    struct stat    st;
     unsigned char  buf [RANDOM_SOURCE_BYTES];
 
-#if HAVE_GETRANDOM
-    /*
-     * If the urandom source has been initialized, reads of up to 256 bytes
-     *   will always return as many bytes as requested and not be interrupted
-     *   by signals.  No such guarantees apply for larger buffer sizes.
-     */
-    src = "getrandom()";
-    len = MIN(256, sizeof (buf));
-retry_getrandom:
-    n = getrandom (buf, len, 0);
-    if (n < 0) {
-        if (errno == EINTR) {
-            goto retry_getrandom;
-        }
-        log_msg (LOG_WARNING, "Failed to fill buffer via getrandom(): %s",
-                strerror (errno));
-    }
-#elif HAVE_GETENTROPY
-    /*
-     *  The maximum buffer size permitted is 256 bytes.
-     */
-    src = "getentropy()";
-    len = MIN(256, sizeof (buf));
-    n = getentropy (buf, len);
-    if (n < 0) {
-        log_msg (LOG_WARNING, "Failed to fill buffer via getentropy(): %s",
-                strerror (errno));
-    }
-    else if (n == 0) {
-        n = len;
-    }
-#endif /* HAVE_GETENTROPY */
-
-    if (n < 0) {
-retry_open:
-        fd = open (RANDOM_SOURCE_PATH, O_RDONLY | O_NONBLOCK);
-        if (fd < 0) {
-            if (errno == EINTR) {
-                goto retry_open;
-            }
-            log_msg (LOG_WARNING, "Failed to open \"%s\": %s",
-                    RANDOM_SOURCE_PATH, strerror (errno));
-        }
-        else {
-            if (fstat (fd, &st) < 0) {
-                log_msg (LOG_WARNING, "Failed to stat \"%s\": %s",
-                        RANDOM_SOURCE_PATH, strerror (errno));
-            }
-            else if (!S_ISCHR (st.st_mode)) {
-                log_msg (LOG_WARNING, "Failed to validate \"%s\": "
-                        "not a character device (mode=0x%x)",
-                        RANDOM_SOURCE_PATH, (st.st_mode & S_IFMT));
-            }
-            else {
-                src = "\"" RANDOM_SOURCE_PATH "\"";
-                len = sizeof (buf);
-                n = fd_read_n (fd, buf, len);
-                if (n < 0) {
-                    log_msg (LOG_WARNING, "Failed to read from \"%s\": %s",
-                            RANDOM_SOURCE_PATH, strerror (errno));
-                }
-            }
-            if (close (fd) < 0) {
-                log_msg (LOG_WARNING, "Failed to close \"%s\": %s",
-                        RANDOM_SOURCE_PATH, strerror (errno));
-            }
-        }
-    }
-
+    n = entropy_read (buf, sizeof (buf), &src);
     if (n > 0) {
-        if (n > sizeof (buf)) {
-            log_msg (LOG_WARNING, "Ignoring entropy from \"%s\":"
-                    " read %d byte%s into a %d-byte buffer",
-                    RANDOM_SOURCE_PATH, n, (n == 1 ? "" : "s"), sizeof (buf));
+        if (_random_check_entropy (buf, n) < 0) {
             n = 0;
-        }
-        else if (_random_check_entropy (buf, n) < 0) {
-            log_msg (LOG_WARNING, "Ignoring entropy from \"%s\":"
-                    " does not appear random", RANDOM_SOURCE_PATH);
-            n = 0;
+            log_msg (LOG_WARNING,
+                    "Ignoring entropy from kernel: does not appear random");
         }
         else {
             _random_add (buf, n);
             log_msg (LOG_INFO, "PRNG seeded with %d byte%s from %s",
-                    n, (n == 1 ? "" : "s"), src);
+                    n, (n == 1 ? "" : "s"), (src != NULL) ? src : "???");
         }
     }
     return (n);
