@@ -44,7 +44,7 @@
 #define LOG_OPT_TIMESTAMP       0x04    /* add timestamp to message          */
 
 
-int log_open_file (FILE *fp, char *identity, int priority, int options);
+int log_open_file (FILE *fp, const char *identity, int priority, int options);
 /*
  *  If [fp] is non-NULL, log messages at the [priority] level and higher
  *    (ie, below) to the specified file stream.
@@ -62,7 +62,7 @@ void log_close_file (void);
  *  Close the logging file stream (if open).
  */
 
-int log_open_syslog (char *identity, int facility);
+int log_open_syslog (const char *identity, int facility);
 /*
  *  If [identity] is non-NULL, log messages to syslog at the specified
  *    [facility] (cf, syslog(3)) prepending the trailing "filename" component

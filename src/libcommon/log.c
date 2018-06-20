@@ -92,9 +92,9 @@ static char * _log_prefix (int priority);
  *****************************************************************************/
 
 int
-log_open_file (FILE *fp, char *identity, int priority, int options)
+log_open_file (FILE *fp, const char *identity, int priority, int options)
 {
-    char *p;
+    const char *p;
 
     if (!fp) {
         errno = EINVAL;
@@ -133,7 +133,7 @@ log_close_file (void)
 
 
 int
-log_open_syslog (char *identity, int facility)
+log_open_syslog (const char *identity, int facility)
 {
     char *p;
 
