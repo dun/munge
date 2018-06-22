@@ -25,6 +25,10 @@ mungekey.8: mungekey.8.in
 sbin_PROGRAMS = \
 	mungekey
 
+mungekey_CFLAGS = \
+	$(AM_CFLAGS) \
+	$(CRYPTO_CFLAGS)
+
 mungekey_CPPFLAGS = \
 	-DSYSCONFDIR='"$(sysconfdir)"' \
 	-I$(top_srcdir)/src/common \
@@ -35,7 +39,8 @@ mungekey_CPPFLAGS = \
 mungekey_LDADD = \
 	$(top_builddir)/src/libcommon/libcommon.la \
 	$(top_builddir)/src/libmissing/libmissing.la \
-	$(top_builddir)/src/libmunge/libmunge.la
+	$(top_builddir)/src/libmunge/libmunge.la \
+	$(CRYPTO_LIBS)
 
 mungekey_SOURCES = \
 	mungekey.c \
@@ -43,8 +48,16 @@ mungekey_SOURCES = \
 	conf.h \
 	key.c \
 	key.h \
+	$(top_srcdir)/src/common/crypto.c \
+	$(top_srcdir)/src/common/crypto.h \
 	$(top_srcdir)/src/common/entropy.c \
 	$(top_srcdir)/src/common/entropy.h \
+	$(top_srcdir)/src/common/hkdf.c \
+	$(top_srcdir)/src/common/hkdf.h \
+	$(top_srcdir)/src/common/mac.c \
+	$(top_srcdir)/src/common/mac.h \
+	$(top_srcdir)/src/common/md.c \
+	$(top_srcdir)/src/common/md.h \
 	$(top_srcdir)/src/common/xsignal.c \
 	$(top_srcdir)/src/common/xsignal.h
 

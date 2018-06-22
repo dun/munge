@@ -33,13 +33,24 @@
 #include <assert.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <string.h>
+#include <sys/types.h>
 #include <unistd.h>
+#include "common.h"
 #include "conf.h"
 #include "entropy.h"
 #include "fd.h"
+#include "hkdf.h"
 #include "log.h"
 #include "munge_defs.h"
 #include "str.h"
+
+
+/*****************************************************************************
+ *  Prototypes
+ *****************************************************************************/
+
+static int _create_key_secret (unsigned char *buf, size_t buflen);
 
 
 /*****************************************************************************
@@ -51,18 +62,20 @@
 void
 create_key (conf_t *confp)
 {
-    unsigned char  buf [MUNGE_KEY_LEN_MAX_BYTES];
-    unsigned char *p;
-    int            fd;
-    int            n;
-    int            n_written;
-    int            rv;
-    const char    *src;
+    unsigned char buf[MUNGE_KEY_LEN_MAX_BYTES];
+    int           fd;
+    int           n;
+    int           rv;
 
     assert (confp != NULL);
     assert (confp->key_num_bytes <= MUNGE_KEY_LEN_MAX_BYTES);
     assert (confp->key_num_bytes >= MUNGE_KEY_LEN_MIN_BYTES);
 
+    if (confp->key_num_bytes > sizeof (buf)) {
+        log_err (EMUNGE_SNAFU, LOG_ERR,
+                "Failed to create \"%s\": %d-byte key exceeds %zu-byte buffer",
+                confp->key_path, confp->key_num_bytes, sizeof (buf));
+    }
     if (confp->do_force) {
         rv = unlink (confp->key_path);
         if ((rv == -1) && (errno != ENOENT)) {
@@ -75,19 +88,13 @@ create_key (conf_t *confp)
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to create \"%s\"",
                 confp->key_path);
     }
-    p = buf;
-    n = confp->key_num_bytes;
-    while (n > 0) {
-        rv = entropy_read (p, n, &src);
-        if (rv <= 0) {
-            break;
-        }
-        p += rv;
-        n -= rv;
-        log_msg (LOG_DEBUG, "Read %d bytes of entropy from %s", rv, src);
+    rv = _create_key_secret (buf, confp->key_num_bytes);
+    if (rv == -1) {
+        log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to create \"%s\"",
+                confp->key_path);
     }
-    n_written = fd_write_n (fd, buf, confp->key_num_bytes);
-    if (n_written != confp->key_num_bytes) {
+    n = fd_write_n (fd, buf, confp->key_num_bytes);
+    if (n != confp->key_num_bytes) {
         log_errno (EMUNGE_SNAFU, LOG_ERR,
                 "Failed to write %d bytes to \"%s\"",
                 confp->key_num_bytes, confp->key_path);
@@ -102,4 +109,98 @@ create_key (conf_t *confp)
         log_msg (LOG_INFO, "Created \"%s\" with %d-bit key",
                 confp->key_path, confp->key_num_bytes * 8);
     }
+}
+
+
+/*****************************************************************************
+ *  Private Functions
+ *****************************************************************************/
+
+/*  Create the key secret, writing it to the buffer [buf] of length [buflen].
+ *  Return 0 on success, or -1 on error.
+ */
+static int
+_create_key_secret (unsigned char *buf, size_t buflen)
+{
+    unsigned char      key[ENTROPY_NUM_BYTES_GUARANTEED];
+    unsigned int       salt;
+    const munge_mac_t  md = MUNGE_DEFAULT_MAC;
+    const char        *md_str;
+    const char        *info_prefix = "MUNGEKEY";
+    int                num_bits;
+    char               info[1024];
+    hkdf_ctx_t        *hkdfp = NULL;
+    int                rv;
+
+    assert (buf != NULL);
+    assert (buflen > 0);
+
+    /*  Read entropy from the kernel's CSPRNG for the input keying material.
+     */
+    rv = entropy_read (key, sizeof (key), NULL);
+    if (rv == -1) {
+        goto err;
+    }
+    /*  Read entropy independent of the kernel's CSPRNG for use as a salt.
+     */
+    rv = entropy_read_uint (&salt);
+    if (rv == -1) {
+        goto err;
+    }
+    /*  Create a distinguisher that embeds the use, algorithm, and key length.
+     *    For example, "MUNGEKEY:sha256:1024:".
+     */
+    md_str = munge_enum_int_to_str (MUNGE_ENUM_MAC, md);
+    if (md_str == NULL) {
+        log_msg (LOG_ERR, "Failed to lookup text string for md=%d", md);
+        rv = -1;
+        goto err;
+    }
+    num_bits = buflen * 8;
+    rv = snprintf (info, sizeof (info), "%s:%s:%d:",
+            info_prefix, md_str, num_bits);
+    if ((rv < 0) || (rv >= sizeof (info))) {
+        log_msg (LOG_ERR, "Failed to create key distinguisher info: "
+                "exceeded %zu-byte buffer", sizeof (info));
+        rv = -1;
+        goto err;
+    }
+    /*  Mix it all together in the key derivation function.
+     */
+    hkdfp = hkdf_ctx_create ();
+    if (hkdfp == NULL) {
+        log_msg (LOG_ERR, "Failed to allocate memory for HKDF context");
+        rv = -1;
+        goto err;
+    }
+    rv = hkdf_ctx_set_md (hkdfp, md);
+    if (rv == -1) {
+        log_msg (LOG_ERR, "Failed to set HKDF message digest to md=%d", md);
+        goto err;
+    }
+    rv = hkdf_ctx_set_key (hkdfp, key, sizeof (key));
+    if (rv == -1) {
+        log_msg (LOG_ERR, "Failed to set HKDF input keying material");
+        goto err;
+    }
+    rv = hkdf_ctx_set_salt (hkdfp, &salt, sizeof (salt));
+    if (rv == -1) {
+        log_msg (LOG_ERR, "Failed to set HKDF salt");
+        goto err;
+    }
+    rv = hkdf_ctx_set_info (hkdfp, info, strlen (info));
+    if (rv == -1) {
+        log_msg (LOG_ERR, "Failed to set HKDF info");
+        goto err;
+    }
+    rv = hkdf (hkdfp, buf, &buflen);
+    if (rv == -1) {
+        log_msg (LOG_ERR, "Failed to compute HKDF key derivation");
+        goto err;
+    }
+err:
+    (void) memburn (key, 0, sizeof (key));
+    (void) memburn (&salt, 0, sizeof (salt));
+    hkdf_ctx_destroy (hkdfp);
+    return rv;
 }

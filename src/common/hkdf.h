@@ -26,71 +26,37 @@
  *****************************************************************************/
 
 
-#if HAVE_CONFIG_H
-#  include "config.h"
-#endif /* HAVE_CONFIG_H */
+#ifndef MUNGE_HKDF_H
+#define MUNGE_HKDF_H
 
-#include <assert.h>
-#include <signal.h>
-#include <stdlib.h>
+#include <sys/types.h>
 #include <munge.h>
-#include "conf.h"
-#include "crypto.h"
-#include "key.h"
-#include "log.h"
-#include "md.h"
-#include "xsignal.h"
+
+
+/*****************************************************************************
+ *  Data Types
+ *****************************************************************************/
+
+typedef struct hkdf_ctx hkdf_ctx_t;
 
 
 /*****************************************************************************
  *  Prototypes
  *****************************************************************************/
 
-static void init_logging (const char *prog);
+hkdf_ctx_t * hkdf_ctx_create (void);
+
+void hkdf_ctx_destroy (hkdf_ctx_t *ctxp);
+
+int hkdf_ctx_set_md (hkdf_ctx_t *ctxp, munge_mac_t md);
+
+int hkdf_ctx_set_key (hkdf_ctx_t *ctxp, const void *key, size_t keylen);
+
+int hkdf_ctx_set_salt (hkdf_ctx_t *ctxp, const void *salt, size_t saltlen);
+
+int hkdf_ctx_set_info (hkdf_ctx_t *ctxp, const void *info, size_t infolen);
+
+int hkdf (hkdf_ctx_t *ctxp, void *dst, size_t *dstlenp);
 
 
-/*****************************************************************************
- *  Functions
- *****************************************************************************/
-
-int
-main (int argc, char *argv[])
-{
-    conf_t *confp;
-
-    xsignal_ignore (SIGHUP);
-    xsignal_ignore (SIGPIPE);
-    init_logging (argv[0]);
-    confp = create_conf ();
-    parse_cmdline (confp, argc, argv);
-
-    crypto_init ();
-    md_init_subsystem ();
-    if (confp->do_create) {
-        create_key (confp);
-    }
-    crypto_fini ();
-    destroy_conf (confp);
-    exit (EXIT_SUCCESS);
-}
-
-
-/*  Configure logging to stderr.
- */
-static void
-init_logging (const char *prog)
-{
-    int priority = LOG_INFO;
-    int options = LOG_OPT_PRIORITY;
-    int rv;
-
-    assert (prog != NULL);
-
-#ifndef NDEBUG
-    priority = LOG_DEBUG;
-#endif /* !NDEBUG */
-    rv = log_open_file (stderr, prog, priority, options);
-    if (rv == -1) {
-        log_err (EMUNGE_SNAFU, LOG_ERR, "Failed to setup logging to stderr");
-    }
-}
+#endif /* !MUNGE_HKDF_H */
