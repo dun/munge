@@ -30,6 +30,7 @@
 #  include "config.h"
 #endif /* HAVE_CONFIG_H */
 
+#include <assert.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <string.h>
@@ -37,6 +38,8 @@
 #include <sys/random.h>
 #endif /* HAVE_SYS_RANDOM_H */
 #include <sys/stat.h>
+#include <sys/time.h>
+#include <time.h>
 #include <unistd.h>
 #include "common.h"
 #include "entropy.h"
@@ -157,4 +160,100 @@ retry_open:
         *srcp = src;
     }
     return n;
+}
+
+
+/*  Read entropy into the unsigned integer referenced by [up].
+ *  This entropy will be from sources independent of the kernel's CSPRNG.
+ *    It may be of lower quality and not uniformly distributed.
+ *  The bits in the uint arg are rotated between entropic additions to better
+ *    distribute the entropy.  Spin the wheel of entropy and win a prize!
+ *  Return 0 on success, or -1 on error (with errno set).
+ */
+int
+entropy_read_uint (unsigned *up)
+{
+    pid_t          pid;
+    clock_t        cpu_time;
+    struct timeval tv;
+
+    if (up == NULL) {
+        errno = EINVAL;
+        return -1;
+    }
+    *up = 0;
+
+    pid = getpid ();
+    *up ^= (unsigned) pid;
+    rotate_left (up, *up);
+
+    pid = getppid ();
+    *up ^= (unsigned) pid;
+    rotate_right (up, *up);
+
+    cpu_time = clock ();
+    if (cpu_time != (clock_t) -1) {
+        *up ^= (unsigned) cpu_time;
+        rotate_left (up, *up);
+    }
+    /*  FIXME: Replace gettimeofday() (usec resolution) with
+     *    clock_gettime() (nsec resolution) for more entropy.
+     */
+    if (gettimeofday (&tv, NULL) == 0) {
+        *up ^= (unsigned) tv.tv_sec;
+        rotate_right (up, *up);
+        *up ^= (unsigned) tv.tv_usec;
+        rotate_left (up, *up);
+    }
+    return 0;
+}
+
+
+/*  Rotate the reference [*up] by [n] bits to the left.
+ *    Bits rotated off the left end are wrapped-around to the right.
+ */
+void
+rotate_left (unsigned *up, size_t n)
+{
+    unsigned ntotal;
+    unsigned mask;
+    unsigned move;
+
+    assert (up != NULL);
+
+    ntotal = sizeof (*up) * 8;
+    n %= ntotal;
+    if (n == 0) {
+        return;
+    }
+    mask = ~0 << (ntotal - n);
+    move = *up & mask;
+    move >>= ntotal - n;
+    *up <<= n;
+    *up |= move;
+}
+
+
+/*  Rotate the reference [*up] by [n] bits to the right.
+ *    Bits rotated off the right end are wrapped-around to the left.
+ */
+void
+rotate_right (unsigned *up, size_t n)
+{
+    unsigned ntotal;
+    unsigned mask;
+    unsigned move;
+
+    assert (up != NULL);
+
+    ntotal = sizeof (*up) * 8;
+    n %= ntotal;
+    if (n == 0) {
+        return;
+    }
+    mask = ~0 >> (ntotal - n);
+    move = *up & mask;
+    move <<= ntotal - n;
+    *up >>= n;
+    *up |= move;
 }

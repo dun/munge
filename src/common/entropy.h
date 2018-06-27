@@ -29,6 +29,8 @@
 #ifndef MUNGE_ENTROPY_H
 #define MUNGE_ENTROPY_H
 
+#include <sys/types.h>
+
 
 /*****************************************************************************
  *  Constants
@@ -44,6 +46,12 @@
  *****************************************************************************/
 
 int entropy_read (void *buf, size_t buflen, const char **srcp);
+
+int entropy_read_uint (unsigned *up);
+
+void rotate_left (unsigned *up, size_t n);
+
+void rotate_right (unsigned *up, size_t n);
 
 
 #endif /* !MUNGE_ENTROPY_H */
