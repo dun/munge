@@ -37,8 +37,6 @@
 #include <stdint.h>
 #include <string.h>
 #include <sys/stat.h>
-#include <sys/time.h>
-#include <time.h>
 #include <unistd.h>
 #include "common.h"
 #include "conf.h"
@@ -321,18 +319,14 @@ _random_read_entropy_from_process (void)
 /*  Reads entropy from sources related to the process.
  *  Returns the number of bytes of entropy added, or -1 on error.
  */
-    pid_t  pid;
-    time_t now;
+    unsigned buf;
+    int      n = 0;
 
-    pid = getpid ();
-    _random_add (&pid, sizeof (pid));
-
-    if (time (&now) != (time_t) -1) {
-        _random_add (&now, sizeof (now));
+    if (entropy_read_uint (&buf) != -1) {
+        _random_add (&buf, sizeof (buf));
+        n += sizeof (buf);
     }
-    /*  Since these sources do not provide much entropy, return 0.
-     */
-    return (0);
+    return (n);
 }
 
 
@@ -524,42 +518,31 @@ _random_stir_entropy (void *_arg_not_used_)
 {
 /*  Periodically stirs the entropy pool by mixing in new entropy.
  */
-    static uint32_t cnt;
-    clock_t         cpu;
-    struct timeval  tv;
-    int             msecs;
+    unsigned buf;
+    int      msecs;
 
     assert (RANDOM_STIR_MAX_SECS > 0);
 
     if (_random_stir_secs <= 0) {
         return;
     }
-    if (cnt == 0) {
-        _random_bytes (&cnt, sizeof (cnt));
-    }
     _random_timer_id = 0;
 
     log_msg (LOG_DEBUG, "Stirring PRNG entropy pool");
 
-    cpu = clock ();
-    if (cpu != (clock_t) -1) {
-        cnt += (uint32_t) cpu;
+    if (entropy_read_uint (&buf) != -1) {
+        _random_add (&buf, sizeof (buf));
     }
-    if (gettimeofday (&tv, NULL) == 0) {
-        cnt += (uint32_t) (tv.tv_sec + tv.tv_usec);
-    }
-    _random_add (&cnt, sizeof (cnt));
-
     /*  Perform an exponential backoff up to the maximum timeout.  This allows
      *    for vigorous stirring of the entropy pool when the daemon is started.
      */
     if (_random_stir_secs < RANDOM_STIR_MAX_SECS) {
         _random_stir_secs = MIN(_random_stir_secs * 2, RANDOM_STIR_MAX_SECS);
     }
-    /*  The 10 low-order bits of the current time are used to mix things up and
-     *    stagger subsequent timer callbacks by up to 1023ms.
+    /*  The 10 low-order bits are used to stagger subsequent timer callbacks
+     *    by up to 1023ms.
      */
-    msecs = (_random_stir_secs * 1000) + (tv.tv_usec & 0x3FF);
+    msecs = (_random_stir_secs * 1000) + (buf & 0x3FF);
 
     _random_timer_id = timer_set_relative (
             (callback_f) _random_stir_entropy, NULL, msecs);
