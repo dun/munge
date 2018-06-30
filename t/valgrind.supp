@@ -1,5 +1,50 @@
 {
-    crypto_init-libgcrypt-malloc
+    getgrent_r-calloc
+    Memcheck:Leak
+    match-leak-kinds: reachable
+    fun:calloc
+    ...
+    fun:getgrent_r@@GLIBC_2.2.5
+}
+
+{
+    getgrent_r-malloc
+    Memcheck:Leak
+    match-leak-kinds: reachable
+    fun:malloc
+    ...
+    fun:getgrent_r@@GLIBC_2.2.5
+}
+
+{
+    getpwnam_r-calloc
+    Memcheck:Leak
+    match-leak-kinds: reachable
+    fun:calloc
+    ...
+    fun:getpwnam_r@@GLIBC_2.2.5
+}
+
+{
+    getpwnam_r-malloc
+    Memcheck:Leak
+    match-leak-kinds: reachable
+    fun:malloc
+    ...
+    fun:getpwnam_r@@GLIBC_2.2.5
+}
+
+{
+    libgcrypt-_gcry_check_version-malloc
+    Memcheck:Leak
+    match-leak-kinds: reachable
+    fun:malloc
+    ...
+    fun:_gcry_check_version
+}
+
+{
+    libgcrypt-crypto_init-malloc
     Memcheck:Leak
     match-leak-kinds: reachable
     fun:malloc
@@ -10,61 +55,10 @@
 }
 
 {
-    getgrent_r-calloc-and-malloc
-    Memcheck:Leak
-    match-leak-kinds: reachable
-    ...
-    fun:dlerror_run
-    fun:__libc_dlopen_mode
-    fun:nss_load_library
-    fun:__nss_lookup_function
-    fun:__nss_next2
-    fun:__nss_getent_r
-    fun:getgrent_r@@GLIBC_2.2.5
-    fun:xgetgrent
-    fun:_gids_map_create
-    fun:_gids_map_update
-    fun:_timer_thread
-    fun:start_thread
-    fun:clone
-}
-
-{
-   getpwnam_r-calloc-and-malloc
-   Memcheck:Leak
-   match-leak-kinds: reachable
-   ...
-   fun:dl_open_worker
-   fun:_dl_catch_exception
-   fun:_dl_open
-   fun:do_dlopen
-   fun:_dl_catch_exception
-   fun:_dl_catch_error
-   fun:dlerror_run
-   fun:__libc_dlopen_mode
-   fun:nss_load_library
-   fun:__nss_lookup_function
-   fun:__nss_next2
-   fun:getpwnam_r@@GLIBC_2.2.5
-   fun:xgetpwnam
-   fun:_gids_user_to_uid
-   fun:_gids_map_create
-   fun:_gids_map_update
-   fun:_timer_thread
-   fun:start_thread
-   fun:clone
-}
-
-{
-    random_init-gcry_control-malloc
+    libgcrypt-gcry_control-malloc
     Memcheck:Leak
     match-leak-kinds: reachable
     fun:malloc
     ...
     fun:gcry_control
-    fun:_random_add
-    fun:_random_read_entropy_from_kernel
-    fun:random_init
-    fun:main
 }
-
