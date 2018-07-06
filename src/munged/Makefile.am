@@ -59,8 +59,6 @@ munged_SOURCES = \
 	conf.h \
 	cred.c \
 	cred.h \
-	crypto.c \
-	crypto.h \
 	dec.c \
 	dec.h \
 	enc.c \
@@ -73,10 +71,6 @@ munged_SOURCES = \
 	job.h \
 	lock.c \
 	lock.h \
-	mac.c \
-	mac.h \
-	md.c \
-	md.h \
 	path.c \
 	path.h \
 	random.c \
@@ -91,8 +85,14 @@ munged_SOURCES = \
 	work.h \
 	zip.c \
 	zip.h \
+	$(top_srcdir)/src/common/crypto.c \
+	$(top_srcdir)/src/common/crypto.h \
 	$(top_srcdir)/src/common/entropy.c \
 	$(top_srcdir)/src/common/entropy.h \
+	$(top_srcdir)/src/common/mac.c \
+	$(top_srcdir)/src/common/mac.h \
+	$(top_srcdir)/src/common/md.c \
+	$(top_srcdir)/src/common/md.h \
 	$(top_srcdir)/src/common/query.c \
 	$(top_srcdir)/src/common/query.h \
 	$(top_srcdir)/src/common/xgetgr.c \
