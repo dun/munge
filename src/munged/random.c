@@ -140,14 +140,8 @@ random_init (const char *seed_path)
         num_bytes_entropy += n;
     }
     if (num_bytes_entropy < RANDOM_BYTES_MIN) {
-        if (!conf->got_force) {
-            log_err (EMUNGE_SNAFU, LOG_ERR,
-                    "Failed to seed PRNG with sufficient entropy");
-        }
-        else {
-            log_msg (LOG_WARNING,
-                    "Failed to seed PRNG with sufficient entropy");
-        }
+        log_err_or_warn (conf->got_force,
+                "Failed to seed PRNG with sufficient entropy");
     }
     /*  Compute the initial time interval for stirring the entropy pool.
      *  If the desired amount of entropy is not available, increase the
@@ -286,11 +280,9 @@ _random_read_entropy_from_file (const char *path)
         log_err (EMUNGE_SNAFU, LOG_ERR,
                 "Failed to check PRNG seed dir \"%s\": %s", dir, ebuf);
     }
-    else if ((n == 0) && (!conf->got_force)) {
-        log_err (EMUNGE_SNAFU, LOG_ERR, "PRNG seed dir is insecure: %s", ebuf);
-    }
     else if (n == 0) {
-        log_msg (LOG_WARNING, "PRNG seed dir is insecure: %s", ebuf);
+        log_err_or_warn (conf->got_force,
+                "PRNG seed dir is insecure: %s", ebuf);
     }
     else {
         is_path_secure = 1;
@@ -388,13 +380,15 @@ retry_open:
         log_msg (LOG_WARNING, "Ignoring PRNG seed \"%s\": not owned by UID %u",
                 path, (unsigned) geteuid ());
     }
-    else if (st.st_mode & (S_IRGRP | S_IROTH)) {
+    else if (st.st_mode & (S_IRGRP | S_IWGRP)) {
         log_msg (LOG_WARNING,
-                "Ignoring PRNG seed \"%s\": readable by group or other", path);
+                "Ignoring PRNG seed \"%s\": readable or writable by group",
+                path);
     }
-    else if (st.st_mode & (S_IWGRP | S_IWOTH)) {
+    else if (st.st_mode & (S_IROTH | S_IWOTH)) {
         log_msg (LOG_WARNING,
-                "Ignoring PRNG seed \"%s\": writable by group or other", path);
+                "Ignoring PRNG seed \"%s\": readable or writable by other",
+                path);
     }
     else {
         is_valid = 1;

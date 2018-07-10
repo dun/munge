@@ -222,6 +222,26 @@ log_msg (int priority, const char *format, ...)
 }
 
 
+void
+log_err_or_warn (int got_force, const char *format, ...)
+{
+    va_list vargs;
+    char    msg [LOG_BUFFER_MAXLEN];
+    int     priority;
+
+    priority = (got_force) ? LOG_WARNING : LOG_ERR;
+
+    va_start (vargs, format);
+    _log_aux (0, priority, msg, sizeof (msg), format, vargs);
+    va_end (vargs);
+
+    if (!got_force) {
+        _log_die (1, priority, msg);
+    }
+    return;
+}
+
+
 /*****************************************************************************
  *  Static Functions
  *****************************************************************************/

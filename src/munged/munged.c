@@ -336,86 +336,67 @@ daemonize_fini (int fd)
 static void
 open_logfile (const char *logfile, int priority, int got_force)
 {
-    int          got_symlink;
+    int          is_symlink;
+    int          is_missing;
     struct stat  st;
-    int          n;
+    int          rv;
     char         logdir [PATH_MAX];
     char         ebuf [1024];
     mode_t       mask;
     FILE        *fp;
 
-    /*  Check file permissions and whatnot.
-     */
-    got_symlink = (lstat (logfile, &st) == 0) ? S_ISLNK (st.st_mode) : 0;
-
-    if (((n = stat (logfile, &st)) < 0) && (errno == ENOENT)) {
-        if (!got_symlink) {
-            ; /* A missing logfile is not considered an error. */
-        }
-        else if (!got_force) {
-            log_err (EMUNGE_SNAFU, LOG_ERR,
-                "Logfile is insecure: \"%s\" should be a regular file",
-                logfile);
-        }
-        else {
-            log_msg (LOG_WARNING,
-                "Logfile is insecure: \"%s\" should not be a symlink",
-                logfile);
-        }
+    if ((logfile == NULL) || (*logfile == '\0')) {
+        log_err (EMUNGE_SNAFU, LOG_ERR, "Logfile name is undefined");
     }
-    else {
-        if (n < 0) {
+    is_symlink = (lstat (logfile, &st) == 0) ? S_ISLNK (st.st_mode) : 0;
+    if (is_symlink) {
+        log_err_or_warn (got_force,
+            "Logfile is insecure: \"%s\" should not be a symbolic link",
+            logfile);
+    }
+    rv = stat (logfile, &st);
+    is_missing = (rv < 0) && (errno == ENOENT);
+
+    if (!is_missing) {
+        if (rv < 0) {
             log_errno (EMUNGE_SNAFU, LOG_ERR,
                 "Failed to check logfile \"%s\"", logfile);
         }
-        if (!S_ISREG (st.st_mode) || got_symlink) {
-            if (!got_force || !got_symlink)
-                log_err (EMUNGE_SNAFU, LOG_ERR,
-                    "Logfile is insecure: \"%s\" should be a regular file",
-                    logfile);
-            else
-                log_msg (LOG_WARNING,
-                    "Logfile is insecure: \"%s\" should not be a symlink",
-                    logfile);
+        if (!S_ISREG (st.st_mode)) {
+            log_err (EMUNGE_SNAFU, LOG_ERR,
+                "Logfile is insecure: \"%s\" must be a regular file", logfile);
         }
         if (st.st_uid != geteuid ()) {
-            if (!got_force)
-                log_err (EMUNGE_SNAFU, LOG_ERR,
-                    "Logfile is insecure: \"%s\" should be owned by UID %u",
-                    logfile, (unsigned) geteuid ());
-            else
-                log_msg (LOG_WARNING,
-                    "Logfile is insecure: \"%s\" should be owned by UID %u",
-                    logfile, (unsigned) geteuid ());
+            log_err_or_warn (got_force,
+                "Logfile is insecure: \"%s\" should be owned by UID %u",
+                logfile, (unsigned) geteuid ());
         }
-        if (st.st_mode & (S_IWGRP | S_IWOTH)) {
-            if (!got_force)
-                log_err (EMUNGE_SNAFU, LOG_ERR,
-                    "Logfile is insecure: \"%s\" should not be writable "
-                    "by group or world", logfile);
-            else
-                log_msg (LOG_WARNING,
-                    "Logfile is insecure: \"%s\" should not be writable "
-                    "by group or world", logfile);
+        if (st.st_mode & S_IWGRP) {
+            log_err_or_warn (got_force,
+                "Logfile is insecure: \"%s\" should not be writable by group",
+                logfile);
+        }
+        if (st.st_mode & S_IWOTH) {
+            log_err_or_warn (got_force,
+                "Logfile is insecure: \"%s\" should not be writable by other",
+                logfile);
         }
     }
     /*  Ensure logfile dir is secure against modification by others.
      */
-    if (path_dirname (logfile, logdir, sizeof (logdir)) < 0) {
+    rv = path_dirname (logfile, logdir, sizeof (logdir));
+    if (rv < 0) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
             "Failed to determine dirname of logfile \"%s\"", logfile);
     }
-    n = path_is_secure (logdir, ebuf, sizeof (ebuf),
+    rv = path_is_secure (logdir, ebuf, sizeof (ebuf),
         PATH_SECURITY_IGNORE_GROUP_WRITE);
-    if (n < 0) {
+    if (rv < 0) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
             "Failed to check logfile dir \"%s\": %s", logdir, ebuf);
     }
-    else if ((n == 0) && (!got_force)) {
-        log_err (EMUNGE_SNAFU, LOG_ERR, "Logfile is insecure: %s", ebuf);
-    }
-    else if (n == 0) {
-        log_msg (LOG_WARNING, "Logfile is insecure: %s", ebuf);
+    else if (rv == 0) {
+        log_err_or_warn (got_force, "Logfile is insecure: %s", ebuf);
     }
     /*  Protect logfile against unauthorized access by removing write-access
      *    from group and all access from other.
@@ -500,12 +481,13 @@ write_pidfile (const char *pidfile, int got_force)
  */
     char    piddir [PATH_MAX];
     char    ebuf [1024];
-    int     n;
+    int     rv;
     mode_t  mask;
     FILE   *fp;
 
-    assert (pidfile != NULL);
-
+    if ((pidfile == NULL) || (*pidfile == '\0')) {
+        log_err (EMUNGE_SNAFU, LOG_ERR, "Pidfile name is undefined");
+    }
     /*  The pidfile must be specified with an absolute pathname; o/w, the
      *    unlink() call in destroy_conf() will fail because the daemon has
      *    chdir()'d.
@@ -520,16 +502,13 @@ write_pidfile (const char *pidfile, int got_force)
         log_err (EMUNGE_SNAFU, LOG_ERR,
             "Failed to determine dirname of pidfile \"%s\"", pidfile);
     }
-    n = path_is_secure (piddir, ebuf, sizeof (ebuf), PATH_SECURITY_NO_FLAGS);
-    if (n < 0) {
+    rv = path_is_secure (piddir, ebuf, sizeof (ebuf), PATH_SECURITY_NO_FLAGS);
+    if (rv < 0) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
             "Failed to check pidfile dir \"%s\": %s", piddir, ebuf);
     }
-    else if ((n == 0) && (!got_force)) {
-        log_err (EMUNGE_SNAFU, LOG_ERR, "Pidfile is insecure: %s", ebuf);
-    }
-    else if (n == 0) {
-        log_msg (LOG_WARNING, "Pidfile is insecure: %s", ebuf);
+    else if (rv == 0) {
+        log_err_or_warn (got_force, "Pidfile is insecure: %s", ebuf);
     }
     /*  Protect pidfile against unauthorized access by removing write-access
      *    from group and other.
@@ -601,11 +580,11 @@ sock_create (conf_t conf)
 {
     char                sockdir [PATH_MAX];
     char                ebuf [1024];
-    int                 n;
     int                 sd;
     struct sockaddr_un  addr;
     mode_t              mask;
     int                 rv;
+    size_t              n;
 
     assert (conf != NULL);
 
@@ -614,33 +593,28 @@ sock_create (conf_t conf)
     }
     /*  Ensure socket dir is secure against modification by others.
      */
-    if (path_dirname (conf->socket_name, sockdir, sizeof (sockdir)) < 0) {
+    rv = path_dirname (conf->socket_name, sockdir, sizeof (sockdir));
+    if (rv < 0) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
             "Failed to determine dirname of socket \"%s\"", conf->socket_name);
     }
-    n = path_is_secure (sockdir, ebuf, sizeof (ebuf), PATH_SECURITY_NO_FLAGS);
-    if (n < 0) {
+    rv = path_is_secure (sockdir, ebuf, sizeof (ebuf), PATH_SECURITY_NO_FLAGS);
+    if (rv < 0) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
             "Failed to check socket dir \"%s\": %s", sockdir, ebuf);
     }
-    else if ((n == 0) && (!conf->got_force)) {
-        log_err (EMUNGE_SNAFU, LOG_ERR, "Socket is insecure: %s", ebuf);
-    }
-    else if (n == 0) {
-        log_msg (LOG_WARNING, "Socket is insecure: %s", ebuf);
+    else if (rv == 0) {
+        log_err_or_warn (conf->got_force, "Socket is insecure: %s", ebuf);
     }
     /*  Ensure socket dir is accessible by all.
      */
-    n = path_is_accessible (sockdir, ebuf, sizeof (ebuf));
-    if (n < 0) {
+    rv = path_is_accessible (sockdir, ebuf, sizeof (ebuf));
+    if (rv < 0) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
             "Failed to check socket dir \"%s\": %s", sockdir, ebuf);
     }
-    else if ((n == 0) && (!conf->got_force)) {
-        log_err (EMUNGE_SNAFU, LOG_ERR, "Socket is inaccessible: %s", ebuf);
-    }
-    else if (n == 0) {
-        log_msg (LOG_WARNING, "Socket is inaccessible: %s", ebuf);
+    else if (rv == 0) {
+        log_err_or_warn (conf->got_force, "Socket is inaccessible: %s", ebuf);
     }
     /*  Create lockfile for exclusive access to the socket.
      */
@@ -648,7 +622,8 @@ sock_create (conf_t conf)
     /*
      *  Remove existing socket from previous instance.
      */
-    if (unlink (conf->socket_name) == 0) {
+    rv = unlink (conf->socket_name);
+    if (rv == 0) {
         log_msg (LOG_INFO, "Removed existing socket \"%s\"",
             conf->socket_name);
     }
@@ -658,7 +633,8 @@ sock_create (conf_t conf)
     }
     /*  Create socket for communicating with clients.
      */
-    if ((sd = socket (PF_UNIX, SOCK_STREAM, 0)) < 0) {
+    sd = socket (PF_UNIX, SOCK_STREAM, 0);
+    if (sd < 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to create socket");
     }
     memset (&addr, 0, sizeof (addr));
@@ -666,7 +642,8 @@ sock_create (conf_t conf)
     n = strlcpy (addr.sun_path, conf->socket_name, sizeof (addr.sun_path));
     if (n >= sizeof (addr.sun_path)) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
-            "Exceeded maximum length of socket pathname");
+            "Exceeded maximum length of %lu bytes for socket pathname",
+            sizeof (addr.sun_path));
     }
     /*  Ensure socket is accessible by all.
      */

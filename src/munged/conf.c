@@ -837,53 +837,45 @@ _conf_open_keyfile (const char *keyfile, int got_force)
 {
 /*  Returns a valid file-descriptor to the opened [keyfile], or dies trying.
  */
-    int          got_symlink;
+    int          is_symlink;
     struct stat  st;
     int          n;
     char         keydir [PATH_MAX];
     char         ebuf [1024];
     int          fd;
 
-    /*  Check file permissions and whatnot.
-     */
     if ((keyfile == NULL) || (*keyfile == '\0')) {
-        log_err (EMUNGE_SNAFU, LOG_ERR, "Key not specified");
+        log_err (EMUNGE_SNAFU, LOG_ERR, "Keyfile name is undefined");
     }
-    got_symlink = (lstat (keyfile, &st) == 0) ? S_ISLNK (st.st_mode) : 0;
+    is_symlink = (lstat (keyfile, &st) == 0) ? S_ISLNK (st.st_mode) : 0;
 
     if (stat (keyfile, &st) < 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR,
             "Failed to check keyfile \"%s\"", keyfile);
     }
-    if (!S_ISREG (st.st_mode) || got_symlink) {
-        if (!got_force)
-            log_err (EMUNGE_SNAFU, LOG_ERR,
-                "Keyfile is insecure: \"%s\" should be a regular file",
-                keyfile);
-        else
-            log_msg (LOG_WARNING,
-                "Keyfile is insecure: \"%s\" should not be a symlink",
-                keyfile);
+    if (!S_ISREG (st.st_mode)) {
+        log_err (EMUNGE_SNAFU, LOG_ERR,
+            "Keyfile is insecure: \"%s\" must be a regular file", keyfile);
+    }
+    if (is_symlink) {
+        log_err_or_warn (got_force,
+            "Keyfile is insecure: \"%s\" should not be a symbolic link",
+            keyfile);
     }
     if (st.st_uid != geteuid ()) {
-        if (!got_force)
-            log_err (EMUNGE_SNAFU, LOG_ERR,
-                "Keyfile is insecure: \"%s\" should be owned by UID %u",
-                keyfile, (unsigned) geteuid ());
-        else
-            log_msg (LOG_WARNING,
-                "Keyfile is insecure: \"%s\" should be owned by UID %u",
-                keyfile, (unsigned) geteuid ());
+        log_err_or_warn (got_force,
+            "Keyfile is insecure: \"%s\" should be owned by UID %u",
+            keyfile, (unsigned) geteuid ());
     }
-    if (st.st_mode & (S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH)) {
-        if (!got_force)
-            log_err (EMUNGE_SNAFU, LOG_ERR,
-                "Keyfile is insecure: \"%s\" should not be "
-                "readable or writable by group or world", keyfile);
-        else
-            log_msg (LOG_WARNING,
-                "Keyfile is insecure: \"%s\" should not be "
-                "readable or writable by group or world", keyfile);
+    if (st.st_mode & (S_IRGRP | S_IWGRP)) {
+        log_err_or_warn (got_force,
+            "Keyfile is insecure: \"%s\" should not be "
+            "readable or writable by group", keyfile);
+    }
+    if (st.st_mode & (S_IROTH | S_IWOTH)) {
+        log_err_or_warn (got_force,
+            "Keyfile is insecure: \"%s\" should not be "
+            "readable or writable by other", keyfile);
     }
     /*  Ensure keyfile dir is secure against modification by others.
      */
@@ -896,13 +888,10 @@ _conf_open_keyfile (const char *keyfile, int got_force)
         log_err (EMUNGE_SNAFU, LOG_ERR,
             "Failed to check keyfile dir \"%s\": %s", keydir, ebuf);
     }
-    else if ((n == 0) && (!got_force)) {
-        log_err (EMUNGE_SNAFU, LOG_ERR, "Keyfile is insecure: %s", ebuf);
-    }
     else if (n == 0) {
-        log_msg (LOG_WARNING, "Keyfile is insecure: %s", ebuf);
+        log_err_or_warn (got_force, "Keyfile is insecure: %s", ebuf);
     }
-    /*  Open keyfile for reading.
+    /*  Open keyfile for reading only.
      */
     if ((fd = open (keyfile, O_RDONLY)) < 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR,

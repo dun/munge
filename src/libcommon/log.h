@@ -112,5 +112,13 @@ void log_msg (int priority, const char *format, ...);
  *    the printf-style [format] string.
  */
 
+void log_err_or_warn (int got_force, const char *format, ...);
+/*
+ *  If [got_force] is false, log a fatal error message with the printf-style
+ *    [format] string.
+ *  If [got_force] is true, the fatal error is converted into a non-fatal
+ *    warning.
+ */
+
 
 #endif /* !LOG_H */

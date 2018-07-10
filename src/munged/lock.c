@@ -34,6 +34,7 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <stdlib.h>
+#include <string.h>
 #include <sys/stat.h>
 #include <unistd.h>
 #include "conf.h"
@@ -72,11 +73,14 @@ lock_create (conf_t conf)
     }
     _lock_create_name (conf);
 
+    /*  If unable to unlink() the lockfile, log a warning instead of an error
+     *    since this code path is being executed with "--force".
+     */
     if (conf->got_force) {
         rv = unlink (conf->lockfile_name);
         if ((rv < 0) && (errno != ENOENT)) {
-            log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to remove \"%s\"",
-                    conf->lockfile_name);
+            log_msg (LOG_WARNING, "Failed to remove \"%s\": %s",
+                    conf->lockfile_name, strerror (errno));
         }
     }
     if (conf->lockfile_fd >= 0) {
@@ -91,38 +95,41 @@ lock_create (conf_t conf)
             O_CREAT | O_TRUNC | O_WRONLY, S_IWUSR);
     umask (mask);
 
+    /*  If the lockfile creation fails, either log an error and exit,
+     *    or log a warning and immediately return.
+     */
     if (conf->lockfile_fd < 0) {
-        log_errno (EMUNGE_SNAFU, LOG_ERR,
-                "Failed to create \"%s\"", conf->lockfile_name);
+        log_err_or_warn (conf->got_force,
+                "Failed to create \"%s\": %s", conf->lockfile_name,
+                strerror (errno));
+        return;                         /* no lock, so nothing more to do */
     }
     _lock_stat (conf->lockfile_fd, conf->lockfile_name);
 
     rv = _lock_set (conf->lockfile_fd);
     if (rv < 0) {
-        if (!conf->got_force) {
-            log_errno (EMUNGE_SNAFU, LOG_ERR,
-                    "Failed to lock \"%s\"", conf->lockfile_name);
-        }
-        else {
-            log_msg (LOG_WARNING,
-                    "Failed to lock \"%s\"", conf->lockfile_name);
-        }
+        log_err_or_warn (conf->got_force,
+                "Failed to lock \"%s\"", conf->lockfile_name);
     }
     else if (rv > 0) {
 
         pid_t pid = _lock_is_set (conf->lockfile_fd);
 
         if (pid < 0) {
-            log_errno (EMUNGE_SNAFU, LOG_ERR,
-                    "Failed to test lock \"%s\"", conf->lockfile_name);
+            log_err_or_warn (conf->got_force,
+                    "Failed to test \"%s\": %s", conf->lockfile_name,
+                    strerror (errno));
         }
         else if (pid > 0) {
-            log_err (EMUNGE_SNAFU, LOG_ERR,
-                    "Found pid %d bound to socket \"%s\"",
-                    pid, conf->socket_name);
+            log_err_or_warn (conf->got_force,
+                    "Failed to lock \"%s\": pid %d bound to socket \"%s\"",
+                    conf->lockfile_name, pid, conf->socket_name);
         }
         else {
-            log_err (EMUNGE_SNAFU, LOG_ERR,
+            /*  _lock_set() reported lock was held by another process,
+             *    but _lock_is_set() found no lock.  TOCTOU.
+             */
+            log_err_or_warn (conf->got_force,
                     "Failed to lock \"%s\": Inconsistent lock state",
                     conf->lockfile_name);
         }
