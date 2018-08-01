@@ -35,8 +35,6 @@
 #include <pthread.h>
 #include <stdlib.h>
 #include "crypto.h"
-#include "cipher.h"
-#include "md.h"
 #include "log.h"
 
 
@@ -97,8 +95,6 @@ crypto_init (void)
         log_err (EMUNGE_SNAFU, LOG_ERR,
             "Failed to initialize Libgcrypt: %s", gcry_strerror (e));
     }
-    cipher_init_subsystem ();
-    md_init_subsystem ();
     return;
 }
 
@@ -256,8 +252,6 @@ crypto_init (void)
 #endif /* HAVE_ERR_LOAD_CRYPTO_STRINGS */
 
     _openssl_thread_setup ();
-    cipher_init_subsystem ();
-    md_init_subsystem ();
 
     return;
 }

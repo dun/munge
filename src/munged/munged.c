@@ -48,6 +48,7 @@
 #include <sys/un.h>
 #include <unistd.h>
 #include "auth_recv.h"
+#include "cipher.h"
 #include "common.h"
 #include "conf.h"
 #include "crypto.h"
@@ -56,6 +57,7 @@
 #include "job.h"
 #include "lock.h"
 #include "log.h"
+#include "md.h"
 #include "missing.h"
 #include "munge_defs.h"
 #include "path.h"
@@ -130,6 +132,8 @@ main (int argc, char *argv[])
         lock_memory ();
     }
     crypto_init ();
+    cipher_init_subsystem ();
+    md_init_subsystem ();
     if (random_init (conf->seed_name) < 0) {
         if (conf->seed_name) {
             free (conf->seed_name);
