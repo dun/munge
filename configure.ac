@@ -117,6 +117,7 @@ AC_CONFIG_FILES( \
   src/libcommon/Makefile \
   src/libmissing/Makefile \
   src/libmunge/Makefile \
+  src/libtap/Makefile \
   src/munge/Makefile \
   src/munged/Makefile \
   src/mungekey/Makefile \
