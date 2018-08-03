@@ -116,6 +116,12 @@ check_PROGRAMS = $(TESTS)
 TESTS = \
 	base64_test
 
+base64_test_CPPFLAGS = \
+	-I$(top_srcdir)/src/libtap
+
+base64_test_LDADD = \
+	$(top_builddir)/src/libtap/libtap.la
+
 base64_test_SOURCES = \
 	base64.c \
 	base64.h \

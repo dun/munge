@@ -30,11 +30,14 @@
 #include <stdlib.h>
 #include <string.h>
 #include "base64.h"
+#include "tap.h"
 
 
-/*  Test cases from rfc2440 (OpenPGP Message Format)
- *    section 6.5 (Examples of Radix-64).
- */
+/*****************************************************************************
+ *  Test cases from RFC 2440 (OpenPGP Message Format)
+ *    Section 6.5 (Examples of Radix-64).
+ *****************************************************************************/
+
 
 int validate (const char *dst, const void *src, int srclen);
 int encode_block (char *dst, int *dstlen, const void *src, int srclen);
@@ -54,15 +57,19 @@ main (int argc, char *argv[])
     const char dst2[] = "FPucA9k=";
     const char dst3[] = "FPucAw==";
 
-    if (validate (dst1, src1, sizeof (src1)) < 0) {
-        exit (EXIT_FAILURE);
-    }
-    if (validate (dst2, src2, sizeof (src2)) < 0) {
-        exit (EXIT_FAILURE);
-    }
-    if (validate (dst3, src3, sizeof (src3)) < 0) {
-        exit (EXIT_FAILURE);
-    }
+    plan (3);
+
+    ok (validate (dst1, src1, sizeof (src1)) == 0,
+            "Input data 0x14fb9c03d97e");
+
+    ok (validate (dst2, src2, sizeof (src2)) == 0,
+            "Input data 0x14fb9c03d9");
+
+    ok (validate (dst3, src3, sizeof (src3)) == 0,
+            "Input data 0x14fb9c03");
+
+    done_testing ();
+
     exit (EXIT_SUCCESS);
 }
 
