@@ -6,6 +6,7 @@
 include $(top_srcdir)/Make-inc.mk
 
 SUBDIRS = \
+	common \
 	etc \
 	libcommon \
 	libmissing \

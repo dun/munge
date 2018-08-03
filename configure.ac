@@ -113,6 +113,7 @@ X_AC_WITH_MUNGE_SOCKET
 AC_CONFIG_FILES( \
   Makefile \
   src/Makefile \
+  src/common/Makefile \
   src/etc/Makefile \
   src/libcommon/Makefile \
   src/libmissing/Makefile \

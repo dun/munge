@@ -23,6 +23,7 @@
 /m4/lt~obsolete.m4
 /munge-*.tar*
 /src/*/*.[1-9]
+/src/common/hkdf_test
 /src/etc/munge.init
 /src/etc/munge.pc
 /src/etc/munge.service
