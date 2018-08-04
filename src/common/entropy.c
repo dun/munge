@@ -44,6 +44,7 @@
 #include "common.h"
 #include "entropy.h"
 #include "log.h"
+#include "rotate.h"
 
 
 /*****************************************************************************
@@ -206,54 +207,4 @@ entropy_read_uint (unsigned *up)
         rotate_left (up, *up);
     }
     return 0;
-}
-
-
-/*  Rotate the reference [*up] by [n] bits to the left.
- *    Bits rotated off the left end are wrapped-around to the right.
- */
-void
-rotate_left (unsigned *up, size_t n)
-{
-    unsigned ntotal;
-    unsigned mask;
-    unsigned move;
-
-    assert (up != NULL);
-
-    ntotal = sizeof (*up) * 8;
-    n %= ntotal;
-    if (n == 0) {
-        return;
-    }
-    mask = ~0 << (ntotal - n);
-    move = *up & mask;
-    move >>= ntotal - n;
-    *up <<= n;
-    *up |= move;
-}
-
-
-/*  Rotate the reference [*up] by [n] bits to the right.
- *    Bits rotated off the right end are wrapped-around to the left.
- */
-void
-rotate_right (unsigned *up, size_t n)
-{
-    unsigned ntotal;
-    unsigned mask;
-    unsigned move;
-
-    assert (up != NULL);
-
-    ntotal = sizeof (*up) * 8;
-    n %= ntotal;
-    if (n == 0) {
-        return;
-    }
-    mask = ~0 >> (ntotal - n);
-    move = *up & mask;
-    move <<= ntotal - n;
-    *up >>= n;
-    *up |= move;
 }

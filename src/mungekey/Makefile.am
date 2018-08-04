@@ -58,6 +58,8 @@ mungekey_SOURCES = \
 	$(top_srcdir)/src/common/mac.h \
 	$(top_srcdir)/src/common/md.c \
 	$(top_srcdir)/src/common/md.h \
+	$(top_srcdir)/src/common/rotate.c \
+	$(top_srcdir)/src/common/rotate.h \
 	$(top_srcdir)/src/common/xsignal.c \
 	$(top_srcdir)/src/common/xsignal.h
 

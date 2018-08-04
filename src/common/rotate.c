@@ -26,28 +26,64 @@
  *****************************************************************************/
 
 
-#ifndef MUNGE_ENTROPY_H
-#define MUNGE_ENTROPY_H
+#if HAVE_CONFIG_H
+#  include "config.h"
+#endif /* HAVE_CONFIG_H */
 
-#include <sys/types.h>
+#include <assert.h>
+#include <stdlib.h>
+#include "rotate.h"
 
 
 /*****************************************************************************
- *  Constants
+ *  Public Functions
  *****************************************************************************/
 
-/*  Number of bytes guaranteed for reading in a single call to entropy_read().
+/*  Rotate the reference [*up] by [n] bits to the left.
+ *    Bits rotated off the left end are wrapped-around to the right.
  */
-#define ENTROPY_NUM_BYTES_GUARANTEED    256
+void
+rotate_left (unsigned *up, size_t n)
+{
+    unsigned ntotal;
+    unsigned mask;
+    unsigned move;
+
+    assert (up != NULL);
+
+    ntotal = sizeof (*up) * 8;
+    n %= ntotal;
+    if (n == 0) {
+        return;
+    }
+    mask = ~0 << (ntotal - n);
+    move = *up & mask;
+    move >>= ntotal - n;
+    *up <<= n;
+    *up |= move;
+}
 
 
-/*****************************************************************************
- *  Prototypes
- *****************************************************************************/
+/*  Rotate the reference [*up] by [n] bits to the right.
+ *    Bits rotated off the right end are wrapped-around to the left.
+ */
+void
+rotate_right (unsigned *up, size_t n)
+{
+    unsigned ntotal;
+    unsigned mask;
+    unsigned move;
 
-int entropy_read (void *buf, size_t buflen, const char **srcp);
+    assert (up != NULL);
 
-int entropy_read_uint (unsigned *up);
-
-
-#endif /* !MUNGE_ENTROPY_H */
+    ntotal = sizeof (*up) * 8;
+    n %= ntotal;
+    if (n == 0) {
+        return;
+    }
+    mask = ~0 >> (ntotal - n);
+    move = *up & mask;
+    move <<= ntotal - n;
+    *up >>= n;
+    *up |= move;
+}

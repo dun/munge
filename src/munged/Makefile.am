@@ -95,6 +95,8 @@ munged_SOURCES = \
 	$(top_srcdir)/src/common/md.h \
 	$(top_srcdir)/src/common/query.c \
 	$(top_srcdir)/src/common/query.h \
+	$(top_srcdir)/src/common/rotate.c \
+	$(top_srcdir)/src/common/rotate.h \
 	$(top_srcdir)/src/common/xgetgr.c \
 	$(top_srcdir)/src/common/xgetgr.h \
 	$(top_srcdir)/src/common/xgetpw.c \

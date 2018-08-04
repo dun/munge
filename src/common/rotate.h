@@ -26,28 +26,15 @@
  *****************************************************************************/
 
 
-#ifndef MUNGE_ENTROPY_H
-#define MUNGE_ENTROPY_H
+#ifndef MUNGE_ROTATE_H
+#define MUNGE_ROTATE_H
 
 #include <sys/types.h>
 
 
-/*****************************************************************************
- *  Constants
- *****************************************************************************/
+void rotate_left (unsigned *up, size_t n);
 
-/*  Number of bytes guaranteed for reading in a single call to entropy_read().
- */
-#define ENTROPY_NUM_BYTES_GUARANTEED    256
+void rotate_right (unsigned *up, size_t n);
 
 
-/*****************************************************************************
- *  Prototypes
- *****************************************************************************/
-
-int entropy_read (void *buf, size_t buflen, const char **srcp);
-
-int entropy_read_uint (unsigned *up);
-
-
-#endif /* !MUNGE_ENTROPY_H */
+#endif /* !MUNGE_ROTATE_H */
