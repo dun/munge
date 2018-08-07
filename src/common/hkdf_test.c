@@ -364,10 +364,8 @@ main (int argc, char *argv[])
     ok (hkdf_test_2 () == 0,
             "Test Case 2: SHA-256 with longer inputs/outputs");
 
-    skip (1, 1, "mac_init: Assertion `keylen > 0' failed");
     ok (hkdf_test_3 () == 0,
             "Test Case 3: SHA-256 with zero-length salt/info");
-    end_skip;
 
     ok (hkdf_test_4 () == 0,
             "Test Case 4: SHA-1 basic test");
@@ -375,10 +373,8 @@ main (int argc, char *argv[])
     ok (hkdf_test_5 () == 0,
             "Test Case 5: SHA-1 with longer inputs/outputs");
 
-    skip (1, 1, "mac_init: Assertion `keylen > 0' failed");
     ok (hkdf_test_6 () == 0,
             "Test Case 6: SHA-1 with zero-length salt/info");
-    end_skip;
 
     ok (hkdf_test_7 () == 0,
             "Test Case 7: SHA-1 with no salt and zero-length info");
