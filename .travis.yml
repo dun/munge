@@ -35,7 +35,7 @@ addons:
       name: "dun/munge"
       description: "MUNGE Uid 'N' Gid Emporium"
     notification_email: cdunlap@llnl.gov
-    build_command_prepend: "./configure"
+    build_command_prepend: "./bootstrap && ./configure"
     build_command: "make"
     branch_pattern: coverity_scan
 
@@ -44,7 +44,7 @@ before_install:
 
 script:
 - test "${TRAVIS_BRANCH}" != 'coverity_scan' || exit 0
-- ./configure ${CONFIGURE_OPTS} && colormake -e -k && colormake -e distcheck
+- ./bootstrap && ./configure ${CONFIGURE_OPTS} && colormake -e -k && colormake -e distcheck
 
 after_failure:
 - find . -type f -name "test-suite.log" -execdir cat {} \;
