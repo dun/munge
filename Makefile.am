@@ -67,3 +67,31 @@ EXTRA_DIST = \
 DISTCLEANFILES = \
 	config/*~ \
 	$(PACKAGE)-*.tar*
+
+MAINTAINERCLEANFILES = \
+	Makefile.in \
+	aclocal.m4 \
+	config/compile \
+	config/config.guess \
+	config/config.h.in \
+	config/config.sub \
+	config/depcomp \
+	config/install-sh \
+	config/libtool.m4 \
+	config/ltmain.sh \
+	config/ltoptions.m4 \
+	config/ltsugar.m4 \
+	config/ltversion.m4 \
+	config/lt~obsolete.m4 \
+	config/missing \
+	config/tap-driver.sh \
+	config/test-driver \
+	configure \
+	src/Makefile.in \
+	src/etc/Makefile.in \
+	src/libcommon/Makefile.in \
+	src/libmissing/Makefile.in \
+	src/libmunge/Makefile.in \
+	src/munge/Makefile.in \
+	src/munged/Makefile.in \
+	t/Makefile.in
