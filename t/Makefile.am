@@ -32,7 +32,7 @@ include $(top_srcdir)/config/Make-inc.mk
 TEST_EXTENSIONS = .t
 
 T_LOG_DRIVER = \
-	env AM_TAP_AWK='$(AWK)' $(SHELL) $(top_srcdir)/config/tap-driver.sh
+	env AM_TAP_AWK='$(AWK)' $(SHELL) $(top_srcdir)/build-aux/tap-driver.sh
 
 TESTS = \
 	0000-sharness.t \

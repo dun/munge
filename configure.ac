@@ -32,7 +32,7 @@
 ##
 AC_INIT
 X_AC_META
-AC_CONFIG_AUX_DIR([config])
+AC_CONFIG_AUX_DIR([build-aux])
 AC_CONFIG_SRCDIR([src/libmunge/munge.h])
 AC_REQUIRE_AUX_FILE([tap-driver.sh])
 X_AC_CANONICAL

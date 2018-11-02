@@ -71,21 +71,21 @@ DISTCLEANFILES = \
 MAINTAINERCLEANFILES = \
 	Makefile.in \
 	aclocal.m4 \
-	config/compile \
-	config/config.guess \
+	build-aux/compile \
+	build-aux/config.guess \
+	build-aux/config.sub \
+	build-aux/depcomp \
+	build-aux/install-sh \
+	build-aux/ltmain.sh \
+	build-aux/missing \
+	build-aux/tap-driver.sh \
+	build-aux/test-driver \
 	config/config.h.in \
-	config/config.sub \
-	config/depcomp \
-	config/install-sh \
 	config/libtool.m4 \
-	config/ltmain.sh \
 	config/ltoptions.m4 \
 	config/ltsugar.m4 \
 	config/ltversion.m4 \
 	config/lt~obsolete.m4 \
-	config/missing \
-	config/tap-driver.sh \
-	config/test-driver \
 	configure \
 	src/Makefile.in \
 	src/etc/Makefile.in \
