@@ -29,41 +29,41 @@
 
 include $(top_srcdir)/config/Make-inc.mk
 
-ACLOCAL_AMFLAGS =		-I config
+ACLOCAL_AMFLAGS = -I config
 
-AUTOMAKE_OPTIONS =		dist-xz foreign no-dist-gzip
+AUTOMAKE_OPTIONS = dist-xz foreign no-dist-gzip
 
-CONFIG_STATUS_DEPENDENCIES =	META
-
-DISTCLEANFILES = \
-				config/*~ \
-				$(PACKAGE)-*.tar*
-
-EXTRA_DIST = \
-				.gitignore \
-				AUTHORS \
-				COPYING \
-				COPYING.LESSER \
-				DISCLAIMER.LLNS \
-				DISCLAIMER.UC \
-				HISTORY \
-				INSTALL \
-				JARGON \
-				KEYS \
-				META \
-				NEWS \
-				PLATFORMS \
-				QUICKSTART \
-				README \
-				README.AIX \
-				README.MULTILIB \
-				THANKS \
-				TODO \
-				bootstrap \
-				doc \
-				extra \
-				munge.spec
+CONFIG_STATUS_DEPENDENCIES = META
 
 SUBDIRS = \
-				src \
-				t
+	src \
+	t
+
+EXTRA_DIST = \
+	.gitignore \
+	AUTHORS \
+	COPYING \
+	COPYING.LESSER \
+	DISCLAIMER.LLNS \
+	DISCLAIMER.UC \
+	HISTORY \
+	INSTALL \
+	JARGON \
+	KEYS \
+	META \
+	NEWS \
+	PLATFORMS \
+	QUICKSTART \
+	README \
+	README.AIX \
+	README.MULTILIB \
+	THANKS \
+	TODO \
+	bootstrap \
+	doc \
+	extra \
+	munge.spec
+
+DISTCLEANFILES = \
+	config/*~ \
+	$(PACKAGE)-*.tar*
