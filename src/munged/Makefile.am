@@ -27,7 +27,7 @@
 ## <http://www.gnu.org/licenses/>.
 ##*****************************************************************************
 
-include $(top_srcdir)/config/Make-inc.mk
+include $(top_srcdir)/Make-inc.mk
 
 AM_CPPFLAGS = \
 	-I$(top_srcdir)/src/libcommon \
