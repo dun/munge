@@ -80,7 +80,7 @@ MAINTAINERCLEANFILES = \
 	build-aux/missing \
 	build-aux/tap-driver.sh \
 	build-aux/test-driver \
-	config/config.h.in \
+	config.h.in \
 	configure \
 	m4/libtool.m4 \
 	m4/ltoptions.m4 \

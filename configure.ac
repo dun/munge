@@ -33,6 +33,7 @@
 AC_INIT
 X_AC_META
 AC_CONFIG_AUX_DIR([build-aux])
+AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_SRCDIR([src/libmunge/munge.h])
 AC_REQUIRE_AUX_FILE([tap-driver.sh])
@@ -44,7 +45,6 @@ X_AC_EXPAND_INSTALL_DIRS
 # Automake support.
 ##
 AM_INIT_AUTOMAKE([$PACKAGE], [$VERSION])
-AC_CONFIG_HEADERS([config/config.h])
 AM_MAINTAINER_MODE
 
 ##
