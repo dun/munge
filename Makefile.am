@@ -29,7 +29,7 @@
 
 include $(top_srcdir)/config/Make-inc.mk
 
-ACLOCAL_AMFLAGS = -I config
+ACLOCAL_AMFLAGS = -I m4
 
 AUTOMAKE_OPTIONS = dist-xz foreign no-dist-gzip
 
@@ -81,12 +81,12 @@ MAINTAINERCLEANFILES = \
 	build-aux/tap-driver.sh \
 	build-aux/test-driver \
 	config/config.h.in \
-	config/libtool.m4 \
-	config/ltoptions.m4 \
-	config/ltsugar.m4 \
-	config/ltversion.m4 \
-	config/lt~obsolete.m4 \
 	configure \
+	m4/libtool.m4 \
+	m4/ltoptions.m4 \
+	m4/ltsugar.m4 \
+	m4/ltversion.m4 \
+	m4/lt~obsolete.m4 \
 	src/Makefile.in \
 	src/etc/Makefile.in \
 	src/libcommon/Makefile.in \
