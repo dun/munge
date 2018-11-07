@@ -49,46 +49,40 @@ munge.service: munge.service.in
 munge.sysconfig: munge.sysconfig.in
 munge.tmpfiles.conf: munge.tmpfiles.conf.in
 
-install-data-local:
-	test -d "/etc/rc.d/init.d" \
-	    && INITDIR="$(sysconfdir)/rc.d/init.d" \
-	    || INITDIR="$(sysconfdir)/init.d"; \
-	  $(INSTALL) -m 0755 -d "$(DESTDIR)$${INITDIR}"; \
-	  $(INSTALL) -m 0755 \
-	    "$(builddir)/munge.init" "$(DESTDIR)$${INITDIR}/munge"
-	:
-	test -d "/etc/sysconfig" \
-	    && CONFDIR="$(sysconfdir)/sysconfig" \
-	    || CONFDIR="$(sysconfdir)/default"; \
-	  $(INSTALL) -m 0755 -d "$(DESTDIR)$${CONFDIR}"; \
-	  $(INSTALL) -m 0644 \
-	    "$(builddir)/munge.sysconfig" "$(DESTDIR)$${CONFDIR}/munge"
-	:
-	PKGCONFIGDIR="$(libdir)/pkgconfig"; \
-	$(INSTALL) -m 0755 -d "$(DESTDIR)$${PKGCONFIGDIR}"; \
-	$(INSTALL) -m 0644 \
-	  "$(builddir)/munge.pc" "$(DESTDIR)$${PKGCONFIGDIR}/munge.pc"
-	:
-	UNITDIR="$(prefix)/lib/systemd/system"; \
-	$(INSTALL) -m 0755 -d "$(DESTDIR)$${UNITDIR}"; \
-	$(INSTALL) -m 0644 \
-	  "$(builddir)/munge.service" "$(DESTDIR)$${UNITDIR}/munge.service"
-	:
-	TMPFILESDIR="$(prefix)/lib/tmpfiles.d"; \
-	$(INSTALL) -m 0755 -d "$(DESTDIR)$${TMPFILESDIR}"; \
-	$(INSTALL) -m 0644 \
-	  "$(builddir)/munge.tmpfiles.conf" \
-	  "$(DESTDIR)$${TMPFILESDIR}/munge.conf"
-	:
-	$(INSTALL) -m 0755 -d "$(DESTDIR)$(sysconfdir)"
-	$(INSTALL) -m 0700 -d "$(DESTDIR)$(sysconfdir)/munge"
-	$(INSTALL) -m 0755 -d "$(DESTDIR)$(localstatedir)"
-	$(INSTALL) -m 0755 -d "$(DESTDIR)$(localstatedir)/lib"
-	$(INSTALL) -m 0711 -d "$(DESTDIR)$(localstatedir)/lib/munge"
-	$(INSTALL) -m 0755 -d "$(DESTDIR)$(localstatedir)/log"
-	$(INSTALL) -m 0700 -d "$(DESTDIR)$(localstatedir)/log/munge"
-	$(INSTALL) -m 0755 -d "$(DESTDIR)$(localstatedir)/run"
-	$(INSTALL) -m 0755 -d "$(DESTDIR)$(localstatedir)/run/munge"
+install-data-hook: install-dirperms install-pkgconfig install-systemd install-sysvinit install-tmpfiles
+
+install-dirperms:
+	$(MKDIR_P) -m 0700 "$(DESTDIR)$(sysconfdir)/munge"
+	$(MKDIR_P) -m 0711 "$(DESTDIR)$(localstatedir)/lib/munge"
+	$(MKDIR_P) -m 0700 "$(DESTDIR)$(localstatedir)/log/munge"
+	$(MKDIR_P) -m 0755 "$(DESTDIR)$(localstatedir)/run/munge"
+
+install-pkgconfig: munge.pc
+	$(MKDIR_P) "$(DESTDIR)$(libdir)/pkgconfig"
+	$(INSTALL_DATA) "$(builddir)/munge.pc" \
+	  "$(DESTDIR)$(libdir)/pkgconfig/$(PACKAGE).pc"
+
+install-systemd: munge.service
+	$(MKDIR_P) "$(DESTDIR)$(prefix)/lib/systemd/system"
+	$(INSTALL_DATA) "$(builddir)/munge.service" \
+	  "$(DESTDIR)$(prefix)/lib/systemd/system/$(PACKAGE).service"
+
+install-sysvinit: munge.init install-sysvinit-conf
+	test -d /etc/rc.d/init.d && d=rc.d/init.d || d=init.d; \
+	  $(MKDIR_P) "$(DESTDIR)$(sysconfdir)/$${d}"; \
+	  $(INSTALL_SCRIPT) "$(builddir)/munge.init" \
+	    "$(DESTDIR)$(sysconfdir)/$${d}/$(PACKAGE)"
+
+install-sysvinit-conf: munge.sysconfig
+	test -d /etc/sysconfig && d=sysconfig || d=default; \
+	  $(MKDIR_P) "$(DESTDIR)$(sysconfdir)/$${d}"; \
+	  $(INSTALL_DATA) "$(builddir)/munge.sysconfig" \
+	    "$(DESTDIR)$(sysconfdir)/$${d}/$(PACKAGE)"
+
+install-tmpfiles: munge.tmpfiles.conf
+	$(MKDIR_P) "$(DESTDIR)$(prefix)/lib/tmpfiles.d"
+	$(INSTALL_DATA) "$(builddir)/munge.tmpfiles.conf" \
+	  "$(DESTDIR)$(prefix)/lib/tmpfiles.d/$(PACKAGE).conf"
 
 uninstall-local:
 	@for p in $(UNINSTALL_FILES); do \

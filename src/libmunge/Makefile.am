@@ -39,10 +39,7 @@ man_MANS = \
 	munge_ctx.3 \
 	munge_enum.3
 
-install-data-local:
-	$(INSTALL) -d -m 0755 "$(DESTDIR)$(includedir)"
-	$(INSTALL) -d -m 0755 "$(DESTDIR)$(libdir)"
-	$(INSTALL) -d -m 0755 "$(DESTDIR)$(mandir)/man3"
+install-data-hook:
 	for man in encode decode strerror; do \
 	  ( cd "$(DESTDIR)$(mandir)/man3/" && \
 	    rm -f munge_$${man}.3 && \
@@ -58,9 +55,6 @@ install-data-local:
 	    rm -f munge_enum_$${man}.3 && \
 	    $(LN_S) munge_enum.3 munge_enum_$${man}.3 ); \
 	done
-	chmod 755 "$(DESTDIR)$(includedir)"
-	chmod 755 "$(DESTDIR)$(libdir)"
-	chmod 755 "$(DESTDIR)$(mandir)"
 
 uninstall-local:
 	for man in encode decode strerror; do \

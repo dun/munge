@@ -12,8 +12,8 @@ AM_CPPFLAGS = \
 
 bin_PROGRAMS = \
 	munge \
-	unmunge \
-	remunge
+	remunge \
+	unmunge
 
 munge_CPPFLAGS = \
 	-I$(top_srcdir)/src/common \
@@ -34,22 +34,6 @@ munge_SOURCES = \
 	$(top_srcdir)/src/common/xgetgr.h \
 	$(top_srcdir)/src/common/xgetpw.c \
 	$(top_srcdir)/src/common/xgetpw.h \
-	$(top_srcdir)/src/common/xsignal.c \
-	$(top_srcdir)/src/common/xsignal.h
-
-unmunge_CPPFLAGS = \
-	-I$(top_srcdir)/src/common \
-	$(AM_CPPFLAGS)
-
-unmunge_LDADD = \
-	$(top_builddir)/src/libcommon/libcommon.la \
-	$(top_builddir)/src/libmissing/libmissing.la \
-	$(top_builddir)/src/libmunge/libmunge.la
-
-unmunge_SOURCES = \
-	unmunge.c \
-	read.c \
-	read.h \
 	$(top_srcdir)/src/common/xsignal.c \
 	$(top_srcdir)/src/common/xsignal.h
 
@@ -75,13 +59,23 @@ remunge_SOURCES = \
 	$(top_srcdir)/src/common/xsignal.c \
 	$(top_srcdir)/src/common/xsignal.h
 
+unmunge_CPPFLAGS = \
+	-I$(top_srcdir)/src/common \
+	$(AM_CPPFLAGS)
+
+unmunge_LDADD = \
+	$(top_builddir)/src/libcommon/libcommon.la \
+	$(top_builddir)/src/libmissing/libmissing.la \
+	$(top_builddir)/src/libmunge/libmunge.la
+
+unmunge_SOURCES = \
+	unmunge.c \
+	read.c \
+	read.h \
+	$(top_srcdir)/src/common/xsignal.c \
+	$(top_srcdir)/src/common/xsignal.h
+
 man_MANS = \
 	munge.1 \
-	unmunge.1 \
-	remunge.1
-
-install-data-local:
-	$(INSTALL) -d -m 0755 "$(DESTDIR)$(bindir)"
-	$(INSTALL) -d -m 0755 "$(DESTDIR)$(mandir)/man1"
-	chmod 755 "$(DESTDIR)$(bindir)"
-	chmod 755 "$(DESTDIR)$(mandir)"
+	remunge.1 \
+	unmunge.1
