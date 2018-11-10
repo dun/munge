@@ -5,6 +5,23 @@
 
 include $(top_srcdir)/Make-inc.mk
 
+TEMPLATE_FILES = \
+	munged.8.in
+
+SUBSTITUTE_FILES = \
+	munged.8
+
+EXTRA_DIST = \
+	$(TEMPLATE_FILES)
+
+CLEANFILES = \
+	$(SUBSTITUTE_FILES)
+
+$(SUBSTITUTE_FILES): Makefile
+	$(substitute) < "$(srcdir)/$@.in" > "$(builddir)/$@"
+
+munged.8: munged.8.in
+
 AM_CPPFLAGS = \
 	-I$(top_srcdir)/src/libcommon \
 	-I$(top_srcdir)/src/libmissing \

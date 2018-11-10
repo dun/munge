@@ -117,18 +117,10 @@ AC_CONFIG_FILES( \
   src/Makefile \
   src/etc/Makefile \
   src/libcommon/Makefile \
-  src/libcommon/munge.7 \
   src/libmissing/Makefile \
   src/libmunge/Makefile \
-  src/libmunge/munge.3 \
-  src/libmunge/munge_ctx.3 \
-  src/libmunge/munge_enum.3 \
   src/munge/Makefile \
-  src/munge/munge.1 \
-  src/munge/remunge.1 \
-  src/munge/unmunge.1 \
   src/munged/Makefile \
-  src/munged/munged.8 \
   t/Makefile \
 )
 AC_OUTPUT

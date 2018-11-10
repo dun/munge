@@ -5,6 +5,29 @@
 
 include $(top_srcdir)/Make-inc.mk
 
+TEMPLATE_FILES = \
+	munge.3.in \
+	munge_ctx.3.in \
+	munge_enum.3.in
+
+SUBSTITUTE_FILES = \
+	munge.3 \
+	munge_ctx.3 \
+	munge_enum.3
+
+EXTRA_DIST = \
+	$(TEMPLATE_FILES)
+
+CLEANFILES = \
+	$(SUBSTITUTE_FILES)
+
+$(SUBSTITUTE_FILES): Makefile
+	$(substitute) < "$(srcdir)/$@.in" > "$(builddir)/$@"
+
+munge.3: munge.3.in
+munge_ctx.3: munge_ctx.3.in
+munge_enum.3: munge_enum.3.in
+
 include_HEADERS = \
 	munge.h
 

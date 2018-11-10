@@ -5,6 +5,29 @@
 
 include $(top_srcdir)/Make-inc.mk
 
+TEMPLATE_FILES = \
+	munge.1.in \
+	remunge.1.in \
+	unmunge.1.in
+
+SUBSTITUTE_FILES = \
+	munge.1 \
+	remunge.1 \
+	unmunge.1
+
+EXTRA_DIST = \
+	$(TEMPLATE_FILES)
+
+CLEANFILES = \
+	$(SUBSTITUTE_FILES)
+
+$(SUBSTITUTE_FILES): Makefile
+	$(substitute) < "$(srcdir)/$@.in" > "$(builddir)/$@"
+
+munge.1: munge.1.in
+remunge.1: remunge.1.in
+unmunge.1: unmunge.1.in
+
 AM_CPPFLAGS = \
 	-I$(top_srcdir)/src/libcommon \
 	-I$(top_srcdir)/src/libmissing \

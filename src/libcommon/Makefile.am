@@ -5,6 +5,23 @@
 
 include $(top_srcdir)/Make-inc.mk
 
+TEMPLATE_FILES = \
+	munge.7.in
+
+SUBSTITUTE_FILES = \
+	munge.7
+
+EXTRA_DIST = \
+	$(TEMPLATE_FILES)
+
+CLEANFILES = \
+	$(SUBSTITUTE_FILES)
+
+$(SUBSTITUTE_FILES): Makefile
+	$(substitute) < "$(srcdir)/$@.in" > "$(builddir)/$@"
+
+munge.7: munge.7.in
+
 AM_CPPFLAGS = \
 	-I$(top_srcdir)/src/libmunge
 

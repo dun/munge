@@ -34,20 +34,21 @@ UNINSTALL_DIRS = \
 	$(localstatedir)/log/munge \
 	$(localstatedir)/run/munge
 
-noinst_DATA = $(SUBSTITUTE_FILES)
+EXTRA_DIST = $(TEMPLATE_FILES)
 
 CLEANFILES = $(SUBSTITUTE_FILES)
 
-EXTRA_DIST = $(TEMPLATE_FILES)
-
 $(SUBSTITUTE_FILES): Makefile
-	$(subst) < "$(srcdir)/$@.in" > "$(builddir)/$@"
+	$(substitute) < "$(srcdir)/$@.in" > "$(builddir)/$@"
 
 munge.init: munge.init.in
 munge.pc: munge.pc.in
 munge.service: munge.service.in
 munge.sysconfig: munge.sysconfig.in
 munge.tmpfiles.conf: munge.tmpfiles.conf.in
+
+noinst_DATA = \
+	$(SUBSTITUTE_FILES)
 
 install-data-hook: install-dirperms install-pkgconfig install-systemd install-sysvinit install-tmpfiles
 

@@ -24,7 +24,7 @@ distclean-local::
 # Perform autoconf-style variable substitution on stdin.
 # Fully expands autoconf variables that depend on other autoconf variables.
 #
-subst = $(SED) \
+substitute = $(SED) \
 	-e 's,[@]META_ALIAS[@],$(META_ALIAS),g' \
 	-e 's,[@]META_AUTHOR[@],$(META_AUTHOR),g' \
 	-e 's,[@]META_DATE[@],$(META_DATE),g' \
@@ -35,7 +35,9 @@ subst = $(SED) \
 	-e 's,[@]datadir[@],$(datadir),g' \
 	-e 's,[@]datarootdir[@],$(datarootdir),g' \
 	-e 's,[@]docdir[@],$(docdir),g' \
+	-e 's,[@]dvidir[@],$(dvidir),g' \
 	-e 's,[@]exec_prefix[@],$(exec_prefix),g' \
+	-e 's,[@]htmldir[@],$(htmldir),g' \
 	-e 's,[@]includedir[@],$(includedir),g' \
 	-e 's,[@]infodir[@],$(infodir),g' \
 	-e 's,[@]libdir[@],$(libdir),g' \
@@ -44,7 +46,14 @@ subst = $(SED) \
 	-e 's,[@]localstatedir[@],$(localstatedir),g' \
 	-e 's,[@]mandir[@],$(mandir),g' \
 	-e 's,[@]oldincludedir[@],$(oldincludedir),g' \
+	-e 's,[@]pdfdir[@],$(pdfdir),g' \
+	-e 's,[@]pkgdatadir[@],$(pkgdatadir),g' \
+	-e 's,[@]pkgincludedir[@],$(pkgincludedir),g' \
+	-e 's,[@]pkglibdir[@],$(pkglibdir),g' \
+	-e 's,[@]pkglibexecdir[@],$(pkglibexecdir),g' \
 	-e 's,[@]prefix[@],$(prefix),g' \
+	-e 's,[@]psdir[@],$(psdir),g' \
+	-e 's,[@]runstatedir[@],$(runstatedir),g' \
 	-e 's,[@]sbindir[@],$(sbindir),g' \
 	-e 's,[@]sharedstatedir[@],$(sharedstatedir),g' \
 	-e 's,[@]sysconfdir[@],$(sysconfdir),g'
