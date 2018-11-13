@@ -45,5 +45,9 @@ libcommon_la_SOURCES = \
 	version.c \
 	version.h
 
+# For dependencies on DATE.
+#
+$(srcdir)/libcommon_la-version.lo: Makefile
+
 man_MANS = \
 	munge.7
