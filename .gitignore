@@ -1,6 +1,8 @@
 *.la
 *.lo
+*.log
 *.o
+*.trs
 .deps/
 .libs/
 /aclocal.m4
@@ -28,8 +30,10 @@
 /src/munge/munge
 /src/munge/remunge
 /src/munge/unmunge
+/src/munged/base64_test
 /src/munged/munged
 /stamp-h1
+/t/test-results/
 Makefile
 Makefile.in
 TAGS
