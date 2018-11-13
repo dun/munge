@@ -37,10 +37,6 @@
 void
 display_version (void)
 {
-    printf ("%s", META_ALIAS);
-#ifdef META_DATE
-    printf (" (%s)", META_DATE);
-#endif /* META_DATE */
-    printf ("\n");
+    printf ("%s-%s (%s)\n", PACKAGE, VERSION, DATE);
     return;
 }

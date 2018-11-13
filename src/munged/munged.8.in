@@ -25,7 +25,7 @@
 .\" <http://www.gnu.org/licenses/>.
 .\"****************************************************************************
 
-.TH MUNGED 8 "@META_DATE@" "@META_ALIAS@" "MUNGE Uid 'N' Gid Emporium"
+.TH MUNGED 8 "@DATE@" "@PACKAGE@-@VERSION@" "MUNGE Uid 'N' Gid Emporium"
 
 .SH NAME
 munged \- MUNGE daemon
@@ -177,7 +177,7 @@ particular host more than once, nothing prevents a credential from being
 decoded on multiple hosts within the security realm before it expires.
 
 .SH AUTHOR
-@META_AUTHOR@
+Chris Dunlap <cdunlap@llnl.gov>
 
 .SH COPYRIGHT
 Copyright (C) 2007-2018 Lawrence Livermore National Security, LLC.

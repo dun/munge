@@ -6,8 +6,9 @@
 ##
 # Prologue.
 ##
-AC_INIT
-X_AC_META
+AC_INIT([MUNGE], [0.5.13])
+AC_SUBST([DATE], [2017-09-26])
+
 AC_CONFIG_AUX_DIR([build-aux])
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_MACRO_DIR([m4])
@@ -20,7 +21,7 @@ X_AC_EXPAND_INSTALL_DIRS
 ##
 # Automake support.
 ##
-AM_INIT_AUTOMAKE([$PACKAGE], [$VERSION])
+AM_INIT_AUTOMAKE
 AM_MAINTAINER_MODE
 
 ##

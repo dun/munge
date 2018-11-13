@@ -22,11 +22,12 @@ $(SUBSTITUTE_FILES): Makefile
 
 munge.7: munge.7.in
 
-AM_CPPFLAGS = \
-	-I$(top_srcdir)/src/libmunge
-
 noinst_LTLIBRARIES = \
 	libcommon.la
+
+libcommon_la_CPPFLAGS = \
+	-DDATE=\"$(DATE)\" \
+	-I$(top_srcdir)/src/libmunge
 
 libcommon_la_SOURCES = \
 	common.h \

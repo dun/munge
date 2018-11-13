@@ -25,12 +25,6 @@ distclean-local::
 # Fully expands autoconf variables that depend on other autoconf variables.
 #
 substitute = $(SED) \
-	-e 's,[@]META_ALIAS[@],$(META_ALIAS),g' \
-	-e 's,[@]META_AUTHOR[@],$(META_AUTHOR),g' \
-	-e 's,[@]META_DATE[@],$(META_DATE),g' \
-	-e 's,[@]META_NAME[@],$(META_NAME),g' \
-	-e 's,[@]META_RELEASE[@],$(META_RELEASE),g' \
-	-e 's,[@]META_VERSION[@],$(META_VERSION),g' \
 	-e 's,[@]bindir[@],$(bindir),g' \
 	-e 's,[@]datadir[@],$(datadir),g' \
 	-e 's,[@]datarootdir[@],$(datarootdir),g' \
@@ -56,4 +50,7 @@ substitute = $(SED) \
 	-e 's,[@]runstatedir[@],$(runstatedir),g' \
 	-e 's,[@]sbindir[@],$(sbindir),g' \
 	-e 's,[@]sharedstatedir[@],$(sharedstatedir),g' \
-	-e 's,[@]sysconfdir[@],$(sysconfdir),g'
+	-e 's,[@]sysconfdir[@],$(sysconfdir),g' \
+	-e 's,[@]DATE[@],$(DATE),g' \
+	-e 's,[@]PACKAGE[@],$(PACKAGE),g' \
+	-e 's,[@]VERSION[@],$(VERSION),g'

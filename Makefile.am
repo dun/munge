@@ -9,8 +9,6 @@ ACLOCAL_AMFLAGS = -I m4
 
 AUTOMAKE_OPTIONS = dist-xz foreign no-dist-gzip
 
-CONFIG_STATUS_DEPENDENCIES = META
-
 SUBDIRS = \
 	src \
 	t
@@ -26,7 +24,6 @@ EXTRA_DIST = \
 	INSTALL \
 	JARGON \
 	KEYS \
-	META \
 	NEWS \
 	PLATFORMS \
 	QUICKSTART \

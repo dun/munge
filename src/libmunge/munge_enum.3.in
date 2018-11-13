@@ -25,7 +25,7 @@
 .\" <http://www.gnu.org/licenses/>.
 .\"****************************************************************************
 
-.TH MUNGE_ENUM 3 "@META_DATE@" "@META_ALIAS@" "MUNGE Uid 'N' Gid Emporium"
+.TH MUNGE_ENUM 3 "@DATE@" "@PACKAGE@-@VERSION@" "MUNGE Uid 'N' Gid Emporium"
 
 .SH NAME
 munge_enum_is_valid, munge_enum_int_to_str, munge_enum_str_to_int \- MUNGE enumeration functions
@@ -108,7 +108,7 @@ main (int argc, char *argv[])
 .fi
 
 .SH AUTHOR
-@META_AUTHOR@
+Chris Dunlap <cdunlap@llnl.gov>
 
 .SH COPYRIGHT
 Copyright (C) 2007-2018 Lawrence Livermore National Security, LLC.

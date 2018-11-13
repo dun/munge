@@ -146,8 +146,8 @@ main (int argc, char *argv[])
     if (!conf->got_foreground) {
         daemonize_fini (fd);
     }
-    log_msg (LOG_NOTICE, "Starting %s daemon (pid %d)",
-        META_ALIAS, (int) getpid ());
+    log_msg (LOG_NOTICE, "Starting %s-%s daemon (pid %d)",
+        PACKAGE, VERSION, (int) getpid ());
 
     job_accept (conf);
 
@@ -160,8 +160,8 @@ main (int argc, char *argv[])
     crypto_fini ();
     destroy_conf (conf, 1);
 
-    log_msg (LOG_NOTICE, "Stopping %s daemon (pid %d)",
-        META_ALIAS, (int) getpid ());
+    log_msg (LOG_NOTICE, "Stopping %s-%s daemon (pid %d)",
+        PACKAGE, VERSION, (int) getpid ());
     log_close_all ();
 
     exit (EMUNGE_SUCCESS);

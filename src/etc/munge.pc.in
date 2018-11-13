@@ -6,6 +6,6 @@ libdir=@libdir@
 Name: MUNGE
 Description: MUNGE authentication service library
 URL: https://dun.github.io/munge/
-Version: @META_VERSION@
+Version: @VERSION@
 Cflags: -I${includedir}
 Libs: -L${libdir} -lmunge
