@@ -22,7 +22,7 @@ CLEANFILES = \
 	$(SUBSTITUTE_FILES)
 
 $(SUBSTITUTE_FILES): Makefile
-	$(substitute) < "$(srcdir)/$@.in" > "$(builddir)/$@"
+	$(AM_V_GEN)$(substitute) < "$(srcdir)/$@.in" > "$(builddir)/$@"
 
 munge.1: munge.1.in
 remunge.1: remunge.1.in

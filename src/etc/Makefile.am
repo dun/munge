@@ -39,7 +39,7 @@ EXTRA_DIST = $(TEMPLATE_FILES)
 CLEANFILES = $(SUBSTITUTE_FILES)
 
 $(SUBSTITUTE_FILES): Makefile
-	$(substitute) < "$(srcdir)/$@.in" > "$(builddir)/$@"
+	$(AM_V_GEN)$(substitute) < "$(srcdir)/$@.in" > "$(builddir)/$@"
 
 munge.init: munge.init.in
 munge.pc: munge.pc.in
