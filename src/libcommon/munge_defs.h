@@ -148,7 +148,7 @@
  *  May be overridden in "config.h".
  */
 #ifndef MUNGE_SOCKET_NAME
-#define MUNGE_SOCKET_NAME               X_LOCALSTATEDIR "/run/munge/munge.socket.2"
+#define MUNGE_SOCKET_NAME               LOCALSTATEDIR "/run/munge/munge.socket.2"
 #endif /* !MUNGE_SOCKET_NAME */
 
 /*  Number of attempts a client makes connecting to the server before failing.
@@ -199,7 +199,7 @@
  *    in this directory, but the client only needs to be able to read a file
  *    from within it.  Recommended permissions for this directory are 0711.
  */
-#define MUNGE_AUTH_SERVER_DIR           X_LOCALSTATEDIR "/lib/munge"
+#define MUNGE_AUTH_SERVER_DIR           LOCALSTATEDIR "/lib/munge"
 
 /*  The directory in which the file used to authenticate a particular client
  *    via fd-passing will be created.  The client must be able to create files
@@ -214,19 +214,19 @@
 
 /*  String specifying the pathname of the daemon's logfile.
  */
-#define MUNGED_LOGFILE                  X_LOCALSTATEDIR "/log/munge/munged.log"
+#define MUNGED_LOGFILE                  LOCALSTATEDIR "/log/munge/munged.log"
 
 /*  String specifying the pathname of the daemon's pidfile.
  */
-#define MUNGED_PIDFILE                  X_LOCALSTATEDIR "/run/munge/munged.pid"
+#define MUNGED_PIDFILE                  LOCALSTATEDIR "/run/munge/munged.pid"
 
 /*  String specifying the pathname of the random seed file.
  */
-#define MUNGED_RANDOM_SEED              X_LOCALSTATEDIR "/lib/munge/munge.seed"
+#define MUNGED_RANDOM_SEED              LOCALSTATEDIR "/lib/munge/munge.seed"
 
 /*  String specifying the pathname of the secret key file.
  */
-#define MUNGED_SECRET_KEY               X_SYSCONFDIR "/munge/munge.key"
+#define MUNGED_SECRET_KEY               SYSCONFDIR "/munge/munge.key"
 
 
 #endif /* !MUNGE_DEFS_H */

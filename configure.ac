@@ -17,7 +17,6 @@ AC_CONFIG_SRCDIR([src/libmunge/munge.h])
 AC_REQUIRE_AUX_FILE([tap-driver.sh])
 X_AC_CANONICAL
 X_AC_HUMOR
-X_AC_EXPAND_INSTALL_DIRS
 
 m4_ifdef([dist-xz],
   [AM_INIT_AUTOMAKE([1.10 foreign dist-xz])],

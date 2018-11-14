@@ -30,6 +30,8 @@ munged_CFLAGS = \
 	$(CRYPTO_CFLAGS)
 
 munged_CPPFLAGS = \
+	-DLOCALSTATEDIR=\"$(localstatedir)\" \
+	-DSYSCONFDIR=\"$(sysconfdir)\" \
 	-DWITH_PTHREADS \
 	-I$(top_srcdir)/src/common \
 	-I$(top_srcdir)/src/libcommon \

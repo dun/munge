@@ -27,6 +27,8 @@ noinst_LTLIBRARIES = \
 
 libcommon_la_CPPFLAGS = \
 	-DDATE=\"$(DATE)\" \
+	-DLOCALSTATEDIR=\"$(localstatedir)\" \
+	-DSYSCONFDIR=\"$(sysconfdir)\" \
 	-I$(top_srcdir)/src/libmunge
 
 libcommon_la_SOURCES = \
