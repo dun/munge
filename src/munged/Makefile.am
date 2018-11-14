@@ -22,11 +22,6 @@ $(SUBSTITUTE_FILES): Makefile
 
 munged.8: munged.8.in
 
-AM_CPPFLAGS = \
-	-I$(top_srcdir)/src/libcommon \
-	-I$(top_srcdir)/src/libmissing \
-	-I$(top_srcdir)/src/libmunge
-
 sbin_PROGRAMS = \
 	munged
 
@@ -37,7 +32,9 @@ munged_CFLAGS = \
 munged_CPPFLAGS = \
 	-DWITH_PTHREADS \
 	-I$(top_srcdir)/src/common \
-	$(AM_CPPFLAGS)
+	-I$(top_srcdir)/src/libcommon \
+	-I$(top_srcdir)/src/libmissing \
+	-I$(top_srcdir)/src/libmunge
 
 munged_LDADD = \
 	$(top_builddir)/src/libcommon/libcommon.la \

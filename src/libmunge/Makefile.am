@@ -34,12 +34,12 @@ include_HEADERS = \
 lib_LTLIBRARIES = \
 	libmunge.la
 
-AM_CPPFLAGS = \
-	-I$(top_srcdir)/src/libcommon
-
 LT_CURRENT = 2
 LT_REVISION = 0
 LT_AGE = 0
+
+libmunge_la_CPPFLAGS = \
+	-I$(top_srcdir)/src/libcommon
 
 libmunge_la_LDFLAGS = \
 	-export-symbols-regex "^munge_.*" \
