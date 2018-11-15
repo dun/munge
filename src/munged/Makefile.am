@@ -100,6 +100,12 @@ munged_SOURCES = \
 	$(top_srcdir)/src/common/xsignal.c \
 	$(top_srcdir)/src/common/xsignal.h
 
+# For dependencies on LOCALSTATEDIR and SYSCONFDIR via the #defines for
+#   MUNGED_LOGFILE, MUNGED_PIDFILE, MUNGED_RANDOM_SEED, MUNGED_SECRET_KEY,
+#   MUNGE_AUTH_SERVER_DIR, and MUNGE_SOCKET_NAME.
+#
+$(srcdir)/munged-conf.$(OBJEXT): Makefile
+
 man_MANS = \
 	munged.8
 

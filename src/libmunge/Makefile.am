@@ -63,6 +63,11 @@ libmunge_la_SOURCES = \
 	strerror.c \
 	munge.h
 
+# For dependencies on LOCALSTATEDIR via the #define for MUNGE_SOCKET_NAME.
+#
+$(srcdir)/libmunge_la-ctx.lo: Makefile
+$(srcdir)/libmunge_la-m_msg_client.lo: Makefile
+
 man_MANS = \
 	munge.3 \
 	munge_ctx.3 \
