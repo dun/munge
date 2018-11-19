@@ -39,8 +39,8 @@ LT_REVISION = 0
 LT_AGE = 0
 
 libmunge_la_CPPFLAGS = \
-	-DLOCALSTATEDIR=\"$(localstatedir)\" \
-	-DSYSCONFDIR=\"$(sysconfdir)\" \
+	-DLOCALSTATEDIR='"$(localstatedir)"' \
+	-DSYSCONFDIR='"$(sysconfdir)"' \
 	-I$(top_srcdir)/src/libcommon
 
 libmunge_la_LDFLAGS = \
