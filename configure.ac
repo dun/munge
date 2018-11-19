@@ -16,7 +16,6 @@ AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_SRCDIR([src/libmunge/munge.h])
 AC_REQUIRE_AUX_FILE([tap-driver.sh])
 AC_USE_SYSTEM_EXTENSIONS
-X_AC_CANONICAL
 X_AC_HUMOR
 
 m4_ifdef([dist-xz],
@@ -58,7 +57,6 @@ fi
 ##
 # Checks for header files.
 ##
-AC_HEADER_STDC
 AC_CHECK_HEADERS( \
   bzlib.h \
   standards.h \
@@ -69,7 +67,6 @@ AC_CHECK_HEADERS( \
 ##
 # Checks for typedefs, structures, and compiler characteristics.
 ##
-AC_C_BIGENDIAN
 AC_C_CONST
 AC_TYPE_UID_T
 AC_CHECK_TYPES(socklen_t, [], [], [#include <sys/types.h>
