@@ -7,8 +7,6 @@ include $(top_srcdir)/Make-inc.mk
 
 ACLOCAL_AMFLAGS = -I m4
 
-AUTOMAKE_OPTIONS = dist-xz foreign no-dist-gzip
-
 SUBDIRS = \
 	src \
 	t

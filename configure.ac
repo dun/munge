@@ -6,6 +6,7 @@
 ##
 # Prologue.
 ##
+AC_PREREQ([2.61])
 AC_INIT([MUNGE], [0.5.13])
 AC_SUBST([DATE], [2017-09-26])
 
@@ -18,11 +19,11 @@ X_AC_CANONICAL
 X_AC_HUMOR
 X_AC_EXPAND_INSTALL_DIRS
 
-##
-# Automake support.
-##
-AM_INIT_AUTOMAKE
+m4_ifdef([dist-xz],
+  [AM_INIT_AUTOMAKE([1.10 foreign dist-xz])],
+  [AM_INIT_AUTOMAKE([1.10 foreign])])
 AM_MAINTAINER_MODE
+m4_ifdef([LT_INIT], [LT_INIT], [AC_PROG_LIBTOOL])
 
 ##
 # Checks for programs.
@@ -37,7 +38,6 @@ AC_PROG_MAKE_SET
 AC_PROG_MKDIR_P
 AC_PROG_SED
 AM_PROG_CC_C_O
-LT_INIT
 X_AC_DEBUG
 
 ##
