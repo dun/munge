@@ -48,7 +48,7 @@ X_AC_CHECK_COND_LIB(bz2, BZ2_bzBuffToBuffCompress)
 X_AC_CHECK_COND_LIB(z, compress)
 AC_SEARCH_LIBS(gethostbyname, nsl)
 AC_SEARCH_LIBS(socket, socket)
-AM_PATH_LIBGCRYPT
+m4_ifdef([AM_PATH_LIBGCRYPT], [AM_PATH_LIBGCRYPT])
 X_AC_PATH_OPENSSL
 X_AC_SELECT_CRYPTO_LIB
 if test "${CRYPTO_PKG}" = "openssl"; then
