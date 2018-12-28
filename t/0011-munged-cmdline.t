@@ -38,7 +38,7 @@ for OPT_STOP in '-s' '--stop'; do
         munged_start_daemon &&
         test -f "${MUNGE_PIDFILE}" &&
         PID=$(cat "${MUNGE_PIDFILE}") &&
-        ps -p "${PID}" | grep munged &&
+        ps -p "${PID}" -ww | grep munged &&
         test -S "${MUNGE_SOCKET}" &&
         "${MUNGED}" "${OPT_STOP}" --socket="${MUNGE_SOCKET}" &&
         test ! -S "${MUNGE_SOCKET}" &&

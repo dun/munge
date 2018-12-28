@@ -36,7 +36,7 @@ test_expect_success 'start munged with open umask' '
 #   active munged process.
 ##
 test_expect_success 'check pidfile after munged success' '
-    ps -p "$(cat "${MUNGE_PIDFILE}")" | grep munged
+    ps -p "$(cat "${MUNGE_PIDFILE}")" -ww | grep munged
 '
 
 # Check if the lockfile has been created.
@@ -74,7 +74,7 @@ test_expect_success 'start munged with in-use socket' '
 #   to start a new munged process using a socket that was already in use.
 ##
 test_expect_success 'check pidfile after munged failure' '
-    ps -p "$(cat "${MUNGE_PIDFILE}")" | grep munged
+    ps -p "$(cat "${MUNGE_PIDFILE}")" -ww | grep munged
 '
 
 # Stop munged using the --stop option which derives the daemon's pid from
@@ -146,7 +146,7 @@ test_expect_success 'check for lockfile truncation after successful start' '
 ##
 test_expect_success 'stop munged via sigkill to prevent cleanup' '
     local PID=$(cat "${MUNGE_PIDFILE}") &&
-    ps -p "${PID}" | grep munged &&
+    ps -p "${PID}" -ww | grep munged &&
     test -S "${MUNGE_SOCKET}" &&
     test -f "${MUNGE_LOCKFILE}" &&
     while kill -s KILL "${PID}" 2>/dev/null; do :; done &&
