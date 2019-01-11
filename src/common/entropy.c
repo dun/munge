@@ -136,7 +136,7 @@ retry_open:
             else if (!S_ISCHR (st.st_mode)) {
                 errno = ENODEV;
                 log_msg (LOG_WARNING, "Failed to validate \"%s\": "
-                        "not a character device (mode=0x%x)",
+                        "not a character device (type=%07o)",
                         ENTROPY_URANDOM_PATH, (st.st_mode & S_IFMT));
             }
             else {

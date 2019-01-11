@@ -364,22 +364,24 @@ open_logfile (const char *logfile, int priority, int got_force)
         }
         if (!S_ISREG (st.st_mode)) {
             log_err (EMUNGE_SNAFU, LOG_ERR,
-                "Logfile is insecure: \"%s\" must be a regular file", logfile);
+                "Logfile is insecure: \"%s\" must be a regular file "
+                "(type=%07o)", logfile, (st.st_mode & S_IFMT));
         }
         if (st.st_uid != geteuid ()) {
             log_err_or_warn (got_force,
-                "Logfile is insecure: \"%s\" should be owned by UID %u",
-                logfile, (unsigned) geteuid ());
+                "Logfile is insecure: \"%s\" should be owned by UID %u "
+                "instead of UID %u", logfile, (unsigned) geteuid (),
+                (unsigned) st.st_uid);
         }
         if (st.st_mode & S_IWGRP) {
             log_err_or_warn (got_force,
-                "Logfile is insecure: \"%s\" should not be writable by group",
-                logfile);
+                "Logfile is insecure: \"%s\" should not be writable by group "
+                "(perms=%04o)", logfile, (st.st_mode & ~S_IFMT));
         }
         if (st.st_mode & S_IWOTH) {
             log_err_or_warn (got_force,
-                "Logfile is insecure: \"%s\" should not be writable by other",
-                logfile);
+                "Logfile is insecure: \"%s\" should not be writable by other "
+                "(perms=%04o)", logfile, (st.st_mode & ~S_IFMT));
         }
     }
     /*  Ensure logfile dir is secure against modification by others.

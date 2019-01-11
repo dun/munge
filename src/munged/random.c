@@ -348,7 +348,8 @@ _random_read_seed (const char *path, int num_bytes)
     is_symlink = (lstat (path, &st) == 0) ? S_ISLNK (st.st_mode) : 0;
     if (is_symlink) {
         log_msg (LOG_WARNING,
-                "Ignoring PRNG seed \"%s\": symbolic link not allowed", path);
+                "Ignoring PRNG seed \"%s\": must not be a symbolic link",
+                path);
         return (-1);
     }
 
@@ -373,22 +374,23 @@ retry_open:
     }
     else if (!S_ISREG (st.st_mode)) {
         log_msg (LOG_WARNING,
-                "Ignoring PRNG seed \"%s\": not a regular file (mode=0x%x)",
-                path, (st.st_mode & S_IFMT));
+                "Ignoring PRNG seed \"%s\": must be a regular file "
+                "(type=%07o)", path, (st.st_mode & S_IFMT));
     }
     else if (st.st_uid != geteuid ()) {
-        log_msg (LOG_WARNING, "Ignoring PRNG seed \"%s\": not owned by UID %u",
-                path, (unsigned) geteuid ());
+        log_msg (LOG_WARNING, "Ignoring PRNG seed \"%s\": must be owned by "
+                "UID %u instead of UID %u", path, (unsigned) geteuid (),
+                (unsigned) st.st_uid);
     }
     else if (st.st_mode & (S_IRGRP | S_IWGRP)) {
         log_msg (LOG_WARNING,
-                "Ignoring PRNG seed \"%s\": readable or writable by group",
-                path);
+                "Ignoring PRNG seed \"%s\": must not be readable or writable "
+                "by group (perms=%04o)", path, (st.st_mode & ~S_IFMT));
     }
     else if (st.st_mode & (S_IROTH | S_IWOTH)) {
         log_msg (LOG_WARNING,
-                "Ignoring PRNG seed \"%s\": readable or writable by other",
-                path);
+                "Ignoring PRNG seed \"%s\": must not be readable or writable "
+                "by other (perms=%04o)", path, (st.st_mode & ~S_IFMT));
     }
     else {
         is_valid = 1;
