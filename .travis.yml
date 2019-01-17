@@ -14,6 +14,7 @@ env:
   - DISTCHECK_CONFIGURE_FLAGS='${CONFIGURE_OPTS}'
   - TEST_LONG='t'
   - chain_lint='t'
+  - verbose='t'
   matrix:
   - CONFIGURE_OPTS='--enable-debug --with-crypto-lib=libgcrypt'
   - CONFIGURE_OPTS='--enable-debug --with-crypto-lib=openssl'

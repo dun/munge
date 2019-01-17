@@ -11,7 +11,6 @@ T_LOG_DRIVER = \
 	env AM_TAP_AWK='$(AWK)' $(SHELL) $(top_srcdir)/build-aux/tap-driver.sh
 
 TESTS = \
-	0000-sharness.t \
 	0001-env-vars.t \
 	0002-smiple.t \
 	0010-basic.t \
@@ -27,6 +26,7 @@ TESTS = \
 
 EXTRA_DIST = \
 	$(TESTS) \
+	0000-sharness.t \
 	sharness.d \
 	sharness.sh \
 	test-terminal.perl \
