@@ -10,7 +10,7 @@ search_dirs()
     (
         cd "${START_DIR}" &&
         while test "$(pwd)" != "/"; do
-            test -e "${FIND_FILE}" && echo "$(pwd)" && break
+            test -e "${FIND_FILE}" && pwd && break
             cd ..
         done
     )
