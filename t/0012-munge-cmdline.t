@@ -30,6 +30,8 @@ for OPT_VERSION in '-V' '--version'; do
 done
 
 test_expect_success 'start munged' '
+    munged_setup_env &&
+    munged_create_key &&
     munged_start_daemon
 '
 

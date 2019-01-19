@@ -15,6 +15,8 @@ if ! test_have_prereq EXPENSIVE; then
 fi
 
 test_expect_success 'start munged under valgrind' '
+    munged_setup_env &&
+    munged_create_key &&
     munged_start_daemon --exec="${VALGRIND_CMD}"
 '
 

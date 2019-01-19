@@ -4,17 +4,13 @@ test_description='Check munged socket lock'
 
 . $(dirname "$0")/sharness.sh
 
-# Setup the environment for starting munged.
-# The socket is placed in TMPDIR since NFS can cause problems for the lockfile.
+# Setup the environment for testing.
+# The location of the lockfile is derived from the name of the socket.
 ##
-test_expect_success 'setup environment' '
-    MUNGE_SOCKET="${TMPDIR:-"/tmp"}/munged.sock.$$" &&
-    MUNGE_LOCKFILE="${MUNGE_SOCKET}.lock" &&
-    MUNGE_KEYFILE="$(pwd)/munged.key.$$" &&
-    MUNGE_LOGFILE="$(pwd)/munged.log.$$" &&
-    MUNGE_PIDFILE="$(pwd)/munged.pid.$$" &&
-    MUNGE_SEEDFILE="$(pwd)/munged.seed.$$" &&
-    munged_create_key "${MUNGE_KEYFILE}"
+test_expect_success 'setup' '
+    munged_setup_env &&
+    munged_create_key &&
+    MUNGE_LOCKFILE="${MUNGE_SOCKET}.lock"
 '
 
 # The umask is cleared here to be able to later check if the lockfile has had
@@ -23,12 +19,7 @@ test_expect_success 'setup environment' '
 test_expect_success 'start munged with open umask' '
     local MASK=$(umask) &&
     umask 0 &&
-    "${MUNGED}" \
-        --socket="${MUNGE_SOCKET}" \
-        --key-file="${MUNGE_KEYFILE}" \
-        --log-file="${MUNGE_LOGFILE}" \
-        --pid-file="${MUNGE_PIDFILE}" \
-        --seed-file="${MUNGE_SEEDFILE}" &&
+    munged_start_daemon &&
     umask "${MASK}"
 '
 
@@ -61,12 +52,7 @@ test_expect_success 'check lockfile permissions' '
 #   The lockfile should prevent this.
 ##
 test_expect_success 'start munged with in-use socket' '
-    test_must_fail "${MUNGED}" \
-        --socket="${MUNGE_SOCKET}" \
-        --key-file="${MUNGE_KEYFILE}" \
-        --log-file="${MUNGE_LOGFILE}" \
-        --pid-file="${MUNGE_PIDFILE}" \
-        --seed-file="${MUNGE_SEEDFILE}"
+    test_must_fail munged_start_daemon
 '
 
 # Check if the pidfile still contains the pid of an active munged process.
@@ -81,7 +67,7 @@ test_expect_success 'check pidfile after munged failure' '
 #   the lockfile.
 ##
 test_expect_success 'stop munged using lockfile-derived pid' '
-    "${MUNGED}" --stop --socket="${MUNGE_SOCKET}"
+    munged_stop_daemon
 '
 
 # Check if the lockfile was removed when munged shut down.
@@ -96,12 +82,7 @@ test_expect_success 'start munged with 0600 bogus lockfile' '
     rm -f "${MUNGE_LOCKFILE}" &&
     touch "${MUNGE_LOCKFILE}" &&
     chmod 0600 "${MUNGE_LOCKFILE}" &&
-    test_must_fail "${MUNGED}" \
-        --socket="${MUNGE_SOCKET}" \
-        --key-file="${MUNGE_KEYFILE}" \
-        --log-file="${MUNGE_LOGFILE}" \
-        --pid-file="${MUNGE_PIDFILE}" \
-        --seed-file="${MUNGE_SEEDFILE}"
+    test_must_fail munged_start_daemon
 '
 
 # Check if munged will honor a supposed lockfile with write permissions for
@@ -111,12 +92,7 @@ test_expect_success 'start munged with 0222 bogus lockfile' '
     rm -f "${MUNGE_LOCKFILE}" &&
     touch "${MUNGE_LOCKFILE}" &&
     chmod 0222 "${MUNGE_LOCKFILE}" &&
-    test_must_fail "${MUNGED}" \
-        --socket="${MUNGE_SOCKET}" \
-        --key-file="${MUNGE_KEYFILE}" \
-        --log-file="${MUNGE_LOGFILE}" \
-        --pid-file="${MUNGE_PIDFILE}" \
-        --seed-file="${MUNGE_SEEDFILE}"
+    test_must_fail munged_start_daemon
 '
 
 # Create a bogus non-empty "lockfile" here to be able to later check if munged
@@ -127,12 +103,7 @@ test_expect_success 'start munged with inactive non-zero lockfile' '
     echo "$$" > "${MUNGE_LOCKFILE}" &&
     chmod 0200 "${MUNGE_LOCKFILE}" &&
     test -s "${MUNGE_LOCKFILE}" &&
-    "${MUNGED}" \
-        --socket="${MUNGE_SOCKET}" \
-        --key-file="${MUNGE_KEYFILE}" \
-        --log-file="${MUNGE_LOGFILE}" \
-        --pid-file="${MUNGE_PIDFILE}" \
-        --seed-file="${MUNGE_SEEDFILE}"
+    munged_start_daemon
 '
 
 # Check if the lockfile gets truncated.
@@ -174,12 +145,7 @@ test_expect_success 'start munged with leftover socket from unclean shutdown' '
     local i=5 &&
     >fail.$$ &&
     while true; do
-        "${MUNGED}" \
-            --socket="${MUNGE_SOCKET}" \
-            --key-file="${MUNGE_KEYFILE}" \
-            --log-file="${MUNGE_LOGFILE}" \
-            --pid-file="${MUNGE_PIDFILE}" \
-            --seed-file="${MUNGE_SEEDFILE}"
+        munged_start_daemon
         if test "$?" -eq 0; then
             break
         elif test "$i" -le 1; then
@@ -196,7 +162,7 @@ test_expect_success 'start munged with leftover socket from unclean shutdown' '
 # Stop the munged that was started for the preceding test.
 ##
 test_expect_success 'stop munged' '
-    "${MUNGED}" --stop --socket="${MUNGE_SOCKET}"
+    munged_stop_daemon
 '
 
 # Check if the lockfile was removed when munged shut down.
@@ -209,14 +175,11 @@ test_expect_success 'check lockfile removal again' '
 #   This tests the case where the lockfile owner (a non-privileged user)
 #   may be checked against the euid (root) of the process performing the
 #   --stop option.
+# The sudo command cannot call the munged_stop_daemon() shell function so
+#   the actual munged command is used here.
 ##
 test_expect_success SUDO 'stop unprivileged munged as root' '
-    "${MUNGED}" \
-        --socket="${MUNGE_SOCKET}" \
-        --key-file="${MUNGE_KEYFILE}" \
-        --log-file="${MUNGE_LOGFILE}" \
-        --pid-file="${MUNGE_PIDFILE}" \
-        --seed-file="${MUNGE_SEEDFILE}" &&
+    munged_start_daemon &&
     sudo "${MUNGED}" --stop --socket="${MUNGE_SOCKET}"
 '
 

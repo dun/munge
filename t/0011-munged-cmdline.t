@@ -4,6 +4,13 @@ test_description='Check munged command-line options'
 
 . $(dirname "$0")/sharness.sh
 
+# Setup the test environment.
+##
+test_expect_success 'setup' '
+    munged_setup_env &&
+    munged_create_key
+'
+
 test_expect_success 'munged invalid option' '
     test_must_fail "${MUNGED}" --invalid-option
 '
@@ -43,9 +50,7 @@ for OPT_STOP in '-s' '--stop'; do
         "${MUNGED}" "${OPT_STOP}" --socket="${MUNGE_SOCKET}" &&
         test ! -S "${MUNGE_SOCKET}" &&
         test ! -f "${MUNGE_PIDFILE}" &&
-        ! ps -p "${PID}" >/dev/null &&
-        unset MUNGE_SOCKET &&
-        unset MUNGE_PIDFILE
+        ! ps -p "${PID}" >/dev/null
     '
 done
 
@@ -60,9 +65,7 @@ for OPT_VERBOSE in '-v' '--verbose'; do
     test_expect_success "munged ${OPT_VERBOSE}" '
         munged_start_daemon &&
         "${MUNGED}" "${OPT_VERBOSE}" --stop --socket="${MUNGE_SOCKET}" 2>&1 |
-        grep -q "Terminated daemon" &&
-        unset MUNGE_SOCKET &&
-        unset MUNGE_PIDFILE
+        grep -q "Terminated daemon"
     '
 done
 
