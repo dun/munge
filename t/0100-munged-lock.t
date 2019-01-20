@@ -151,7 +151,7 @@ test_expect_success 'stop munged via sigkill to prevent cleanup' '
     test -f "${MUNGE_LOCKFILE}" &&
     while kill -s KILL "${PID}" 2>/dev/null; do :; done &&
     test "$(cat "${MUNGE_PIDFILE}")" = "${PID}" &&
-    ! ps -p "${PID}"
+    ! ps -p "${PID}" >/dev/null
 '
 
 # Check for the expected detritus from the sigkill since munged was prevented

@@ -17,11 +17,11 @@ test_expect_success 'examine credential' '
 '
 
 test_expect_success 'decode credential' '
-    "${UNMUNGE}" --socket="${MUNGE_SOCKET}" <cred.$$
+    "${UNMUNGE}" --socket="${MUNGE_SOCKET}" <cred.$$ >/dev/null
 '
 
 test_expect_success 'replay credential' '
-    test_must_fail "${UNMUNGE}" --socket="${MUNGE_SOCKET}" <cred.$$
+    test_must_fail "${UNMUNGE}" --socket="${MUNGE_SOCKET}" <cred.$$ >/dev/null
 '
 
 test_expect_success 'stop munged' '

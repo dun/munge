@@ -43,7 +43,7 @@ for OPT_STOP in '-s' '--stop'; do
         "${MUNGED}" "${OPT_STOP}" --socket="${MUNGE_SOCKET}" &&
         test ! -S "${MUNGE_SOCKET}" &&
         test ! -f "${MUNGE_PIDFILE}" &&
-        ! ps -p "${PID}" &&
+        ! ps -p "${PID}" >/dev/null &&
         unset MUNGE_SOCKET &&
         unset MUNGE_PIDFILE
     '
