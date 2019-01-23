@@ -15,7 +15,7 @@ if ! test_have_prereq EXPENSIVE; then
 fi
 
 test_expect_success 'start munged under valgrind' '
-    munged_start_daemon "${VALGRIND_CMD}"
+    munged_start_daemon --exec="${VALGRIND_CMD}"
 '
 
 test_expect_success 'encode credential' '

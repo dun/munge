@@ -18,20 +18,20 @@ VALGRIND_LOGFILE="valgrind.log.$$"
 # Use of this variable should be followed by the program being analyzed
 #   along with any of its command-line options.
 ##
-VALGRIND_CMD="libtool --mode=execute valgrind --tool=memcheck
-    --errors-for-leak-kinds=all
-    --gen-suppressions=all
-    --keep-stacktraces=alloc-and-free
-    --leak-check=full
-    --leak-resolution=high
-    --log-file=${VALGRIND_LOGFILE}
-    --num-callers=40
-    --partial-loads-ok=no
-    --read-var-info=yes
-    --show-leak-kinds=all
-    --suppressions=${SHARNESS_TEST_SRCDIR}/valgrind.supp
-    --track-origins=yes
-    --undef-value-errors=yes
+VALGRIND_CMD="libtool --mode=execute valgrind --tool=memcheck \
+    --errors-for-leak-kinds=all \
+    --gen-suppressions=all \
+    --keep-stacktraces=alloc-and-free \
+    --leak-check=full \
+    --leak-resolution=high \
+    --log-file=${VALGRIND_LOGFILE} \
+    --num-callers=40 \
+    --partial-loads-ok=no \
+    --read-var-info=yes \
+    --show-leak-kinds=all \
+    --suppressions=${SHARNESS_TEST_SRCDIR}/valgrind.supp \
+    --track-origins=yes \
+    --undef-value-errors=yes \
 "
 
 ##
