@@ -2,7 +2,7 @@
 
 test_description='Check munge command-line options'
 
-. $(dirname "$0")/sharness.sh
+. "$(dirname "$0")/sharness.sh"
 
 test_expect_success 'munge invalid option' '
     test_must_fail "${MUNGE}" --invalid-option

@@ -2,7 +2,7 @@
 
 test_description='Check basic functionality of MUNGE daemon and clients'
 
-. $(dirname "$0")/sharness.sh
+. "$(dirname "$0")/sharness.sh"
 
 test_expect_success 'setup environment' '
     munged_setup_env

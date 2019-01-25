@@ -2,7 +2,7 @@
 
 test_description='Check mungekey command-line options'
 
-. $(dirname "$0")/sharness.sh
+. "$(dirname "$0")/sharness.sh"
 
 # Check if an invalid short-option displays the expected option text in the
 #   error message.

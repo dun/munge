@@ -2,7 +2,7 @@
 
 test_description='Check munged command-line options'
 
-. $(dirname "$0")/sharness.sh
+. "$(dirname "$0")/sharness.sh"
 
 # Setup the test environment.
 ##

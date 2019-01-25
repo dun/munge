@@ -2,7 +2,7 @@
 
 test_description="Because nothing is so simple that it can't still go wrong"
 
-. $(dirname "$0")/sharness.sh
+. "$(dirname "$0")/sharness.sh"
 
 # Check if the string is a valid absolute pathname (x_ac_with_munge_socket.m4).
 ##

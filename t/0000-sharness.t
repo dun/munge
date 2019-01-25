@@ -19,7 +19,7 @@
 
 test_description='Test Sharness itself'
 
-. $(dirname "$0")/sharness.sh
+. "$(dirname "$0")/sharness.sh"
 
 ret="$?"
 

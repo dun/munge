@@ -2,7 +2,7 @@
 
 test_description='Check munged socket lock'
 
-. $(dirname "$0")/sharness.sh
+. "$(dirname "$0")/sharness.sh"
 
 # Setup the environment for testing.
 # The location of the lockfile is derived from the name of the socket.

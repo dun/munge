@@ -2,7 +2,7 @@
 
 test_description='Check unmunge command-line options'
 
-. $(dirname "$0")/sharness.sh
+. "$(dirname "$0")/sharness.sh"
 
 test_expect_success 'unmunge invalid option' '
     test_must_fail "${UNMUNGE}" --invalid-option

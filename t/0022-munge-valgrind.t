@@ -2,7 +2,7 @@
 
 test_description='Check munge for resource leaks'
 
-. $(dirname "$0")/sharness.sh
+. "$(dirname "$0")/sharness.sh"
 
 if ! test_have_prereq VALGRIND; then
     skip_all='skipping valgrind tests; valgrind not installed'
