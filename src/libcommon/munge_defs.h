@@ -126,7 +126,7 @@
 
 /*  Number of attempts to signal a process before sending SIGKILL.
  */
-#define MUNGE_SIGNAL_ATTEMPTS           10
+#define MUNGE_SIGNAL_ATTEMPTS           19
 
 /*  Starting number of milliseconds between signaling a process and checking
  *    to see if it has responded (i.e., kicked the bucket, shuffled off this
@@ -134,7 +134,7 @@
  *    invisible).  The delay is further incremented by this amount after each
  *    attempt.
  */
-#define MUNGE_SIGNAL_DELAY_MSECS        100
+#define MUNGE_SIGNAL_DELAY_MSECS        50
 
 /*  Socket backlog for the server listening on the unix domain socket.
  */
