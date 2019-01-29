@@ -222,8 +222,7 @@ _lock_stat (int fd, const char *name)
     else if ((st.st_mode & 07777) != S_IWUSR) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
                 "Failed to validate lockfile: "
-                        "\"%s\" should be writable only by user",
-                name);
+                        "\"%s\" should only be writable by user", name);
     }
     else if (st.st_uid != geteuid()) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
