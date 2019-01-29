@@ -7,7 +7,7 @@ test_description='Check munged socket lock'
 # Setup the environment for testing.
 # The location of the lockfile is derived from the name of the socket.
 ##
-test_expect_success 'setup' '
+test_expect_success 'setup environment' '
     munged_setup_env &&
     munged_create_key &&
     MUNGE_LOCKFILE="${MUNGE_SOCKET}.lock"
@@ -17,7 +17,8 @@ test_expect_success 'setup' '
 #   its permissions set properly.
 ##
 test_expect_success 'start munged with open umask' '
-    local MASK=$(umask) &&
+    local MASK &&
+    MASK=$(umask) &&
     umask 0 &&
     munged_start_daemon &&
     umask "${MASK}"
@@ -36,7 +37,7 @@ test_expect_success 'check lockfile existence' '
     test -e "${MUNGE_LOCKFILE}"
 '
 
-# Check if the lockfile is an actual file.
+# Check if the lockfile is a regular file.
 ##
 test_expect_success 'check lockfile type' '
     test -f "${MUNGE_LOCKFILE}"
@@ -52,7 +53,8 @@ test_expect_success 'check lockfile permissions' '
 #   The lockfile should prevent this.
 ##
 test_expect_success 'start munged with in-use socket' '
-    test_must_fail munged_start_daemon
+    test_must_fail munged_start_daemon &&
+    egrep "Error:.* Failed to lock \"${MUNGE_LOCKFILE}\"" "${MUNGE_LOGFILE}"
 '
 
 # Check if the pidfile still contains the pid of an active munged process.
@@ -73,6 +75,7 @@ test_expect_success 'stop munged using lockfile-derived pid' '
 # Check if the lockfile was removed when munged shut down.
 ##
 test_expect_success 'check lockfile removal' '
+    test -n "${MUNGE_LOCKFILE}" &&
     test ! -f "${MUNGE_LOCKFILE}"
 '
 
@@ -82,7 +85,9 @@ test_expect_success 'start munged with 0600 bogus lockfile' '
     rm -f "${MUNGE_LOCKFILE}" &&
     touch "${MUNGE_LOCKFILE}" &&
     chmod 0600 "${MUNGE_LOCKFILE}" &&
-    test_must_fail munged_start_daemon
+    test_must_fail munged_start_daemon &&
+    egrep "Error:.* \"${MUNGE_LOCKFILE}\" should only be writable by user" \
+            "${MUNGE_LOGFILE}"
 '
 
 # Check if munged will honor a supposed lockfile with write permissions for
@@ -92,13 +97,15 @@ test_expect_success 'start munged with 0222 bogus lockfile' '
     rm -f "${MUNGE_LOCKFILE}" &&
     touch "${MUNGE_LOCKFILE}" &&
     chmod 0222 "${MUNGE_LOCKFILE}" &&
-    test_must_fail munged_start_daemon
+    test_must_fail munged_start_daemon &&
+    egrep "Error:.* \"${MUNGE_LOCKFILE}\" should only be writable by user" \
+            "${MUNGE_LOGFILE}"
 '
 
 # Create a bogus non-empty "lockfile" here to be able to later check if munged
 #   has truncated it.
 ##
-test_expect_success 'start munged with inactive non-zero lockfile' '
+test_expect_success 'start munged with inactive non-zero-length lockfile' '
     rm -f "${MUNGE_LOCKFILE}" &&
     echo "$$" > "${MUNGE_LOCKFILE}" &&
     chmod 0200 "${MUNGE_LOCKFILE}" &&
@@ -109,6 +116,7 @@ test_expect_success 'start munged with inactive non-zero lockfile' '
 # Check if the lockfile gets truncated.
 ##
 test_expect_success 'check for lockfile truncation after successful start' '
+    test -f "${MUNGE_LOCKFILE}" &&
     test ! -s "${MUNGE_LOCKFILE}"
 '
 
@@ -116,21 +124,28 @@ test_expect_success 'check for lockfile truncation after successful start' '
 #   munged can recover from a dead socket and lockfile.
 ##
 test_expect_success 'stop munged via sigkill to prevent cleanup' '
-    local PID=$(cat "${MUNGE_PIDFILE}") &&
+    local PID &&
+    PID=$(cat "${MUNGE_PIDFILE}") &&
     ps -p "${PID}" -ww | grep munged &&
-    test -S "${MUNGE_SOCKET}" &&
-    test -f "${MUNGE_LOCKFILE}" &&
     while kill -s KILL "${PID}" 2>/dev/null; do :; done &&
-    test "$(cat "${MUNGE_PIDFILE}")" = "${PID}" &&
     ! ps -p "${PID}" >/dev/null
 '
 
-# Check for the expected detritus from the sigkill since munged was prevented
-#   from cleaning up.
+# Check for the leftover socket since munged was prevented from cleaning up.
 ##
-test_expect_success 'check for unclean shutdown' '
-    test -S "${MUNGE_SOCKET}" &&
-    test -f "${MUNGE_LOCKFILE}" &&
+test_expect_success 'check for leftover socket from unclean shutdown' '
+    test -S "${MUNGE_SOCKET}"
+'
+
+# Check for the leftover lockfile since munged was prevented from cleaning up.
+##
+test_expect_success 'check for leftover lockfile from unclean shutdown' '
+    test -f "${MUNGE_LOCKFILE}"
+'
+
+# Check for the leftover pidfile since munged was prevented from cleaning up.
+##
+test_expect_success 'check for leftover pidfile from unclean shutdown' '
     test -f "${MUNGE_PIDFILE}"
 '
 
@@ -168,6 +183,7 @@ test_expect_success 'stop munged' '
 # Check if the lockfile was removed when munged shut down.
 ##
 test_expect_success 'check lockfile removal again' '
+    test -n "${MUNGE_LOCKFILE}" &&
     test ! -f "${MUNGE_LOCKFILE}"
 '
 
