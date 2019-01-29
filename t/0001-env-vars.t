@@ -4,11 +4,14 @@ test_description='Check custom sharness environment variables'
 
 . "$(dirname "$0")/sharness.sh"
 
-for VAR in MUNGE_BUILD_DIR MUNGE_SOURCE_DIR; do
-    test_debug "echo ${VAR}=$(echo \$${VAR})"
-    test_expect_success "${VAR} directory exists" "
-        test -d "$(echo \"\$\{${VAR}\}\")"
-    "
-done
+test_expect_success 'MUNGE_BUILD_DIR directory exists' '
+    test_debug "echo MUNGE_BUILD_DIR=${MUNGE_BUILD_DIR}" &&
+    test -d "${MUNGE_BUILD_DIR}"
+'
+
+test_expect_success 'MUNGE_SOURCE_DIR directory exists' '
+    test_debug "echo MUNGE_SOURCE_DIR=${MUNGE_SOURCE_DIR}" &&
+    test -d "${MUNGE_SOURCE_DIR}"
+'
 
 test_done
