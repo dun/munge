@@ -44,10 +44,10 @@ test_expect_success 'socket type and perms' '
 # Check a socket dir that is owned by the EUID.
 ##
 test_expect_success 'socket dir owned by euid' '
-    local DIR_UID EUID &&
+    local DIR_UID MY_EUID &&
     DIR_UID=$(ls -d -l -n "${MUNGE_SOCKETDIR}" | awk "{ print \$3 }") &&
-    EUID=$(id -u) &&
-    test "${DIR_UID}" = "${EUID}" &&
+    MY_EUID=$(id -u) &&
+    test "${DIR_UID}" = "${MY_EUID}" &&
     munged_start_daemon &&
     munged_stop_daemon
 '
