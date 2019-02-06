@@ -15,7 +15,8 @@ if ! test_have_prereq EXPENSIVE; then
 fi
 
 test_expect_success 'create key under valgrind' '
-    ${VALGRIND_CMD} "${MUNGEKEY}" --create --keyfile=key.$$ --force
+    munged_setup_env &&
+    munged_create_key --exec="${VALGRIND_CMD}"
 '
 
 test_expect_success 'check valgrind log for errors in mungekey' '
