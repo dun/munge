@@ -42,7 +42,7 @@ test_expect_success 'encode credential' '
 '
 
 test_expect_success 'examine credential' '
-    test "$(expr "$(cat cred.$$)" : "^MUNGE:.*:$")" -gt 0
+    test "$(expr "$(cat cred.$$)" : "MUNGE:.*:$")" -gt 0
 '
 
 test_expect_success 'decode credential' '
