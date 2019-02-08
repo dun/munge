@@ -23,7 +23,8 @@ TESTS = \
 	0023-unmunge-valgrind.t \
 	0025-mungekey-valgrind.t \
 	0100-munged-lock.t \
-	0101-munged-security-socket.t
+	0101-munged-security-socket.t \
+	0102-munged-security-keyfile.t
 
 EXTRA_DIST = \
 	$(TESTS) \
