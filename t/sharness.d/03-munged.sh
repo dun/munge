@@ -83,13 +83,16 @@ munged_start_daemon()
 
 ##
 # Stop munged.
+# Additional arguments will be appended to the munged command-line.
 ##
 munged_stop_daemon()
 {
     test_debug "echo \"${MUNGED}\" \
             --socket=\"${MUNGE_SOCKET}\" \
-            --stop" &&
+            --stop \
+            $*" &&
     "${MUNGED}" \
             --socket="${MUNGE_SOCKET}" \
-            --stop
+            --stop \
+            "$@"
 }
