@@ -191,12 +191,10 @@ test_expect_success 'check lockfile removal again' '
 #   This tests the case where the lockfile owner (a non-privileged user)
 #   may be checked against the euid (root) of the process performing the
 #   --stop option.
-# The sudo command cannot call the munged_stop_daemon() shell function so
-#   the actual munged command is used here.
 ##
 test_expect_success SUDO 'stop unprivileged munged as root' '
     munged_start_daemon &&
-    sudo "${MUNGED}" --stop --socket="${MUNGE_SOCKET}"
+    munged_stop_daemon --exec=sudo
 '
 
 test_done

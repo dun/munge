@@ -83,15 +83,21 @@ munged_start_daemon()
 
 ##
 # Stop munged.
+# If the first arg matches "--exec=", its value will be used to exec munged.
 # Additional arguments will be appended to the munged command-line.
 ##
 munged_stop_daemon()
 {
-    test_debug "echo \"${MUNGED}\" \
+    local EXEC &&
+    if expr "$1" : "--exec=" >/dev/null; then
+        EXEC=$(echo "$1" | sed "s/^[^=]*=//")
+        shift
+    fi &&
+    test_debug "echo ${EXEC} \"${MUNGED}\" \
             --socket=\"${MUNGE_SOCKET}\" \
             --stop \
             $*" &&
-    "${MUNGED}" \
+    ${EXEC} "${MUNGED}" \
             --socket="${MUNGE_SOCKET}" \
             --stop \
             "$@"
