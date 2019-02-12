@@ -38,6 +38,7 @@ munged_setup_env()
 ##
 # Create the smallest-allowable key if one does not already exist.
 # If the first arg matches "--exec=", its value will be used to exec mungekey.
+# Additional arguments will be appended to the mungekey command-line.
 ##
 munged_create_key()
 {
@@ -50,11 +51,13 @@ munged_create_key()
         test_debug "echo ${EXEC} \"${MUNGEKEY}\" \
                 --create \
                 --keyfile=\"${MUNGE_KEYFILE}\" \
-                --bits=256" &&
+                --bits=256 \
+                $*" &&
         ${EXEC} "${MUNGEKEY}" \
                 --create \
                 --keyfile="${MUNGE_KEYFILE}" \
-                --bits=256
+                --bits=256 \
+                "$@"
     fi
 }
 
