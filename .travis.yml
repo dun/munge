@@ -10,17 +10,17 @@ env:
   global:
   # Encrypted COVERITY_SCAN_TOKEN
   - secure: "BQDASY4yNtsHV5bX6CDcFux4csQ4lkKm+Ihjwslab6XVOX8YAQrFeq6bHw+eCl8uCybrwUCOHYavvCHAFIBp5ik5D/NZUid+U1Yk1DSw6NcXpLMhEZDx9GVupyjExwFCOHMGnIRXcOI1mEMMaPHQQZWKixTVZX9350Dku6Qu3AXFjTSf3aCQLoazxGoNQveefmaqLLOg/kUgfGQV2eW8J4b9UKw3mdaDa651jdLaAOvKunRlI22j675JkFE45f0+RG/DtqSEfoDc3eAnsSebl9bj9JPNS4qgXschM0WaDUoogJFKcZ+OeLRPGQDGZUvCmvBE7mprOiFYtkFihAZmVpZ7pT1kgtmEnyuRX0+yaJN/YW+EQ5Nht89c5pM5BxInDXlyQWW1Kn9qXacpdIA8YTKswxa58tWQJp7c6oqaCrN5dUV3QvRJFLMxCMI3Ptjl196G4lZvVlT5ZyoYYnIhDmwoTrI1rhjKpnOQG9Ce64Jdlaf6c+5GPXHoqDSc8/zRWTVZrJJWnFStTSakLNDmdZtVO2bj5EQnMRgcaxK9uwmxRAUJvcocq1KKvkByesLD/5bH3d+gM9LL0NcJKjPRqgPL2amjXXqBuGRo9MSiEicgFPZ6inV/MUZGdTO4Lzr/8X5gqUl3cuvjybTDlu4izBSn3iCt5yZCQb2mtTx7m18="
-  - CFLAGS='-Werror'
+  - CFLAGS="-Werror"
   - DISTCHECK_CONFIGURE_FLAGS='${CONFIGURE_OPTS}'
   - MUNGE_ROOT="/tmp/munge-$$"
-  - TEST_LONG='t'
-  - chain_lint='t'
-  - verbose='t'
+  - TEST_LONG="t"
+  - chain_lint="t"
+  - verbose="t"
   matrix:
-  - CONFIGURE_OPTS='--enable-debug --with-crypto-lib=libgcrypt'
-  - CONFIGURE_OPTS='--enable-debug --with-crypto-lib=openssl'
-  - CONFIGURE_OPTS='--disable-debug --with-crypto-lib=libgcrypt'
-  - CONFIGURE_OPTS='--disable-debug --with-crypto-lib=openssl'
+  - CONFIGURE_OPTS="--enable-debug --with-crypto-lib=libgcrypt"
+  - CONFIGURE_OPTS="--enable-debug --with-crypto-lib=openssl"
+  - CONFIGURE_OPTS="--disable-debug --with-crypto-lib=libgcrypt"
+  - CONFIGURE_OPTS="--disable-debug --with-crypto-lib=openssl"
 
 addons:
   apt:
@@ -42,10 +42,10 @@ addons:
     branch_pattern: coverity_scan
 
 before_install:
-- test "${TRAVIS_BRANCH}" != 'coverity_scan' -o "${TRAVIS_JOB_NUMBER##*.}" = '1' || exit 0
+- test "${TRAVIS_BRANCH}" != "coverity_scan" -o "${TRAVIS_JOB_NUMBER##*.}" = "1" || exit 0
 
 script:
-- test "${TRAVIS_BRANCH}" != 'coverity_scan' || exit 0
+- test "${TRAVIS_BRANCH}" != "coverity_scan" || exit 0
 - ./bootstrap && ./configure ${CONFIGURE_OPTS} && colormake -e -k && colormake -e distcheck
 
 after_failure:
