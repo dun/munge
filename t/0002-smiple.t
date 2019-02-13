@@ -4,9 +4,15 @@ test_description="Because nothing is so simple that it can't still go wrong"
 
 . "$(dirname "$0")/sharness.sh"
 
-# Check if the string is a valid absolute pathname (x_ac_with_munge_socket.m4).
+# When testing an expr string regex match for an absolute path, check if the
+#   "/" regex should be escaped (i.e., "\/").
+# FreeBSD requires the "/" regex in expr to be escaped.
+# See "m4/x_ac_with_munge_socket.m4".
 ##
-test_expect_success 'check for absolute pathname with $(expr string : regex)' '
+test_expect_success 'expr string match of absolute path with "/" regex' '
+    test_might_fail test "$(expr "/path" : "/")" -eq 1
+'
+test_expect_success 'expr string match of absolute path with "\/" regex' '
     test "$(expr "/path" : "\/")" -eq 1
 '
 
