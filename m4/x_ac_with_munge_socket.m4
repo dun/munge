@@ -18,7 +18,7 @@ AC_DEFUN([X_AC_WITH_MUNGE_SOCKET], [
     [AS_HELP_STRING(
       [--with-munge-socket=PATH],
       [specify default MUNGE socket pathname])],
-    [if expr "${withval}" : "\/" >/dev/null 2>&1; then
+    [if expr X"${withval}" : "X\/" >/dev/null 2>&1; then
        x_ac_with_munge_socket="${withval}";
      else
        AC_MSG_RESULT([failed])

@@ -10,4 +10,22 @@ test_expect_success 'check for absolute pathname with $(expr string : regex)' '
     test "$(expr "/path" : "\/")" -eq 1
 '
 
+# Check for a given long option using an expr string regex match.
+# Some expr implementations require the option string to be preceded by the
+#   "--" parameter to force an end to option-scanning.  But some older
+#   implementations don't recognize that syntax.  Since no expr keyword starts
+#   with 'X', prepending an 'X' to both strings should be a portable solution.
+# FreeBSD requires that a leading argument beginning with a minus sign be
+#   considered an option to the program.
+##
+test_expect_success 'expr string match of long opt' '
+    test_might_fail test "$(expr "--exec=foo" : "--exec=")" -eq 7
+'
+test_expect_success 'expr string match of long opt w/ preceding "--" parm' '
+    test_might_fail test "$(expr -- "--exec=foo" : "--exec=")" -eq 7
+'
+test_expect_success 'expr string match of long opt w/ prepended "X" char' '
+    test "$(expr X"--exec=foo" : "X--exec=")" -eq 8
+'
+
 test_done

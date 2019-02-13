@@ -43,7 +43,7 @@ munged_setup_env()
 munged_create_key()
 {
     local EXEC &&
-    if expr "$1" : "--exec=" >/dev/null; then
+    if expr X"$1" : "X--exec=" >/dev/null; then
         EXEC=$(echo "$1" | sed "s/^[^=]*=//")
         shift
     fi &&
@@ -69,7 +69,7 @@ munged_create_key()
 munged_start_daemon()
 {
     local EXEC &&
-    if expr "$1" : "--exec=" >/dev/null; then
+    if expr X"$1" : "X--exec=" >/dev/null; then
         EXEC=$(echo "$1" | sed "s/^[^=]*=//")
         shift
     fi &&
@@ -98,7 +98,7 @@ munged_start_daemon()
 munged_stop_daemon()
 {
     local EXEC &&
-    if expr "$1" : "--exec=" >/dev/null; then
+    if expr X"$1" : "X--exec=" >/dev/null; then
         EXEC=$(echo "$1" | sed "s/^[^=]*=//")
         shift
     fi &&

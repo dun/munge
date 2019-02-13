@@ -44,7 +44,7 @@ AC_DEFUN([X_AC_ARCH], [
       [AS_VAR_SET(x_ac_arch_prog_cc_m, no); CFLAGS="$_x_ac_arch_cflags_save"])
     AC_MSG_RESULT([${x_ac_arch_prog_cc_m=no}])
 
-    if expr "$host_os" : "aix" >/dev/null 2>&1; then
+    if expr X"$host_os" : "Xaix" >/dev/null 2>&1; then
       AC_MSG_CHECKING([whether $CC accepts -maix${x_ac_arch}])
       _x_ac_arch_cflags_save="$CFLAGS"
       CFLAGS="$CFLAGS -maix${x_ac_arch}"
@@ -56,7 +56,7 @@ AC_DEFUN([X_AC_ARCH], [
   fi
 
   if test "$x_ac_arch" = "32"; then
-    if expr "$host_os" : "aix" >/dev/null 2>&1; then
+    if expr X"$host_os" : "Xaix" >/dev/null 2>&1; then
       test -z "$OBJECT_MODE" && AC_MSG_ERROR(
         [The OBJECT_MODE variable must be exported to the shell.])
       OBJECT_MODE=32
@@ -66,7 +66,7 @@ AC_DEFUN([X_AC_ARCH], [
         && LDFLAGS="-L/lib -L/usr/lib $LDFLAGS"
     fi
   elif test "$x_ac_arch" = "64"; then
-    if expr "$host_os" : "aix" >/dev/null 2>&1; then
+    if expr X"$host_os" : "Xaix" >/dev/null 2>&1; then
       test -z "$OBJECT_MODE" && AC_MSG_ERROR(
         [The OBJECT_MODE variable must be exported to the shell.])
       OBJECT_MODE=64
