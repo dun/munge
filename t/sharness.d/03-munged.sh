@@ -11,6 +11,8 @@
 ##
 munged_setup_env()
 {
+    umask 0022 &&
+
     : "${MUNGE_ROOT:="$(pwd)"}" &&
     mkdir -m 0755 -p "${MUNGE_ROOT}" &&
 
