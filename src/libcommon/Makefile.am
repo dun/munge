@@ -6,16 +6,20 @@
 include $(top_srcdir)/Make-inc.mk
 
 TEMPLATE_FILES = \
-	munge.7.in
+	munge.7.in \
+	# End of TEMPLATE_FILES
 
 SUBSTITUTE_FILES = \
-	munge.7
+	munge.7 \
+	# End of SUBSTITUTE_FILES
 
 EXTRA_DIST = \
-	$(TEMPLATE_FILES)
+	$(TEMPLATE_FILES) \
+	# End of EXTRA_DIST
 
 CLEANFILES = \
-	$(SUBSTITUTE_FILES)
+	$(SUBSTITUTE_FILES) \
+	# End of CLEANFILES
 
 $(SUBSTITUTE_FILES): Makefile
 	$(AM_V_GEN)$(substitute) < "$(srcdir)/$@.in" > "$(builddir)/$@"
@@ -23,13 +27,15 @@ $(SUBSTITUTE_FILES): Makefile
 munge.7: munge.7.in
 
 noinst_LTLIBRARIES = \
-	libcommon.la
+	libcommon.la \
+	# End of noinst_LTLIBRARIES
 
 libcommon_la_CPPFLAGS = \
 	-DDATE='"$(DATE)"' \
 	-DLOCALSTATEDIR='"$(localstatedir)"' \
 	-DSYSCONFDIR='"$(sysconfdir)"' \
-	-I$(top_srcdir)/src/libmunge
+	-I$(top_srcdir)/src/libmunge \
+	# End of libcommon_la_CPPFLAGS
 
 libcommon_la_SOURCES = \
 	common.h \
@@ -45,11 +51,13 @@ libcommon_la_SOURCES = \
 	str.c \
 	str.h \
 	version.c \
-	version.h
+	version.h \
+	# End of libcommon_la_SOURCES
 
 # For dependencies on DATE.
 #
 $(srcdir)/libcommon_la-version.lo: Makefile
 
 man_MANS = \
-	munge.7
+	munge.7 \
+	# End of man_MANS

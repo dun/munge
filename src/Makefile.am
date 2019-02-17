@@ -14,4 +14,5 @@ SUBDIRS = \
 	libtap \
 	munge \
 	munged \
-	mungekey
+	mungekey \
+	# End of SUBDIRS

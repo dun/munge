@@ -6,16 +6,20 @@
 include $(top_srcdir)/Make-inc.mk
 
 TEMPLATE_FILES = \
-	munged.8.in
+	munged.8.in \
+	# End of TEMPLATE_FILES
 
 SUBSTITUTE_FILES = \
-	munged.8
+	munged.8 \
+	# End of SUBSTITUTE_FILES
 
 EXTRA_DIST = \
-	$(TEMPLATE_FILES)
+	$(TEMPLATE_FILES) \
+	# End of EXTRA_DIST
 
 CLEANFILES = \
-	$(SUBSTITUTE_FILES)
+	$(SUBSTITUTE_FILES) \
+	# End of CLEANFILES
 
 $(SUBSTITUTE_FILES): Makefile
 	$(AM_V_GEN)$(substitute) < "$(srcdir)/$@.in" > "$(builddir)/$@"
@@ -23,11 +27,13 @@ $(SUBSTITUTE_FILES): Makefile
 munged.8: munged.8.in
 
 sbin_PROGRAMS = \
-	munged
+	munged \
+	# End of sbin_PROGRAMS
 
 munged_CFLAGS = \
 	$(AM_CFLAGS) \
-	$(CRYPTO_CFLAGS)
+	$(CRYPTO_CFLAGS) \
+	# End of munged_CFLAGS
 
 munged_CPPFLAGS = \
 	-DLOCALSTATEDIR='"$(localstatedir)"' \
@@ -36,7 +42,8 @@ munged_CPPFLAGS = \
 	-I$(top_srcdir)/src/common \
 	-I$(top_srcdir)/src/libcommon \
 	-I$(top_srcdir)/src/libmissing \
-	-I$(top_srcdir)/src/libmunge
+	-I$(top_srcdir)/src/libmunge \
+	# End of munged_CPPFLAGS
 
 munged_LDADD = \
 	$(top_builddir)/src/libcommon/libcommon.la \
@@ -45,7 +52,8 @@ munged_LDADD = \
 	$(LIBPTHREAD) \
 	$(LIBBZ2) \
 	$(LIBZ) \
-	$(CRYPTO_LIBS)
+	$(CRYPTO_LIBS) \
+	# End of munged_LDADD
 
 munged_SOURCES = \
 	munged.c \
@@ -102,7 +110,8 @@ munged_SOURCES = \
 	$(top_srcdir)/src/common/xgetpw.c \
 	$(top_srcdir)/src/common/xgetpw.h \
 	$(top_srcdir)/src/common/xsignal.c \
-	$(top_srcdir)/src/common/xsignal.h
+	$(top_srcdir)/src/common/xsignal.h \
+	# End of munged_SOURCES
 
 # For dependencies on LOCALSTATEDIR and SYSCONFDIR via the #defines for
 #   MUNGE_KEYFILE_PATH, MUNGED_LOGFILE, MUNGED_PIDFILE, MUNGED_RANDOM_SEED,
@@ -111,20 +120,27 @@ munged_SOURCES = \
 $(srcdir)/munged-conf.$(OBJEXT): Makefile
 
 man_MANS = \
-	munged.8
+	munged.8 \
+	# End of man_MANS
 
-check_PROGRAMS = $(TESTS)
+check_PROGRAMS = \
+	$(TESTS) \
+	# End of check_PROGRAMS
 
 TESTS = \
-	base64_test
+	base64_test \
+	# End of TESTS
 
 base64_test_CPPFLAGS = \
-	-I$(top_srcdir)/src/libtap
+	-I$(top_srcdir)/src/libtap \
+	# End of base64_test_CPPFLAGS
 
 base64_test_LDADD = \
-	$(top_builddir)/src/libtap/libtap.la
+	$(top_builddir)/src/libtap/libtap.la \
+	# End of base64_test_LDADD
 
 base64_test_SOURCES = \
 	base64.c \
 	base64.h \
-	base64_test.c
+	base64_test.c \
+	# End of base64_test_SOURCES

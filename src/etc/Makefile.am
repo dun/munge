@@ -10,14 +10,16 @@ TEMPLATE_FILES = \
 	munge.pc.in \
 	munge.service.in \
 	munge.sysconfig.in \
-	munge.tmpfiles.conf.in
+	munge.tmpfiles.conf.in \
+	# End of TEMPLATE_FILES
 
 SUBSTITUTE_FILES = \
 	munge.init \
 	munge.pc \
 	munge.service \
 	munge.sysconfig \
-	munge.tmpfiles.conf
+	munge.tmpfiles.conf \
+	# End of SUBSTITUTE_FILES
 
 UNINSTALL_FILES = \
 	$(sysconfdir)/rc.d/init.d/munge \
@@ -26,17 +28,23 @@ UNINSTALL_FILES = \
 	$(sysconfdir)/default/munge \
 	$(libdir)/pkgconfig/munge.pc \
 	$(prefix)/lib/systemd/system/munge.service \
-	$(prefix)/lib/tmpfiles.d/munge.conf
+	$(prefix)/lib/tmpfiles.d/munge.conf \
+	# End of UNINSTALL_FILES
 
 UNINSTALL_DIRS = \
 	$(sysconfdir)/munge \
 	$(localstatedir)/lib/munge \
 	$(localstatedir)/log/munge \
-	$(localstatedir)/run/munge
+	$(localstatedir)/run/munge \
+	# End of UNINSTALL_DIRS
 
-EXTRA_DIST = $(TEMPLATE_FILES)
+EXTRA_DIST = \
+	$(TEMPLATE_FILES) \
+	# End of EXTRA_DIST
 
-CLEANFILES = $(SUBSTITUTE_FILES)
+CLEANFILES = \
+	$(SUBSTITUTE_FILES) \
+	# End of CLEANFILES
 
 $(SUBSTITUTE_FILES): Makefile
 	$(AM_V_GEN)$(substitute) < "$(srcdir)/$@.in" > "$(builddir)/$@"
@@ -48,7 +56,8 @@ munge.sysconfig: munge.sysconfig.in
 munge.tmpfiles.conf: munge.tmpfiles.conf.in
 
 noinst_DATA = \
-	$(SUBSTITUTE_FILES)
+	$(SUBSTITUTE_FILES) \
+	# End of noinst_DATA
 
 install-data-hook: install-dirperms install-pkgconfig install-systemd install-sysvinit install-tmpfiles
 

@@ -6,21 +6,26 @@
 include $(top_srcdir)/Make-inc.mk
 
 noinst_LTLIBRARIES = \
-	libmissing.la
+	libmissing.la \
+	# End of noinst_LTLIBRARIES
 
 libmissing_la_LIBADD = \
-	$(LTLIBOBJS)
+	$(LTLIBOBJS) \
+	# End of libmissing_la_LIBADD
 
 libmissing_la_SOURCES = \
 	getopt.h \
 	getopt.c \
 	getopt1.c \
-	missing.h
+	missing.h \
+	# End of libmissing_la_SOURCES
 
 EXTRA_libmissing_la_SOURCES = \
 	inet_ntop.h \
 	strlcat.h \
-	strlcpy.h
+	strlcpy.h \
+	# End of EXTRA_libmissing_la_SOURCES
 
 EXTRA_DIST = \
-	URL
+	URL \
+	# End of EXTRA_DIST

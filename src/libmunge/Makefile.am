@@ -8,18 +8,22 @@ include $(top_srcdir)/Make-inc.mk
 TEMPLATE_FILES = \
 	munge.3.in \
 	munge_ctx.3.in \
-	munge_enum.3.in
+	munge_enum.3.in \
+	# End of TEMPLATE_FILES
 
 SUBSTITUTE_FILES = \
 	munge.3 \
 	munge_ctx.3 \
-	munge_enum.3
+	munge_enum.3 \
+	# End of SUBSTITUTE_FILES
 
 EXTRA_DIST = \
-	$(TEMPLATE_FILES)
+	$(TEMPLATE_FILES) \
+	# End of EXTRA_DIST
 
 CLEANFILES = \
-	$(SUBSTITUTE_FILES)
+	$(SUBSTITUTE_FILES) \
+	# End of CLEANFILES
 
 $(SUBSTITUTE_FILES): Makefile
 	$(AM_V_GEN)$(substitute) < "$(srcdir)/$@.in" > "$(builddir)/$@"
@@ -29,10 +33,12 @@ munge_ctx.3: munge_ctx.3.in
 munge_enum.3: munge_enum.3.in
 
 include_HEADERS = \
-	munge.h
+	munge.h \
+	# End of include_HEADERS
 
 lib_LTLIBRARIES = \
-	libmunge.la
+	libmunge.la \
+	# End of lib_LTLIBRARIES
 
 LT_CURRENT = 2
 LT_REVISION = 0
@@ -41,14 +47,17 @@ LT_AGE = 0
 libmunge_la_CPPFLAGS = \
 	-DLOCALSTATEDIR='"$(localstatedir)"' \
 	-DSYSCONFDIR='"$(sysconfdir)"' \
-	-I$(top_srcdir)/src/libcommon
+	-I$(top_srcdir)/src/libcommon \
+	# End of libmunge_la_CPPFLAGS
 
 libmunge_la_LDFLAGS = \
 	-export-symbols-regex "^munge_.*" \
-	-version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE)
+	-version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE) \
+	# End of libmunge_la_LDFLAGS
 
 libmunge_la_LIBADD = \
-	$(top_builddir)/src/libcommon/libcommon.la
+	$(top_builddir)/src/libcommon/libcommon.la \
+	# End of libmunge_la_LIBADD
 
 libmunge_la_SOURCES = \
 	auth_send.c \
@@ -61,7 +70,8 @@ libmunge_la_SOURCES = \
 	m_msg_client.c \
 	m_msg_client.h \
 	strerror.c \
-	munge.h
+	munge.h \
+	# End of libmunge_la_SOURCES
 
 # For dependencies on LOCALSTATEDIR via the #define for MUNGE_SOCKET_NAME.
 #
@@ -71,7 +81,8 @@ $(srcdir)/libmunge_la-m_msg_client.lo: Makefile
 man_MANS = \
 	munge.3 \
 	munge_ctx.3 \
-	munge_enum.3
+	munge_enum.3 \
+	# End of man_MANS
 
 install-data-hook:
 	for man in encode decode strerror; do \

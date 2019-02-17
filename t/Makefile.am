@@ -24,7 +24,8 @@ TESTS = \
 	0025-mungekey-valgrind.t \
 	0100-munged-lock.t \
 	0101-munged-security-socket.t \
-	0102-munged-security-keyfile.t
+	0102-munged-security-keyfile.t \
+	# End of TESTS
 
 EXTRA_DIST = \
 	$(TESTS) \
@@ -32,7 +33,8 @@ EXTRA_DIST = \
 	sharness.d \
 	sharness.sh \
 	test-terminal.perl \
-	valgrind.supp
+	valgrind.supp \
+	# End of EXTRA_DIST
 
 clean-local:
 	-rm -rf test-results

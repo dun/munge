@@ -9,7 +9,8 @@ ACLOCAL_AMFLAGS = -I m4
 
 SUBDIRS = \
 	src \
-	t
+	t \
+	# End of SUBDIRS
 
 EXTRA_DIST = \
 	.gitignore \
@@ -32,11 +33,13 @@ EXTRA_DIST = \
 	bootstrap \
 	doc \
 	extra \
-	munge.spec
+	munge.spec \
+	# End of EXTRA_DIST
 
 DISTCLEANFILES = \
 	config/*~ \
-	$(PACKAGE)-*.tar*
+	$(PACKAGE)-*.tar* \
+	# End of DISTCLEANFILES
 
 MAINTAINERCLEANFILES = \
 	Makefile.in \
@@ -64,4 +67,5 @@ MAINTAINERCLEANFILES = \
 	src/libmunge/Makefile.in \
 	src/munge/Makefile.in \
 	src/munged/Makefile.in \
-	t/Makefile.in
+	t/Makefile.in \
+	# End of MAINTAINERCLEANFILES

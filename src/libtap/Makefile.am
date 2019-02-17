@@ -6,11 +6,14 @@
 include $(top_srcdir)/Make-inc.mk
 
 check_LTLIBRARIES = \
-	libtap.la
+	libtap.la \
+	# End of check_LTLIBRARIES
 
 libtap_la_CFLAGS = \
-	-D_BSD_SOURCE
+	-D_BSD_SOURCE \
+	# End of libtap_la_CFLAGS
 
 libtap_la_SOURCES = \
 	tap.c \
-	tap.h
+	tap.h \
+	# End of libtap_la_SOURCES
