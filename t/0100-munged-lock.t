@@ -194,7 +194,7 @@ test_expect_success 'check lockfile removal again' '
 ##
 test_expect_success SUDO 'stop unprivileged munged as root' '
     munged_start_daemon &&
-    munged_stop_daemon --exec=sudo
+    munged_stop_daemon t-exec=sudo
 '
 
 test_done

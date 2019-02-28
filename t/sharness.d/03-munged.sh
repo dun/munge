@@ -39,16 +39,20 @@ munged_setup_env()
 
 ##
 # Create the smallest-allowable key if one does not already exist.
-# If the first arg matches "--exec=", its value will be used to exec mungekey.
-# Additional arguments will be appended to the mungekey command-line.
+# The following leading args are recognized:
+#   t-exec=ARG - use ARG to exec mungekey.
+# Remaining args will be appended to the mungekey command-line.
 ##
 munged_create_key()
 {
-    local EXEC &&
-    if expr X"$1" : "X--exec=" >/dev/null; then
-        EXEC=$(echo "$1" | sed "s/^[^=]*=//")
+    local EXEC= &&
+    while true; do
+        case $1 in
+            t-exec=*) EXEC=$(echo "$1" | sed 's/^[^=]*=//');;
+            *) break;;
+        esac
         shift
-    fi &&
+    done &&
     if test ! -r "${MUNGE_KEYFILE}"; then
         test_debug "echo ${EXEC} \"${MUNGEKEY}\" \
                 --create \
@@ -65,16 +69,20 @@ munged_create_key()
 
 ##
 # Start munged, removing an existing logfile (from a previous run) if present.
-# If the first arg matches "--exec=", its value will be used to exec munged.
-# Additional arguments will be appended to the munged command-line.
+# The following leading args are recognized:
+#   t-exec=ARG - use ARG to exec munged.
+# Remaining args will be appended to the munged command-line.
 ##
 munged_start_daemon()
 {
-    local EXEC &&
-    if expr X"$1" : "X--exec=" >/dev/null; then
-        EXEC=$(echo "$1" | sed "s/^[^=]*=//")
+    local EXEC= &&
+    while true; do
+        case $1 in
+            t-exec=*) EXEC=$(echo "$1" | sed 's/^[^=]*=//');;
+            *) break;;
+        esac
         shift
-    fi &&
+    done &&
     rm -f "${MUNGE_LOGFILE}" &&
     test_debug "echo ${EXEC} \"${MUNGED}\" \
             --socket=\"${MUNGE_SOCKET}\" \
@@ -94,16 +102,20 @@ munged_start_daemon()
 
 ##
 # Stop munged.
-# If the first arg matches "--exec=", its value will be used to exec munged.
-# Additional arguments will be appended to the munged command-line.
+# The following leading args are recognized:
+#   t-exec=ARG - use ARG to exec munged.
+# Remaining args will be appended to the munged command-line.
 ##
 munged_stop_daemon()
 {
-    local EXEC &&
-    if expr X"$1" : "X--exec=" >/dev/null; then
-        EXEC=$(echo "$1" | sed "s/^[^=]*=//")
+    local EXEC= &&
+    while true; do
+        case $1 in
+            t-exec=*) EXEC=$(echo "$1" | sed 's/^[^=]*=//');;
+            *) break;;
+        esac
         shift
-    fi &&
+    done &&
     test_debug "echo ${EXEC} \"${MUNGED}\" \
             --socket=\"${MUNGE_SOCKET}\" \
             --stop \

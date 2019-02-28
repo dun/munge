@@ -16,7 +16,7 @@ fi
 
 test_expect_success 'create key under valgrind' '
     munged_setup_env &&
-    munged_create_key --exec="${VALGRIND_CMD}"
+    munged_create_key t-exec="${VALGRIND_CMD}"
 '
 
 test_expect_success 'check valgrind log for errors in mungekey' '
