@@ -265,7 +265,7 @@ test_expect_success ALT,SUDO 'keyfile dir owned by other override' '
 ##
 test_expect_success ALT,SUDO 'alt keyfile dir cleanup' '
     sudo rm -r -f "${ALT_KEYDIR}" &&
-    if ! rmdir "$(dirname "${ALT_KEYDIR}")" 2>/dev/null; then :; fi &&
+    if rmdir "$(dirname "${ALT_KEYDIR}")" 2>/dev/null; then :; fi &&
     unset ALT_KEYDIR &&
     unset ALT_KEYFILE
 '

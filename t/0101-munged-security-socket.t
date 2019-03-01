@@ -207,7 +207,7 @@ test_expect_success 'socket dir inaccessible by all override' '
 ##
 test_expect_success 'cleanup' '
     rmdir "${MUNGE_SOCKETDIR}" &&
-    if ! rmdir "$(dirname "${MUNGE_SOCKETDIR}")" 2>/dev/null; then :; fi
+    if rmdir "$(dirname "${MUNGE_SOCKETDIR}")" 2>/dev/null; then :; fi
 '
 
 test_done
