@@ -71,19 +71,23 @@ munged_create_key()
 # Start munged, removing an existing logfile (from a previous run) if present.
 # The following leading args are recognized:
 #   t-exec=ARG - use ARG to exec munged.
+#   t-keep-logfile - do not remove logfile before starting munged.
 # Remaining args will be appended to the munged command-line.
 ##
 munged_start_daemon()
 {
-    local EXEC= &&
+    local EXEC= KEEP_LOGFILE= &&
     while true; do
         case $1 in
             t-exec=*) EXEC=$(echo "$1" | sed 's/^[^=]*=//');;
+            t-keep-logfile) KEEP_LOGFILE=1;;
             *) break;;
         esac
         shift
     done &&
-    rm -f "${MUNGE_LOGFILE}" &&
+    if test "${KEEP_LOGFILE}" != 1; then
+        rm -f "${MUNGE_LOGFILE}"
+    fi &&
     test_debug "echo ${EXEC} \"${MUNGED}\" \
             --socket=\"${MUNGE_SOCKET}\" \
             --key-file=\"${MUNGE_KEYFILE}\" \

@@ -25,6 +25,7 @@ TESTS = \
 	0100-munged-lock.t \
 	0101-munged-security-socket.t \
 	0102-munged-security-keyfile.t \
+	0103-munged-security-logfile.t \
 	# End of TESTS
 
 EXTRA_DIST = \
