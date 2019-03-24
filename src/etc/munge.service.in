@@ -6,7 +6,8 @@ After=time-sync.target
 
 [Service]
 Type=forking
-ExecStart=@sbindir@/munged
+EnvironmentFile=-@sysconfdir@/sysconfig/munge
+ExecStart=@sbindir@/munged $DAEMON_ARGS
 PIDFile=@localstatedir@/run/munge/munged.pid
 User=munge
 Group=munge
