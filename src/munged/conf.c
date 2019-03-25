@@ -46,6 +46,7 @@
 #include <sys/stat.h>
 #include <time.h>
 #include <unistd.h>
+#include <ifaddrs.h>                    /* for getifaddrs/freeifaddrs */
 #include "conf.h"
 #include "license.h"
 #include "lock.h"
@@ -77,7 +78,8 @@
 #define OPT_LOG_FILE            267
 #define OPT_SEED_FILE           268
 #define OPT_TRUSTED_GROUP       269
-#define OPT_LAST                270
+#define OPT_HOSTNAME            270
+#define OPT_LAST                271
 
 const char * const short_opts = ":hLVfFMsS:v";
 
@@ -108,6 +110,7 @@ struct option long_opts[] = {
     { "seed-file",         required_argument, NULL, OPT_SEED_FILE     },
     { "syslog",            no_argument,       NULL, OPT_SYSLOG        },
     { "trusted-group",     required_argument, NULL, OPT_TRUSTED_GROUP },
+    { "hostname",          required_argument, NULL, OPT_HOSTNAME      },
     {  NULL,               0,                 NULL, 0                 }
 };
 
@@ -197,6 +200,7 @@ create_conf (void)
     conf->auth_server_dir = NULL;
     conf->auth_client_dir = NULL;
     conf->auth_rnd_bytes = MUNGE_AUTH_RND_BYTES;
+    conf->hostname = NULL;
 
 #if defined(AUTH_METHOD_RECVFD_MKFIFO) || defined(AUTH_METHOD_RECVFD_MKNOD)
     if (!(conf->auth_server_dir = strdup (MUNGE_AUTH_SERVER_DIR))) {
@@ -268,6 +272,10 @@ destroy_conf (conf_t conf, int do_unlink)
     if (conf->auth_client_dir) {
         free (conf->auth_client_dir);
         conf->auth_client_dir = NULL;
+    }
+    if (conf->hostname) {
+        free (conf->hostname);
+        conf->hostname = NULL;
     }
     free (conf);
 
@@ -432,6 +440,13 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                         "Invalid value \"%s\" for trusted-group", optarg);
                 }
                 break;
+            case OPT_HOSTNAME:
+                if (conf->hostname)
+                    free (conf->hostname);
+                if (!(conf->hostname = strdup (optarg)))
+                    log_errno (EMUNGE_NO_MEMORY, LOG_ERR,
+                        "Failed to copy hostname cmdline string");
+                break;
             case '?':
                 if (optopt > 0) {
                     log_err (EMUNGE_SNAFU, LOG_ERR,
@@ -572,6 +587,9 @@ display_help (char *prog)
     printf ("  %*s %s\n", w, "--trusted-group=GROUP",
             "Specify trusted group/GID for directory checks");
 
+    printf ("  %*s %s\n", w, "--hostname=HOSTNAME",
+            "Specify which hostname should be used by munged");
+
     printf ("\n");
     return;
 }
@@ -677,9 +695,14 @@ lookup_ip_addr (conf_t conf)
     char hostname [MAXHOSTNAMELEN];
     char ip_addr_buf [INET_ADDRSTRLEN];
     struct hostent *hptr;
+    struct ifaddrs *ifaddr, *ifa = NULL;
 
-    if (gethostname (hostname, sizeof (hostname)) < 0) {
-        log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to determine hostname");
+    if(conf->hostname) {
+        strncpy(hostname, conf->hostname, MAXHOSTNAMELEN);
+    } else {
+        if (gethostname (hostname, sizeof (hostname)) < 0) {
+            log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to determine hostname");
+        }
     }
     hostname [sizeof (hostname) - 1] = '\0';
 
@@ -710,6 +733,42 @@ lookup_ip_addr (conf_t conf)
     if (!inet_ntop (AF_INET, &conf->addr, ip_addr_buf, sizeof (ip_addr_buf))) {
         log_errno (EMUNGE_SNAFU, LOG_ERR,
                 "Failed to convert IP address for \"%s\"", hostname);
+    }
+
+    // check if the requested ip address is associated with a local network interface
+    if (getifaddrs(&ifaddr) == -1) {
+        log_errno (EMUNGE_SNAFU, LOG_ERR,
+            "Failed to get a list of network interfaces: %s", strerror(errno));
+    }
+
+    ifa = ifaddr;
+    while(ifa != NULL) {
+       if (ifa->ifa_addr != NULL && ifa->ifa_addr->sa_family == AF_INET &&
+               ((struct sockaddr_in *)ifa->ifa_addr)->sin_addr.s_addr == conf->addr.s_addr)
+           break;
+       else
+       {
+           ifa = ifa->ifa_next;
+           continue;
+       }
+    }
+
+    if (ifa == NULL) {
+        // no interface with given ip address
+        log_errno (EMUNGE_SNAFU, LOG_ERR,
+            "Failed to find a network interface with IP address \"%s\"", ip_addr_buf);
+    } else {
+        log_msg(LOG_DEBUG, "Found IP address \"%s\" on interface \"%s\"", ip_addr_buf, ifa->ifa_name);
+    }
+
+    freeifaddrs(ifaddr);
+
+    if(strncmp(hostname, ip_addr_buf, INET_ADDRSTRLEN) == 0) {
+        // hostname and ip addr match means we got an ip addr instead of
+        // a proper hostname, try to do a reverse lookup
+        if (!(hptr = gethostbyaddr (&conf->addr, sizeof (conf->addr), AF_INET))) {
+            log_msg (LOG_WARNING, "Failed to lookup hostname for \"%s\"", ip_addr_buf);
+        }
     }
 
     log_msg (LOG_NOTICE, "Running on \"%s\" (%s)",

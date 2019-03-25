@@ -77,6 +77,7 @@ struct conf {
     char           *auth_server_dir;    /* dir in which to create auth pipe  */
     char           *auth_client_dir;    /* dir in which to create auth file  */
     int             auth_rnd_bytes;     /* num rnd bytes in auth pipe name   */
+    char           *hostname;           /* which hostname to use for munged  */
 };
 
 typedef struct conf * conf_t;
