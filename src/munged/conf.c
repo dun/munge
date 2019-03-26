@@ -719,7 +719,11 @@ lookup_ip_addr (conf_t conf)
      *  Note that gethostbyname() DOES NOT set errno.
      */
     if (!(hptr = gethostbyname (hostname))) {
-        log_msg (LOG_WARNING, "Failed to resolve host \"%s\"", hostname);
+        if (conf->hostname) {
+            log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to resolve host \"%s\"", hostname);
+        } else {
+            log_msg (LOG_WARNING, "Failed to resolve host \"%s\"", hostname);
+        }
     }
     else if (sizeof (conf->addr) != hptr->h_length) {
         log_msg (LOG_WARNING,
@@ -736,38 +740,41 @@ lookup_ip_addr (conf_t conf)
     }
 
     // check if the requested ip address is associated with a local network interface
-    if (getifaddrs(&ifaddr) == -1) {
-        log_errno (EMUNGE_SNAFU, LOG_ERR,
-            "Failed to get a list of network interfaces: %s", strerror(errno));
-    }
+    // but only when we have a real ip
+    if (conf->addr.s_addr != 0 && conf->hostname) {
+        if (getifaddrs(&ifaddr) == -1) {
+            log_errno (EMUNGE_SNAFU, LOG_ERR,
+                "Failed to get a list of network interfaces: %s", strerror(errno));
+        }
 
-    ifa = ifaddr;
-    while(ifa != NULL) {
-       if (ifa->ifa_addr != NULL && ifa->ifa_addr->sa_family == AF_INET &&
-               ((struct sockaddr_in *)ifa->ifa_addr)->sin_addr.s_addr == conf->addr.s_addr)
-           break;
-       else
-       {
-           ifa = ifa->ifa_next;
-           continue;
-       }
-    }
+        ifa = ifaddr;
+        while(ifa != NULL) {
+           if (ifa->ifa_addr != NULL && ifa->ifa_addr->sa_family == AF_INET &&
+                   ((struct sockaddr_in *)ifa->ifa_addr)->sin_addr.s_addr == conf->addr.s_addr)
+               break;
+           else
+           {
+               ifa = ifa->ifa_next;
+               continue;
+           }
+        }
 
-    if (ifa == NULL) {
-        // no interface with given ip address
-        log_errno (EMUNGE_SNAFU, LOG_ERR,
-            "Failed to find a network interface with IP address \"%s\"", ip_addr_buf);
-    } else {
-        log_msg(LOG_DEBUG, "Found IP address \"%s\" on interface \"%s\"", ip_addr_buf, ifa->ifa_name);
-    }
+        if (ifa == NULL) {
+            // no interface with given ip address
+            log_errno (EMUNGE_SNAFU, LOG_ERR,
+                "Failed to find a network interface with IP address \"%s\"", ip_addr_buf);
+        } else {
+            log_msg(LOG_DEBUG, "Found IP address \"%s\" on interface \"%s\"", ip_addr_buf, ifa->ifa_name);
+        }
 
-    freeifaddrs(ifaddr);
+        freeifaddrs(ifaddr);
 
-    if(strncmp(hostname, ip_addr_buf, INET_ADDRSTRLEN) == 0) {
-        // hostname and ip addr match means we got an ip addr instead of
-        // a proper hostname, try to do a reverse lookup
-        if (!(hptr = gethostbyaddr (&conf->addr, sizeof (conf->addr), AF_INET))) {
-            log_msg (LOG_WARNING, "Failed to lookup hostname for \"%s\"", ip_addr_buf);
+        if(strncmp(hostname, ip_addr_buf, INET_ADDRSTRLEN) == 0) {
+            // hostname and ip addr match means we got an ip addr instead of
+            // a proper hostname, try to do a reverse lookup
+            if (!(hptr = gethostbyaddr (&conf->addr, sizeof (conf->addr), AF_INET))) {
+                log_msg (LOG_WARNING, "Failed to lookup hostname for \"%s\"", ip_addr_buf);
+            }
         }
     }
 
