@@ -52,6 +52,7 @@
 #include "common.h"
 #include "conf.h"
 #include "crypto.h"
+#include "daemonpipe.h"
 #include "gids.h"
 #include "hash.h"
 #include "job.h"
@@ -73,8 +74,8 @@
  *****************************************************************************/
 
 static void disable_core_dumps (void);
-static int daemonize_init (char *progname, conf_t conf);
-static void daemonize_fini (int fd);
+static void daemonize_init (char *progname, conf_t conf);
+static void daemonize_fini (void);
 static void open_logfile (const char *logfile, int priority, int got_force);
 static void handle_signals (void);
 static void sig_handler (int sig);
@@ -99,7 +100,6 @@ volatile sig_atomic_t got_terminate = 0;    /* signum if INT/TERM received   */
 int
 main (int argc, char *argv[])
 {
-    int   fd = -1;
     char *log_identity = argv[0];
     int   log_priority = LOG_INFO;
     int   log_options = LOG_OPT_PRIORITY;
@@ -117,7 +117,7 @@ main (int argc, char *argv[])
         conf->got_force);
 
     if (!conf->got_foreground) {
-        fd = daemonize_init (argv[0], conf);
+        daemonize_init (argv[0], conf);
         if (conf->got_syslog) {
             log_close_file ();
             log_open_syslog (log_identity, LOG_DAEMON);
@@ -148,7 +148,7 @@ main (int argc, char *argv[])
     write_pidfile (conf->pidfile_name, conf->got_force);
 
     if (!conf->got_foreground) {
-        daemonize_fini (fd);
+        daemonize_fini ();
     }
     log_msg (LOG_NOTICE, "Starting %s-%s daemon (pid %d)",
         PACKAGE, VERSION, (int) getpid ());
@@ -191,70 +191,61 @@ disable_core_dumps (void)
 }
 
 
-static int
+static void
 daemonize_init (char *progname, conf_t conf)
 {
 /*  Begins the daemonization of the process.
  *  Despite the fact that this routine backgrounds the process, control
  *    will not be returned to the shell until daemonize_fini() is called.
- *  Returns an 'fd' to pass to daemonize_fini() to complete the daemonization.
  */
-    int         fds [2];
-    pid_t       pid;
-    int         n;
-    signed char priority;
-    char        ebuf [1024];
+    pid_t pid;
+    int   status;
+    int   priority;
+    char  buf [1024];
 
     /*  Clear file mode creation mask.
      */
     umask (0);
 
-    /*  Create pipe for IPC so parent process will wait to terminate until
-     *    signaled by grandchild process.  This allows messages written to
-     *    stdout/stderr by the grandchild to be properly displayed before
-     *    the parent process returns control to the shell.
+    /*  Create a daemonpipe to have the parent process wait until signaled by
+     *    its double-forked grandchild process that startup is complete.
      */
-    if (pipe (fds) < 0) {
-        log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to create daemon pipe");
+    if (daemonpipe_create () < 0) {
+        log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to create daemonpipe");
     }
-    /*  Set the fd used by log_err() to return status back to the parent.
-     */
-    log_set_err_pipe (fds[1]);
-
     /*  Automatically background the process and
-     *    ensure child is not a process group leader.
+     *    ensure child process is not a process group leader.
      */
     if ((pid = fork ()) < 0) {
-        log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to create child process");
+        log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to fork child process");
     }
     else if (pid > 0) {
-        log_set_err_pipe (-1);
-        if (close (fds[1]) < 0) {
+        /*
+         *  Parent process waits for notification that startup is complete
+         *    before exiting.
+         */
+        if (daemonpipe_close_writes () < 0) {
             log_errno (EMUNGE_SNAFU, LOG_ERR,
-                "Failed to close write-pipe in parent process");
+                "Failed to close write-end of daemonpipe");
         }
-        if ((n = read (fds[0], &priority, sizeof (priority))) < 0) {
+        if (daemonpipe_read (&status, &priority, buf, sizeof (buf)) < 0) {
             log_errno (EMUNGE_SNAFU, LOG_ERR,
-                "Failed to read status from grandchild process");
+                "Failed to read from daemonpipe");
         }
-        if ((n > 0) && (priority >= 0)) {
-            if ((n = read (fds[0], ebuf, sizeof (ebuf))) < 0) {
-                log_errno (EMUNGE_SNAFU, LOG_ERR,
-                    "Failed to read err msg from grandchild process");
-            }
-            if ((n > 0) && (ebuf[0] != '\0')) {
-                log_open_file (stderr, progname, priority, LOG_OPT_PRIORITY);
-                log_msg (priority, "%s", ebuf);
-            }
+        if (status != 0) {
+            log_open_file (stderr, progname, priority, LOG_OPT_PRIORITY);
+            log_msg (priority, "%s", buf);
             exit (EXIT_FAILURE);
         }
         destroy_conf (conf, 0);
         log_close_all ();
         exit (EXIT_SUCCESS);
     }
-    if (close (fds[0]) < 0) {
+    /*  Child process continues.
+     */
+    if (daemonpipe_close_reads () < 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR,
-            "Failed to close read-pipe in child process");
+            "Failed to close read-end of daemonpipe");
     }
     /*  Become a session leader and process group leader
      *    with no controlling tty.
@@ -263,32 +254,32 @@ daemonize_init (char *progname, conf_t conf)
         log_errno (EMUNGE_SNAFU, LOG_ERR,
             "Failed to disassociate controlling tty");
     }
-    /*  Ignore SIGHUP to keep child from terminating when
-     *    the session leader (ie, the parent) terminates.
+    /*  Ignore SIGHUP to keep child process from terminating when
+     *    the session leader (i.e., the parent proces) terminates.
      */
     xsignal_ignore (SIGHUP);
 
-    /*  Abdicate session leader position in order to guarantee
-     *    daemon cannot automatically re-acquire a controlling tty.
+    /*  Abdicate session leader position to ensure the daemon cannot
+     *    automatically re-acquire a controlling tty.
      */
     if ((pid = fork ()) < 0) {
-        log_errno (EMUNGE_SNAFU, LOG_ERR,
-            "Failed to create grandchild process");
+        log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to fork grandchild process");
     }
     else if (pid > 0) {
         destroy_conf (conf, 0);
         log_close_all ();
         exit (EXIT_SUCCESS);
     }
-    return (fds[1]);
+    /*  Grandchild process continues.
+     */
+    return;
 }
 
 
 static void
-daemonize_fini (int fd)
+daemonize_fini (void)
 {
-/*  Completes the daemonization of the process,
- *    where 'fd' is the file descriptor returned by daemonize_init().
+/*  Completes the daemonization of the process.
  */
     int dev_null;
 
@@ -319,15 +310,18 @@ daemonize_fini (int fd)
     if ((dev_null > STDERR_FILENO) && (close (dev_null)) < 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to close \"/dev/null\"");
     }
-    /*  Clear the fd used by log_err() to return status back to the parent.
+    /*  Signal parent process to exit now that startup is complete.
+     *  The daemonpipe_write() below is not strictly necessary since
+     *    daemonpipe_close_writes() closes the daemonpipe which will cause
+     *    daemonpipe_read() to read an EOF.
      */
-    log_set_err_pipe (-1);
-    /*
-     *  Signal grandparent process to terminate.
-     */
-    if ((fd >= 0) && (close (fd) < 0)) {
+    if (daemonpipe_write (0, 0, NULL) < 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR,
-            "Failed to close write-pipe in grandchild process");
+            "Failed to signal parent process that startup is complete");
+    }
+    if (daemonpipe_close_writes () < 0) {
+        log_errno (EMUNGE_SNAFU, LOG_ERR,
+            "Failed to close write-end of daemonpipe");
     }
     return;
 }

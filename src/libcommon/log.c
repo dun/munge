@@ -41,6 +41,7 @@
 #include <syslog.h>
 #include <time.h>
 #include <unistd.h>
+#include "daemonpipe.h"
 #include "log.h"
 #include "str.h"
 
@@ -65,7 +66,6 @@ struct log_ctx {
     int   got_syslog;
     int   priority;
     int   options;
-    int   fd_daemonize;
     char  id [LOG_IDENTITY_MAXLEN];
 };
 
@@ -74,7 +74,7 @@ struct log_ctx {
  *  Static Variables
  *****************************************************************************/
 
-static struct log_ctx log_ctx = { NULL, 0, 0, 0, 0, -1, { '\0' } };
+static struct log_ctx log_ctx = { NULL, 0, 0, 0, 0, { '\0' } };
 
 
 /*****************************************************************************
@@ -83,7 +83,7 @@ static struct log_ctx log_ctx = { NULL, 0, 0, 0, 0, -1, { '\0' } };
 
 static void _log_aux (int errnum, int priority, char *msgbuf, int msgbuflen,
         const char *format, va_list vargs);
-static void _log_die (int status, int priority, char *msg);
+static void _log_die (int status, int priority, const char *msg);
 static char * _log_prefix (int priority);
 
 
@@ -167,14 +167,6 @@ log_close_all (void)
 {
     log_close_file ();
     log_close_syslog ();
-    return;
-}
-
-
-void
-log_set_err_pipe (int fd)
-{
-    log_ctx.fd_daemonize = (fd >= 0) ? fd : -1;
     return;
 }
 
@@ -394,24 +386,14 @@ _log_aux (int errnum, int priority, char *msgbuf, int msgbuflen,
 
 
 static void
-_log_die (int status, int priority, char *msg)
+_log_die (int status, int priority, const char *msg)
 {
-    signed char  c;
-    int          n;
-    char        *p;
-
-    /*  Write error status and message to "daemonize" pipe.
+    /*  If the daemonpipe is open between the (grand)child process and the
+     *    parent process, relay the error message to the parent for output
+     *    onto stderr.
      */
-    if (log_ctx.fd_daemonize >= 0) {
-        c = (signed char) priority;
-        n = write (log_ctx.fd_daemonize, &c, sizeof (c));
-        if ((n > 0) && (msg != NULL) && (log_ctx.fp != stderr)) {
-            if ((p = strchr (msg, '\n'))) {
-                *p = '\0';
-            }
-            (void) write (log_ctx.fd_daemonize, msg, strlen (msg) + 1);
-        }
-    }
+    (void) daemonpipe_write (status, priority, msg);
+
 #ifndef NDEBUG
     /*  Generate core for debugging.
      */
@@ -419,6 +401,7 @@ _log_die (int status, int priority, char *msg)
         abort ();
     }
 #endif /* !NDEBUG */
+
     exit (status);
 }
 
