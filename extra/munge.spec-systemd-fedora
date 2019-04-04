@@ -72,7 +72,7 @@ rm -rf "$RPM_BUILD_ROOT"
 mkdir -p "$RPM_BUILD_ROOT"
 DESTDIR="$RPM_BUILD_ROOT" make install
 touch "$RPM_BUILD_ROOT"/%{_sysconfdir}/munge/munge.key
-touch "$RPM_BUILD_ROOT"/%{_localstatedir}/lib/munge/munge.seed
+touch "$RPM_BUILD_ROOT"/%{_localstatedir}/lib/munge/munged.seed
 touch "$RPM_BUILD_ROOT"/%{_localstatedir}/log/munge/munged.log
 touch "$RPM_BUILD_ROOT"/%{_localstatedir}/run/munge/munged.pid
 ##
@@ -128,7 +128,7 @@ fi
 %dir %attr(0700,munge,munge) %{_sysconfdir}/munge
 %attr(0600,munge,munge) %config(noreplace) %ghost %{_sysconfdir}/munge/munge.key
 %dir %attr(0711,munge,munge) %{_localstatedir}/lib/munge
-%attr(0600,munge,munge) %ghost %{_localstatedir}/lib/munge/munge.seed
+%attr(0600,munge,munge) %ghost %{_localstatedir}/lib/munge/munged.seed
 %dir %attr(0700,munge,munge) %{_localstatedir}/log/munge
 %attr(0640,munge,munge) %ghost %{_localstatedir}/log/munge/munged.log
 %dir %attr(0755,munge,munge) %ghost %{_localstatedir}/run/munge

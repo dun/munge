@@ -166,11 +166,11 @@ create_conf (void)
     conf->lockfile_fd = -1;
     conf->lockfile_name = NULL;
 
-    if (!(conf->logfile_name = strdup (MUNGED_LOGFILE))) {
+    if (!(conf->logfile_name = strdup (MUNGE_LOGFILE_PATH))) {
         log_errno (EMUNGE_NO_MEMORY, LOG_ERR,
             "Failed to copy logfile name string");
     }
-    if (!(conf->pidfile_name = strdup (MUNGED_PIDFILE))) {
+    if (!(conf->pidfile_name = strdup (MUNGE_PIDFILE_PATH))) {
         log_errno (EMUNGE_NO_MEMORY, LOG_ERR,
             "Failed to copy pidfile name string");
     }
@@ -178,7 +178,7 @@ create_conf (void)
         log_errno (EMUNGE_NO_MEMORY, LOG_ERR,
             "Failed to copy socket name string");
     }
-    if (!(conf->seed_name = strdup (MUNGED_RANDOM_SEED))) {
+    if (!(conf->seed_name = strdup (MUNGE_SEEDFILE_PATH))) {
         log_errno (EMUNGE_NO_MEMORY, LOG_ERR,
             "Failed to copy seed name string");
     }
@@ -552,7 +552,7 @@ display_help (char *prog)
             "Specify key file", MUNGE_KEYFILE_PATH);
 
     printf ("  %*s %s [%s]\n", w, "--log-file=PATH",
-            "Specify log file", MUNGED_LOGFILE);
+            "Specify log file", MUNGE_LOGFILE_PATH);
 
     printf ("  %*s %s [%d]\n", w, "--max-ttl=INT",
             "Specify maximum time-to-live (in seconds)", MUNGE_MAXIMUM_TTL);
@@ -561,10 +561,10 @@ display_help (char *prog)
             "Specify number of threads to spawn", MUNGE_THREADS);
 
     printf ("  %*s %s [%s]\n", w, "--pid-file=PATH",
-            "Specify PID file", MUNGED_PIDFILE);
+            "Specify PID file", MUNGE_PIDFILE_PATH);
 
     printf ("  %*s %s [%s]\n", w, "--seed-file=PATH",
-            "Specify PRNG seed file", MUNGED_RANDOM_SEED);
+            "Specify PRNG seed file", MUNGE_SEEDFILE_PATH);
 
     printf ("  %*s %s\n", w, "--syslog",
             "Redirect log messages to syslog");

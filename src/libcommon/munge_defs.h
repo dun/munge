@@ -228,15 +228,15 @@
 
 /*  String specifying the pathname of the daemon's logfile.
  */
-#define MUNGED_LOGFILE                  LOCALSTATEDIR "/log/munge/munged.log"
+#define MUNGE_LOGFILE_PATH              LOCALSTATEDIR "/log/munge/munged.log"
 
 /*  String specifying the pathname of the daemon's pidfile.
  */
-#define MUNGED_PIDFILE                  LOCALSTATEDIR "/run/munge/munged.pid"
+#define MUNGE_PIDFILE_PATH              LOCALSTATEDIR "/run/munge/munged.pid"
 
-/*  String specifying the pathname of the random seed file.
+/*  String specifying the pathname of the daemon's PRNG seedfile.
  */
-#define MUNGED_RANDOM_SEED              LOCALSTATEDIR "/lib/munge/munge.seed"
+#define MUNGE_SEEDFILE_PATH             LOCALSTATEDIR "/lib/munge/munged.seed"
 
 
 #endif /* !MUNGE_DEFS_H */

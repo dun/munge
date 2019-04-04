@@ -66,7 +66,7 @@ make %{?_smp_mflags}
 rm -rf %{buildroot}
 make install DESTDIR=%{buildroot}
 touch %{buildroot}/%{_sysconfdir}/munge/munge.key
-touch %{buildroot}/%{_localstatedir}/lib/munge/munge.seed
+touch %{buildroot}/%{_localstatedir}/lib/munge/munged.seed
 touch %{buildroot}/%{_localstatedir}/log/munge/munged.log
 touch %{buildroot}/%{_localstatedir}/run/munge/munged.pid
 rm -f %{buildroot}/%{_sysconfdir}/sysconfig/munge
@@ -118,7 +118,7 @@ fi
 %dir %attr(0700,munge,munge) %{_sysconfdir}/munge
 %attr(0600,munge,munge) %config(noreplace) %ghost %{_sysconfdir}/munge/munge.key
 %dir %attr(0711,munge,munge) %{_localstatedir}/lib/munge
-%attr(0600,munge,munge) %ghost %{_localstatedir}/lib/munge/munge.seed
+%attr(0600,munge,munge) %ghost %{_localstatedir}/lib/munge/munged.seed
 %dir %attr(0700,munge,munge) %{_localstatedir}/log/munge
 %attr(0640,munge,munge) %ghost %{_localstatedir}/log/munge/munged.log
 %dir %attr(0755,munge,munge) %{_localstatedir}/run/munge
