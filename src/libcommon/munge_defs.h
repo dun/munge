@@ -144,7 +144,7 @@
  *  May be overridden in "config.h".
  */
 #ifndef MUNGE_SOCKET_NAME
-#define MUNGE_SOCKET_NAME               LOCALSTATEDIR "/run/munge/munge.socket.2"
+#define MUNGE_SOCKET_NAME               RUNSTATEDIR "/munge/munge.socket.2"
 #endif /* !MUNGE_SOCKET_NAME */
 
 /*  Number of attempts a client makes connecting to the server before failing.
@@ -232,7 +232,7 @@
 
 /*  String specifying the pathname of the daemon's pidfile.
  */
-#define MUNGE_PIDFILE_PATH              LOCALSTATEDIR "/run/munge/munged.pid"
+#define MUNGE_PIDFILE_PATH              RUNSTATEDIR "/munge/munged.pid"
 
 /*  String specifying the pathname of the daemon's PRNG seedfile.
  */

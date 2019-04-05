@@ -37,6 +37,7 @@ munged_CFLAGS = \
 
 munged_CPPFLAGS = \
 	-DLOCALSTATEDIR='"$(localstatedir)"' \
+	-DRUNSTATEDIR='"$(runstatedir)"' \
 	-DSYSCONFDIR='"$(sysconfdir)"' \
 	-DWITH_PTHREADS \
 	-I$(top_srcdir)/src/common \
@@ -113,8 +114,8 @@ munged_SOURCES = \
 	$(top_srcdir)/src/common/xsignal.h \
 	# End of munged_SOURCES
 
-# For dependencies on LOCALSTATEDIR and SYSCONFDIR via the #defines for
-#   MUNGE_AUTH_SERVER_DIR, MUNGE_KEYFILE_PATH, MUNGE_LOGFILE_PATH,
+# For dependencies on LOCALSTATEDIR, RUNSTATEDIR, and SYSCONFDIR via the
+#   #defines for MUNGE_AUTH_SERVER_DIR, MUNGE_KEYFILE_PATH, MUNGE_LOGFILE_PATH,
 #   MUNGE_PIDFILE_PATH, MUNGE_SEEDFILE_PATH, and MUNGE_SOCKET_NAME.
 #
 $(srcdir)/munged-conf.$(OBJEXT): Makefile

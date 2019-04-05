@@ -35,7 +35,7 @@ UNINSTALL_DIRS = \
 	$(sysconfdir)/munge \
 	$(localstatedir)/lib/munge \
 	$(localstatedir)/log/munge \
-	$(localstatedir)/run/munge \
+	$(runstatedir)/munge \
 	# End of UNINSTALL_DIRS
 
 EXTRA_DIST = \
@@ -65,7 +65,7 @@ install-dirperms:
 	$(MKDIR_P) -m 0700 "$(DESTDIR)$(sysconfdir)/munge"
 	$(MKDIR_P) -m 0711 "$(DESTDIR)$(localstatedir)/lib/munge"
 	$(MKDIR_P) -m 0700 "$(DESTDIR)$(localstatedir)/log/munge"
-	$(MKDIR_P) -m 0755 "$(DESTDIR)$(localstatedir)/run/munge"
+	$(MKDIR_P) -m 0755 "$(DESTDIR)$(runstatedir)/munge"
 
 install-pkgconfig: munge.pc
 	$(MKDIR_P) "$(DESTDIR)$(libdir)/pkgconfig"

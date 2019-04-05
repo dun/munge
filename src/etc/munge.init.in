@@ -36,12 +36,12 @@ SERVICE_NAME="MUNGE"
 DAEMON_EXEC="$sbindir/munged"
 #DAEMON_ARGS=
 #CONFIG=#_NOT_SUPPORTED_#
-PIDFILE="$localstatedir/run/munge/munged.pid"
+PIDFILE="$runstatedir/munge/munged.pid"
 #NICE=
 USER="munge"
 GROUP="munge"
 #SIGHUP_RELOAD=#_NOT_SUPPORTED_#
-VARRUNDIR="$localstatedir/run/munge"
+VARRUNDIR="$runstatedir/munge"
 
 ###############################################################################
 

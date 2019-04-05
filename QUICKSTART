@@ -40,8 +40,21 @@ MUNGE Installation Guide
       To compile the software, execute the following command; you may need
       to su to root in order to perform the "make install":
 
-      $ ./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var \
-        && make && make install
+      $ ./configure            \
+          --prefix=/usr        \
+          --sysconfdir=/etc    \
+          --localstatedir=/var \
+          --runstatedir=/run   \
+        && make                \
+        && sudo make install
+
+      The "--runstatedir" configure option is slated to appear in autoconf
+      2.70; however, it has been backported to Debian's autoconf 2.69-9.
+      If the configure script was built by an earlier version of autoconf,
+      ${runstatedir} can be set directly by appending the variable assignment
+      to the configure line:
+
+      $ ./configure runstatedir=/run
 
 
 2. Securing the Installation
@@ -53,11 +66,11 @@ MUNGE Installation Guide
 
    By default, the munged daemon uses the following system directories:
 
-   A. /etc/munge/
+   A. ${sysconfdir}/munge [/etc/munge]
       This directory contains the daemon's key.  The recommended permissions
       for it are 0700.
 
-   B. /var/lib/munge/
+   B. ${localstatedir}/lib/munge [/var/lib/munge]
       This directory contains the daemon's PRNG seed file.  It is also
       where the daemon creates pipes for authenticating clients via
       file-descriptor-passing.  If the file-descriptor-passing authentication
@@ -65,11 +78,11 @@ MUNGE Installation Guide
       all; however, it should not expose read permissions.  The recommended
       permissions for it are 0711.
 
-   C. /var/log/munge/
+   C. ${localstatedir}/log/munge [/var/log/munge]
       This directory contains the daemon's log file.  The recommended
       permissions for it are 0700.
 
-   D. /var/run/munge/
+   D. ${runstatedir}/munge [/run/munge]
       This directory contains the Unix domain socket for clients to
       communicate with the daemon.  It also contains the daemon's pid file.
       This directory must allow execute permissions for all.  The recommended

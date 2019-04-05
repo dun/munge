@@ -47,6 +47,7 @@ A shared library for applications using MUNGE.
 
 %prep
 %setup -q
+%{!?_runstatedir:%global _runstatedir /run}
 
 %build
 ##
@@ -57,7 +58,8 @@ A shared library for applications using MUNGE.
 %configure --disable-static \
     %{?_with_arch32: --enable-arch=32} \
     %{?_with_arch64: --enable-arch=64} \
-    --program-prefix=%{?_program_prefix:%{_program_prefix}}
+    --program-prefix=%{?_program_prefix:%{_program_prefix}} \
+    runstatedir=%{_runstatedir}
 sed -i 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g' libtool
 sed -i 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' libtool
 make %{?_smp_mflags}
@@ -68,7 +70,7 @@ make install DESTDIR=%{buildroot}
 touch %{buildroot}/%{_sysconfdir}/munge/munge.key
 touch %{buildroot}/%{_localstatedir}/lib/munge/munged.seed
 touch %{buildroot}/%{_localstatedir}/log/munge/munged.log
-touch %{buildroot}/%{_localstatedir}/run/munge/munged.pid
+touch %{buildroot}/%{_runstatedir}/munge/munged.pid
 rm -f %{buildroot}/%{_sysconfdir}/sysconfig/munge
 rm -f %{buildroot}/%{_initddir}/munge
 
@@ -121,8 +123,8 @@ fi
 %attr(0600,munge,munge) %ghost %{_localstatedir}/lib/munge/munged.seed
 %dir %attr(0700,munge,munge) %{_localstatedir}/log/munge
 %attr(0640,munge,munge) %ghost %{_localstatedir}/log/munge/munged.log
-%dir %attr(0755,munge,munge) %{_localstatedir}/run/munge
-%attr(0644,munge,munge) %ghost %{_localstatedir}/run/munge/munged.pid
+%dir %attr(0755,munge,munge) %{_runstatedir}/munge
+%attr(0644,munge,munge) %ghost %{_runstatedir}/munge/munged.pid
 %{_bindir}/*
 %{_sbindir}/*
 %{_mandir}/*[^3]/*

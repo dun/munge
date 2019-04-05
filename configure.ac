@@ -16,6 +16,9 @@ AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_SRCDIR([src/libmunge/munge.h])
 AC_REQUIRE_AUX_FILE([tap-driver.sh])
 AC_USE_SYSTEM_EXTENSIONS
+AS_IF(
+  [test X"${runstatedir}" = "X"],
+  [AC_SUBST([runstatedir], ['${localstatedir}/run'])])
 X_AC_HUMOR
 
 m4_ifdef([dist-xz],

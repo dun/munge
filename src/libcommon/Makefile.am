@@ -33,6 +33,7 @@ noinst_LTLIBRARIES = \
 libcommon_la_CPPFLAGS = \
 	-DDATE='"$(DATE)"' \
 	-DLOCALSTATEDIR='"$(localstatedir)"' \
+	-DRUNSTATEDIR='"$(runstatedir)"' \
 	-DSYSCONFDIR='"$(sysconfdir)"' \
 	-I$(top_srcdir)/src/libmunge \
 	# End of libcommon_la_CPPFLAGS

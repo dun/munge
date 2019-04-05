@@ -7,7 +7,7 @@ After=time-sync.target
 [Service]
 Type=forking
 ExecStart=@sbindir@/munged
-PIDFile=@localstatedir@/run/munge/munged.pid
+PIDFile=@runstatedir@/munge/munged.pid
 User=munge
 Group=munge
 Restart=on-abort

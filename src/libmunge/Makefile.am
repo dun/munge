@@ -45,7 +45,7 @@ LT_REVISION = 0
 LT_AGE = 0
 
 libmunge_la_CPPFLAGS = \
-	-DLOCALSTATEDIR='"$(localstatedir)"' \
+	-DRUNSTATEDIR='"$(runstatedir)"' \
 	-DSYSCONFDIR='"$(sysconfdir)"' \
 	-I$(top_srcdir)/src/libcommon \
 	# End of libmunge_la_CPPFLAGS
@@ -73,7 +73,7 @@ libmunge_la_SOURCES = \
 	munge.h \
 	# End of libmunge_la_SOURCES
 
-# For dependencies on LOCALSTATEDIR via the #define for MUNGE_SOCKET_NAME.
+# For dependencies on RUNSTATEDIR via the #define for MUNGE_SOCKET_NAME.
 #
 $(srcdir)/libmunge_la-ctx.lo: Makefile
 $(srcdir)/libmunge_la-m_msg_client.lo: Makefile

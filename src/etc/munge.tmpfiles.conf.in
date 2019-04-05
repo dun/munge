@@ -1,1 +1,1 @@
-d @localstatedir@/run/munge 0755 munge munge -
+d @runstatedir@/munge 0755 munge munge -
