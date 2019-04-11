@@ -257,6 +257,7 @@ _conf_parse_bits_opt (int *dstp, const char *src, int sopt, const char *lopt)
     assert (dstp != NULL);
     assert (src != NULL);
 
+    n = 0;                              /* suppress uninitialized warning */
     rv = _conf_set_int (&n, src, min, max);
     if (rv < 0) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
