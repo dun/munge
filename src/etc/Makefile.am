@@ -59,7 +59,7 @@ noinst_DATA = \
 	$(SUBSTITUTE_FILES) \
 	# End of noinst_DATA
 
-install-data-hook: install-dirperms install-pkgconfig install-systemd install-sysvinit install-tmpfiles
+install-data-hook: install-dirperms install-pkgconfig install-systemd install-sysvinit
 
 install-dirperms:
 	$(MKDIR_P) -m 0700 "$(DESTDIR)$(sysconfdir)/munge"

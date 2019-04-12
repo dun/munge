@@ -123,12 +123,11 @@ fi
 %attr(0600,munge,munge) %ghost %{_localstatedir}/lib/munge/munged.seed
 %dir %attr(0700,munge,munge) %{_localstatedir}/log/munge
 %attr(0640,munge,munge) %ghost %{_localstatedir}/log/munge/munged.log
-%dir %attr(0755,munge,munge) %{_runstatedir}/munge
+%dir %attr(0755,munge,munge) %ghost %{_runstatedir}/munge
 %attr(0644,munge,munge) %ghost %{_runstatedir}/munge/munged.pid
 %{_bindir}/*
 %{_sbindir}/*
 %{_mandir}/*[^3]/*
-%{_tmpfilesdir}/munge.conf
 %{_unitdir}/munge.service
 
 %files devel
