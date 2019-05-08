@@ -21,9 +21,7 @@ AS_IF(
   [AC_SUBST([runstatedir], ['${localstatedir}/run'])])
 X_AC_HUMOR
 
-m4_ifdef([dist-xz],
-  [AM_INIT_AUTOMAKE([1.10 foreign dist-xz])],
-  [AM_INIT_AUTOMAKE([1.10 foreign])])
+AM_INIT_AUTOMAKE([1.11 foreign dist-xz no-dist-gzip])
 AM_MAINTAINER_MODE
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 m4_ifdef([LT_INIT], [LT_INIT], [AC_PROG_LIBTOOL])
