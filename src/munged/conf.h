@@ -99,8 +99,6 @@ void destroy_conf (conf_t conf, int do_unlink);
 
 void parse_cmdline (conf_t conf, int argc, char **argv);
 
-void display_help (char *prog);
-
 void create_subkeys (conf_t conf);
 
 void lookup_ip_addr (conf_t conf);

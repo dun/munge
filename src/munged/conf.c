@@ -116,6 +116,8 @@ struct option long_opts[] = {
  *  Internal Prototypes
  *****************************************************************************/
 
+static void _conf_display_help (char *prog);
+
 static void _process_stop (conf_t conf);
 
 static int _send_signal (pid_t pid, int signum, int msecs);
@@ -298,7 +300,7 @@ parse_cmdline (conf_t conf, int argc, char **argv)
         }
         switch (c) {
             case 'h':
-                display_help (prog);
+                _conf_display_help (prog);
                 exit (EMUNGE_SUCCESS);
                 break;
             case 'L':
@@ -487,97 +489,6 @@ parse_cmdline (conf_t conf, int argc, char **argv)
 
 
 void
-display_help (char *prog)
-{
-/*  Displays a help message describing the command-line options.
- */
-    const int w = -24;                  /* pad for width of option string */
-
-    assert (prog != NULL);
-
-    printf ("Usage: %s [OPTIONS]\n", prog);
-    printf ("\n");
-
-    printf ("  %*s %s\n", w, "-h, --help",
-            "Display this help");
-
-    printf ("  %*s %s\n", w, "-L, --license",
-            "Display license information");
-
-    printf ("  %*s %s\n", w, "-V, --version",
-            "Display version information");
-
-    printf ("\n");
-
-    printf ("  %*s %s\n", w, "-f, --force",
-            "Force daemon to run if possible");
-
-    printf ("  %*s %s\n", w, "-F, --foreground",
-            "Run daemon in the foreground (do not fork)");
-
-    printf ("  %*s %s\n", w, "-M, --mlockall",
-            "Lock all pages in memory");
-
-    printf ("  %*s %s\n", w, "-s, --stop",
-            "Stop daemon bound to socket");
-
-    printf ("  %*s %s [%s]\n", w, "-S, --socket=PATH",
-            "Specify local socket", MUNGE_SOCKET_NAME);
-
-    printf ("  %*s %s\n", w, "-v, --verbose",
-            "Be verbose");
-
-    printf ("\n");
-
-#if defined(AUTH_METHOD_RECVFD_MKFIFO) || defined(AUTH_METHOD_RECVFD_MKNOD)
-    printf ("  %*s %s [%s]\n", w, "--auth-server-dir=DIR",
-            "Specify auth-server directory", MUNGE_AUTH_SERVER_DIR);
-
-    printf ("  %*s %s [%s]\n", w, "--auth-client-dir=DIR",
-            "Specify auth-client directory", MUNGE_AUTH_CLIENT_DIR);
-#endif /* AUTH_METHOD_RECVFD_MKFIFO || AUTH_METHOD_RECVFD_MKNOD */
-
-    printf ("  %*s %s\n", w, "--benchmark",
-            "Disable timers to reduce noise while benchmarking");
-
-    printf ("  %*s Specify whether to check \"%s\" mtime [%d]\n",
-            w, "--group-check-mtime=BOOL", GIDS_GROUP_FILE,
-            MUNGE_GROUP_STAT_FLAG);
-
-    printf ("  %*s %s [%d]\n", w, "--group-update-time=INT",
-            "Specify seconds between group info updates",
-            MUNGE_GROUP_UPDATE_SECS);
-
-    printf ("  %*s %s [%s]\n", w, "--key-file=PATH",
-            "Specify key file", MUNGE_KEYFILE_PATH);
-
-    printf ("  %*s %s [%s]\n", w, "--log-file=PATH",
-            "Specify log file", MUNGE_LOGFILE_PATH);
-
-    printf ("  %*s %s [%d]\n", w, "--max-ttl=INT",
-            "Specify maximum time-to-live (in seconds)", MUNGE_MAXIMUM_TTL);
-
-    printf ("  %*s %s [%d]\n", w, "--num-threads=INT",
-            "Specify number of threads to spawn", MUNGE_THREADS);
-
-    printf ("  %*s %s [%s]\n", w, "--pid-file=PATH",
-            "Specify PID file", MUNGE_PIDFILE_PATH);
-
-    printf ("  %*s %s [%s]\n", w, "--seed-file=PATH",
-            "Specify PRNG seed file", MUNGE_SEEDFILE_PATH);
-
-    printf ("  %*s %s\n", w, "--syslog",
-            "Redirect log messages to syslog");
-
-    printf ("  %*s %s\n", w, "--trusted-group=GROUP",
-            "Specify trusted group/GID for directory checks");
-
-    printf ("\n");
-    return;
-}
-
-
-void
 create_subkeys (conf_t conf)
 {
     int fd;
@@ -721,6 +632,97 @@ lookup_ip_addr (conf_t conf)
 /*****************************************************************************
  *  Internal Functions
  *****************************************************************************/
+
+static void
+_conf_display_help (char *prog)
+{
+/*  Displays a help message describing the command-line options.
+ */
+    const int w = -24;                  /* pad for width of option string */
+
+    assert (prog != NULL);
+
+    printf ("Usage: %s [OPTIONS]\n", prog);
+    printf ("\n");
+
+    printf ("  %*s %s\n", w, "-h, --help",
+            "Display this help");
+
+    printf ("  %*s %s\n", w, "-L, --license",
+            "Display license information");
+
+    printf ("  %*s %s\n", w, "-V, --version",
+            "Display version information");
+
+    printf ("\n");
+
+    printf ("  %*s %s\n", w, "-f, --force",
+            "Force daemon to run if possible");
+
+    printf ("  %*s %s\n", w, "-F, --foreground",
+            "Run daemon in the foreground (do not fork)");
+
+    printf ("  %*s %s\n", w, "-M, --mlockall",
+            "Lock all pages in memory");
+
+    printf ("  %*s %s\n", w, "-s, --stop",
+            "Stop daemon bound to socket");
+
+    printf ("  %*s %s [%s]\n", w, "-S, --socket=PATH",
+            "Specify local socket", MUNGE_SOCKET_NAME);
+
+    printf ("  %*s %s\n", w, "-v, --verbose",
+            "Be verbose");
+
+    printf ("\n");
+
+#if defined(AUTH_METHOD_RECVFD_MKFIFO) || defined(AUTH_METHOD_RECVFD_MKNOD)
+    printf ("  %*s %s [%s]\n", w, "--auth-server-dir=DIR",
+            "Specify auth-server directory", MUNGE_AUTH_SERVER_DIR);
+
+    printf ("  %*s %s [%s]\n", w, "--auth-client-dir=DIR",
+            "Specify auth-client directory", MUNGE_AUTH_CLIENT_DIR);
+#endif /* AUTH_METHOD_RECVFD_MKFIFO || AUTH_METHOD_RECVFD_MKNOD */
+
+    printf ("  %*s %s\n", w, "--benchmark",
+            "Disable timers to reduce noise while benchmarking");
+
+    printf ("  %*s Specify whether to check \"%s\" mtime [%d]\n",
+            w, "--group-check-mtime=BOOL", GIDS_GROUP_FILE,
+            MUNGE_GROUP_STAT_FLAG);
+
+    printf ("  %*s %s [%d]\n", w, "--group-update-time=INT",
+            "Specify seconds between group info updates",
+            MUNGE_GROUP_UPDATE_SECS);
+
+    printf ("  %*s %s [%s]\n", w, "--key-file=PATH",
+            "Specify key file", MUNGE_KEYFILE_PATH);
+
+    printf ("  %*s %s [%s]\n", w, "--log-file=PATH",
+            "Specify log file", MUNGE_LOGFILE_PATH);
+
+    printf ("  %*s %s [%d]\n", w, "--max-ttl=INT",
+            "Specify maximum time-to-live (in seconds)", MUNGE_MAXIMUM_TTL);
+
+    printf ("  %*s %s [%d]\n", w, "--num-threads=INT",
+            "Specify number of threads to spawn", MUNGE_THREADS);
+
+    printf ("  %*s %s [%s]\n", w, "--pid-file=PATH",
+            "Specify PID file", MUNGE_PIDFILE_PATH);
+
+    printf ("  %*s %s [%s]\n", w, "--seed-file=PATH",
+            "Specify PRNG seed file", MUNGE_SEEDFILE_PATH);
+
+    printf ("  %*s %s\n", w, "--syslog",
+            "Redirect log messages to syslog");
+
+    printf ("  %*s %s\n", w, "--trusted-group=GROUP",
+            "Specify trusted group/GID for directory checks");
+
+    printf ("\n");
+    return;
+}
+
 
 static void
 _process_stop (conf_t conf)
