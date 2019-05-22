@@ -118,9 +118,9 @@ struct option long_opts[] = {
 
 static void _conf_display_help (char *prog);
 
-static void _process_stop (conf_t conf);
+static void _conf_process_stop (conf_t conf);
 
-static int _send_signal (pid_t pid, int signum, int msecs);
+static int _conf_send_signal (pid_t pid, int signum, int msecs);
 
 static int _conf_open_keyfile (const char *keyfile, int got_force);
 
@@ -482,7 +482,7 @@ parse_cmdline (conf_t conf, int argc, char **argv)
             "Unrecognized parameter \"%s\"", argv[optind]);
     }
     if (conf->got_stop) {
-        _process_stop (conf);
+        _conf_process_stop (conf);
     }
     return;
 }
@@ -725,7 +725,7 @@ _conf_display_help (char *prog)
 
 
 static void
-_process_stop (conf_t conf)
+_conf_process_stop (conf_t conf)
 {
 /*  Processes the -s/--stop option.
  *  A series of SIGTERMs are sent to the process holding the write-lock.
@@ -766,7 +766,7 @@ _process_stop (conf_t conf)
             signum = SIGKILL;           /* Kill me harder! */
         }
         msecs += MUNGE_SIGNAL_DELAY_MSECS;
-        rv = _send_signal (pid, signum, msecs);
+        rv = _conf_send_signal (pid, signum, msecs);
         if (rv == 0) {
             if (conf->got_verbose) {
                 log_msg (LOG_NOTICE,
@@ -787,7 +787,7 @@ _process_stop (conf_t conf)
 
 
 static int
-_send_signal (pid_t pid, int signum, int msecs)
+_conf_send_signal (pid_t pid, int signum, int msecs)
 {
 /*  Sends the signal [signum] to the process specified by [pid].
  *  Returns 1 if the process is still running after a delay of [msecs],
