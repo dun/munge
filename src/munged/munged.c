@@ -113,6 +113,7 @@ main (int argc, char *argv[])
     disable_core_dumps ();
     conf = create_conf ();
     parse_cmdline (conf, argc, argv);
+    process_conf (conf);
     auth_recv_init (conf->auth_server_dir, conf->auth_client_dir,
         conf->got_force);
 
@@ -129,7 +130,7 @@ main (int argc, char *argv[])
     log_msg (LOG_NOTICE, "Starting %s-%s daemon (pid %d)",
         PACKAGE, VERSION, (int) getpid ());
     handle_signals ();
-    lookup_ip_addr (conf);
+    write_origin_addr (conf);
     if (conf->got_mlockall) {
         lock_memory ();
     }

@@ -80,6 +80,8 @@ munged_SOURCES = \
 	job.h \
 	lock.c \
 	lock.h \
+	net.c \
+	net.h \
 	path.c \
 	path.h \
 	random.c \

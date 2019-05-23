@@ -70,7 +70,7 @@ struct conf {
     int             dek_key_len;        /* length of cipher subkey           */
     unsigned char  *mac_key;            /* subkey for mac ops                */
     int             mac_key_len;        /* length of mac subkey              */
-    struct in_addr  addr;               /* IPv4 addr in n/w byte order       */
+    struct in_addr  addr;               /* origin addr in n/w byte order     */
     gids_t          gids;               /* supplementary group information   */
     int             gids_update_secs;   /* gids update interval in seconds   */
     int             nthreads;           /* num threads for processing creds  */
@@ -99,9 +99,11 @@ void destroy_conf (conf_t conf, int do_unlink);
 
 void parse_cmdline (conf_t conf, int argc, char **argv);
 
-void create_subkeys (conf_t conf);
+void process_conf (conf_t conf);
 
-void lookup_ip_addr (conf_t conf);
+void write_origin_addr (conf_t conf);
+
+void create_subkeys (conf_t conf);
 
 
 #endif /* !MUNGE_CONF_H */

@@ -30,22 +30,20 @@
 #  include <config.h>
 #endif /* HAVE_CONFIG_H */
 
-#include <sys/types.h>                  /* include before in.h for bsd */
-#include <netinet/in.h>                 /* include before inet.h for bsd */
+#include <arpa/inet.h>                  /* for inet_ntop() */
 #include <assert.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <limits.h>
-#include <munge.h>
-#include <netdb.h>                      /* for gethostbyname() */
 #include <signal.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/param.h>                  /* for MAXHOSTNAMELEN */
 #include <sys/socket.h>                 /* for AF_INET */
 #include <sys/stat.h>
+#include <sys/types.h>
 #include <time.h>
 #include <unistd.h>
+#include <munge.h>
 #include "conf.h"
 #include "license.h"
 #include "lock.h"
@@ -53,6 +51,7 @@
 #include "md.h"
 #include "missing.h"                    /* for inet_ntop() */
 #include "munge_defs.h"
+#include "net.h"
 #include "path.h"
 #include "str.h"
 #include "version.h"
@@ -121,6 +120,8 @@ static void _conf_display_help (char *prog);
 static void _conf_process_stop (conf_t conf);
 
 static int _conf_send_signal (pid_t pid, int signum, int msecs);
+
+static void _conf_set_origin_addr (conf_t conf);
 
 static int _conf_open_keyfile (const char *keyfile, int got_force);
 
@@ -481,8 +482,39 @@ parse_cmdline (conf_t conf, int argc, char **argv)
         log_err (EMUNGE_SNAFU, LOG_ERR,
             "Unrecognized parameter \"%s\"", argv[optind]);
     }
+}
+
+
+void
+process_conf (conf_t conf)
+{
+/*  Process the configuration.
+ */
+    assert (conf != NULL);
+
     if (conf->got_stop) {
         _conf_process_stop (conf);
+    }
+    _conf_set_origin_addr (conf);
+    return;
+}
+
+
+void
+write_origin_addr (conf_t conf)
+{
+/*  Write a log message indicating the origin address that will be encoded into
+ *    the credential metadata.
+ */
+    char buf[INET_ADDRSTRLEN];
+
+    assert (conf != NULL);
+
+    if (!inet_ntop (AF_INET, &conf->addr, buf, sizeof (buf))) {
+        log_msg (LOG_WARNING, "Failed to convert origin address to a string");
+    }
+    else {
+        log_msg (LOG_INFO, "Set origin address to %s", buf);
     }
     return;
 }
@@ -578,53 +610,6 @@ create_subkeys (conf_t conf)
     }
     assert (n <= conf->mac_key_len);
 
-    return;
-}
-
-
-void
-lookup_ip_addr (conf_t conf)
-{
-    char hostname [MAXHOSTNAMELEN];
-    char ip_addr_buf [INET_ADDRSTRLEN];
-    struct hostent *hptr;
-
-    if (gethostname (hostname, sizeof (hostname)) < 0) {
-        log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to determine hostname");
-    }
-    hostname [sizeof (hostname) - 1] = '\0';
-
-    /*  The origin IP address is embedded within the credential metadata,
-     *    but is informational and not required for successful authentication.
-     *    The in_addr is zeroed here so that if name resolution fails, the IPv4
-     *    address will be set to 0.0.0.0.
-     */
-    memset (&conf->addr, 0, sizeof (conf->addr));
-
-    /*  The gethostbyname() call is not reentrant, but that's ok because:
-     *    1. there is only one thread active at this point, and
-     *    2. this is the only call to gethostbyname().
-     *  Note that gethostbyname() DOES NOT set errno.
-     */
-    if (!(hptr = gethostbyname (hostname))) {
-        log_msg (LOG_WARNING, "Failed to resolve host \"%s\"", hostname);
-    }
-    else if (sizeof (conf->addr) != hptr->h_length) {
-        log_msg (LOG_WARNING,
-                "Failed to resolve host \"%s\": not an IPv4 address (len=%d)",
-                hostname, hptr->h_length);
-    }
-    else {
-        memcpy (&conf->addr, hptr->h_addr_list[0], sizeof (conf->addr));
-    }
-
-    if (!inet_ntop (AF_INET, &conf->addr, ip_addr_buf, sizeof (ip_addr_buf))) {
-        log_errno (EMUNGE_SNAFU, LOG_ERR,
-                "Failed to convert IP address for \"%s\"", hostname);
-    }
-
-    log_msg (LOG_NOTICE, "Running on \"%s\" (%s)",
-            (hptr && hptr->h_name) ? hptr->h_name : hostname, ip_addr_buf);
     return;
 }
 
@@ -831,6 +816,34 @@ retry:
                 "Failed to check daemon (pid %d, sig 0)", pid);
     }
     return (1);
+}
+
+
+static void
+_conf_set_origin_addr (conf_t conf)
+{
+/*  Set the origin address to be encoded into the credential metadata.
+ */
+    char *hostname = NULL;
+    int   rv;
+
+    memset (&conf->addr, 0, sizeof (conf->addr));
+
+    rv = net_get_hostname (&hostname);
+    if (rv < 0) {
+        log_msg (LOG_WARNING, "Failed to get name of current host");
+    }
+    else {
+        rv = net_host_to_addr4 (&conf->addr, hostname);
+        if (rv < 0) {
+            log_msg (LOG_WARNING, "Failed to resolve hostname \"%s\"",
+                    hostname);
+        }
+    }
+    if (hostname != NULL) {
+        free (hostname);
+    }
+    return;
 }
 
 
