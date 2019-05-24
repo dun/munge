@@ -1012,7 +1012,7 @@ dec_validate_replay (munge_cred_t c)
         if ((conf->got_socket_retry)
                 && (m->retry > 0)
                 && (m->retry <= MUNGE_SOCKET_RETRY_ATTEMPTS)) {
-            log_msg (LOG_NOTICE,
+            log_msg (LOG_INFO,
                 "Allowed credential replay for client UID=%u GID=%u",
                 (unsigned int) m->client_uid, (unsigned int) m->client_gid);
             return (0);

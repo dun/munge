@@ -287,7 +287,7 @@ daemonize_fini (void)
      */
     if (chdir ("/") < 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR,
-            "Failed to change to root directory");
+            "Failed to change CWD to root directory");
     }
     /*  Discard data to/from stdin, stdout, and stderr.
      */
@@ -481,7 +481,7 @@ write_pidfile (const char *pidfile, int got_force)
     FILE   *fp;
 
     if ((pidfile == NULL) || (*pidfile == '\0')) {
-        log_err (EMUNGE_SNAFU, LOG_ERR, "Pidfile name is undefined");
+        log_err (EMUNGE_SNAFU, LOG_ERR, "PIDfile name is undefined");
     }
     /*  The pidfile must be specified with an absolute pathname; o/w, the
      *    unlink() call in destroy_conf() will fail because the daemon has
@@ -489,21 +489,21 @@ write_pidfile (const char *pidfile, int got_force)
      */
     if (pidfile[0] != '/') {
         log_err (EMUNGE_SNAFU, LOG_ERR,
-            "Pidfile \"%s\" requires an absolute path", pidfile);
+            "PIDfile \"%s\" requires an absolute path", pidfile);
     }
     /*  Ensure pidfile dir is secure against modification by others.
      */
     if (path_dirname (pidfile, piddir, sizeof (piddir)) < 0) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
-            "Failed to determine dirname of pidfile \"%s\"", pidfile);
+            "Failed to determine dirname of PIDfile \"%s\"", pidfile);
     }
     rv = path_is_secure (piddir, ebuf, sizeof (ebuf), PATH_SECURITY_NO_FLAGS);
     if (rv < 0) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
-            "Failed to check pidfile dir \"%s\": %s", piddir, ebuf);
+            "Failed to check PIDfile dir \"%s\": %s", piddir, ebuf);
     }
     else if (rv == 0) {
-        log_err_or_warn (got_force, "Pidfile is insecure: %s", ebuf);
+        log_err_or_warn (got_force, "PIDfile is insecure: %s", ebuf);
     }
     /*  Protect pidfile against unauthorized access by removing write-access
      *    from group and other.
@@ -517,16 +517,16 @@ write_pidfile (const char *pidfile, int got_force)
      *  An error in creating the pidfile is not considered fatal.
      */
     if (!fp) {
-        log_msg (LOG_WARNING, "Failed to open pidfile \"%s\": %s",
+        log_msg (LOG_WARNING, "Failed to open PIDfile \"%s\": %s",
             pidfile, strerror (errno));
     }
     else if (fprintf (fp, "%d\n", (int) getpid ()) == EOF) {
-        log_msg (LOG_WARNING, "Failed to write to pidfile \"%s\": %s",
+        log_msg (LOG_WARNING, "Failed to write to PIDfile \"%s\": %s",
             pidfile, strerror (errno));
         (void) fclose (fp);
     }
     else if (fclose (fp) == EOF) {
-        log_msg (LOG_WARNING, "Failed to close pidfile \"%s\": %s",
+        log_msg (LOG_WARNING, "Failed to close PIDfile \"%s\": %s",
             pidfile, strerror (errno));
     }
     else {
@@ -623,7 +623,7 @@ sock_create (conf_t conf)
             conf->socket_name);
     }
     else if (errno != ENOENT) {
-        log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to remove \"%s\"",
+        log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to remove socket \"%s\"",
             conf->socket_name);
     }
     /*  Create socket for communicating with clients.
@@ -648,14 +648,14 @@ sock_create (conf_t conf)
 
     if (rv < 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR,
-            "Failed to bind \"%s\"", conf->socket_name);
+            "Failed to bind socket \"%s\"", conf->socket_name);
     }
     if (listen (sd, MUNGE_SOCKET_BACKLOG) < 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR,
-            "Failed to listen on \"%s\"", conf->socket_name);
+            "Failed to listen on socket \"%s\"", conf->socket_name);
     }
     conf->ld = sd;
-    log_msg (LOG_NOTICE, "Bound to socket \"%s\"", conf->socket_name);
+    log_msg (LOG_INFO, "Created socket \"%s\"", conf->socket_name);
     return;
 }
 
@@ -669,26 +669,26 @@ sock_destroy (conf_t conf)
 
     if (conf->socket_name) {
         if (unlink (conf->socket_name) < 0) {
-            log_msg (LOG_WARNING, "Failed to remove \"%s\": %s",
+            log_msg (LOG_WARNING, "Failed to remove socket \"%s\": %s",
                 conf->socket_name, strerror (errno));
         }
     }
     if (conf->ld >= 0) {
         if (close (conf->ld) < 0) {
-            log_msg (LOG_WARNING, "Failed to close \"%s\": %s",
+            log_msg (LOG_WARNING, "Failed to close socket \"%s\": %s",
                 conf->socket_name, strerror (errno));
         }
         conf->ld = -1;
     }
     if (conf->lockfile_name) {
         if (unlink (conf->lockfile_name) < 0) {
-            log_msg (LOG_WARNING, "Failed to remove \"%s\": %s",
+            log_msg (LOG_WARNING, "Failed to remove lockfile \"%s\": %s",
                 conf->lockfile_name, strerror (errno));
         }
     }
     if (conf->lockfile_fd >= 0) {
         if (close (conf->lockfile_fd) < 0) {
-            log_msg (LOG_WARNING, "Failed to close \"%s\": %s",
+            log_msg (LOG_WARNING, "Failed to close lockfile \"%s\": %s",
                 conf->lockfile_name, strerror (errno));
         }
         conf->lockfile_fd = -1;

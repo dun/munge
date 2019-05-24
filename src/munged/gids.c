@@ -583,7 +583,7 @@ _gids_user_to_uid (hash_t uid_hash, hash_t ghost_hash,
         }
     }
     else {
-        log_msg (LOG_NOTICE, "Failed to query passwd file for \"%s\": %s",
+        log_msg (LOG_INFO, "Failed to query passwd file for \"%s\": %s",
                 user, strerror (errno));
     }
     if (uid == UID_SENTINEL) {
