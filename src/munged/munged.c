@@ -126,6 +126,8 @@ main (int argc, char *argv[])
             open_logfile (conf->logfile_name, log_priority, conf->got_force);
         }
     }
+    log_msg (LOG_NOTICE, "Starting %s-%s daemon (pid %d)",
+        PACKAGE, VERSION, (int) getpid ());
     handle_signals ();
     lookup_ip_addr (conf);
     if (conf->got_mlockall) {
@@ -150,9 +152,6 @@ main (int argc, char *argv[])
     if (!conf->got_foreground) {
         daemonize_fini ();
     }
-    log_msg (LOG_NOTICE, "Starting %s-%s daemon (pid %d)",
-        PACKAGE, VERSION, (int) getpid ());
-
     job_accept (conf);
 
     sock_destroy (conf);
