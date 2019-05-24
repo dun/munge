@@ -677,7 +677,7 @@ sock_destroy (conf_t conf)
     if (conf->ld >= 0) {
         if (close (conf->ld) < 0) {
             log_msg (LOG_WARNING, "Failed to close \"%s\": %s",
-                conf->ld, strerror (errno));
+                conf->socket_name, strerror (errno));
         }
         conf->ld = -1;
     }
@@ -690,7 +690,7 @@ sock_destroy (conf_t conf)
     if (conf->lockfile_fd >= 0) {
         if (close (conf->lockfile_fd) < 0) {
             log_msg (LOG_WARNING, "Failed to close \"%s\": %s",
-                conf->lockfile_fd, strerror (errno));
+                conf->lockfile_name, strerror (errno));
         }
         conf->lockfile_fd = -1;
     }
