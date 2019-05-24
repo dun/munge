@@ -804,15 +804,21 @@ dec_unpack_inner (munge_cred_t c)
     /*
      *  Unpack the origin IP address.
      */
-    if (m->addr_len != sizeof (m->addr)) {
-        return (m_msg_set_err (m, EMUNGE_BAD_CRED,
-            strdup ("Invalid origin IP addr length")));
-    }
     if (m->addr_len > len) {
         return (m_msg_set_err (m, EMUNGE_BAD_CRED,
             strdup ("Truncated origin IP addr")));
     }
-    memcpy (&m->addr, p, m->addr_len);
+    else if (m->addr_len == 4) {
+        assert (sizeof (m->addr) == 4);
+        memcpy (&m->addr, p, m->addr_len);
+    }
+    else if (m->addr_len == 0) {
+        memset (&m->addr, 0, sizeof (m->addr));
+    }
+    else {
+        return (m_msg_set_err (m, EMUNGE_BAD_CRED,
+            strdup ("Invalid origin IP addr length")));
+    }
     p += m->addr_len;
     len -= m->addr_len;
     /*
