@@ -60,6 +60,7 @@ fi
 ##
 AC_CHECK_HEADERS( \
   bzlib.h \
+  ifaddrs.h \
   standards.h \
   sys/random.h \
   zlib.h \
@@ -78,6 +79,7 @@ AC_CHECK_TYPES(socklen_t, [], [], [#include <sys/types.h>
 ##
 AC_CHECK_FUNCS( \
   getentropy \
+  getifaddrs \
   getrandom \
   localtime_r \
   mlockall \

@@ -35,7 +35,8 @@
 
 int net_get_hostname (char **result);
 
-int net_host_to_addr4 (struct in_addr *result, const char *host);
+int net_is_name_ifaddr (const char *name,
+        struct in_addr *ifaddrp, char **ifnamep);
 
 
 #endif /* !MUNGE_NET_H */

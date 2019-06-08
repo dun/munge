@@ -32,12 +32,16 @@
 
 #include <assert.h>
 #include <errno.h>
+#include <sys/types.h>                  /* before ifaddrs.h for NetBSD 7.1.2 */
+#if HAVE_IFADDRS_H
+#include <ifaddrs.h>
+#endif /* HAVE_IFADDRS_H */
 #include <limits.h>                     /* _POSIX_HOST_NAME_MAX */
 #include <netdb.h>
-#include <netinet/in.h>                 /* struct in_addr */
+#include <netinet/in.h>                 /* in_addr, sockaddr_in */
 #include <stdlib.h>
 #include <string.h>
-#include <sys/socket.h>                 /* AF_INET */
+#include <sys/socket.h>                 /* AF_INET, sockaddr */
 #include <unistd.h>
 #include <munge.h>
 #include "net.h"
@@ -90,32 +94,69 @@ net_get_hostname (char **result)
 }
 
 
-/*  Lookup the address for the given hostname/IPaddr string [host].
- *    If [host] is NULL, the null address will be used.
- *  Return 0 on success with [result] set, or -1 on error.
+/*  Return 1 if the hostname/IPaddr string [name] matches an address assigned
+ *    to a local network interface, 0 if no match is found, or -1 on error.
+ *  If given a ptr to [ifaddrp], it will be set to the matching IP address.
+ *  If given a ptr to [ifnamep], it will be set to the name of the matching
+ *    interface.  The caller is responsible for freeing this string.
+ *  Note: getifaddrs() is not in POSIX.1-2001.
+ *  FIXME: gethostbyname() is obsolete as of POSIX.1-2001.  Use getaddrinfo().
  */
 int
-net_host_to_addr4 (struct in_addr *result, const char *host)
+net_is_name_ifaddr (const char *name, struct in_addr *ifaddrp, char **ifnamep)
 {
-    struct hostent *h;
+#if HAVE_GETIFADDRS
+    struct hostent      *h;
+    struct ifaddrs      *ifaddr;
+    struct ifaddrs      *ifa;
+    struct sockaddr_in  *sa = NULL;
+    struct in_addr     **hap;
+    int                  is_found = 0;
 
-    if (result == NULL) {
+    if (name == NULL) {
         errno = EINVAL;
         return -1;
     }
-    if (host == NULL) {
-        memset (result, 0, sizeof (*result));
-        return 0;
-    }
-    /*  FIXME: gethostbyname() is obsolete as of POSIX.1-2001.
-     */
-    h = gethostbyname (host);
+    h = gethostbyname (name);
     if (h == NULL) {
         return -1;
     }
     if (h->h_addrtype != AF_INET) {
         return -1;
     }
-    memcpy (result, h->h_addr_list[0], sizeof (*result));
-    return 0;
+    if (getifaddrs (&ifaddr) == -1) {
+        return -1;
+    }
+    for (ifa = ifaddr; ifa != NULL; ifa = ifa->ifa_next) {
+        if (ifa->ifa_addr == NULL) {
+            continue;
+        }
+        if (ifa->ifa_addr->sa_family == AF_INET) {
+            sa = (struct sockaddr_in *) ifa->ifa_addr;
+            for (hap = (struct in_addr **) h->h_addr_list; *hap; hap++) {
+                if ((**hap).s_addr == sa->sin_addr.s_addr) {
+                    is_found = 1;
+                    break;
+                }
+            }
+        }
+        if (is_found) {
+            break;      /* prevent ifa from changing when match is found */
+        }
+    }
+    if (is_found) {
+        if ((ifaddrp != NULL) && (sa != NULL)) {
+            *ifaddrp = sa->sin_addr;
+        }
+        if ((ifnamep != NULL) && (ifa->ifa_name != NULL)) {
+            *ifnamep = strdup (ifa->ifa_name);
+        }
+    }
+    freeifaddrs (ifaddr);
+    return is_found;
+
+#else  /* !HAVE_GETIFADDRS */
+    errno = ENOTSUP;
+    return -1;
+#endif /* !HAVE_GETIFADDRS */
 }

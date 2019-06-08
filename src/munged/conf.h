@@ -70,6 +70,8 @@ struct conf {
     int             dek_key_len;        /* length of cipher subkey           */
     unsigned char  *mac_key;            /* subkey for mac ops                */
     int             mac_key_len;        /* length of mac subkey              */
+    char           *origin_name;        /* origin addr hostname/IP string    */
+    char           *origin_iface;       /* origin addr n/w interface name    */
     struct in_addr  addr;               /* origin addr in n/w byte order     */
     gids_t          gids;               /* supplementary group information   */
     int             gids_update_secs;   /* gids update interval in seconds   */

@@ -143,6 +143,13 @@ with minimal skew.
 .BI "\-\-num\-threads " integer
 Specify the number of threads to spawn for processing credential requests.
 .TP
+.BI "\-\-origin " string
+Specify the hostname or IPv4 address of the origin address that will be
+encoded into credential metadata.  This must match an IP address assigned to
+a local network interface; failure to do so will result in an error which
+can be overridden.  The default value is the IPv4 address of the hostname
+returned by \fBgethostname()\fR.
+.TP
 .BI "\-\-pid\-file " path
 Specify an alternate pathname for storing the Process ID of the daemon.
 .TP

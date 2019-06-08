@@ -76,7 +76,8 @@
 #define OPT_LOG_FILE            267
 #define OPT_SEED_FILE           268
 #define OPT_TRUSTED_GROUP       269
-#define OPT_LAST                270
+#define OPT_ORIGIN              270
+#define OPT_LAST                271
 
 const char * const short_opts = ":hLVfFMsS:v";
 
@@ -103,6 +104,7 @@ struct option long_opts[] = {
     { "log-file",          required_argument, NULL, OPT_LOG_FILE      },
     { "max-ttl",           required_argument, NULL, OPT_MAX_TTL       },
     { "num-threads",       required_argument, NULL, OPT_NUM_THREADS   },
+    { "origin",            required_argument, NULL, OPT_ORIGIN        },
     { "pid-file",          required_argument, NULL, OPT_PID_FILE      },
     { "seed-file",         required_argument, NULL, OPT_SEED_FILE     },
     { "syslog",            no_argument,       NULL, OPT_SYSLOG        },
@@ -193,6 +195,8 @@ create_conf (void)
     conf->dek_key_len = 0;
     conf->mac_key = NULL;
     conf->mac_key_len = 0;
+    conf->origin_name = NULL;
+    conf->origin_iface = NULL;
     memset (&conf->addr, 0, sizeof (conf->addr));
     conf->gids = NULL;
     conf->gids_update_secs = MUNGE_GROUP_UPDATE_SECS;
@@ -263,6 +267,14 @@ destroy_conf (conf_t conf, int do_unlink)
         memburn (conf->mac_key, 0, conf->mac_key_len);
         free (conf->mac_key);
         conf->mac_key = NULL;
+    }
+    if (conf->origin_name) {
+        free (conf->origin_name);
+        conf->origin_name = NULL;
+    }
+    if (conf->origin_iface) {
+        free (conf->origin_iface);
+        conf->origin_iface = NULL;
     }
     if (conf->auth_server_dir) {
         free (conf->auth_server_dir);
@@ -412,6 +424,13 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                 }
                 conf->nthreads = l;
                 break;
+            case OPT_ORIGIN:
+                if (conf->origin_name)
+                    free (conf->origin_name);
+                if (!(conf->origin_name = strdup (optarg)))
+                    log_errno (EMUNGE_NO_MEMORY, LOG_ERR,
+                        "Failed to copy origin string");
+                break;
             case OPT_PID_FILE:
                 if (conf->pidfile_name)
                     free (conf->pidfile_name);
@@ -512,6 +531,10 @@ write_origin_addr (conf_t conf)
 
     if (!inet_ntop (AF_INET, &conf->addr, buf, sizeof (buf))) {
         log_msg (LOG_WARNING, "Failed to convert origin address to a string");
+    }
+    else if (conf->origin_iface != NULL) {
+        log_msg (LOG_INFO, "Set origin address to %s (%s)", buf,
+                conf->origin_iface);
     }
     else {
         log_msg (LOG_INFO, "Set origin address to %s", buf);
@@ -692,6 +715,11 @@ _conf_display_help (char *prog)
     printf ("  %*s %s [%d]\n", w, "--num-threads=INT",
             "Specify number of threads to spawn", MUNGE_THREADS);
 
+#if HAVE_GETIFADDRS
+    printf ("  %*s %s\n", w, "--origin=ADDRESS",
+            "Specify origin address via hostname/IPaddr");
+#endif /* HAVE_GETIFADDRS */
+
     printf ("  %*s %s [%s]\n", w, "--pid-file=PATH",
             "Specify PID file", MUNGE_PIDFILE_PATH);
 
@@ -823,25 +851,40 @@ static void
 _conf_set_origin_addr (conf_t conf)
 {
 /*  Set the origin address to be encoded into the credential metadata.
+ *  If an origin address is explicitly specified, a failure to match an
+ *    address assigned to a local network interface results in an error which
+ *    can be overridden; otherwise, a failure to match results in a warning,
+ *    and the origin address is set to the null address.
  */
-    char *hostname = NULL;
-    int   rv;
+    int is_match_required;
+    int rv = 0;
 
     memset (&conf->addr, 0, sizeof (conf->addr));
 
-    rv = net_get_hostname (&hostname);
-    if (rv < 0) {
-        log_msg (LOG_WARNING, "Failed to get name of current host");
-    }
-    else {
-        rv = net_host_to_addr4 (&conf->addr, hostname);
+    is_match_required = (conf->origin_name != NULL) ? 1 : 0;
+
+    if (conf->origin_name == NULL) {
+        rv = net_get_hostname (&conf->origin_name);
         if (rv < 0) {
-            log_msg (LOG_WARNING, "Failed to resolve hostname \"%s\"",
-                    hostname);
+            log_msg (LOG_WARNING, "Failed to get name of current host");
         }
     }
-    if (hostname != NULL) {
-        free (hostname);
+    if (conf->origin_name != NULL) {
+        errno = 0;
+        rv = net_is_name_ifaddr (conf->origin_name,
+                &conf->addr, &conf->origin_iface);
+        if (rv != 1) {
+            char buf[1024] = "";
+            if ((rv == -1) && (errno != 0)) {
+                (void) snprintf (buf, sizeof (buf), ": %s", strerror (errno));
+            }
+            log_err_or_warn (conf->got_force || !is_match_required,
+                    "Failed to match origin \"%s\" to a local network "
+                    "interface%s", conf->origin_name, buf);
+        }
+    }
+    if (rv != 1) {
+        log_msg (LOG_WARNING, "Continuing with origin set to null address");
     }
     return;
 }
