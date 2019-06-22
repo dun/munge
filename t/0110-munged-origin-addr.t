@@ -55,11 +55,15 @@ test_expect_success 'munged --origin null address metadata' '
 '
 
 # Check if the origin address can be set by specifying an IP address.
+# Save the interface name to ifname0.$$ for later checks.
 ##
 test_expect_success GETIFADDRS 'munged --origin IP address' '
+    rm -f ifname0.$$ &&
     munged_start_daemon --origin=127.0.0.1 &&
     munged_stop_daemon &&
-    grep "Set origin address to 127.0.0.1" "${MUNGE_LOGFILE}"
+    grep "Set origin address to 127.0.0.1" "${MUNGE_LOGFILE}" &&
+    sed -n -e "s/.*Set origin address.*(\([^)]*\)).*/\1/p" \
+            "${MUNGE_LOGFILE}" >ifname0.$$
 '
 
 # Check if the origin address is set to the appropriate IP address in the
@@ -67,6 +71,31 @@ test_expect_success GETIFADDRS 'munged --origin IP address' '
 ##
 test_expect_success GETIFADDRS 'munged --origin IP address metadata' '
     munged_start_daemon --origin=127.0.0.1 &&
+    "${MUNGE}" --socket="${MUNGE_SOCKET}" --no-input --output=cred.$$ &&
+    "${UNMUNGE}" --socket="${MUNGE_SOCKET}" --input=cred.$$ \
+            --metadata=meta.$$ --keys=ENCODE_HOST --numeric &&
+    munged_stop_daemon &&
+    egrep "^ENCODE_HOST:.*\<127\.0\.0\.1\>" meta.$$
+'
+
+# Check if the origin address can be set by specifying an interface name.
+##
+test_expect_success GETIFADDRS 'munged --origin interface name' '
+    test -s ifname0.$$ &&
+    munged_start_daemon --origin="$(cat ifname0.$$)" &&
+    munged_stop_daemon &&
+    grep "Set origin address to 127.0.0.1" "${MUNGE_LOGFILE}" &&
+    sed -n -e "s/.*Set origin address.*(\([^)]*\)).*/\1/p" \
+            "${MUNGE_LOGFILE}" >ifname1.$$ &&
+    test_cmp ifname0.$$ ifname1.$$
+'
+
+# Check if the origin address is set to the appropriate IP address in the
+#   credential metadata.
+##
+test_expect_success GETIFADDRS 'munged --origin interface name metadata' '
+    test -s ifname0.$$ &&
+    munged_start_daemon --origin="$(cat ifname0.$$)" &&
     "${MUNGE}" --socket="${MUNGE_SOCKET}" --no-input --output=cred.$$ &&
     "${UNMUNGE}" --socket="${MUNGE_SOCKET}" --input=cred.$$ \
             --metadata=meta.$$ --keys=ENCODE_HOST --numeric &&

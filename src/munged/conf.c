@@ -717,7 +717,7 @@ _conf_display_help (char *prog)
 
 #if HAVE_GETIFADDRS
     printf ("  %*s %s\n", w, "--origin=ADDRESS",
-            "Specify origin address via hostname/IPaddr");
+            "Specify origin address via hostname/IPaddr/interface");
 #endif /* HAVE_GETIFADDRS */
 
     printf ("  %*s %s [%s]\n", w, "--pid-file=PATH",
