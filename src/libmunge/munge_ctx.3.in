@@ -91,13 +91,13 @@ or the variable type of a pointer used for the subsequent argument in
 \fBmunge_ctx_get\fR().
 .TP
 \fBMUNGE_OPT_CIPHER_TYPE\fR , \fIint\fR
-Get or set the cipher type (cf., \fBCIPHER TYPES\fR).
+Get or set the cipher type (see \fBCIPHER TYPES\fR).
 .TP
 \fBMUNGE_OPT_MAC_TYPE\fR , \fIint\fR
-Get or set the MAC type (cf., \fBMAC TYPES\fR).
+Get or set the MAC type (see \fBMAC TYPES\fR).
 .TP
 \fBMUNGE_OPT_ZIP_TYPE\fR , \fIint\fR
-Get or set the compression type (cf., \fBCOMPRESSION TYPES\fR).
+Get or set the compression type (see \fBCOMPRESSION TYPES\fR).
 .TP
 \fBMUNGE_OPT_REALM\fR , \fIchar *\fR
 Get or set the security realm, where the \fIchar *\fR type is a NUL-terminated
@@ -105,7 +105,7 @@ character string.  The string returned by \fBmunge_ctx_get\fR() should not
 be freed or modified by the caller.  \fBNOT CURRENTLY SUPPORTED\fR.
 .TP
 \fBMUNGE_OPT_TTL\fR , \fIint\fR
-Get or set the time-to-live (in seconds) (cf., \fBTTL TYPES\fR).  This value
+Get or set the time-to-live (in seconds) (see \fBTTL TYPES\fR).  This value
 controls how long the credential is valid once it has been encoded.
 .TP
 \fBMUNGE_OPT_ADDR4\fR , \fIstruct in_addr\fR
@@ -126,12 +126,12 @@ Get or set the local domain socket for connecting with \fBmunged\fR, where the
 by \fBmunge_ctx_get\fR() should not be freed or modified by the caller.
 .TP
 \fBMUNGE_OPT_UID_RESTRICTION\fR , \fIuid_t\fR
-Get or set the UID allowed to decode the credential (cf., \fBUID & GID
+Get or set the UID allowed to decode the credential (see \fBUID & GID
 TYPES\fR).  This value will be matched against the effective user ID of
 the process requesting the credential decode.
 .TP
 \fBMUNGE_OPT_GID_RESTRICTION\fR , \fIgid_t\fR
-Get or set the GID allowed to decode the credential (cf., \fBUID & GID
+Get or set the GID allowed to decode the credential (see \fBUID & GID
 TYPES\fR).  This value will be matched against the effective group ID of
 the process requesting the credential decode, as well as each supplementary
 group of which the effective user ID of that process is a member.
