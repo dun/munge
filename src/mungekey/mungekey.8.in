@@ -33,7 +33,7 @@ mungekey \- MUNGE key management utility
 .SH SYNOPSIS
 .B mungekey
 [\fB\-c\fR] [\fB\-b\fR \fIbits\fR] [\fB\-f\fR] [\fB\-k\fR \fIkeyfile\fR]
-[\-\fBv\fR]
+[\fB\-v\fR]
 .br
 
 .SH DESCRIPTION
