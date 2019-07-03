@@ -1,64 +1,64 @@
 {
-    getgrent_r-calloc
-    Memcheck:Leak
-    match-leak-kinds: reachable
-    fun:calloc
-    ...
-    fun:getgrent_r@@GLIBC_2.2.5
+   getgrent_r-calloc
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:calloc
+   ...
+   fun:getgrent_r@@GLIBC_2.2.5
 }
 
 {
-    getgrent_r-malloc
-    Memcheck:Leak
-    match-leak-kinds: reachable
-    fun:malloc
-    ...
-    fun:getgrent_r@@GLIBC_2.2.5
+   getgrent_r-malloc
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   ...
+   fun:getgrent_r@@GLIBC_2.2.5
 }
 
 {
-    getpwnam_r-calloc
-    Memcheck:Leak
-    match-leak-kinds: reachable
-    fun:calloc
-    ...
-    fun:getpwnam_r@@GLIBC_2.2.5
+   getpwnam_r-calloc
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:calloc
+   ...
+   fun:getpwnam_r@@GLIBC_2.2.5
 }
 
 {
-    getpwnam_r-malloc
-    Memcheck:Leak
-    match-leak-kinds: reachable
-    fun:malloc
-    ...
-    fun:getpwnam_r@@GLIBC_2.2.5
+   getpwnam_r-malloc
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   ...
+   fun:getpwnam_r@@GLIBC_2.2.5
 }
 
 {
-    libgcrypt-_gcry_check_version-malloc
-    Memcheck:Leak
-    match-leak-kinds: reachable
-    fun:malloc
-    ...
-    fun:_gcry_check_version
+   libgcrypt-_gcry_check_version-malloc
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   ...
+   fun:_gcry_check_version
 }
 
 {
-    libgcrypt-crypto_init-malloc
-    Memcheck:Leak
-    match-leak-kinds: reachable
-    fun:malloc
-    ...
-    obj:*/libgcrypt.so.*
-    fun:crypto_init
-    fun:main
+   libgcrypt-crypto_init-malloc
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   ...
+   obj:*/libgcrypt.so.*
+   fun:crypto_init
+   fun:main
 }
 
 {
-    libgcrypt-gcry_control-malloc
-    Memcheck:Leak
-    match-leak-kinds: reachable
-    fun:malloc
-    ...
-    fun:gcry_control
+   libgcrypt-gcry_control-malloc
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   ...
+   fun:gcry_control
 }
