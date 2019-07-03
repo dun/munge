@@ -94,6 +94,7 @@ munged_start_daemon()
             --log-file=\"${MUNGE_LOGFILE}\" \
             --pid-file=\"${MUNGE_PIDFILE}\" \
             --seed-file=\"${MUNGE_SEEDFILE}\" \
+            --group-update-time=-1 \
             $*" &&
     ${EXEC} "${MUNGED}" \
             --socket="${MUNGE_SOCKET}" \
@@ -101,6 +102,7 @@ munged_start_daemon()
             --log-file="${MUNGE_LOGFILE}" \
             --pid-file="${MUNGE_PIDFILE}" \
             --seed-file="${MUNGE_SEEDFILE}" \
+            --group-update-time=-1 \
             "$@"
 }
 
