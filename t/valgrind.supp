@@ -1,4 +1,13 @@
 {
+   dlopen-_dlerror_run-calloc
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:calloc
+   fun:_dlerror_run
+   fun:dlopen@@GLIBC_2.2.5
+}
+
+{
    getgrent_r-calloc
    Memcheck:Leak
    match-leak-kinds: reachable
@@ -32,6 +41,24 @@
    fun:malloc
    ...
    fun:getpwnam_r@@GLIBC_2.2.5
+}
+
+{
+   libcrypto-CRYPTO_THREAD_lock_new-malloc
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:CRYPTO_zalloc
+   fun:CRYPTO_THREAD_lock_new
+   obj:/usr/lib64/libcrypto.so.1.1
+}
+
+{
+   libcrypto-FIPS_mode_set-cond
+   Memcheck:Cond
+   ...
+   fun:FIPS_mode_set
+   obj:/usr/lib64/libcrypto.so.1.1
 }
 
 {
