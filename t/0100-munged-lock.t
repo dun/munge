@@ -188,13 +188,16 @@ test_expect_success 'check lockfile removal again' '
 '
 
 # Check if root can stop a munged process started by a non-privileged user.
-#   This tests the case where the lockfile owner (a non-privileged user)
-#   may be checked against the euid (root) of the process performing the
-#   --stop option.
+#   This tests the case where the lockfile owner (a non-privileged user) is
+#   checked against the euid of the process performing the --stop option
+#   (root).  If root is unable to stop it, attempt cleanup as the
+#   non-privileged user and return a failure status.
 ##
 test_expect_success SUDO 'stop unprivileged munged as root' '
     munged_start_daemon &&
-    munged_stop_daemon t-exec=sudo
+    if munged_stop_daemon t-exec=sudo; then :; else
+        munged_stop_daemon; false;
+    fi
 '
 
 test_done
