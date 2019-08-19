@@ -758,8 +758,9 @@ _conf_process_stop (conf_t conf)
     if (pid <= 0) {
         if (conf->got_verbose) {
             log_err (EMUNGE_SNAFU, LOG_ERR,
-                    "Failed to signal daemon bound to socket \"%s\""
-                    ": Lockfile not found", conf->socket_name);
+                    "Failed to query socket lockfile \"%s\": %s",
+                    conf->lockfile_name,
+                    (pid == 0) ? "Lock not held" : strerror (errno));
         }
         exit (EXIT_FAILURE);
     }
