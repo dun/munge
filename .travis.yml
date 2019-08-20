@@ -13,7 +13,7 @@ env:
   - CFLAGS="-Werror"
   - DISTCHECK_CONFIGURE_FLAGS='${CONFIGURE_OPTS}'
   - MUNGE_ROOT="/tmp/munge-$$"
-  - TEST_LONG="t"
+  - TEST_LONG=
   - chain_lint="t"
   - verbose="t"
   matrix:
