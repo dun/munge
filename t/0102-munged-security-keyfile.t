@@ -224,7 +224,7 @@ test_expect_success 'keyfile dir owned by euid' '
 #   fail if NFS is configured for squashed access.
 ##
 test_expect_success SUDO 'alt keyfile dir setup' '
-    ALT_KEYDIR="${TMPDIR:-"/tmp"}/munge-$$/alt-etc" &&
+    ALT_KEYDIR="${TMPDIR:-"/tmp"}/munge-$$/alt-etc-$$" &&
     mkdir -m 0755 -p "${ALT_KEYDIR}" &&
     ALT_KEYFILE="${ALT_KEYDIR}/munged.key.$$" &&
     cp -p "${MUNGE_KEYFILE}" "${ALT_KEYFILE}" &&

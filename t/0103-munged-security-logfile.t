@@ -221,7 +221,7 @@ test_expect_success 'logfile dir owned by euid' '
 #   fail if NFS is configured for squashed access.
 ##
 test_expect_success SUDO 'alt logfile dir setup' '
-    ALT_LOGDIR="${TMPDIR:-"/tmp"}/munge-$$/alt-log" &&
+    ALT_LOGDIR="${TMPDIR:-"/tmp"}/munge-$$/alt-log-$$" &&
     mkdir -m 0755 -p "${ALT_LOGDIR}" &&
     ALT_LOGFILE="${ALT_LOGDIR}/munged.log.$$" &&
     touch "${ALT_LOGFILE}" &&

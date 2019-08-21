@@ -11,7 +11,7 @@ test_description='Check munged security of socket'
 #   socket name),
 ##
 test_expect_success 'setup' '
-    MUNGE_SOCKETDIR="${TMPDIR:-"/tmp"}/munge-$$/socketdir" &&
+    MUNGE_SOCKETDIR="${TMPDIR:-"/tmp"}/munge-$$/socketdir-$$" &&
     munged_setup_env &&
     munged_create_key
 '
@@ -57,7 +57,7 @@ test_expect_success 'socket dir owned by euid' '
 #   fail if NFS is configured for squashed access.
 ##
 test_expect_success SUDO 'alt socket dir setup' '
-    ALT_SOCKETDIR="${TMPDIR:-"/tmp"}/munge-$$/alt-socketdir" &&
+    ALT_SOCKETDIR="${TMPDIR:-"/tmp"}/munge-$$/alt-socketdir-$$" &&
     mkdir -m 1777 -p "${ALT_SOCKETDIR}" &&
     ALT_SOCKET="${ALT_SOCKETDIR}/munged.sock.$$" &&
     test_set_prereq ALT

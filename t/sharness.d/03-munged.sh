@@ -19,22 +19,27 @@ munged_setup_env()
     : "${MUNGE_SOCKETDIR:="${TMPDIR:-"/tmp"}"}" &&
     MUNGE_SOCKET="${MUNGE_SOCKETDIR}/munged.sock.$$" &&
     mkdir -m 1777 -p "${MUNGE_SOCKETDIR}" &&
+    test_debug "echo MUNGE_SOCKET=\"${MUNGE_SOCKET}\"" &&
 
-    : "${MUNGE_KEYDIR:="${MUNGE_ROOT}/etc"}" &&
+    : "${MUNGE_KEYDIR:="${MUNGE_ROOT}/etc-$$"}" &&
     MUNGE_KEYFILE="${MUNGE_KEYDIR}/munged.key.$$" &&
     mkdir -m 0755 -p "${MUNGE_KEYDIR}" &&
+    test_debug "echo MUNGE_KEYFILE=\"${MUNGE_KEYFILE}\"" &&
 
-    : "${MUNGE_LOGDIR:="${MUNGE_ROOT}/log"}" &&
+    : "${MUNGE_LOGDIR:="${MUNGE_ROOT}/log-$$"}" &&
     MUNGE_LOGFILE="${MUNGE_LOGDIR}/munged.log.$$" &&
     mkdir -m 0755 -p "${MUNGE_LOGDIR}" &&
+    test_debug "echo MUNGE_LOGFILE=\"${MUNGE_LOGFILE}\"" &&
 
-    : "${MUNGE_PIDDIR:="${MUNGE_ROOT}/run"}" &&
+    : "${MUNGE_PIDDIR:="${MUNGE_ROOT}/run-$$"}" &&
     MUNGE_PIDFILE="${MUNGE_PIDDIR}/munged.pid.$$" &&
     mkdir -m 0755 -p "${MUNGE_PIDDIR}" &&
+    test_debug "echo MUNGE_PIDFILE=\"${MUNGE_PIDFILE}\"" &&
 
-    : "${MUNGE_SEEDDIR:="${MUNGE_ROOT}/lib"}" &&
+    : "${MUNGE_SEEDDIR:="${MUNGE_ROOT}/lib-$$"}" &&
     MUNGE_SEEDFILE="${MUNGE_SEEDDIR}/munged.seed.$$" &&
-    mkdir -m 0755 -p "${MUNGE_SEEDDIR}"
+    mkdir -m 0755 -p "${MUNGE_SEEDDIR}" &&
+    test_debug "echo MUNGE_SEEDFILE=\"${MUNGE_SEEDFILE}\""
 }
 
 ##
