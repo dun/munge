@@ -278,7 +278,8 @@ test_expect_success 'keyfile dir writable by trusted group' '
     GID=$(ls -d -l -n "${MUNGE_KEYDIR}" | awk "{ print \$4 }") &&
     chmod 0770 "${MUNGE_KEYDIR}" &&
     munged_start_daemon --trusted-group="${GID}" &&
-    munged_stop_daemon
+    munged_stop_daemon &&
+    chmod 0755 "${MUNGE_KEYDIR}"
 '
 
 # Check for an error when the keyfile dir is writable (without the sticky bit)
@@ -289,7 +290,8 @@ test_expect_success 'keyfile dir writable by untrusted group failure' '
     GID=$(ls -d -l -n "${MUNGE_KEYDIR}" | awk "{ print \$4 }") &&
     GID=$(( ${GID} + 1 )) &&
     chmod 0770 "${MUNGE_KEYDIR}" &&
-    test_must_fail munged_start_daemon --trusted-group="${GID}"
+    test_must_fail munged_start_daemon --trusted-group="${GID}" &&
+    chmod 0755 "${MUNGE_KEYDIR}"
 '
 
 # Check for an error when the keyfile dir is writable by group without the
@@ -298,6 +300,7 @@ test_expect_success 'keyfile dir writable by untrusted group failure' '
 test_expect_success 'keyfile dir writable by group failure' '
     chmod 0770 "${MUNGE_KEYDIR}" &&
     test_must_fail munged_start_daemon &&
+    chmod 0755 "${MUNGE_KEYDIR}" &&
     egrep "Error:.* group-writable permissions without sticky bit set" \
             "${MUNGE_LOGFILE}"
 '
@@ -309,6 +312,7 @@ test_expect_success 'keyfile dir writable by group override' '
     chmod 0770 "${MUNGE_KEYDIR}" &&
     munged_start_daemon --force &&
     munged_stop_daemon &&
+    chmod 0755 "${MUNGE_KEYDIR}" &&
     egrep "Warning:.* group-writable permissions without sticky bit set" \
             "${MUNGE_LOGFILE}"
 '
@@ -318,7 +322,8 @@ test_expect_success 'keyfile dir writable by group override' '
 test_expect_success 'keyfile dir writable by group with sticky bit' '
     chmod 1770 "${MUNGE_KEYDIR}" &&
     munged_start_daemon &&
-    munged_stop_daemon
+    munged_stop_daemon &&
+    chmod 0755 "${MUNGE_KEYDIR}"
 '
 
 # Check for an error when the keyfile dir is writable by other without the
@@ -327,6 +332,7 @@ test_expect_success 'keyfile dir writable by group with sticky bit' '
 test_expect_success 'keyfile dir writable by other failure' '
     chmod 0707 "${MUNGE_KEYDIR}" &&
     test_must_fail munged_start_daemon &&
+    chmod 0755 "${MUNGE_KEYDIR}" &&
     egrep "Error:.* world-writable permissions without sticky bit set" \
             "${MUNGE_LOGFILE}"
 '
@@ -338,6 +344,7 @@ test_expect_success 'keyfile dir writable by other override' '
     chmod 0707 "${MUNGE_KEYDIR}" &&
     munged_start_daemon --force &&
     munged_stop_daemon &&
+    chmod 0755 "${MUNGE_KEYDIR}" &&
     egrep "Warning:.* world-writable permissions without sticky bit set" \
             "${MUNGE_LOGFILE}"
 '
@@ -347,7 +354,8 @@ test_expect_success 'keyfile dir writable by other override' '
 test_expect_success 'keyfile dir writable by other with sticky bit' '
     chmod 1707 "${MUNGE_KEYDIR}" &&
     munged_start_daemon &&
-    munged_stop_daemon
+    munged_stop_daemon &&
+    chmod 0755 "${MUNGE_KEYDIR}"
 '
 
 test_done

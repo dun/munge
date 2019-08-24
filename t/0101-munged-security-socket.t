@@ -109,7 +109,8 @@ test_expect_success 'socket dir writable by trusted group' '
     GID=$(ls -d -l -n "${MUNGE_SOCKETDIR}" | awk "{ print \$4 }") &&
     chmod 0771 "${MUNGE_SOCKETDIR}" &&
     munged_start_daemon --trusted-group="${GID}" &&
-    munged_stop_daemon
+    munged_stop_daemon &&
+    chmod 1777 "${MUNGE_SOCKETDIR}"
 '
 
 # Check for an error when the socket dir is writable (without the sticky bit
@@ -120,7 +121,8 @@ test_expect_success 'socket dir writable by untrusted group failure' '
     GID=$(ls -d -l -n "${MUNGE_SOCKETDIR}" | awk "{ print \$4 }") &&
     GID=$(( ${GID} + 1 )) &&
     chmod 0771 "${MUNGE_SOCKETDIR}" &&
-    test_must_fail munged_start_daemon --trusted-group="${GID}"
+    test_must_fail munged_start_daemon --trusted-group="${GID}" &&
+    chmod 1777 "${MUNGE_SOCKETDIR}"
 '
 
 # Check for an error when the socket dir is writable by group without the
@@ -129,6 +131,7 @@ test_expect_success 'socket dir writable by untrusted group failure' '
 test_expect_success 'socket dir writable by group failure' '
     chmod 0771 "${MUNGE_SOCKETDIR}" &&
     test_must_fail munged_start_daemon &&
+    chmod 1777 "${MUNGE_SOCKETDIR}" &&
     egrep "Error:.* group-writable permissions without sticky bit set" \
             "${MUNGE_LOGFILE}"
 '
@@ -140,6 +143,7 @@ test_expect_success 'socket dir writable by group override' '
     chmod 0771 "${MUNGE_SOCKETDIR}" &&
     munged_start_daemon --force &&
     munged_stop_daemon &&
+    chmod 1777 "${MUNGE_SOCKETDIR}" &&
     egrep "Warning:.* group-writable permissions without sticky bit set" \
             "${MUNGE_LOGFILE}"
 '
@@ -149,7 +153,8 @@ test_expect_success 'socket dir writable by group override' '
 test_expect_success 'socket dir writable by group with sticky bit' '
     chmod 1771 "${MUNGE_SOCKETDIR}" &&
     munged_start_daemon &&
-    munged_stop_daemon
+    munged_stop_daemon &&
+    chmod 1777 "${MUNGE_SOCKETDIR}"
 '
 
 # Check for an error when the socket dir is writable by other without the
@@ -158,6 +163,7 @@ test_expect_success 'socket dir writable by group with sticky bit' '
 test_expect_success 'socket dir writable by other failure' '
     chmod 0717 "${MUNGE_SOCKETDIR}" &&
     test_must_fail munged_start_daemon &&
+    chmod 1777 "${MUNGE_SOCKETDIR}" &&
     egrep "Error:.* world-writable permissions without sticky bit set" \
             "${MUNGE_LOGFILE}"
 '
@@ -169,6 +175,7 @@ test_expect_success 'socket dir writable by other override' '
     chmod 0717 "${MUNGE_SOCKETDIR}" &&
     munged_start_daemon --force &&
     munged_stop_daemon &&
+    chmod 1777 "${MUNGE_SOCKETDIR}" &&
     egrep "Warning:.* world-writable permissions without sticky bit set" \
             "${MUNGE_LOGFILE}"
 '
@@ -178,7 +185,8 @@ test_expect_success 'socket dir writable by other override' '
 test_expect_success 'socket dir writable by other with sticky bit' '
     chmod 1717 "${MUNGE_SOCKETDIR}" &&
     munged_start_daemon &&
-    munged_stop_daemon
+    munged_stop_daemon &&
+    chmod 1777 "${MUNGE_SOCKETDIR}"
 '
 
 # Check for an error when the socket dir does not have execute permissions
@@ -187,6 +195,7 @@ test_expect_success 'socket dir writable by other with sticky bit' '
 test_expect_success 'socket dir inaccessible by all failure' '
     chmod 0700 "${MUNGE_SOCKETDIR}" &&
     test_must_fail munged_start_daemon &&
+    chmod 1777 "${MUNGE_SOCKETDIR}" &&
     egrep "Error:.* Socket is inaccessible.* \"${MUNGE_SOCKETDIR}\"" \
             "${MUNGE_LOGFILE}"
 '
@@ -199,6 +208,7 @@ test_expect_success 'socket dir inaccessible by all override' '
     chmod 0700 "${MUNGE_SOCKETDIR}" &&
     munged_start_daemon --force &&
     munged_stop_daemon &&
+    chmod 1777 "${MUNGE_SOCKETDIR}" &&
     egrep "Warning:.* Socket is inaccessible.* \"${MUNGE_SOCKETDIR}\"" \
             "${MUNGE_LOGFILE}"
 '

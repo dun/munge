@@ -276,7 +276,8 @@ test_expect_success 'logfile dir writable by trusted group ' '
     GID=$(ls -d -l -n "${MUNGE_LOGDIR}" | awk "{ print \$4 }") &&
     chmod 0770 "${MUNGE_LOGDIR}" &&
     munged_start_daemon --trusted-group="${GID}" &&
-    munged_stop_daemon
+    munged_stop_daemon &&
+    chmod 0755 "${MUNGE_LOGDIR}"
 '
 
 # Check if the logfile dir can be writable (without the sticky bit) by a group
@@ -289,7 +290,8 @@ test_expect_success 'logfile dir writable by untrusted group failure' '
     GID=$(( ${GID} + 1 )) &&
     chmod 0770 "${MUNGE_LOGDIR}" &&
     munged_start_daemon --trusted-group="${GID}" &&
-    munged_stop_daemon
+    munged_stop_daemon &&
+    chmod 0755 "${MUNGE_LOGDIR}"
 '
 
 # Check if the logfile dir can be writable by group without the sticky bit set.
@@ -298,7 +300,8 @@ test_expect_success 'logfile dir writable by untrusted group failure' '
 test_expect_success 'logfile dir writable by group' '
     chmod 0770 "${MUNGE_LOGDIR}" &&
     munged_start_daemon &&
-    munged_stop_daemon
+    munged_stop_daemon &&
+    chmod 0755 "${MUNGE_LOGDIR}"
 '
 
 # Check if the logfile dir can be writable by group with the sticky bit set.
@@ -306,7 +309,8 @@ test_expect_success 'logfile dir writable by group' '
 test_expect_success 'logfile dir writable by group with sticky bit' '
     chmod 1770 "${MUNGE_LOGDIR}" &&
     munged_start_daemon &&
-    munged_stop_daemon
+    munged_stop_daemon &&
+    chmod 0755 "${MUNGE_LOGDIR}"
 '
 
 # Check for an error when the logfile dir is writable by other without the
@@ -315,6 +319,7 @@ test_expect_success 'logfile dir writable by group with sticky bit' '
 test_expect_success 'logfile dir writable by other failure' '
     chmod 0707 "${MUNGE_LOGDIR}" &&
     test_must_fail munged_start_daemon 2>err.$$ &&
+    chmod 0755 "${MUNGE_LOGDIR}" &&
     egrep "Error:.* world-writable permissions without sticky bit set" err.$$
 '
 
@@ -325,6 +330,7 @@ test_expect_success 'logfile dir writable by other override' '
     chmod 0707 "${MUNGE_LOGDIR}" &&
     munged_start_daemon --force 2>err.$$ &&
     munged_stop_daemon &&
+    chmod 0755 "${MUNGE_LOGDIR}" &&
     egrep "Warning:.* world-writable permissions without sticky bit set" err.$$
 '
 
@@ -333,7 +339,8 @@ test_expect_success 'logfile dir writable by other override' '
 test_expect_success 'logfile dir writable by other with sticky bit' '
     chmod 1707 "${MUNGE_LOGDIR}" &&
     munged_start_daemon &&
-    munged_stop_daemon
+    munged_stop_daemon &&
+    chmod 0755 "${MUNGE_LOGDIR}"
 '
 
 # Check for a regression of a duplicate error message being written to stderr
