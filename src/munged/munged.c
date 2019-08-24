@@ -233,8 +233,10 @@ daemonize_init (char *progname, conf_t conf)
                 "Failed to read from daemonpipe");
         }
         if (status != 0) {
-            log_open_file (stderr, progname, priority, LOG_OPT_PRIORITY);
-            log_msg (priority, "%s", buf);
+            if ((priority >= 0) && (buf[0] != '\0')) {
+                log_open_file (stderr, progname, priority, LOG_OPT_PRIORITY);
+                log_msg (priority, "%s", buf);
+            }
             exit (EXIT_FAILURE);
         }
         destroy_conf (conf, 0);

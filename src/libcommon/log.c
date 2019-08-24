@@ -389,10 +389,12 @@ static void
 _log_die (int status, int priority, const char *msg)
 {
     /*  If the daemonpipe is open between the (grand)child process and the
-     *    parent process, relay the error message to the parent for output
-     *    onto stderr.
+     *    parent process, relay the error message to the parent for output onto
+     *    stderr.  But if the error message has already been written to stderr,
+     *    simply relay the status without the message text.
      */
-    (void) daemonpipe_write (status, priority, msg);
+    (void) daemonpipe_write (status, priority,
+            (log_ctx.fp != stderr) ? msg : NULL);
 
 #ifndef NDEBUG
     /*  Generate core for debugging.

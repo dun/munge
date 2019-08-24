@@ -336,4 +336,19 @@ test_expect_success 'logfile dir writable by other with sticky bit' '
     munged_stop_daemon
 '
 
+# Check for a regression of a duplicate error message being written to stderr
+#   for a failure to open the logfile.
+##
+test_expect_success 'logfile failure writes single message to stderr' '
+    local ERR NUM &&
+    rm -f "${MUNGE_LOGFILE}" &&
+    touch "${MUNGE_LOGFILE}" &&
+    chmod 0400 "${MUNGE_LOGFILE}" &&
+    test_must_fail munged_start_daemon t-keep-logfile 2>err.$$ &&
+    cat err.$$ &&
+    ERR=$(sed -n -e "s/.*Error: //p" err.$$ | sort | uniq -c | sort -n -r) &&
+    NUM=$(echo "${ERR}" | awk "{ print \$1; exit }") &&
+    test "${NUM}" -eq 1 2>/dev/null
+'
+
 test_done
