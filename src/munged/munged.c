@@ -234,7 +234,6 @@ daemonize_init (char *progname, conf_t conf)
         }
         if (status != 0) {
             if ((priority >= 0) && (buf[0] != '\0')) {
-                log_open_file (stderr, progname, priority, LOG_OPT_PRIORITY);
                 log_msg (priority, "%s", buf);
             }
             exit (EXIT_FAILURE);
