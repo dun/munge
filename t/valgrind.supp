@@ -44,6 +44,17 @@
 }
 
 {
+   libcrypto-AES_encrypt-value8
+   Memcheck:Value8
+   obj:*/libcrypto.so.1.1
+   fun:AES_encrypt
+   ...
+   fun:RAND_DRBG_instantiate
+   ...
+   fun:_random_add
+}
+
+{
    libcrypto-CRYPTO_THREAD_lock_new-malloc
    Memcheck:Leak
    match-leak-kinds: reachable
