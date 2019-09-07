@@ -26,6 +26,19 @@
 }
 
 {
+   gethostbyaddr-leak
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:*alloc
+   ...
+   fun:gethostbyaddr_r@@GLIBC_2.2.5
+   fun:gethostbyaddr
+   fun:display_encode_host
+   fun:display_meta
+   fun:main
+}
+
+{
    getpwnam_r-calloc
    Memcheck:Leak
    match-leak-kinds: reachable
@@ -55,6 +68,12 @@
 }
 
 {
+   libcrypto-base64_encode_block-value8
+   Memcheck:Value8
+   fun:base64_encode_block
+}
+
+{
    libcrypto-CRYPTO_THREAD_lock_new-malloc
    Memcheck:Leak
    match-leak-kinds: reachable
@@ -70,6 +89,23 @@
    ...
    fun:FIPS_mode_set
    obj:/usr/lib64/libcrypto.so.1.1
+}
+
+{
+   libcrypto-cond
+   Memcheck:Cond
+   obj:*/libcrypto.so.1.1
+}
+
+{
+   libcrypto-_random_write_seed-param
+   Memcheck:Param
+   write(buf)
+   fun:write
+   fun:fd_write_n
+   fun:_random_write_seed
+   fun:random_fini
+   fun:main
 }
 
 {
