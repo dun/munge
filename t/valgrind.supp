@@ -1,5 +1,5 @@
 {
-   dlopen-_dlerror_run-calloc
+   dlopen-_dlerror_run-leak
    Memcheck:Leak
    match-leak-kinds: reachable
    fun:calloc
@@ -8,19 +8,10 @@
 }
 
 {
-   getgrent_r-calloc
+   getgrent_r-leak
    Memcheck:Leak
    match-leak-kinds: reachable
-   fun:calloc
-   ...
-   fun:getgrent_r@@GLIBC_2.2.5
-}
-
-{
-   getgrent_r-malloc
-   Memcheck:Leak
-   match-leak-kinds: reachable
-   fun:malloc
+   fun:?alloc
    ...
    fun:getgrent_r@@GLIBC_2.2.5
 }
@@ -29,7 +20,7 @@
    gethostbyaddr-leak
    Memcheck:Leak
    match-leak-kinds: reachable
-   fun:*alloc
+   fun:?alloc
    ...
    fun:gethostbyaddr_r@@GLIBC_2.2.5
    fun:gethostbyaddr
@@ -39,19 +30,10 @@
 }
 
 {
-   getpwnam_r-calloc
+   getpwnam_r-leak
    Memcheck:Leak
    match-leak-kinds: reachable
-   fun:calloc
-   ...
-   fun:getpwnam_r@@GLIBC_2.2.5
-}
-
-{
-   getpwnam_r-malloc
-   Memcheck:Leak
-   match-leak-kinds: reachable
-   fun:malloc
+   fun:?alloc
    ...
    fun:getpwnam_r@@GLIBC_2.2.5
 }
@@ -74,13 +56,13 @@
 }
 
 {
-   libcrypto-CRYPTO_THREAD_lock_new-malloc
+   libcrypto-CRYPTO_THREAD_lock_new-leak
    Memcheck:Leak
    match-leak-kinds: reachable
    fun:malloc
    fun:CRYPTO_zalloc
    fun:CRYPTO_THREAD_lock_new
-   obj:/usr/lib64/libcrypto.so.1.1
+   obj:*/libcrypto.so.1.1
 }
 
 {
@@ -88,7 +70,7 @@
    Memcheck:Cond
    ...
    fun:FIPS_mode_set
-   obj:/usr/lib64/libcrypto.so.1.1
+   obj:*/libcrypto.so.1.1
 }
 
 {
@@ -109,7 +91,7 @@
 }
 
 {
-   libgcrypt-_gcry_check_version-malloc
+   libgcrypt-_gcry_check_version-leak
    Memcheck:Leak
    match-leak-kinds: reachable
    fun:malloc
@@ -118,18 +100,18 @@
 }
 
 {
-   libgcrypt-crypto_init-malloc
+   libgcrypt-crypto_init-leak
    Memcheck:Leak
    match-leak-kinds: reachable
    fun:malloc
    ...
-   obj:*/libgcrypt.so.*
+   obj:*/libgcrypt.so.20.*
    fun:crypto_init
    fun:main
 }
 
 {
-   libgcrypt-gcry_control-malloc
+   libgcrypt-gcry_control-leak
    Memcheck:Leak
    match-leak-kinds: reachable
    fun:malloc
