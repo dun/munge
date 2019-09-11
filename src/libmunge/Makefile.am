@@ -26,7 +26,7 @@ CLEANFILES = \
 	# End of CLEANFILES
 
 $(SUBSTITUTE_FILES): Makefile
-	$(AM_V_GEN)$(substitute) < "$(srcdir)/$@.in" > "$(builddir)/$@"
+	$(AM_V_GEN)$(substitute) < '$(srcdir)/$@.in' > '$(builddir)/$@'
 
 munge.3: munge.3.in
 munge_ctx.3: munge_ctx.3.in

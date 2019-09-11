@@ -22,7 +22,7 @@ CLEANFILES = \
 	# End of CLEANFILES
 
 $(SUBSTITUTE_FILES): Makefile
-	$(AM_V_GEN)$(substitute) < "$(srcdir)/$@.in" > "$(builddir)/$@"
+	$(AM_V_GEN)$(substitute) < '$(srcdir)/$@.in' > '$(builddir)/$@'
 
 mungekey.8: mungekey.8.in
 
