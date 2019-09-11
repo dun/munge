@@ -38,3 +38,5 @@ hkdf_test_SOURCES = \
 	md.h \
 	hkdf_test.c \
 	# End of hkdf_test_SOURCES
+
+.NOTPARALLEL: hkdf_test
