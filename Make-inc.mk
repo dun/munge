@@ -10,7 +10,7 @@ $(top_builddir)/src/libmissing/libmissing.la \
 $(top_builddir)/src/libmunge/libmunge.la \
 $(top_builddir)/src/libtap/libtap.la \
 : force-dependency-check
-	@cd `dirname $@` && $(MAKE) `basename $@`
+	@cd `dirname $@` && $(MAKE) $(AM_MAKEFLAGS) `basename $@`
 
 force-dependency-check:
 
