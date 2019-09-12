@@ -15,15 +15,17 @@ AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_SRCDIR([src/libmunge/munge.h])
 AC_REQUIRE_AUX_FILE([tap-driver.sh])
-AC_USE_SYSTEM_EXTENSIONS
+
 AS_IF(
   [test X"${runstatedir}" = "X"],
   [AC_SUBST([runstatedir], ['${localstatedir}/run'])])
+X_AC_WITH_MUNGE_SOCKET
 X_AC_HUMOR
 
 AM_INIT_AUTOMAKE([1.11 foreign dist-xz no-dist-gzip])
 AM_MAINTAINER_MODE
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
+AC_USE_SYSTEM_EXTENSIONS
 m4_ifdef([LT_INIT], [LT_INIT], [AC_PROG_LIBTOOL])
 
 ##
@@ -104,11 +106,6 @@ X_AC_DARWIN
 # Checks for client authentication method.
 ##
 X_AC_SELECT_AUTH_METHOD
-
-##
-# Checks for customizations.
-##
-X_AC_WITH_MUNGE_SOCKET
 
 ##
 # Epilogue.
