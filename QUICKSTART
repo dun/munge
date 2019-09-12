@@ -51,10 +51,7 @@ MUNGE Installation Guide
       The "--runstatedir" configure option is slated to appear in autoconf
       2.70; however, it has been backported to Debian's autoconf 2.69-9.
       If the configure script was built by an earlier version of autoconf,
-      ${runstatedir} can be set directly by appending the variable assignment
-      to the configure line:
-
-      $ ./configure runstatedir=/run
+      the "--with-runstatedir" configure option can be used to set this value.
 
 
 2. Securing the Installation
