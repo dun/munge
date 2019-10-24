@@ -42,6 +42,7 @@ substitute = $(SED) \
 	-e 's|[@]mandir[@]|$(mandir)|g' \
 	-e 's|[@]oldincludedir[@]|$(oldincludedir)|g' \
 	-e 's|[@]pdfdir[@]|$(pdfdir)|g' \
+	-e 's|[@]pkgconfigdir[@]|$(pkgconfigdir)|g' \
 	-e 's|[@]pkgdatadir[@]|$(pkgdatadir)|g' \
 	-e 's|[@]pkgincludedir[@]|$(pkgincludedir)|g' \
 	-e 's|[@]pkglibdir[@]|$(pkglibdir)|g' \
@@ -52,6 +53,9 @@ substitute = $(SED) \
 	-e 's|[@]sbindir[@]|$(sbindir)|g' \
 	-e 's|[@]sharedstatedir[@]|$(sharedstatedir)|g' \
 	-e 's|[@]sysconfdir[@]|$(sysconfdir)|g' \
+	-e 's|[@]sysconfigdir[@]|$(sysconfigdir)|g' \
+	-e 's|[@]systemdunitdir[@]|$(systemdunitdir)|g' \
+	-e 's|[@]sysvinitddir[@]|$(sysvinitddir)|g' \
 	-e 's|[@]DATE[@]|$(DATE)|g' \
 	-e 's|[@]PACKAGE[@]|$(PACKAGE)|g' \
 	-e 's|[@]VERSION[@]|$(VERSION)|g'

@@ -21,23 +21,6 @@ SUBSTITUTE_FILES = \
 	munge.tmpfiles.conf \
 	# End of SUBSTITUTE_FILES
 
-UNINSTALL_FILES = \
-	$(sysconfdir)/rc.d/init.d/munge \
-	$(sysconfdir)/init.d/munge \
-	$(sysconfdir)/sysconfig/munge \
-	$(sysconfdir)/default/munge \
-	$(libdir)/pkgconfig/munge.pc \
-	$(prefix)/lib/systemd/system/munge.service \
-	$(prefix)/lib/tmpfiles.d/munge.conf \
-	# End of UNINSTALL_FILES
-
-UNINSTALL_DIRS = \
-	$(sysconfdir)/munge \
-	$(localstatedir)/lib/munge \
-	$(localstatedir)/log/munge \
-	$(runstatedir)/munge \
-	# End of UNINSTALL_DIRS
-
 EXTRA_DIST = \
 	$(TEMPLATE_FILES) \
 	# End of EXTRA_DIST
@@ -59,51 +42,83 @@ noinst_DATA = \
 	$(SUBSTITUTE_FILES) \
 	# End of noinst_DATA
 
-install-data-hook: install-dirperms install-pkgconfig install-systemd install-sysvinit
+install-data-hook: install-dirs install-pkgconfig install-systemd install-sysvinit
 
-install-dirperms:
-	$(MKDIR_P) -m 0700 "$(DESTDIR)$(sysconfdir)/munge"
-	$(MKDIR_P) -m 0711 "$(DESTDIR)$(localstatedir)/lib/munge"
-	$(MKDIR_P) -m 0700 "$(DESTDIR)$(localstatedir)/log/munge"
-	$(MKDIR_P) -m 0755 "$(DESTDIR)$(runstatedir)/munge"
+uninstall-local: uninstall-dirs uninstall-pkgconfig uninstall-systemd uninstall-sysvinit
+
+install-dirs:
+	$(MKDIR_P) -m 0700 '$(DESTDIR)$(sysconfdir)/munge'
+	$(MKDIR_P) -m 0711 '$(DESTDIR)$(localstatedir)/lib/munge'
+	$(MKDIR_P) -m 0700 '$(DESTDIR)$(localstatedir)/log/munge'
+	$(MKDIR_P) -m 0755 '$(DESTDIR)$(runstatedir)/munge'
+
+uninstall-dirs:
+	rmdir '$(DESTDIR)$(sysconfdir)/munge' 2>/dev/null || :
+	rmdir '$(DESTDIR)$(localstatedir)/lib/munge' 2>/dev/null || :
+	rmdir '$(DESTDIR)$(localstatedir)/log/munge' 2>/dev/null || :
+	rmdir '$(DESTDIR)$(runstatedir)/munge' 2>/dev/null || :
 
 install-pkgconfig: munge.pc
-	$(MKDIR_P) "$(DESTDIR)$(libdir)/pkgconfig"
-	$(INSTALL_DATA) "$(builddir)/munge.pc" \
-	  "$(DESTDIR)$(libdir)/pkgconfig/$(PACKAGE).pc"
+	@if test 'x$(pkgconfigdir)' != x; then \
+	  echo $(MKDIR_P) "'$(DESTDIR)$(pkgconfigdir)'"; \
+	  $(MKDIR_P) '$(DESTDIR)$(pkgconfigdir)'; \
+	  echo $(INSTALL_DATA) "'$(builddir)/munge.pc'" \
+	      "'$(DESTDIR)$(pkgconfigdir)/$(PACKAGE).pc'"; \
+	  $(INSTALL_DATA) '$(builddir)/munge.pc' \
+	      '$(DESTDIR)$(pkgconfigdir)/$(PACKAGE).pc'; \
+	fi
+
+uninstall-pkgconfig:
+	@if test 'x$(pkgconfigdir)' != x; then \
+	  echo rm -f "'$(DESTDIR)$(pkgconfigdir)/$(PACKAGE).pc'"; \
+	  rm -f '$(DESTDIR)$(pkgconfigdir)/$(PACKAGE).pc'; \
+	fi
 
 install-systemd: munge.service
-	$(MKDIR_P) "$(DESTDIR)$(prefix)/lib/systemd/system"
-	$(INSTALL_DATA) "$(builddir)/munge.service" \
-	  "$(DESTDIR)$(prefix)/lib/systemd/system/$(PACKAGE).service"
+	@if test 'x$(systemdunitdir)' != x; then \
+	  echo $(MKDIR_P) "'$(DESTDIR)$(systemdunitdir)'"; \
+	  $(MKDIR_P) '$(DESTDIR)$(systemdunitdir)'; \
+	  echo $(INSTALL_DATA) "'$(builddir)/munge.service'" \
+	      "'$(DESTDIR)$(systemdunitdir)/$(PACKAGE).service'"; \
+	  $(INSTALL_DATA) '$(builddir)/munge.service' \
+	      '$(DESTDIR)$(systemdunitdir)/$(PACKAGE).service'; \
+	fi
+
+uninstall-systemd:
+	@if test 'x$(systemdunitdir)' != x; then \
+	  echo rm -f "'$(DESTDIR)$(systemdunitdir)/$(PACKAGE).service'"; \
+	  rm -f '$(DESTDIR)$(systemdunitdir)/$(PACKAGE).service'; \
+	fi
 
 install-sysvinit: munge.init install-sysvinit-conf
-	test -d /etc/rc.d/init.d && d=rc.d/init.d || d=init.d; \
-	  $(MKDIR_P) "$(DESTDIR)$(sysconfdir)/$${d}"; \
-	  $(INSTALL_SCRIPT) "$(builddir)/munge.init" \
-	    "$(DESTDIR)$(sysconfdir)/$${d}/$(PACKAGE)"
+	@if test 'x$(sysvinitddir)' != x; then \
+	  echo $(MKDIR_P) "'$(DESTDIR)$(sysvinitddir)'"; \
+	  $(MKDIR_P) '$(DESTDIR)$(sysvinitddir)'; \
+	  echo $(INSTALL_SCRIPT) "'$(builddir)/munge.init'" \
+	      "'$(DESTDIR)$(sysvinitddir)/$(PACKAGE)'"; \
+	  $(INSTALL_SCRIPT) '$(builddir)/munge.init' \
+	      '$(DESTDIR)$(sysvinitddir)/$(PACKAGE)'; \
+	fi
+
+uninstall-sysvinit: uninstall-sysvinit-conf
+	@if test 'x$(sysvinitddir)' != x; then \
+	  echo rm -f "'$(DESTDIR)$(sysvinitddir)/$(PACKAGE)'"; \
+	  rm -f '$(DESTDIR)$(sysvinitddir)/$(PACKAGE)'; \
+	fi
 
 install-sysvinit-conf: munge.sysconfig
-	test -d /etc/sysconfig && d=sysconfig || d=default; \
-	  $(MKDIR_P) "$(DESTDIR)$(sysconfdir)/$${d}"; \
-	  $(INSTALL_DATA) "$(builddir)/munge.sysconfig" \
-	    "$(DESTDIR)$(sysconfdir)/$${d}/$(PACKAGE)"
+	@if test 'x${sysvinitddir}' != x \
+	      && test 'x$(sysconfigdir)' != x; then \
+	  echo $(MKDIR_P) "'$(DESTDIR)$(sysconfigdir)'"; \
+	  $(MKDIR_P) '$(DESTDIR)$(sysconfigdir)'; \
+	  echo $(INSTALL_DATA) "'$(builddir)/munge.sysconfig'" \
+	      "'$(DESTDIR)$(sysconfigdir)/$(PACKAGE)'"; \
+	  $(INSTALL_DATA) '$(builddir)/munge.sysconfig' \
+	      '$(DESTDIR)$(sysconfigdir)/$(PACKAGE)'; \
+	fi
 
-install-tmpfiles: munge.tmpfiles.conf
-	$(MKDIR_P) "$(DESTDIR)$(prefix)/lib/tmpfiles.d"
-	$(INSTALL_DATA) "$(builddir)/munge.tmpfiles.conf" \
-	  "$(DESTDIR)$(prefix)/lib/tmpfiles.d/$(PACKAGE).conf"
-
-uninstall-local:
-	@for p in $(UNINSTALL_FILES); do \
-	  test -f "$(DESTDIR)$${p}" || continue; \
-	  d=`dirname "$${p}"`; \
-	  f=`basename "$${p}"`; \
-	  echo " ( cd '$(DESTDIR)$${d}' && rm -f '$${f}' )"; \
-	  cd "$(DESTDIR)$${d}" && rm -f "$${f}"; \
-	done
-	@for d in $(UNINSTALL_DIRS); do \
-	  test -d "$(DESTDIR)$${d}" || continue; \
-	  echo "rmdir '$${d}'"; \
-	  rmdir "$(DESTDIR)$${d}" || :; \
-	done
+uninstall-sysvinit-conf:
+	@if test 'x$(sysconfigdir)' != x; then \
+	  echo rm -f "'$(DESTDIR)$(sysconfigdir)/$(PACKAGE)'"; \
+	  rm -f '$(DESTDIR)$(sysconfigdir)/$(PACKAGE)'; \
+	fi

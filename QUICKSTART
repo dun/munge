@@ -36,9 +36,8 @@ MUNGE Installation Guide
 
    B. Source:
 
-      Edit src/libcommon/munge_defs.h to customize values if necessary.
-      To compile the software, execute the following command; you may need
-      to su to root in order to perform the "make install":
+      The shell commands "./configure; make; make install" should
+      configure, build, and install the software.  For example:
 
       $ ./configure            \
           --prefix=/usr        \
@@ -52,6 +51,21 @@ MUNGE Installation Guide
       2.70; however, it has been backported to Debian's autoconf 2.69-9.
       If the configure script was built by an earlier version of autoconf,
       the "--with-runstatedir" configure option can be used to set this value.
+
+      The following configure options allow further customization of the
+      installation:
+
+      --with-pkgconfigdir=DIR / --without-pkgconfigdir
+        installation directory for pkg-config .pc files
+
+      --with-sysconfigdir=DIR / --without-sysconfigdir
+        installation directory for SysV init script config files
+
+      --with-systemdunitdir=DIR / --without-systemdunitdir
+        installation directory for systemd service files
+
+      --with-sysvinitddir=DIR / --without-sysvinitddir
+        installation directory for SysV init scripts
 
 
 2. Securing the Installation

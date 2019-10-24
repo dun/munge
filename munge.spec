@@ -59,7 +59,9 @@ A shared library for applications using MUNGE.
     %{?_with_arch32: --enable-arch=32} \
     %{?_with_arch64: --enable-arch=64} \
     --program-prefix=%{?_program_prefix:%{_program_prefix}} \
-    runstatedir=%{_runstatedir}
+    --with-pkgconfigdir=%{_libdir}/pkgconfig \
+    --with-runstatedir=%{_runstatedir} \
+    --with-systemdunitdir=%{_unitdir}
 sed -i 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g' libtool
 sed -i 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' libtool
 make %{?_smp_mflags}
@@ -71,8 +73,6 @@ touch %{buildroot}/%{_sysconfdir}/munge/munge.key
 touch %{buildroot}/%{_localstatedir}/lib/munge/munged.seed
 touch %{buildroot}/%{_localstatedir}/log/munge/munged.log
 touch %{buildroot}/%{_runstatedir}/munge/munged.pid
-rm -f %{buildroot}/%{_sysconfdir}/sysconfig/munge
-rm -f %{buildroot}/%{_initddir}/munge
 
 %clean
 rm -rf %{buildroot}
