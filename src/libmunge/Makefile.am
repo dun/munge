@@ -84,30 +84,32 @@ man_MANS = \
 	munge_enum.3 \
 	# End of man_MANS
 
-install-data-hook:
-	for man in encode decode strerror; do \
-	  ( cd "$(DESTDIR)$(mandir)/man3/" && \
-	    rm -f munge_$${man}.3 && \
-	    $(LN_S) munge.3 munge_$${man}.3 ); \
-	done
-	for man in create copy destroy strerror get set; do \
-	  ( cd "$(DESTDIR)$(mandir)/man3/" && \
-	    rm -f munge_ctx_$${man}.3 && \
-	    $(LN_S) munge_ctx.3 munge_ctx_$${man}.3 ); \
-	done
-	for man in is_valid int_to_str str_to_int; do \
-	  ( cd "$(DESTDIR)$(mandir)/man3/" && \
-	    rm -f munge_enum_$${man}.3 && \
-	    $(LN_S) munge_enum.3 munge_enum_$${man}.3 ); \
-	done
+install-data-hook: uninstall-local
+	$(MKDIR_P) '$(DESTDIR)$(mandir)/man3/'
+	( cd '$(DESTDIR)$(mandir)/man3/' \
+	    && $(LN_S) munge.3 munge_decode.3 \
+	    && $(LN_S) munge.3 munge_encode.3 \
+	    && $(LN_S) munge.3 munge_strerror.3 \
+	    && $(LN_S) munge_ctx.3 munge_ctx_copy.3 \
+	    && $(LN_S) munge_ctx.3 munge_ctx_create.3 \
+	    && $(LN_S) munge_ctx.3 munge_ctx_destroy.3 \
+	    && $(LN_S) munge_ctx.3 munge_ctx_get.3 \
+	    && $(LN_S) munge_ctx.3 munge_ctx_set.3 \
+	    && $(LN_S) munge_ctx.3 munge_ctx_strerror.3 \
+	    && $(LN_S) munge_enum.3 munge_enum_int_to_str.3 \
+	    && $(LN_S) munge_enum.3 munge_enum_is_valid.3 \
+	    && $(LN_S) munge_enum.3 munge_enum_str_to_int.3 )
 
 uninstall-local:
-	for man in encode decode strerror; do \
-	  rm -f "$(DESTDIR)$(mandir)/man3/munge_$${man}.3"; \
-	done
-	for man in create copy destroy strerror get set; do \
-	  rm -f "$(DESTDIR)$(mandir)/man3/munge_ctx_$${man}.3"; \
-	done
-	for man in is_valid int_to_str str_to_int; do \
-	  rm -f "$(DESTDIR)$(mandir)/man3/munge_enum_$${man}.3"; \
-	done
+	rm -f '$(DESTDIR)$(mandir)/man3/munge_ctx_copy.3'
+	rm -f '$(DESTDIR)$(mandir)/man3/munge_ctx_create.3'
+	rm -f '$(DESTDIR)$(mandir)/man3/munge_ctx_destroy.3'
+	rm -f '$(DESTDIR)$(mandir)/man3/munge_ctx_get.3'
+	rm -f '$(DESTDIR)$(mandir)/man3/munge_ctx_set.3'
+	rm -f '$(DESTDIR)$(mandir)/man3/munge_ctx_strerror.3'
+	rm -f '$(DESTDIR)$(mandir)/man3/munge_decode.3'
+	rm -f '$(DESTDIR)$(mandir)/man3/munge_encode.3'
+	rm -f '$(DESTDIR)$(mandir)/man3/munge_enum_int_to_str.3'
+	rm -f '$(DESTDIR)$(mandir)/man3/munge_enum_is_valid.3'
+	rm -f '$(DESTDIR)$(mandir)/man3/munge_enum_str_to_int.3'
+	rm -f '$(DESTDIR)$(mandir)/man3/munge_strerror.3'
