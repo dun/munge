@@ -6,18 +6,18 @@
 include $(top_srcdir)/Make-inc.mk
 
 TEMPLATE_FILES = \
-	munge.init.in \
-	munge.pc.in \
-	munge.service.in \
-	munge.sysconfig.in \
+	munge.pkgconfig.pc.in \
+	munge.systemd.service.in \
+	munge.sysvinit.init.in \
+	munge.sysvinit.sysconfig.in \
 	munge.tmpfiles.conf.in \
 	# End of TEMPLATE_FILES
 
 SUBSTITUTE_FILES = \
-	munge.init \
-	munge.pc \
-	munge.service \
-	munge.sysconfig \
+	munge.pkgconfig.pc \
+	munge.systemd.service \
+	munge.sysvinit.init \
+	munge.sysvinit.sysconfig \
 	munge.tmpfiles.conf \
 	# End of SUBSTITUTE_FILES
 
@@ -32,10 +32,10 @@ CLEANFILES = \
 $(SUBSTITUTE_FILES): Makefile
 	$(AM_V_GEN)$(substitute) < '$(srcdir)/$@.in' > '$(builddir)/$@'
 
-munge.init: munge.init.in
-munge.pc: munge.pc.in
-munge.service: munge.service.in
-munge.sysconfig: munge.sysconfig.in
+munge.pkgconfig.pc: munge.pkgconfig.pc.in
+munge.systemd.service: munge.systemd.service.in
+munge.sysvinit.init: munge.sysvinit.init.in
+munge.sysvinit.sysconfig: munge.sysvinit.sysconfig.in
 munge.tmpfiles.conf: munge.tmpfiles.conf.in
 
 noinst_DATA = \
@@ -58,13 +58,13 @@ uninstall-dirs:
 	rmdir '$(DESTDIR)$(localstatedir)/log/munge' 2>/dev/null || :
 	rmdir '$(DESTDIR)$(runstatedir)/munge' 2>/dev/null || :
 
-install-pkgconfig: munge.pc
+install-pkgconfig: munge.pkgconfig.pc
 	@if test 'x$(pkgconfigdir)' != x; then \
 	  echo $(MKDIR_P) "'$(DESTDIR)$(pkgconfigdir)'"; \
 	  $(MKDIR_P) '$(DESTDIR)$(pkgconfigdir)'; \
-	  echo $(INSTALL_DATA) "'$(builddir)/munge.pc'" \
+	  echo $(INSTALL_DATA) "'$(builddir)/munge.pkgconfig.pc'" \
 	      "'$(DESTDIR)$(pkgconfigdir)/$(PACKAGE).pc'"; \
-	  $(INSTALL_DATA) '$(builddir)/munge.pc' \
+	  $(INSTALL_DATA) '$(builddir)/munge.pkgconfig.pc' \
 	      '$(DESTDIR)$(pkgconfigdir)/$(PACKAGE).pc'; \
 	fi
 
@@ -74,13 +74,13 @@ uninstall-pkgconfig:
 	  rm -f '$(DESTDIR)$(pkgconfigdir)/$(PACKAGE).pc'; \
 	fi
 
-install-systemd: munge.service
+install-systemd: munge.systemd.service
 	@if test 'x$(systemdunitdir)' != x; then \
 	  echo $(MKDIR_P) "'$(DESTDIR)$(systemdunitdir)'"; \
 	  $(MKDIR_P) '$(DESTDIR)$(systemdunitdir)'; \
-	  echo $(INSTALL_DATA) "'$(builddir)/munge.service'" \
+	  echo $(INSTALL_DATA) "'$(builddir)/munge.systemd.service'" \
 	      "'$(DESTDIR)$(systemdunitdir)/$(PACKAGE).service'"; \
-	  $(INSTALL_DATA) '$(builddir)/munge.service' \
+	  $(INSTALL_DATA) '$(builddir)/munge.systemd.service' \
 	      '$(DESTDIR)$(systemdunitdir)/$(PACKAGE).service'; \
 	fi
 
@@ -90,34 +90,34 @@ uninstall-systemd:
 	  rm -f '$(DESTDIR)$(systemdunitdir)/$(PACKAGE).service'; \
 	fi
 
-install-sysvinit: munge.init install-sysvinit-conf
+install-sysvinit: munge.sysvinit.init install-sysvinit-sysconfig
 	@if test 'x$(sysvinitddir)' != x; then \
 	  echo $(MKDIR_P) "'$(DESTDIR)$(sysvinitddir)'"; \
 	  $(MKDIR_P) '$(DESTDIR)$(sysvinitddir)'; \
-	  echo $(INSTALL_SCRIPT) "'$(builddir)/munge.init'" \
+	  echo $(INSTALL_SCRIPT) "'$(builddir)/munge.sysvinit.init'" \
 	      "'$(DESTDIR)$(sysvinitddir)/$(PACKAGE)'"; \
-	  $(INSTALL_SCRIPT) '$(builddir)/munge.init' \
+	  $(INSTALL_SCRIPT) '$(builddir)/munge.sysvinit.init' \
 	      '$(DESTDIR)$(sysvinitddir)/$(PACKAGE)'; \
 	fi
 
-uninstall-sysvinit: uninstall-sysvinit-conf
+uninstall-sysvinit: uninstall-sysvinit-sysconfig
 	@if test 'x$(sysvinitddir)' != x; then \
 	  echo rm -f "'$(DESTDIR)$(sysvinitddir)/$(PACKAGE)'"; \
 	  rm -f '$(DESTDIR)$(sysvinitddir)/$(PACKAGE)'; \
 	fi
 
-install-sysvinit-conf: munge.sysconfig
+install-sysvinit-sysconfig: munge.sysvinit.sysconfig
 	@if test 'x${sysvinitddir}' != x \
 	      && test 'x$(sysconfigdir)' != x; then \
 	  echo $(MKDIR_P) "'$(DESTDIR)$(sysconfigdir)'"; \
 	  $(MKDIR_P) '$(DESTDIR)$(sysconfigdir)'; \
-	  echo $(INSTALL_DATA) "'$(builddir)/munge.sysconfig'" \
+	  echo $(INSTALL_DATA) "'$(builddir)/munge.sysvinit.sysconfig'" \
 	      "'$(DESTDIR)$(sysconfigdir)/$(PACKAGE)'"; \
-	  $(INSTALL_DATA) '$(builddir)/munge.sysconfig' \
+	  $(INSTALL_DATA) '$(builddir)/munge.sysvinit.sysconfig' \
 	      '$(DESTDIR)$(sysconfigdir)/$(PACKAGE)'; \
 	fi
 
-uninstall-sysvinit-conf:
+uninstall-sysvinit-sysconfig:
 	@if test 'x$(sysconfigdir)' != x; then \
 	  echo rm -f "'$(DESTDIR)$(sysconfigdir)/$(PACKAGE)'"; \
 	  rm -f '$(DESTDIR)$(sysconfigdir)/$(PACKAGE)'; \
