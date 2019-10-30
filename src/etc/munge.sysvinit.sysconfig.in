@@ -1,23 +1,13 @@
-###############################################################################
-# MUNGE system configuration
-###############################################################################
+# MUNGE configuration
 
-##
-# Pass additional command-line options to the daemon.
-##
-# DAEMON_ARGS="--key-file @sysconfdir@/munge/munge.key --num-threads 1"
+# Pass additional command-line options to munged.
+# OPTIONS="--key-file=@sysconfdir@/munge/munge.key --num-threads=2"
 
-##
-# Adjust the scheduling priority of the daemon.
-##
+# Adjust the scheduling priority of munged.
 # NICE=
 
-##
-# Execute the daemon under another username.
-##
+# Execute munged under another username.
 # USER="munge"
 
-##
-# Execute the daemon under another groupname.
-##
+# Execute munged under another groupname.
 # GROUP="munge"

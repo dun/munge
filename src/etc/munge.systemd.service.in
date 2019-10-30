@@ -6,7 +6,8 @@ After=time-sync.target
 
 [Service]
 Type=forking
-ExecStart=@sbindir@/munged
+EnvironmentFile=-@sysconfigdir@/munge
+ExecStart=@sbindir@/munged $OPTIONS
 PIDFile=@runstatedir@/munge/munged.pid
 RuntimeDirectory=munge
 RuntimeDirectoryMode=0755

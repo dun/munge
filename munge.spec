@@ -129,6 +129,7 @@ fi
 %{_sbindir}/*
 %{_mandir}/*[^3]/*
 %{_unitdir}/munge.service
+%{_sysconfdir}/sysconfig/munge
 
 %files devel
 %{_includedir}/*

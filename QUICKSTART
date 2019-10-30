@@ -59,7 +59,7 @@ MUNGE Installation Guide
         installation directory for pkg-config .pc files
 
       --with-sysconfigdir=DIR / --without-sysconfigdir
-        installation directory for SysV init script config files
+        installation directory for systemd/sysvinit config files
 
       --with-systemdunitdir=DIR / --without-systemdunitdir
         installation directory for systemd service files
@@ -130,17 +130,11 @@ MUNGE Installation Guide
 4. Starting the Daemon
 
    On each host within the security realm, invoke the daemon directly
-   (/usr/sbin/munged) or use the init script (/etc/init.d/munge start).
-   The init script sources /etc/default/munge (found on Debian-based systems)
-   and /etc/sysconfig/munge (found on RedHat-based systems), if present,
-   to set variables recognized by the script.
-
-   The DAEMON_ARGS variable passes additional command-line options to the
-   daemon; for example, this can be used to override the location of the key
-   file (--key-file) or set the number of worker threads (--num-threads).
-   If the init script is invoked by root, the USER variable causes the
-   daemon to execute under the specified username; the "munge" user is used
-   by default.
+   (/usr/sbin/munged), use the SysV init script (/etc/init.d/munge start),
+   or use the systemd unit configuration (systemctl start munge).
+   A sysconfig file (/etc/sysconfig/munge on RedHat-based systems, and
+   /etc/default/munge on Debian-based systems) can be used to pass additional
+   command-line options to munged.
 
 
 5. Testing the Installation

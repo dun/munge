@@ -4,7 +4,7 @@
 #
 #  DESCRIPTION:
 #    The "--with-sysconfigdir" option sets "sysconfigdir", the installation
-#    directory for SysV init script configuration files.
+#    directory for systemd/sysvinit system configuration files.
 #
 #    By default (or if this option is specified without a directory name),
 #    sysconfigdir will be set to either "${sysconfdir}/sysconfig" or
@@ -19,7 +19,7 @@ AC_DEFUN([X_AC_WITH_SYSCONFIGDIR],
     [sysconfigdir],
     [AS_HELP_STRING(
        [--with-sysconfigdir@<:@=DIR@:>@],
-       [SysV init script config file installation directory])])
+       [systemd/sysvinit config file installation directory])])
   AS_IF(
     [test "x${with_sysconfigdir}" = xyes \
        || test "x${with_sysconfigdir}" = x],

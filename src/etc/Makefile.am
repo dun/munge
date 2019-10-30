@@ -8,6 +8,7 @@ include $(top_srcdir)/Make-inc.mk
 TEMPLATE_FILES = \
 	munge.pkgconfig.pc.in \
 	munge.systemd.service.in \
+	munge.systemd.sysconfig.in \
 	munge.sysvinit.init.in \
 	munge.sysvinit.sysconfig.in \
 	munge.tmpfiles.conf.in \
@@ -16,6 +17,7 @@ TEMPLATE_FILES = \
 SUBSTITUTE_FILES = \
 	munge.pkgconfig.pc \
 	munge.systemd.service \
+	munge.systemd.sysconfig \
 	munge.sysvinit.init \
 	munge.sysvinit.sysconfig \
 	munge.tmpfiles.conf \
@@ -34,6 +36,7 @@ $(SUBSTITUTE_FILES): Makefile
 
 munge.pkgconfig.pc: munge.pkgconfig.pc.in
 munge.systemd.service: munge.systemd.service.in
+munge.systemd.sysconfig: munge.systemd.sysconfig.in
 munge.sysvinit.init: munge.sysvinit.init.in
 munge.sysvinit.sysconfig: munge.sysvinit.sysconfig.in
 munge.tmpfiles.conf: munge.tmpfiles.conf.in
@@ -74,7 +77,7 @@ uninstall-pkgconfig:
 	  rm -f '$(DESTDIR)$(pkgconfigdir)/$(PACKAGE).pc'; \
 	fi
 
-install-systemd: munge.systemd.service
+install-systemd: munge.systemd.service install-systemd-sysconfig
 	@if test 'x$(systemdunitdir)' != x; then \
 	  echo $(MKDIR_P) "'$(DESTDIR)$(systemdunitdir)'"; \
 	  $(MKDIR_P) '$(DESTDIR)$(systemdunitdir)'; \
@@ -88,6 +91,23 @@ uninstall-systemd:
 	@if test 'x$(systemdunitdir)' != x; then \
 	  echo rm -f "'$(DESTDIR)$(systemdunitdir)/$(PACKAGE).service'"; \
 	  rm -f '$(DESTDIR)$(systemdunitdir)/$(PACKAGE).service'; \
+	fi
+
+install-systemd-sysconfig: munge.systemd.sysconfig
+	@if test 'x${systemdunitdir}' != x \
+	      && test 'x$(sysconfigdir)' != x; then \
+	  echo $(MKDIR_P) "'$(DESTDIR)$(sysconfigdir)'"; \
+	  $(MKDIR_P) '$(DESTDIR)$(sysconfigdir)'; \
+	  echo $(INSTALL_DATA) "'$(builddir)/munge.systemd.sysconfig'" \
+	      "'$(DESTDIR)$(sysconfigdir)/$(PACKAGE)'"; \
+	  $(INSTALL_DATA) '$(builddir)/munge.systemd.sysconfig' \
+	      '$(DESTDIR)$(sysconfigdir)/$(PACKAGE)'; \
+	fi
+
+uninstall-systemd-sysconfig:
+	@if test 'x$(sysconfigdir)' != x; then \
+	  echo rm -f "'$(DESTDIR)$(sysconfigdir)/$(PACKAGE)'"; \
+	  rm -f '$(DESTDIR)$(sysconfigdir)/$(PACKAGE)'; \
 	fi
 
 install-sysvinit: munge.sysvinit.init install-sysvinit-sysconfig
