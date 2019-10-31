@@ -30,7 +30,7 @@ prefix="@prefix@"
 exec_prefix="@exec_prefix@"
 sbindir="@sbindir@"
 sysconfdir="@sysconfdir@"
-localstatedir="@localstatedir@"
+runstatedir="@runstatedir@"
 
 SERVICE_NAME="MUNGE"
 DAEMON_EXEC="$sbindir/munged"
