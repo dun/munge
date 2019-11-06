@@ -27,6 +27,10 @@ AC_DEFUN([X_AC_CHECK_FIFO_RECVFD], [
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
+
+#ifndef PATH_MAX
+#define PATH_MAX 4096
+#endif /* !PATH_MAX */
 ]],
 [[
 char name[PATH_MAX];
