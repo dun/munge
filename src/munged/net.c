@@ -63,13 +63,16 @@
  *  Internal Prototypes
  *****************************************************************************/
 
+static int _net_get_hostaddr_via_ifaddrs (
+        const char *name, struct in_addr *inaddrp, char **ifnamep);
+
 #if HAVE_GETIFADDRS
 
-static struct ifaddrs * _net_is_ifname_ifaddr (
-        const char *name, struct ifaddrs *ifaddr);
+static const struct ifaddrs * _net_get_ifa_via_ifname (
+        const char *name, const struct ifaddrs *ifa_list);
 
-static struct ifaddrs * _net_is_host_ifaddr (
-        const char *name, struct ifaddrs *ifaddr);
+static const struct ifaddrs * _net_get_ifa_via_addr (
+        const struct hostent *h, const struct ifaddrs *ifa_list);
 
 #endif /* HAVE_GETIFADDRS */
 
@@ -109,49 +112,99 @@ net_get_hostname (char **result)
 }
 
 
-/*  Return 1 if the hostname/IPaddr string [name] matches an address assigned
- *    to a local network interface, 0 if no match is found, or -1 on error.
- *  If given a ptr to [ifaddrp], it will be set to the matching IP address.
- *  If given a ptr to [ifnamep], it will be set to the name of the matching
- *    interface.  The caller is responsible for freeing this string.
- *  Note: getifaddrs() is not in POSIX.1-2001.
+/*  Lookup the network address for the [name] string which can be a hostname,
+ *    IPv4 address, or local network interface name.
+ *  Return 0 on success, or -1 on error.
+ *  On success, [inaddrp] will be set to this address, and [ifnamep] will be
+ *    set to either a new string containing the name of the corresponding local
+ *    network interface (if available) or NULL (if not).  The caller is
+ *    responsible for freeing this new string.
  */
 int
-net_is_name_ifaddr (const char *name, struct in_addr *ifaddrp, char **ifnamep)
+net_get_hostaddr (const char *name, struct in_addr *inaddrp, char **ifnamep)
 {
-#if HAVE_GETIFADDRS
-    struct ifaddrs *ifaddr;
-    struct ifaddrs *ifa;
+    struct hostent *h;
+    int             rv;
 
-    if (name == NULL) {
+    if ((name == NULL) || (inaddrp == NULL) || (ifnamep == NULL)) {
         errno = EINVAL;
         return -1;
     }
-    if (getifaddrs (&ifaddr) == -1) {
+    rv = _net_get_hostaddr_via_ifaddrs (name, inaddrp, ifnamep);
+    /*
+     *  If unable to set addr via getifaddrs(), fallback to traditional lookup.
+     *  FIXME: gethostbyname() obsolete as of POSIX.1-2001.  Use getaddrinfo().
+     */
+    if (rv < 0) {
+        h = gethostbyname (name);
+        if ((h != NULL) && (h->h_addrtype == AF_INET)) {
+            *inaddrp = * (struct in_addr *) h->h_addr;
+            rv = 0;
+        }
+    }
+    return rv;
+}
+
+
+/*****************************************************************************
+ *  Internal Functions
+ *****************************************************************************/
+
+/*  Check if [name] matches an address assigned to a local network interface.
+ *  Return 0 if a matching address is found, or -1 on error.
+ *  On success, [inaddrp] will be set to this address, and [ifnamep] will be
+ *    set to either a new string containing the name of the corresponding local
+ *    network interface (if available) or NULL (if not).  The caller is
+ *    responsible for freeing this new string.
+ *  Note: getifaddrs() is not in POSIX.1-2001.
+ */
+static int
+_net_get_hostaddr_via_ifaddrs (const char *name, struct in_addr *inaddrp,
+        char **ifnamep)
+{
+#if HAVE_GETIFADDRS
+    struct ifaddrs       *ifa_list;
+    const struct ifaddrs *ifa;
+    struct hostent       *h;
+    int                   rv = -1;
+
+    assert (name != NULL);
+    assert (inaddrp != NULL);
+    assert (ifnamep != NULL);
+
+    if (getifaddrs (&ifa_list) < 0) {
         return -1;
     }
     /*  Check if NAME matches the name of a local network interface.
      */
-    ifa = _net_is_ifname_ifaddr (name, ifaddr);
+    ifa = _net_get_ifa_via_ifname (name, ifa_list);
     /*
      *  Check if NAME matches a hostname or IP address assigned to a local
      *    network interface.
+     *  FIXME: gethostbyname() obsolete as of POSIX.1-2001.  Use getaddrinfo().
      */
     if (ifa == NULL) {
-        ifa = _net_is_host_ifaddr (name, ifaddr);
+        h = gethostbyname (name);
+        if (h != NULL) {
+            ifa = _net_get_ifa_via_addr (h, ifa_list);
+        }
     }
     /*  If a match is found...
      */
     if (ifa != NULL) {
-        if (ifaddrp != NULL) {
-            *ifaddrp = ((struct sockaddr_in *) ifa->ifa_addr)->sin_addr;
-        }
-        if ((ifnamep != NULL) && (ifa->ifa_name != NULL)) {
-            *ifnamep = strdup (ifa->ifa_name);
-        }
+        *inaddrp = ((struct sockaddr_in *) ifa->ifa_addr)->sin_addr;
+        *ifnamep = (ifa->ifa_name != NULL) ? strdup (ifa->ifa_name) : NULL;
+        rv = 0;
     }
-    freeifaddrs (ifaddr);
-    return (ifa != NULL) ? 1 : 0;
+    /*  If a match is not found, but host lookup succeeded...
+     */
+    else if ((h != NULL) && (h->h_addrtype == AF_INET)) {
+        *inaddrp = * (struct in_addr *) h->h_addr;
+        *ifnamep = NULL;
+        rv = 0;
+    }
+    freeifaddrs (ifa_list);
+    return rv;
 
 #else  /* !HAVE_GETIFADDRS */
     errno = ENOTSUP;
@@ -160,25 +213,21 @@ net_is_name_ifaddr (const char *name, struct in_addr *ifaddrp, char **ifnamep)
 }
 
 
-/*****************************************************************************
- *  Internal Functions
- *****************************************************************************/
-
 #if HAVE_GETIFADDRS
 
-/*  Search the linked list of structures returned by getifaddrs() [ifaddr]
- *    for an interface name matching [name].
+/*  Search the linked list of structures returned by getifaddrs() [ifa_list]
+ *    for an interface name matching the string [name].
  *  Return a ptr to the matching ifaddrs struct, or NULL if no match is found.
  */
-static struct ifaddrs *
-_net_is_ifname_ifaddr (const char *name, struct ifaddrs *ifaddr)
+static const struct ifaddrs *
+_net_get_ifa_via_ifname (const char *name, const struct ifaddrs *ifa_list)
 {
-    struct ifaddrs *ifa;
+    const struct ifaddrs *ifa;
 
     assert (name != NULL);
-    assert (ifaddr != NULL);
+    assert (ifa_list != NULL);
 
-    for (ifa = ifaddr; ifa != NULL; ifa = ifa->ifa_next) {
+    for (ifa = ifa_list; ifa != NULL; ifa = ifa->ifa_next) {
         if (ifa->ifa_addr == NULL) {
             continue;
         }
@@ -196,38 +245,32 @@ _net_is_ifname_ifaddr (const char *name, struct ifaddrs *ifaddr)
 }
 
 
-/*  Search the linked list of structures returned by getifaddrs() [ifaddr]
+/*  Search the linked list of structures returned by getifaddrs() [ifa_list]
  *    for an interface IPv4 address matching [name], where [name] is either a
  *    hostname or IP address.
  *  Return a ptr to the matching ifaddrs struct, or NULL if no match is found.
- *  FIXME: gethostbyname() is obsolete as of POSIX.1-2001.  Use getaddrinfo().
  */
-static struct ifaddrs *
-_net_is_host_ifaddr (const char *name, struct ifaddrs *ifaddr)
+static const struct ifaddrs *
+_net_get_ifa_via_addr (const struct hostent *h, const struct ifaddrs *ifa_list)
 {
-    struct hostent      *h;
-    struct ifaddrs      *ifa;
-    struct sockaddr_in  *sa;
-    struct in_addr     **hap;
+    const struct ifaddrs  *ifa;
+    struct sockaddr_in    *sai;
+    struct in_addr       **hap;
 
-    assert (name != NULL);
-    assert (ifaddr != NULL);
+    assert (h != NULL);
+    assert (ifa_list != NULL);
 
-    h = gethostbyname (name);
-    if (h == NULL) {
-        return NULL;
-    }
     if (h->h_addrtype != AF_INET) {
         return NULL;
     }
-    for (ifa = ifaddr; ifa != NULL; ifa = ifa->ifa_next) {
+    for (ifa = ifa_list; ifa != NULL; ifa = ifa->ifa_next) {
         if (ifa->ifa_addr == NULL) {
             continue;
         }
         if (ifa->ifa_addr->sa_family == AF_INET) {
-            sa = (struct sockaddr_in *) ifa->ifa_addr;
+            sai = (struct sockaddr_in *) ifa->ifa_addr;
             for (hap = (struct in_addr **) h->h_addr_list; *hap; hap++) {
-                if ((**hap).s_addr == sa->sin_addr.s_addr) {
+                if ((**hap).s_addr == sai->sin_addr.s_addr) {
                     return ifa;
                 }
             }

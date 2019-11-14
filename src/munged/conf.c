@@ -196,7 +196,7 @@ create_conf (void)
     conf->mac_key = NULL;
     conf->mac_key_len = 0;
     conf->origin_name = NULL;
-    conf->origin_iface = NULL;
+    conf->origin_ifname = NULL;
     memset (&conf->addr, 0, sizeof (conf->addr));
     conf->gids = NULL;
     conf->gids_update_secs = MUNGE_GROUP_UPDATE_SECS;
@@ -272,9 +272,9 @@ destroy_conf (conf_t conf, int do_unlink)
         free (conf->origin_name);
         conf->origin_name = NULL;
     }
-    if (conf->origin_iface) {
-        free (conf->origin_iface);
-        conf->origin_iface = NULL;
+    if (conf->origin_ifname) {
+        free (conf->origin_ifname);
+        conf->origin_ifname = NULL;
     }
     if (conf->auth_server_dir) {
         free (conf->auth_server_dir);
@@ -532,9 +532,9 @@ write_origin_addr (conf_t conf)
     if (!inet_ntop (AF_INET, &conf->addr, buf, sizeof (buf))) {
         log_msg (LOG_WARNING, "Failed to convert origin address to a string");
     }
-    else if (conf->origin_iface != NULL) {
+    else if (conf->origin_ifname != NULL) {
         log_msg (LOG_INFO, "Set origin address to %s (%s)", buf,
-                conf->origin_iface);
+                conf->origin_ifname);
     }
     else {
         log_msg (LOG_INFO, "Set origin address to %s", buf);
@@ -715,10 +715,8 @@ _conf_display_help (char *prog)
     printf ("  %*s %s [%d]\n", w, "--num-threads=INT",
             "Specify number of threads to spawn", MUNGE_THREADS);
 
-#if HAVE_GETIFADDRS
     printf ("  %*s %s\n", w, "--origin=ADDRESS",
             "Specify origin address via hostname/IPaddr/interface");
-#endif /* HAVE_GETIFADDRS */
 
     printf ("  %*s %s [%s]\n", w, "--pid-file=PATH",
             "Specify PID file", MUNGE_PIDFILE_PATH);
@@ -851,18 +849,21 @@ retry:
 static void
 _conf_set_origin_addr (conf_t conf)
 {
-/*  Set the origin address to be encoded into the credential metadata.
- *  If an origin address is explicitly specified, a failure to match an
- *    address assigned to a local network interface results in an error which
- *    can be overridden; otherwise, a failure to match results in a warning,
- *    and the origin address is set to the null address.
+/*  Set the origin address to be encoded into credential metadata.
+ *  If an origin is explicitly specified, failure to lookup its network address
+ *    results in an error which can be overridden.
+ *  If an orgin is not specified or the error is overridden, a warning is
+ *    logged and the origin address is set to the null address.
  */
-    int is_match_required;
+    int is_origin_specified;
     int rv = 0;
 
-    memset (&conf->addr, 0, sizeof (conf->addr));
+    assert (conf != NULL);
 
-    is_match_required = (conf->origin_name != NULL) ? 1 : 0;
+    memset (&conf->addr, 0, sizeof (conf->addr));
+    conf->origin_ifname = NULL;
+
+    is_origin_specified = (conf->origin_name != NULL) ? 1 : 0;
 
     if (conf->origin_name == NULL) {
         rv = net_get_hostname (&conf->origin_name);
@@ -872,19 +873,16 @@ _conf_set_origin_addr (conf_t conf)
     }
     if (conf->origin_name != NULL) {
         errno = 0;
-        rv = net_is_name_ifaddr (conf->origin_name,
-                &conf->addr, &conf->origin_iface);
-        if (rv != 1) {
-            char buf[1024] = "";
-            if ((rv == -1) && (errno != 0)) {
-                (void) snprintf (buf, sizeof (buf), ": %s", strerror (errno));
-            }
-            log_err_or_warn (conf->got_force || !is_match_required,
-                    "Failed to match origin \"%s\" to a local network "
-                    "interface%s", conf->origin_name, buf);
+        rv = net_get_hostaddr (conf->origin_name, &conf->addr,
+                &conf->origin_ifname);
+        if (rv < 0) {
+            log_err_or_warn (conf->got_force || !is_origin_specified,
+                    "Failed to lookup origin \"%s\"%s%s", conf->origin_name,
+                    (errno != 0) ? ": " : "",
+                    (errno != 0) ? strerror (errno) : "");
         }
     }
-    if (rv != 1) {
+    if (rv != 0) {
         log_msg (LOG_WARNING, "Continuing with origin set to null address");
     }
     return;

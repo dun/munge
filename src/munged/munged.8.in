@@ -147,10 +147,9 @@ Specify the number of threads to spawn for processing credential requests.
 Specify the origin address that will be encoded into credential metadata.
 This can be a hostname or IPv4 address; it can also be the name of a local
 network interface, in which case the first IPv4 address found assigned to
-that interface will be used.  The resulting IP address must match an address
-assigned to a local network interface.  Failure to match will result in an
-error; if overridden, the origin will be set to the null address.  The default
-value is the IPv4 address of the hostname returned by \fBgethostname()\fR.
+that interface will be used.  The default value is the IPv4 address of the
+hostname returned by \fBgethostname()\fR.  Failure to lookup the address will
+result in an error; if overridden, the origin will be set to the null address.
 .TP
 .BI "\-\-pid\-file " path
 Specify an alternate pathname for storing the Process ID of the daemon.
