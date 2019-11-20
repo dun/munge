@@ -64,6 +64,7 @@ struct log_ctx {
     FILE *fp;
     int   got_init;
     int   got_syslog;
+    int   got_fprintf_error;
     int   priority;
     int   options;
     char  id [LOG_IDENTITY_MAXLEN];
@@ -74,7 +75,7 @@ struct log_ctx {
  *  Static Variables
  *****************************************************************************/
 
-static struct log_ctx log_ctx = { NULL, 0, 0, 0, 0, { '\0' } };
+static struct log_ctx log_ctx = { NULL, 0, 0, 0, 0, 0, { '\0' } };
 
 
 /*****************************************************************************
@@ -370,15 +371,23 @@ _log_aux (int errnum, int priority, char *msgbuf, int msgbuflen,
             msgbuf[0] = '\0';
         }
     }
-    /*  Log this!
+    /*  Log message.
      */
     if (log_ctx.got_syslog && sbuf) {
         syslog (priority, "%s", sbuf);
     }
     if (log_ctx.fp && (priority <= log_ctx.priority)) {
+        errno = 0;
         if (fprintf (log_ctx.fp, "%s", buf) == EOF) {
-            syslog (LOG_CRIT, "Logging stopped due to error");
-            log_ctx.fp = NULL;
+            if (!log_ctx.got_fprintf_error) {
+                syslog (LOG_ERR,
+                    "Failed logfile write: %s: messages may have been dropped",
+                    (errno != 0) ? strerror (errno) : "Unspecified error");
+                log_ctx.got_fprintf_error = 1;
+            }
+        }
+        else if (log_ctx.got_fprintf_error) {
+            log_ctx.got_fprintf_error = 0;
         }
     }
     return;
