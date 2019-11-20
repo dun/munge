@@ -376,9 +376,11 @@ _log_aux (int errnum, int priority, char *msgbuf, int msgbuflen,
         syslog (priority, "%s", sbuf);
     }
     if (log_ctx.fp && (priority <= log_ctx.priority)) {
+        errno = 0;
         if (fprintf (log_ctx.fp, "%s", buf) == EOF) {
-            syslog (LOG_CRIT, "Logging stopped due to error");
-            log_ctx.fp = NULL;
+            syslog (LOG_ERR,
+                "Failed logfile write: %s: messages may have been dropped",
+                (errno != 0) ? strerror (errno) : "Unspecified error");
         }
     }
     return;
