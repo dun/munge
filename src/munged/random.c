@@ -246,7 +246,7 @@ _random_read_entropy_from_kernel (void)
         }
         else {
             _random_add (buf, n);
-            log_msg (LOG_INFO, "PRNG seeded with %d byte%s from %s",
+            log_msg (LOG_INFO, "Seeded PRNG with %d byte%s from %s",
                     n, (n == 1 ? "" : "s"), (src != NULL) ? src : "???");
         }
     }
@@ -416,7 +416,7 @@ retry_open:
     }
     n = num_bytes - num_left;
     if (n > 0) {
-        log_msg (LOG_INFO, "PRNG seeded with %d byte%s from \"%s\"",
+        log_msg (LOG_INFO, "Seeded PRNG with %d byte%s from \"%s\"",
                 n, (n == 1 ? "" : "s"), path);
     }
     return (!is_valid ? -1 : n);
