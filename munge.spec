@@ -2,6 +2,9 @@ Name:		munge
 Version:	0.5.13
 Release:	1%{?dist}
 
+# Enable hardened build since munged is a long-running daemon.
+%global _hardened_build 1
+
 Summary:	MUNGE authentication service
 License:	GPLv3+
 URL:		https://dun.github.io/munge/
