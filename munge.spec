@@ -50,15 +50,7 @@ A shared library for applications using MUNGE.
 %{!?_runstatedir:%global _runstatedir /run}
 
 %build
-##
-# Add the following to the rpm command line to specify 32-bit/64-bit builds:
-#   --with arch32  (build 32-bit executables & library)
-#   --with arch64  (build 64-bit executables & library)
-##
 %configure --disable-static \
-    %{?_with_arch32: --enable-arch=32} \
-    %{?_with_arch64: --enable-arch=64} \
-    --program-prefix=%{?_program_prefix:%{_program_prefix}} \
     --with-pkgconfigdir=%{_libdir}/pkgconfig \
     --with-runstatedir=%{_runstatedir} \
     --with-systemdunitdir=%{_unitdir}
