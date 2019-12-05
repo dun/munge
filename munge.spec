@@ -108,6 +108,7 @@ fi
 %doc doc/*
 %dir %attr(0700,munge,munge) %{_sysconfdir}/munge
 %attr(0600,munge,munge) %config(noreplace) %ghost %{_sysconfdir}/munge/munge.key
+%config(noreplace) %{_sysconfdir}/sysconfig/munge
 %dir %attr(0700,munge,munge) %{_localstatedir}/lib/munge
 %attr(0600,munge,munge) %ghost %{_localstatedir}/lib/munge/munged.seed
 %dir %attr(0700,munge,munge) %{_localstatedir}/log/munge
@@ -118,7 +119,6 @@ fi
 %{_sbindir}/*
 %{_mandir}/man[^3]/*
 %{_unitdir}/munge.service
-%{_sysconfdir}/sysconfig/munge
 
 %files devel
 %{_includedir}/*
