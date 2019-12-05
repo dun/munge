@@ -3,8 +3,7 @@ Version:	0.5.13
 Release:	1%{?dist}
 
 Summary:	MUNGE authentication service
-Group:		System Environment/Daemons
-License:	GPLv3+ and LGPLv3+
+License:	GPLv3+
 URL:		https://dun.github.io/munge/
 Source0:	https://github.com/dun/munge/releases/download/%{name}-%{version}/%{name}-%{version}.tar.xz
 
@@ -12,22 +11,11 @@ BuildRequires:	bzip2-devel
 BuildRequires:	openssl-devel
 BuildRequires:	zlib-devel
 BuildRequires:	systemd
-Requires:	%{name}-libs = %{version}-%{release}
+Requires:	%{name}-libs%{?_isa} = %{version}-%{release}
 Requires(pre):	shadow-utils
 Requires(post): systemd
 Requires(preun): systemd
 Requires(postun): systemd
-
-%package devel
-Summary:	Headers and libraries for developing applications using MUNGE
-Group:		Development/Libraries
-Requires:	%{name}-libs%{?_isa} = %{version}-%{release}
-BuildRequires:	pkgconfig
-
-%package libs
-Summary:	Libraries for applications using MUNGE
-Group:		System Environment/Libraries
-Requires:	%{name} = %{version}-%{release}
 
 %description
 MUNGE (MUNGE Uid 'N' Gid Emporium) is an authentication service for creating
@@ -39,35 +27,43 @@ defined by a shared cryptographic key.  Clients within this security realm
 can create and validate credentials without the use of root privileges,
 reserved ports, or platform-specific methods.
 
+%package devel
+Summary:	MUNGE authentication service development files
+License:	LGPLv3+
+BuildRequires:	pkgconfig
+Requires:	%{name}-libs%{?_isa} = %{version}-%{release}
+
 %description devel
-A header file and static library for developing applications using MUNGE.
+Development files for building applications that use libmunge.
+
+%package libs
+Summary:	MUNGE authentication service shared library
+License:	LGPLv3+
+Requires:	%{name} = %{version}-%{release}
 
 %description libs
-A shared library for applications using MUNGE.
+The shared library (libmunge) for running applications that use MUNGE.
 
 %prep
 %setup -q
-%{!?_runstatedir:%global _runstatedir /run}
 
 %build
+%{!?_runstatedir:%global _runstatedir /run}
 %configure --disable-static \
+    --with-crypto-lib=openssl \
     --with-pkgconfigdir=%{_libdir}/pkgconfig \
     --with-runstatedir=%{_runstatedir} \
     --with-systemdunitdir=%{_unitdir}
 sed -i 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g' libtool
 sed -i 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' libtool
-make %{?_smp_mflags}
+%make_build
 
 %install
-rm -rf %{buildroot}
-make install DESTDIR=%{buildroot}
-touch %{buildroot}/%{_sysconfdir}/munge/munge.key
-touch %{buildroot}/%{_localstatedir}/lib/munge/munged.seed
-touch %{buildroot}/%{_localstatedir}/log/munge/munged.log
-touch %{buildroot}/%{_runstatedir}/munge/munged.pid
-
-%clean
-rm -rf %{buildroot}
+%make_install
+touch %{buildroot}%{_sysconfdir}/munge/munge.key
+touch %{buildroot}%{_localstatedir}/lib/munge/munged.seed
+touch %{buildroot}%{_localstatedir}/log/munge/munged.log
+touch %{buildroot}%{_runstatedir}/munge/munged.pid
 
 %pre
 getent group munge >/dev/null || \
@@ -111,7 +107,7 @@ fi
 %doc doc/*
 %dir %attr(0700,munge,munge) %{_sysconfdir}/munge
 %attr(0600,munge,munge) %config(noreplace) %ghost %{_sysconfdir}/munge/munge.key
-%dir %attr(0711,munge,munge) %{_localstatedir}/lib/munge
+%dir %attr(0700,munge,munge) %{_localstatedir}/lib/munge
 %attr(0600,munge,munge) %ghost %{_localstatedir}/lib/munge/munged.seed
 %dir %attr(0700,munge,munge) %{_localstatedir}/log/munge
 %attr(0640,munge,munge) %ghost %{_localstatedir}/log/munge/munged.log
@@ -119,16 +115,17 @@ fi
 %attr(0644,munge,munge) %ghost %{_runstatedir}/munge/munged.pid
 %{_bindir}/*
 %{_sbindir}/*
-%{_mandir}/*[^3]/*
+%{_mandir}/man[^3]/*
 %{_unitdir}/munge.service
 %{_sysconfdir}/sysconfig/munge
 
 %files devel
 %{_includedir}/*
-%{_libdir}/*.la
-%{_libdir}/*.so
-%{_libdir}/pkgconfig/*.pc
-%{_mandir}/*3/*
+%{_libdir}/libmunge.la
+%{_libdir}/libmunge.so
+%{_libdir}/pkgconfig/munge.pc
+%{_mandir}/man3/*
 
 %files libs
-%{_libdir}/*.so.*
+%{_libdir}/libmunge.so.2
+%{_libdir}/libmunge.so.2.0.0
