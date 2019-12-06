@@ -10,6 +10,7 @@ License:	GPLv3+
 URL:		https://dun.github.io/munge/
 Source0:	https://github.com/dun/munge/releases/download/%{name}-%{version}/%{name}-%{version}.tar.xz
 
+BuildRequires:	gcc
 BuildRequires:	bzip2-devel
 BuildRequires:	openssl-devel
 BuildRequires:	zlib-devel
