@@ -15,6 +15,7 @@ BuildRequires:	bzip2-devel
 BuildRequires:	openssl-devel
 BuildRequires:	zlib-devel
 BuildRequires:	systemd
+BuildRequires:	procps
 Requires:	%{name}-libs%{?_isa} = %{version}-%{release}
 Requires(pre):	shadow-utils
 %{?systemd_requires}
@@ -59,6 +60,11 @@ The shared library (libmunge) for running applications that use MUNGE.
 sed -i 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g' libtool
 sed -i 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' libtool
 %make_build
+
+%check
+%make_build check \
+    LD_LIBRARY_PATH=%{buildroot}%{_libdir} \
+    MUNGE_ROOT=/tmp/munge-$$ VERBOSE=t verbose=t
 
 %install
 %make_install
