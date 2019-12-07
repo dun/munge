@@ -13,9 +13,7 @@ BuildRequires:	zlib-devel
 BuildRequires:	systemd
 Requires:	%{name}-libs%{?_isa} = %{version}-%{release}
 Requires(pre):	shadow-utils
-Requires(post): systemd
-Requires(preun): systemd
-Requires(postun): systemd
+%{?systemd_requires}
 
 %description
 MUNGE (MUNGE Uid 'N' Gid Emporium) is an authentication service for creating
