@@ -465,7 +465,8 @@ test_expect_success 'munge --uid for effective user by number' '
 
 test_expect_success SUDO 'munge --uid for root user by name via sudo' '
     local ID=root META &&
-    sudo "${MUNGE}" --socket="${MUNGE_SOCKET}" --no-input --uid="${ID}" |
+    sudo LD_LIBRARY_PATH="${LD_LIBRARY_PATH}" "${MUNGE}" \
+            --socket="${MUNGE_SOCKET}" --no-input --uid="${ID}" |
     "${UNMUNGE}" --socket="${MUNGE_SOCKET}" |
     awk "/^UID:/ { print \$2 }" >meta.$$ &&
     META=$(cat meta.$$) &&
@@ -475,7 +476,8 @@ test_expect_success SUDO 'munge --uid for root user by name via sudo' '
 
 test_expect_success SUDO 'munge --uid for root user by number via sudo' '
     local ID=0 META &&
-    sudo "${MUNGE}" --socket="${MUNGE_SOCKET}" --no-input --uid="${ID}" |
+    sudo LD_LIBRARY_PATH="${LD_LIBRARY_PATH}" "${MUNGE}" \
+            --socket="${MUNGE_SOCKET}" --no-input --uid="${ID}" |
     "${UNMUNGE}" --socket="${MUNGE_SOCKET}" |
     awk "/^UID:/ { gsub(/[()]/, \"\"); print \$3 }" >meta.$$ &&
     META=$(cat meta.$$) &&
@@ -552,7 +554,8 @@ test_expect_success 'munge --gid for effective group by number' '
 ##
 test_expect_success SUDO 'munge --gid for root group by name via sudo' '
     local ID=$(id -g -n root) META &&
-    sudo "${MUNGE}" --socket="${MUNGE_SOCKET}" --no-input --gid="${ID}" |
+    sudo LD_LIBRARY_PATH="${LD_LIBRARY_PATH}" "${MUNGE}" \
+            --socket="${MUNGE_SOCKET}" --no-input --gid="${ID}" |
     "${UNMUNGE}" --socket="${MUNGE_SOCKET}" |
     awk "/^GID:/ { print \$2 }" >meta.$$ &&
     META=$(cat meta.$$) &&
@@ -562,7 +565,8 @@ test_expect_success SUDO 'munge --gid for root group by name via sudo' '
 
 test_expect_success SUDO 'munge --gid for root group by number via sudo' '
     local ID=0 META &&
-    sudo "${MUNGE}" --socket="${MUNGE_SOCKET}" --no-input --gid="${ID}" |
+    sudo LD_LIBRARY_PATH="${LD_LIBRARY_PATH}" "${MUNGE}" \
+            --socket="${MUNGE_SOCKET}" --no-input --gid="${ID}" |
     "${UNMUNGE}" --socket="${MUNGE_SOCKET}" |
     awk "/^GID:/ { gsub(/[()]/, \"\"); print \$3 }" >meta.$$ &&
     META=$(cat meta.$$) &&
