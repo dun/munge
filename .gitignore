@@ -24,10 +24,11 @@
 /munge-*.tar*
 /src/*/*.[1-9]
 /src/common/hkdf_test
-/src/etc/munge.init
-/src/etc/munge.pc
-/src/etc/munge.service
-/src/etc/munge.sysconfig
+/src/etc/munge.pkgconfig.pc
+/src/etc/munge.systemd.service
+/src/etc/munge.systemd.sysconfig
+/src/etc/munge.sysvinit.init
+/src/etc/munge.sysvinit.sysconfig
 /src/etc/munge.tmpfiles.conf
 /src/munge/munge
 /src/munge/remunge
