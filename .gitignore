@@ -24,6 +24,7 @@
 /munge-*.tar*
 /src/*/*.[1-9]
 /src/common/hkdf_test
+/src/etc/munge.logrotate.conf
 /src/etc/munge.pkgconfig.pc
 /src/etc/munge.systemd.service
 /src/etc/munge.systemd.sysconfig

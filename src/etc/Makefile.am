@@ -6,6 +6,7 @@
 include $(top_srcdir)/Make-inc.mk
 
 TEMPLATE_FILES = \
+	munge.logrotate.conf.in \
 	munge.pkgconfig.pc.in \
 	munge.systemd.service.in \
 	munge.systemd.sysconfig.in \
@@ -15,6 +16,7 @@ TEMPLATE_FILES = \
 	# End of TEMPLATE_FILES
 
 SUBSTITUTE_FILES = \
+	munge.logrotate.conf \
 	munge.pkgconfig.pc \
 	munge.systemd.service \
 	munge.systemd.sysconfig \
@@ -34,6 +36,7 @@ CLEANFILES = \
 $(SUBSTITUTE_FILES): Makefile
 	$(AM_V_GEN)$(substitute) < '$(srcdir)/$@.in' > '$(builddir)/$@'
 
+munge.logrotate.conf: munge.logrotate.conf.in
 munge.pkgconfig.pc: munge.pkgconfig.pc.in
 munge.systemd.service: munge.systemd.service.in
 munge.systemd.sysconfig: munge.systemd.sysconfig.in
@@ -45,9 +48,9 @@ noinst_DATA = \
 	$(SUBSTITUTE_FILES) \
 	# End of noinst_DATA
 
-install-data-hook: install-dirs install-pkgconfig install-systemd install-sysvinit
+install-data-hook: install-dirs install-logrotate install-pkgconfig install-systemd install-sysvinit
 
-uninstall-local: uninstall-dirs uninstall-pkgconfig uninstall-systemd uninstall-sysvinit
+uninstall-local: uninstall-dirs uninstall-logrotate uninstall-pkgconfig uninstall-systemd uninstall-sysvinit
 
 install-dirs:
 	$(MKDIR_P) -m 0700 '$(DESTDIR)$(sysconfdir)/munge'
@@ -60,6 +63,22 @@ uninstall-dirs:
 	rmdir '$(DESTDIR)$(localstatedir)/lib/munge' 2>/dev/null || :
 	rmdir '$(DESTDIR)$(localstatedir)/log/munge' 2>/dev/null || :
 	rmdir '$(DESTDIR)$(runstatedir)/munge' 2>/dev/null || :
+
+install-logrotate: munge.logrotate.conf
+	@if test 'x$(logrotateddir)' != x; then \
+	  echo $(MKDIR_P) "'$(DESTDIR)$(logrotateddir)'"; \
+	  $(MKDIR_P) '$(DESTDIR)$(logrotateddir)'; \
+	  echo $(INSTALL_DATA) "'$(builddir)/munge.logrotate.conf'" \
+	      "'$(DESTDIR)$(logrotateddir)/$(PACKAGE)'"; \
+	  $(INSTALL_DATA) '$(builddir)/munge.logrotate.conf' \
+	      '$(DESTDIR)$(logrotateddir)/$(PACKAGE)'; \
+	fi
+
+uninstall-logrotate:
+	@if test 'x$(logrotateddir)' != x; then \
+	  echo rm -f "'$(DESTDIR)$(logrotateddir)/$(PACKAGE)'"; \
+	  rm -f '$(DESTDIR)$(logrotateddir)/$(PACKAGE)'; \
+	fi
 
 install-pkgconfig: munge.pkgconfig.pc
 	@if test 'x$(pkgconfigdir)' != x; then \

@@ -54,6 +54,7 @@ The shared library (libmunge) for running applications that use MUNGE.
 %{!?_runstatedir:%global _runstatedir /run}
 %configure --disable-static \
     --with-crypto-lib=openssl \
+    --with-logrotateddir=%{_sysconfdir}/logrotate.d \
     --with-pkgconfigdir=%{_libdir}/pkgconfig \
     --with-runstatedir=%{_runstatedir} \
     --with-systemdunitdir=%{_unitdir}
@@ -115,6 +116,7 @@ fi
 %doc doc/*
 %dir %attr(0700,munge,munge) %{_sysconfdir}/munge
 %attr(0600,munge,munge) %config(noreplace) %ghost %{_sysconfdir}/munge/munge.key
+%config(noreplace) %{_sysconfdir}/logrotate.d/munge
 %config(noreplace) %{_sysconfdir}/sysconfig/munge
 %dir %attr(0700,munge,munge) %{_localstatedir}/lib/munge
 %attr(0600,munge,munge) %ghost %{_localstatedir}/lib/munge/munged.seed

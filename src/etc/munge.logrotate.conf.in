@@ -1,0 +1,8 @@
+@localstatedir@/log/munge/munged.log {
+    rotate 1
+    size 100k
+    copytruncate
+    compress
+    nodelaycompress
+    missingok
+}

@@ -55,6 +55,9 @@ MUNGE Installation Guide
       The following configure options allow further customization of the
       installation:
 
+      --with-logrotateddir=DIR / --without-logrotateddir
+        installation directory for logrotate config files
+
       --with-pkgconfigdir=DIR / --without-pkgconfigdir
         installation directory for pkg-config .pc files
 
