@@ -2,6 +2,9 @@ Name:		munge
 Version:	0.5.13
 Release:	1%{?dist}
 
+# Disable test suite by default; add "--with check" to enable.
+%bcond_with check
+
 # Enable hardened build since munged is a long-running daemon.
 %global _hardened_build 1
 
@@ -63,9 +66,11 @@ sed -i 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' libtool
 %make_build
 
 %check
+%if %{with check}
 %make_build check \
     LD_LIBRARY_PATH=%{buildroot}%{_libdir} \
     MUNGE_ROOT=/tmp/munge-$$ VERBOSE=t verbose=t
+%endif
 
 %install
 %make_install
