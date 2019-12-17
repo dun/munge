@@ -41,16 +41,8 @@ done
 ##
 for OPT_STOP in '-s' '--stop'; do
     test_expect_success "munged ${OPT_STOP}" '
-        local PID &&
         munged_start_daemon &&
-        test -f "${MUNGE_PIDFILE}" &&
-        PID=$(cat "${MUNGE_PIDFILE}") &&
-        ps -p "${PID}" -ww | grep munged &&
-        test -S "${MUNGE_SOCKET}" &&
-        "${MUNGED}" "${OPT_STOP}" --socket="${MUNGE_SOCKET}" &&
-        test ! -S "${MUNGE_SOCKET}" &&
-        test ! -f "${MUNGE_PIDFILE}" &&
-        ! ps -p "${PID}" >/dev/null
+        "${MUNGED}" "${OPT_STOP}" --socket="${MUNGE_SOCKET}"
     '
 done
 

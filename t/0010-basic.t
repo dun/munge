@@ -67,7 +67,9 @@ test_expect_success 'check process has exited' '
     ! ps -p "${PID}" >/dev/null
 '
 
-test_expect_success 'check pidfile removal' '
+# Testing occasionally fails on Debian 4.0; FreeBSD 12.1, 11.3.
+##
+test_expect_unstable 'check pidfile removal' '
     test -n "${MUNGE_PIDFILE}" &&
     test ! -f "${MUNGE_PIDFILE}"
 '
@@ -76,7 +78,9 @@ test_expect_success 'check seedfile creation' '
     test -s "${MUNGE_SEEDFILE}"
 '
 
-test_expect_success 'check logfile for replay' '
+# Testing occasionally fails on NetBSD 8.1, 7.2.
+##
+test_expect_unstable 'check logfile for replay' '
     grep "Replayed credential" "${MUNGE_LOGFILE}"
 '
 
