@@ -5,6 +5,9 @@ Release:	1%{?dist}
 # Disable test suite by default; add "--with check" to enable.
 %bcond_with check
 
+# Enable source file verification by default; add "--without verify" to disable.
+%bcond_without verify
+
 # Enable hardened build since munged is a long-running daemon.
 %global _hardened_build 1
 
@@ -12,7 +15,10 @@ Summary:	MUNGE authentication service
 License:	GPLv3+
 URL:		https://dun.github.io/munge/
 Source0:	https://github.com/dun/munge/releases/download/%{name}-%{version}/%{name}-%{version}.tar.xz
+Source1:	https://github.com/dun/munge/releases/download/%{name}-%{version}/%{name}-%{version}.tar.xz.asc
+Source2:	https://github.com/dun.gpg
 
+BuildRequires:	gnupg2
 BuildRequires:	gcc
 BuildRequires:	bzip2-devel
 BuildRequires:	openssl-devel
@@ -51,6 +57,9 @@ Requires:	%{name} = %{version}-%{release}
 The shared library (libmunge) for running applications that use MUNGE.
 
 %prep
+%if %{with verify}
+%{gpgverify} --keyring='%{SOURCE2}' --signature='%{SOURCE1}' --data='%{SOURCE0}'
+%endif
 %setup -q
 
 %build
