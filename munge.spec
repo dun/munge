@@ -54,12 +54,11 @@ The shared library (libmunge) for running applications that use MUNGE.
 %setup -q
 
 %build
-%{!?_runstatedir:%global _runstatedir /run}
 %configure --disable-static \
     --with-crypto-lib=openssl \
     --with-logrotateddir=%{_sysconfdir}/logrotate.d \
     --with-pkgconfigdir=%{_libdir}/pkgconfig \
-    --with-runstatedir=%{_runstatedir} \
+    --with-runstatedir=%{_rundir} \
     --with-systemdunitdir=%{_unitdir}
 sed -i 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g' libtool
 sed -i 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' libtool
@@ -77,7 +76,7 @@ sed -i 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' libtool
 touch %{buildroot}%{_sysconfdir}/munge/munge.key
 touch %{buildroot}%{_localstatedir}/lib/munge/munged.seed
 touch %{buildroot}%{_localstatedir}/log/munge/munged.log
-touch %{buildroot}%{_runstatedir}/munge/munged.pid
+touch %{buildroot}%{_rundir}/munge/munged.pid
 
 %pre
 getent group munge >/dev/null || \
@@ -127,8 +126,8 @@ fi
 %attr(0600,munge,munge) %ghost %{_localstatedir}/lib/munge/munged.seed
 %dir %attr(0700,munge,munge) %{_localstatedir}/log/munge
 %attr(0640,munge,munge) %ghost %{_localstatedir}/log/munge/munged.log
-%dir %attr(0755,munge,munge) %ghost %{_runstatedir}/munge
-%attr(0644,munge,munge) %ghost %{_runstatedir}/munge/munged.pid
+%dir %attr(0755,munge,munge) %ghost %{_rundir}/munge
+%attr(0644,munge,munge) %ghost %{_rundir}/munge/munged.pid
 %{_bindir}/*
 %{_sbindir}/*
 %{_mandir}/man[^3]/*
