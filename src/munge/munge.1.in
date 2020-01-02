@@ -1,6 +1,6 @@
 .\"****************************************************************************
 .\" Written by Chris Dunlap <cdunlap@llnl.gov>.
-.\" Copyright (C) 2007-2019 Lawrence Livermore National Security, LLC.
+.\" Copyright (C) 2007-2020 Lawrence Livermore National Security, LLC.
 .\" Copyright (C) 2002-2007 The Regents of the University of California.
 .\" UCRL-CODE-155910.
 .\"
@@ -124,7 +124,7 @@ to stderr and returns a non-zero exit code.
 Chris Dunlap <cdunlap@llnl.gov>
 
 .SH COPYRIGHT
-Copyright (C) 2007-2019 Lawrence Livermore National Security, LLC.
+Copyright (C) 2007-2020 Lawrence Livermore National Security, LLC.
 .br
 Copyright (C) 2002-2007 The Regents of the University of California.
 .PP

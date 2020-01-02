@@ -1,6 +1,6 @@
 .\"****************************************************************************
 .\" Written by Chris Dunlap <cdunlap@llnl.gov>.
-.\" Copyright (C) 2007-2019 Lawrence Livermore National Security, LLC.
+.\" Copyright (C) 2007-2020 Lawrence Livermore National Security, LLC.
 .\" Copyright (C) 2002-2007 The Regents of the University of California.
 .\" UCRL-CODE-155910.
 .\"
@@ -84,7 +84,7 @@ Contains the shared cryptographic key for hosts within the security realm.
 Chris Dunlap <cdunlap@llnl.gov>
 
 .SH COPYRIGHT
-Copyright (C) 2007-2019 Lawrence Livermore National Security, LLC.
+Copyright (C) 2007-2020 Lawrence Livermore National Security, LLC.
 .br
 Copyright (C) 2002-2007 The Regents of the University of California.
 .PP
