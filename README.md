@@ -17,6 +17,4 @@ the use of root privileges, reserved ports, or platform-specific methods.
 - [Installation Guide](../../wiki/Installation-Guide)
 - [License Information](../../wiki/License-Info)
 - [Man Pages](../../wiki/Man-Pages)
-- [Atom feed for Releases](../../releases.atom)
 - [Verifying Releases](../../wiki/Verifying-Releases)
-- [Latest Release](../../releases/latest)
