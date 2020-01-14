@@ -7,8 +7,8 @@
 # Prologue.
 ##
 AC_PREREQ([2.61])
-AC_INIT([MUNGE], [0.5.13])
-AC_SUBST([DATE], ["2017-09-26"])
+AC_INIT([MUNGE], [0.5.14])
+AC_SUBST([DATE], ["2020-01-14"])
 
 AC_CONFIG_AUX_DIR([build-aux])
 AC_CONFIG_HEADERS([config.h])

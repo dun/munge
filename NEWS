@@ -1,3 +1,31 @@
+munge-0.5.14 (2020-01-14):
+- Added mungekey command for key generation via HKDF. (5fc870e)
+- Added negative caching of user lookups for processing supplementary groups. (#26, d51fec8)
+- Added munged --origin cmdline opt. (#69, #23)
+- Added munged --stop cmdline opt. (06306b8)
+- Added unmunge --numeric cmdline opt. (171abe2)
+- Added configure --with-logrotateddir opt and logrotate config. (2d35713)
+- Added configure --with-munge-socket opt. (565db69)
+- Added configure --with-pkgconfigdir opt. (9abebcd)
+- Added configure --with-runstatedir opt. (25eef52)
+- Added configure --with-sysconfigdir opt. (9abebcd)
+- Added configure --with-systemdunitdir opt. (9abebcd)
+- Added configure --with-sysvinitddir opt. (9abebcd)
+- Added systemd EnvironmentFile to set sysconfig options. (#68, #64)
+- Added systemd RuntimeDirectory to replace tmpfiles.d conf. (3eed37e)
+- Added GPG verification of source to RPM specfile. (5bb8912, 24f18a1)
+- Added "make check" test suite.
+- Changed logging of non-existent users to only log once for a given user. (#26, 7b00d81)
+- Changed default name of munged seedfile. (df8c22a)
+- Fixed pidfile corruption when starting new daemon while socket still in use. (258b67e)
+- Fixed munged signal handlers to be async-signal-safe. (be39512)
+- Fixed "Logging stopped due to error" behavior for transient errors. (6176b42)
+- Fixed misleading "Lockfile not found" error message. (34fcdb6)
+- Fixed conversion-specifier / argument mismatch in error message. (0079630)
+- Fixed installation directory variable substitution. (2affe07)
+- Fixed manpage variable substitution. (a8ff2fe)
+- Removed autotools-generated files from version control. (46dd77b)
+
 munge-0.5.13 (2017-09-26):
 - Added support for OpenSSL 1.1.0. (#54)
 - Added support for UID/GID values >= 2^31.

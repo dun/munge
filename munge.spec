@@ -1,5 +1,5 @@
 Name:		munge
-Version:	0.5.13
+Version:	0.5.14
 Release:	1%{?dist}
 
 # Disable test suite by default; add "--with check" to enable.
