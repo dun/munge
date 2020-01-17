@@ -7,73 +7,68 @@ MUNGE Installation Guide
    dual original-BSD-style licenses.  On some systems, the OpenSSL license is
    incompatible with the GPL license used by MUNGE.  While Libgcrypt offers
    a more compatible license, OpenSSL typically offers better performance.
-   The performance (in terms of credentials per second) can be compared with
+   The performance (in terms of credentials per second) can be measured with
    the "remunge" executable.  The selection of the cryptographic library
    can be overridden with the configure "--with-crypto-lib" option.
 
    MUNGE includes bzip2 and zlib compression support if these libraries
    are found when the software is built.
 
-2. Installing pre-built packages
-
-   See the wiki page <https://github.com/dun/munge/wiki/Installation-Guide>
-   for up-to-date information.
-
-3. Building the latest release
+2. Building the latest release
 
    A. Installing from the source tarball:
 
       The commands "./configure; make; make install" should configure,
       build, and install the software.  For example:
 
-      $ tar xJf munge-0.5.14.tar.xz \
-        && cd munge-0.5.14          \
-        && ./configure              \
-             --prefix=/usr          \
-             --sysconfdir=/etc      \
-             --localstatedir=/var   \
-             --runstatedir=/run     \
-        && make                     \
-        && make check               \
-        && sudo make install
+         $ tar xJf munge-0.5.14.tar.xz \
+           && cd munge-0.5.14          \
+           && ./configure              \
+              --prefix=/usr            \
+              --sysconfdir=/etc        \
+              --localstatedir=/var     \
+              --runstatedir=/run       \
+           && make                     \
+           && make check               \
+           && sudo make install
 
       The "make check" command is optional; it runs the test suite.
 
-      The configure "--runstatedir" option is slated to appear in
-      autoconf-2.70; however, it has been backported to Debian's
-      autoconf-2.69-9.  If the configure script was built by an earlier
-      version of autoconf, the configure "--with-runstatedir" option can
-      be used to set this value.
+      The configure "--runstatedir" option is slated to appear
+      in autoconf-2.70; however, it has been backported to Debian's
+      autoconf-2.69-9.  The configure "--with-runstatedir" option can also
+      be used to set this value in case the configure script was built by
+      an earlier version of autoconf.
 
       The following configure options allow further customization of the
       installation:
 
-      --with-crypto-lib=(libgcrypt|openssl)
-        cryptographic library selection
+        --with-crypto-lib=(libgcrypt|openssl)
+          cryptographic library selection
 
-      --with-logrotateddir=DIR / --without-logrotateddir
-        installation directory for logrotate config files
+        --with-logrotateddir=DIR / --without-logrotateddir
+          installation directory for logrotate config files
 
-      --with-munge-socket=PATH
-        socket pathname default for client/server communication
+        --with-munge-socket=PATH
+          socket pathname default for client/server communication
 
-      --with-pkgconfigdir=DIR / --without-pkgconfigdir
-        installation directory for pkg-config .pc files
+        --with-pkgconfigdir=DIR / --without-pkgconfigdir
+          installation directory for pkg-config .pc files
 
-      --with-runstatedir=DIR
-        installation director for modifiable per-process data;
-        overrides --runstatedir if both are specified
+        --with-runstatedir=DIR
+          installation director for modifiable per-process data;
+          overrides --runstatedir if both are specified
 
-      --with-sysconfigdir=DIR / --without-sysconfigdir
-        installation directory for systemd/sysvinit config files
+        --with-sysconfigdir=DIR / --without-sysconfigdir
+          installation directory for systemd/sysvinit config files
 
-      --with-systemdunitdir=DIR / --without-systemdunitdir
-        installation directory for systemd service unit files
+        --with-systemdunitdir=DIR / --without-systemdunitdir
+          installation directory for systemd service unit files
 
-      --with-sysvinitddir=DIR / --without-sysvinitddir
-        installation directory for SysV init scripts
+        --with-sysvinitddir=DIR / --without-sysvinitddir
+          installation directory for SysV init scripts
 
-   B. Installing from rpm:
+   B. Installing from rpm on CentOS/Fedora:
 
       RPMs for recent CentOS/Fedora can be built directly from the tarball.
       As of 0.5.14, GPG verification of the source is performed by default.
@@ -81,28 +76,46 @@ MUNGE Installation Guide
       GPG signature (munge-0.5.14.tar.xz.asc) to reside in the same directory
       as the tarball (munge-0.5.14.tar.xz):
 
-      $ ls
-      dun.gpg  munge-0.5.14.tar.xz  munge-0.5.14.tar.xz.asc
+         $ ls
+         dun.gpg  munge-0.5.14.tar.xz  munge-0.5.14.tar.xz.asc
 
-      $ rpmbuild -tb munge-0.5.14.tar.xz
+         $ rpmbuild -tb munge-0.5.14.tar.xz
 
       GPG verification can be disabled by specifying "--without verify"
       to rpmbuild; this removes the need for the public key and detached
       signature:
 
-      $ rpmbuild -tb --without verify munge-0.5.14.tar.xz
+         $ rpmbuild -tb --without verify munge-0.5.14.tar.xz
 
       Three or more binary RPMs will be generated: munge, munge-devel,
       munge-libs, and potentially a debugsource and a couple debuginfo RPMs.
-      The munge RPM contains the munged daemon, mungekey key management
-      utility, and client executables.  The munge-devel RPM contains a
-      header file for developing applications using MUNGE.  The munge-libs
-      RPM contains a shared library for running applications that use MUNGE.
+      The munge RPM contains the munged daemon, mungekey utility, and
+      client executables.  The munge-devel RPM contains a header file for
+      developing applications using MUNGE.  The munge-libs RPM contains a
+      shared library for running applications that use MUNGE.
 
       The binary RPMs can be installed with rpm:
 
-      $ sudo rpm -ivh munge-0.5.14-1.x86_64.rpm \
-        munge-devel-0.5.14-1.x86_64.rpm munge-libs-0.5.14-1.x86_64.rpm
+         $ sudo rpm -ivh munge-0.5.14-1.x86_64.rpm \
+           munge-devel-0.5.14-1.x86_64.rpm munge-libs-0.5.14-1.x86_64.rpm
+
+   C. Installing from rpm on CentOS 6
+
+      The top-level "munge.spec" requires systemd, but RPMs for CentOS 6
+      using a SysV-style init script can be built using the specfile in
+      "extra/munge.spec-centos.6".  For example, to extract the alternate
+      specfile and then build RPMs in "${HOME}/rpmbuild" using the
+      munge-0.5.14.tar.xz tarball in the current directory:
+
+         $ tar xJf munge-0.5.14.tar.xz munge-0.5.14/extra/munge.spec-centos.6
+
+         $ rpmbuild -bb -D "%_topdir ${HOME}/rpmbuild" -D "%_sourcedir `pwd`" \
+           munge-0.5.14/extra/munge.spec-centos.6
+
+3. Installing pre-built packages
+
+   See the wiki page <https://github.com/dun/munge/wiki/Installation-Guide>
+   for up-to-date information.
 
 4. Securing the installation
 
@@ -114,23 +127,23 @@ MUNGE Installation Guide
    installation directories and must be substituted accordingly):
 
    A. ${sysconfdir}/munge [/etc/munge]
-      This directory contains the daemon's key.  Its permissions should be
-      set to 0700.
+      This directory will contain the daemon's key.  Its permissions should
+      be set to 0700.
 
    B. ${localstatedir}/lib/munge [/var/lib/munge]
-      This directory contains the daemon's PRNG seed file.  On systems
+      This directory will contain the daemon's PRNG seed file.  On systems
       where a file-descriptor-passing authentication method is used, this
       is also where the daemon creates pipes for authenticating clients.
       Its permissions should be set to 0711 if using file-descriptor-passing,
       or 0700 otherwise.
 
    C. ${localstatedir}/log/munge [/var/log/munge]
-      This directory contains the daemon's log file.  Its permissions should
-      be set to 0700.
+      This directory will contain the daemon's log file.  Its permissions
+      should be set to 0700.
 
    D. ${runstatedir}/munge [/run/munge]
-      This directory contains the Unix domain socket for clients to
-      communicate with the local daemon.  It also contains the daemon's
+      This directory will contain the Unix domain socket for clients to
+      communicate with the local daemon.  It will also contain the daemon's
       pid file.  This directory must allow execute permissions for all.
       Its permissions should be set to 0755.
 
@@ -150,8 +163,9 @@ MUNGE Installation Guide
    A. Creating a key
 
       All munged daemons within a security realm share a common key.
-      All hosts within this realm are expected to have common users/UIDs
-      and groups/GIDs.  Credentials are valid only within a security realm.
+      Since authentication is based on UID and GID, all hosts within this
+      realm are expected to have consistent user/UID and group/GID mappings.
+      Credentials are valid only within a security realm.
 
       The "mungekey" executable is the key management utility for MUNGE.
       To ensure the key file maintains the correct ownership and permissions,
@@ -175,8 +189,8 @@ MUNGE Installation Guide
 
 6. Starting and stopping the daemon
 
-   The key file "${sysconfdir}/munge/munge.key" must exist before starting
-   the daemon.
+   The key file "${sysconfdir}/munge/munge.key" must be created before
+   starting the daemon.
 
    A. systemd
 
@@ -211,11 +225,11 @@ MUNGE Installation Guide
 
          $ sudo -u munge ${sbindir}/munged
 
-      Stop the daemon by adding the "--stop" command-line option:
+      Stop the daemon with the "--stop" command-line option:
 
          $ sudo -u munge ${sbindir}/munged --stop
 
-      Or stop the daemon by sending a SIGTERM to the process:
+      Or stop the daemon by sending a SIGTERM to the munged process:
 
          $ sudo -u munge kill `cat ${runstatedir}/munge/munged.pid`
 
@@ -227,58 +241,61 @@ MUNGE Installation Guide
 
    A. Verify the installation
 
-      The following steps can be performed to verify the software is properly
-      installed and working:
+      The following steps can be performed to verify that the software is
+      properly installed and working:
 
       1. Encode a credential.  This tests if the munge executable and
          libmunge library can be found, if munged is running, and if the
          client (munge/libmunge) can communicate with the server (munged):
 
-         $ munge -n
+            $ munge -n
 
-      2. Encode and decode a credential.
+      2. Encode and decode a credential.  This is similar to the test above,
+         but also tests that the credential has been properly encoded and
+         successfully decoded.  It also shows the metadata that has been
+         encoded into the credential.
 
-         $ munge -n | unmunge
+            $ munge -n | unmunge
 
       3. Remotely decode a locally-encoded credential.  This tests if
          local and remote munged daemons are running with the same key,
          if the two versions are compatible, and if the local defaults
          used to encode the credential can be decoded by the remote daemon.
 
-         $ munge -n | ssh somehost unmunge
+            $ munge -n | ssh somehost unmunge
 
       4. Locally decode a remotely-encoded credential.  This tests if
          local and remote munged daemons are running with the same key,
          if the two versions are compatible, and if the remote defaults
          used to encode the credential can be decoded by the local daemon.
 
-         $ ssh somehost munge -n | unmunge
+            $ ssh somehost munge -n | unmunge
 
    B. Check the default locations
 
       The default locations for the socket, key file, log file, pid file,
       and PRNG seed file are configured at build time.  These defaults can
-      be found in the munged "--help" output:
+      be found in the munged "--help" output; look for the values between
+      square brackets:
 
-      $ ${sbindir}/munged --help
+         $ ${sbindir}/munged --help
 
    C. Check the log
 
       The munged daemon logs descriptive error messages when possible.
-      If munged fails to start, the first step in troubleshooting should
-      be to check the log.
+      If munged fails to start, check the log for details.
 
-      1. For systemd, check runtime status information about the munge unit:
+      1. For systemd, check runtime status information for the munge unit:
 
-         $ sudo systemctl status --full munge
+            $ sudo systemctl status --full munge
 
-      2. For systemd, if the service has failed, check the systemd journal:
+      2. For systemd, check the systemd journal:
 
-         $ sudo journalctl -xe | grep munged
+            $ sudo journalctl -xe | grep munged
 
       3. For systemd, limit journal output to services run by the munge user:
 
-         $ sudo journalctl _UID=$(id -u munge)
+            $ sudo journalctl _UID=$(id -u munge)
 
       4. The munged daemon writes to "${localstatedir}/log/munge/munged.log"
          by default; but, the location of this file can be changed with
@@ -295,17 +312,16 @@ MUNGE Installation Guide
       in this manner, log messages are written to stderr.  But remember to
       start munged as the appropriate user:
 
-      $ sudo -u munge ${sbindir}/munged --foreground
+         $ sudo -u munge ${sbindir}/munged --foreground
 
    E. "Force" the daemon to run (but use with caution!)
 
       Some error conditions can be overridden by "forcing" the daemon.
       Use the munged "--force" option to override errors for an existing
-      local domain socket, a lack of entropy for the PRNG, and insecure
-      file/directory permissions.  But use with caution as overriding these
-      errors can affect security:
+      socket, a lack of PRNG entropy, and insecure file/directory permissions.
+      But use with caution as overriding these errors can affect security:
 
-      $ sudo -u munge ${sbindir}/munged --force
+         $ sudo -u munge ${sbindir}/munged --force
 
    F. Common errors
 
@@ -326,5 +342,5 @@ MUNGE Installation Guide
 
       $ cc $(pkg-config --cflags --libs munge) -o foo foo.c
 
-   Scripts can invoke the "munge" and "unmunge" executables -- specify "-h"
-   or "--help" for usage information, or Read The Fine Manpages.
+   Scripts can invoke the "munge" and "unmunge" executables -- specify
+   "--help" for usage information, or Read The Fine Manpages.
