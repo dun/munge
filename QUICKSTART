@@ -153,17 +153,17 @@ MUNGE Installation Guide
       All hosts within this realm are expected to have common users/UIDs
       and groups/GIDs.  Credentials are valid only within a security realm.
 
-      The "mungekey" executable is the key management utility for MUNGE.
-      To ensure the key file maintains the correct ownership and permissions,
-      it should be run by the same user ID that will run the munged daemon
-      process.  For example, to create a key:
+      The "mungekey" executable is the key management utility.  To ensure
+      the key file maintains the correct ownership, it should be invoked
+      by either the root user or the user that will run the munged process.
+      For example, to create a key:
 
-         $ sudo -u munge ${sbindir}/mungekey --verbose
+         $ sudo ${sbindir}/mungekey --verbose
 
       The key resides in "${sysconfdir}/munge/munge.key".  This file must
-      be owned by the same user ID that will run the munged daemon process,
-      and its permissions should be set to 0600.  Additionally, this key
-      file will need to be securely propagated (e.g., via ssh) to all hosts
+      be owned by the same user ID that will run the munged process, and
+      its permissions should be set to 0600.  Additionally, this key file
+      will need to be securely propagated (e.g., via ssh) to all hosts
       within the security realm.
 
    B. Setting command-line options

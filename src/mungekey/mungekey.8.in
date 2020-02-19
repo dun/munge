@@ -38,7 +38,10 @@ mungekey \- MUNGE key management utility
 
 .SH DESCRIPTION
 The \fBmungekey\fR executable is the key management utility for MUNGE.
-It should be run by the same user that starts the \fBmunged\fR daemon.
+To ensure the key file maintains the correct ownership, it should be invoked
+by either the root user or the user that will run the \fBmunged\fR process.
+When invoked by the root user, it will set the ownership of the key file
+to match that of key's directory.
 .PP
 If no options are specified, \fBmungekey\fR will attempt to create a new
 key using the default settings; this will fail if the keyfile already exists.

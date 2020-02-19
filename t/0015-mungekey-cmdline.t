@@ -93,6 +93,25 @@ for OPT_CREATE in '-c' '--create'; do
     '
 done
 
+# Check if the keyfile ownership is changed to match that of its directory when
+#   mungekey is invoked by root.
+# KEYDIR is placed in TMPDIR since root may be unable to write to a keyfile in
+#   an NFS directory exported with root_squash.
+##
+test_expect_success SUDO 'mungekey --create key ownership change by root' '
+    local KEYDIR KEYFILE KEYFILE_UID KEYFILE_GID &&
+    KEYDIR="${TMPDIR:-"/tmp"}/mungekey.$$" &&
+    KEYFILE="${KEYDIR}/key.$$" &&
+    mkdir -m 0700 -p "${KEYDIR}" &&
+    sudo "${MUNGEKEY}" --create --keyfile="${KEYFILE}" &&
+    ls -l "${KEYFILE}" &&
+    KEYFILE_UID=$(ls -d -l -n "${KEYFILE}" | awk "{ print \$3 }") &&
+    KEYFILE_GID=$(ls -d -l -n "${KEYFILE}" | awk "{ print \$4 }") &&
+    test "${KEYFILE_UID}" = $(id -u) &&
+    test "${KEYFILE_GID}" = $(id -g) &&
+    rm -r -f "${KEYDIR}"
+'
+
 # Check if the keyfile is the appropriate size based on the number of bits
 #   specified.
 ##
@@ -321,7 +340,7 @@ for OPT_VERBOSE in '-v' '--verbose'; do
         "${MUNGEKEY}" --create --keyfile="${KEYFILE}" "${OPT_VERBOSE}" \
                 2>err.$$ &&
         test -f "${KEYFILE}" &&
-        grep -q "Created \"${KEYFILE}\"" err.$$
+        grep -q "Created " err.$$
     '
 done
 

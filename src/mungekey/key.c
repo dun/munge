@@ -33,7 +33,11 @@
 #include <assert.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <libgen.h>                     /* basename, dirname */
+#include <limits.h>                     /* PATH_MAX */
+#include <stdlib.h>
 #include <string.h>
+#include <sys/stat.h>                   /* fstat */
 #include <sys/types.h>
 #include <unistd.h>
 #include "common.h"
@@ -50,6 +54,12 @@
  *  Prototypes
  *****************************************************************************/
 
+static void _get_key_path_components (const char *key_path,
+        char **keydir_name, char **key_name);
+
+static void _write_key_to_file (const char *key_path, int fd,
+        size_t num_bytes);
+
 static int _create_key_secret (unsigned char *buf, size_t buflen);
 
 
@@ -57,64 +67,178 @@ static int _create_key_secret (unsigned char *buf, size_t buflen);
  *  Public Functions
  *****************************************************************************/
 
-/*  Create a key for the config in [confp].
+/*  Create a key for the config [confp].
+ *  If the process is running as root, set the ownership of the key file to
+ *    match that of the key's directory.  Protect against TOCTOU.
  */
 void
 create_key (conf_t *confp)
 {
-    unsigned char buf[MUNGE_KEY_LEN_MAX_BYTES];
-    int           fd;
-    int           n;
-    int           rv;
+    char *keydir_name;
+    char *key_name;
+    int keydir_fd;
+    int key_fd;
+    struct stat keydir_stat;
+    int got_chown = 0;
+    int rv;
 
     assert (confp != NULL);
-    assert (confp->key_num_bytes <= MUNGE_KEY_LEN_MAX_BYTES);
-    assert (confp->key_num_bytes >= MUNGE_KEY_LEN_MIN_BYTES);
+    assert (confp->key_path != NULL);
+    assert (confp->key_path[0] == '/');
 
-    if (confp->key_num_bytes > sizeof (buf)) {
-        log_err (EMUNGE_SNAFU, LOG_ERR,
-                "Failed to create \"%s\": %d-byte key exceeds %zu-byte buffer",
-                confp->key_path, confp->key_num_bytes, sizeof (buf));
+    _get_key_path_components (confp->key_path, &keydir_name, &key_name);
+
+    keydir_fd = open (keydir_name, O_DIRECTORY | O_NOFOLLOW | O_RDONLY);
+    if (keydir_fd == -1) {
+        log_errno (EMUNGE_SNAFU, LOG_ERR,
+                "Failed to open directory \"%s\"", keydir_name);
+    }
+    rv = fstat (keydir_fd, &keydir_stat);
+    if (rv == -1) {
+        log_errno (EMUNGE_SNAFU, LOG_ERR,
+                "Failed to stat directory \"%s\"", keydir_name);
     }
     if (confp->do_force) {
-        rv = unlink (confp->key_path);
+        rv = unlinkat (keydir_fd, key_name, 0);
         if ((rv == -1) && (errno != ENOENT)) {
-            log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to remove \"%s\"",
-                    confp->key_path);
+            log_errno (EMUNGE_SNAFU, LOG_ERR,
+                    "Failed to remove \"%s\"", confp->key_path);
         }
     }
-    fd = open (confp->key_path, O_WRONLY | O_CREAT | O_EXCL, 0600);
-    if (fd == -1) {
-        log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to create \"%s\"",
-                confp->key_path);
-    }
-    rv = _create_key_secret (buf, confp->key_num_bytes);
-    if (rv == -1) {
-        log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to create \"%s\"",
-                confp->key_path);
-    }
-    n = fd_write_n (fd, buf, confp->key_num_bytes);
-    if (n != confp->key_num_bytes) {
+    key_fd = openat (keydir_fd, key_name, O_WRONLY | O_CREAT | O_EXCL, 0600);
+    if (key_fd == -1) {
         log_errno (EMUNGE_SNAFU, LOG_ERR,
-                "Failed to write %d bytes to \"%s\"",
-                confp->key_num_bytes, confp->key_path);
+                "Failed to create \"%s\"", confp->key_path);
     }
-    rv = close (fd);
+    _write_key_to_file (confp->key_path, key_fd, confp->key_num_bytes);
+
+    if (geteuid () == 0) {
+        rv = fchown (key_fd, keydir_stat.st_uid, keydir_stat.st_gid);
+        if (rv == -1) {
+            log_errno (EMUNGE_SNAFU, LOG_ERR,
+                    "Failed to chown \"%s\"", confp->key_path);
+        }
+        got_chown = 1;
+    }
+    rv = close (key_fd);
     if (rv == -1) {
-        log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to close \"%s\"",
-                confp->key_path);
+        log_errno (EMUNGE_SNAFU, LOG_ERR,
+                "Failed to close \"%s\"", confp->key_path);
     }
-    (void) memburn (buf, 0, sizeof (buf));
+    rv = close (keydir_fd);
+    if (rv == -1) {
+        log_errno (EMUNGE_SNAFU, LOG_ERR,
+                "Failed to close directory \"%s\"", keydir_name);
+    }
     if (confp->do_verbose) {
-        log_msg (LOG_INFO, "Created \"%s\" with %d-bit key",
-                confp->key_path, confp->key_num_bytes * 8);
+        char log_msg_buf[64] = "";
+
+        if (got_chown) {
+            rv = snprintf (log_msg_buf, sizeof (log_msg_buf), "(%lu:%lu) ",
+                    (unsigned long) keydir_stat.st_uid,
+                    (unsigned long) keydir_stat.st_gid);
+            if ((rv < 0) || (rv >= sizeof (log_msg_buf))) {
+                log_msg_buf[0] = '\0';
+            }
+        }
+        log_msg (LOG_INFO, "Created \"%s\" %swith %d-bit key",
+                confp->key_path, log_msg_buf, confp->key_num_bytes * 8);
     }
+    free (keydir_name);
+    free (key_name);
 }
 
 
 /*****************************************************************************
  *  Private Functions
  *****************************************************************************/
+
+/*  Separate the absolute path [key_path] into dirname and basename components.
+ *  Upon return, [keydir_name] and [key_name] will point to null-terminated
+ *    strings.
+ */
+static void
+_get_key_path_components (const char *key_path, char **keydir_name,
+        char **key_name)
+{
+    char buf [PATH_MAX];
+    size_t n;
+    char *p;
+
+    assert (key_path != NULL);
+    assert (keydir_name != NULL);
+    assert (key_name != NULL);
+
+    if (key_path[0] != '/') {
+        log_err (EMUNGE_SNAFU, LOG_ERR,
+                "Invalid keyfile: Not an absolute pathname");
+    }
+    n = strlen (key_path);
+    if (n >= sizeof (buf)) {
+        errno = ENAMETOOLONG;
+        log_errno (EMUNGE_SNAFU, LOG_ERR, "Invalid keyfile");
+    }
+    strncpy (buf, key_path, n + 1);
+    p = dirname (buf);
+    if (p[0] != '/') {
+        log_err (EMUNGE_SNAFU, LOG_ERR,
+                "Invalid keyfile directory name: Not an absolute pathname");
+    }
+    p = strdup (buf);
+    if (p == NULL) {
+        log_errno (EMUNGE_SNAFU, LOG_ERR,
+                "Failed to copy keyfile directory name");
+    }
+    *keydir_name = p;
+
+    strncpy (buf, key_path, n + 1);
+    p = basename (buf);
+    if (( p[0] == '\0') ||
+        ((p[0] == '/' || p[0] == '.') && p[1] == '\0') ||
+        ((p[0] == '.') && (p[1] == '.') && (p[2] == '\0'))) {
+        log_err (EMUNGE_SNAFU, LOG_ERR,
+                "Invalid keyfile: Not a file");
+    }
+    p = strdup (buf);
+    if (p == NULL) {
+        log_errno (EMUNGE_SNAFU, LOG_ERR,
+                "Failed to copy keyfile name");
+    }
+    *key_name = p;
+}
+
+
+/*  FIXME
+ */
+static void
+_write_key_to_file (const char *key_path, int fd, size_t num_bytes)
+{
+    unsigned char buf [MUNGE_KEY_LEN_MAX_BYTES];
+    int n;
+    int rv;
+
+    assert (key_path != NULL);
+    assert (fd >= 0);
+    assert (num_bytes > 0);
+
+    if (num_bytes > sizeof (buf)) {
+        log_err (EMUNGE_SNAFU, LOG_ERR,
+                "Failed to create \"%s\": %zu-byte key exceeds %zu-byte buffer",
+                key_path, num_bytes, sizeof (buf));
+    }
+    rv = _create_key_secret (buf, num_bytes);
+    if (rv == -1) {
+        log_err (EMUNGE_SNAFU, LOG_ERR,
+                "Failed to create \"%s\"", key_path);
+    }
+    n = fd_write_n (fd, buf, num_bytes);
+    if (n != num_bytes) {
+        log_errno (EMUNGE_SNAFU, LOG_ERR,
+                "Failed to write %d bytes to \"%s\"", num_bytes, key_path);
+    }
+    (void) memburn (buf, 0, sizeof (buf));
+}
+
 
 /*  Create the key secret, writing it to the buffer [buf] of length [buflen].
  *  Return 0 on success, or -1 on error.

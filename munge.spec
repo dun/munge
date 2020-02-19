@@ -102,9 +102,7 @@ exit 0
 
 %post
 if test ! -f %{_sysconfdir}/munge/munge.key; then
-    echo "Run %{_sbindir}/mungekey as the munge user to create a key."
-    echo "For example: \"sudo -u munge %{_sbindir}/mungekey -v\"."
-    echo "Refer to the mungekey(8) manpage for more information."
+    echo "Run %{_sbindir}/mungekey to create a key."
 fi
 %systemd_post munge.service
 
