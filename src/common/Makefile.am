@@ -11,6 +11,7 @@ check_PROGRAMS = \
 
 TESTS = \
 	hkdf_test \
+	path_canonicalize_test \
 	# End of TESTS
 
 hkdf_test_CPPFLAGS = \
@@ -38,5 +39,19 @@ hkdf_test_SOURCES = \
 	md.h \
 	hkdf_test.c \
 	# End of hkdf_test_SOURCES
+
+path_canonicalize_test_CPPFLAGS = \
+	-I$(top_srcdir)/src/libtap \
+	# End of path_canonicalize_test_CPPFLAGS
+
+path_canonicalize_test_LDADD = \
+	$(top_builddir)/src/libtap/libtap.la \
+	# End of path_canonicalize_test_LDADD
+
+path_canonicalize_test_SOURCES = \
+	path.c \
+	path.h \
+	path_canonicalize_test.c \
+	# End of path_canonicalize_test_SOURCES
 
 .NOTPARALLEL: hkdf_test

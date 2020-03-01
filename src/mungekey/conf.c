@@ -43,6 +43,7 @@
 #include "log.h"
 #include "missing.h"
 #include "munge_defs.h"
+#include "path.h"
 #include "version.h"
 
 
@@ -282,15 +283,22 @@ static void
 _conf_parse_keyfile_opt (char **dstp, const char *src, int sopt,
         const char *lopt)
 {
-    int rv;
+    char buf [PATH_MAX];
+    int  rv;
 
     assert (dstp != NULL);
     assert (src != NULL);
 
-    rv = _conf_set_str (dstp, src);
+    rv = path_canonicalize (src, buf, sizeof (buf));
     if (rv < 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR,
-                "Option \"%s\" failed to copy argument string",
+                "Option \"%s\" failed to canonicalize argument",
+                _conf_get_opt_string (sopt, lopt, NULL));
+    }
+    rv = _conf_set_str (dstp, buf);
+    if (rv < 0) {
+        log_errno (EMUNGE_SNAFU, LOG_ERR,
+                "Option \"%s\" failed to copy argument",
                 _conf_get_opt_string (sopt, lopt, NULL));
     }
 }
@@ -456,6 +464,10 @@ _conf_validate (conf_t *confp)
     if (confp->key_path == NULL) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
                 "Failed to validate conf: key_path undefined");
+    }
+    if (confp->key_path[0] != '/') {
+        log_err (EMUNGE_SNAFU, LOG_ERR,
+                "Failed to validate conf: key_path not absolute path");
     }
     if (confp->key_num_bytes > MUNGE_KEY_LEN_MAX_BYTES) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
