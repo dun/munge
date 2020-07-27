@@ -80,10 +80,6 @@ test_expect_success 'unmunge --input from /dev/null' '
     test_must_fail "${UNMUNGE}" --socket="${MUNGE_SOCKET}" --input=/dev/null
 '
 
-test_expect_success 'unmunge --input from invalid file' '
-    test_must_fail "${UNMUNGE}" --socket="${MUNGE_SOCKET}" --input=.
-'
-
 test_expect_success 'unmunge --input from missing file' '
     test_must_fail "${UNMUNGE}" --socket="${MUNGE_SOCKET}" \
             --input=missing.file.$$
@@ -126,12 +122,6 @@ test_expect_success 'unmunge --metadata to /dev/null with payload on stdout' '
     test "$(cat out.$$)" = "${PAYLOAD}"
 '
 
-test_expect_success 'unmunge --metadata to invalid file' '
-    local PAYLOAD=xyzzy-$$ &&
-    "${MUNGE}" --socket="${MUNGE_SOCKET}" --string="${PAYLOAD}" |
-    test_must_fail "${UNMUNGE}" --socket="${MUNGE_SOCKET}" --metadata=.
-'
-
 for OPT_OUTPUT in '-o' '--output'; do
     test_expect_success "unmunge ${OPT_OUTPUT}" '
         local PAYLOAD=xyzzy-$$ &&
@@ -158,12 +148,6 @@ test_expect_success 'unmunge --output to /dev/null with metadata on stdout' '
     "${UNMUNGE}" --socket="${MUNGE_SOCKET}" --output=/dev/null >meta.$$ &&
     grep -q "^STATUS:" meta.$$ &&
     grep -q -v "${PAYLOAD}" meta.$$
-'
-
-test_expect_success 'unmunge --output to invalid file' '
-    local PAYLOAD=xyzzy-$$ &&
-    "${MUNGE}" --socket="${MUNGE_SOCKET}" --string="${PAYLOAD}" |
-    test_must_fail "${UNMUNGE}" --socket="${MUNGE_SOCKET}" --output=.
 '
 
 for OPT_LIST_KEYS in '-K' '--list-keys'; do

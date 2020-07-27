@@ -109,10 +109,6 @@ test_expect_success 'munge --input from /dev/null' '
     test ! -s out.$$
 '
 
-test_expect_success 'munge --input from invalid file' '
-    test_must_fail "${MUNGE}" --socket="${MUNGE_SOCKET}" --input=.
-'
-
 test_expect_success 'munge --input from missing file' '
     test_must_fail "${MUNGE}" --socket="${MUNGE_SOCKET}" \
             --input=missing.file.$$
@@ -139,10 +135,6 @@ test_expect_success 'munge --output to /dev/null' '
     echo -n xyzzy-$$ >in.$$ &&
     "${MUNGE}" --socket="${MUNGE_SOCKET}" --output=/dev/null <in.$$ >out.$$ &&
     test ! -s out.$$
-'
-
-test_expect_success 'munge --output to invalid file' '
-    test_must_fail "${MUNGE}" --socket="${MUNGE_SOCKET}" --no-input --output=.
 '
 
 for OPT_LIST_CIPHERS in '-C' '--list-ciphers'; do
