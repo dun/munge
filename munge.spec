@@ -82,7 +82,7 @@ sed -i 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' libtool
 %if %{with check}
 %make_build check \
     LD_LIBRARY_PATH=%{buildroot}%{_libdir} \
-    MUNGE_ROOT=/tmp/munge-$$ VERBOSE=t verbose=t
+    root=/tmp/munge-test-$$ verbose=t VERBOSE=t
 %endif
 
 %install
