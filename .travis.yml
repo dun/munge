@@ -22,6 +22,9 @@ env:
   - CONFIGURE_OPTS="--disable-debug --with-crypto-lib=libgcrypt"
   - CONFIGURE_OPTS="--disable-debug --with-crypto-lib=openssl"
 
+arch:
+  - ppc64le
+
 addons:
   apt:
     packages:
