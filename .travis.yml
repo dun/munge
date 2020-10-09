@@ -31,7 +31,6 @@ addons:
     - libbz2-dev
     - libgcrypt20-dev
     - libssl-dev
-    - colormake
     - valgrind
     - valgrind-dbg
   coverity_scan:
@@ -49,7 +48,7 @@ before_install:
 script:
 - umask 022
 - test "${TRAVIS_BRANCH}" != "coverity_scan" || exit 0
-- ./bootstrap && ./configure ${CONFIGURE_OPTS} && colormake -e -k && colormake -e distcheck
+- ./bootstrap && ./configure ${CONFIGURE_OPTS} && make -e -k && make -e distcheck
 
 after_failure:
 - grep -q "configure[:] exit 1" "config.log" && cat "config.log"
