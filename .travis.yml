@@ -1,6 +1,8 @@
-language: c
+dist: focal
 
 sudo: false
+
+language: c
 
 compiler:
 - gcc
