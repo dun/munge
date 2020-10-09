@@ -50,5 +50,7 @@ script:
 - ./bootstrap && ./configure ${CONFIGURE_OPTS} && colormake -e -k && colormake -e distcheck
 
 after_failure:
+- grep -q "configure[:] exit 1" "config.log" && cat "config.log"
 - find . -type f -name "test-suite.log" -execdir cat {} \;
 - find . -type f -name "valgrind.log*" -execdir cat {} \;
+- sleep 2 # config.log gets truncated without this final sleep
