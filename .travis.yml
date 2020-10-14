@@ -1,7 +1,5 @@
 dist: focal
 
-sudo: false
-
 language: c
 
 compiler:
