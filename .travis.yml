@@ -1,5 +1,7 @@
 dist: focal
 
+arch: amd64
+
 language: c
 
 compiler:
@@ -21,6 +23,17 @@ env:
   - CONFIGURE_FLAGS="--enable-debug --with-crypto-lib=openssl"
   - CONFIGURE_FLAGS="--disable-debug --with-crypto-lib=libgcrypt"
   - CONFIGURE_FLAGS="--disable-debug --with-crypto-lib=openssl"
+
+jobs:
+  include:
+  - arch: arm64
+    env: CONFIGURE_FLAGS="--with-crypto-lib=libgcrypt" TEST_LONG=
+  - arch: arm64
+    env: CONFIGURE_FLAGS="--with-crypto-lib=openssl" TEST_LONG=
+  - arch: ppc64le
+    env: CONFIGURE_FLAGS="--with-crypto-lib=libgcrypt" TEST_LONG=
+  - arch: ppc64le
+    env: CONFIGURE_FLAGS="--with-crypto-lib=openssl" TEST_LONG=
 
 addons:
   apt:
