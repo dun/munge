@@ -16,7 +16,7 @@ env:
   - chain_lint="t"
   - root="/tmp/munge-test-$$"
   - verbose="t"
-  matrix:
+  jobs:
   - CONFIGURE_OPTS="--enable-debug --with-crypto-lib=libgcrypt"
   - CONFIGURE_OPTS="--enable-debug --with-crypto-lib=openssl"
   - CONFIGURE_OPTS="--disable-debug --with-crypto-lib=libgcrypt"
