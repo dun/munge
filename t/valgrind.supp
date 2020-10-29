@@ -17,16 +17,12 @@
 }
 
 {
-   gethostbyaddr-leak
+   gethostbyaddr_r-leak
    Memcheck:Leak
    match-leak-kinds: reachable
    fun:?alloc
    ...
    fun:gethostbyaddr_r@@GLIBC_2.2.5
-   fun:gethostbyaddr
-   fun:display_encode_host
-   fun:display_meta
-   fun:main
 }
 
 {
