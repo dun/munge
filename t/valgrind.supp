@@ -35,6 +35,15 @@
 }
 
 {
+   gethostbyname_r-leak
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:?alloc
+   ...
+   fun:gethostbyname_r@@GLIBC_2.2.5
+}
+
+{
    getpwnam_r-leak
    Memcheck:Leak
    match-leak-kinds: reachable
