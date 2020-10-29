@@ -8,6 +8,15 @@
 }
 
 {
+   exit-leak
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   ...
+   fun:exit
+}
+
+{
    getgrent_r-leak
    Memcheck:Leak
    match-leak-kinds: reachable
@@ -32,6 +41,15 @@
    fun:?alloc
    ...
    fun:getpwnam_r@@GLIBC_2.2.5
+}
+
+{
+   getpwuid_r-leak
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:?alloc
+   ...
+   fun:getpwuid_r@@GLIBC_2.2.5
 }
 
 {
