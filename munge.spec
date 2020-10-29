@@ -90,6 +90,7 @@ sed -i 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' libtool
 touch %{buildroot}%{_sysconfdir}/munge/munge.key
 touch %{buildroot}%{_localstatedir}/lib/munge/munged.seed
 touch %{buildroot}%{_localstatedir}/log/munge/munged.log
+mkdir -p %{buildroot}%{_rundir}/munge
 touch %{buildroot}%{_rundir}/munge/munged.pid
 
 %pre

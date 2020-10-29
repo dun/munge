@@ -56,7 +56,6 @@ install-dirs:
 	$(MKDIR_P) -m 0700 '$(DESTDIR)$(sysconfdir)/munge'
 	$(MKDIR_P) -m 0711 '$(DESTDIR)$(localstatedir)/lib/munge'
 	$(MKDIR_P) -m 0700 '$(DESTDIR)$(localstatedir)/log/munge'
-	$(MKDIR_P) -m 0755 '$(DESTDIR)$(runstatedir)/munge'
 
 uninstall-dirs:
 	rmdir '$(DESTDIR)$(sysconfdir)/munge' 2>/dev/null || :
@@ -104,6 +103,9 @@ install-systemd: munge.systemd.service install-systemd-sysconfig
 	      "'$(DESTDIR)$(systemdunitdir)/$(PACKAGE).service'"; \
 	  $(INSTALL_DATA) '$(builddir)/munge.systemd.service' \
 	      '$(DESTDIR)$(systemdunitdir)/$(PACKAGE).service'; \
+	else \
+	  echo $(MKDIR_P) -m 0755 "'$(DESTDIR)$(runstatedir)/munge'"; \
+	  $(MKDIR_P) -m 0755 '$(DESTDIR)$(runstatedir)/munge'; \
 	fi
 
 uninstall-systemd:
