@@ -19,6 +19,7 @@ Source1:	https://github.com/dun/munge/releases/download/%{name}-%{version}/%{nam
 Source2:	https://github.com/dun.gpg
 
 BuildRequires:	gnupg2
+BuildRequires:	make
 BuildRequires:	gcc
 BuildRequires:	bzip2-devel
 BuildRequires:	openssl-devel
