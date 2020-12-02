@@ -32,6 +32,7 @@
 
 #include <assert.h>
 #include <errno.h>
+#include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -316,6 +317,7 @@ _hkdf_extract (hkdf_ctx_t *ctxp, void *prk, size_t *prklenp)
 {
     mac_ctx mac_ctx;
     int     mac_ctx_is_initialized = 0;
+    int     prklen;
     int     rv = 0;
 
     assert (ctxp != NULL);
@@ -324,6 +326,14 @@ _hkdf_extract (hkdf_ctx_t *ctxp, void *prk, size_t *prklenp)
     assert (prk != NULL);
     assert (prklenp != NULL);
     assert (*prklenp > 0);
+
+    /*  Convert prklen size_t to int for the call to mac_final() since the parm
+     *    is being passed as a ptr, and size of size_t and int may differ.
+     *  *prklenp must be representable as an int because it was assigned
+     *    (via ctxp->mdlen) by mac_size() which returns an int.
+     */
+    assert (*prklenp <= INT_MAX);
+    prklen = (int) *prklenp;
 
     /*  Compute the pseudorandom key.
      *    prk = HMAC (salt, ikm)
@@ -340,7 +350,7 @@ _hkdf_extract (hkdf_ctx_t *ctxp, void *prk, size_t *prklenp)
         log_msg (LOG_ERR, "Failed to update HKDF MAC ctx for extraction");
         goto err;
     }
-    rv = mac_final (&mac_ctx, prk, (int *) prklenp);
+    rv = mac_final (&mac_ctx, prk, &prklen);
     if (rv == -1) {
         log_msg (LOG_ERR, "Failed to finalize HKDF MAC ctx for extraction");
         goto err;
@@ -351,6 +361,12 @@ err:
             log_msg (LOG_ERR, "Failed to cleanup HKDF MAC ctx for extraction");
             return -1;
         }
+    }
+    /*  Update [prklenp] on success.
+     */
+    if (rv >= 0) {
+        assert (prklen >= 0);
+        *prklenp = (size_t) prklen;
     }
     return rv;
 }
@@ -371,7 +387,7 @@ _hkdf_expand (hkdf_ctx_t *ctxp, const void *prk, size_t prklen,
     unsigned char *dstptr;
     size_t         dstlen;
     unsigned char *okm = NULL;
-    size_t         okmlen;
+    int            okmlen;
     int            num_rounds;
     const int      max_rounds = 255;
     unsigned char  round;
@@ -390,8 +406,14 @@ _hkdf_expand (hkdf_ctx_t *ctxp, const void *prk, size_t prklen,
 
     /*  Allocate buffer for output keying material.
      *  The buffer size is equal to the size of the hash function output.
+     *  Note that okmlen must be an int (and not size_t) for the call to
+     *    mac_final() since the parm is being passed as a ptr, and size of
+     *    size_t and int may differ.
+     *  ctxp->mdlen must be representable as an int because it was assigned
+     *    by mac_size() which returns an int.
      */
-    okmlen = ctxp->mdlen;
+    assert (ctxp->mdlen <= INT_MAX);
+    okmlen = (int) ctxp->mdlen;
     okm = calloc (1, okmlen);
     if (okm == NULL) {
         rv = -1;
@@ -448,7 +470,7 @@ _hkdf_expand (hkdf_ctx_t *ctxp, const void *prk, size_t prklen,
                     "for expansion round #%u", round);
             goto err;
         }
-        rv = mac_final (&mac_ctx, okm, (int *) &okmlen);
+        rv = mac_final (&mac_ctx, okm, &okmlen);
         if (rv == -1) {
             log_msg (LOG_ERR,
                     "Failed to finalize HKDF MAC ctx "
