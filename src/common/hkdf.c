@@ -237,10 +237,10 @@ hkdf_ctx_set_info (hkdf_ctx_t *ctxp, const void *info, size_t infolen)
 /*  Compute the HMAC-based Key Derivation Function (HKDF) based on the
  *    HKDF context [ctxp].
  *  The resulting output keying material will be written into the buffer [dst].
- *    [dstlenp] is a value-result parameter.  It must be initialized to the
- *    size of the [dst] buffer, and will be set on return to the number of
- *    bytes written into that buffer.
- *  Return 0 on success, or -1 on error (with errno set).
+ *    [dstlenp] is a value-result parameter; it must be initialized to the size
+ *    of the [dst] buffer (in bytes).
+ *  Return 0 on success (with [*dstlenp] set to the number of bytes written
+ *    into the [dst] buffer), or -1 on error (with errno set).
  */
 int
 hkdf (hkdf_ctx_t *ctxp, void *dst, size_t *dstlenp)
@@ -254,7 +254,10 @@ hkdf (hkdf_ctx_t *ctxp, void *dst, size_t *dstlenp)
         errno = EINVAL;
         return -1;
     }
-    /*  Compute length of hash function output.
+    /*  Validate mac.
+     *  ctx is initialized with 0 which equates to MUNGE_MAC_NONE which is
+     *    invalid by definition.  The mac will be validated by mac_size() when
+     *    computing the length of the hash function output.
      */
     ctxp->mdlen = (size_t) mac_size (ctxp->md);
     if (ctxp->mdlen == (size_t) -1) {
@@ -287,7 +290,7 @@ hkdf (hkdf_ctx_t *ctxp, void *dst, size_t *dstlenp)
     if (prk == NULL) {
         return -1;
     }
-    prklen_used = prklen;
+    prklen_used = prklen;               /* initialize value-result parm */
     /*
      *  Extract pseudorandom key.
      */
@@ -321,10 +324,10 @@ cleanup:
  *  Extract (or concentrate) the possibly dispersed entropy of the input
  *    keying material into a short, but cryptographically strong,
  *    pseudorandom key (prk).
- *  [prklenp] is a value-result parameter.  It must be initialized to the
- *    size of the [prk] buffer, and will be set on return to the number of
- *    bytes written into that buffer.
- *  Return 0 on success, or -1 on error.
+ *  [prklenp] is a value-result parameter; it must be initialized to the size
+ *    of the [prk] buffer (in bytes).
+ *  Return 0 on success (with [*prklenp] set to the number of bytes written
+ *    into the [prk] buffer), or -1 on error (with errno set).
  */
 static int
 _hkdf_extract (hkdf_ctx_t *ctxp, void *prk, size_t *prklenp)
@@ -389,10 +392,10 @@ err:
 /*  HKDF Second Stage.
  *  Expand the pseudorandom key [prk] of length [prklen] to the desired length,
  *    writing the output keying material into the buffer [dst].
- *  [dstlenp] is a value-result parameter.  It must be initialized to the
- *    size of the [dst] buffer, and will be set on return to the number of
- *    bytes written into that buffer.
- *  Return 0 on success, or -1 on error.
+ *  [dstlenp] is a value-result parameter; it must be initialized to the size
+ *    of the [dst] buffer (in bytes).
+ *  Return 0 on success (with [*dstlenp] set to the number of bytes written
+ *    into the [dst] buffer), or -1 on error (with errno set).
  */
 static int
 _hkdf_expand (hkdf_ctx_t *ctxp, const void *prk, size_t prklen,
