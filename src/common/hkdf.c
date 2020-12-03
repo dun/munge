@@ -244,8 +244,8 @@ hkdf (hkdf_ctx_t *ctxp, void *dst, size_t *dstlenp)
     }
     /*  Compute length of hash function output.
      */
-    ctxp->mdlen = mac_size (ctxp->md);
-    if (ctxp->mdlen == -1) {
+    ctxp->mdlen = (size_t) mac_size (ctxp->md);
+    if (ctxp->mdlen == (size_t) -1) {
         errno = EINVAL;
         return -1;
     }
