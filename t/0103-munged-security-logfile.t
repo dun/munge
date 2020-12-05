@@ -343,14 +343,16 @@ test_expect_success 'logfile dir writable by other with sticky bit' '
     chmod 0755 "${MUNGE_LOGDIR}"
 '
 
-# Check for a regression of a duplicate error message being written to stderr
-#   for a failure to open the logfile.
+# Check for a regression of a duplicate error message being written to stderr.
+# To generate an error, test for the logfile being writable by other since this
+#   will not be affected by root privileges.
+#
 ##
 test_expect_success 'logfile failure writes single message to stderr' '
     local ERR NUM &&
     rm -f "${MUNGE_LOGFILE}" &&
     touch "${MUNGE_LOGFILE}" &&
-    chmod 0400 "${MUNGE_LOGFILE}" &&
+    chmod 0602 "${MUNGE_LOGFILE}" &&
     test_must_fail munged_start_daemon t-keep-logfile 2>err.$$ &&
     cat err.$$ &&
     ERR=$(sed -n -e "s/.*Error: //p" err.$$ | sort | uniq -c | sort -n -r) &&
