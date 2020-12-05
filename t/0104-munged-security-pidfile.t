@@ -4,10 +4,10 @@ test_description='Check munged security of pidfile'
 
 . "$(dirname "$0")/sharness.sh"
 
-# Setup the environment for checking the pidfile.
+# Set up the environment for checking the pidfile.
 ##
 test_expect_success 'setup' '
-    munged_setup_env &&
+    munged_setup &&
     munged_create_key
 '
 

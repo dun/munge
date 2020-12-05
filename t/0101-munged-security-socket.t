@@ -4,7 +4,7 @@ test_description='Check munged security of socket'
 
 . "$(dirname "$0")/sharness.sh"
 
-# Setup the environment for checking the socket.
+# Set up the environment for checking the socket.
 # MUNGE_SOCKETDIR is redefined to add a sub-directory for testing changes to
 #   directory ownership and permissions.  It is kept in TMPDIR since NFS can
 #   cause problems for the lockfile (the location of which is derived from the
@@ -12,7 +12,7 @@ test_description='Check munged security of socket'
 ##
 test_expect_success 'setup' '
     MUNGE_SOCKETDIR="${TMPDIR:-"/tmp"}/munge-$$/socketdir-$$" &&
-    munged_setup_env &&
+    munged_setup &&
     munged_create_key
 '
 

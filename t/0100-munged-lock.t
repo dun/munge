@@ -4,11 +4,11 @@ test_description='Check munged socket lock'
 
 . "$(dirname "$0")/sharness.sh"
 
-# Setup the environment for testing.
+# Set up the environment for testing.
 # The location of the lockfile is derived from the name of the socket.
 ##
-test_expect_success 'setup environment' '
-    munged_setup_env &&
+test_expect_success 'setup' '
+    munged_setup &&
     munged_create_key &&
     MUNGE_LOCKFILE="${MUNGE_SOCKET}.lock"
 '

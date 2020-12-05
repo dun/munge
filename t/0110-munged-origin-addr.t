@@ -4,10 +4,10 @@ test_description='Check munged --origin'
 
 . "$(dirname "$0")/sharness.sh"
 
-# Setup the test environment.
+# Set up the test environment.
 ##
 test_expect_success 'setup' '
-    munged_setup_env &&
+    munged_setup &&
     munged_create_key
 '
 

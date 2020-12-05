@@ -1,7 +1,7 @@
 # Requires MUNGED and MUNGEKEY.
 
 ##
-# Setup directory tree and shell variables for testing.
+# Set up directory tree and shell variables for starting munged.
 # MUNGE_ROOT, MUNGE_SOCKETDIR, MUNGE_KEYDIR, MUNGE_LOGDIR, MUNGE_PIDDIR, and
 #   MUNGE_SEEDDIR can be overridden by setting them beforehand.
 # MUNGE_SOCKET is placed in TMPDIR by default since NFS can cause problems for
@@ -9,7 +9,7 @@
 #   the lock across an NFS mount.  FreeBSD cannot create a lockfile across an
 #   NFS mount.
 ##
-munged_setup_env()
+munged_setup()
 {
     umask 0022 &&
 

@@ -4,10 +4,10 @@ test_description='Check munged security of seedfile'
 
 . "$(dirname "$0")/sharness.sh"
 
-# Setup the environment for checking the seedfile.
+# Set up the environment for checking the seedfile.
 ##
 test_expect_success 'setup' '
-    munged_setup_env &&
+    munged_setup &&
     munged_create_key
 '
 

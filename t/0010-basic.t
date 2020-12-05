@@ -4,8 +4,8 @@ test_description='Check basic functionality of MUNGE daemon and clients'
 
 . "$(dirname "$0")/sharness.sh"
 
-test_expect_success 'setup environment' '
-    munged_setup_env
+test_expect_success 'setup' '
+    munged_setup
 '
 
 test_expect_success 'create key' '
