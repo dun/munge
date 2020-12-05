@@ -118,8 +118,10 @@ test_expect_success 'logfile non-regular-file override failure' '
 '
 
 # Check for an error when the logfile is not writable by user.
+# Skip this test if running as root since the root user will not get the
+#   expected EACCESS failure.
 ##
-test_expect_success 'logfile not writable by user failure' '
+test_expect_success !ROOT 'logfile not writable by user failure' '
     rm -f "${MUNGE_LOGFILE}" &&
     touch "${MUNGE_LOGFILE}" &&
     chmod 0400 "${MUNGE_LOGFILE}" &&
