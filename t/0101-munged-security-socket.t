@@ -213,11 +213,13 @@ test_expect_success 'socket dir inaccessible by all override' '
             "${MUNGE_LOGFILE}"
 '
 
-# Cleanup detritus from testing.
+# Clean up detritus from testing.  This may include an errant munged process
+#   that has not terminated.
 ##
 test_expect_success 'cleanup' '
     rmdir "${MUNGE_SOCKETDIR}" &&
-    if rmdir "$(dirname "${MUNGE_SOCKETDIR}")" 2>/dev/null; then :; fi
+    if rmdir "$(dirname "${MUNGE_SOCKETDIR}")" 2>/dev/null; then :; fi &&
+    munged_cleanup
 '
 
 test_done

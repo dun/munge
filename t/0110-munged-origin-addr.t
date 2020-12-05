@@ -139,4 +139,10 @@ test_expect_success 'munged --origin non-interface IP address metadata' '
     egrep "^ENCODE_HOST:.* 192\.0\.0\.255\>" meta.$$
 '
 
+# Clean up after a munged process that may not have terminated.
+##
+test_expect_success 'cleanup' '
+    munged_cleanup
+'
+
 test_done

@@ -73,25 +73,31 @@ munged_create_key()
 }
 
 ##
-# Start munged, removing an existing logfile (from a previous run) if present.
+# Start munged, removing an existing logfile or killing an errant munged
+#   process (from a previous run) if needed.
 # The following leading args are recognized:
 #   t-exec=ARG - use ARG to exec munged.
 #   t-keep-logfile - do not remove logfile before starting munged.
+#   t-keep-process - do not kill previous munged process.
 # Remaining args will be appended to the munged command-line.
 ##
 munged_start_daemon()
 {
-    local EXEC= KEEP_LOGFILE= &&
+    local EXEC= KEEP_LOGFILE= KEEP_PROCESS= &&
     while true; do
         case $1 in
             t-exec=*) EXEC=$(echo "$1" | sed 's/^[^=]*=//');;
             t-keep-logfile) KEEP_LOGFILE=1;;
+            t-keep-process) KEEP_PROCESS=1;;
             *) break;;
         esac
         shift
     done &&
     if test "${KEEP_LOGFILE}" != 1; then
         rm -f "${MUNGE_LOGFILE}"
+    fi &&
+    if test "${KEEP_PROCESS}" != 1; then
+        munged_kill_daemon
     fi &&
     test_debug "echo ${EXEC} \"${MUNGED}\" \
             --socket=\"${MUNGE_SOCKET}\" \
@@ -135,4 +141,36 @@ munged_stop_daemon()
             --socket="${MUNGE_SOCKET}" \
             --stop \
             "$@"
+}
+
+##
+# Kill an errant munged process running in the background from a previous test.
+# This situation is most likely to occur if a munged test is expected to fail
+#   and instead erroneously succeeds.
+# Only check for the pid named in ${MUNGE_PIDFILE} to avoid intefering with
+#   munged processes belonging to other tests or system use.  And check that
+#   the named pid is a munged process and not one recycled by the system for
+#   some other running process.
+# A SIGTERM is used here instead of "munged --stop" in case the latter has a
+#   bug introduced that prevents cleanup from occurring.
+# A SIGKILL would prevent the munged process from cleaning up which could cause
+#   other tests to inadvertently fail.
+##
+munged_kill_daemon()
+{
+    local PID
+    PID=$(cat "${MUNGE_PIDFILE}" 2>/dev/null)
+    if ps -p "${PID}" -ww 2>/dev/null | grep munged; then
+        kill "${PID}"
+        test_debug "echo \"Killed munged pid ${PID}\""
+    fi
+}
+
+##
+#  Perform any housekeeping to clean up after munged.  This should be called
+#    at the end of any test script that starts a munged process.
+##
+munged_cleanup()
+{
+    munged_kill_daemon
 }

@@ -84,4 +84,8 @@ test_expect_unstable 'check logfile for replay' '
     grep "Replayed credential" "${MUNGE_LOGFILE}"
 '
 
+test_expect_success 'cleanup' '
+    munged_cleanup
+'
+
 test_done

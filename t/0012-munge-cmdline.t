@@ -615,4 +615,8 @@ test_expect_success 'stop munged' '
     munged_stop_daemon
 '
 
+test_expect_success 'cleanup' '
+    munged_cleanup
+'
+
 test_done

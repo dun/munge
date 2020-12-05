@@ -53,7 +53,7 @@ test_expect_success 'check lockfile permissions' '
 #   The lockfile should prevent this.
 ##
 test_expect_success 'start munged with in-use socket' '
-    test_must_fail munged_start_daemon &&
+    test_must_fail munged_start_daemon t-keep-process &&
     egrep "Error:.* Failed to lock \"${MUNGE_LOCKFILE}\"" "${MUNGE_LOGFILE}"
 '
 
@@ -199,6 +199,12 @@ test_expect_success SUDO 'stop unprivileged munged as root' '
             t-exec="sudo LD_LIBRARY_PATH=${LD_LIBRARY_PATH}"; then :; else
         munged_stop_daemon; false;
     fi
+'
+
+# Clean up after a munged process that may not have terminated.
+##
+test_expect_success 'cleanup' '
+    munged_cleanup
 '
 
 test_done

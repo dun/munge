@@ -358,4 +358,10 @@ test_expect_success 'keyfile dir writable by other with sticky bit' '
     chmod 0755 "${MUNGE_KEYDIR}"
 '
 
+# Clean up after a munged process that may not have terminated.
+##
+test_expect_success 'cleanup' '
+    munged_cleanup
+'
+
 test_done
