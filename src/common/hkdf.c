@@ -394,7 +394,7 @@ _hkdf_expand (hkdf_ctx_t *ctxp, const void *prk, size_t prklen,
     mac_ctx        mac_ctx;
     int            mac_ctx_is_initialized = 0;
     size_t         n;
-    int            rv = 0;
+    int            rv = 0, rv2;
 
     assert (ctxp != NULL);
     assert (prk != NULL);
@@ -495,9 +495,10 @@ _hkdf_expand (hkdf_ctx_t *ctxp, const void *prk, size_t prklen,
     *dstlenp = dstptr - (unsigned char *) dst;
 err:
     if (mac_ctx_is_initialized) {
-        rv = mac_cleanup (&mac_ctx);
-        if (rv == -1) {
+        rv2 = mac_cleanup (&mac_ctx);
+        if (rv2 == -1) {
             log_msg (LOG_ERR, "Failed to cleanup HKDF MAC ctx for expansion");
+            rv = -1;
         }
     }
     if (okm != NULL) {
