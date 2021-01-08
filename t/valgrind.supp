@@ -81,7 +81,6 @@
 {
    libcrypto-CRYPTO_THREAD_lock_new-leak
    Memcheck:Leak
-   match-leak-kinds: reachable
    fun:malloc
    fun:CRYPTO_zalloc
    fun:CRYPTO_THREAD_lock_new
