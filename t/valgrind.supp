@@ -26,6 +26,15 @@
 }
 
 {
+   getgrgid_r-leak
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:?alloc
+   ...
+   fun:getgrgid_r@@GLIBC_2.2.5
+}
+
+{
    gethostbyaddr_r-leak
    Memcheck:Leak
    match-leak-kinds: reachable
