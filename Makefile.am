@@ -31,9 +31,11 @@ EXTRA_DIST = \
 	README.MULTILIB \
 	THANKS \
 	bootstrap \
+	build-aux/gen-date \
+	build-aux/gen-version \
 	doc \
 	extra \
-	munge.spec \
+	$(TEMPLATE_FILES) \
 	# End of EXTRA_DIST
 
 DISTCLEANFILES = \
@@ -69,3 +71,29 @@ MAINTAINERCLEANFILES = \
 	src/munged/Makefile.in \
 	t/Makefile.in \
 	# End of MAINTAINERCLEANFILES
+
+TEMPLATE_FILES = \
+	munge.spec.in \
+	# End of TEMPLATE_FILES
+
+SUBSTITUTE_FILES = \
+	munge.spec \
+	# End of SUBSTITUTE_FILES
+
+CLEANFILES = \
+	$(SUBSTITUTE_FILES) \
+	# End of CLEANFILES
+
+$(SUBSTITUTE_FILES): Makefile
+	$(AM_V_GEN)$(substitute) < '$(srcdir)/$@.in' > '$(builddir)/$@'
+
+munge.spec: munge.spec.in
+
+noinst_DATA = \
+	$(SUBSTITUTE_FILES) \
+	# End of noinst_DATA
+
+dist-hook: munge.spec
+	$(INSTALL_DATA) munge.spec '$(distdir)/munge.spec'
+	echo $(VERSION) > '$(distdir)/.dist-version'
+	echo $(DATE) > '$(distdir)/.dist-date'

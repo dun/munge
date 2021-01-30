@@ -1,0 +1,94 @@
+#!/bin/sh
+#
+# MUNGE build-aux/gen-version
+#
+# This file is part of the MUNGE Uid 'N' Gid Emporium (MUNGE).
+# For details, see <https://dun.github.io/munge/>.
+#
+# Outputs the version string based on the latest git commit.
+#
+# Snapshots (i.e., releases where the most recent git tag does not point to the
+# latest commit) will have the version string appended with the date and hash
+# of the latest commit in the form ".YYYYMMDD.H"; this format presumes there
+# will be at most one such release per day.
+##
+
+# Date string file written by git-archive via the export-subst attribute.
+ARCHIVE_DATE_FILE=".gitarchive-date"
+
+# Git commit hash file written by git-archive via the export-subst attribute.
+ARCHIVE_HASH_FILE=".gitarchive-hash"
+
+# Version string file written by Makefile dist-hook.
+DIST_VERSION_FILE=".dist-version"
+
+# Release notes file.  The most recent release is expected to be at the top of
+#   the file in the format "PACKAGE-VERSION (YYYY-MM-DD)".  This is used as a
+#   fallback when release information cannot otherwise be ascertained.
+RELEASE_FILE="NEWS"
+
+# Git release tag prefix.
+TAG_PREFIX="munge-"
+
+# Initialize to prevent interference by environment variables.
+VERSION=
+
+# Check the dist metadata.
+# This should be present in release tarballs created by "make dist".
+if test -f "${DIST_VERSION_FILE}"; then
+    VERSION=$(cat "${DIST_VERSION_FILE}")
+fi
+
+# Check the git commit metadata.
+# This should be present in git clones.
+if test "x${VERSION}" = x && test -d "${GIT_DIR:-.git}"; then
+    DESC=$(git describe --match "${TAG_PREFIX}*" --tags 2>/dev/null)
+    if test "x${DESC}" != x; then
+        VERSION=$(echo "${DESC}" \
+                | sed -ne "s/^${TAG_PREFIX}\([^-]*\).*/\1/p")
+
+        # Check the git-describe string for a commit hash to determine whether
+        #   this is a snapshot release.  By default, git-describe will show
+        #   only the tag name if it points to the given commit.
+        if test "x${VERSION}" != x; then
+            COMMIT_HASH=$(echo "${DESC}" \
+                    | sed -ne "s/^${TAG_PREFIX}.*-g\([0-9a-f]*\)$/\1/p")
+            if test "x${COMMIT_HASH}" != x; then
+                COMMIT_DATE=$(git show -s --pretty=format:%ci \
+                        "${COMMIT_HASH}" 2>/dev/null \
+                        | sed -e 's/-//g' -ne 's/^\([0-9]*\).*/\1/p')
+                test "x${COMMIT_DATE}" != x \
+                        && VERSION="${VERSION}.${COMMIT_DATE}.${COMMIT_HASH}"
+            fi
+        fi
+    fi
+fi
+
+# Check the release notes for the latest version and release date.
+# The most recent release should be listed in the first line of the file.
+if test "x${VERSION}" = x && test -f "${RELEASE_FILE}"; then
+    LATEST=$(head -1 "${RELEASE_FILE}")
+    VERSION=$(echo "${LATEST}" | sed -ne 's/^[^0-9]*\([^ ]*\).*/\1/p')
+    RELEASE_DATE=$(echo "${LATEST}" | sed -ne 's/.*(\([^)]*\)).*/\1/p')
+
+    # Check the git archive metadata for both the archive date and commit hash.
+    # These should be present in git archives & GitHub source code assets.
+    # Presume snapshot if the release date does not match the archive date.
+    if test "x${VERSION}" != x && test "x${RELEASE_DATE}" != x \
+            && test -f "${ARCHIVE_DATE_FILE}" \
+            && test -f "${ARCHIVE_HASH_FILE}"; then
+        ARCHIVE_DATE=$(sed -ne 's/^\([0-9-]*\).*/\1/p' "${ARCHIVE_DATE_FILE}")
+        ARCHIVE_HASH=$(sed -ne '/^[0-9a-f]*$/p' "${ARCHIVE_HASH_FILE}")
+
+        test "x${RELEASE_DATE}" != "x${ARCHIVE_DATE}" \
+                && test "x${ARCHIVE_DATE}" != x \
+                && test "x${ARCHIVE_HASH}" != x \
+                && DATE=$(echo "${ARCHIVE_DATE}" | sed -e 's/-//g') \
+                && VERSION="${VERSION}.${DATE}.${ARCHIVE_HASH}"
+    fi
+fi
+
+# Omit the trailing newline so m4_esyscmd can use the result directly.
+test "x${VERSION}" != x && printf %s "${VERSION}" || printf %s "UNKNOWN"
+
+exit 0

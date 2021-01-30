@@ -7,7 +7,15 @@
 .libs/
 /aclocal.m4
 /autom4te.cache
-/build-aux/
+/build-aux/compile
+/build-aux/config.guess
+/build-aux/config.sub
+/build-aux/depcomp
+/build-aux/install-sh
+/build-aux/ltmain.sh
+/build-aux/missing
+/build-aux/tap-driver.sh
+/build-aux/test-driver
 /config.cache
 /config.h
 /config.h.in
@@ -22,6 +30,7 @@
 /m4/ltversion.m4
 /m4/lt~obsolete.m4
 /munge-*.tar*
+/munge.spec
 /src/*/*.[1-9]
 /src/common/hkdf_test
 /src/etc/munge.logrotate.conf

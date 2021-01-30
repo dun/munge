@@ -7,8 +7,8 @@
 # Prologue.
 ##
 AC_PREREQ([2.61])
-AC_INIT([MUNGE], [0.5.14])
-AC_SUBST([DATE], ["2020-01-14"])
+AC_INIT([MUNGE], m4_esyscmd([build-aux/gen-version]))
+AC_SUBST([DATE], m4_esyscmd([build-aux/gen-date]))
 
 AC_CONFIG_AUX_DIR([build-aux])
 AC_CONFIG_HEADERS([config.h])

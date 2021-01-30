@@ -71,10 +71,11 @@ MUNGE Installation Guide
    B. Installing from rpm on CentOS/Fedora:
 
       RPMs for recent CentOS/Fedora can be built directly from the tarball.
-      As of 0.5.14, GPG verification of the source is performed by default.
-      This requires the public key <https://github.com/dun.gpg> and detached
-      GPG signature (munge-0.5.14.tar.xz.asc) to reside in the same directory
-      as the tarball (munge-0.5.14.tar.xz):
+      As of 0.5.14, GPG verification of the source can be enabled by
+      specifying "--with verify" to rpmbuild.  This requires the public key
+      <https://github.com/dun.gpg> and corresponding detached GPG signature
+      (munge-0.5.14.tar.xz.asc) to reside in the same directory as the
+      tarball (munge-0.5.14.tar.xz):
 
          $ ls
          dun.gpg  munge-0.5.14.tar.xz  munge-0.5.14.tar.xz.asc

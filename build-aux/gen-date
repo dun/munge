@@ -1,0 +1,58 @@
+#!/bin/sh
+#
+# MUNGE build-aux/gen-date
+#
+# This file is part of the MUNGE Uid 'N' Gid Emporium (MUNGE).
+# For details, see <https://dun.github.io/munge/>.
+#
+# Outputs the release date (YYYY-MM-DD).
+##
+
+# Date string file written by git-archive via the export-subst attribute.
+ARCHIVE_DATE_FILE=".gitarchive-date"
+
+# Date string file written by Makefile dist-hook.
+DIST_DATE_FILE=".dist-date"
+
+# Release notes file.  The most recent release is expected to be at the top of
+#   the file in the format "PACKAGE-VERSION (YYYY-MM-DD)".  This is used as a
+#   fallback when release information cannot otherwise be ascertained.
+RELEASE_FILE="NEWS"
+
+# Initialize to prevent interference by environment variables.
+DATE=
+
+# Check the dist metadata.
+# This should be present in release tarballs created by "make dist".
+if test -f "${DIST_DATE_FILE}"; then
+    DATE=$(cat "${DIST_DATE_FILE}")
+fi
+
+# Check the git commit metadata.
+# This should be present in git clones.
+if test "x${DATE}" = x && test -d "${GIT_DIR:-.git}"; then
+    DATE=$(git show -s --pretty=format:%ci 2>/dev/null \
+            | sed -ne 's/^\([0-9-]*\).*/\1/p')
+fi
+
+# Check the git archive metadata.
+# This should be present in git archives & GitHub-generated source code assets.
+if test "x${DATE}" = x && test -f "${ARCHIVE_DATE_FILE}"; then
+    DATE=$(sed -ne 's/^\([0-9-]*\).*/\1/p' "${ARCHIVE_DATE_FILE}")
+fi
+
+# Check the release notes.
+# The most recent release should be listed in the first line of the file.
+if test "x${DATE}" = x && test -f "${RELEASE_FILE}"; then
+    DATE=$(head -1 "${RELEASE_FILE}" | sed -ne 's/.*(\([^)]*\)).*/\1/p')
+fi
+
+# Fall back to today's date.
+if test "x${DATE}" = x; then
+    DATE=$(date +%F 2>/dev/null)
+fi
+
+# Omit the trailing newline so m4_esyscmd can use the result directly.
+test "x${DATE}" != x && printf %s "${DATE}" || printf %s "UNKNOWN"
+
+exit 0
