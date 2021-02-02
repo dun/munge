@@ -100,19 +100,6 @@ MUNGE Installation Guide
          $ sudo rpm -ivh munge-0.5.14-1.x86_64.rpm \
            munge-devel-0.5.14-1.x86_64.rpm munge-libs-0.5.14-1.x86_64.rpm
 
-   C. Installing from rpm on CentOS 6
-
-      The top-level "munge.spec" requires systemd, but RPMs for CentOS 6
-      using a SysV-style init script can be built using the specfile in
-      "extra/munge.spec-centos.6".  For example, to extract the alternate
-      specfile and then build RPMs in "${HOME}/rpmbuild" using the
-      munge-0.5.14.tar.xz tarball in the current directory:
-
-         $ tar xJf munge-0.5.14.tar.xz munge-0.5.14/extra/munge.spec-centos.6
-
-         $ rpmbuild -bb -D "%_topdir ${HOME}/rpmbuild" -D "%_sourcedir `pwd`" \
-           munge-0.5.14/extra/munge.spec-centos.6
-
 3. Installing pre-built packages
 
    See the wiki page <https://github.com/dun/munge/wiki/Installation-Guide>

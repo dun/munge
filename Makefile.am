@@ -34,7 +34,6 @@ EXTRA_DIST = \
 	build-aux/gen-date \
 	build-aux/gen-version \
 	doc \
-	extra \
 	$(TEMPLATE_FILES) \
 	# End of EXTRA_DIST
 
