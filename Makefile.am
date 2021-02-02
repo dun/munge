@@ -33,6 +33,7 @@ EXTRA_DIST = \
 	bootstrap \
 	build-aux/gen-date \
 	build-aux/gen-version \
+	build-aux/tap-driver.sh.bak \
 	doc \
 	$(TEMPLATE_FILES) \
 	# End of EXTRA_DIST
