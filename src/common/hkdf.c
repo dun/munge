@@ -249,6 +249,14 @@ hkdf (hkdf_ctx_t *ctxp, void *dst, size_t *dstlenp)
         errno = EINVAL;
         return -1;
     }
+    /*  Validate key.
+     *  A zero-length key seems to be allowed, but the key ptr must not be NULL
+     *    due to assertions in mac.c.
+     */
+    if (ctxp->key == NULL) {
+        errno = EINVAL;
+        return -1;
+    }
     /*  Validate dstlen.
      */
     if (*dstlenp > (ctxp->mdlen * 255)) {
