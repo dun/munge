@@ -359,25 +359,25 @@ main (int argc, char *argv[])
     plan (7);
 
     ok (hkdf_test_1 () == 0,
-            "Test Case 1: SHA-256 basic test");
+            "RFC 5869 Test Case 1: SHA-256 basic test");
 
     ok (hkdf_test_2 () == 0,
-            "Test Case 2: SHA-256 with longer inputs/outputs");
+            "RFC 5869 Test Case 2: SHA-256 with longer inputs/outputs");
 
     ok (hkdf_test_3 () == 0,
-            "Test Case 3: SHA-256 with zero-length salt/info");
+            "RFC 5869 Test Case 3: SHA-256 with zero-length salt/info");
 
     ok (hkdf_test_4 () == 0,
-            "Test Case 4: SHA-1 basic test");
+            "RFC 5869 Test Case 4: SHA-1 basic test");
 
     ok (hkdf_test_5 () == 0,
-            "Test Case 5: SHA-1 with longer inputs/outputs");
+            "RFC 5869 Test Case 5: SHA-1 with longer inputs/outputs");
 
     ok (hkdf_test_6 () == 0,
-            "Test Case 6: SHA-1 with zero-length salt/info");
+            "RFC 5869 Test Case 6: SHA-1 with zero-length salt/info");
 
     ok (hkdf_test_7 () == 0,
-            "Test Case 7: SHA-1 with no salt and zero-length info");
+            "RFC 5869 Test Case 7: SHA-1 with no salt and zero-length info");
 
     done_testing ();
 
