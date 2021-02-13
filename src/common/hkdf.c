@@ -250,10 +250,7 @@ hkdf (hkdf_ctx_t *ctxp, void *dst, size_t *dstlenp)
     size_t         prklen_used;         /* length of PRK used (in bytes)     */
     int            rv;
 
-    if ((ctxp == NULL)    ||
-        (dstlenp == NULL) ||
-        ((dst == NULL) && (*dstlenp > 0)))
-    {
+    if ((ctxp == NULL) || (dst == NULL) || (dstlenp == NULL)) {
         errno = EINVAL;
         return -1;
     }
@@ -414,6 +411,7 @@ _hkdf_expand (hkdf_ctx_t *ctxp, const void *prk, size_t prklen,
     assert (ctxp != NULL);
     assert (prk != NULL);
     assert (prklen > 0);
+    assert (dst != NULL);
     assert (dstlenp != NULL);
 
     dstp = dst;
@@ -491,11 +489,10 @@ _hkdf_expand (hkdf_ctx_t *ctxp, const void *prk, size_t prklen,
         }
         assert (okmlen == ctxp->mdlen);
         n = MIN(okmlen, dstlen_left);
-        if (dstp != NULL) {
-            memcpy (dstp, okm, n);
-            dstp += n;
-            dstlen_left -= n;
-        }
+        memcpy (dstp, okm, n);
+        dstp += n;
+        dstlen_left -= n;
+
         if (round == HKDF_MAX_ROUNDS) {
             break;
         }
