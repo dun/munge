@@ -58,6 +58,21 @@
 
 
 /*****************************************************************************
+ *  Constants
+ *****************************************************************************/
+
+/*  As per RFC 5869: For HKDF-Expand, the output keying material (OKM) is
+ *    calculated by generating sufficient octets of T(1)...T(N), where
+ *    N = ceil (L / HashLen).  L (length of OKM in octets) <= 255 * HashLen.
+ *    HashLen denotes the length of the hash function output in octets.
+ *    Thus, the maximum number of rounds is 255.
+ *  Furthermore, the number of the round concatenated to the end of each T(n)
+ *    is a single octet which architecturally limits it to 255.
+ */
+#define HKDF_MAX_ROUNDS 255
+
+
+/*****************************************************************************
  *  Data Types
  *****************************************************************************/
 
@@ -257,12 +272,6 @@ hkdf (hkdf_ctx_t *ctxp, void *dst, size_t *dstlenp)
         errno = EINVAL;
         return -1;
     }
-    /*  Validate dstlen.
-     */
-    if (*dstlenp > (ctxp->mdlen * 255)) {
-        errno = ERANGE;
-        return -1;
-    }
     /*  Allocate salt, if not already set.
      */
     if (ctxp->salt == NULL) {
@@ -392,16 +401,14 @@ static int
 _hkdf_expand (hkdf_ctx_t *ctxp, const void *prk, size_t prklen,
               void *dst, size_t *dstlenp)
 {
-    unsigned char *dstptr;
-    size_t         dstlen;
+    unsigned char *dstp;
+    size_t         dstlen_left;
     unsigned char *okm = NULL;
     int            okmlen;
-    int            num_rounds;
-    const int      max_rounds = 255;
     unsigned char  round;
     mac_ctx        mac_ctx;
     int            mac_ctx_is_initialized = 0;
-    size_t         n;
+    int            n;
     int            rv = 0, rv2;
 
     assert (ctxp != NULL);
@@ -409,8 +416,8 @@ _hkdf_expand (hkdf_ctx_t *ctxp, const void *prk, size_t prklen,
     assert (prklen > 0);
     assert (dstlenp != NULL);
 
-    dstptr = dst;
-    dstlen = *dstlenp;
+    dstp = dst;
+    dstlen_left = *dstlenp;
 
     /*  Allocate buffer for output keying material.
      *  The buffer size is equal to the size of the hash function output.
@@ -427,21 +434,12 @@ _hkdf_expand (hkdf_ctx_t *ctxp, const void *prk, size_t prklen,
         rv = -1;
         goto err;
     }
-    /*  Compute the number of expansion rounds needed to fill [dst].
-     *    n = CEIL (dstlen / mdlen)
-     */
-    num_rounds = (dstlen + ctxp->mdlen - 1) / ctxp->mdlen;
-    if (num_rounds > max_rounds) {
-        log_msg (LOG_ERR,
-                "Failed to initialize HKDF: %d rounds exceeds max of %d",
-                num_rounds, max_rounds);
-        rv = -1;
-        goto err;
-    }
     /*  Compute output keying material for each expansion round.
      *    okm(i) = HMAC (prk, okm(i-i) | [info] | i)
      */
-    for (round = 1; round <= num_rounds; round++) {
+    round = 0;
+    while (dstlen_left > 0) {
+        round++;
 
         rv = mac_init (&mac_ctx, ctxp->md, prk, prklen);
         if (rv == -1) {
@@ -492,15 +490,17 @@ _hkdf_expand (hkdf_ctx_t *ctxp, const void *prk, size_t prklen,
             goto err;
         }
         assert (okmlen == ctxp->mdlen);
-        n = MIN(okmlen, dstlen);
-        if ((dstptr != NULL) && (n > 0)) {
-            memcpy (dstptr, okm, n);
-            dstptr += n;
-            dstlen -= n;
+        n = MIN(okmlen, dstlen_left);
+        if (dstp != NULL) {
+            memcpy (dstp, okm, n);
+            dstp += n;
+            dstlen_left -= n;
+        }
+        if (round == HKDF_MAX_ROUNDS) {
+            break;
         }
     }
-    rv = 0;
-    *dstlenp = dstptr - (unsigned char *) dst;
+    *dstlenp = dstp - (unsigned char *) dst;
 err:
     if (mac_ctx_is_initialized) {
         rv2 = mac_cleanup (&mac_ctx);
