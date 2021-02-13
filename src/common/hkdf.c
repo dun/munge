@@ -171,7 +171,7 @@ hkdf_ctx_set_md (hkdf_ctx_t *ctxp, munge_mac_t md)
 int
 hkdf_ctx_set_key (hkdf_ctx_t *ctxp, const void *key, size_t keylen)
 {
-    if ((ctxp == NULL) || ((key == NULL) && (keylen > 0))) {
+    if ((ctxp == NULL) || (key == NULL)) {
         errno = EINVAL;
         return -1;
     }
@@ -200,7 +200,7 @@ hkdf_ctx_set_key (hkdf_ctx_t *ctxp, const void *key, size_t keylen)
 int
 hkdf_ctx_set_salt (hkdf_ctx_t *ctxp, const void *salt, size_t saltlen)
 {
-    if ((ctxp == NULL) || ((salt == NULL) && (saltlen > 0))) {
+    if ((ctxp == NULL) || (salt == NULL)) {
         errno = EINVAL;
         return -1;
     }
@@ -224,7 +224,7 @@ hkdf_ctx_set_salt (hkdf_ctx_t *ctxp, const void *salt, size_t saltlen)
 int
 hkdf_ctx_set_info (hkdf_ctx_t *ctxp, const void *info, size_t infolen)
 {
-    if ((ctxp == NULL) || ((info == NULL) && (infolen > 0))) {
+    if ((ctxp == NULL) || (info == NULL)) {
         errno = EINVAL;
         return -1;
     }
