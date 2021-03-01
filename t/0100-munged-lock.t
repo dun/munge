@@ -157,21 +157,7 @@ test_expect_success 'check for leftover pidfile from unclean shutdown' '
 #   attempts to give the old lock a chance to clear before admitting defeat.
 ##
 test_expect_success 'start munged with leftover socket from unclean shutdown' '
-    local i=5 &&
-    >fail.$$ &&
-    while true; do
-        munged_start_daemon
-        if test "$?" -eq 0; then
-            break
-        elif test "$i" -le 1; then
-            echo 1 >fail.$$
-            break
-        else
-            i=$((i - 1))
-            sleep 1
-        fi
-    done &&
-    test ! -s fail.$$
+    retry 5 "munged_start_daemon"
 '
 
 # Stop the munged that was started for the preceding test.
