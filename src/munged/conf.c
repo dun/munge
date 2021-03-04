@@ -835,12 +835,11 @@ _conf_send_signal (pid_t pid, int signum, int msecs)
     }
     ts.tv_sec = msecs / 1000;
     ts.tv_nsec = (msecs % 1000) * 1000 * 1000;
-retry:
-    rv = nanosleep (&ts, &ts);
+    do {
+        rv = nanosleep (&ts, &ts);
+    } while ((rv < 0) && (errno == EINTR));
+
     if (rv < 0) {
-        if (errno == EINTR) {
-            goto retry;
-        }
         log_errno (EMUNGE_SNAFU, LOG_ERR,
                 "Failed to sleep while awaiting signal result");
     }

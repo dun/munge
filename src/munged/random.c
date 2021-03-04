@@ -356,13 +356,11 @@ _random_read_seed (const char *path, int num_bytes)
                 path);
         return (-1);
     }
+    do {
+        fd = open (path, O_RDONLY);
+    } while ((fd < 0) && (errno == EINTR));
 
-retry_open:
-    fd = open (path, O_RDONLY);
     if (fd < 0) {
-        if (errno == EINTR) {
-            goto retry_open;
-        }
         if (errno == ENOENT) {
             return (0);
         }
@@ -451,12 +449,11 @@ _random_write_seed (const char *path, int num_bytes)
         log_msg (LOG_WARNING, "Failed to unlink old PRNG seed \"%s\": %s",
                 path, strerror (errno));
     }
-retry_open:
-    fd = open (path, O_WRONLY | O_CREAT | O_TRUNC, 0600);
+    do {
+        fd = open (path, O_WRONLY | O_CREAT | O_TRUNC, 0600);
+    } while ((fd < 0) && (errno == EINTR));
+
     if (fd < 0) {
-        if (errno == EINTR) {
-            goto retry_open;
-        }
         log_msg (LOG_WARNING, "Failed to create PRNG seed \"%s\": %s",
                 path, strerror (errno));
         return (-1);

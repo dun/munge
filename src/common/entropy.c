@@ -85,12 +85,11 @@ entropy_read (void *buf, size_t buflen, const char **srcp)
      *    by signals.  No such guarantees apply for larger buffer sizes.
      */
     len = MIN(256, buflen);
-retry_getrandom:
-    rv = getrandom (buf, len, 0);
+    do {
+        rv = getrandom (buf, len, 0);
+    } while ((rv < 0) && (errno == EINTR));
+
     if (rv < 0) {
-        if (errno == EINTR) {
-            goto retry_getrandom;
-        }
         log_msg (LOG_WARNING, "Failed to fill buffer via getrandom(): %s",
                 strerror (errno));
     }
@@ -119,12 +118,11 @@ retry_getrandom:
         int fd;
         struct stat st;
 
-retry_open:
-        fd = open (ENTROPY_URANDOM_PATH, O_RDONLY | O_NONBLOCK);
+        do {
+            fd = open (ENTROPY_URANDOM_PATH, O_RDONLY | O_NONBLOCK);
+        } while ((fd < 0) && (errno == EINTR));
+
         if (fd < 0) {
-            if (errno == EINTR) {
-                goto retry_open;
-            }
             log_msg (LOG_WARNING, "Failed to open \"%s\": %s",
                     ENTROPY_URANDOM_PATH, strerror (errno));
         }
