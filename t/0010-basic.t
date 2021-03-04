@@ -67,9 +67,7 @@ test_expect_success 'check process has exited' '
     ! ps -p "${PID}" >/dev/null
 '
 
-# Testing occasionally fails on Debian 4.0; FreeBSD 12.1, 11.3.
-##
-test_expect_unstable 'check pidfile removal' '
+test_expect_success 'check pidfile removal' '
     test "x${MUNGE_PIDFILE}" != x &&
     test ! -f "${MUNGE_PIDFILE}"
 '

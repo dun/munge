@@ -77,7 +77,10 @@ create_key (conf_t *confp)
                 confp->key_path, confp->key_num_bytes, sizeof (buf));
     }
     if (confp->do_force) {
-        rv = unlink (confp->key_path);
+        do {
+            rv = unlink (confp->key_path);
+        } while ((rv == -1) && (errno == EINTR));
+
         if ((rv == -1) && (errno != ENOENT)) {
             log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to remove \"%s\"",
                     confp->key_path);

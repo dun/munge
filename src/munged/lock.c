@@ -77,7 +77,10 @@ lock_create (conf_t conf)
      *    since this code path is being executed with "--force".
      */
     if (conf->got_force) {
-        rv = unlink (conf->lockfile_name);
+        do {
+            rv = unlink (conf->lockfile_name);
+        } while ((rv < 0) && (errno == EINTR));
+
         if ((rv < 0) && (errno != ENOENT)) {
             log_msg (LOG_WARNING, "Failed to remove \"%s\": %s",
                     conf->lockfile_name, strerror (errno));

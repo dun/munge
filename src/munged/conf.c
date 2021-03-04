@@ -223,6 +223,8 @@ create_conf (void)
 void
 destroy_conf (conf_t conf, int do_unlink)
 {
+    int rv;
+
     assert (conf != NULL);
     assert (conf->ld < 0);              /* sock_destroy() already called */
     assert (conf->lockfile_fd < 0);
@@ -241,7 +243,14 @@ destroy_conf (conf_t conf, int do_unlink)
     }
     if (conf->pidfile_name) {
         if (do_unlink) {
-            (void) unlink (conf->pidfile_name);
+            do {
+                rv = unlink (conf->pidfile_name);
+            } while ((rv < 0) && (errno == EINTR));
+
+            if (rv < 0) {
+                log_msg (LOG_WARNING, "Failed to remove pidfile \"%s\": %s",
+                        conf->pidfile_name, strerror (errno));
+            }
         }
         free (conf->pidfile_name);
         conf->pidfile_name = NULL;

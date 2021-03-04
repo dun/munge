@@ -264,6 +264,7 @@ _random_read_entropy_from_file (const char *path)
     int  n;
     char dir [PATH_MAX];
     char ebuf [1024];
+    int  rv;
 
     if ((path == NULL) || (path[0] == '\0')) {
         errno = EINVAL;
@@ -290,13 +291,16 @@ _random_read_entropy_from_file (const char *path)
 
     n = _random_read_seed (path, RANDOM_SEED_BYTES);
     if (n < 0) {
-        if (unlink (path) < 0) {
-            if (errno != ENOENT) {
-                log_msg (LOG_WARNING,
-                        "Failed to remove insecure PRNG seed \"%s\"", path);
-            }
+        do {
+            rv = unlink (path);
+        } while ((rv < 0) && (errno == EINTR));
+
+        if ((rv < 0) && (errno != ENOENT)) {
+            log_msg (LOG_WARNING,
+                    "Failed to remove insecure PRNG seed \"%s\": %s",
+                    path, strerror (errno));
         }
-        else {
+        else if (rv == 0) {
             log_msg (LOG_INFO, "Removed insecure PRNG seed \"%s\"", path);
         }
         n = 0;
@@ -429,6 +433,7 @@ _random_write_seed (const char *path, int num_bytes)
 /*  Writes 'num_bytes' of random bytes to the seed file specified by 'path'.
  *  Returns the number of bytes written, or -1 on error.
  */
+    int            rv;
     int            fd;
     int            num_left;
     int            num_want;
@@ -438,7 +443,11 @@ _random_write_seed (const char *path, int num_bytes)
     assert (path != NULL);
     assert (num_bytes > 0);
 
-    if ((unlink (path) < 0) && (errno != ENOENT)) {
+    do {
+        rv = unlink (path);
+    } while ((rv < 0) && (errno == EINTR));
+
+    if ((rv < 0) && (errno != ENOENT)) {
         log_msg (LOG_WARNING, "Failed to unlink old PRNG seed \"%s\": %s",
                 path, strerror (errno));
     }

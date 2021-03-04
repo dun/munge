@@ -509,10 +509,18 @@ write_pidfile (const char *pidfile, int got_force)
     }
     /*  Protect pidfile against unauthorized access by removing write-access
      *    from group and other.
+     *  An error removing an old pidfile is not considered fatal.
      */
     mask = umask (0);
     umask (mask | 022);
-    (void) unlink (pidfile);
+    do {
+        rv = unlink (pidfile);
+    } while ((rv < 0) && (errno == EINTR));
+
+    if ((rv < 0) && (errno != ENOENT)) {
+        log_msg (LOG_WARNING, "Failed to remove PIDfile \"%s\": %s",
+                pidfile, strerror (errno));
+    }
     fp = fopen (pidfile, "w");
     umask (mask);
     /*
@@ -534,7 +542,14 @@ write_pidfile (const char *pidfile, int got_force)
     else {
         return;                         /* success */
     }
-    (void) unlink (pidfile);
+    do {
+        rv = unlink (pidfile);
+    } while ((rv < 0) && (errno == EINTR));
+
+    if ((rv < 0) && (errno != ENOENT)) {
+        log_msg (LOG_WARNING, "Failed to remove PIDfile \"%s\": %s",
+                pidfile, strerror (errno));
+    }
     return;                             /* failure */
 }
 
@@ -619,13 +634,16 @@ sock_create (conf_t conf)
     /*
      *  Remove existing socket from previous instance.
      */
-    rv = unlink (conf->socket_name);
-    if (rv == 0) {
-        log_msg (LOG_INFO, "Removed existing socket \"%s\"",
+    do {
+        rv = unlink (conf->socket_name);
+    } while ((rv < 0) && (errno == EINTR));
+
+    if ((rv < 0) && (errno != ENOENT)) {
+        log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to remove socket \"%s\"",
             conf->socket_name);
     }
-    else if (errno != ENOENT) {
-        log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to remove socket \"%s\"",
+    else if (rv == 0) {
+        log_msg (LOG_INFO, "Removed existing socket \"%s\"",
             conf->socket_name);
     }
     /*  Create socket for communicating with clients.
@@ -665,31 +683,43 @@ sock_create (conf_t conf)
 static void
 sock_destroy (conf_t conf)
 {
+    int rv;
+
     assert (conf != NULL);
     assert (conf->ld >= 0);
     assert (conf->socket_name != NULL);
 
     if (conf->socket_name) {
-        if (unlink (conf->socket_name) < 0) {
+        do {
+            rv = unlink (conf->socket_name);
+        } while ((rv < 0) && (errno == EINTR));
+
+        if (rv < 0) {
             log_msg (LOG_WARNING, "Failed to remove socket \"%s\": %s",
                 conf->socket_name, strerror (errno));
         }
     }
     if (conf->ld >= 0) {
-        if (close (conf->ld) < 0) {
+        rv = close (conf->ld);
+        if (rv < 0) {
             log_msg (LOG_WARNING, "Failed to close socket \"%s\": %s",
                 conf->socket_name, strerror (errno));
         }
         conf->ld = -1;
     }
     if (conf->lockfile_name) {
-        if (unlink (conf->lockfile_name) < 0) {
+        do {
+            rv = unlink (conf->lockfile_name);
+        } while ((rv < 0) && (errno == EINTR));
+
+        if (rv < 0) {
             log_msg (LOG_WARNING, "Failed to remove lockfile \"%s\": %s",
                 conf->lockfile_name, strerror (errno));
         }
     }
     if (conf->lockfile_fd >= 0) {
-        if (close (conf->lockfile_fd) < 0) {
+        rv = close (conf->lockfile_fd);
+        if (rv < 0) {
             log_msg (LOG_WARNING, "Failed to close lockfile \"%s\": %s",
                 conf->lockfile_name, strerror (errno));
         }
