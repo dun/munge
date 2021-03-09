@@ -51,6 +51,12 @@
 
 
 /*****************************************************************************
+ *  Constants
+ *****************************************************************************/
+#define LOG_LIMIT_SECS  60
+
+
+/*****************************************************************************
  *  Extern Variables
  *****************************************************************************/
 
@@ -75,6 +81,10 @@ job_accept (conf_t conf)
     work_p  w;
     m_msg_t m;
     int     sd;
+    int     curr_errno;
+    time_t  curr_time;
+    int     last_log_errno = 0;
+    time_t  last_log_time = 0;
 
     assert (conf != NULL);
     assert (conf->ld >= 0);
@@ -94,7 +104,8 @@ job_accept (conf_t conf)
             got_reconfig = 0;
             gids_update (conf->gids);
         }
-        if ((sd = accept (conf->ld, NULL, NULL)) < 0) {
+        sd = accept (conf->ld, NULL, NULL);
+        if (sd < 0) {
             switch (errno) {
                 case ECONNABORTED:
                 case EINTR:
@@ -103,8 +114,21 @@ job_accept (conf_t conf)
                 case ENFILE:
                 case ENOBUFS:
                 case ENOMEM:
-                    log_msg (LOG_INFO,
-                        "Suspended new connections while processing backlog");
+                    curr_errno = errno; /* save errno before calling time() */
+                    curr_time = time (NULL);
+                    if (curr_time == (time_t) -1) {
+                        log_errno (EMUNGE_SNAFU, LOG_ERR,
+                                "Failed to query current time");
+                    }
+                    if ((curr_time > last_log_time + LOG_LIMIT_SECS) ||
+                            (curr_errno != last_log_errno)) {
+                        log_msg (LOG_INFO, "Failed to accept connection: %s",
+                                strerror (curr_errno));
+                        last_log_errno = curr_errno;
+                        last_log_time = curr_time;
+                    }
+                    /*  Process backlog before accepting new connections.
+                    */
                     work_wait (w);
                     continue;
                 default:
