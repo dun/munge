@@ -172,7 +172,8 @@ _m_msg_client_connect (m_msg_t m, char *path)
     }
     if (stat (path, &st) < 0) {
         m_msg_set_err (m, EMUNGE_SOCKET,
-            strdupf ("Failed to access \"%s\": %s", path, strerror (errno)));
+            strdupf ("Failed to access \"%s\": %s (%s)",
+            path, strerror (errno), "Did you start munged?"));
         return (EMUNGE_SOCKET);
     }
     if (!S_ISSOCK (st.st_mode)) {
