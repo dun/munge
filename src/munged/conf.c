@@ -756,9 +756,10 @@ _conf_process_stop (conf_t conf)
     if (pid <= 0) {
         if (conf->got_verbose) {
             log_err (EMUNGE_SNAFU, LOG_ERR,
-                    "Failed to query socket lockfile \"%s\": %s",
+                    "Failed to query socket lockfile \"%s\": %s (%s)",
                     conf->lockfile_name,
-                    (pid == 0) ? "Lock not held" : strerror (errno));
+                    (pid == 0) ? "Lock not held" : strerror (errno),
+                    "Cannot find running process");
         }
         exit (EXIT_FAILURE);
     }
