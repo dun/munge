@@ -25,7 +25,7 @@ test_expect_success 'keyfile missing failure' '
     local MUNGE_KEYFILE &&
     MUNGE_KEYFILE="${MUNGE_KEYDIR}/munged.key.$$.missing" &&
     test_must_fail munged_start_daemon &&
-    egrep "Error:.* Failed to check keyfile.*: No such file" "${MUNGE_LOGFILE}"
+    egrep "Error:.* Failed to find keyfile.*: No such file" "${MUNGE_LOGFILE}"
 '
 
 # Check for an error when the keyfile is not a regular file.

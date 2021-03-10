@@ -907,8 +907,9 @@ _conf_open_keyfile (const char *keyfile, int got_force)
     is_symlink = (lstat (keyfile, &st) == 0) ? S_ISLNK (st.st_mode) : 0;
 
     if (stat (keyfile, &st) < 0) {
-        log_errno (EMUNGE_SNAFU, LOG_ERR,
-            "Failed to check keyfile \"%s\"", keyfile);
+        log_err (EMUNGE_SNAFU, LOG_ERR,
+            "Failed to find keyfile \"%s\": %s (%s)",
+            keyfile, strerror (errno), "Did you run mungekey?");
     }
     if (!S_ISREG (st.st_mode)) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
