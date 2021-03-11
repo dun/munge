@@ -226,9 +226,8 @@ _lock_stat (int fd, const char *name)
     }
     else if (st.st_uid != geteuid()) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
-                "Failed to validate lockfile: "
-                        "\"%s\" should be owned by UID %u",
-                name, (unsigned) geteuid());
+                "Failed to validate lockfile: \"%s\" should be owned by "
+                "UID %u", name, (unsigned) geteuid());
     }
     return;
 }
