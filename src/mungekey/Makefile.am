@@ -72,6 +72,10 @@ mungekey_SOURCES = \
 	$(top_srcdir)/src/common/xsignal.h \
 	# End of mungekey_SOURCES
 
+# For dependency on SYSCONFDIR via the #define for MUNGE_KEYFILE_PATH.
+#
+$(srcdir)/mungekey-conf.$(OBJEXT): Makefile
+
 man_MANS = \
 	mungekey.8 \
 	# End of man_MANS
