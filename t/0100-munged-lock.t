@@ -86,7 +86,7 @@ test_expect_success 'start munged with 0600 bogus lockfile' '
     touch "${MUNGE_LOCKFILE}" &&
     chmod 0600 "${MUNGE_LOCKFILE}" &&
     test_must_fail munged_start_daemon &&
-    egrep "Error:.* \"${MUNGE_LOCKFILE}\" should only be writable by user" \
+    egrep "Error:.* \"${MUNGE_LOCKFILE}\" .* permissions for write by user" \
             "${MUNGE_LOGFILE}"
 '
 
@@ -98,7 +98,7 @@ test_expect_success 'start munged with 0222 bogus lockfile' '
     touch "${MUNGE_LOCKFILE}" &&
     chmod 0222 "${MUNGE_LOCKFILE}" &&
     test_must_fail munged_start_daemon &&
-    egrep "Error:.* \"${MUNGE_LOCKFILE}\" should only be writable by user" \
+    egrep "Error:.* \"${MUNGE_LOCKFILE}\" .* permissions for write by user" \
             "${MUNGE_LOGFILE}"
 '
 
