@@ -193,7 +193,9 @@ _net_get_hostaddr_via_ifaddrs (const char *name, struct in_addr *inaddrp,
      */
     if (ifa != NULL) {
         *inaddrp = ((struct sockaddr_in *) ifa->ifa_addr)->sin_addr;
-        *ifnamep = (ifa->ifa_name != NULL) ? strdup (ifa->ifa_name) : NULL;
+        *ifnamep = ((ifa->ifa_name != NULL) && (ifa->ifa_name[0] != '\0'))
+                ? strdup (ifa->ifa_name)
+                : NULL;
         rv = 0;
     }
     /*  If a match is not found, but host lookup succeeded...

@@ -63,15 +63,12 @@ test_expect_success 'munged --origin null address warning' '
 '
 
 # Check if the origin address can be set by specifying an IP address.
-# Save the interface name to ifname0.$$ for later checks.
 ##
 test_expect_success 'munged --origin local IP address' '
     rm -f ifname0.$$ &&
     munged_start_daemon --origin=127.0.0.1 &&
     munged_stop_daemon &&
-    egrep "Set origin address to 127\.0\.0\.1\>" "${MUNGE_LOGFILE}" &&
-    sed -n -e "s/.*Set origin address.*(\([^)]*\)).*/\1/p" \
-            "${MUNGE_LOGFILE}" >ifname0.$$
+    egrep "Set origin address to 127\.0\.0\.1\>" "${MUNGE_LOGFILE}"
 '
 
 # Check if the origin address is set to the appropriate IP address in the
@@ -87,23 +84,35 @@ test_expect_success 'munged --origin local IP address metadata' '
     egrep "^ENCODE_HOST:.* 127\.0\.0\.1\>" meta.$$
 '
 
-# Check if the origin address can be set by specifying an interface name.
+# Check the log from the previous test for the network interface name
+#   corresponding to the loopback address.
+# Set the IFNAME prereq if "ifname0.$$" contains a non-empty string.
 ##
-test_expect_success GETIFADDRS 'munged --origin interface name' '
-    test -s ifname0.$$ &&
+test_expect_success GETIFADDRS 'munged --origin interface name lookup' '
+    local ifname &&
+    sed -n -e "s/.*Set origin address.*(\([^)]*\)).*/\1/p" "${MUNGE_LOGFILE}" \
+            >ifname0.$$ &&
+    ifname=$(cat ifname0.$$) &&
+    test_debug "echo \"Loopback network interface name is [${ifname}]\"" &&
+    if test "x${ifname}" != x; then test_set_prereq IFNAME; fi
+'
+
+# Check if the origin address can be set by specifying the loopback network
+#   interface name.
+##
+test_expect_success IFNAME 'munged --origin interface name' '
     munged_start_daemon --origin="$(cat ifname0.$$)" &&
     munged_stop_daemon &&
     egrep "Set origin address to 127\.0\.0\.1\>" "${MUNGE_LOGFILE}" &&
-    sed -n -e "s/.*Set origin address.*(\([^)]*\)).*/\1/p" \
-            "${MUNGE_LOGFILE}" >ifname1.$$ &&
+    sed -n -e "s/.*Set origin address.*(\([^)]*\)).*/\1/p" "${MUNGE_LOGFILE}" \
+            >ifname1.$$ &&
     test_cmp ifname0.$$ ifname1.$$
 '
 
 # Check if the origin address is set to the appropriate IP address in the
-#   credential metadata when specifying an interface name.
+#   credential metadata when specifying the loopback network interface name.
 ##
-test_expect_success GETIFADDRS 'munged --origin interface name metadata' '
-    test -s ifname0.$$ &&
+test_expect_success IFNAME 'munged --origin interface name metadata' '
     munged_start_daemon --origin="$(cat ifname0.$$)" &&
     "${MUNGE}" --socket="${MUNGE_SOCKET}" --no-input --output=cred.$$ &&
     "${UNMUNGE}" --socket="${MUNGE_SOCKET}" --input=cred.$$ \
