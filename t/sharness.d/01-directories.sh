@@ -23,7 +23,7 @@ set_build_dir()
 {
     if test -z "${MUNGE_BUILD_DIR}"; then
 
-        if test -n "${builddir}"; then
+        if test "x${builddir}" != x; then
             MUNGE_BUILD_DIR=${builddir}
         else
             MUNGE_BUILD_DIR=$(search_dirs "." "config.status")

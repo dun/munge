@@ -58,19 +58,19 @@ test_expect_success 'stop munged' '
 '
 
 test_expect_success 'check socket removal' '
-    test -n "${MUNGE_SOCKET}" &&
+    test "x${MUNGE_SOCKET}" != x &&
     test ! -S "${MUNGE_SOCKET}"
 '
 
 test_expect_success 'check process has exited' '
-    test -n "${PID}" &&
+    test "x${PID}" != x &&
     ! ps -p "${PID}" >/dev/null
 '
 
 # Testing occasionally fails on Debian 4.0; FreeBSD 12.1, 11.3.
 ##
 test_expect_unstable 'check pidfile removal' '
-    test -n "${MUNGE_PIDFILE}" &&
+    test "x${MUNGE_PIDFILE}" != x &&
     test ! -f "${MUNGE_PIDFILE}"
 '
 

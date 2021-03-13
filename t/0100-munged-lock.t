@@ -75,7 +75,7 @@ test_expect_success 'stop munged using lockfile-derived pid' '
 # Check if the lockfile was removed when munged shut down.
 ##
 test_expect_success 'check lockfile removal' '
-    test -n "${MUNGE_LOCKFILE}" &&
+    test "x${MUNGE_LOCKFILE}" != x &&
     test ! -f "${MUNGE_LOCKFILE}"
 '
 
@@ -183,7 +183,7 @@ test_expect_success 'stop munged' '
 # Check if the lockfile was removed when munged shut down.
 ##
 test_expect_success 'check lockfile removal again' '
-    test -n "${MUNGE_LOCKFILE}" &&
+    test "x${MUNGE_LOCKFILE}" != x &&
     test ! -f "${MUNGE_LOCKFILE}"
 '
 
