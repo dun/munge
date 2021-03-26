@@ -112,7 +112,7 @@ uninstall-systemd:
 	fi
 
 install-systemd-sysconfig: munge.systemd.sysconfig
-	@if test 'x${systemdunitdir}' != x \
+	@if test 'x$(systemdunitdir)' != x \
 	      && test 'x$(sysconfigdir)' != x; then \
 	  echo $(MKDIR_P) "'$(DESTDIR)$(sysconfigdir)'"; \
 	  $(MKDIR_P) '$(DESTDIR)$(sysconfigdir)'; \
@@ -145,7 +145,7 @@ uninstall-sysvinit: uninstall-sysvinit-sysconfig
 	fi
 
 install-sysvinit-sysconfig: munge.sysvinit.sysconfig
-	@if test 'x${sysvinitddir}' != x \
+	@if test 'x$(sysvinitddir)' != x \
 	      && test 'x$(sysconfigdir)' != x; then \
 	  echo $(MKDIR_P) "'$(DESTDIR)$(sysconfigdir)'"; \
 	  $(MKDIR_P) '$(DESTDIR)$(sysconfigdir)'; \
