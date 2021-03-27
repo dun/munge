@@ -105,7 +105,7 @@ install-systemd: munge.systemd.service install-systemd-sysconfig
 	  $(MKDIR_P) -m 0755 '$(DESTDIR)$(runstatedir)/munge'; \
 	fi
 
-uninstall-systemd:
+uninstall-systemd: uninstall-systemd-sysconfig
 	@if test 'x$(systemdunitdir)' != x; then \
 	  echo rm -f "'$(DESTDIR)$(systemdunitdir)/$(PACKAGE).service'"; \
 	  rm -f '$(DESTDIR)$(systemdunitdir)/$(PACKAGE).service'; \
@@ -123,7 +123,8 @@ install-systemd-sysconfig: munge.systemd.sysconfig
 	fi
 
 uninstall-systemd-sysconfig:
-	@if test 'x$(sysconfigdir)' != x; then \
+	@if test 'x$(systemdunitdir)' != x \
+	      && test 'x$(sysconfigdir)' != x; then \
 	  echo rm -f "'$(DESTDIR)$(sysconfigdir)/$(PACKAGE)'"; \
 	  rm -f '$(DESTDIR)$(sysconfigdir)/$(PACKAGE)'; \
 	fi
@@ -156,7 +157,8 @@ install-sysvinit-sysconfig: munge.sysvinit.sysconfig
 	fi
 
 uninstall-sysvinit-sysconfig:
-	@if test 'x$(sysconfigdir)' != x; then \
+	@if test 'x$(sysvinitddir)' != x \
+	      && test 'x$(sysconfigdir)' != x; then \
 	  echo rm -f "'$(DESTDIR)$(sysconfigdir)/$(PACKAGE)'"; \
 	  rm -f '$(DESTDIR)$(sysconfigdir)/$(PACKAGE)'; \
 	fi
