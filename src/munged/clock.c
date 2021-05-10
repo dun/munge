@@ -63,19 +63,19 @@ clock_get_timespec (struct timespec *tsp, long msecs)
 }
 
 
-/*  Return 1 if timespec [tsp0] >= [tsp1], 0 if not, or -1 on error.
+/*  Return 1 if timespec [tsp0] <= [tsp1], 0 if not, or -1 on error.
  */
 int
-clock_is_timespec_ge (const struct timespec *tsp0, const struct timespec *tsp1)
+clock_is_timespec_le (const struct timespec *tsp0, const struct timespec *tsp1)
 {
     if ((tsp0 == NULL) || (tsp1 == NULL)) {
         errno = EINVAL;
         return -1;
     }
     if (tsp0->tv_sec == tsp1->tv_sec) {
-        return (tsp0->tv_nsec >= tsp1->tv_nsec);
+        return (tsp0->tv_nsec <= tsp1->tv_nsec);
     }
     else {
-        return (tsp0->tv_sec >= tsp1->tv_sec);
+        return (tsp0->tv_sec <= tsp1->tv_sec);
     }
 }

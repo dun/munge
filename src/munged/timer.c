@@ -221,7 +221,7 @@ timer_set_absolute (callback_f cb, void *arg, const struct timespec *tsp)
     /*  Insert the timer into the active list.
      */
     t_prev_ptr = &_timer_active;
-    while (*t_prev_ptr && clock_is_timespec_ge (&t->ts, &(*t_prev_ptr)->ts)) {
+    while (*t_prev_ptr && clock_is_timespec_le (&(*t_prev_ptr)->ts, &t->ts)) {
         t_prev_ptr = &(*t_prev_ptr)->next;
     }
     t->next = *t_prev_ptr;
@@ -369,7 +369,7 @@ _timer_thread (void *arg)
          */
         t_prev_ptr = &_timer_active;
         while (*t_prev_ptr
-                && clock_is_timespec_ge (&ts_now, &(*t_prev_ptr)->ts)) {
+                && clock_is_timespec_le (&(*t_prev_ptr)->ts, &ts_now)) {
             t_prev_ptr = &(*t_prev_ptr)->next;
         }
         if (t_prev_ptr != &_timer_active) {
