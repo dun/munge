@@ -64,6 +64,8 @@ munged_SOURCES = \
 	base64.h \
 	cipher.c \
 	cipher.h \
+	clock.c \
+	clock.h \
 	conf.c \
 	conf.h \
 	cred.c \

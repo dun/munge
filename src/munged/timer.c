@@ -41,10 +41,10 @@
 #include <pthread.h>
 #include <signal.h>
 #include <stdlib.h>
-#include <sys/time.h>
 #include <time.h>
 #include <unistd.h>
 #include <munge.h>
+#include "clock.h"
 #include "log.h"
 #include "thread.h"
 #include "timer.h"
@@ -74,11 +74,6 @@ static void * _timer_thread (void *arg);
 static void _timer_thread_cleanup (void *arg);
 
 static timer_p _timer_alloc (void);
-
-static void _timer_get_timespec (struct timespec *tsp);
-
-static int _timer_is_timespec_ge (
-        struct timespec *tsp0, struct timespec *tsp1);
 
 
 /*****************************************************************************
@@ -226,7 +221,7 @@ timer_set_absolute (callback_f cb, void *arg, const struct timespec *tsp)
     /*  Insert the timer into the active list.
      */
     t_prev_ptr = &_timer_active;
-    while (*t_prev_ptr && _timer_is_timespec_ge (&t->ts, &(*t_prev_ptr)->ts)) {
+    while (*t_prev_ptr && clock_is_timespec_ge (&t->ts, &(*t_prev_ptr)->ts)) {
         t_prev_ptr = &(*t_prev_ptr)->next;
     }
     t->next = *t_prev_ptr;
@@ -256,18 +251,13 @@ long
 timer_set_relative (callback_f cb, void *arg, long msec)
 {
     struct timespec ts;
+    int rv;
 
     /*  Convert the relative time offset into an absolute timespec from now.
      */
-    _timer_get_timespec (&ts);
-
-    if (msec > 0) {
-        ts.tv_sec += msec / 1000;
-        ts.tv_nsec += (msec % 1000) * 1000000;
-        if (ts.tv_nsec >= 1000000000) {
-            ts.tv_sec += ts.tv_nsec / 1000000000;
-            ts.tv_nsec %= 1000000000;
-        }
+    rv = clock_get_timespec (&ts, msec);
+    if (rv < 0) {
+        log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to query current time");
     }
     return (timer_set_absolute (cb, arg, &ts));
 }
@@ -336,6 +326,7 @@ _timer_thread (void *arg)
     struct timespec  ts_now;
     timer_p         *t_prev_ptr;
     timer_p          timer_expired;
+    int              rv;
 
     if (sigfillset (&sigset)) {
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to init timer sigset");
@@ -370,13 +361,15 @@ _timer_thread (void *arg)
             log_errno (EMUNGE_SNAFU, LOG_ERR,
                     "Failed to disable timer thread cancellation");
         }
-        _timer_get_timespec (&ts_now);
-
+        rv = clock_get_timespec (&ts_now, 0);
+        if (rv < 0) {
+            log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to query current time");
+        }
         /*  Select expired timers.
          */
         t_prev_ptr = &_timer_active;
         while (*t_prev_ptr
-                && _timer_is_timespec_ge (&ts_now, &(*t_prev_ptr)->ts)) {
+                && clock_is_timespec_ge (&ts_now, &(*t_prev_ptr)->ts)) {
             t_prev_ptr = &(*t_prev_ptr)->next;
         }
         if (t_prev_ptr != &_timer_active) {
@@ -488,48 +481,4 @@ _timer_alloc (void)
         t = malloc (sizeof (struct timer));
     }
     return (t);
-}
-
-
-static void
-_timer_get_timespec (struct timespec *tsp)
-{
-/*  Sets the timespec [tsp] to the current time.
- */
-    struct timeval tv;
-
-    assert (tsp != NULL);
-
-    if (gettimeofday (&tv, NULL) < 0) {
-        log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to query current time");
-    }
-    tsp->tv_sec = tv.tv_sec;
-    tsp->tv_nsec = tv.tv_usec * 1000;
-    return;
-}
-
-
-static int
-_timer_is_timespec_ge (struct timespec *tsp0, struct timespec *tsp1)
-{
-/*  Returns non-zero if the time specified by [tsp0] is
- *    greater than or equal to the time specified by [tsp1].
- */
-    assert (tsp0 != NULL);
-    assert (tsp1 != NULL);
-
-    if (tsp0->tv_nsec >= 1000000000) {
-        tsp0->tv_sec += tsp0->tv_nsec / 1000000000;
-        tsp0->tv_nsec %= 1000000000;
-    }
-    if (tsp1->tv_nsec >= 1000000000) {
-        tsp1->tv_sec += tsp1->tv_nsec / 1000000000;
-        tsp1->tv_nsec %= 1000000000;
-    }
-    if (tsp0->tv_sec == tsp1->tv_sec) {
-        return (tsp0->tv_nsec >= tsp1->tv_nsec);
-    }
-    else {
-        return (tsp0->tv_sec >= tsp1->tv_sec);
-    }
 }
