@@ -35,21 +35,21 @@
 }
 
 {
-   gethostbyaddr_r-leak
+   gethostbyaddr-leak
    Memcheck:Leak
    match-leak-kinds: reachable
    fun:?alloc
    ...
-   fun:gethostbyaddr_r@@GLIBC_2.2.5
+   fun:gethostbyaddr
 }
 
 {
-   gethostbyname_r-leak
+   gethostbyname-leak
    Memcheck:Leak
    match-leak-kinds: reachable
    fun:?alloc
    ...
-   fun:gethostbyname_r@@GLIBC_2.2.5
+   fun:gethostbyname
 }
 
 {
