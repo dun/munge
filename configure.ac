@@ -50,6 +50,7 @@ X_AC_DEBUG
 ##
 X_AC_CHECK_PTHREADS
 X_AC_CHECK_COND_LIB(bz2, BZ2_bzBuffToBuffCompress)
+X_AC_CHECK_COND_LIB(rt, clock_gettime)
 X_AC_CHECK_COND_LIB(z, compress)
 AC_SEARCH_LIBS(gethostbyname, nsl)
 AC_SEARCH_LIBS(socket, socket)

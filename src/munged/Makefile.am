@@ -52,6 +52,7 @@ munged_LDADD = \
 	$(top_builddir)/src/libmunge/libmunge.la \
 	$(LIBPTHREAD) \
 	$(LIBBZ2) \
+	$(LIBRT) \
 	$(LIBZ) \
 	$(CRYPTO_LIBS) \
 	# End of munged_LDADD
