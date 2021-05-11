@@ -84,6 +84,7 @@ AC_CHECK_TYPES(socklen_t, [], [], [#include <sys/types.h>
 # Checks for library functions.
 ##
 AC_CHECK_FUNCS( \
+  clock_nanosleep \
   getentropy \
   getifaddrs \
   getrandom \

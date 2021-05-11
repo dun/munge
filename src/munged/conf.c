@@ -124,6 +124,8 @@ static void _conf_process_stop (conf_t conf);
 
 static int _conf_send_signal (pid_t pid, int signum, int msecs);
 
+static void _conf_sleep (int msecs);
+
 static void _conf_set_origin_addr (conf_t conf);
 
 static int _conf_open_keyfile (const char *keyfile, int got_force);
@@ -810,7 +812,6 @@ _conf_send_signal (pid_t pid, int signum, int msecs)
  *    or 0 if the process has terminated.
  */
     struct timespec wait_abstime;
-    struct timespec check_abstime;
     int             rv;
 
     assert (pid > 0);
@@ -832,19 +833,7 @@ _conf_send_signal (pid_t pid, int signum, int msecs)
                 "Failed to signal daemon (pid %d, sig %d)", pid, signum);
     }
     while (1) {
-        rv = clock_get_timespec (&check_abstime, MUNGE_SIGNAL_CHECK_MSECS);
-        if (rv < 0) {
-            log_errno (EMUNGE_SNAFU, LOG_ERR,
-                    "Failed to get check time for termination");
-        }
-        do {
-            rv = clock_nanosleep (CLOCK_REALTIME, TIMER_ABSTIME,
-                    &check_abstime, NULL);
-        } while ((rv < 0) && (errno == EINTR));
-        if (rv < 0) {
-            log_errno (EMUNGE_SNAFU, LOG_ERR,
-                    "Failed to sleep before checking for termination");
-        }
+        _conf_sleep (MUNGE_SIGNAL_CHECK_MSECS);
         rv = kill (pid, 0);
         if (rv < 0) {
             if (errno == ESRCH) {
@@ -863,6 +852,51 @@ _conf_send_signal (pid_t pid, int signum, int msecs)
         }
     }
     return (1);
+}
+
+
+static void
+_conf_sleep (int msecs)
+{
+/*  Sleep for the specified number of milliseconds [msecs].
+ */
+#if HAVE_CLOCK_NANOSLEEP
+    struct timespec check_abstime;
+    int             rv;
+
+    rv = clock_get_timespec (&check_abstime, msecs);
+    if (rv < 0) {
+        log_errno (EMUNGE_SNAFU, LOG_ERR,
+                "Failed to get check time for termination");
+    }
+retry:
+    rv = clock_nanosleep (CLOCK_REALTIME, TIMER_ABSTIME, &check_abstime, NULL);
+    if (rv < 0) {
+        if (errno == EINTR) {
+            goto retry;
+        }
+        log_errno (EMUNGE_SNAFU, LOG_ERR,
+                "Failed to sleep before checking for termination");
+    }
+#else  /* !HAVE_CLOCK_NANOSLEEP */
+    struct timespec request_time;
+    struct timespec remain_time;
+    int             rv;
+
+    request_time.tv_sec = msecs / 1000;
+    request_time.tv_nsec = (msecs % 1000) * 1000 * 1000;
+
+retry:
+    rv = nanosleep (&request_time, &remain_time);
+    if (rv < 0) {
+        if (errno == EINTR) {
+            request_time = remain_time;
+            goto retry;
+        }
+        log_errno (EMUNGE_SNAFU, LOG_ERR,
+                "Failed to sleep before checking for termination");
+    }
+#endif /* !HAVE_CLOCK_NANOSLEEP */
 }
 
 
