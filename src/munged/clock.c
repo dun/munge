@@ -32,6 +32,7 @@
 
 #include <errno.h>
 #include <time.h>
+#include "clock.h"
 
 
 /*  Set timespec [tsp] to the current time adjusted forward by
@@ -78,4 +79,25 @@ clock_is_timespec_le (const struct timespec *tsp0, const struct timespec *tsp1)
     else {
         return (tsp0->tv_sec <= tsp1->tv_sec);
     }
+}
+
+
+/*  Return 1 if timespec [tsp] <= the current time, 0 if not, or -1 on error.
+ */
+int
+clock_is_timespec_expired (const struct timespec *tsp)
+{
+    struct timespec now;
+    int rv;
+
+    if (tsp == NULL) {
+        errno = EINVAL;
+        return -1;
+    }
+    rv = clock_get_timespec (&now, 0);
+    if (rv < 0) {
+        return -1;
+    }
+    rv = clock_is_timespec_le (tsp, &now);
+    return rv;
 }

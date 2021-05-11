@@ -83,9 +83,8 @@ test_expect_unstable 'check logfile for replay' '
 '
 
 # Check if the final log message for stopping the daemon has been written out.
-# Occasionally fails on FreeBSD 12.2, 11.4.
 ##
-test_expect_unstable 'check logfile for stop' '
+test_expect_success 'check logfile for stop' '
     grep "Stopping" "${MUNGE_LOGFILE}"
 '
 

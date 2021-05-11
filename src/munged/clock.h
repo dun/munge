@@ -42,5 +42,7 @@ int clock_get_timespec (struct timespec *tsp, long msecs);
 int clock_is_timespec_le (
         const struct timespec *tsp0, const struct timespec *tsp1);
 
+int clock_is_timespec_expired (const struct timespec *tsp);
+
 
 #endif /* !CLOCK_H */
