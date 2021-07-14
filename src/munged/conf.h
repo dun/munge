@@ -58,6 +58,7 @@ struct conf {
     munge_mac_t     def_mac;            /* default message auth code type    */
     munge_ttl_t     def_ttl;            /* default time-to-live in seconds   */
     munge_ttl_t     max_ttl;            /* maximum time-to-live in seconds   */
+    char           *cwd;                /* current working dir at startup    */
     char           *config_name;        /* configuration filename            */
     int             lockfile_fd;        /* daemon lockfile fd                */
     char           *lockfile_name;      /* daemon lockfile name              */

@@ -118,7 +118,12 @@ struct option long_opts[] = {
  *  Internal Prototypes
  *****************************************************************************/
 
+static void _conf_set_cwd (conf_t conf);
+
 static void _conf_display_help (char *prog);
+
+static void _conf_set_string (char **str_p, const char *val, const char *cwd,
+        const char *dsc);
 
 static void _conf_process_stop (conf_t conf);
 
@@ -173,6 +178,8 @@ create_conf (void)
     conf->config_name = NULL;
     conf->lockfile_fd = -1;
     conf->lockfile_name = NULL;
+
+    _conf_set_cwd (conf);
 
     if (!(conf->logfile_name = strdup (MUNGE_LOGFILE_PATH))) {
         log_errno (EMUNGE_NO_MEMORY, LOG_ERR,
@@ -232,6 +239,10 @@ destroy_conf (conf_t conf, int do_unlink)
     assert (conf->ld < 0);              /* sock_destroy() already called */
     assert (conf->lockfile_fd < 0);
 
+    if (conf->cwd) {
+        free (conf->cwd);
+        conf->cwd = NULL;
+    }
     if (conf->config_name) {
         free (conf->config_name);
         conf->config_name = NULL;
@@ -349,11 +360,8 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                 conf->got_stop = 1;
                 break;
             case 'S':
-                if (conf->socket_name)
-                    free (conf->socket_name);
-                if (!(conf->socket_name = strdup (optarg)))
-                    log_errno (EMUNGE_NO_MEMORY, LOG_ERR,
-                        "Failed to copy socket name string");
+                _conf_set_string (&conf->socket_name, optarg, conf->cwd,
+                        "socket name");
                 break;
             case 'v':
                 conf->got_verbose = 1;
@@ -363,18 +371,12 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                 exit (42);
 #if defined(AUTH_METHOD_RECVFD_MKFIFO) || defined(AUTH_METHOD_RECVFD_MKNOD)
             case OPT_AUTH_SERVER:
-                if (conf->auth_server_dir)
-                    free (conf->auth_server_dir);
-                if (!(conf->auth_server_dir = strdup (optarg)))
-                    log_errno (EMUNGE_NO_MEMORY, LOG_ERR,
-                        "Failed to copy auth-server-dir cmdline string");
+                _conf_set_string (&conf->auth_server_dir, optarg, conf->cwd,
+                        "auth-server-dir name");
                 break;
             case OPT_AUTH_CLIENT:
-                if (conf->auth_client_dir)
-                    free (conf->auth_client_dir);
-                if (!(conf->auth_client_dir = strdup (optarg)))
-                    log_errno (EMUNGE_NO_MEMORY, LOG_ERR,
-                        "Failed to copy auth-client-dir cmdline string");
+                _conf_set_string (&conf->auth_client_dir, optarg, conf->cwd,
+                        "auth-client-dir name");
                 break;
 #endif /* AUTH_METHOD_RECVFD_MKFIFO || AUTH_METHOD_RECVFD_MKNOD */
             case OPT_BENCHMARK:
@@ -402,18 +404,12 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                 conf->gids_update_secs = l;
                 break;
             case OPT_KEY_FILE:
-                if (conf->key_name)
-                    free (conf->key_name);
-                if (!(conf->key_name = strdup (optarg)))
-                    log_errno (EMUNGE_NO_MEMORY, LOG_ERR,
-                        "Failed to copy key-file name string");
+                _conf_set_string (&conf->key_name, optarg, conf->cwd,
+                        "key-file name");
                 break;
             case OPT_LOG_FILE:
-                if (conf->logfile_name)
-                    free (conf->logfile_name);
-                if (!(conf->logfile_name = strdup (optarg)))
-                    log_errno (EMUNGE_NO_MEMORY, LOG_ERR,
-                        "Failed to copy log-file name string");
+                _conf_set_string (&conf->logfile_name, optarg, conf->cwd,
+                        "log-file name");
                 break;
             case OPT_MAX_TTL:
                 l = strtol (optarg, &p, 10);
@@ -437,25 +433,15 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                 conf->nthreads = l;
                 break;
             case OPT_ORIGIN:
-                if (conf->origin_name)
-                    free (conf->origin_name);
-                if (!(conf->origin_name = strdup (optarg)))
-                    log_errno (EMUNGE_NO_MEMORY, LOG_ERR,
-                        "Failed to copy origin string");
+                _conf_set_string (&conf->origin_name, optarg, NULL, "origin");
                 break;
             case OPT_PID_FILE:
-                if (conf->pidfile_name)
-                    free (conf->pidfile_name);
-                if (!(conf->pidfile_name = strdup (optarg)))
-                    log_errno (EMUNGE_NO_MEMORY, LOG_ERR,
-                        "Failed to copy pid-file name string");
+                _conf_set_string (&conf->pidfile_name, optarg, conf->cwd,
+                        "pid-file name");
                 break;
             case OPT_SEED_FILE:
-                if (conf->seed_name)
-                    free (conf->seed_name);
-                if (!(conf->seed_name = strdup (optarg)))
-                    log_errno (EMUNGE_NO_MEMORY, LOG_ERR,
-                        "Failed to copy seed-file name string");
+                _conf_set_string (&conf->seed_name, optarg, conf->cwd,
+                        "seed-file name");
                 break;
             case OPT_SYSLOG:
                 conf->got_syslog = 1;
@@ -654,6 +640,53 @@ create_subkeys (conf_t conf)
  *****************************************************************************/
 
 static void
+_conf_set_cwd (conf_t conf)
+{
+/*  Set the current working directory in order to fix relative paths so these
+ *    locations can still be accessed after chdir() is called.
+ */
+    char  buf [PATH_MAX];
+    char *rv;
+
+    rv = getcwd (buf, sizeof (buf));
+
+    /*  Starting in Linux 2.6.36, the path returned by getcwd() will be
+     *    prefixed with "(unreachable)" if the current directory is not below
+     *    the root directory of the current process.  With glibc 2.27 onwards,
+     *    this will instead result in failure with ENOENT.
+     *  Since relative paths break the getcwd() API contract requiring an
+     *    absolute path, convert anything not starting with an absolute path
+     *    (like "(unreachable)") to ENOENT.
+     */
+    if ((rv != NULL) && (buf[0] != '/')) {
+        rv = NULL;
+        errno = ENOENT;
+    }
+
+    if (rv == NULL) {
+        conf->cwd = NULL;
+        if (errno == ERANGE) {
+            log_msg (LOG_WARNING,
+                    "Failed to set current working directory: "
+                    "Exceeded %lu-byte buffer", sizeof (buf));
+        }
+        else {
+            log_msg (LOG_WARNING,
+                    "Failed to set current working directory: %s",
+                    strerror (errno));
+        }
+    }
+    else {
+        conf->cwd = strdup (buf);
+        if (conf->cwd == NULL) {
+            log_errno (EMUNGE_NO_MEMORY, LOG_ERR,
+                    "Failed to copy current working directory string");
+        }
+    }
+}
+
+
+static void
 _conf_display_help (char *prog)
 {
 /*  Displays a help message describing the command-line options.
@@ -744,6 +777,33 @@ _conf_display_help (char *prog)
 
     printf ("\n");
     return;
+}
+
+
+static void
+_conf_set_string (char **str_p, const char *val, const char *cwd,
+        const char *dsc)
+{
+/*  Set the string referenced by [str_p] to the string value [val], freeing
+ *    an existing string pointed to by [str_p] if needed.  If [val] is not an
+ *    absolute pathname and the current working directory string [cwd] is set,
+ *    that string will be prepended to [val].
+ *  The description string [dsc] will be used in the error message if needed.
+ */
+    assert (str_p != NULL);
+    assert (val != NULL);
+    assert (dsc != NULL);
+
+    if (*str_p != NULL) {
+        free (*str_p);
+    }
+    *str_p = (val[0] == '/' || cwd == NULL)
+        ? strdup (val)
+        : strdupf ("%s/%s", cwd, val);
+
+    if (*str_p == NULL) {
+        log_errno (EMUNGE_NO_MEMORY, LOG_ERR, "Failed to copy %s string", dsc);
+    }
 }
 
 
