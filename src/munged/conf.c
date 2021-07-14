@@ -176,23 +176,23 @@ create_conf (void)
 
     if (!(conf->logfile_name = strdup (MUNGE_LOGFILE_PATH))) {
         log_errno (EMUNGE_NO_MEMORY, LOG_ERR,
-            "Failed to copy logfile name string");
+            "Failed to copy log-file name default string");
     }
     if (!(conf->pidfile_name = strdup (MUNGE_PIDFILE_PATH))) {
         log_errno (EMUNGE_NO_MEMORY, LOG_ERR,
-            "Failed to copy pidfile name string");
+            "Failed to copy pid-file name default string");
     }
     if (!(conf->socket_name = strdup (MUNGE_SOCKET_NAME))) {
         log_errno (EMUNGE_NO_MEMORY, LOG_ERR,
-            "Failed to copy socket name string");
+            "Failed to copy socket name default string");
     }
     if (!(conf->seed_name = strdup (MUNGE_SEEDFILE_PATH))) {
         log_errno (EMUNGE_NO_MEMORY, LOG_ERR,
-            "Failed to copy seed name string");
+            "Failed to copy seed-file name default string");
     }
     if (!(conf->key_name = strdup (MUNGE_KEYFILE_PATH))) {
         log_errno (EMUNGE_NO_MEMORY, LOG_ERR,
-            "Failed to copy key name string");
+            "Failed to copy key-file name default string");
     }
     conf->dek_key = NULL;
     conf->dek_key_len = 0;
