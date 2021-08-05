@@ -72,11 +72,10 @@ crypto_init (void)
     /*  gcry_check_version() must be called before any other Libgcrypt function
      *    (except the GCRYCTL_SET_THREAD_CBS command prior to Libgcrypt 1.6).
      */
-    v = gcry_check_version (GCRYPT_VERSION);
+    v = gcry_check_version (NULL);
     if (v == NULL) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
-            "Failed to initialize Libgcrypt: version mismatch: expected %s",
-            GCRYPT_VERSION);
+            "Failed to initialize Libgcrypt %s", GCRYPT_VERSION);
     }
     e = gcry_control (GCRYCTL_DISABLE_SECMEM, 0);
     if (e) {
