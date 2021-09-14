@@ -57,7 +57,7 @@ for OPT_VERBOSE in '-v' '--verbose'; do
     test_expect_success "munged ${OPT_VERBOSE}" '
         munged_start_daemon &&
         "${MUNGED}" "${OPT_VERBOSE}" --stop --socket="${MUNGE_SOCKET}" 2>&1 |
-        grep -q "Terminated daemon"
+        egrep -q "(Terminated|Killed) daemon"
     '
 done
 
