@@ -869,30 +869,25 @@ _conf_sleep (int msecs)
         log_errno (EMUNGE_SNAFU, LOG_ERR,
                 "Failed to get check time for termination");
     }
-retry:
-    rv = clock_nanosleep (CLOCK_REALTIME, TIMER_ABSTIME, &check_abstime, NULL);
+    do {
+        rv = clock_nanosleep (CLOCK_REALTIME, TIMER_ABSTIME, &check_abstime,
+                NULL);
+    } while ((rv < 0) && (errno == EINTR));
     if (rv < 0) {
-        if (errno == EINTR) {
-            goto retry;
-        }
         log_errno (EMUNGE_SNAFU, LOG_ERR,
                 "Failed to sleep before checking for termination");
     }
 #else  /* !HAVE_CLOCK_NANOSLEEP */
-    struct timespec request_time;
-    struct timespec remain_time;
+    struct timespec check_reltime;
     int             rv;
 
-    request_time.tv_sec = msecs / 1000;
-    request_time.tv_nsec = (msecs % 1000) * 1000 * 1000;
+    check_reltime.tv_sec = msecs / 1000;
+    check_reltime.tv_nsec = (msecs % 1000) * 1000 * 1000;
 
-retry:
-    rv = nanosleep (&request_time, &remain_time);
+    do {
+        rv = nanosleep (&check_reltime, &check_reltime);
+    } while ((rv < 0) && (errno == EINTR));
     if (rv < 0) {
-        if (errno == EINTR) {
-            request_time = remain_time;
-            goto retry;
-        }
         log_errno (EMUNGE_SNAFU, LOG_ERR,
                 "Failed to sleep before checking for termination");
     }
