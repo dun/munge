@@ -36,9 +36,6 @@ for OPT_VERSION in '-V' '--version'; do
     '
 done
 
-# Check if the stop option succeeds in stopping the process and removing the
-#   socket and pidfile from the filesystem.
-##
 for OPT_STOP in '-s' '--stop'; do
     test_expect_success "munged ${OPT_STOP}" '
         munged_start_daemon &&
