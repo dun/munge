@@ -53,6 +53,10 @@ test_expect_success 'replay credential' '
     test_must_fail "${UNMUNGE}" --socket="${MUNGE_SOCKET}" <cred.$$ >/dev/null
 '
 
+test_expect_success 'check logfile for replay' '
+    grep "Replayed credential" "${MUNGE_LOGFILE}"
+'
+
 test_expect_success 'stop munged' '
     munged_stop_daemon
 '
@@ -74,12 +78,6 @@ test_expect_success 'check pidfile removal' '
 
 test_expect_success 'check seedfile creation' '
     test -s "${MUNGE_SEEDFILE}"
-'
-
-# Testing occasionally fails on NetBSD 8.1, 7.2.
-##
-test_expect_unstable 'check logfile for replay' '
-    grep "Replayed credential" "${MUNGE_LOGFILE}"
 '
 
 # Check if the final log message for stopping the daemon has been written out.
