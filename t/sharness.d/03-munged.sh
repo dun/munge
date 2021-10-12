@@ -136,10 +136,12 @@ munged_stop_daemon()
     test_debug "echo ${EXEC} \"${MUNGED}\" \
             --socket=\"${MUNGE_SOCKET}\" \
             --stop \
+            --verbose \
             $*" &&
     ${EXEC} "${MUNGED}" \
             --socket="${MUNGE_SOCKET}" \
             --stop \
+            --verbose \
             "$@"
 }
 

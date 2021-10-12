@@ -67,9 +67,12 @@ test_expect_success 'check pidfile after munged failure' '
 
 # Stop munged using the --stop option which derives the daemon's pid from
 #   the lockfile.
+# Check that it responded to SIGTERM indicating it cleaned up before exiting.
+#   A successful cleanup is necessary for the subsequent check for lockfile
+#   removal.
 ##
 test_expect_success 'stop munged using lockfile-derived pid' '
-    munged_stop_daemon
+    munged_stop_daemon 2>&1 | grep "Terminated daemon"
 '
 
 # Check if the lockfile was removed when munged shut down.
@@ -123,7 +126,7 @@ test_expect_success 'check for lockfile truncation after successful start' '
 # Kill munged to prevent cleanup in preparation for a later test to check if
 #   munged can recover from a dead socket and lockfile.
 ##
-test_expect_success 'stop munged via sigkill to prevent cleanup' '
+test_expect_success 'stop munged using sigkill to prevent cleanup' '
     local PID &&
     PID=$(cat "${MUNGE_PIDFILE}") &&
     ps -p "${PID}" -ww | grep munged &&
@@ -161,9 +164,12 @@ test_expect_success 'start munged with leftover socket from unclean shutdown' '
 '
 
 # Stop the munged that was started for the preceding test.
+# Check that it responded to SIGTERM indicating it cleaned up before exiting.
+#   A successful cleanup is necessary for the subsequent check for lockfile
+#   removal.
 ##
 test_expect_success 'stop munged' '
-    munged_stop_daemon
+    munged_stop_daemon 2>&1 | grep "Terminated daemon"
 '
 
 # Check if the lockfile was removed when munged shut down.
