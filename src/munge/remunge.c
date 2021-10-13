@@ -684,7 +684,7 @@ display_help (char *prog)
     printf ("\n");
 
     printf ("  %*s %s\n", w, "-h, --help",
-            "Display this help");
+            "Display this help message");
 
     printf ("  %*s %s\n", w, "-L, --license",
             "Display license information");
@@ -697,19 +697,19 @@ display_help (char *prog)
 
     printf ("\n");
 
-    printf ("  %*s %s\n", w, "-c, --cipher=STRING",
+    printf ("  %*s %s\n", w, "-c, --cipher=STR",
             "Specify cipher type");
 
     printf ("  %*s %s\n", w, "-C, --list-ciphers",
             "Display a list of supported ciphers");
 
-    printf ("  %*s %s\n", w, "-m, --mac=STRING",
+    printf ("  %*s %s\n", w, "-m, --mac=STR",
             "Specify MAC type");
 
     printf ("  %*s %s\n", w, "-M, --list-macs",
             "Display a list of supported MACs");
 
-    printf ("  %*s %s\n", w, "-z, --zip=STRING",
+    printf ("  %*s %s\n", w, "-z, --zip=STR",
             "Specify compression type");
 
     printf ("  %*s %s\n", w, "-Z, --list-zips",
@@ -723,33 +723,33 @@ display_help (char *prog)
     printf ("  %*s %s\n", w, "-d, --decode",
             "Encode and decode each credential");
 
-    printf ("  %*s %s\n", w, "-l, --length=INTEGER",
+    printf ("  %*s %s\n", w, "-l, --length=BYTES",
             "Specify payload length (in bytes)");
 
     printf ("  %*s %s\n", w, "-u, --restrict-uid=UID",
-            "Restrict credential decoding by UID");
+            "Restrict credential decoding by user/UID");
 
     printf ("  %*s %s\n", w, "-g, --restrict-gid=GID",
-            "Restrict credential decoding by GID");
+            "Restrict credential decoding by group/GID");
 
-    printf ("  %*s %s\n", w, "-t, --ttl=INTEGER",
+    printf ("  %*s %s\n", w, "-t, --ttl=SECS",
             "Specify time-to-live (in seconds; 0=dfl -1=max)");
 
-    printf ("  %*s %s\n", w, "-S, --socket=STRING",
-            "Specify local domain socket for munged");
+    printf ("  %*s %s\n", w, "-S, --socket=PATH",
+            "Specify local socket for munged");
 
     printf ("\n");
 
-    printf ("  %*s %s\n", w, "-D, --duration=INTEGER",
+    printf ("  %*s %s\n", w, "-D, --duration=SECS",
             "Specify test duration (in seconds; -1=max)");
 
-    printf ("  %*s %s\n", w, "-N, --num-creds=INTEGER",
+    printf ("  %*s %s\n", w, "-N, --num-creds=INT",
             "Specify number of credentials to generate");
 
-    printf ("  %*s %s\n", w, "-T, --num-threads=INTEGER",
+    printf ("  %*s %s\n", w, "-T, --num-threads=INT",
             "Specify number of threads to spawn");
 
-    printf ("  %*s %s\n", w, "-W, --warn-time=INTEGER",
+    printf ("  %*s %s\n", w, "-W, --warn-time=SECS",
             "Specify max seconds for munge op before warning");
 
     printf ("\n");

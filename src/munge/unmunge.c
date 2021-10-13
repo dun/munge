@@ -468,7 +468,7 @@ display_help (char *prog)
     printf ("\n");
 
     printf ("  %*s %s\n", w, "-h, --help",
-            "Display this help");
+            "Display this help message");
 
     printf ("  %*s %s\n", w, "-L, --license",
             "Display license information");
@@ -478,21 +478,21 @@ display_help (char *prog)
 
     printf ("\n");
 
-    printf ("  %*s %s\n", w, "-i, --input=FILE",
-            "Input credential from FILE");
+    printf ("  %*s %s\n", w, "-i, --input=PATH",
+            "Input credential from file");
 
     printf ("  %*s %s\n", w, "-n, --no-output",
             "Discard all output");
 
-    printf ("  %*s %s\n", w, "-m, --metadata=FILE",
-            "Output metadata to FILE");
+    printf ("  %*s %s\n", w, "-m, --metadata=PATH",
+            "Output metadata to file");
 
-    printf ("  %*s %s\n", w, "-o, --output=FILE",
-            "Output payload to FILE");
+    printf ("  %*s %s\n", w, "-o, --output=PATH",
+            "Output payload to file");
 
     printf ("\n");
 
-    printf ("  %*s %s\n", w, "-k, --keys=STRING",
+    printf ("  %*s %s\n", w, "-k, --keys=STR",
             "Specify subset of metadata keys to output");
 
     printf ("  %*s %s\n", w, "-K, --list-keys",
@@ -501,8 +501,8 @@ display_help (char *prog)
     printf ("  %*s %s\n", w, "-N, --numeric",
             "Display metadata values numerically");
 
-    printf ("  %*s %s\n", w, "-S, --socket=STRING",
-            "Specify local domain socket for munged");
+    printf ("  %*s %s\n", w, "-S, --socket=PATH",
+            "Specify local socket for munged");
 
     printf ("\n");
     printf ("By default, credential read from stdin, "

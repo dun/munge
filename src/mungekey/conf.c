@@ -301,7 +301,7 @@ _conf_parse_keyfile_opt (char **dstp, const char *src, int sopt,
 static void
 _conf_display_help (const char *prog)
 {
-    const int w = -24;                  /* pad for width of option string */
+    const int w = -25;                  /* pad for width of option string */
 
     assert (prog != NULL);
 
@@ -313,7 +313,7 @@ _conf_display_help (const char *prog)
 
     printf ("\n");
 
-    printf ("  %*s %s\n", w, "-b, --bits=INTEGER",
+    printf ("  %*s %s\n", w, "-b, --bits=INT",
             "Specify number of bits in key being created");
 
     printf ("  %*s %s\n", w, "-f, --force",
@@ -328,7 +328,7 @@ _conf_display_help (const char *prog)
     printf ("\n");
 
     printf ("  %*s %s\n", w, "-h, --help",
-            "Display this help");
+            "Display this help message");
 
     printf ("  %*s %s\n", w, "-L, --license",
             "Display license information");

@@ -62,10 +62,10 @@ Discard all input for the payload.
 .BI "\-s, \-\-string " string
 Input payload from the specified string.
 .TP
-.BI "\-i, \-\-input " file
+.BI "\-i, \-\-input " path
 Input payload from the specified file.
 .TP
-.BI "\-o, \-\-output " file
+.BI "\-o, \-\-output " path
 Output the credential to the specified file.
 .TP
 .BI "\-c, \-\-cipher " string
@@ -105,7 +105,7 @@ user ID of that process is a member.
 Specify the group name or GID under which to request the credential.
 This requires root privileges or the CAP_SETGID capability.
 .TP
-.BI "\-t, \-\-ttl " integer
+.BI "\-t, \-\-ttl " seconds
 Specify the time-to-live (in seconds).  This controls how long the credential
 is valid once it has been encoded.  A value of 0 selects the default TTL.
 A value of \-1 selects the maximum allowed TTL.  Note that \fBmunged\fR
@@ -113,7 +113,7 @@ can impose a maximum allowable TTL for all credentials which may be smaller
 than this value.
 .TP
 .BI "\-S, \-\-socket " path
-Specify the local domain socket for connecting with \fBmunged\fR.
+Specify the local socket for connecting with \fBmunged\fR.
 
 .SH "EXIT STATUS"
 The \fBmunge\fR program returns a zero exit code when the credential is

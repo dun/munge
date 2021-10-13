@@ -82,7 +82,7 @@ operation, the credential is not stored in the replay cache.
 .BI "\-d, \-\-decode"
 Encode and decode each credential.
 .TP
-.BI "\-l, \-\-length " integer
+.BI "\-l, \-\-length " bytes
 Specify an arbitrary payload length (in bytes).  The integer may be followed
 by a single-character modifier: k=kilobytes, m=megabytes, g=gigabytes;
 K=kibibytes, M=mebibytes, G=gibibytes.
@@ -98,15 +98,15 @@ be matched against the effective group ID of the process requesting the
 credential decode, as well as each supplementary group of which the effective
 user ID of that process is a member.
 .TP
-.BI "\-t, \-\-ttl " integer
+.BI "\-t, \-\-ttl " seconds
 Specify the time-to-live (in seconds).  This controls how long the credential
 is valid once it has been encoded.  A value of 0 selects the default TTL.
 A value of \-1 selects the maximum allowed TTL.
 .TP
 .BI "\-S, \-\-socket " path
-Specify the local domain socket for connecting with \fBmunged\fR.
+Specify the local socket for connecting with \fBmunged\fR.
 .TP
-.BI "\-D, \-\-duration " integer
+.BI "\-D, \-\-duration " seconds
 Specify the test duration (in seconds).  The default duration is one second.
 A value of \-1 selects the maximum duration.  The integer may be followed
 by a single-character modifier: s=seconds, m=minutes, h=hours, d=days.
@@ -119,7 +119,7 @@ K=kibibytes, M=mebibytes, G=gibibytes.
 .BI "\-T, \-\-num\-threads " integer
 Specify the number of threads to spawn for processing credentials.
 .TP
-.BI "\-W, \-\-warn\-time " integer
+.BI "\-W, \-\-warn\-time " seconds
 Specify the maximum number of seconds to allow for a given
 \fBmunge_encode\fR() or \fBmunge_decode\fR() operation before issuing
 a warning.

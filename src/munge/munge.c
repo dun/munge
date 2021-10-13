@@ -455,7 +455,7 @@ display_help (char *prog)
     printf ("\n");
 
     printf ("  %*s %s\n", w, "-h, --help",
-            "Display this help");
+            "Display this help message");
 
     printf ("  %*s %s\n", w, "-L, --license",
             "Display license information");
@@ -468,30 +468,30 @@ display_help (char *prog)
     printf ("  %*s %s\n", w, "-n, --no-input",
             "Discard all input for payload");
 
-    printf ("  %*s %s\n", w, "-s, --string=STRING",
-            "Input payload from STRING");
+    printf ("  %*s %s\n", w, "-s, --string=STR",
+            "Input payload from string");
 
-    printf ("  %*s %s\n", w, "-i, --input=FILE",
-            "Input payload from FILE");
+    printf ("  %*s %s\n", w, "-i, --input=PATH",
+            "Input payload from file");
 
-    printf ("  %*s %s\n", w, "-o, --output=FILE",
-            "Output credential to FILE");
+    printf ("  %*s %s\n", w, "-o, --output=PATH",
+            "Output credential to file");
 
     printf ("\n");
 
-    printf ("  %*s %s\n", w, "-c, --cipher=STRING",
+    printf ("  %*s %s\n", w, "-c, --cipher=STR",
             "Specify cipher type");
 
     printf ("  %*s %s\n", w, "-C, --list-ciphers",
             "Display a list of supported ciphers");
 
-    printf ("  %*s %s\n", w, "-m, --mac=STRING",
+    printf ("  %*s %s\n", w, "-m, --mac=STR",
             "Specify MAC type");
 
     printf ("  %*s %s\n", w, "-M, --list-macs",
             "Display a list of supported MACs");
 
-    printf ("  %*s %s\n", w, "-z, --zip=STRING",
+    printf ("  %*s %s\n", w, "-z, --zip=STR",
             "Specify compression type");
 
     printf ("  %*s %s\n", w, "-Z, --list-zips",
@@ -500,22 +500,22 @@ display_help (char *prog)
     printf ("\n");
 
     printf ("  %*s %s\n", w, "-u, --restrict-uid=UID",
-            "Restrict credential decoding by UID");
+            "Restrict credential decoding by user/UID");
 
     printf ("  %*s %s\n", w, "-U, --uid=UID",
-            "Specify credential UID (requires root/CAP_SETUID)");
+            "Specify credential user/UID");
 
     printf ("  %*s %s\n", w, "-g, --restrict-gid=GID",
-            "Restrict credential decoding by GID");
+            "Restrict credential decoding by group/GID");
 
     printf ("  %*s %s\n", w, "-G, --gid=GID",
-            "Specify credential GID (requires root/CAP_SETGID)");
+            "Specify credential group/GID");
 
-    printf ("  %*s %s\n", w, "-t, --ttl=INTEGER",
+    printf ("  %*s %s\n", w, "-t, --ttl=SECS",
             "Specify time-to-live (in seconds; 0=dfl -1=max)");
 
-    printf ("  %*s %s\n", w, "-S, --socket=STRING",
-            "Specify local domain socket for munged");
+    printf ("  %*s %s\n", w, "-S, --socket=PATH",
+            "Specify local socket for munged");
 
     printf ("\n");
     printf ("By default, payload read from stdin, "

@@ -691,7 +691,7 @@ _conf_display_help (char *prog)
 {
 /*  Displays a help message describing the command-line options.
  */
-    const int w = -24;                  /* pad for width of option string */
+    const int w = -25;                  /* pad for width of option string */
 
     assert (prog != NULL);
 
@@ -699,7 +699,7 @@ _conf_display_help (char *prog)
     printf ("\n");
 
     printf ("  %*s %s\n", w, "-h, --help",
-            "Display this help");
+            "Display this help message");
 
     printf ("  %*s %s\n", w, "-L, --license",
             "Display license information");
@@ -744,7 +744,7 @@ _conf_display_help (char *prog)
             w, "--group-check-mtime=BOOL", GIDS_GROUP_FILE,
             MUNGE_GROUP_STAT_FLAG);
 
-    printf ("  %*s %s [%d]\n", w, "--group-update-time=INT",
+    printf ("  %*s %s [%d]\n", w, "--group-update-time=SECS",
             "Specify seconds between group info updates",
             MUNGE_GROUP_UPDATE_SECS);
 
@@ -754,13 +754,13 @@ _conf_display_help (char *prog)
     printf ("  %*s %s [%s]\n", w, "--log-file=PATH",
             "Specify log file", MUNGE_LOGFILE_PATH);
 
-    printf ("  %*s %s [%d]\n", w, "--max-ttl=INT",
+    printf ("  %*s %s [%d]\n", w, "--max-ttl=SECS",
             "Specify maximum time-to-live (in seconds)", MUNGE_MAXIMUM_TTL);
 
     printf ("  %*s %s [%d]\n", w, "--num-threads=INT",
             "Specify number of threads to spawn", MUNGE_THREADS);
 
-    printf ("  %*s %s\n", w, "--origin=ADDRESS",
+    printf ("  %*s %s\n", w, "--origin=ADDR",
             "Specify origin address via hostname/IPaddr/interface");
 
     printf ("  %*s %s [%s]\n", w, "--pid-file=PATH",
@@ -772,7 +772,7 @@ _conf_display_help (char *prog)
     printf ("  %*s %s\n", w, "--syslog",
             "Redirect log messages to syslog");
 
-    printf ("  %*s %s\n", w, "--trusted-group=GROUP",
+    printf ("  %*s %s\n", w, "--trusted-group=GID",
             "Specify trusted group/GID for directory checks");
 
     printf ("\n");

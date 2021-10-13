@@ -53,16 +53,16 @@ Display license information.
 .BI "\-V, \-\-version"
 Display version information.
 .TP
-.BI "\-i, \-\-input " file
+.BI "\-i, \-\-input " path
 Input the credential from the specified file.
 .TP
 .BI "\-n, \-\-no\-output"
 Discard all output, both metadata and payload.
 .TP
-.BI "\-m, \-\-metadata " file
+.BI "\-m, \-\-metadata " path
 Output metadata to the specified file.
 .TP
-.BI "\-o, \-\-output " file
+.BI "\-o, \-\-output " path
 Output the payload to the specified file.
 .TP
 .BI "\-k, \-\-keys " string
@@ -81,7 +81,7 @@ to hostnames, seconds to date and time strings, UIDs to user names, GIDs
 to group names, and cipher/mac/zip type lookups.
 .TP
 .BI "\-S, \-\-socket " path
-Specify the local domain socket for connecting with \fBmunged\fR.
+Specify the local socket for connecting with \fBmunged\fR.
 
 .SH "METADATA KEYS"
 The following metadata keys are supported.
