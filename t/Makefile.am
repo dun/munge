@@ -22,6 +22,7 @@ TESTS = \
 	0022-munge-valgrind.t \
 	0023-unmunge-valgrind.t \
 	0025-mungekey-valgrind.t \
+	0099-credential-decode.t \
 	0100-munged-lock.t \
 	0101-munged-security-socket.t \
 	0102-munged-security-keyfile.t \
@@ -32,6 +33,9 @@ TESTS = \
 EXTRA_DIST = \
 	$(TESTS) \
 	0000-sharness.t \
+	0099-credential-decode.cred \
+	0099-credential-decode.key \
+	0099-credential-decode.out \
 	sharness.d \
 	sharness.sh \
 	test-terminal.perl \
