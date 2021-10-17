@@ -164,7 +164,7 @@ munged_kill_daemon()
     PID=$(cat "${MUNGE_PIDFILE}" 2>/dev/null)
     if ps -p "${PID}" -ww 2>/dev/null | grep munged; then
         kill "${PID}"
-        test_debug "echo \"Killed munged pid ${PID}\""
+        test_debug "echo \"Terminated errant munged pid ${PID}\""
     fi
 }
 
