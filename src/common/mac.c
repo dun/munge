@@ -280,7 +280,6 @@ _mac_block (munge_mac_t md, const void *key, int keylen,
 
 #if HAVE_OPENSSL
 
-#include <openssl/crypto.h>
 #include <openssl/evp.h>
 #include <openssl/hmac.h>
 
