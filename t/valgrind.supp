@@ -46,7 +46,7 @@
 {
    gethostbyname-leak
    Memcheck:Leak
-   match-leak-kinds: reachable
+   match-leak-kinds: definite,reachable
    fun:?alloc
    ...
    fun:gethostbyname
