@@ -149,3 +149,15 @@
    ...
    fun:gcry_control
 }
+
+{
+   pthread_cancel-leak
+   Memcheck:Leak
+   match-leak-kinds: definite
+   fun:malloc
+   ...
+   fun:pthread_cancel@@GLIBC_2.34
+   fun:work_fini
+   fun:job_accept
+   fun:main
+}
