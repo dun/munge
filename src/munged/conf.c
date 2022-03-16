@@ -813,6 +813,7 @@ _conf_send_signal (pid_t pid, int signum, int msecs)
  */
     struct timespec wait_abstime;
     int             rv;
+    int             sig;
 
     assert (pid > 0);
     assert (signum > 0);
@@ -824,23 +825,15 @@ _conf_send_signal (pid_t pid, int signum, int msecs)
         log_errno (EMUNGE_SNAFU, LOG_ERR,
                 "Failed to get wait time for termination");
     }
-    rv = kill (pid, signum);
-    if (rv < 0) {
-        if (errno == ESRCH) {
-            return (0);
-        }
-        log_errno (EMUNGE_SNAFU, LOG_ERR,
-                "Failed to signal daemon (pid %d, sig %d)", pid, signum);
-    }
+    sig = signum;
     while (1) {
-        _conf_sleep (MUNGE_SIGNAL_CHECK_MSECS);
-        rv = kill (pid, 0);
+        rv = kill (pid, sig);
         if (rv < 0) {
             if (errno == ESRCH) {
                 return (0);
             }
             log_errno (EMUNGE_SNAFU, LOG_ERR,
-                    "Failed to signal daemon (pid %d, sig %d)", pid, 0);
+                    "Failed to signal daemon (pid %d, sig %d)", pid, sig);
         }
         rv = clock_is_timespec_expired (&wait_abstime);
         if (rv < 0) {
@@ -850,6 +843,13 @@ _conf_send_signal (pid_t pid, int signum, int msecs)
         if (rv == 1) {
             break;
         }
+        /*  Now that SIGNUM has been sent, switch to sending the null signal
+         *    to check for PID existence.
+         */
+        if (sig != 0) {
+            sig = 0;
+        }
+        _conf_sleep (MUNGE_SIGNAL_CHECK_MSECS);
     }
     return (1);
 }
