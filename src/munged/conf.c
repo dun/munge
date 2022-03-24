@@ -44,6 +44,7 @@
 #include <time.h>
 #include <unistd.h>
 #include <munge.h>
+#include "clock.h"
 #include "conf.h"
 #include "license.h"
 #include "lock.h"
@@ -122,6 +123,8 @@ static void _conf_display_help (char *prog);
 static void _conf_process_stop (conf_t conf);
 
 static int _conf_send_signal (pid_t pid, int signum, int msecs);
+
+static void _conf_sleep (int msecs);
 
 static void _conf_set_origin_addr (conf_t conf);
 
@@ -747,20 +750,18 @@ _conf_display_help (char *prog)
 static void
 _conf_process_stop (conf_t conf)
 {
-/*  Processes the -s/--stop option.
- *  A series of SIGTERMs are sent to the process holding the write-lock.
- *    If the process fails to terminate, a final SIGKILL is sent.
+/*  Process the -s/--stop option.
+ *  A SIGTERM is sent to the process holding the write-lock.
+ *    A SIGKILL is sent afterwards if the process fails to terminate.
  */
     pid_t pid;
-    int   signum;
-    int   msecs;
-    int   i;
     int   rv;
 
     assert (conf != NULL);
-    assert (MUNGE_SIGNAL_ATTEMPTS > 0);
-    assert (MUNGE_SIGNAL_DELAY_MSECS > 0);
+    assert (MUNGE_SIGNAL_WAIT_MSECS > 0);
 
+    /*  Obtain pid of daemon bound to socket.
+     */
     pid = lock_query (conf);
     if (pid <= 0) {
         if (conf->got_verbose) {
@@ -772,38 +773,33 @@ _conf_process_stop (conf_t conf)
         }
         exit (EXIT_FAILURE);
     }
-    rv = kill (pid, 0);
-    if (rv < 0) {
+    /*  Terminate.
+     */
+    rv = _conf_send_signal (pid, SIGTERM, MUNGE_SIGNAL_WAIT_MSECS);
+    if (rv == 0) {
         if (conf->got_verbose) {
-            log_errno (EMUNGE_SNAFU, LOG_ERR,
-                    "Failed to signal daemon bound to socket \"%s\" (pid %d)",
+            log_msg (LOG_NOTICE,
+                    "Terminated daemon bound to socket \"%s\" (pid %d)",
                     conf->socket_name, pid);
         }
-        exit (EXIT_FAILURE);
+        exit (EXIT_SUCCESS);
     }
-    signum = SIGTERM;
-    msecs = 0;
-    for (i = 0; i < (MUNGE_SIGNAL_ATTEMPTS + 1); i++) {
-        if (i == MUNGE_SIGNAL_ATTEMPTS) {
-            signum = SIGKILL;           /* Kill me harder! */
+    /*  Kill.
+     */
+    rv = _conf_send_signal (pid, SIGKILL, MUNGE_SIGNAL_WAIT_MSECS);
+    if (rv == 0) {
+        if (conf->got_verbose) {
+            log_msg (LOG_NOTICE,
+                    "Killed daemon bound to socket \"%s\" (pid %d)",
+                    conf->socket_name, pid);
         }
-        msecs += MUNGE_SIGNAL_DELAY_MSECS;
-        rv = _conf_send_signal (pid, signum, msecs);
-        if (rv == 0) {
-            if (conf->got_verbose) {
-                log_msg (LOG_NOTICE,
-                        "%s daemon bound to socket \"%s\" (pid %d)",
-                        (signum == SIGTERM) ? "Terminated" : "Killed",
-                        conf->socket_name, pid);
-            }
-            exit (EXIT_SUCCESS);
-        }
+        exit (EXIT_SUCCESS);
     }
-    if (conf->got_verbose) {
-        log_err (EMUNGE_SNAFU, LOG_ERR,
-                "Failed to terminate daemon bound to socket \"%s\" (pid %d)",
-                conf->socket_name, pid);
-    }
+    /*  Fail.
+     */
+    log_err (EMUNGE_SNAFU, LOG_ERR,
+            "Failed to terminate daemon bound to socket \"%s\" (pid %d)",
+            conf->socket_name, pid);
     exit (EXIT_FAILURE);
 }
 
@@ -811,47 +807,91 @@ _conf_process_stop (conf_t conf)
 static int
 _conf_send_signal (pid_t pid, int signum, int msecs)
 {
-/*  Sends the signal [signum] to the process specified by [pid].
- *  Returns 1 if the process is still running after a delay of [msecs],
- *    or 0 if the process cannot be found.
+/*  Send the signal [signum] to the process specified by [pid].
+ *  Return 1 if the process is still running after a delay of [msecs],
+ *    or 0 if the process has terminated.
  */
-    struct timespec ts;
+    struct timespec wait_abstime;
     int             rv;
+    int             sig;
 
     assert (pid > 0);
     assert (signum > 0);
     assert (msecs > 0);
+    assert (MUNGE_SIGNAL_CHECK_MSECS > 0);
 
-    log_msg (LOG_DEBUG, "Signaling pid %d with sig %d and %dms delay",
-            pid, signum, msecs);
-
-    rv = kill (pid, signum);
+    rv = clock_get_timespec (&wait_abstime, msecs);
     if (rv < 0) {
-        if (errno == ESRCH) {
-            return (0);
-        }
         log_errno (EMUNGE_SNAFU, LOG_ERR,
-                "Failed to signal daemon (pid %d, sig %d)", pid, signum);
+                "Failed to get wait time for termination");
     }
-    ts.tv_sec = msecs / 1000;
-    ts.tv_nsec = (msecs % 1000) * 1000 * 1000;
-    do {
-        rv = nanosleep (&ts, &ts);
-    } while ((rv < 0) && (errno == EINTR));
-
-    if (rv < 0) {
-        log_errno (EMUNGE_SNAFU, LOG_ERR,
-                "Failed to sleep while awaiting signal result");
-    }
-    rv = kill (pid, 0);
-    if (rv < 0) {
-        if (errno == ESRCH) {
-            return (0);
+    sig = signum;
+    while (1) {
+        rv = kill (pid, sig);
+        if (rv < 0) {
+            if (errno == ESRCH) {
+                return (0);
+            }
+            log_errno (EMUNGE_SNAFU, LOG_ERR,
+                    "Failed to signal daemon (pid %d, sig %d)", pid, sig);
         }
-        log_errno (EMUNGE_SNAFU, LOG_ERR,
-                "Failed to check daemon (pid %d, sig 0)", pid);
+        rv = clock_is_timespec_expired (&wait_abstime);
+        if (rv < 0) {
+            log_errno (EMUNGE_SNAFU, LOG_ERR,
+                    "Failed to check if termination wait time has expired");
+        }
+        if (rv == 1) {
+            break;
+        }
+        /*  Now that SIGNUM has been sent, switch to sending the null signal
+         *    to check for PID existence.
+         */
+        if (sig != 0) {
+            sig = 0;
+        }
+        _conf_sleep (MUNGE_SIGNAL_CHECK_MSECS);
     }
     return (1);
+}
+
+
+static void
+_conf_sleep (int msecs)
+{
+/*  Sleep for the specified number of milliseconds [msecs].
+ */
+#if HAVE_CLOCK_NANOSLEEP
+    struct timespec check_abstime;
+    int             rv;
+
+    rv = clock_get_timespec (&check_abstime, msecs);
+    if (rv < 0) {
+        log_errno (EMUNGE_SNAFU, LOG_ERR,
+                "Failed to get check time for termination");
+    }
+    do {
+        rv = clock_nanosleep (CLOCK_REALTIME, TIMER_ABSTIME, &check_abstime,
+                NULL);
+    } while ((rv < 0) && (errno == EINTR));
+    if (rv < 0) {
+        log_errno (EMUNGE_SNAFU, LOG_ERR,
+                "Failed to sleep before checking for termination");
+    }
+#else  /* !HAVE_CLOCK_NANOSLEEP */
+    struct timespec check_reltime;
+    int             rv;
+
+    check_reltime.tv_sec = msecs / 1000;
+    check_reltime.tv_nsec = (msecs % 1000) * 1000 * 1000;
+
+    do {
+        rv = nanosleep (&check_reltime, &check_reltime);
+    } while ((rv < 0) && (errno == EINTR));
+    if (rv < 0) {
+        log_errno (EMUNGE_SNAFU, LOG_ERR,
+                "Failed to sleep before checking for termination");
+    }
+#endif /* !HAVE_CLOCK_NANOSLEEP */
 }
 
 

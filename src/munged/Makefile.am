@@ -52,6 +52,7 @@ munged_LDADD = \
 	$(top_builddir)/src/libmunge/libmunge.la \
 	$(LIBPTHREAD) \
 	$(LIBBZ2) \
+	$(LIBRT) \
 	$(LIBZ) \
 	$(CRYPTO_LIBS) \
 	# End of munged_LDADD
@@ -64,6 +65,8 @@ munged_SOURCES = \
 	base64.h \
 	cipher.c \
 	cipher.h \
+	clock.c \
+	clock.h \
 	conf.c \
 	conf.h \
 	cred.c \

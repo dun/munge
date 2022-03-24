@@ -124,17 +124,16 @@
  */
 #define MUNGE_REPLAY_PURGE_SECS         60
 
-/*  Number of attempts to signal a process before sending SIGKILL.
+/*  Maximum number of milliseconds to wait for a process to terminate after
+ *    sending a signal.
  */
-#define MUNGE_SIGNAL_ATTEMPTS           19
+#define MUNGE_SIGNAL_WAIT_MSECS         5000
 
-/*  Starting number of milliseconds between signaling a process and checking
- *    to see if it has responded (i.e., kicked the bucket, shuffled off this
- *    mortal coil, run down the curtain, and joined the bleedin' choir
- *    invisible).  The delay is further incremented by this amount after each
- *    attempt.
+/*  Number of milliseconds between checks to see whether a process has
+ *    terminated (i.e., kicked the bucket, shuffled off this mortal coil,
+ *    run down the curtain, and joined the bleedin' choir invisible).
  */
-#define MUNGE_SIGNAL_DELAY_MSECS        50
+#define MUNGE_SIGNAL_CHECK_MSECS        25
 
 /*  Socket backlog for the server listening on the unix domain socket.
  */
