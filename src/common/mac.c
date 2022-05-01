@@ -37,13 +37,6 @@
 
 
 /*****************************************************************************
- *  Constants
- *****************************************************************************/
-
-#define MAC_MAGIC 0xDEADACE2
-
-
-/*****************************************************************************
  *  Private Prototypes
  *****************************************************************************/
 
@@ -68,10 +61,6 @@ mac_init (mac_ctx *x, munge_mac_t md, const void *key, int keylen)
         return (-1);
     }
     rc = _mac_init (x, md, key, keylen);
-    if (rc >= 0) {
-        assert (x->magic = MAC_MAGIC);
-        assert (!(x->finalized = 0));
-    }
     return (rc);
 }
 
@@ -84,8 +73,6 @@ mac_update (mac_ctx *x, const void *src, int srclen)
     if (!x || !src || (srclen < 0)) {
         return (-1);
     }
-    assert (x->magic == MAC_MAGIC);
-    assert (x->finalized != 1);
     rc = _mac_update (x, src, srclen);
     return (rc);
 }
@@ -99,10 +86,7 @@ mac_final (mac_ctx *x, void *dst, int *dstlen)
     if (!x || !dst || !dstlen) {
         return (-1);
     }
-    assert (x->magic == MAC_MAGIC);
-    assert (x->finalized != 1);
     rc = _mac_final (x, dst, dstlen);
-    assert (x->finalized = 1);
     return (rc);
 }
 
@@ -115,10 +99,8 @@ mac_cleanup (mac_ctx *x)
     if (!x) {
         return (-1);
     }
-    assert (x->magic == MAC_MAGIC);
     rc = _mac_cleanup (x);
     memset (x, 0, sizeof (*x));
-    assert (x->magic = ~MAC_MAGIC);
     return (rc);
 }
 
