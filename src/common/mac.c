@@ -64,10 +64,9 @@ mac_init (mac_ctx *x, munge_mac_t md, const void *key, int keylen)
 {
     int rc;
 
-    assert (x != NULL);
-    assert (key != NULL);
-    assert (keylen >= 0);
-
+    if (!x || !key || (keylen < 0)) {
+        return (-1);
+    }
     rc = _mac_init (x, md, key, keylen);
     if (rc >= 0) {
         assert (x->magic = MAC_MAGIC);
@@ -82,14 +81,11 @@ mac_update (mac_ctx *x, const void *src, int srclen)
 {
     int rc;
 
-    assert (x != NULL);
+    if (!x || !src || (srclen < 0)) {
+        return (-1);
+    }
     assert (x->magic == MAC_MAGIC);
     assert (x->finalized != 1);
-    assert (src != NULL);
-
-    if (srclen <= 0) {
-        return (0);
-    }
     rc = _mac_update (x, src, srclen);
     return (rc);
 }
@@ -100,15 +96,11 @@ mac_final (mac_ctx *x, void *dst, int *dstlen)
 {
     int rc;
 
-    assert (x != NULL);
-    assert (x->magic == MAC_MAGIC);
-    assert (x->finalized != 1);
-    assert (dst != NULL);
-    assert (dstlen != NULL);
-
-    if ((dstlen == NULL) || (*dstlen <= 0)) {
+    if (!x || !dst || !dstlen) {
         return (-1);
     }
+    assert (x->magic == MAC_MAGIC);
+    assert (x->finalized != 1);
     rc = _mac_final (x, dst, dstlen);
     assert (x->finalized = 1);
     return (rc);
@@ -120,9 +112,10 @@ mac_cleanup (mac_ctx *x)
 {
     int rc;
 
-    assert (x != NULL);
+    if (!x) {
+        return (-1);
+    }
     assert (x->magic == MAC_MAGIC);
-
     rc = _mac_cleanup (x);
     memset (x, 0, sizeof (*x));
     assert (x->magic = ~MAC_MAGIC);
@@ -143,14 +136,8 @@ mac_block (munge_mac_t md, const void *key, int keylen,
 {
     int rc;
 
-    assert (key != NULL);
-    assert (src != NULL);
-    assert (dst != NULL);
-    assert (dstlen != NULL);
-
-    if (srclen <= 0) {
-        *dstlen = 0;
-        return (0);
+    if (!key || (keylen < 0) || !dst || !dstlen || !src || (srclen < 0)) {
+        return (-1);
     }
     rc = _mac_block (md, key, keylen, dst, dstlen, src, srclen);
     return (rc);
@@ -288,10 +275,6 @@ _mac_init (mac_ctx *x, munge_mac_t md, const void *key, int keylen)
 {
     EVP_MD *algo;
 
-    assert (x != NULL);
-    assert (key != NULL);
-    assert (keylen >= 0);
-
     if (md_map_enum (md, &algo) < 0) {
         return (-1);
     }
@@ -335,11 +318,6 @@ _mac_init (mac_ctx *x, munge_mac_t md, const void *key, int keylen)
 static int
 _mac_update (mac_ctx *x, const void *src, int srclen)
 {
-    assert (x != NULL);
-    assert (x->ctx != NULL);
-    assert (src != NULL);
-    assert (srclen >= 0);
-
 #if HAVE_HMAC_UPDATE_RETURN_INT
     /*  OpenSSL >= 1.0.0  */
     if (HMAC_Update (x->ctx, src, srclen) != 1) {
@@ -359,11 +337,6 @@ _mac_update (mac_ctx *x, const void *src, int srclen)
 static int
 _mac_final (mac_ctx *x, void *dst, int *dstlen)
 {
-    assert (x != NULL);
-    assert (x->ctx != NULL);
-    assert (dst != NULL);
-    assert (dstlen != NULL);
-
     if (*dstlen < x->diglen) {
         return (-1);
     }
@@ -386,9 +359,6 @@ _mac_final (mac_ctx *x, void *dst, int *dstlen)
 static int
 _mac_cleanup (mac_ctx *x)
 {
-    assert (x != NULL);
-    assert (x->ctx != NULL);
-
 #if HAVE_HMAC_CTX_FREE
     /*  OpenSSL >= 1.1.0  */
     HMAC_CTX_free (x->ctx);
@@ -413,11 +383,6 @@ _mac_block (munge_mac_t md, const void *key, int keylen,
             void *dst, int *dstlen, const void *src, int srclen)
 {
     EVP_MD *algo;
-
-    assert (dst != NULL);
-    assert (dstlen != NULL);
-    assert (src != NULL);
-    assert (srclen >= 0);
 
     if (md_map_enum (md, &algo) < 0) {
         return (-1);
