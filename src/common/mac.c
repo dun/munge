@@ -127,9 +127,9 @@ mac_block (munge_mac_t md, const void *key, int keylen,
 
 
 int
-mac_map_enum (munge_mac_t mac, void *dst)
+mac_map_enum (munge_mac_t md, void *dst)
 {
-    return (md_map_enum (mac, dst));
+    return (md_map_enum (md, dst));
 }
 
 

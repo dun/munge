@@ -117,9 +117,9 @@ int mac_block (munge_mac_t md, const void *key, int keylen,
  *    to the number of bytes written to [dst].
  */
 
-int mac_map_enum (munge_mac_t mac, void *dst);
+int mac_map_enum (munge_mac_t md, void *dst);
 /*
- *  Map the specified [mac] algorithm to the internal representation used
+ *  Map the specified [md] algorithm to the internal representation used
  *    by the underlying cryptographic library.
  *  If [dst] is non-NULL, write the cryptographic library's internal
  *    representation of the message digest algorithm to [dst].
