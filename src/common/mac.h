@@ -84,13 +84,13 @@ int mac_update (mac_ctx *x, const void *src, int srclen);
  *  Returns 0 on success, or -1 on error.
  */
 
-int mac_final (mac_ctx *x, void *dst, int *dstlen);
+int mac_final (mac_ctx *x, void *dst, int *dstlenp);
 /*
- *  Finalizes the MAC context [x], placing the MAC in [dst] of length [dstlen].
- *    The [dst] buffer must have sufficient space for the MAC output
- *    (mac_size).
+ *  Finalizes the MAC context [x], placing the MAC in [dst] of length
+ *    [dstlenp].  The [dst] buffer must have sufficient space for the MAC
+ *    output (mac_size).
  *  After this function, no further calls to md_update() should be made.
- *  Returns 0 on success, or -1 on error; in addition, [dstlen] will be set
+ *  Returns 0 on success, or -1 on error; in addition, [dstlenp] will be set
  *    to the number of bytes written to [dst].
  */
 
@@ -106,14 +106,14 @@ int mac_size (munge_mac_t md);
  */
 
 int mac_block (munge_mac_t md, const void *key, int keylen,
-               void *dst, int *dstlen, const void *src, int srclen);
+               void *dst, int *dstlenp, const void *src, int srclen);
 /*
  *  Computes the MAC without the need of a context; this requires
  *    the [src] to be contiguous.
  *  Uses the message digest [md] and key [key] of [keylen] bytes.
  *  Reads [srclen] bytes of data from [src], and writes the MAC to [dst]
- *    of length [dstlen].
- *  Returns 0 on success, or -1 on error; in addition, [dstlen] will be set
+ *    of length [dstlenp].
+ *  Returns 0 on success, or -1 on error; in addition, [dstlenp] will be set
  *    to the number of bytes written to [dst].
  */
 

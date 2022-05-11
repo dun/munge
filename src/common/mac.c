@@ -42,10 +42,10 @@
 
 static int _mac_init (mac_ctx *x, munge_mac_t md, const void *key, int keylen);
 static int _mac_update (mac_ctx *x, const void *src, int srclen);
-static int _mac_final (mac_ctx *x, void *dst, int *dstlen);
+static int _mac_final (mac_ctx *x, void *dst, int *dstlenp);
 static int _mac_cleanup (mac_ctx *x);
 static int _mac_block (munge_mac_t md, const void *key, int keylen,
-    void *dst, int *dstlen, const void *src, int srclen);
+    void *dst, int *dstlenp, const void *src, int srclen);
 
 
 /*****************************************************************************
@@ -79,14 +79,14 @@ mac_update (mac_ctx *x, const void *src, int srclen)
 
 
 int
-mac_final (mac_ctx *x, void *dst, int *dstlen)
+mac_final (mac_ctx *x, void *dst, int *dstlenp)
 {
     int rc;
 
-    if (!x || !dst || !dstlen) {
+    if (!x || !dst || !dstlenp) {
         return (-1);
     }
-    rc = _mac_final (x, dst, dstlen);
+    rc = _mac_final (x, dst, dstlenp);
     return (rc);
 }
 
@@ -114,14 +114,14 @@ mac_size (munge_mac_t md)
 
 int
 mac_block (munge_mac_t md, const void *key, int keylen,
-           void *dst, int *dstlen, const void *src, int srclen)
+           void *dst, int *dstlenp, const void *src, int srclen)
 {
     int rc;
 
-    if (!key || (keylen < 0) || !dst || !dstlen || !src || (srclen < 0)) {
+    if (!key || (keylen < 0) || !dst || !dstlenp || !src || (srclen < 0)) {
         return (-1);
     }
-    rc = _mac_block (md, key, keylen, dst, dstlen, src, srclen);
+    rc = _mac_block (md, key, keylen, dst, dstlenp, src, srclen);
     return (rc);
 }
 
@@ -175,18 +175,18 @@ _mac_update (mac_ctx *x, const void *src, int srclen)
 
 
 static int
-_mac_final (mac_ctx *x, void *dst, int *dstlen)
+_mac_final (mac_ctx *x, void *dst, int *dstlenp)
 {
     unsigned char *digest;
 
-    if (*dstlen < x->diglen) {
+    if (*dstlenp < x->diglen) {
         return (-1);
     }
     if ((digest = gcry_md_read (x->ctx, 0)) == NULL) {
         return (-1);
     }
     memcpy (dst, digest, x->diglen);
-    *dstlen = x->diglen;
+    *dstlenp = x->diglen;
     return (0);
 }
 
@@ -201,7 +201,7 @@ _mac_cleanup (mac_ctx *x)
 
 static int
 _mac_block (munge_mac_t md, const void *key, int keylen,
-            void *dst, int *dstlen, const void *src, int srclen)
+            void *dst, int *dstlenp, const void *src, int srclen)
 {
     gcry_error_t   e;
     int            algo;
@@ -213,7 +213,7 @@ _mac_block (munge_mac_t md, const void *key, int keylen,
         return (-1);
     }
     len = gcry_md_get_algo_dlen (algo);
-    if (*dstlen < len) {
+    if (*dstlenp < len) {
         return (-1);
     }
     if ((e = gcry_md_open (&ctx, algo, GCRY_MD_FLAG_HMAC)) != 0) {
@@ -234,7 +234,7 @@ _mac_block (munge_mac_t md, const void *key, int keylen,
         return (-1);
     }
     memcpy (dst, digest, len);
-    *dstlen = len;
+    *dstlenp = len;
     gcry_md_close (ctx);
     memset (&ctx, 0, sizeof (ctx));
     return (0);
@@ -317,19 +317,19 @@ _mac_update (mac_ctx *x, const void *src, int srclen)
 
 
 static int
-_mac_final (mac_ctx *x, void *dst, int *dstlen)
+_mac_final (mac_ctx *x, void *dst, int *dstlenp)
 {
-    if (*dstlen < x->diglen) {
+    if (*dstlenp < x->diglen) {
         return (-1);
     }
 #if HAVE_HMAC_FINAL_RETURN_INT
     /*  OpenSSL >= 1.0.0  */
-    if (HMAC_Final (x->ctx, dst, (unsigned int *) dstlen) != 1) {
+    if (HMAC_Final (x->ctx, dst, (unsigned int *) dstlenp) != 1) {
         return (-1);
     }
 #elif HAVE_HMAC_FINAL
     /*  OpenSSL >= 0.9.0, < 1.0.0  */
-    HMAC_Final (x->ctx, dst, (unsigned int *) dstlen);
+    HMAC_Final (x->ctx, dst, (unsigned int *) dstlenp);
 #else  /* !HAVE_HMAC_FINAL */
 #error "No OpenSSL HMAC_Final"
 #endif /* !HAVE_HMAC_FINAL */
@@ -362,17 +362,17 @@ _mac_cleanup (mac_ctx *x)
 
 static int
 _mac_block (munge_mac_t md, const void *key, int keylen,
-            void *dst, int *dstlen, const void *src, int srclen)
+            void *dst, int *dstlenp, const void *src, int srclen)
 {
     EVP_MD *algo;
 
     if (md_map_enum (md, &algo) < 0) {
         return (-1);
     }
-    if (*dstlen < EVP_MD_size (algo)) {
+    if (*dstlenp < EVP_MD_size (algo)) {
         return (-1);
     }
-    if (!HMAC (algo, key, keylen, src, srclen, dst, (unsigned int *) dstlen)) {
+    if (!HMAC (algo, key, keylen, src, srclen, dst, (unsigned int *)dstlenp)) {
         return (-1);
     }
     return (0);
