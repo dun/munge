@@ -37,13 +37,6 @@
 
 
 /*****************************************************************************
- *  Constants
- *****************************************************************************/
-
-#define MD_MAGIC 0xDEADACE3
-
-
-/*****************************************************************************
  *  Private Data
  *****************************************************************************/
 
@@ -90,10 +83,6 @@ md_init (md_ctx *x, munge_mac_t md)
     assert (x != NULL);
 
     rc = _md_init (x, md);
-    if (rc >= 0) {
-        assert (x->magic = MD_MAGIC);
-        assert (!(x->finalized = 0));
-    }
     return (rc);
 }
 
@@ -105,8 +94,6 @@ md_update (md_ctx *x, const void *src, int srclen)
 
     assert (_md_is_initialized);
     assert (x != NULL);
-    assert (x->magic == MD_MAGIC);
-    assert (x->finalized != 1);
     assert (src != NULL);
 
     if (srclen <= 0) {
@@ -124,8 +111,6 @@ md_final (md_ctx *x, void *dst, int *dstlen)
 
     assert (_md_is_initialized);
     assert (x != NULL);
-    assert (x->magic == MD_MAGIC);
-    assert (x->finalized != 1);
     assert (dst != NULL);
     assert (dstlen != NULL);
 
@@ -133,7 +118,6 @@ md_final (md_ctx *x, void *dst, int *dstlen)
         return (-1);
     }
     rc = _md_final (x, dst, dstlen);
-    assert (x->finalized = 1);
     return (rc);
 }
 
@@ -145,11 +129,9 @@ md_cleanup (md_ctx *x)
 
     assert (_md_is_initialized);
     assert (x != NULL);
-    assert (x->magic == MD_MAGIC);
 
     rc = _md_cleanup (x);
     memset (x, 0, sizeof (*x));
-    assert (x->magic = ~MD_MAGIC);
     return (rc);
 }
 
@@ -162,13 +144,9 @@ md_copy (md_ctx *xdst, md_ctx *xsrc)
     assert (_md_is_initialized);
     assert (xdst != NULL);
     assert (xsrc != NULL);
-    assert (xsrc->magic == MD_MAGIC);
-    assert (xsrc->finalized != 1);
 
     xdst->diglen = xsrc->diglen;
     rc = _md_copy (xdst, xsrc);
-    assert (!(xdst->finalized = 0));
-    assert (xdst->magic = MD_MAGIC);
     return (rc);
 }
 

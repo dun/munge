@@ -48,10 +48,6 @@
 typedef struct {
     gcry_md_hd_t        ctx;
     int                 diglen;
-#ifndef NDEBUG
-    int                 magic;
-    int                 finalized;
-#endif /* !NDEBUG */
 } md_ctx;
 
 #endif /* HAVE_LIBGCRYPT */
@@ -64,10 +60,6 @@ typedef struct {
 typedef struct {
     EVP_MD_CTX         *ctx;
     int                 diglen;
-#ifndef NDEBUG
-    int                 magic;
-    int                 finalized;
-#endif /* !NDEBUG */
 } md_ctx;
 
 #endif /* HAVE_OPENSSL */
