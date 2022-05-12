@@ -80,8 +80,10 @@ md_init (md_ctx *x, munge_mac_t md)
     int rc;
 
     assert (_md_is_initialized);
-    assert (x != NULL);
 
+    if (!x) {
+        return (-1);
+    }
     rc = _md_init (x, md);
     return (rc);
 }
@@ -93,11 +95,9 @@ md_update (md_ctx *x, const void *src, int srclen)
     int rc;
 
     assert (_md_is_initialized);
-    assert (x != NULL);
-    assert (src != NULL);
 
-    if (srclen <= 0) {
-        return (0);
+    if (!x || !src || (srclen < 0)) {
+        return (-1);
     }
     rc = _md_update (x, src, srclen);
     return (rc);
@@ -110,11 +110,8 @@ md_final (md_ctx *x, void *dst, int *dstlen)
     int rc;
 
     assert (_md_is_initialized);
-    assert (x != NULL);
-    assert (dst != NULL);
-    assert (dstlen != NULL);
 
-    if ((dstlen == NULL) || (*dstlen <= 0)) {
+    if (!x || !dst || !dstlen) {
         return (-1);
     }
     rc = _md_final (x, dst, dstlen);
@@ -128,8 +125,10 @@ md_cleanup (md_ctx *x)
     int rc;
 
     assert (_md_is_initialized);
-    assert (x != NULL);
 
+    if (!x) {
+        return (-1);
+    }
     rc = _md_cleanup (x);
     memset (x, 0, sizeof (*x));
     return (rc);
@@ -142,9 +141,10 @@ md_copy (md_ctx *xdst, md_ctx *xsrc)
     int rc;
 
     assert (_md_is_initialized);
-    assert (xdst != NULL);
-    assert (xsrc != NULL);
 
+    if (!xdst || !xsrc) {
+        return (-1);
+    }
     xdst->diglen = xsrc->diglen;
     rc = _md_copy (xdst, xsrc);
     return (rc);
@@ -155,6 +155,7 @@ int
 md_size (munge_mac_t md)
 {
     assert (_md_is_initialized);
+
     return (_md_size (md));
 }
 
@@ -163,6 +164,7 @@ int
 md_map_enum (munge_mac_t md, void *dst)
 {
     assert (_md_is_initialized);
+
     return (_md_map_enum (md, dst));
 }
 
@@ -336,8 +338,6 @@ _md_init (md_ctx *x, munge_mac_t md)
 {
     EVP_MD *algo;
 
-    assert (x != NULL);
-
     if (_md_map_enum (md, &algo) < 0) {
         return (-1);
     }
@@ -365,8 +365,6 @@ _md_init (md_ctx *x, munge_mac_t md)
 static int
 _md_ctx_create (md_ctx *x)
 {
-    assert (x != NULL);
-
 #if HAVE_EVP_MD_CTX_NEW
     /*  OpenSSL >= 1.1.0  */
     x->ctx = EVP_MD_CTX_new ();                         /* alloc & init */
@@ -392,11 +390,6 @@ _md_ctx_create (md_ctx *x)
 static int
 _md_update (md_ctx *x, const void *src, int srclen)
 {
-    assert (x != NULL);
-    assert (x->ctx != NULL);
-    assert (src != NULL);
-    assert (srclen >= 0);
-
 #if HAVE_EVP_DIGESTUPDATE_RETURN_INT
     /*  OpenSSL >= 0.9.7  */
     if (EVP_DigestUpdate (x->ctx, src, (unsigned int) srclen) != 1) {
@@ -416,11 +409,6 @@ _md_update (md_ctx *x, const void *src, int srclen)
 static int
 _md_final (md_ctx *x, void *dst, int *dstlen)
 {
-    assert (x != NULL);
-    assert (x->ctx != NULL);
-    assert (dst != NULL);
-    assert (dstlen != NULL);
-
     if (*dstlen < x->diglen) {
         return (-1);
     }
@@ -444,9 +432,6 @@ static int
 _md_cleanup (md_ctx *x)
 {
     int rv = 0;
-
-    assert (x != NULL);
-    assert (x->ctx != NULL);
 
 #if HAVE_EVP_MD_CTX_FREE
     /*  OpenSSL >= 1.1.0  */
@@ -472,9 +457,6 @@ _md_cleanup (md_ctx *x)
 static int
 _md_copy (md_ctx *xdst, md_ctx *xsrc)
 {
-    assert (xdst != NULL);
-    assert (xsrc != NULL);
-
     if (_md_ctx_create (xdst) < 0) {
         return (-1);
     }
