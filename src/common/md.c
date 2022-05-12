@@ -431,7 +431,7 @@ _md_final (md_ctx *x, void *dst, int *dstlenp)
 static int
 _md_cleanup (md_ctx *x)
 {
-    int rv = 0;
+    int rc = 0;
 
 #if HAVE_EVP_MD_CTX_FREE
     /*  OpenSSL >= 1.1.0  */
@@ -443,14 +443,14 @@ _md_cleanup (md_ctx *x)
 #if HAVE_EVP_MD_CTX_CLEANUP
     /*  OpenSSL >= 0.9.7, < 1.1.0  */
     if (EVP_MD_CTX_cleanup (x->ctx) != 1) {
-        rv = -1;
+        rc = -1;
     }
 #endif /* HAVE_EVP_MD_CTX_CLEANUP */
     OPENSSL_free (x->ctx);
 #endif /* !HAVE_EVP_MD_CTX_DESTROY */
 
     x->ctx = NULL;
-    return (rv);
+    return (rc);
 }
 
 
