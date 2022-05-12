@@ -50,7 +50,7 @@ static int _md_is_initialized = 0;
 static void _md_init_subsystem (void);
 static int _md_init (md_ctx *x, munge_mac_t md);
 static int _md_update (md_ctx *x, const void *src, int srclen);
-static int _md_final (md_ctx *x, void *dst, int *dstlen);
+static int _md_final (md_ctx *x, void *dst, int *dstlenp);
 static int _md_cleanup (md_ctx *x);
 static int _md_copy (md_ctx *xdst, md_ctx *xsrc);
 static int _md_size (munge_mac_t md);
@@ -105,16 +105,16 @@ md_update (md_ctx *x, const void *src, int srclen)
 
 
 int
-md_final (md_ctx *x, void *dst, int *dstlen)
+md_final (md_ctx *x, void *dst, int *dstlenp)
 {
     int rc;
 
     assert (_md_is_initialized);
 
-    if (!x || !dst || !dstlen) {
+    if (!x || !dst || !dstlenp) {
         return (-1);
     }
-    rc = _md_final (x, dst, dstlen);
+    rc = _md_final (x, dst, dstlenp);
     return (rc);
 }
 
@@ -227,18 +227,18 @@ _md_update (md_ctx *x, const void *src, int srclen)
 
 
 static int
-_md_final (md_ctx *x, void *dst, int *dstlen)
+_md_final (md_ctx *x, void *dst, int *dstlenp)
 {
     unsigned char *digest;
 
-    if (*dstlen < x->diglen) {
+    if (*dstlenp < x->diglen) {
         return (-1);
     }
     if ((digest = gcry_md_read (x->ctx, 0)) == NULL) {
         return (-1);
     }
     memcpy (dst, digest, x->diglen);
-    *dstlen = x->diglen;
+    *dstlenp = x->diglen;
     return (0);
 }
 
@@ -407,19 +407,19 @@ _md_update (md_ctx *x, const void *src, int srclen)
 
 
 static int
-_md_final (md_ctx *x, void *dst, int *dstlen)
+_md_final (md_ctx *x, void *dst, int *dstlenp)
 {
-    if (*dstlen < x->diglen) {
+    if (*dstlenp < x->diglen) {
         return (-1);
     }
 #if HAVE_EVP_DIGESTFINAL_EX
     /*  OpenSSL >= 0.9.7  */
-    if (!(EVP_DigestFinal_ex (x->ctx, dst, (unsigned int *) dstlen))) {
+    if (!(EVP_DigestFinal_ex (x->ctx, dst, (unsigned int *) dstlenp))) {
         return (-1);
     }
 #elif HAVE_EVP_DIGESTFINAL
     /*  OpenSSL < 0.9.7  */
-    EVP_DigestFinal (x->ctx, dst, (unsigned int *) dstlen);
+    EVP_DigestFinal (x->ctx, dst, (unsigned int *) dstlenp);
 #else  /* !HAVE_EVP_DIGESTFINAL */
 #error "No OpenSSL EVP_DigestFinal"
 #endif /* !HAVE_EVP_DIGESTFINAL */

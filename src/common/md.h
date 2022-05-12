@@ -88,13 +88,13 @@ int md_update (md_ctx *x, const void *src, int srclen);
  *  Returns 0 on success, or -1 on error.
  */
 
-int md_final (md_ctx *x, void *dst, int *dstlen);
+int md_final (md_ctx *x, void *dst, int *dstlenp);
 /*
  *  Finalizes the message digest context [x], placing the digest in [dst]
- *    of length [dstlen].  The [dst] buffer must have sufficient space for
+ *    of length [dstlenp].  The [dst] buffer must have sufficient space for
  *    the message digest output (md_size).
  *  After this function, no further calls to md_update() should be made.
- *  Returns 0 on success, or -1 on error; in addition, [dstlen] will be set
+ *  Returns 0 on success, or -1 on error; in addition, [dstlenp] will be set
  *    to the number of bytes written to [dst].
  */
 
