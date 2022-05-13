@@ -263,7 +263,7 @@ _cipher_update (cipher_ctx *x, void *vdst, int *dstlenp,
 /*  During encryption, any remaining src data that is not a multiple of the
  *    cipher block size is saved in the context's partial block buffer.
  *    This buffer will be padded when the encryption is finalized
- *    (cf, PKCS #5, rfc2898).
+ *    (see PKCS #5, rfc2898).
  *  During decryption, the partial block buffer will always contain data at
  *    the end of each update to ensure the padding is properly removed when
  *    the decryption is finalized.

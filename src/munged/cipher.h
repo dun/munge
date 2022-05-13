@@ -144,7 +144,8 @@ int cipher_map_enum (munge_cipher_t cipher, void *dst);
  *  Map the specified [cipher] algorithm to the internal representation used
  *    by the underlying cryptographic library.
  *  If [dst] is non-NULL, write the cryptographic library's internal
- *    representation of the cipher algorithm to [dst].
+ *    representation of the cipher algorithm to [dst]; otherwise, just validate
+ *    the specified [cipher] algorithm.
  *  Returns 0 on success, or -1 on error.
  */
 

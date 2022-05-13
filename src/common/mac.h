@@ -122,7 +122,8 @@ int mac_map_enum (munge_mac_t md, void *dst);
  *  Map the specified [md] algorithm to the internal representation used
  *    by the underlying cryptographic library.
  *  If [dst] is non-NULL, write the cryptographic library's internal
- *    representation of the message digest algorithm to [dst].
+ *    representation of the message digest algorithm to [dst]; otherwise, just
+ *    validate the specified [md] algorithm.
  *  Returns 0 on success, or -1 on error.
  */
 
