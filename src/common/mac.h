@@ -57,7 +57,12 @@ typedef struct {
 
 #include <openssl/evp.h>
 
-#if HAVE_EVP_MAC_CTX_P
+/*  openSUSE 15.1 has OpenSSL 1.1.0i-fips (14 Aug 2018) but defines EVP_MAC_CTX
+ *    in <openssl/ossl_typ.h> (libopenssl-1_1-devel-1.1.0i-lp151.8.12.2.x86_64)
+ *    (EVP_MAC_CTX shouldn't appear until OpenSSL 3.0), so also add a guard for
+ *    HAVE_EVP_MAC_CTX_NEW to prevent EVP_MAC_CTX from being erroneously used.
+ */
+#if HAVE_EVP_MAC_CTX_P && HAVE_EVP_MAC_CTX_NEW
 
 /*  OpenSSL >= 3.0  */
 typedef struct {
