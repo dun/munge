@@ -46,6 +46,7 @@ static int _mac_final (mac_ctx *x, void *dst, int *dstlenp);
 static int _mac_cleanup (mac_ctx *x);
 static int _mac_block (munge_mac_t md, const void *key, int keylen,
     void *dst, int *dstlenp, const void *src, int srclen);
+static int _mac_map_enum (munge_mac_t md, void *dst);
 
 
 /*****************************************************************************
@@ -129,7 +130,10 @@ mac_block (munge_mac_t md, const void *key, int keylen,
 int
 mac_map_enum (munge_mac_t md, void *dst)
 {
-    return (md_map_enum (md, dst));
+    if ((md <= MUNGE_MAC_DEFAULT) || (md >= MUNGE_MAC_LAST_ITEM)) {
+        return (-1);
+    }
+    return (_mac_map_enum (md, dst));
 }
 
 
@@ -148,7 +152,7 @@ _mac_init (mac_ctx *x, munge_mac_t md, const void *key, int keylen)
     gcry_error_t e;
     int          algo;
 
-    if (md_map_enum (md, &algo) < 0) {
+    if (_mac_map_enum (md, &algo) < 0) {
         return (-1);
     }
     if ((e = gcry_md_open (&(x->ctx), algo, GCRY_MD_FLAG_HMAC)) != 0) {
@@ -161,6 +165,8 @@ _mac_init (mac_ctx *x, munge_mac_t md, const void *key, int keylen)
             md, gcry_strerror (e));
         return (-1);
     }
+    /*  Bypass mac_size() since md->algo mapping has already been computed.
+     */
     x->diglen = gcry_md_get_algo_dlen (algo);
     return (0);
 }
@@ -209,9 +215,11 @@ _mac_block (munge_mac_t md, const void *key, int keylen,
     gcry_md_hd_t   ctx;
     unsigned char *digest;
 
-    if (md_map_enum (md, &algo) < 0) {
+    if (_mac_map_enum (md, &algo) < 0) {
         return (-1);
     }
+    /*  Bypass mac_size() since md->algo mapping has already been computed.
+     */
     len = gcry_md_get_algo_dlen (algo);
     if (*dstlenp < len) {
         return (-1);
@@ -240,6 +248,13 @@ _mac_block (munge_mac_t md, const void *key, int keylen,
     return (0);
 }
 
+
+int
+_mac_map_enum (munge_mac_t md, void *dst)
+{
+    return (md_map_enum (md, dst));
+}
+
 #endif /* HAVE_LIBGCRYPT */
 
 
@@ -249,24 +264,50 @@ _mac_block (munge_mac_t md, const void *key, int keylen,
 
 #if HAVE_OPENSSL
 
+#include <limits.h>
 #include <openssl/evp.h>
+
+#if HAVE_OPENSSL_CORE_H
+#include <openssl/core.h>
+#endif /* HAVE_OPENSSL_CORE_H */
+
+#if HAVE_OPENSSL_CORE_NAMES_H
+#include <openssl/core_names.h>
+#endif /* HAVE_OPENSSL_CORE_NAMES_H */
+
 #include <openssl/hmac.h>
 
 static int
 _mac_init (mac_ctx *x, munge_mac_t md, const void *key, int keylen)
 {
+#if HAVE_OSSL_PARAM_P && HAVE_EVP_MAC_P
+    /*  OpenSSL >= 3.0  */
+    OSSL_PARAM *algo;
+    EVP_MAC *mac;
+#else /* !HAVE_OSSL_PARAM_P */
+    /*  OpenSSL < 3.0  */
     EVP_MD *algo;
+#endif /* !HAVE_OSSL_PARAM_P */
 
-    if (md_map_enum (md, &algo) < 0) {
+    if (_mac_map_enum (md, &algo) < 0) {
         return (-1);
     }
-#if HAVE_HMAC_CTX_NEW
-    /*  OpenSSL >= 1.1.0  */
+
+#if HAVE_EVP_MAC_FETCH && HAVE_EVP_MAC_CTX_NEW
+    /*  OpenSSL >= 3.0  */
+    mac = EVP_MAC_fetch (NULL, "HMAC", NULL);
+    if (mac == NULL) {
+        return (-1);
+    }
+    x->ctx = EVP_MAC_CTX_new (mac);
+    EVP_MAC_free (mac);
+#elif HAVE_HMAC_CTX_NEW
+    /*  OpenSSL >= 1.1.0, Deprecated since OpenSSL 3.0  */
     x->ctx = HMAC_CTX_new ();
 #else  /* !HAVE_HMAC_CTX_NEW */
     x->ctx = OPENSSL_malloc (sizeof (HMAC_CTX));
 #if HAVE_HMAC_CTX_INIT
-    /*  OpenSSL >= 0.9.7, < 1.1.0  */
+    /*  OpenSSL >= 0.9.7, < 1.1.0, Replaced with HMAC_CTX_reset() in 1.1.0  */
     if (x->ctx != NULL) {
         HMAC_CTX_init (x->ctx);
     }
@@ -276,23 +317,28 @@ _mac_init (mac_ctx *x, munge_mac_t md, const void *key, int keylen)
         return (-1);
     }
 
-#if HAVE_HMAC_INIT_EX_RETURN_INT
-    /*  OpenSSL >= 1.0.0  */
+#if HAVE_EVP_MAC_INIT
+    /*  OpenSSL >= 3.0  */
+    if (EVP_MAC_init (x->ctx, key, (size_t) keylen, algo) != 1) {
+        return (-1);
+    }
+#elif HAVE_HMAC_INIT_EX_RETURN_INT
+    /*  OpenSSL >= 1.0.0, Deprecated since OpenSSL 3.0  */
     if (HMAC_Init_ex (x->ctx, key, keylen, algo, NULL) != 1) {
         return (-1);
     }
 #elif HAVE_HMAC_INIT_EX
-    /*  OpenSSL >= 0.9.7, < 1.0.0  */
+    /*  OpenSSL >= 0.9.7, < 1.0.0, Deprecated since OpenSSL 3.0  */
     HMAC_Init_ex (x->ctx, key, keylen, algo, NULL);
 #elif HAVE_HMAC_INIT
     /*  HMAC_Init() implicitly initializes the HMAC_CTX.  */
-    /*  OpenSSL >= 0.9.0  */
+    /*  OpenSSL >= 0.9.0, Deprecated since OpenSSL 1.1.0  */
     HMAC_Init (x->ctx, key, keylen, algo);
 #else  /* !HAVE_HMAC_INIT */
 #error "No OpenSSL HMAC_Init"
 #endif /* !HAVE_HMAC_INIT */
 
-    x->diglen = EVP_MD_size (algo);
+    x->diglen = mac_size (md);
     return (0);
 }
 
@@ -300,13 +346,18 @@ _mac_init (mac_ctx *x, munge_mac_t md, const void *key, int keylen)
 static int
 _mac_update (mac_ctx *x, const void *src, int srclen)
 {
-#if HAVE_HMAC_UPDATE_RETURN_INT
-    /*  OpenSSL >= 1.0.0  */
+#if HAVE_EVP_MAC_UPDATE
+    /*  OpenSSL >= 3.0  */
+    if (EVP_MAC_update (x->ctx, src, (size_t) srclen) != 1) {
+        return (-1);
+    }
+#elif HAVE_HMAC_UPDATE_RETURN_INT
+    /*  OpenSSL >= 1.0.0, Deprecated since OpenSSL 3.0  */
     if (HMAC_Update (x->ctx, src, srclen) != 1) {
         return (-1);
     }
 #elif HAVE_HMAC_UPDATE
-    /*  OpenSSL >= 0.9.0, < 1.0.0  */
+    /*  OpenSSL >= 0.9.0, < 1.0.0, Deprecated since OpenSSL 3.0  */
     HMAC_Update (x->ctx, src, srclen);
 #else  /* !HAVE_HMAC_UPDATE */
 #error "No OpenSSL HMAC_Update"
@@ -322,13 +373,23 @@ _mac_final (mac_ctx *x, void *dst, int *dstlenp)
     if (*dstlenp < x->diglen) {
         return (-1);
     }
-#if HAVE_HMAC_FINAL_RETURN_INT
-    /*  OpenSSL >= 1.0.0  */
+#if HAVE_EVP_MAC_FINAL
+    /*  OpenSSL >= 3.0  */
+    size_t dstsize = (size_t) *dstlenp;
+    if (EVP_MAC_final (x->ctx, dst, &dstsize, dstsize) != 1) {
+        return (-1);
+    }
+    if (dstsize > INT_MAX) {
+        return (-1);
+    }
+    *dstlenp = (int) dstsize;
+#elif HAVE_HMAC_FINAL_RETURN_INT
+    /*  OpenSSL >= 1.0.0, Deprecated since OpenSSL 3.0  */
     if (HMAC_Final (x->ctx, dst, (unsigned int *) dstlenp) != 1) {
         return (-1);
     }
 #elif HAVE_HMAC_FINAL
-    /*  OpenSSL >= 0.9.0, < 1.0.0  */
+    /*  OpenSSL >= 0.9.0, < 1.0.0, Deprecated since OpenSSL 3.0  */
     HMAC_Final (x->ctx, dst, (unsigned int *) dstlenp);
 #else  /* !HAVE_HMAC_FINAL */
 #error "No OpenSSL HMAC_Final"
@@ -341,8 +402,11 @@ _mac_final (mac_ctx *x, void *dst, int *dstlenp)
 static int
 _mac_cleanup (mac_ctx *x)
 {
-#if HAVE_HMAC_CTX_FREE
-    /*  OpenSSL >= 1.1.0  */
+#if HAVE_EVP_MAC_CTX_FREE
+    /*  OpenSSL >= 3.0  */
+    EVP_MAC_CTX_free (x->ctx);
+#elif HAVE_HMAC_CTX_FREE
+    /*  OpenSSL >= 1.1.0, Deprecated since OpenSSL 3.0  */
     HMAC_CTX_free (x->ctx);
 #else  /* !HAVE_HMAC_CTX_FREE */
 #if HAVE_HMAC_CTX_CLEANUP
@@ -364,18 +428,90 @@ static int
 _mac_block (munge_mac_t md, const void *key, int keylen,
             void *dst, int *dstlenp, const void *src, int srclen)
 {
+#if HAVE_OSSL_PARAM_P
+    /*  OpenSSL >= 3.0  */
+    OSSL_PARAM *algo;
+#else /* !HAVE_OSSL_PARAM_P */
+    /*  OpenSSL < 3.0  */
     EVP_MD *algo;
+#endif /* !HAVE_OSSL_PARAM_P */
 
-    if (md_map_enum (md, &algo) < 0) {
+    /*  OpenSSL has EVP_MD_size(const EVP_MD *md) to get the size of the
+     *    message digest [md].  Converting from munge_mac_t to EVP_MD * is
+     *    straightforward.
+     *  OpenSSL 3.0 introduces EVP_MAC_CTX_get_mac_size(EVP_MAC_CTX *ctx).
+     *    But before that can be called, one needs to create the context via
+     *    EVP_MAC_fetch() and EVP_MAC_CTX_new(), specify the underlying message
+     *    digest in an OSSL_PARAM array, and initialize the context via
+     *    EVP_MAC_init().  And none of that is needed with EVP_Q_mac()!
+     *    So instead, mac_size() is called to abstract away any shenanigans in
+     *    getting the size of the message digest [md] needed to validate the
+     *    buffer size in [dstlenp].
+     */
+    if (*dstlenp < mac_size (md)) {
         return (-1);
     }
-    if (*dstlenp < EVP_MD_size (algo)) {
+    if (_mac_map_enum (md, &algo) < 0) {
         return (-1);
     }
+#if HAVE_EVP_Q_MAC
+    /*  OpenSSL >= 3.0  */
+    size_t dstsize = (size_t) *dstlenp;
+    if (!EVP_Q_mac (NULL, "HMAC", NULL, NULL, algo, key, (size_t) keylen,
+                src, (size_t) srclen, dst, dstsize, &dstsize)) {
+        return (-1);
+    }
+    if (dstsize > INT_MAX) {
+        return (-1);
+    }
+    *dstlenp = (int) dstsize;
+#elif HAVE_HMAC
+    /*  OpenSSL < 3.0  */
     if (!HMAC (algo, key, keylen, src, srclen, dst, (unsigned int *)dstlenp)) {
         return (-1);
     }
+#else
+#error "No OpenSSL single-pass HMAC routine"
+#endif
     return (0);
+}
+
+
+int
+_mac_map_enum (munge_mac_t md, void *dst)
+{
+#if HAVE_EVP_MAC_INIT
+/*
+ *  EVP_MAC_init() has a parameter of type "const OSSL_PARAM params[]",
+ *    so HAVE_EVP_MAC_INIT is being used here as a proxy to detect OpenSSL 3.0
+ *    API changes.
+ */
+    static const OSSL_PARAM param[][2] = {
+        { OSSL_PARAM_END },             /* MUNGE_MAC_NONE */
+        { OSSL_PARAM_END },             /* MUNGE_MAC_DEFAULT */
+        { OSSL_PARAM_utf8_string (OSSL_ALG_PARAM_DIGEST, "MD5", 3),
+          OSSL_PARAM_END },             /* MUNGE_MAC_MD5 */
+        { OSSL_PARAM_utf8_string (OSSL_ALG_PARAM_DIGEST, "SHA1", 4),
+          OSSL_PARAM_END },             /* MUNGE_MAC_SHA1 */
+        { OSSL_PARAM_utf8_string (OSSL_ALG_PARAM_DIGEST, "RIPEMD160", 9),
+          OSSL_PARAM_END },             /* MUNGE_MAC_RIPEMD160 */
+        { OSSL_PARAM_utf8_string (OSSL_ALG_PARAM_DIGEST, "SHA2-256", 8),
+          OSSL_PARAM_END },             /* MUNGE_MAC_SHA256 */
+        { OSSL_PARAM_utf8_string (OSSL_ALG_PARAM_DIGEST, "SHA2-512", 8),
+          OSSL_PARAM_END },             /* MUNGE_MAC_SHA512 */
+    };
+
+    if ((md < MUNGE_MAC_MD5) || (md > MUNGE_MAC_SHA512)) {
+        return (-1);
+    }
+    if (dst != NULL) {
+        * (const OSSL_PARAM **) dst = param[md];
+    }
+    return (0);
+
+#else  /* !HAVE_EVP_MAC_INIT */
+    return (md_map_enum (md, dst));
+#endif /* !HAVE_EVP_MAC_INIT */
 }
 
 #endif /* HAVE_OPENSSL */

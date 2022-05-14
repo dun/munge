@@ -119,6 +119,12 @@ crypto_fini (void)
 #include <openssl/opensslv.h>
 #include <string.h>
 
+#if HAVE_OPENSSL_PROVIDER_H
+#include <openssl/provider.h>
+static OSSL_PROVIDER *_openssl_provider_default;
+static OSSL_PROVIDER *_openssl_provider_legacy;
+#endif /* HAVE_OPENSSL_PROVIDER_H */
+
 static void _openssl_thread_setup (void);
 static void _openssl_thread_cleanup (void);
 
@@ -252,6 +258,22 @@ crypto_init (void)
 
     _openssl_thread_setup ();
 
+#if HAVE_OPENSSL_PROVIDER_H
+    if (!(_openssl_provider_default = OSSL_PROVIDER_load (NULL, "default"))) {
+        log_err (EMUNGE_SNAFU, LOG_ERR,
+                "Failed to load OpenSSL default provider");
+    }
+    /*  OpenSSL 3.0: The legacy provider is needed for implementations of
+     *    Blowfish (cipher 2), CAST5 (cipher 3), and RIPEMD160 (mac 4).
+     *  Treat failure as a warning since these are not default algorithms.
+     */
+    if (!(_openssl_provider_legacy = OSSL_PROVIDER_load (NULL, "legacy"))) {
+        log_msg (LOG_WARNING, "%s: %s",
+                "Failed to load OpenSSL legacy provider",
+                "See OSSL_PROVIDER-legacy(7ssl) manpage for more info");
+    }
+#endif /* HAVE_OPENSSL_PROVIDER_H */
+
     return;
 }
 
@@ -259,6 +281,19 @@ crypto_init (void)
 void
 crypto_fini (void)
 {
+#if HAVE_OPENSSL_PROVIDER_H
+    if (_openssl_provider_legacy != NULL) {
+        if (OSSL_PROVIDER_unload (_openssl_provider_legacy) != 1) {
+            log_msg (LOG_WARNING, "Failed to unload OpenSSL legacy provider");
+        }
+    }
+    if (_openssl_provider_default != NULL) {
+        if (OSSL_PROVIDER_unload (_openssl_provider_default) != 1) {
+            log_msg (LOG_WARNING, "Failed to unload OpenSSL default provider");
+        }
+    }
+#endif /* HAVE_OPENSSL_PROVIDER_H */
+
     _openssl_thread_cleanup ();
 
 #if HAVE_ERR_FREE_STRINGS

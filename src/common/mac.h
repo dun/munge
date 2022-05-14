@@ -56,12 +56,26 @@ typedef struct {
 #if HAVE_OPENSSL
 
 #include <openssl/evp.h>
+
+#if HAVE_EVP_MAC_CTX_P
+
+/*  OpenSSL >= 3.0  */
+typedef struct {
+    EVP_MAC_CTX        *ctx;
+    int                 diglen;
+} mac_ctx;
+
+#else  /* !HAVE_EVP_MAC_CTX_P */
+
 #include <openssl/hmac.h>
 
+/*  OpenSSL < 3.0  */
 typedef struct {
     HMAC_CTX           *ctx;
     int                 diglen;
 } mac_ctx;
+
+#endif /* !HAVE_EVP_MAC_CTX_P */
 
 #endif /* HAVE_OPENSSL */
 
