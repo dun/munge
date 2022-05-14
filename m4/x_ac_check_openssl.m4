@@ -109,6 +109,7 @@ AC_DEFUN([X_AC_CHECK_OPENSSL], [
   AC_CHECK_HEADERS( \
     openssl/core.h \
     openssl/core_names.h \
+    openssl/hmac.h \
     openssl/provider.h \
   )
   AC_CHECK_TYPES([CRYPTO_dynlock], [], [], [#include <openssl/crypto.h>])

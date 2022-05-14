@@ -72,7 +72,9 @@ typedef struct {
 
 #else  /* !HAVE_EVP_MAC_CTX_P */
 
+#if HAVE_OPENSSL_HMAC_H
 #include <openssl/hmac.h>
+#endif /* HAVE_OPENSSL_HMAC_H */
 
 /*  OpenSSL < 3.0  */
 typedef struct {

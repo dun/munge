@@ -275,7 +275,9 @@ _mac_map_enum (munge_mac_t md, void *dst)
 #include <openssl/core_names.h>
 #endif /* HAVE_OPENSSL_CORE_NAMES_H */
 
+#if HAVE_OPENSSL_HMAC_H
 #include <openssl/hmac.h>
+#endif /* HAVE_OPENSSL_HMAC_H */
 
 static int
 _mac_init (mac_ctx *x, munge_mac_t md, const void *key, int keylen)
