@@ -52,10 +52,6 @@ typedef struct {
     int                 len;
     int                 blklen;
     unsigned char       buf [MUNGE_MAXIMUM_BLK_LEN];
-#ifndef NDEBUG
-    int                 magic;
-    int                 finalized;
-#endif /* !NDEBUG */
 } cipher_ctx;
 
 #endif /* HAVE_LIBGCRYPT */
@@ -67,10 +63,6 @@ typedef struct {
 
 typedef struct {
     EVP_CIPHER_CTX     *ctx;
-#ifndef NDEBUG
-    int                 magic;
-    int                 finalized;
-#endif /* !NDEBUG */
 } cipher_ctx;
 
 #endif /* HAVE_OPENSSL */

@@ -37,13 +37,6 @@
 
 
 /*****************************************************************************
- *  Constants
- *****************************************************************************/
-
-#define CIPHER_MAGIC 0xDEADACE1
-
-
-/*****************************************************************************
  *  Private Data
  *****************************************************************************/
 
@@ -97,10 +90,6 @@ cipher_init (cipher_ctx *x, munge_cipher_t cipher,
     assert ((enc == 0) || (enc == 1));
 
     rc = _cipher_init (x, cipher, key, iv, enc);
-    if (rc >= 0) {
-        assert (x->magic = CIPHER_MAGIC);
-        assert (!(x->finalized = 0));
-    }
     return (rc);
 }
 
@@ -113,8 +102,6 @@ cipher_update (cipher_ctx *x, void *dst, int *dstlen,
 
     assert (_cipher_is_initialized);
     assert (x != NULL);
-    assert (x->magic == CIPHER_MAGIC);
-    assert (x->finalized != 1);
     assert (dst != NULL);
     assert (dstlen != NULL);
     assert (src != NULL);
@@ -137,8 +124,6 @@ cipher_final (cipher_ctx *x, void *dst, int *dstlen)
 
     assert (_cipher_is_initialized);
     assert (x != NULL);
-    assert (x->magic == CIPHER_MAGIC);
-    assert (x->finalized != 1);
     assert (dst != NULL);
     assert (dstlen != NULL);
 
@@ -146,7 +131,6 @@ cipher_final (cipher_ctx *x, void *dst, int *dstlen)
         return (-1);
     }
     rc = _cipher_final (x, dst, dstlen);
-    assert (x->finalized = 1);
     return (rc);
 }
 
@@ -158,11 +142,9 @@ cipher_cleanup (cipher_ctx *x)
 
     assert (_cipher_is_initialized);
     assert (x != NULL);
-    assert (x->magic == CIPHER_MAGIC);
 
     rc = _cipher_cleanup (x);
     memset (x, 0, sizeof (*x));
-    assert (x->magic = ~CIPHER_MAGIC);
     return (rc);
 }
 
