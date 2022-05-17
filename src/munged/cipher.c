@@ -84,11 +84,11 @@ cipher_init (cipher_ctx *x, munge_cipher_t cipher,
     int rc;
 
     assert (_cipher_is_initialized);
-    assert (x != NULL);
-    assert (key != NULL);
-    assert (iv != NULL);
-    assert ((enc == 0) || (enc == 1));
 
+    if (!x || !key || !iv
+            || !((enc == CIPHER_DECRYPT) || (enc == CIPHER_ENCRYPT))) {
+        return (-1);
+    }
     rc = _cipher_init (x, cipher, key, iv, enc);
     return (rc);
 }
@@ -101,15 +101,8 @@ cipher_update (cipher_ctx *x, void *dst, int *dstlen,
     int rc;
 
     assert (_cipher_is_initialized);
-    assert (x != NULL);
-    assert (dst != NULL);
-    assert (dstlen != NULL);
-    assert (src != NULL);
 
-    if (srclen <= 0) {
-        return (0);
-    }
-    if ((dstlen == NULL) || (*dstlen <= 0)) {
+    if (!x || !dst || !dstlen || (*dstlen < 0) || !src || (srclen < 0)) {
         return (-1);
     }
     rc = _cipher_update (x, dst, dstlen, src, srclen);
@@ -123,11 +116,8 @@ cipher_final (cipher_ctx *x, void *dst, int *dstlen)
     int rc;
 
     assert (_cipher_is_initialized);
-    assert (x != NULL);
-    assert (dst != NULL);
-    assert (dstlen != NULL);
 
-    if ((dstlen == NULL) || (*dstlen <= 0)) {
+    if (!x || !dst || !dstlen || (*dstlen < 0)) {
         return (-1);
     }
     rc = _cipher_final (x, dst, dstlen);
@@ -141,8 +131,10 @@ cipher_cleanup (cipher_ctx *x)
     int rc;
 
     assert (_cipher_is_initialized);
-    assert (x != NULL);
 
+    if (!x) {
+        return (-1);
+    }
     rc = _cipher_cleanup (x);
     memset (x, 0, sizeof (*x));
     return (rc);
@@ -570,11 +562,6 @@ _cipher_init (cipher_ctx *x, munge_cipher_t cipher,
 {
     EVP_CIPHER *algo;
 
-    assert (x != NULL);
-    assert (key != NULL);
-    assert (iv != NULL);
-    assert ((enc == 0) || (enc == 1));
-
     if (_cipher_map_enum (cipher, &algo) < 0) {
         return (-1);
     }
@@ -619,13 +606,6 @@ static int
 _cipher_update (cipher_ctx *x, void *dst, int *dstlen,
                 const void *src, int srclen)
 {
-    assert (x != NULL);
-    assert (x->ctx != NULL);
-    assert (dst != NULL);
-    assert (dstlen != NULL);
-    assert (src != NULL);
-    assert (srclen >= 0);
-
 #if HAVE_EVP_CIPHERUPDATE_RETURN_INT
     /*  OpenSSL > 0.9.5a  */
     if (EVP_CipherUpdate (x->ctx, dst, dstlen, (void *) src, srclen) != 1) {
@@ -645,11 +625,6 @@ _cipher_update (cipher_ctx *x, void *dst, int *dstlen,
 static int
 _cipher_final (cipher_ctx *x, void *dst, int *dstlen)
 {
-    assert (x != NULL);
-    assert (x->ctx != NULL);
-    assert (dst != NULL);
-    assert (dstlen != NULL);
-
 #if HAVE_EVP_CIPHERFINAL_EX
     /*  OpenSSL >= 0.9.7  */
     if (EVP_CipherFinal_ex (x->ctx, dst, dstlen) != 1) {
@@ -671,9 +646,6 @@ static int
 _cipher_cleanup (cipher_ctx *x)
 {
     int rv = 0;
-
-    assert (x != NULL);
-    assert (x->ctx != NULL);
 
 #if HAVE_EVP_CIPHER_CTX_FREE
     /*  OpenSSL >= 0.9.8b  */
