@@ -34,6 +34,7 @@
 /src/*/*.[1-9]
 /src/common/hkdf_api_test
 /src/common/hkdf_rfc_test
+/src/common/mac_test
 /src/etc/munge.logrotate.conf
 /src/etc/munge.pkgconfig.pc
 /src/etc/munge.systemd.service

@@ -39,6 +39,12 @@ AC_DEFUN([X_AC_CHECK_OPENSSL], [
     EVP_DigestInit \
     EVP_DigestInit_ex \
     EVP_DigestUpdate \
+    EVP_MAC_CTX_free \
+    EVP_MAC_CTX_new \
+    EVP_MAC_fetch \
+    EVP_MAC_final \
+    EVP_MAC_init \
+    EVP_MAC_update \
     EVP_MD_CTX_cleanup \
     EVP_MD_CTX_copy \
     EVP_MD_CTX_copy_ex \
@@ -47,10 +53,12 @@ AC_DEFUN([X_AC_CHECK_OPENSSL], [
     EVP_MD_CTX_free \
     EVP_MD_CTX_init \
     EVP_MD_CTX_new \
+    EVP_Q_mac \
     EVP_aes_128_cbc \
     EVP_aes_256_cbc \
     EVP_sha256 \
     EVP_sha512 \
+    HMAC \
     HMAC_CTX_cleanup \
     HMAC_CTX_free \
     HMAC_CTX_init \
@@ -98,7 +106,16 @@ AC_DEFUN([X_AC_CHECK_OPENSSL], [
     [NULL, NULL, 0],
     [#include <openssl/hmac.h>]
   )
-  AC_CHECK_TYPES(CRYPTO_dynlock, [], [], [#include <openssl/crypto.h>])
+  AC_CHECK_HEADERS( \
+    openssl/core.h \
+    openssl/core_names.h \
+    openssl/hmac.h \
+    openssl/provider.h \
+  )
+  AC_CHECK_TYPES([CRYPTO_dynlock], [], [], [#include <openssl/crypto.h>])
+  AC_CHECK_TYPES([EVP_MAC *, EVP_MAC_CTX *], [], [], [#include <openssl/evp.h>])
+  AC_CHECK_TYPES([OSSL_PARAM *], [], [], [#include <openssl/params.h>])
+  AC_CHECK_TYPES([OSSL_PROVIDER *], [], [], [#include <openssl/provider.h>])
   CFLAGS="${ac_save_CFLAGS}"
   LIBS="${ac_save_LIBS}"
   ]

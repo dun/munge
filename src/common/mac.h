@@ -48,10 +48,6 @@
 typedef struct {
     gcry_md_hd_t        ctx;
     int                 diglen;
-#ifndef NDEBUG
-    int                 magic;
-    int                 finalized;
-#endif /* !NDEBUG */
 } mac_ctx;
 
 #endif /* HAVE_LIBGCRYPT */
@@ -60,16 +56,33 @@ typedef struct {
 #if HAVE_OPENSSL
 
 #include <openssl/evp.h>
-#include <openssl/hmac.h>
 
+/*  openSUSE 15.1 has OpenSSL 1.1.0i-fips (14 Aug 2018) but defines EVP_MAC_CTX
+ *    in <openssl/ossl_typ.h> (libopenssl-1_1-devel-1.1.0i-lp151.8.12.2.x86_64)
+ *    (EVP_MAC_CTX shouldn't appear until OpenSSL 3.0), so also add a guard for
+ *    HAVE_EVP_MAC_CTX_NEW to prevent EVP_MAC_CTX from being erroneously used.
+ */
+#if HAVE_EVP_MAC_CTX_P && HAVE_EVP_MAC_CTX_NEW
+
+/*  OpenSSL >= 3.0  */
+typedef struct {
+    EVP_MAC_CTX        *ctx;
+    int                 diglen;
+} mac_ctx;
+
+#else  /* !HAVE_EVP_MAC_CTX_P */
+
+#if HAVE_OPENSSL_HMAC_H
+#include <openssl/hmac.h>
+#endif /* HAVE_OPENSSL_HMAC_H */
+
+/*  OpenSSL < 3.0  */
 typedef struct {
     HMAC_CTX           *ctx;
     int                 diglen;
-#ifndef NDEBUG
-    int                 magic;
-    int                 finalized;
-#endif /* !NDEBUG */
 } mac_ctx;
+
+#endif /* !HAVE_EVP_MAC_CTX_P */
 
 #endif /* HAVE_OPENSSL */
 
@@ -92,13 +105,13 @@ int mac_update (mac_ctx *x, const void *src, int srclen);
  *  Returns 0 on success, or -1 on error.
  */
 
-int mac_final (mac_ctx *x, void *dst, int *dstlen);
+int mac_final (mac_ctx *x, void *dst, int *dstlenp);
 /*
- *  Finalizes the MAC context [x], placing the MAC in [dst] of length [dstlen].
- *    The [dst] buffer must have sufficient space for the MAC output
- *    (mac_size).
+ *  Finalizes the MAC context [x], placing the MAC in [dst] of length
+ *    [dstlenp].  The [dst] buffer must have sufficient space for the MAC
+ *    output (mac_size).
  *  After this function, no further calls to md_update() should be made.
- *  Returns 0 on success, or -1 on error; in addition, [dstlen] will be set
+ *  Returns 0 on success, or -1 on error; in addition, [dstlenp] will be set
  *    to the number of bytes written to [dst].
  */
 
@@ -114,23 +127,24 @@ int mac_size (munge_mac_t md);
  */
 
 int mac_block (munge_mac_t md, const void *key, int keylen,
-               void *dst, int *dstlen, const void *src, int srclen);
+               void *dst, int *dstlenp, const void *src, int srclen);
 /*
  *  Computes the MAC without the need of a context; this requires
  *    the [src] to be contiguous.
  *  Uses the message digest [md] and key [key] of [keylen] bytes.
  *  Reads [srclen] bytes of data from [src], and writes the MAC to [dst]
- *    of length [dstlen].
- *  Returns 0 on success, or -1 on error; in addition, [dstlen] will be set
+ *    of length [dstlenp].
+ *  Returns 0 on success, or -1 on error; in addition, [dstlenp] will be set
  *    to the number of bytes written to [dst].
  */
 
-int mac_map_enum (munge_mac_t mac, void *dst);
+int mac_map_enum (munge_mac_t md, void *dst);
 /*
- *  Map the specified [mac] algorithm to the internal representation used
+ *  Map the specified [md] algorithm to the internal representation used
  *    by the underlying cryptographic library.
  *  If [dst] is non-NULL, write the cryptographic library's internal
- *    representation of the message digest algorithm to [dst].
+ *    representation of the message digest algorithm to [dst]; otherwise, just
+ *    validate the specified [md] algorithm.
  *  Returns 0 on success, or -1 on error.
  */
 

@@ -37,13 +37,6 @@
 
 
 /*****************************************************************************
- *  Constants
- *****************************************************************************/
-
-#define MD_MAGIC 0xDEADACE3
-
-
-/*****************************************************************************
  *  Private Data
  *****************************************************************************/
 
@@ -57,7 +50,7 @@ static int _md_is_initialized = 0;
 static void _md_init_subsystem (void);
 static int _md_init (md_ctx *x, munge_mac_t md);
 static int _md_update (md_ctx *x, const void *src, int srclen);
-static int _md_final (md_ctx *x, void *dst, int *dstlen);
+static int _md_final (md_ctx *x, void *dst, int *dstlenp);
 static int _md_cleanup (md_ctx *x);
 static int _md_copy (md_ctx *xdst, md_ctx *xsrc);
 static int _md_size (munge_mac_t md);
@@ -87,13 +80,11 @@ md_init (md_ctx *x, munge_mac_t md)
     int rc;
 
     assert (_md_is_initialized);
-    assert (x != NULL);
 
-    rc = _md_init (x, md);
-    if (rc >= 0) {
-        assert (x->magic = MD_MAGIC);
-        assert (!(x->finalized = 0));
+    if (!x) {
+        return (-1);
     }
+    rc = _md_init (x, md);
     return (rc);
 }
 
@@ -104,13 +95,9 @@ md_update (md_ctx *x, const void *src, int srclen)
     int rc;
 
     assert (_md_is_initialized);
-    assert (x != NULL);
-    assert (x->magic == MD_MAGIC);
-    assert (x->finalized != 1);
-    assert (src != NULL);
 
-    if (srclen <= 0) {
-        return (0);
+    if (!x || !src || (srclen < 0)) {
+        return (-1);
     }
     rc = _md_update (x, src, srclen);
     return (rc);
@@ -118,22 +105,16 @@ md_update (md_ctx *x, const void *src, int srclen)
 
 
 int
-md_final (md_ctx *x, void *dst, int *dstlen)
+md_final (md_ctx *x, void *dst, int *dstlenp)
 {
     int rc;
 
     assert (_md_is_initialized);
-    assert (x != NULL);
-    assert (x->magic == MD_MAGIC);
-    assert (x->finalized != 1);
-    assert (dst != NULL);
-    assert (dstlen != NULL);
 
-    if ((dstlen == NULL) || (*dstlen <= 0)) {
+    if (!x || !dst || !dstlenp) {
         return (-1);
     }
-    rc = _md_final (x, dst, dstlen);
-    assert (x->finalized = 1);
+    rc = _md_final (x, dst, dstlenp);
     return (rc);
 }
 
@@ -144,12 +125,12 @@ md_cleanup (md_ctx *x)
     int rc;
 
     assert (_md_is_initialized);
-    assert (x != NULL);
-    assert (x->magic == MD_MAGIC);
 
+    if (!x) {
+        return (-1);
+    }
     rc = _md_cleanup (x);
     memset (x, 0, sizeof (*x));
-    assert (x->magic = ~MD_MAGIC);
     return (rc);
 }
 
@@ -160,15 +141,12 @@ md_copy (md_ctx *xdst, md_ctx *xsrc)
     int rc;
 
     assert (_md_is_initialized);
-    assert (xdst != NULL);
-    assert (xsrc != NULL);
-    assert (xsrc->magic == MD_MAGIC);
-    assert (xsrc->finalized != 1);
 
+    if (!xdst || !xsrc) {
+        return (-1);
+    }
     xdst->diglen = xsrc->diglen;
     rc = _md_copy (xdst, xsrc);
-    assert (!(xdst->finalized = 0));
-    assert (xdst->magic = MD_MAGIC);
     return (rc);
 }
 
@@ -177,6 +155,7 @@ int
 md_size (munge_mac_t md)
 {
     assert (_md_is_initialized);
+
     return (_md_size (md));
 }
 
@@ -185,6 +164,7 @@ int
 md_map_enum (munge_mac_t md, void *dst)
 {
     assert (_md_is_initialized);
+
     return (_md_map_enum (md, dst));
 }
 
@@ -247,18 +227,18 @@ _md_update (md_ctx *x, const void *src, int srclen)
 
 
 static int
-_md_final (md_ctx *x, void *dst, int *dstlen)
+_md_final (md_ctx *x, void *dst, int *dstlenp)
 {
     unsigned char *digest;
 
-    if (*dstlen < x->diglen) {
+    if (*dstlenp < x->diglen) {
         return (-1);
     }
     if ((digest = gcry_md_read (x->ctx, 0)) == NULL) {
         return (-1);
     }
     memcpy (dst, digest, x->diglen);
-    *dstlen = x->diglen;
+    *dstlenp = x->diglen;
     return (0);
 }
 
@@ -358,8 +338,6 @@ _md_init (md_ctx *x, munge_mac_t md)
 {
     EVP_MD *algo;
 
-    assert (x != NULL);
-
     if (_md_map_enum (md, &algo) < 0) {
         return (-1);
     }
@@ -387,8 +365,6 @@ _md_init (md_ctx *x, munge_mac_t md)
 static int
 _md_ctx_create (md_ctx *x)
 {
-    assert (x != NULL);
-
 #if HAVE_EVP_MD_CTX_NEW
     /*  OpenSSL >= 1.1.0  */
     x->ctx = EVP_MD_CTX_new ();                         /* alloc & init */
@@ -414,11 +390,6 @@ _md_ctx_create (md_ctx *x)
 static int
 _md_update (md_ctx *x, const void *src, int srclen)
 {
-    assert (x != NULL);
-    assert (x->ctx != NULL);
-    assert (src != NULL);
-    assert (srclen >= 0);
-
 #if HAVE_EVP_DIGESTUPDATE_RETURN_INT
     /*  OpenSSL >= 0.9.7  */
     if (EVP_DigestUpdate (x->ctx, src, (unsigned int) srclen) != 1) {
@@ -436,24 +407,19 @@ _md_update (md_ctx *x, const void *src, int srclen)
 
 
 static int
-_md_final (md_ctx *x, void *dst, int *dstlen)
+_md_final (md_ctx *x, void *dst, int *dstlenp)
 {
-    assert (x != NULL);
-    assert (x->ctx != NULL);
-    assert (dst != NULL);
-    assert (dstlen != NULL);
-
-    if (*dstlen < x->diglen) {
+    if (*dstlenp < x->diglen) {
         return (-1);
     }
 #if HAVE_EVP_DIGESTFINAL_EX
     /*  OpenSSL >= 0.9.7  */
-    if (!(EVP_DigestFinal_ex (x->ctx, dst, (unsigned int *) dstlen))) {
+    if (!(EVP_DigestFinal_ex (x->ctx, dst, (unsigned int *) dstlenp))) {
         return (-1);
     }
 #elif HAVE_EVP_DIGESTFINAL
     /*  OpenSSL < 0.9.7  */
-    EVP_DigestFinal (x->ctx, dst, (unsigned int *) dstlen);
+    EVP_DigestFinal (x->ctx, dst, (unsigned int *) dstlenp);
 #else  /* !HAVE_EVP_DIGESTFINAL */
 #error "No OpenSSL EVP_DigestFinal"
 #endif /* !HAVE_EVP_DIGESTFINAL */
@@ -465,10 +431,7 @@ _md_final (md_ctx *x, void *dst, int *dstlen)
 static int
 _md_cleanup (md_ctx *x)
 {
-    int rv = 0;
-
-    assert (x != NULL);
-    assert (x->ctx != NULL);
+    int rc = 0;
 
 #if HAVE_EVP_MD_CTX_FREE
     /*  OpenSSL >= 1.1.0  */
@@ -480,23 +443,20 @@ _md_cleanup (md_ctx *x)
 #if HAVE_EVP_MD_CTX_CLEANUP
     /*  OpenSSL >= 0.9.7, < 1.1.0  */
     if (EVP_MD_CTX_cleanup (x->ctx) != 1) {
-        rv = -1;
+        rc = -1;
     }
 #endif /* HAVE_EVP_MD_CTX_CLEANUP */
     OPENSSL_free (x->ctx);
 #endif /* !HAVE_EVP_MD_CTX_DESTROY */
 
     x->ctx = NULL;
-    return (rv);
+    return (rc);
 }
 
 
 static int
 _md_copy (md_ctx *xdst, md_ctx *xsrc)
 {
-    assert (xdst != NULL);
-    assert (xsrc != NULL);
-
     if (_md_ctx_create (xdst) < 0) {
         return (-1);
     }

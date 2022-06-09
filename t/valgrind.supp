@@ -151,6 +151,17 @@
 }
 
 {
+   openssl-OSSL_PROVIDER_try_load
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:?alloc
+   ...
+   fun:OSSL_PROVIDER_try_load
+   fun:crypto_init
+   fun:main
+}
+
+{
    pthread_cancel-leak
    Memcheck:Leak
    match-leak-kinds: definite

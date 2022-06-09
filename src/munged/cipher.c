@@ -37,13 +37,6 @@
 
 
 /*****************************************************************************
- *  Constants
- *****************************************************************************/
-
-#define CIPHER_MAGIC 0xDEADACE1
-
-
-/*****************************************************************************
  *  Private Data
  *****************************************************************************/
 
@@ -57,9 +50,9 @@ static int _cipher_is_initialized = 0;
 static void _cipher_init_subsystem (void);
 static int _cipher_init (cipher_ctx *x, munge_cipher_t cipher,
     unsigned char *key, unsigned char *iv, int enc);
-static int _cipher_update (cipher_ctx *x, void *dst, int *dstlen,
+static int _cipher_update (cipher_ctx *x, void *dst, int *dstlenp,
     const void *src, int srclen);
-static int _cipher_final (cipher_ctx *x, void *dst, int *dstlen);
+static int _cipher_final (cipher_ctx *x, void *dst, int *dstlenp);
 static int _cipher_cleanup (cipher_ctx *x);
 static int _cipher_block_size (munge_cipher_t cipher);
 static int _cipher_iv_size (munge_cipher_t cipher);
@@ -91,62 +84,43 @@ cipher_init (cipher_ctx *x, munge_cipher_t cipher,
     int rc;
 
     assert (_cipher_is_initialized);
-    assert (x != NULL);
-    assert (key != NULL);
-    assert (iv != NULL);
-    assert ((enc == 0) || (enc == 1));
 
-    rc = _cipher_init (x, cipher, key, iv, enc);
-    if (rc >= 0) {
-        assert (x->magic = CIPHER_MAGIC);
-        assert (!(x->finalized = 0));
+    if (!x || !key || !iv
+            || !((enc == CIPHER_DECRYPT) || (enc == CIPHER_ENCRYPT))) {
+        return (-1);
     }
+    rc = _cipher_init (x, cipher, key, iv, enc);
     return (rc);
 }
 
 
 int
-cipher_update (cipher_ctx *x, void *dst, int *dstlen,
+cipher_update (cipher_ctx *x, void *dst, int *dstlenp,
                const void *src, int srclen)
 {
     int rc;
 
     assert (_cipher_is_initialized);
-    assert (x != NULL);
-    assert (x->magic == CIPHER_MAGIC);
-    assert (x->finalized != 1);
-    assert (dst != NULL);
-    assert (dstlen != NULL);
-    assert (src != NULL);
 
-    if (srclen <= 0) {
-        return (0);
-    }
-    if ((dstlen == NULL) || (*dstlen <= 0)) {
+    if (!x || !dst || !dstlenp || (*dstlenp < 0) || !src || (srclen < 0)) {
         return (-1);
     }
-    rc = _cipher_update (x, dst, dstlen, src, srclen);
+    rc = _cipher_update (x, dst, dstlenp, src, srclen);
     return (rc);
 }
 
 
 int
-cipher_final (cipher_ctx *x, void *dst, int *dstlen)
+cipher_final (cipher_ctx *x, void *dst, int *dstlenp)
 {
     int rc;
 
     assert (_cipher_is_initialized);
-    assert (x != NULL);
-    assert (x->magic == CIPHER_MAGIC);
-    assert (x->finalized != 1);
-    assert (dst != NULL);
-    assert (dstlen != NULL);
 
-    if ((dstlen == NULL) || (*dstlen <= 0)) {
+    if (!x || !dst || !dstlenp || (*dstlenp < 0)) {
         return (-1);
     }
-    rc = _cipher_final (x, dst, dstlen);
-    assert (x->finalized = 1);
+    rc = _cipher_final (x, dst, dstlenp);
     return (rc);
 }
 
@@ -157,12 +131,12 @@ cipher_cleanup (cipher_ctx *x)
     int rc;
 
     assert (_cipher_is_initialized);
-    assert (x != NULL);
-    assert (x->magic == CIPHER_MAGIC);
 
+    if (!x) {
+        return (-1);
+    }
     rc = _cipher_cleanup (x);
     memset (x, 0, sizeof (*x));
-    assert (x->magic = ~CIPHER_MAGIC);
     return (rc);
 }
 
@@ -212,7 +186,7 @@ cipher_map_enum (munge_cipher_t cipher, void *dst)
 
 static int _cipher_map [MUNGE_CIPHER_LAST_ITEM];
 
-static int _cipher_update_aux (cipher_ctx *x, void *dst, int *dstlen,
+static int _cipher_update_aux (cipher_ctx *x, void *dst, int *dstlenp,
     const void *src, int srclen);
 
 
@@ -283,13 +257,13 @@ _cipher_init (cipher_ctx *x, munge_cipher_t cipher,
 
 
 static int
-_cipher_update (cipher_ctx *x, void *vdst, int *dstlen,
+_cipher_update (cipher_ctx *x, void *vdst, int *dstlenp,
                 const void *vsrc, int srclen)
 {
 /*  During encryption, any remaining src data that is not a multiple of the
  *    cipher block size is saved in the context's partial block buffer.
  *    This buffer will be padded when the encryption is finalized
- *    (cf, PKCS #5, rfc2898).
+ *    (see PKCS #5, rfc2898).
  *  During decryption, the partial block buffer will always contain data at
  *    the end of each update to ensure the padding is properly removed when
  *    the decryption is finalized.
@@ -320,7 +294,7 @@ _cipher_update (cipher_ctx *x, void *vdst, int *dstlen,
          */
         if (x->len == x->blklen) {
             if ((x->do_encrypt) || (srclen > 0)) {
-                n = *dstlen;
+                n = *dstlenp;
                 if (_cipher_update_aux (x, dst, &n, x->buf, x->blklen) < 0) {
                     goto err;
                 }
@@ -347,7 +321,7 @@ _cipher_update (cipher_ctx *x, void *vdst, int *dstlen,
     if (n_complete > 0) {
         assert (x->len == 0);
         assert (n_complete % x->blklen == 0);
-        n = *dstlen - n_written;
+        n = *dstlenp - n_written;
         if (_cipher_update_aux (x, dst, &n, src, n_complete) < 0) {
             goto err;
         }
@@ -370,21 +344,21 @@ _cipher_update (cipher_ctx *x, void *vdst, int *dstlen,
 
     /*  Set the number of bytes written.
      */
-    *dstlen = n_written;
+    *dstlenp = n_written;
     return (0);
 
 err:
-    *dstlen = 0;
+    *dstlenp = 0;
     return (-1);
 }
 
 
 static int
-_cipher_update_aux (cipher_ctx *x, void *dst, int *dstlen_ptr,
+_cipher_update_aux (cipher_ctx *x, void *dst, int *dstlenp,
                     const void *src, int srclen)
 {
     gcry_error_t e;
-    int          dstlen = *dstlen_ptr;
+    int          dstlen = *dstlenp;
 
     if (x->do_encrypt) {
         e = gcry_cipher_encrypt (x->ctx, dst, dstlen, src, srclen);
@@ -396,18 +370,18 @@ _cipher_update_aux (cipher_ctx *x, void *dst, int *dstlen_ptr,
         log_msg (LOG_DEBUG, "%s failed: %s",
             (x->do_encrypt ? "gcry_cipher_encrypt" : "gcry_cipher_decrypt"),
             gcry_strerror (e));
-        *dstlen_ptr = 0;
+        *dstlenp = 0;
         return (-1);
     }
     if ((src != NULL) || (srclen != 0)) {
-        *dstlen_ptr = srclen;
+        *dstlenp = srclen;
     }
     return (0);
 }
 
 
 static int
-_cipher_final (cipher_ctx *x, void *dst, int *dstlen)
+_cipher_final (cipher_ctx *x, void *dst, int *dstlenp)
 {
     int n;
     int i;
@@ -419,7 +393,7 @@ _cipher_final (cipher_ctx *x, void *dst, int *dstlen)
         for (i = x->len; i < x->blklen; i++) {
             x->buf[i] = pad;
         }
-        if (_cipher_update_aux (x, dst, dstlen, x->buf, x->blklen) < 0) {
+        if (_cipher_update_aux (x, dst, dstlenp, x->buf, x->blklen) < 0) {
             return (-1);
         }
     }
@@ -459,12 +433,12 @@ _cipher_final (cipher_ctx *x, void *dst, int *dstlen)
          */
         n = x->blklen - pad;
         if (n > 0) {
-            if (*dstlen < n) {
+            if (*dstlenp < n) {
                 return (-1);
             }
             memcpy (dst, x->buf, n);
         }
-        *dstlen = n;
+        *dstlenp = n;
     }
     return (0);
 }
@@ -588,11 +562,6 @@ _cipher_init (cipher_ctx *x, munge_cipher_t cipher,
 {
     EVP_CIPHER *algo;
 
-    assert (x != NULL);
-    assert (key != NULL);
-    assert (iv != NULL);
-    assert ((enc == 0) || (enc == 1));
-
     if (_cipher_map_enum (cipher, &algo) < 0) {
         return (-1);
     }
@@ -634,24 +603,17 @@ _cipher_init (cipher_ctx *x, munge_cipher_t cipher,
 
 
 static int
-_cipher_update (cipher_ctx *x, void *dst, int *dstlen,
+_cipher_update (cipher_ctx *x, void *dst, int *dstlenp,
                 const void *src, int srclen)
 {
-    assert (x != NULL);
-    assert (x->ctx != NULL);
-    assert (dst != NULL);
-    assert (dstlen != NULL);
-    assert (src != NULL);
-    assert (srclen >= 0);
-
 #if HAVE_EVP_CIPHERUPDATE_RETURN_INT
     /*  OpenSSL > 0.9.5a  */
-    if (EVP_CipherUpdate (x->ctx, dst, dstlen, (void *) src, srclen) != 1) {
+    if (EVP_CipherUpdate (x->ctx, dst, dstlenp, (void *) src, srclen) != 1) {
         return (-1);
     }
 #elif HAVE_EVP_CIPHERUPDATE
     /*  OpenSSL <= 0.9.5a  */
-    EVP_CipherUpdate (x->ctx, dst, dstlen, (void *) src, srclen);
+    EVP_CipherUpdate (x->ctx, dst, dstlenp, (void *) src, srclen);
 #else  /* !HAVE_EVP_CIPHERUPDATE */
 #error "No OpenSSL EVP_CipherUpdate"
 #endif /* !HAVE_EVP_CIPHERUPDATE */
@@ -661,20 +623,15 @@ _cipher_update (cipher_ctx *x, void *dst, int *dstlen,
 
 
 static int
-_cipher_final (cipher_ctx *x, void *dst, int *dstlen)
+_cipher_final (cipher_ctx *x, void *dst, int *dstlenp)
 {
-    assert (x != NULL);
-    assert (x->ctx != NULL);
-    assert (dst != NULL);
-    assert (dstlen != NULL);
-
 #if HAVE_EVP_CIPHERFINAL_EX
     /*  OpenSSL >= 0.9.7  */
-    if (EVP_CipherFinal_ex (x->ctx, dst, dstlen) != 1) {
+    if (EVP_CipherFinal_ex (x->ctx, dst, dstlenp) != 1) {
         return (-1);
     }
 #elif HAVE_EVP_CIPHERFINAL
-    if (EVP_CipherFinal (x->ctx, dst, dstlen) != 1) {
+    if (EVP_CipherFinal (x->ctx, dst, dstlenp) != 1) {
         return (-1);
     }
 #else  /* !HAVE_EVP_CIPHERFINAL */
@@ -689,9 +646,6 @@ static int
 _cipher_cleanup (cipher_ctx *x)
 {
     int rv = 0;
-
-    assert (x != NULL);
-    assert (x->ctx != NULL);
 
 #if HAVE_EVP_CIPHER_CTX_FREE
     /*  OpenSSL >= 0.9.8b  */

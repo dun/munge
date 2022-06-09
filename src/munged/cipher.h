@@ -52,10 +52,6 @@ typedef struct {
     int                 len;
     int                 blklen;
     unsigned char       buf [MUNGE_MAXIMUM_BLK_LEN];
-#ifndef NDEBUG
-    int                 magic;
-    int                 finalized;
-#endif /* !NDEBUG */
 } cipher_ctx;
 
 #endif /* HAVE_LIBGCRYPT */
@@ -67,10 +63,6 @@ typedef struct {
 
 typedef struct {
     EVP_CIPHER_CTX     *ctx;
-#ifndef NDEBUG
-    int                 magic;
-    int                 finalized;
-#endif /* !NDEBUG */
 } cipher_ctx;
 
 #endif /* HAVE_OPENSSL */
@@ -101,19 +93,19 @@ int cipher_init (cipher_ctx *x, munge_cipher_t cipher,
  *  Returns 0 on success, or -1 on error.
  */
 
-int cipher_update (cipher_ctx *x, void *dst, int *dstlen,
+int cipher_update (cipher_ctx *x, void *dst, int *dstlenp,
                    const void *src, int srclen);
 /*
  *  Updates the cipher context [x], reading [srclen] bytes from [src] and
- *    writing the result into [dst] of length [dstlen].  This can be called
+ *    writing the result into [dst] of length [dstlenp].  This can be called
  *    multiple times to process successive blocks of data.
  *  The number of bytes written will be from 0 to (srclen + cipher_block_size)
  *    depending on the cipher block alignment.
- *  Returns 0 on success, or -1 on error; in addition, [dstlen] will be set
+ *  Returns 0 on success, or -1 on error; in addition, [dstlenp] will be set
  *    to the number of bytes written to [dst].
  */
 
-int cipher_final (cipher_ctx *x, void *dst, int *dstlen);
+int cipher_final (cipher_ctx *x, void *dst, int *dstlenp);
 /*
  *  Finalizes the cipher context [x], processing the "final" data
  *    remaining in a partial block and writing the result into [dst] of
@@ -121,7 +113,7 @@ int cipher_final (cipher_ctx *x, void *dst, int *dstlen);
  *  The number of bytes written will be at most cipher_block_size() bytes
  *    depending on the cipher block alignment.
  *  After this function, no further calls to cipher_update() should be made.
- *  Returns 0 on success, or -1 on error; in addition, [dstlen] will be set
+ *  Returns 0 on success, or -1 on error; in addition, [dstlenp] will be set
  *    to the number of bytes written to [dst].
  */
 
@@ -152,7 +144,8 @@ int cipher_map_enum (munge_cipher_t cipher, void *dst);
  *  Map the specified [cipher] algorithm to the internal representation used
  *    by the underlying cryptographic library.
  *  If [dst] is non-NULL, write the cryptographic library's internal
- *    representation of the cipher algorithm to [dst].
+ *    representation of the cipher algorithm to [dst]; otherwise, just validate
+ *    the specified [cipher] algorithm.
  *  Returns 0 on success, or -1 on error.
  */
 
