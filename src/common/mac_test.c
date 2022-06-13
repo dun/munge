@@ -75,6 +75,7 @@ check_mac (munge_mac_t m, const char *str, const char *key, int keylen,
     ok (!mac_map_enum (m, NULL), "mac_map_enum %s", str);
 
     buflen = sizeof (buf);
+    memset (buf, 0, sizeof (buf));
     ok (!mac_block (m, key, keylen, buf, &buflen, src, srclen),
             "mac_block %s", str);
     ok (buflen == dstlen, "mac_block %s outlen", str);
