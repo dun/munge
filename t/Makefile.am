@@ -27,6 +27,8 @@ TESTS = \
 	0101-munged-security-socket.t \
 	0102-munged-security-keyfile.t \
 	0103-munged-security-logfile.t \
+	0104-munged-security-pidfile.t \
+	0105-munged-security-seedfile.t \
 	0110-munged-origin-addr.t \
 	# End of TESTS
 
