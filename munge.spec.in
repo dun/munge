@@ -169,7 +169,9 @@ systemd-tmpfiles --create %{_tmpfilesdir}/munge.conf
 
 %files devel
 %{_includedir}/*
+%if 0%{?fedora} < 36
 %{_libdir}/libmunge.la
+%endif
 %{_libdir}/libmunge.so
 %{_libdir}/pkgconfig/munge.pc
 %{_mandir}/man3/*
