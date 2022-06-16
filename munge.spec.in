@@ -30,6 +30,7 @@ BuildRequires:	zlib-devel
 BuildRequires:	systemd
 BuildRequires:	procps
 Requires:	%{name}-libs%{?_isa} = %{version}-%{release}
+Requires:	logrotate
 Requires(pre):	shadow-utils
 %{?systemd_requires}
 
@@ -45,7 +46,7 @@ the use of root privileges, reserved ports, or platform-specific methods.
 %package devel
 Summary:	MUNGE authentication service development files
 License:	LGPLv3+
-BuildRequires:	pkgconfig
+Requires:	pkgconfig
 Requires:	%{name}-libs%{?_isa} = %{version}-%{release}
 
 %description devel
