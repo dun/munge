@@ -97,6 +97,12 @@ touch %{buildroot}%{_localstatedir}/lib/munge/munged.seed
 touch %{buildroot}%{_localstatedir}/log/munge/munged.log
 mkdir -p %{buildroot}%{_rundir}/munge
 touch %{buildroot}%{_rundir}/munge/munged.pid
+#
+%if 0%{?rhel} == 7
+sed -i '/^RuntimeDirectory/ s/^/#/' %{buildroot}%{_unitdir}/munge.service
+mkdir -p %{buildroot}%{_tmpfilesdir}
+install -m 0644 src/etc/munge.tmpfiles.conf %{buildroot}%{_tmpfilesdir}/munge.conf
+%endif
 
 %pre
 getent group munge >/dev/null || \
@@ -113,6 +119,10 @@ if test ! -f %{_sysconfdir}/munge/munge.key; then
     echo "Refer to the mungekey(8) manpage for more information."
 fi
 %systemd_post munge.service
+#
+%if 0%{?rhel} == 7
+systemd-tmpfiles --create %{_tmpfilesdir}/munge.conf
+%endif
 
 %post libs -p /sbin/ldconfig
 
@@ -152,6 +162,10 @@ fi
 %{_sbindir}/*
 %{_mandir}/man[^3]/*
 %{_unitdir}/munge.service
+#
+%if 0%{?rhel} == 7
+%{_tmpfilesdir}/munge.conf
+%endif
 
 %files devel
 %{_includedir}/*
