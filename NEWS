@@ -1,3 +1,17 @@
+munge-0.5.15 (2022-06-22):
+- Added support for OpenSSL 3.0. (#110)
+- Fixed "make install" conflict with systemd RuntimeDirectory. (#82)
+- Fixed big-endian bug causing failures on s390x. (#91)
+- Fixed systemd service unit conf to wait until network is online. (#93)
+- Fixed excessive logging of "suspended new connections". (#94)
+- Fixed test suite failure for origin addr on Debian kfreebsd-i386. (77ff682)
+- Fixed gcry_check_version(GCRYPT_VERSION) bug reported by Debian. (0c37cc0)
+- Fixed sending repeated SIGTERMs to signal stop. (dbe6dcc)
+- Fixed bugs where unlink() could be interrupted by signals on FreeBSD. (be183e2)
+- Fixed failure to clean up socket or create seedfile having relative path. (1245cd3)
+- Fixed test suite to clean up errant processes from failed tests. (7baed04)
+- Fixed rpm not creating "/run/munge" directory on CentOS 7. (5f3b1bf)
+
 munge-0.5.14 (2020-01-14):
 - Added mungekey command for key generation via HKDF. (5fc870e)
 - Added negative caching of user lookups for processing supplementary groups. (#26, d51fec8)
