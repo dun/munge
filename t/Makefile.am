@@ -30,6 +30,7 @@ TESTS = \
 	0104-munged-security-pidfile.t \
 	0105-munged-security-seedfile.t \
 	0110-munged-origin-addr.t \
+	1000-chaos-rpm.t \
 	# End of TESTS
 
 EXTRA_DIST = \
