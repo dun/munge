@@ -171,6 +171,8 @@ munged_kill_daemon()
 ##
 #  Perform any housekeeping to clean up after munged.  This should be called
 #    at the end of any test script that starts a munged process.
+#  This function must be at the start of any &&-chain to ensure it cannot be
+#    prevented from running by a preceding failure in the chain.
 ##
 munged_cleanup()
 {
