@@ -8,3 +8,7 @@ test -f build-aux/tap-driver.sh.bak && \
   cp -p build-aux/tap-driver.sh.bak build-aux/tap-driver.sh
 
 autoreconf --force --install --verbose --warnings=none
+
+# Output the package string containing the auto-generated version.
+#
+sed -ne "s/^PACKAGE_STRING='\([^']*\)'$/\1/p" configure
