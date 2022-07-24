@@ -30,7 +30,7 @@ fi
 
 # Check the git commit metadata.
 # This should be present in git clones.
-if test "x${DATE}" = x && test -d "${GIT_DIR:-.git}"; then
+if test "x${DATE}" = x && test -e "${GIT_DIR:-.git}"; then
     DATE=$(git show -s --pretty=format:%ci 2>/dev/null \
             | sed -ne 's/^\([0-9-]*\).*/\1/p')
 fi
