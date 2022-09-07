@@ -76,7 +76,7 @@ done
 for OPT_VERSION in '-V' '--version'; do
     test_expect_success "mungekey ${OPT_VERSION}" '
         "${MUNGEKEY}" "${OPT_VERSION}" |
-        grep -q "^munge-[0-9.]*"
+        grep -q "^munge-[0-9][0-9a-f.]* "
     '
 done
 
