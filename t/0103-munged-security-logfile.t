@@ -37,7 +37,7 @@ test_expect_success 'logfile symlink to regular file failure' '
     touch "${MUNGE_LOGFILE}" &&
     test_must_fail munged_start_daemon t-keep-logfile \
             --log-file="${MY_LOGFILE}" 2>err.$$ &&
-    egrep "Error:.* Logfile.* should not be a symbolic link" err.$$
+    grep "Error:.* Logfile.* should not be a symbolic link" err.$$
 '
 
 # Check if the error can be overridden when the logfile is a symlink to a
@@ -52,7 +52,7 @@ test_expect_success 'logfile symlink to regular file override' '
     munged_start_daemon t-keep-logfile --log-file="${MY_LOGFILE}" --force \
             2>err.$$ &&
     munged_stop_daemon &&
-    egrep "Warning:.* Logfile.* should not be a symbolic link" err.$$
+    grep "Warning:.* Logfile.* should not be a symbolic link" err.$$
 '
 
 # Check startup without an existing logfile (by not specifying t-keep-logfile
@@ -73,7 +73,7 @@ test_expect_success 'logfile symlink to missing file failure' '
     MY_LOGFILE="${MUNGE_LOGFILE}.symlink" &&
     ln -s -f "${MUNGE_LOGFILE}" "${MY_LOGFILE}" &&
     test_must_fail munged_start_daemon --log-file="${MY_LOGFILE}" 2>err.$$ &&
-    egrep "Error:.* Logfile.* should not be a symbolic link" err.$$
+    grep "Error:.* Logfile.* should not be a symbolic link" err.$$
 '
 
 # Check if the error can be overridden when the logfile is a symlink to a
@@ -87,7 +87,7 @@ test_expect_success 'logfile symlink to missing file override' '
     ln -s -f "${MUNGE_LOGFILE}" "${MY_LOGFILE}" &&
     munged_start_daemon --log-file="${MY_LOGFILE}" --force 2>err.$$ &&
     munged_stop_daemon &&
-    egrep "Warning:.* Logfile.* should not be a symbolic link" err.$$ &&
+    grep "Warning:.* Logfile.* should not be a symbolic link" err.$$ &&
     test -s "${MUNGE_LOGFILE}"
 '
 
@@ -100,7 +100,7 @@ test_expect_success 'logfile non-regular-file failure' '
     rm -f "${MUNGE_LOGFILE}" &&
     mkdir "${MUNGE_LOGFILE}" &&
     test_must_fail munged_start_daemon t-keep-logfile 2>err.$$ &&
-    egrep "Error:.* Logfile.* must be a regular file" err.$$ &&
+    grep "Error:.* Logfile.* must be a regular file" err.$$ &&
     rmdir "${MUNGE_LOGFILE}"
 '
 
@@ -113,7 +113,7 @@ test_expect_success 'logfile non-regular-file override failure' '
     rm -f "${MUNGE_LOGFILE}" &&
     mkdir "${MUNGE_LOGFILE}" &&
     test_must_fail munged_start_daemon t-keep-logfile --force 2>err.$$ &&
-    egrep "Error:.* Logfile.* must be a regular file" err.$$ &&
+    grep "Error:.* Logfile.* must be a regular file" err.$$ &&
     rmdir "${MUNGE_LOGFILE}"
 '
 
@@ -126,7 +126,7 @@ test_expect_success !ROOT 'logfile not writable by user failure' '
     touch "${MUNGE_LOGFILE}" &&
     chmod 0400 "${MUNGE_LOGFILE}" &&
     test_must_fail munged_start_daemon t-keep-logfile 2>err.$$ &&
-    egrep "Error:.* Failed to open logfile.* Permission denied" err.$$
+    grep "Error:.* Failed to open logfile.* Permission denied" err.$$
 '
 
 # Check if the logfile can be writable by a group that matches the specified
@@ -162,7 +162,7 @@ test_expect_success 'logfile writable by group failure' '
     touch "${MUNGE_LOGFILE}" &&
     chmod 0620 "${MUNGE_LOGFILE}" &&
     test_must_fail munged_start_daemon t-keep-logfile 2>err.$$ &&
-    egrep "Error:.* Logfile.* writable.* by.* group" err.$$
+    grep "Error:.* Logfile.* writable.* by.* group" err.$$
 '
 
 # Check if the error can be overridden when the logfile is writable by group.
@@ -173,7 +173,7 @@ test_expect_success 'logfile writable by group override' '
     chmod 0620 "${MUNGE_LOGFILE}" &&
     munged_start_daemon t-keep-logfile --force 2>err.$$ &&
     munged_stop_daemon &&
-    egrep "Warning:.* Logfile.* writable.* by.* group" err.$$
+    grep "Warning:.* Logfile.* writable.* by.* group" err.$$
 '
 
 # Check for an error when the logfile is writable by other.
@@ -183,7 +183,7 @@ test_expect_success 'logfile writable by other failure' '
     touch "${MUNGE_LOGFILE}" &&
     chmod 0602 "${MUNGE_LOGFILE}" &&
     test_must_fail munged_start_daemon t-keep-logfile 2>err.$$ &&
-    egrep "Error:.* Logfile.* writable.* by.* other" err.$$
+    grep "Error:.* Logfile.* writable.* by.* other" err.$$
 '
 
 # Check if the error can be overridden when the logfile is writable by other.
@@ -194,7 +194,7 @@ test_expect_success 'logfile writable by other override' '
     chmod 0602 "${MUNGE_LOGFILE}" &&
     munged_start_daemon t-keep-logfile --force 2>err.$$ &&
     munged_stop_daemon &&
-    egrep "Warning:.* Logfile.* writable.* by.* other" err.$$
+    grep "Warning:.* Logfile.* writable.* by.* other" err.$$
 '
 
 # Check if the logfile can be readable by all.
@@ -246,7 +246,7 @@ test_expect_success ALT,SUDO 'logfile dir owned by other failure' '
     sudo chown 1 "${ALT_LOGDIR}" &&
     > "${ALT_LOGFILE}" &&
     test_must_fail munged_start_daemon --log-file="${ALT_LOGFILE}" 2>err.$$ &&
-    egrep "Error:.* Logfile.* invalid ownership of \"${ALT_LOGDIR}\"" err.$$
+    grep "Error:.* Logfile.* invalid ownership of \"${ALT_LOGDIR}\"" err.$$
 '
 
 # Check if the error can be overridden when the logfile dir is not owned by
@@ -258,7 +258,7 @@ test_expect_success ALT,SUDO 'logfile dir owned by other override' '
     > "${ALT_LOGFILE}" &&
     munged_start_daemon --log-file="${ALT_LOGFILE}" --force 2>err.$$ &&
     munged_stop_daemon &&
-    egrep "Warning:.* Logfile.* invalid ownership of \"${ALT_LOGDIR}\"" err.$$
+    grep "Warning:.* Logfile.* invalid ownership of \"${ALT_LOGDIR}\"" err.$$
 '
 
 # Cleanup the alternate logfile dir.
@@ -322,7 +322,7 @@ test_expect_success 'logfile dir writable by other failure' '
     chmod 0707 "${MUNGE_LOGDIR}" &&
     test_must_fail munged_start_daemon 2>err.$$ &&
     chmod 0755 "${MUNGE_LOGDIR}" &&
-    egrep "Error:.* world-writable permissions without sticky bit set" err.$$
+    grep "Error:.* world-writable permissions without sticky bit set" err.$$
 '
 
 # Check if the error can be overridden when the logfile dir is writable by
@@ -333,7 +333,7 @@ test_expect_success 'logfile dir writable by other override' '
     munged_start_daemon --force 2>err.$$ &&
     munged_stop_daemon &&
     chmod 0755 "${MUNGE_LOGDIR}" &&
-    egrep "Warning:.* world-writable permissions without sticky bit set" err.$$
+    grep "Warning:.* world-writable permissions without sticky bit set" err.$$
 '
 
 # Check if the logfile dir can be writable by other with the sticky bit set.

@@ -25,7 +25,7 @@ test_expect_success 'keyfile missing failure' '
     local MUNGE_KEYFILE &&
     MUNGE_KEYFILE="${MUNGE_KEYDIR}/munged.key.$$.missing" &&
     test_must_fail munged_start_daemon &&
-    egrep "Error:.* Failed to find keyfile.*: No such file" "${MUNGE_LOGFILE}"
+    grep "Error:.* Failed to find keyfile.*: No such file" "${MUNGE_LOGFILE}"
 '
 
 # Check for an error when the keyfile is not a regular file.
@@ -37,7 +37,7 @@ test_expect_success 'keyfile non-regular-file failure' '
     rm -r -f "${MUNGE_KEYFILE}" &&
     mkdir "${MUNGE_KEYFILE}" &&
     test_must_fail munged_start_daemon &&
-    egrep "Error:.* Keyfile.* must be a regular file" "${MUNGE_LOGFILE}" &&
+    grep "Error:.* Keyfile.* must be a regular file" "${MUNGE_LOGFILE}" &&
     rmdir "${MUNGE_KEYFILE}"
 '
 
@@ -50,7 +50,7 @@ test_expect_success 'keyfile non-regular-file override failure' '
     rm -r -f "${MUNGE_KEYFILE}" &&
     mkdir "${MUNGE_KEYFILE}" &&
     test_must_fail munged_start_daemon --force &&
-    egrep "Error:.* Keyfile.* must be a regular file" "${MUNGE_LOGFILE}" &&
+    grep "Error:.* Keyfile.* must be a regular file" "${MUNGE_LOGFILE}" &&
     rmdir "${MUNGE_KEYFILE}"
 '
 
@@ -61,7 +61,7 @@ test_expect_success 'keyfile symlink to regular file failure' '
     MY_KEYFILE="${MUNGE_KEYFILE}.symlink" &&
     ln -s -f "${MUNGE_KEYFILE}" "${MY_KEYFILE}" &&
     test_must_fail munged_start_daemon --key-file="${MY_KEYFILE}" &&
-    egrep "Error:.* Keyfile.* a symbolic link" "${MUNGE_LOGFILE}"
+    grep "Error:.* Keyfile.* a symbolic link" "${MUNGE_LOGFILE}"
 '
 
 # Check if the error can be overridden when the keyfile is a symlink to a
@@ -73,7 +73,7 @@ test_expect_success 'keyfile symlink to regular file override' '
     ln -s -f "${MUNGE_KEYFILE}" "${MY_KEYFILE}" &&
     munged_start_daemon --key-file="${MY_KEYFILE}" --force &&
     munged_stop_daemon &&
-    egrep "Warning:.* Keyfile.* a symbolic link" "${MUNGE_LOGFILE}"
+    grep "Warning:.* Keyfile.* a symbolic link" "${MUNGE_LOGFILE}"
 '
 
 # Check a keyfile owned by the EUID.
@@ -136,7 +136,7 @@ test_expect_success 'keyfile writable by untrusted group failure' '
 test_expect_success 'keyfile readable by group failure' '
     chmod 0640 "${MUNGE_KEYFILE}" &&
     test_must_fail munged_start_daemon &&
-    egrep "Error:.* Keyfile.* readable.* by.* group" "${MUNGE_LOGFILE}"
+    grep "Error:.* Keyfile.* readable.* by.* group" "${MUNGE_LOGFILE}"
 '
 
 # Check if the error can be overridden when the keyfile is readable by group.
@@ -145,7 +145,7 @@ test_expect_success 'keyfile readable by group override' '
     chmod 0640 "${MUNGE_KEYFILE}" &&
     munged_start_daemon --force &&
     munged_stop_daemon &&
-    egrep "Warning:.* Keyfile.* readable.* by.* group" "${MUNGE_LOGFILE}"
+    grep "Warning:.* Keyfile.* readable.* by.* group" "${MUNGE_LOGFILE}"
 '
 
 # Check for an error when the keyfile is writable by group.
@@ -153,7 +153,7 @@ test_expect_success 'keyfile readable by group override' '
 test_expect_success 'keyfile writable by group failure' '
     chmod 0620 "${MUNGE_KEYFILE}" &&
     test_must_fail munged_start_daemon &&
-    egrep "Error:.* Keyfile.* writable.* by.* group" "${MUNGE_LOGFILE}"
+    grep "Error:.* Keyfile.* writable.* by.* group" "${MUNGE_LOGFILE}"
 '
 
 # Check if the error can be overridden when the keyfile is writable by group.
@@ -162,7 +162,7 @@ test_expect_success 'keyfile writable by group override' '
     chmod 0620 "${MUNGE_KEYFILE}" &&
     munged_start_daemon --force &&
     munged_stop_daemon &&
-    egrep "Warning:.* Keyfile.* writable.* by.* group" "${MUNGE_LOGFILE}"
+    grep "Warning:.* Keyfile.* writable.* by.* group" "${MUNGE_LOGFILE}"
 '
 
 # Check for an error when the keyfile is readable by other.
@@ -170,7 +170,7 @@ test_expect_success 'keyfile writable by group override' '
 test_expect_success 'keyfile readable by other failure' '
     chmod 0604 "${MUNGE_KEYFILE}" &&
     test_must_fail munged_start_daemon &&
-    egrep "Error:.* Keyfile.* readable.* by.* other" "${MUNGE_LOGFILE}"
+    grep "Error:.* Keyfile.* readable.* by.* other" "${MUNGE_LOGFILE}"
 '
 
 # Check if the error can be overridden when the keyfile is readable by other.
@@ -179,7 +179,7 @@ test_expect_success 'keyfile readable by other override' '
     chmod 0604 "${MUNGE_KEYFILE}" &&
     munged_start_daemon --force &&
     munged_stop_daemon &&
-    egrep "Warning:.* Keyfile.* readable.* by.* other" "${MUNGE_LOGFILE}"
+    grep "Warning:.* Keyfile.* readable.* by.* other" "${MUNGE_LOGFILE}"
 '
 
 # Check for an error when the keyfile is writable by other.
@@ -187,7 +187,7 @@ test_expect_success 'keyfile readable by other override' '
 test_expect_success 'keyfile writable by other failure' '
     chmod 0602 "${MUNGE_KEYFILE}" &&
     test_must_fail munged_start_daemon &&
-    egrep "Error:.* Keyfile.* writable.* by.* other" "${MUNGE_LOGFILE}"
+    grep "Error:.* Keyfile.* writable.* by.* other" "${MUNGE_LOGFILE}"
 '
 
 # Check if the error can be overridden when the keyfile is writable by other.
@@ -196,7 +196,7 @@ test_expect_success 'keyfile writable by other override' '
     chmod 0602 "${MUNGE_KEYFILE}" &&
     munged_start_daemon --force &&
     munged_stop_daemon &&
-    egrep "Warning:.* Keyfile.* writable.* by.* other" "${MUNGE_LOGFILE}"
+    grep "Warning:.* Keyfile.* writable.* by.* other" "${MUNGE_LOGFILE}"
 '
 
 # Check a keyfile with secure permissions.
@@ -245,7 +245,7 @@ test_expect_success ALT,SUDO 'keyfile dir owned by other failure' '
     test "$(id -u)" != "1" &&
     sudo chown 1 "${ALT_KEYDIR}" &&
     test_must_fail munged_start_daemon --key-file="${ALT_KEYFILE}" &&
-    egrep "Error:.* Keyfile.* invalid ownership of \"${ALT_KEYDIR}\"" \
+    grep "Error:.* Keyfile.* invalid ownership of \"${ALT_KEYDIR}\"" \
             "${MUNGE_LOGFILE}"
 '
 
@@ -257,7 +257,7 @@ test_expect_success ALT,SUDO 'keyfile dir owned by other override' '
     sudo chown 1 "${ALT_KEYDIR}" &&
     munged_start_daemon --key-file="${ALT_KEYFILE}" --force &&
     munged_stop_daemon &&
-    egrep "Warning:.* Keyfile.* invalid ownership of \"${ALT_KEYDIR}\"" \
+    grep "Warning:.* Keyfile.* invalid ownership of \"${ALT_KEYDIR}\"" \
             "${MUNGE_LOGFILE}"
 '
 
@@ -301,7 +301,7 @@ test_expect_success 'keyfile dir writable by group failure' '
     chmod 0770 "${MUNGE_KEYDIR}" &&
     test_must_fail munged_start_daemon &&
     chmod 0755 "${MUNGE_KEYDIR}" &&
-    egrep "Error:.* group-writable permissions without sticky bit set" \
+    grep "Error:.* group-writable permissions without sticky bit set" \
             "${MUNGE_LOGFILE}"
 '
 
@@ -313,7 +313,7 @@ test_expect_success 'keyfile dir writable by group override' '
     munged_start_daemon --force &&
     munged_stop_daemon &&
     chmod 0755 "${MUNGE_KEYDIR}" &&
-    egrep "Warning:.* group-writable permissions without sticky bit set" \
+    grep "Warning:.* group-writable permissions without sticky bit set" \
             "${MUNGE_LOGFILE}"
 '
 
@@ -333,7 +333,7 @@ test_expect_success 'keyfile dir writable by other failure' '
     chmod 0707 "${MUNGE_KEYDIR}" &&
     test_must_fail munged_start_daemon &&
     chmod 0755 "${MUNGE_KEYDIR}" &&
-    egrep "Error:.* world-writable permissions without sticky bit set" \
+    grep "Error:.* world-writable permissions without sticky bit set" \
             "${MUNGE_LOGFILE}"
 '
 
@@ -345,7 +345,7 @@ test_expect_success 'keyfile dir writable by other override' '
     munged_start_daemon --force &&
     munged_stop_daemon &&
     chmod 0755 "${MUNGE_KEYDIR}" &&
-    egrep "Warning:.* world-writable permissions without sticky bit set" \
+    grep "Warning:.* world-writable permissions without sticky bit set" \
             "${MUNGE_LOGFILE}"
 '
 

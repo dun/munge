@@ -34,4 +34,17 @@ test_expect_success 'expr string match of long opt w/ prepended "X" char' '
     test "$(expr X"--exec=foo" : "X--exec=")" -eq 8
 '
 
+# As of GNU grep-3.8, egrep warns that it is obsolescent and should be replaced
+#   with "grep -E".
+# Check if "grep -E" works for matching extended regular expressions.
+##
+test_expect_success 'grep extended regex expected failure' '
+    echo "hoopy frood" |
+    test_must_fail grep "(groovy|hoopy)"
+'
+test_expect_success 'grep extended regex success' '
+    echo "hoopy frood" |
+    grep -E "(groovy|hoopy)"
+'
+
 test_done

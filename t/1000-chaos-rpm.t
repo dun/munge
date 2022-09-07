@@ -14,7 +14,8 @@ fi
 # Ensure this is a RedHat-based system.
 # This regexp matches recent AlmaLinux, CentOS, and Fedora.
 #
-if egrep '^ID.*=.*\b(rhel|fedora)\b' /etc/os-release >/dev/null 2>&1; then :; else
+if grep -E '^ID.*=.*\b(rhel|fedora)\b' /etc/os-release >/dev/null 2>&1; then :
+else
     skip_all='skipping rpm test; not a supported redhat-based system'
     test_done
 fi

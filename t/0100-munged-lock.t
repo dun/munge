@@ -54,7 +54,7 @@ test_expect_success 'check lockfile permissions' '
 ##
 test_expect_success 'start munged with in-use socket' '
     test_must_fail munged_start_daemon t-keep-process &&
-    egrep "Error:.* Failed to lock \"${MUNGE_LOCKFILE}\"" "${MUNGE_LOGFILE}"
+    grep "Error:.* Failed to lock \"${MUNGE_LOCKFILE}\"" "${MUNGE_LOGFILE}"
 '
 
 # Check if the pidfile still contains the pid of an active munged process.
@@ -89,7 +89,7 @@ test_expect_success 'start munged with 0600 bogus lockfile' '
     touch "${MUNGE_LOCKFILE}" &&
     chmod 0600 "${MUNGE_LOCKFILE}" &&
     test_must_fail munged_start_daemon &&
-    egrep "Error:.* \"${MUNGE_LOCKFILE}\" .* permissions for write by user" \
+    grep "Error:.* \"${MUNGE_LOCKFILE}\" .* permissions for write by user" \
             "${MUNGE_LOGFILE}"
 '
 
@@ -101,7 +101,7 @@ test_expect_success 'start munged with 0222 bogus lockfile' '
     touch "${MUNGE_LOCKFILE}" &&
     chmod 0222 "${MUNGE_LOCKFILE}" &&
     test_must_fail munged_start_daemon &&
-    egrep "Error:.* \"${MUNGE_LOCKFILE}\" .* permissions for write by user" \
+    grep "Error:.* \"${MUNGE_LOCKFILE}\" .* permissions for write by user" \
             "${MUNGE_LOGFILE}"
 '
 

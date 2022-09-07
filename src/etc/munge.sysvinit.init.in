@@ -429,7 +429,7 @@ query_pids ()
     rc=$?
   else
     pids=`(ps awx -o pid -o command || ps -e -f -o pid -o args) 2>/dev/null \
-      | tail +2 | egrep "( |/)$PROCNAME( |$)" | grep -v egrep \
+      | tail +2 | grep -E "( |/)$PROCNAME( |$)" | grep -v grep \
       | sed 's/ *\([0-9]*\).*/\1/' | sort -n | tr '\012' ' '`
     [ -n "$pids" ] && rc=0 || rc=1
   fi
