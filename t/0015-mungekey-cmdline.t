@@ -53,7 +53,7 @@ test_expect_success 'mungekey lone hyphen option' '
     grep -q "Option \"-\" is unrecognized" err.$$
 '
 
-# Check for a successful exit after writing usage info to stdout.
+# Check if usage information is written to stdout.
 ##
 for OPT_HELP in '-h' '--help'; do
     test_expect_success "mungekey ${OPT_HELP}" '
@@ -62,7 +62,7 @@ for OPT_HELP in '-h' '--help'; do
     '
 done
 
-# Check for a successful exit after writing license info to stdout.
+# Check if license information is written to stdout.
 ##
 for OPT_LICENSE in '-L' '--license'; do
     test_expect_success "mungekey ${OPT_LICENSE}" '
@@ -71,7 +71,7 @@ for OPT_LICENSE in '-L' '--license'; do
     '
 done
 
-# Check for a successful exit after writing version info to stdout.
+# Check if version information is written to stdout.
 ##
 for OPT_VERSION in '-V' '--version'; do
     test_expect_success "mungekey ${OPT_VERSION}" '
