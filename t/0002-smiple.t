@@ -46,5 +46,17 @@ test_expect_success 'grep extended regex success' '
     echo "hoopy frood" |
     grep -E "(groovy|hoopy)"
 '
+test_expect_success 'grep extended regex for end of word expected failure' '
+    echo "08.04-oops" |
+    test_must_fail grep -E "[0-9.]+( |$)"
+'
+test_expect_success 'grep extended regex for end of word via end of line' '
+    echo "08.04" |
+    grep -E "[0-9.]+( |$)"
+'
+test_expect_success 'grep extended regex for end of word via space char' '
+    echo "08.04 (national chocolate-chip cookie day)" |
+    grep -E "[0-9.]+( |$)"
+'
 
 test_done
