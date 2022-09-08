@@ -57,8 +57,8 @@ test_expect_success 'mungekey lone hyphen option' '
 ##
 for OPT_HELP in '-h' '--help'; do
     test_expect_success "mungekey ${OPT_HELP}" '
-        "${MUNGEKEY}" "${OPT_HELP}" >out.$$ &&
-        grep -q "^Usage:" out.$$
+        "${MUNGEKEY}" "${OPT_HELP}" |
+        grep -q "^Usage:"
     '
 done
 
@@ -66,8 +66,8 @@ done
 ##
 for OPT_LICENSE in '-L' '--license'; do
     test_expect_success "mungekey ${OPT_LICENSE}" '
-        "${MUNGEKEY}" "${OPT_LICENSE}" >out.$$ &&
-        grep -q "GNU General Public License" out.$$
+        "${MUNGEKEY}" "${OPT_LICENSE}" |
+        grep -q "GNU General Public License"
     '
 done
 
@@ -75,8 +75,8 @@ done
 ##
 for OPT_VERSION in '-V' '--version'; do
     test_expect_success "mungekey ${OPT_VERSION}" '
-        "${MUNGEKEY}" "${OPT_VERSION}" >out.$$ &&
-        grep -q "^munge-[0-9.]*" out.$$
+        "${MUNGEKEY}" "${OPT_VERSION}" |
+        grep -q "^munge-[0-9.]*"
     '
 done
 
