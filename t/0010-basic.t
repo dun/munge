@@ -89,18 +89,18 @@ test_expect_success 'stop munged' '
     munged_stop_daemon
 '
 
-# Verify the socket has been removed.
-#
-test_expect_success 'check socket removal' '
-    test "x${MUNGE_SOCKET}" != x &&
-    test ! -S "${MUNGE_SOCKET}"
-'
-
 # Verify the daemon process is no longer running.
 #
 test_expect_success 'check process has exited' '
     test "x${PID}" != x &&
     ! ps -p "${PID}" >/dev/null
+'
+
+# Verify the socket has been removed.
+#
+test_expect_success 'check socket removal' '
+    test "x${MUNGE_SOCKET}" != x &&
+    test ! -S "${MUNGE_SOCKET}"
 '
 
 # Verify the pidfile has been removed.
