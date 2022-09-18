@@ -140,7 +140,7 @@ test_expect_success MUNGE_RPM 'start munge service' '
 # Check if the munge service is running.
 #
 test_expect_success MUNGE_RPM 'check service status' '
-    systemctl status --full munge
+    systemctl status --full --no-pager munge
 '
 
 # Encode a credential, saving the resulting output for multiple decodes.
