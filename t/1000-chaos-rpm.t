@@ -84,8 +84,9 @@ test_expect_success MUNGE_TARBALL 'build srpm' '
 #
 test_expect_success MUNGE_SRPM 'install builddeps' '
     local BUILDDEP &&
-    if type -p dnf; then BUILDDEP="dnf builddep --assumeyes"; \
-            elif type -p yum-builddep; then BUILDDEP="yum-builddep"; fi &&
+    if type -p dnf >/dev/null 2>&1; then BUILDDEP="dnf builddep --assumeyes"; \
+    elif type -p yum-builddep >/dev/null 2>&1; then BUILDDEP="yum-builddep"; \
+    else echo "builddep command not found"; false; fi &&
     sudo ${BUILDDEP} "${MUNGE_RPM_DIR}"/SRPMS/*.src.rpm
 '
 
