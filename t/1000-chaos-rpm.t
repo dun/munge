@@ -135,13 +135,13 @@ test_expect_success MUNGE_RPM 'check key' '
 # Start the munge service.
 #
 test_expect_success MUNGE_RPM 'start munge service' '
-    sudo systemctl start munge
+    sudo systemctl start munge.service
 '
 
 # Check if the munge service is running.
 #
 test_expect_success MUNGE_RPM 'check service status' '
-    systemctl status --full --no-pager munge
+    systemctl status --full --no-pager munge.service
 '
 
 # Encode a credential, saving the resulting output for multiple decodes.
@@ -165,7 +165,7 @@ test_expect_success MUNGE_RPM 'replay credential' '
 # Stop the munge service.
 #
 test_expect_success MUNGE_RPM 'stop munge service' '
-    sudo systemctl stop munge
+    sudo systemctl stop munge.service
 '
 
 # Remove the binary RPMs installed earlier in the test.

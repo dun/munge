@@ -270,15 +270,15 @@ MUNGE Installation Guide
 
       Start the daemon automatically at boot:
 
-         $ sudo systemctl enable munge
+         $ sudo systemctl enable munge.service
 
       Start the daemon now:
 
-         $ sudo systemctl start munge
+         $ sudo systemctl start munge.service
 
       Stop the daemon:
 
-         $ sudo systemctl stop munge
+         $ sudo systemctl stop munge.service
 
    B. Init script
 
@@ -364,7 +364,7 @@ MUNGE Installation Guide
 
       1. For systemd, check runtime status information for the munge unit:
 
-         $ sudo systemctl status --full munge
+         $ sudo systemctl status --full munge.service
 
       2. For systemd, check the systemd journal:
 
