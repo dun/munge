@@ -129,7 +129,6 @@ systemd-tmpfiles --create %{_tmpfilesdir}/munge.conf
 %postun libs -p /sbin/ldconfig
 
 %files
-%{!?_licensedir:%global license %doc}
 %license COPYING*
 %doc AUTHORS
 %doc DISCLAIMER*
