@@ -129,14 +129,13 @@ systemd-tmpfiles --create %{_tmpfilesdir}/munge.conf
 %postun libs -p /sbin/ldconfig
 
 %files
-%license COPYING*
+%license COPYING
+%license COPYING.LESSER
 %doc AUTHORS
-%doc DISCLAIMER*
-%doc HISTORY
+%doc DISCLAIMER.LLNS
+%doc DISCLAIMER.UC
 %doc JARGON
-%doc KEYS
 %doc NEWS
-%doc PLATFORMS
 %doc QUICKSTART
 %doc README
 %doc THANKS
@@ -151,9 +150,17 @@ systemd-tmpfiles --create %{_tmpfilesdir}/munge.conf
 %attr(0640,munge,munge) %ghost %{_localstatedir}/log/munge/munged.log
 %dir %attr(0755,munge,munge) %ghost %{_rundir}/munge
 %attr(0644,munge,munge) %ghost %{_rundir}/munge/munged.pid
-%{_bindir}/*
-%{_sbindir}/*
-%{_mandir}/man[^3]/*
+%{_bindir}/munge
+%{_bindir}/remunge
+%{_bindir}/unmunge
+%{_sbindir}/munged
+%{_sbindir}/mungekey
+%{_mandir}/man1/munge.1.gz
+%{_mandir}/man1/remunge.1.gz
+%{_mandir}/man1/unmunge.1.gz
+%{_mandir}/man7/munge.7.gz
+%{_mandir}/man8/munged.8.gz
+%{_mandir}/man8/mungekey.8.gz
 %{_unitdir}/munge.service
 #
 %if 0%{?rhel} == 7
@@ -161,13 +168,27 @@ systemd-tmpfiles --create %{_tmpfilesdir}/munge.conf
 %endif
 
 %files devel
-%{_includedir}/*
+%{_includedir}/munge.h
 %if 0%{?fedora} < 36
 %{_libdir}/libmunge.la
 %endif
 %{_libdir}/libmunge.so
 %{_libdir}/pkgconfig/munge.pc
-%{_mandir}/man3/*
+%{_mandir}/man3/munge.3.gz
+%{_mandir}/man3/munge_ctx.3.gz
+%{_mandir}/man3/munge_ctx_copy.3.gz
+%{_mandir}/man3/munge_ctx_create.3.gz
+%{_mandir}/man3/munge_ctx_destroy.3.gz
+%{_mandir}/man3/munge_ctx_get.3.gz
+%{_mandir}/man3/munge_ctx_set.3.gz
+%{_mandir}/man3/munge_ctx_strerror.3.gz
+%{_mandir}/man3/munge_decode.3.gz
+%{_mandir}/man3/munge_encode.3.gz
+%{_mandir}/man3/munge_enum.3.gz
+%{_mandir}/man3/munge_enum_int_to_str.3.gz
+%{_mandir}/man3/munge_enum_is_valid.3.gz
+%{_mandir}/man3/munge_enum_str_to_int.3.gz
+%{_mandir}/man3/munge_strerror.3.gz
 
 %files libs
 %{_libdir}/libmunge.so.2
