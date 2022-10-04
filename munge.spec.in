@@ -27,8 +27,8 @@ BuildRequires:	gcc
 BuildRequires:	bzip2-devel
 BuildRequires:	openssl-devel
 BuildRequires:	zlib-devel
-BuildRequires:	systemd
 BuildRequires:	procps
+BuildRequires:	%{?el7:systemd}%{!?el7:systemd-rpm-macros}
 Requires:	%{name}-libs%{?_isa} = %{version}-%{release}
 Requires:	logrotate
 Requires(pre):	shadow-utils
