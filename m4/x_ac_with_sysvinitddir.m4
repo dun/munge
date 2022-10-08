@@ -4,7 +4,7 @@
 #
 #  DESCRIPTION:
 #    The "--with-sysvinitddir" option sets "sysvinitddir", the installation
-#    directory for SysV init scripts.
+#    directory for sysvinit scripts.
 #
 #    By default, sysvinitddir will be disabled/unset if systemdunitdir is set.
 #    Otherwise, sysvinitddir will default to either "${sysconfdir}/rc.d/init.d"
@@ -19,7 +19,7 @@ AC_DEFUN([X_AC_WITH_SYSVINITDDIR],
     [sysvinitddir],
     [AS_HELP_STRING(
        [--with-sysvinitddir@<:@=DIR@:>@],
-       [SysV init script installation directory])])
+       [sysvinit script installation directory])])
   AS_IF(
     [test "x${with_sysvinitddir}" = xyes \
        || (test "x${with_sysvinitddir}" = x && test "x${systemdunitdir}" = x)],
