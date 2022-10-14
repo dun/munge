@@ -32,7 +32,7 @@ fi
 
 # Ensure the rpmbuild executable is already installed.
 #
-if type rpmbuild >/dev/null 2>&1; then :; else
+if command -v rpmbuild >/dev/null 2>&1; then :; else
     skip_all='skipping rpm test; rpmbuild not installed'
     test_done
 fi
@@ -84,9 +84,13 @@ test_expect_success MUNGE_TARBALL 'build srpm' '
 #
 test_expect_success MUNGE_SRPM 'install builddeps' '
     local BUILDDEP &&
-    if type -p dnf >/dev/null 2>&1; then BUILDDEP="dnf builddep --assumeyes"; \
-    elif type -p yum-builddep >/dev/null 2>&1; then BUILDDEP="yum-builddep"; \
-    else echo "builddep command not found"; false; fi &&
+    if command -v dnf >/dev/null 2>&1; then
+        BUILDDEP="dnf builddep --assumeyes"
+    elif command -v yum-builddep >/dev/null 2>&1; then
+        BUILDDEP="yum-builddep"
+    else
+        echo "builddep command not found"; false
+    fi &&
     sudo ${BUILDDEP} "${MUNGE_RPM_DIR}"/SRPMS/*.src.rpm
 '
 
