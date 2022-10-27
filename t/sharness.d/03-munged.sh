@@ -144,7 +144,7 @@ munged_stop_daemon()
 # Kill an errant munged process running in the background from a previous test.
 # This situation is most likely to occur if a munged test is expected to fail
 #   and instead erroneously succeeds.
-# Only check for the pid named in ${MUNGE_PIDFILE} to avoid intefering with
+# Only check for the pid named in ${MUNGE_PIDFILE} to avoid interfering with
 #   munged processes belonging to other tests or system use.  And check that
 #   the named pid is a munged process and not one recycled by the system for
 #   some other running process.
