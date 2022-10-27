@@ -1,7 +1,6 @@
-##
 # Retry the COMMAND up to COUNT times.
 # Return 0 on success, 1 on error, 2 on invalid COUNT.
-##
+#
 retry()
 {
     local COUNT="$1"

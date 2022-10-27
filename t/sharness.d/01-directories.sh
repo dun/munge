@@ -1,8 +1,7 @@
-##
 # Search from directory [$1] on up to root, looking for the directory that
 #   contains [$2].
 # Output the resulting directory if a match is found.
-##
+#
 search_dirs()
 {
     local START_DIR=$1
@@ -16,9 +15,8 @@ search_dirs()
     )
 }
 
-##
 # Set the top-level build directory.
-##
+#
 set_build_dir()
 {
     if test -z "${MUNGE_BUILD_DIR}"; then
@@ -38,9 +36,8 @@ set_build_dir()
     fi
 }
 
-##
 # Set the top-level source directory.
-##
+#
 set_source_dir()
 {
     local DIR

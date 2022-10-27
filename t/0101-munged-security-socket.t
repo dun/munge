@@ -9,7 +9,7 @@ test_description='Check munged security of socket'
 #   directory ownership and permissions.  It is kept in TMPDIR since NFS can
 #   cause problems for the lockfile (the location of which is derived from the
 #   socket name),
-##
+#
 test_expect_success 'setup' '
     MUNGE_SOCKETDIR="${TMPDIR:-"/tmp"}/munge-$$/socketdir-$$" &&
     munged_setup &&
@@ -17,7 +17,7 @@ test_expect_success 'setup' '
 '
 
 # Check the permissions on the socket dir.
-##
+#
 test_expect_success 'socket dir perms' '
     test "$(find "${MUNGE_SOCKETDIR}" -type d -perm 1777)" = \
             "${MUNGE_SOCKETDIR}" &&
@@ -30,7 +30,7 @@ test_expect_success 'socket dir perms' '
 #   removed when the daemon terminates.
 # Testing TYPE and PERM after munged terminates allows the daemon to be stopped
 #   even if the tests fail.
-##
+#
 test_expect_success 'socket type and perms' '
     local TYPE PERM &&
     munged_start_daemon &&
@@ -42,7 +42,7 @@ test_expect_success 'socket type and perms' '
 '
 
 # Check a socket dir that is owned by the EUID.
-##
+#
 test_expect_success 'socket dir owned by euid' '
     local DIR_UID MY_EUID &&
     DIR_UID=$(ls -d -l -n "${MUNGE_SOCKETDIR}" | awk "{ print \$3 }") &&
@@ -55,7 +55,7 @@ test_expect_success 'socket dir owned by euid' '
 # Create an alternate socket dir that can be chwon'd.
 # This dir is placed in a subdir of TMPDIR since chowning something as root can
 #   fail if NFS is configured for squashed access.
-##
+#
 test_expect_success SUDO 'alt socket dir setup' '
     ALT_SOCKETDIR="${TMPDIR:-"/tmp"}/munge-$$/alt-socketdir-$$" &&
     mkdir -m 1777 -p "${ALT_SOCKETDIR}" &&
@@ -64,7 +64,7 @@ test_expect_success SUDO 'alt socket dir setup' '
 '
 
 # Check a socket dir that is owned by root.
-##
+#
 test_expect_success ALT,SUDO 'socket dir owned by root' '
     sudo chown root "${ALT_SOCKETDIR}" &&
     munged_start_daemon --socket="${ALT_SOCKET}" &&
@@ -72,7 +72,7 @@ test_expect_success ALT,SUDO 'socket dir owned by root' '
 '
 
 # Check for an error when the socket dir is not owned by the EUID or root.
-##
+#
 test_expect_success ALT,SUDO 'socket dir owned by other failure' '
     test "$(id -u)" != "1" &&
     sudo chown 1 "${ALT_SOCKETDIR}" &&
@@ -83,7 +83,7 @@ test_expect_success ALT,SUDO 'socket dir owned by other failure' '
 
 # Check if the error can be overridden when the socket dir is not owned by the
 #   EUID or root.
-##
+#
 test_expect_success ALT,SUDO 'socket dir owned by other override' '
     test "$(id -u)" != "1" &&
     sudo chown 1 "${ALT_SOCKETDIR}" &&
@@ -94,7 +94,7 @@ test_expect_success ALT,SUDO 'socket dir owned by other override' '
 '
 
 # Cleanup the alternate socket dir.
-##
+#
 test_expect_success ALT 'alt socket dir cleanup' '
     rmdir "${ALT_SOCKETDIR}" &&
     unset ALT_SOCKETDIR &&
@@ -103,7 +103,7 @@ test_expect_success ALT 'alt socket dir cleanup' '
 
 # Check if the socket dir can be writable by group (without the sticky bit set)
 #   when a trusted group is specified that matches the directory's group.
-##
+#
 test_expect_success 'socket dir writable by trusted group' '
     local GID &&
     GID=$(ls -d -l -n "${MUNGE_SOCKETDIR}" | awk "{ print \$4 }") &&
@@ -115,7 +115,7 @@ test_expect_success 'socket dir writable by trusted group' '
 
 # Check for an error when the socket dir is writable (without the sticky bit
 #   set) by a group that does not match the specified trusted group.
-##
+#
 test_expect_success 'socket dir writable by untrusted group failure' '
     local GID &&
     GID=$(ls -d -l -n "${MUNGE_SOCKETDIR}" | awk "{ print \$4 }") &&
@@ -127,7 +127,7 @@ test_expect_success 'socket dir writable by untrusted group failure' '
 
 # Check for an error when the socket dir is writable by group without the
 #   sticky bit set.
-##
+#
 test_expect_success 'socket dir writable by group failure' '
     chmod 0771 "${MUNGE_SOCKETDIR}" &&
     test_must_fail munged_start_daemon &&
@@ -138,7 +138,7 @@ test_expect_success 'socket dir writable by group failure' '
 
 # Check if the error can be overridden when the socket dir is writable by group
 #   without the sticky bit set.
-##
+#
 test_expect_success 'socket dir writable by group override' '
     chmod 0771 "${MUNGE_SOCKETDIR}" &&
     munged_start_daemon --force &&
@@ -149,7 +149,7 @@ test_expect_success 'socket dir writable by group override' '
 '
 
 # Check if the socket dir can be writable by group with the sticky bit set.
-##
+#
 test_expect_success 'socket dir writable by group with sticky bit' '
     chmod 1771 "${MUNGE_SOCKETDIR}" &&
     munged_start_daemon &&
@@ -159,7 +159,7 @@ test_expect_success 'socket dir writable by group with sticky bit' '
 
 # Check for an error when the socket dir is writable by other without the
 #   sticky bit set.
-##
+#
 test_expect_success 'socket dir writable by other failure' '
     chmod 0717 "${MUNGE_SOCKETDIR}" &&
     test_must_fail munged_start_daemon &&
@@ -170,7 +170,7 @@ test_expect_success 'socket dir writable by other failure' '
 
 # Check if the error can be overridden when the socket dir is writable by other
 #   without the sticky bit set.
-##
+#
 test_expect_success 'socket dir writable by other override' '
     chmod 0717 "${MUNGE_SOCKETDIR}" &&
     munged_start_daemon --force &&
@@ -181,7 +181,7 @@ test_expect_success 'socket dir writable by other override' '
 '
 
 # Check if the socket dir can be writable by other with the sticky bit set.
-##
+#
 test_expect_success 'socket dir writable by other with sticky bit' '
     chmod 1717 "${MUNGE_SOCKETDIR}" &&
     munged_start_daemon &&
@@ -191,7 +191,7 @@ test_expect_success 'socket dir writable by other with sticky bit' '
 
 # Check for an error when the socket dir does not have execute permissions
 #   for all.
-##
+#
 test_expect_success 'socket dir inaccessible by all failure' '
     chmod 0700 "${MUNGE_SOCKETDIR}" &&
     test_must_fail munged_start_daemon &&
@@ -203,7 +203,7 @@ test_expect_success 'socket dir inaccessible by all failure' '
 #
 # Check if the error can be overridden when the socket dir does not have
 #   execute permissions for all.
-##
+#
 test_expect_success 'socket dir inaccessible by all override' '
     chmod 0700 "${MUNGE_SOCKETDIR}" &&
     munged_start_daemon --force &&
@@ -217,7 +217,7 @@ test_expect_success 'socket dir inaccessible by all override' '
 #   that has not terminated.
 # MUNGE_SOCKETDIR should be empty if munged gracefully terminated, so list the
 #   directory contents to aid in debugging if needed.
-##
+#
 test_expect_success 'cleanup' '
     munged_cleanup &&
     ls -A1 "${MUNGE_SOCKETDIR}" &&

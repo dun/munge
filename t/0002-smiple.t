@@ -8,7 +8,7 @@ test_description="Because nothing is so simple that it can't still go wrong"
 #   "/" regex should be escaped (i.e., "\/").
 # FreeBSD requires the "/" regex in expr to be escaped.
 # See "m4/x_ac_with_munge_socket.m4".
-##
+#
 test_expect_success 'expr string match of absolute path with "/" regex' '
     test_might_fail test "$(expr "/path" : "/")" -eq 1
 '
@@ -23,7 +23,7 @@ test_expect_success 'expr string match of absolute path with "\/" regex' '
 #   with 'X', prepending an 'X' to both strings should be a portable solution.
 # FreeBSD requires that a leading argument beginning with a minus sign be
 #   considered an option to the program.
-##
+#
 test_expect_success 'expr string match of long opt' '
     test_might_fail test "$(expr "--exec=foo" : "--exec=")" -eq 7
 '
@@ -37,7 +37,7 @@ test_expect_success 'expr string match of long opt w/ prepended "X" char' '
 # As of GNU grep-3.8, egrep warns that it is obsolescent and should be replaced
 #   with "grep -E".
 # Check if "grep -E" works for matching extended regular expressions.
-##
+#
 test_expect_success 'grep extended regex expected failure' '
     echo "hoopy frood" |
     test_must_fail grep "(groovy|hoopy)"

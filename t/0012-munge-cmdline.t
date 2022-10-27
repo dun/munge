@@ -314,7 +314,7 @@ done
 # Compression will be disabled if the compressed credential is not smaller than
 #   an uncompressed credential.  Consequently, encode a highly-compressible
 #   payload when testing --zip to force compression.
-##
+#
 for OPT_ZIP in '-z' '--zip'; do
     test_expect_success "munge ${OPT_ZIP} for default by name" '
         "${MUNGE}" --socket="${MUNGE_SOCKET}" --no-input \
@@ -543,7 +543,7 @@ test_expect_success 'munge --gid for effective group by number' '
 
 # Since FreeBSD uses the wheel group instead of the root group,
 #   query root's group via id.
-##
+#
 test_expect_success SUDO 'munge --gid for root group by name via sudo' '
     local ID=$(id -g -n root) META &&
     sudo LD_LIBRARY_PATH="${LD_LIBRARY_PATH}" "${MUNGE}" \

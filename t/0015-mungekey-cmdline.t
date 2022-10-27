@@ -6,7 +6,7 @@ test_description='Check mungekey command-line options'
 
 # Check if an invalid short-option displays the expected option text in the
 #   error message.
-##
+#
 test_expect_success 'mungekey invalid short option' '
     test_must_fail "${MUNGEKEY}" -9 2>err.$$ &&
     grep -q "Option \"-9\" is invalid" err.$$
@@ -14,7 +14,7 @@ test_expect_success 'mungekey invalid short option' '
 
 # Check if an invalid long-option displays the expected option text in the
 #   error message.
-##
+#
 test_expect_success 'mungekey invalid long option' '
     test_must_fail "${MUNGEKEY}" --invalid-option 2>err.$$ &&
     grep -q "Option \"--invalid-option\" is invalid" err.$$
@@ -22,7 +22,7 @@ test_expect_success 'mungekey invalid long option' '
 
 # Check if a non-printable option is handled.  This tests the case where the
 #   text of an invalid option cannot be properly displayed.
-##
+#
 test_expect_success 'mungekey invalid non-printable short option' '
     test_must_fail "${MUNGEKEY}" - 2>err.$$ &&
     grep -q "Failed to process command-line" err.$$
@@ -31,7 +31,7 @@ test_expect_success 'mungekey invalid non-printable short option' '
 # Check if an unimplemented option is handled.
 # The unimplemented short-option is specified in GETOPT_DEBUG_SHORT_OPTS
 #   when configured with --enable-debug.
-##
+#
 test_expect_success DEBUG 'mungekey unimplemented option' '
     test_must_fail "${MUNGEKEY}" -8 2>err.$$ &&
     grep -q "Option \"-8\" is not implemented" err.$$
@@ -40,21 +40,21 @@ test_expect_success DEBUG 'mungekey unimplemented option' '
 # Check if a non-option option (i.e., one without a single or double leading
 #   hyphen) is handled.  This tests the case of leftover args in argv[] after
 #   getopt_long() is finished.
-##
+#
 test_expect_success 'mungekey unrecognized option' '
     test_must_fail "${MUNGEKEY}" unrecognized-option 2>err.$$ &&
     grep -q "Option \"unrecognized-option\" is unrecognized" err.$$
 '
 
 # Check if a single lone hyphen is handled.
-##
+#
 test_expect_success 'mungekey lone hyphen option' '
     test_must_fail "${MUNGEKEY}" - 2>err.$$ &&
     grep -q "Option \"-\" is unrecognized" err.$$
 '
 
 # Check if usage information is written to stdout.
-##
+#
 for OPT_HELP in '-h' '--help'; do
     test_expect_success "mungekey ${OPT_HELP}" '
         "${MUNGEKEY}" "${OPT_HELP}" |
@@ -63,7 +63,7 @@ for OPT_HELP in '-h' '--help'; do
 done
 
 # Check if license information is written to stdout.
-##
+#
 for OPT_LICENSE in '-L' '--license'; do
     test_expect_success "mungekey ${OPT_LICENSE}" '
         "${MUNGEKEY}" "${OPT_LICENSE}" |
@@ -72,7 +72,7 @@ for OPT_LICENSE in '-L' '--license'; do
 done
 
 # Check if version information is written to stdout.
-##
+#
 for OPT_VERSION in '-V' '--version'; do
     test_expect_success "mungekey ${OPT_VERSION}" '
         "${MUNGEKEY}" "${OPT_VERSION}" |
@@ -81,7 +81,7 @@ for OPT_VERSION in '-V' '--version'; do
 done
 
 # Check if the keyfile is created and properly permissioned.
-##
+#
 for OPT_CREATE in '-c' '--create'; do
     test_expect_success "mungekey ${OPT_CREATE}" '
         local KEYFILE=key.$$ &&
@@ -95,7 +95,7 @@ done
 
 # Check if the keyfile is the appropriate size based on the number of bits
 #   specified.
-##
+#
 for OPT_BITS in '-b' '--bits'; do
     test_expect_success "mungekey ${OPT_BITS}" '
         local KEYFILE=key.$$ NUM_BITS=1000 FILE_SIZE &&
@@ -112,7 +112,7 @@ done
 # Check if the number of bits is rounded-up to the next byte if it is not
 #   evenly divisible by 8.  NUM_BITS is set to 1 bit above the requested
 #   NUM_BYTES.
-##
+#
 test_expect_success 'mungekey --bits rounding-up to next byte' '
     local KEYFILE=key.$$ NUM_BYTES=128 NUM_BITS NUM_BYTES_ROUNDED FILE_SIZE &&
     NUM_BITS=$(( (${NUM_BYTES} * 8) + 1 )) &&
@@ -127,7 +127,7 @@ test_expect_success 'mungekey --bits rounding-up to next byte' '
 '
 
 # Check if the default def is used when the number of bits is unspecified.
-##
+#
 test_expect_success 'mungekey --bits unspecified and using default' '
     local KEYFILE=key.$$ DEFS NUM_BYTES NUM_BITS FILE_SIZE &&
     DEFS="${MUNGE_SOURCE_DIR}/src/libcommon/munge_defs.h" &&
@@ -143,7 +143,7 @@ test_expect_success 'mungekey --bits unspecified and using default' '
 '
 
 # Check the boundary case for the minimum number of bits.
-##
+#
 test_expect_success 'mungekey --bits with minimum value' '
     local KEYFILE=key.$$ DEFS NUM_BYTES NUM_BITS FILE_SIZE &&
     DEFS="${MUNGE_SOURCE_DIR}/src/libcommon/munge_defs.h" &&
@@ -159,7 +159,7 @@ test_expect_success 'mungekey --bits with minimum value' '
 '
 
 # Check the boundary case for the maximum number of bits.
-##
+#
 test_expect_success 'mungekey --bits with maximum value' '
     local KEYFILE=key.$$ DEFS NUM_BYTES NUM_BITS FILE_SIZE &&
     DEFS="${MUNGE_SOURCE_DIR}/src/libcommon/munge_defs.h" &&
@@ -175,7 +175,7 @@ test_expect_success 'mungekey --bits with maximum value' '
 '
 
 # Check the boundary case below the minimum number of bits.
-##
+#
 test_expect_success 'mungekey --bits below minimum value' '
     local DEFS NUM_BYTES NUM_BITS &&
     DEFS="${MUNGE_SOURCE_DIR}/src/libcommon/munge_defs.h" &&
@@ -188,7 +188,7 @@ test_expect_success 'mungekey --bits below minimum value' '
 '
 
 # Check the boundary case above the maximum number of bits.
-##
+#
 test_expect_success 'mungekey --bits above maximum value' '
     local DEFS NUM_BYTES NUM_BITS &&
     DEFS="${MUNGE_SOURCE_DIR}/src/libcommon/munge_defs.h" &&
@@ -201,7 +201,7 @@ test_expect_success 'mungekey --bits above maximum value' '
 '
 
 # Check if the minimum number of bits is displayed in the error message.
-##
+#
 test_expect_success 'mungekey --bits error message with minimum value' '
     local DEFS NUM_BYTES NUM_BITS &&
     DEFS="${MUNGE_SOURCE_DIR}/src/libcommon/munge_defs.h" &&
@@ -213,7 +213,7 @@ test_expect_success 'mungekey --bits error message with minimum value' '
 '
 
 # Check if the maximum number of bits is displayed in the error message.
-##
+#
 test_expect_success 'mungekey --bits error message with maximum value' '
     local DEFS NUM_BYTES NUM_BITS &&
     DEFS="${MUNGE_SOURCE_DIR}/src/libcommon/munge_defs.h" &&
@@ -225,14 +225,14 @@ test_expect_success 'mungekey --bits error message with maximum value' '
 '
 
 # Check the case for zero number of bits.
-##
+#
 test_expect_success 'mungekey --bits with zero value' '
     test_must_fail "${MUNGEKEY}" --create --keyfile=key.$$ --bits=0 2>err.$$ &&
     grep -q "Option \"--bits\" has invalid value" err.$$
 '
 
 # Check the case for a negative number of bits.
-##
+#
 test_expect_success 'mungekey --bits with negative value' '
     test_must_fail "${MUNGEKEY}" --create --keyfile=key.$$ --bits=-1 \
             2>err.$$ &&
@@ -241,7 +241,7 @@ test_expect_success 'mungekey --bits with negative value' '
 
 # Check if -b requires an argument and displays the expected short-option text
 #   in the error message.
-##
+#
 test_expect_success 'mungekey -b without required value' '
     test_must_fail "${MUNGEKEY}" --create --keyfile=key.$$ -b 2>err.$$ &&
     grep -q "Option \"-b\" is missing a required argument" err.$$
@@ -249,14 +249,14 @@ test_expect_success 'mungekey -b without required value' '
 
 # Check if --bits requires an argument and displays the expected long-option
 #   text in the error message.
-##
+#
 test_expect_success 'mungekey --bits without required value' '
     test_must_fail "${MUNGEKEY}" --create --keyfile=key.$$ --bits 2>err.$$ &&
     grep -q "Option \"--bits\" is missing a required argument" err.$$
 '
 
 # Check if --force removes an existing keyfile.
-##
+#
 for OPT_FORCE in '-f' '--force'; do
     test_expect_success "mungekey ${OPT_FORCE}" '
         local KEYFILE=key.$$ &&
@@ -269,7 +269,7 @@ for OPT_FORCE in '-f' '--force'; do
 done
 
 # Check if the lack of --force preserves an existing and writable keyfile.
-##
+#
 test_expect_success 'mungekey without --force and with existing keyfile' '
     local KEYFILE=key.$$ &&
     rm -f "${KEYFILE}" &&
@@ -283,7 +283,7 @@ test_expect_success 'mungekey without --force and with existing keyfile' '
 # Check if an alternate keyfile can be specified.
 # This is tested by practically every testcase in order to prevent writing a
 #   key somewhere it shouldn't.
-##
+#
 for OPT_KEYFILE in '-k' '--keyfile'; do
     test_expect_success "mungekey ${OPT_KEYFILE}" '
         local KEYFILE=key.$$ &&
@@ -296,7 +296,7 @@ done
 
 # Check if -k requires an argument and displays the expected short-option text
 #   in the error message.
-##
+#
 test_expect_success 'mungekey -k without required value' '
     test_must_fail "${MUNGEKEY}" --create -k 2>err.$$ &&
     grep -q "Option \"-k\" is missing a required argument" err.$$
@@ -304,7 +304,7 @@ test_expect_success 'mungekey -k without required value' '
 
 # Check if --keyfile requires an argument and displays the expected long-option
 #   text in the error message.
-##
+#
 test_expect_success 'mungekey --keyfile without required value' '
     test_must_fail "${MUNGEKEY}" --create --keyfile 2>err.$$ &&
     grep -q "Option \"--keyfile\" is missing a required argument" err.$$
@@ -312,7 +312,7 @@ test_expect_success 'mungekey --keyfile without required value' '
 
 # Check if an informational message is written to stderr when creating a key
 #   with --verbose.
-##
+#
 for OPT_VERBOSE in '-v' '--verbose'; do
     test_expect_success "mungekey ${OPT_VERBOSE}" '
         local KEYFILE=key.$$ &&
@@ -327,7 +327,7 @@ done
 
 # Check if the informational message written to stderr when creating a key
 #   contains the number of bits used.
-##
+#
 test_expect_success 'mungekey --verbose number of bits' '
     local KEYFILE=key.$$ NUM_BITS=1000 NUM_BITS_USED &&
     rm -f "${KEYFILE}" &&
@@ -341,7 +341,7 @@ test_expect_success 'mungekey --verbose number of bits' '
 
 # Check that nothing is written to stdout or stderr when successfully creating
 #   a key without --verbose (unless configured with --enable-debug).
-##
+#
 test_expect_success !DEBUG 'mungekey without --verbose' '
     local KEYFILE=key.$$ &&
     rm -f "${KEYFILE}" &&
@@ -360,7 +360,7 @@ test_expect_success !DEBUG 'mungekey without --verbose' '
 #   (with an invalid value to trigger the error case).  If long_ind is not
 #   being re-initialized, the error message will erroneously refer to the last
 #   successfully-parsed long-option (i.e., --keyfile).
-##
+#
 test_expect_success 'mungekey long_ind re-initialized for getopt_long()' '
     test_must_fail "${MUNGEKEY}" --create --keyfile=key.$$ -b 1 2>err.$$ &&
     grep -q "Option \"-b\" has invalid value" err.$$
@@ -369,7 +369,7 @@ test_expect_success 'mungekey long_ind re-initialized for getopt_long()' '
 # Check if mungekey defaults to creating a key if no operation is specified.
 #   The --keyfile option does not specify an operation, and it must be
 #   specified here to prevent writing a key somewhere it shouldn't.
-##
+#
 test_expect_success 'mungekey defaults to create key' '
     local KEYFILE=key.$$ &&
     rm -f "${KEYFILE}" &&

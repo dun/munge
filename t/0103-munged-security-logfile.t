@@ -5,7 +5,7 @@ test_description='Check munged security of logfile'
 . "$(dirname "$0")/sharness.sh"
 
 # Set up the environment for checking the logfile.
-##
+#
 test_expect_success 'setup' '
     munged_setup &&
     munged_create_key
@@ -14,7 +14,7 @@ test_expect_success 'setup' '
 # Check startup with an existing empty logfile.  The same file (identified by
 #   its inode number) should exist after the daemon terminates, but it should
 #   no longer be empty.
-##
+#
 test_expect_success 'logfile regular file' '
     local INODE0 INODE1 &&
     rm -f "${MUNGE_LOGFILE}" &&
@@ -28,7 +28,7 @@ test_expect_success 'logfile regular file' '
 '
 
 # Check for an error when the logfile is a symlink to a regular file.
-##
+#
 test_expect_success 'logfile symlink to regular file failure' '
     local MY_LOGFILE &&
     MY_LOGFILE="${MUNGE_LOGFILE}.symlink" &&
@@ -42,7 +42,7 @@ test_expect_success 'logfile symlink to regular file failure' '
 
 # Check if the error can be overridden when the logfile is a symlink to a
 #   regular file.
-##
+#
 test_expect_success 'logfile symlink to regular file override' '
     local MY_LOGFILE &&
     MY_LOGFILE="${MUNGE_LOGFILE}.symlink" &&
@@ -58,7 +58,7 @@ test_expect_success 'logfile symlink to regular file override' '
 # Check startup without an existing logfile (by not specifying t-keep-logfile
 #   so as to remove an existing logfile).  A non-empty logfile should exist
 #   after the daemon terminates.
-##
+#
 test_expect_success 'logfile missing' '
     munged_start_daemon &&
     munged_stop_daemon &&
@@ -67,7 +67,7 @@ test_expect_success 'logfile missing' '
 
 # Check for an error when the logfile is a symlink to a non-existent file
 #   (by not specifying t-keep-logfile so as to remove an existing logfile).
-##
+#
 test_expect_success 'logfile symlink to missing file failure' '
     local MY_LOGFILE &&
     MY_LOGFILE="${MUNGE_LOGFILE}.symlink" &&
@@ -80,7 +80,7 @@ test_expect_success 'logfile symlink to missing file failure' '
 #   non-existent file (by not specifying t-keep-logfile so as to remove an
 #   existing logfile).  A non-empty logfile should exist after the daemon
 #   terminates.
-##
+#
 test_expect_success 'logfile symlink to missing file override' '
     local MY_LOGFILE &&
     MY_LOGFILE="${MUNGE_LOGFILE}.symlink" &&
@@ -93,7 +93,7 @@ test_expect_success 'logfile symlink to missing file override' '
 
 # Check for an error when the logfile is not a regular file.
 # Using a directory for the non-regular-file seems the most portable solution.
-##
+#
 test_expect_success 'logfile non-regular-file failure' '
     local MUNGE_LOGFILE &&
     MUNGE_LOGFILE="${MUNGE_LOGDIR}/munged.log.$$.non-regular-file" &&
@@ -106,7 +106,7 @@ test_expect_success 'logfile non-regular-file failure' '
 
 # Check that the error cannot be overridden when the logfile is not a regular
 #   file.
-##
+#
 test_expect_success 'logfile non-regular-file override failure' '
     local MUNGE_LOGFILE &&
     MUNGE_LOGFILE="${MUNGE_LOGDIR}/munged.log.$$.non-regular-file" &&
@@ -120,7 +120,7 @@ test_expect_success 'logfile non-regular-file override failure' '
 # Check for an error when the logfile is not writable by user.
 # Skip this test if running as root since the root user will not get the
 #   expected EACCESS failure.
-##
+#
 test_expect_success !ROOT 'logfile not writable by user failure' '
     rm -f "${MUNGE_LOGFILE}" &&
     touch "${MUNGE_LOGFILE}" &&
@@ -131,7 +131,7 @@ test_expect_success !ROOT 'logfile not writable by user failure' '
 
 # Check if the logfile can be writable by a group that matches the specified
 #   trusted group.
-##
+#
 test_expect_failure 'logfile writable by trusted group ' '
     local GID &&
     rm -f "${MUNGE_LOGFILE}" &&
@@ -144,7 +144,7 @@ test_expect_failure 'logfile writable by trusted group ' '
 
 # Check for an error when the logfile is writable by a group that does not
 #   match the specified trusted group.
-##
+#
 test_expect_success 'logfile writable by untrusted group failure' '
     local GID &&
     rm -f "${MUNGE_LOGFILE}" &&
@@ -156,7 +156,7 @@ test_expect_success 'logfile writable by untrusted group failure' '
 '
 
 # Check for an error when the logfile is writable by group.
-##
+#
 test_expect_success 'logfile writable by group failure' '
     rm -f "${MUNGE_LOGFILE}" &&
     touch "${MUNGE_LOGFILE}" &&
@@ -166,7 +166,7 @@ test_expect_success 'logfile writable by group failure' '
 '
 
 # Check if the error can be overridden when the logfile is writable by group.
-##
+#
 test_expect_success 'logfile writable by group override' '
     rm -f "${MUNGE_LOGFILE}" &&
     touch "${MUNGE_LOGFILE}" &&
@@ -177,7 +177,7 @@ test_expect_success 'logfile writable by group override' '
 '
 
 # Check for an error when the logfile is writable by other.
-##
+#
 test_expect_success 'logfile writable by other failure' '
     rm -f "${MUNGE_LOGFILE}" &&
     touch "${MUNGE_LOGFILE}" &&
@@ -187,7 +187,7 @@ test_expect_success 'logfile writable by other failure' '
 '
 
 # Check if the error can be overridden when the logfile is writable by other.
-##
+#
 test_expect_success 'logfile writable by other override' '
     rm -f "${MUNGE_LOGFILE}" &&
     touch "${MUNGE_LOGFILE}" &&
@@ -198,7 +198,7 @@ test_expect_success 'logfile writable by other override' '
 '
 
 # Check if the logfile can be readable by all.
-##
+#
 test_expect_success 'logfile readable by all' '
     rm -f "${MUNGE_LOGFILE}" &&
     touch "${MUNGE_LOGFILE}" &&
@@ -208,7 +208,7 @@ test_expect_success 'logfile readable by all' '
 '
 
 # Check a logfile dir that is owned by the EUID.
-##
+#
 test_expect_success 'logfile dir owned by euid' '
     local DIR_UID MY_EUID &&
     DIR_UID=$(ls -d -l -n "${MUNGE_LOGDIR}" | awk "{ print \$3 }") &&
@@ -221,7 +221,7 @@ test_expect_success 'logfile dir owned by euid' '
 # Create an alternate logfile dir that can be chown'd.
 # This dir is placed in a subdir of TMPDIR since chowning something as root can
 #   fail if NFS is configured for squashed access.
-##
+#
 test_expect_success SUDO 'alt logfile dir setup' '
     ALT_LOGDIR="${TMPDIR:-"/tmp"}/munge-$$/alt-log-$$" &&
     mkdir -m 0755 -p "${ALT_LOGDIR}" &&
@@ -231,7 +231,7 @@ test_expect_success SUDO 'alt logfile dir setup' '
 '
 
 # Check a logfile dir that is owned by root.
-##
+#
 test_expect_success ALT,SUDO 'logfile dir owned by root' '
     sudo chown root "${ALT_LOGDIR}" &&
     > "${ALT_LOGFILE}" &&
@@ -240,7 +240,7 @@ test_expect_success ALT,SUDO 'logfile dir owned by root' '
 '
 
 # Check for an error when the logfile dir is not owned by the EUID or root.
-##
+#
 test_expect_success ALT,SUDO 'logfile dir owned by other failure' '
     test "$(id -u)" != "1" &&
     sudo chown 1 "${ALT_LOGDIR}" &&
@@ -251,7 +251,7 @@ test_expect_success ALT,SUDO 'logfile dir owned by other failure' '
 
 # Check if the error can be overridden when the logfile dir is not owned by
 #   the EUID or root.
-##
+#
 test_expect_success ALT,SUDO 'logfile dir owned by other override' '
     test "$(id -u)" != "1" &&
     sudo chown 1 "${ALT_LOGDIR}" &&
@@ -262,7 +262,7 @@ test_expect_success ALT,SUDO 'logfile dir owned by other override' '
 '
 
 # Cleanup the alternate logfile dir.
-##
+#
 test_expect_success ALT,SUDO 'alt logfile dir cleanup' '
     sudo rm -r -f "${ALT_LOGDIR}" &&
     if rmdir "$(dirname "${ALT_LOGDIR}")" 2>/dev/null; then :; fi &&
@@ -272,7 +272,7 @@ test_expect_success ALT,SUDO 'alt logfile dir cleanup' '
 
 # Check if the logfile dir can be writable (without the sticky bit) by a group
 #   that matches the specified trusted group.
-##
+#
 test_expect_success 'logfile dir writable by trusted group ' '
     local GID &&
     GID=$(ls -d -l -n "${MUNGE_LOGDIR}" | awk "{ print \$4 }") &&
@@ -285,7 +285,7 @@ test_expect_success 'logfile dir writable by trusted group ' '
 # Check if the logfile dir can be writable (without the sticky bit) by a group
 #   that does not match the specified trusted group.
 # Group-writable permissions are allowed on the logfile dir (see Issue #31).
-##
+#
 test_expect_success 'logfile dir writable by untrusted group failure' '
     local GID &&
     GID=$(ls -d -l -n "${MUNGE_LOGDIR}" | awk "{ print \$4 }") &&
@@ -298,7 +298,7 @@ test_expect_success 'logfile dir writable by untrusted group failure' '
 
 # Check if the logfile dir can be writable by group without the sticky bit set.
 # Group-writable permissions are allowed on the logfile dir (see Issue #31).
-##
+#
 test_expect_success 'logfile dir writable by group' '
     chmod 0770 "${MUNGE_LOGDIR}" &&
     munged_start_daemon &&
@@ -307,7 +307,7 @@ test_expect_success 'logfile dir writable by group' '
 '
 
 # Check if the logfile dir can be writable by group with the sticky bit set.
-##
+#
 test_expect_success 'logfile dir writable by group with sticky bit' '
     chmod 1770 "${MUNGE_LOGDIR}" &&
     munged_start_daemon &&
@@ -317,7 +317,7 @@ test_expect_success 'logfile dir writable by group with sticky bit' '
 
 # Check for an error when the logfile dir is writable by other without the
 #   sticky bit set.
-##
+#
 test_expect_success 'logfile dir writable by other failure' '
     chmod 0707 "${MUNGE_LOGDIR}" &&
     test_must_fail munged_start_daemon 2>err.$$ &&
@@ -327,7 +327,7 @@ test_expect_success 'logfile dir writable by other failure' '
 
 # Check if the error can be overridden when the logfile dir is writable by
 #   other without the sticky bit set.
-##
+#
 test_expect_success 'logfile dir writable by other override' '
     chmod 0707 "${MUNGE_LOGDIR}" &&
     munged_start_daemon --force 2>err.$$ &&
@@ -337,7 +337,7 @@ test_expect_success 'logfile dir writable by other override' '
 '
 
 # Check if the logfile dir can be writable by other with the sticky bit set.
-##
+#
 test_expect_success 'logfile dir writable by other with sticky bit' '
     chmod 1707 "${MUNGE_LOGDIR}" &&
     munged_start_daemon &&
@@ -349,7 +349,7 @@ test_expect_success 'logfile dir writable by other with sticky bit' '
 # To generate an error, test for the logfile being writable by other since this
 #   will not be affected by root privileges.
 #
-##
+#
 test_expect_success 'logfile failure writes single message to stderr' '
     local ERR NUM &&
     rm -f "${MUNGE_LOGFILE}" &&
@@ -363,7 +363,7 @@ test_expect_success 'logfile failure writes single message to stderr' '
 '
 
 # Clean up after a munged process that may not have terminated.
-##
+#
 test_expect_success 'cleanup' '
     munged_cleanup
 '

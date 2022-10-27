@@ -1,6 +1,5 @@
 # Requires MUNGED and MUNGEKEY.
 
-##
 # Set up directory tree and shell variables for starting munged.
 # MUNGE_ROOT, MUNGE_SOCKETDIR, MUNGE_KEYDIR, MUNGE_LOGDIR, MUNGE_PIDDIR, and
 #   MUNGE_SEEDDIR can be overridden by setting them beforehand.
@@ -8,7 +7,7 @@
 #   the lockfile.  Debian 3.1 returns an incorrect PID for the process holding
 #   the lock across an NFS mount.  FreeBSD cannot create a lockfile across an
 #   NFS mount.
-##
+#
 munged_setup()
 {
     umask 0022 &&
@@ -42,12 +41,11 @@ munged_setup()
     test_debug "echo MUNGE_SEEDFILE=\"${MUNGE_SEEDFILE}\""
 }
 
-##
 # Create the smallest-allowable key if one does not already exist.
 # The following leading args are recognized:
 #   t-exec=ARG - use ARG to exec mungekey.
 # Remaining args will be appended to the mungekey command-line.
-##
+#
 munged_create_key()
 {
     local EXEC= &&
@@ -72,7 +70,6 @@ munged_create_key()
     fi
 }
 
-##
 # Start munged, removing an existing logfile or killing an errant munged
 #   process (from a previous run) if needed.
 # The following leading args are recognized:
@@ -80,7 +77,7 @@ munged_create_key()
 #   t-keep-logfile - do not remove logfile before starting munged.
 #   t-keep-process - do not kill previous munged process.
 # Remaining args will be appended to the munged command-line.
-##
+#
 munged_start_daemon()
 {
     local EXEC= KEEP_LOGFILE= KEEP_PROCESS= &&
@@ -117,12 +114,11 @@ munged_start_daemon()
             "$@"
 }
 
-##
 # Stop munged.
 # The following leading args are recognized:
 #   t-exec=ARG - use ARG to exec munged.
 # Remaining args will be appended to the munged command-line.
-##
+#
 munged_stop_daemon()
 {
     local EXEC= &&
@@ -145,7 +141,6 @@ munged_stop_daemon()
             "$@"
 }
 
-##
 # Kill an errant munged process running in the background from a previous test.
 # This situation is most likely to occur if a munged test is expected to fail
 #   and instead erroneously succeeds.
@@ -157,7 +152,7 @@ munged_stop_daemon()
 #   bug introduced that prevents cleanup from occurring.
 # A SIGKILL would prevent the munged process from cleaning up which could cause
 #   other tests to inadvertently fail.
-##
+#
 munged_kill_daemon()
 {
     local PID
@@ -168,12 +163,11 @@ munged_kill_daemon()
     fi
 }
 
-##
-#  Perform any housekeeping to clean up after munged.  This should be called
-#    at the end of any test script that starts a munged process.
-#  This function must be at the start of any &&-chain to ensure it cannot be
-#    prevented from running by a preceding failure in the chain.
-##
+# Perform any housekeeping to clean up after munged.  This should be called
+#   at the end of any test script that starts a munged process.
+# This function must be at the start of any &&-chain to ensure it cannot be
+#   prevented from running by a preceding failure in the chain.
+#
 munged_cleanup()
 {
     munged_kill_daemon

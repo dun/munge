@@ -117,7 +117,7 @@ test_expect_success 'check seedfile creation' '
 '
 
 # Check if the final log message for stopping the daemon has been written out.
-##
+#
 test_expect_success 'check logfile for stop' '
     grep "Stopping" "${MUNGE_LOGFILE}"
 '
