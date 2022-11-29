@@ -50,7 +50,7 @@
 /src/munged/munged
 /src/mungekey/mungekey
 /stamp-h1
-/t/test-results/
+/test/test-results/
 Makefile
 Makefile.in
 TAGS
