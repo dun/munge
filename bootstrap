@@ -1,14 +1,4 @@
 #!/bin/sh
 set -e
-
-# automake < v1.12 does not install tap-driver.sh, so provide a TAP driver for
-#   older versions which can be overridden with the "--force --install" flags.
-#
-test -f build-aux/tap-driver.sh.bak && \
-  cp -p build-aux/tap-driver.sh.bak build-aux/tap-driver.sh
-
 autoreconf --force --install --verbose --warnings=none
-
-# Output the package string containing the auto-generated version.
-#
 sed -ne "s/^PACKAGE_STRING='\([^']*\)'$/\1/p" configure
