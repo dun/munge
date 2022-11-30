@@ -5,15 +5,18 @@
 
 include $(top_srcdir)/Make-inc.mk
 
-check_PROGRAMS = \
-	$(TESTS) \
-	# End of check_PROGRAMS
+LOG_DRIVER = \
+	env AM_TAP_AWK='$(AWK)' $(SHELL) $(top_srcdir)/build-aux/tap-driver.sh
 
 TESTS = \
 	hkdf_api_test \
 	hkdf_rfc_test \
 	mac_test \
 	# End of TESTS
+
+check_PROGRAMS = \
+	$(TESTS) \
+	# End of check_PROGRAMS
 
 hkdf_api_test_CPPFLAGS = \
 	-I$(top_srcdir)/src/libcommon \

@@ -129,13 +129,16 @@ man_MANS = \
 	munged.8 \
 	# End of man_MANS
 
-check_PROGRAMS = \
-	$(TESTS) \
-	# End of check_PROGRAMS
+LOG_DRIVER = \
+	env AM_TAP_AWK='$(AWK)' $(SHELL) $(top_srcdir)/build-aux/tap-driver.sh
 
 TESTS = \
 	base64_test \
 	# End of TESTS
+
+check_PROGRAMS = \
+	$(TESTS) \
+	# End of check_PROGRAMS
 
 base64_test_CPPFLAGS = \
 	-I$(top_srcdir)/src/libtap \
