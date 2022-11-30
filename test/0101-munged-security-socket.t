@@ -2,7 +2,8 @@
 
 test_description='Check munged security of socket'
 
-. "$(dirname "$0")/sharness.sh"
+: "${SHARNESS_TEST_SRCDIR:=$(cd "$(dirname "$0")" && pwd)}"
+. "${SHARNESS_TEST_SRCDIR}/sharness.sh"
 
 # Set up the environment for checking the socket.
 # MUNGE_SOCKETDIR is redefined to add a sub-directory for testing changes to

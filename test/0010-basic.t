@@ -2,7 +2,8 @@
 
 test_description='Check basic functionality of MUNGE daemon and clients'
 
-. "$(dirname "$0")/sharness.sh"
+: "${SHARNESS_TEST_SRCDIR:=$(cd "$(dirname "$0")" && pwd)}"
+. "${SHARNESS_TEST_SRCDIR}/sharness.sh"
 
 # Set up the environment.
 #

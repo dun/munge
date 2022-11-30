@@ -35,16 +35,15 @@ TESTS = \
 
 EXTRA_DIST = \
 	$(TESTS) \
-	0000-sharness.t \
 	0099-credential-decode.cred \
 	0099-credential-decode.key \
 	0099-credential-decode.out \
+	lib-sharness \
 	sharness.d \
 	sharness.sh \
-	test-terminal.perl \
 	valgrind.supp \
 	# End of EXTRA_DIST
 
 clean-local:
 	-rm -rf test-results
-	-rm -rf trash-directory.*
+	-rm -rf trash*directory.*

@@ -2,7 +2,8 @@
 
 test_description='Check custom sharness environment variables'
 
-. "$(dirname "$0")/sharness.sh"
+: "${SHARNESS_TEST_SRCDIR:=$(cd "$(dirname "$0")" && pwd)}"
+. "${SHARNESS_TEST_SRCDIR}/sharness.sh"
 
 test_expect_success 'MUNGE_BUILD_DIR directory exists' '
     test_debug "echo MUNGE_BUILD_DIR=${MUNGE_BUILD_DIR}" &&

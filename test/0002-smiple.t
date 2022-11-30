@@ -2,7 +2,8 @@
 
 test_description="Because nothing is so simple that it can't still go wrong"
 
-. "$(dirname "$0")/sharness.sh"
+: "${SHARNESS_TEST_SRCDIR:=$(cd "$(dirname "$0")" && pwd)}"
+. "${SHARNESS_TEST_SRCDIR}/sharness.sh"
 
 # When testing an expr string regex match for an absolute path, check if the
 #   "/" regex should be escaped (i.e., "\/").

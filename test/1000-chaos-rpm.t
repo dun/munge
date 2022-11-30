@@ -2,7 +2,8 @@
 
 test_description='Check to build, install, and test RPMs'
 
-. "$(dirname "$0")/sharness.sh"
+: "${SHARNESS_TEST_SRCDIR:=$(cd "$(dirname "$0")" && pwd)}"
+. "${SHARNESS_TEST_SRCDIR}/sharness.sh"
 
 # Check for the guard variable.
 #
