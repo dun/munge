@@ -152,7 +152,7 @@ test_expect_success 'logfile writable by untrusted group failure' '
     touch "${MUNGE_LOGFILE}" &&
     chmod 0620 "${MUNGE_LOGFILE}" &&
     GID=$(ls -l -n "${MUNGE_LOGFILE}" | awk "{ print \$4 }") &&
-    GID=$(( ${GID} + 1 )) &&
+    GID=$((GID + 1)) &&
     test_must_fail munged_start t-keep-logfile --trusted-group="${GID}"
 '
 
@@ -290,7 +290,7 @@ test_expect_success 'logfile dir writable by trusted group ' '
 test_expect_success 'logfile dir writable by untrusted group failure' '
     local GID &&
     GID=$(ls -d -l -n "${MUNGE_LOGDIR}" | awk "{ print \$4 }") &&
-    GID=$(( ${GID} + 1 )) &&
+    GID=$((GID + 1)) &&
     chmod 0770 "${MUNGE_LOGDIR}" &&
     munged_start --trusted-group="${GID}" &&
     munged_stop &&

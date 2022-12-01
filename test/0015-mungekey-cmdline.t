@@ -106,7 +106,7 @@ for OPT_BITS in '-b' '--bits'; do
                 "${OPT_BITS}" "${NUM_BITS}" &&
         test -f "${KEYFILE}" &&
         FILE_SIZE=$(wc -c < "${KEYFILE}") &&
-        test "${FILE_SIZE}" -eq "$(( ${NUM_BITS} / 8 ))"
+        test "${FILE_SIZE}" -eq "$((NUM_BITS / 8))"
     '
 done
 
@@ -116,13 +116,13 @@ done
 #
 test_expect_success 'mungekey --bits rounding-up to next byte' '
     local KEYFILE=key.$$ NUM_BYTES=128 NUM_BITS NUM_BYTES_ROUNDED FILE_SIZE &&
-    NUM_BITS=$(( (${NUM_BYTES} * 8) + 1 )) &&
+    NUM_BITS=$(((NUM_BYTES * 8) + 1)) &&
     rm -f "${KEYFILE}" &&
     test ! -f "${KEYFILE}" &&
     "${MUNGEKEY}" --create --keyfile="${KEYFILE}" --bits="${NUM_BITS}" &&
     test -f "${KEYFILE}" &&
-    NUM_BYTES_ROUNDED=$(( (${NUM_BITS} + 7) / 8 )) &&
-    test "${NUM_BYTES_ROUNDED}" = "$(( ${NUM_BYTES} + 1 ))" &&
+    NUM_BYTES_ROUNDED=$(((NUM_BITS + 7) / 8)) &&
+    test "${NUM_BYTES_ROUNDED}" = "$((NUM_BYTES + 1))" &&
     FILE_SIZE=$(wc -c < "${KEYFILE}") &&
     test "${FILE_SIZE}" -eq "${NUM_BYTES_ROUNDED}"
 '
@@ -134,7 +134,7 @@ test_expect_success 'mungekey --bits unspecified and using default' '
     DEFS="${MUNGE_SOURCE_DIR}/src/libcommon/munge_defs.h" &&
     test -f "${DEFS}" &&
     NUM_BYTES=$(awk "/MUNGE_KEY_LEN_DFL_BYTES/ { print \$3 }" "${DEFS}") &&
-    NUM_BITS=$(( ${NUM_BYTES} * 8 )) &&
+    NUM_BITS=$((NUM_BYTES * 8)) &&
     rm -f "${KEYFILE}" &&
     test ! -f "${KEYFILE}" &&
     "${MUNGEKEY}" --create --keyfile="${KEYFILE}" &&
@@ -150,7 +150,7 @@ test_expect_success 'mungekey --bits with minimum value' '
     DEFS="${MUNGE_SOURCE_DIR}/src/libcommon/munge_defs.h" &&
     test -f "${DEFS}" &&
     NUM_BYTES=$(awk "/MUNGE_KEY_LEN_MIN_BYTES/ { print \$3 }" "${DEFS}") &&
-    NUM_BITS=$(( ${NUM_BYTES} * 8 )) &&
+    NUM_BITS=$((NUM_BYTES * 8)) &&
     rm -f "${KEYFILE}" &&
     test ! -f "${KEYFILE}" &&
     "${MUNGEKEY}" --create --keyfile="${KEYFILE}" --bits="${NUM_BITS}" &&
@@ -166,7 +166,7 @@ test_expect_success 'mungekey --bits with maximum value' '
     DEFS="${MUNGE_SOURCE_DIR}/src/libcommon/munge_defs.h" &&
     test -f "${DEFS}" &&
     NUM_BYTES=$(awk "/MUNGE_KEY_LEN_MAX_BYTES/ { print \$3 }" "${DEFS}") &&
-    NUM_BITS=$(( ${NUM_BYTES} * 8 )) &&
+    NUM_BITS=$((NUM_BYTES * 8)) &&
     rm -f "${KEYFILE}" &&
     test ! -f "${KEYFILE}" &&
     "${MUNGEKEY}" --create --keyfile="${KEYFILE}" --bits="${NUM_BITS}" &&
@@ -182,7 +182,7 @@ test_expect_success 'mungekey --bits below minimum value' '
     DEFS="${MUNGE_SOURCE_DIR}/src/libcommon/munge_defs.h" &&
     test -f "${DEFS}" &&
     NUM_BYTES=$(awk "/MUNGE_KEY_LEN_MIN_BYTES/ { print \$3 }" "${DEFS}") &&
-    NUM_BITS=$(( (${NUM_BYTES} * 8) - 1 )) &&
+    NUM_BITS=$(((NUM_BYTES * 8) - 1)) &&
     test_must_fail "${MUNGEKEY}" --create --keyfile=key.$$ \
             --bits="${NUM_BITS}" 2>err.$$ &&
     grep -q "Option \"--bits\" has invalid value \"${NUM_BITS}\"" err.$$
@@ -195,7 +195,7 @@ test_expect_success 'mungekey --bits above maximum value' '
     DEFS="${MUNGE_SOURCE_DIR}/src/libcommon/munge_defs.h" &&
     test -f "${DEFS}" &&
     NUM_BYTES=$(awk "/MUNGE_KEY_LEN_MAX_BYTES/ { print \$3 }" "${DEFS}") &&
-    NUM_BITS=$(( (${NUM_BYTES} * 8) + 1 )) &&
+    NUM_BITS=$(((NUM_BYTES * 8) + 1)) &&
     test_must_fail "${MUNGEKEY}" --create --keyfile=key.$$ \
             --bits="${NUM_BITS}" 2>err.$$ &&
     grep -q "Option \"--bits\" has invalid value \"${NUM_BITS}\"" err.$$
@@ -208,7 +208,7 @@ test_expect_success 'mungekey --bits error message with minimum value' '
     DEFS="${MUNGE_SOURCE_DIR}/src/libcommon/munge_defs.h" &&
     test -f "${DEFS}" &&
     NUM_BYTES=$(awk "/MUNGE_KEY_LEN_MIN_BYTES/ { print \$3 }" "${DEFS}") &&
-    NUM_BITS=$(( ${NUM_BYTES} * 8 )) &&
+    NUM_BITS=$((NUM_BYTES * 8)) &&
     test_must_fail "${MUNGEKEY}" --create --keyfile=key.$$ --bits=1 2>err.$$ &&
     grep -q -- "${NUM_BITS}-" err.$$
 '
@@ -220,7 +220,7 @@ test_expect_success 'mungekey --bits error message with maximum value' '
     DEFS="${MUNGE_SOURCE_DIR}/src/libcommon/munge_defs.h" &&
     test -f "${DEFS}" &&
     NUM_BYTES=$(awk "/MUNGE_KEY_LEN_MAX_BYTES/ { print \$3 }" "${DEFS}") &&
-    NUM_BITS=$(( ${NUM_BYTES} * 8 )) &&
+    NUM_BITS=$((NUM_BYTES * 8)) &&
     test_must_fail "${MUNGEKEY}" --create --keyfile=key.$$ --bits=1 2>err.$$ &&
     grep -q -- "-${NUM_BITS}" err.$$
 '

@@ -120,7 +120,7 @@ test_expect_success 'socket dir writable by trusted group' '
 test_expect_success 'socket dir writable by untrusted group failure' '
     local GID &&
     GID=$(ls -d -l -n "${MUNGE_SOCKETDIR}" | awk "{ print \$4 }") &&
-    GID=$(( ${GID} + 1 )) &&
+    GID=$((GID + 1)) &&
     chmod 0771 "${MUNGE_SOCKETDIR}" &&
     test_must_fail munged_start --trusted-group="${GID}" &&
     chmod 1777 "${MUNGE_SOCKETDIR}"

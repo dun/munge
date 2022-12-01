@@ -105,7 +105,7 @@ test_expect_failure 'keyfile readable by trusted group' '
 test_expect_success 'keyfile readable by untrusted group failure' '
     local GID &&
     GID=$(ls -l -n "${MUNGE_KEYFILE}" | awk "{ print \$4 }") &&
-    GID=$(( ${GID} + 1 )) &&
+    GID=$((GID + 1)) &&
     chmod 0640 "${MUNGE_KEYFILE}" &&
     test_must_fail munged_start --trusted-group="${GID}"
 '
@@ -127,7 +127,7 @@ test_expect_failure 'keyfile writable by trusted group' '
 test_expect_success 'keyfile writable by untrusted group failure' '
     local GID &&
     GID=$(ls -l -n "${MUNGE_KEYFILE}" | awk "{ print \$4 }") &&
-    GID=$(( ${GID} + 1 )) &&
+    GID=$((GID + 1)) &&
     chmod 0620 "${MUNGE_KEYFILE}" &&
     test_must_fail munged_start --trusted-group="${GID}"
 '
@@ -289,7 +289,7 @@ test_expect_success 'keyfile dir writable by trusted group' '
 test_expect_success 'keyfile dir writable by untrusted group failure' '
     local GID &&
     GID=$(ls -d -l -n "${MUNGE_KEYDIR}" | awk "{ print \$4 }") &&
-    GID=$(( ${GID} + 1 )) &&
+    GID=$((GID + 1)) &&
     chmod 0770 "${MUNGE_KEYDIR}" &&
     test_must_fail munged_start --trusted-group="${GID}" &&
     chmod 0755 "${MUNGE_KEYDIR}"
