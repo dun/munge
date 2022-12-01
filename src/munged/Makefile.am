@@ -132,6 +132,8 @@ man_MANS = \
 LOG_DRIVER = \
 	env AM_TAP_AWK='$(AWK)' $(SHELL) $(top_srcdir)/build-aux/tap-driver.sh
 
+AM_TESTSUITE_SUMMARY_HEADER = ' of src/munged/ for $(PACKAGE_STRING)'
+
 TESTS = \
 	base64_test \
 	# End of TESTS
