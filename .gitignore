@@ -33,9 +33,9 @@
 /munge-*.tar*
 /munge.spec
 /src/*/*.[1-9]
-/src/common/hkdf_api_test
-/src/common/hkdf_rfc_test
-/src/common/mac_test
+/src/common/hkdf_api.test
+/src/common/hkdf_rfc.test
+/src/common/mac.test
 /src/etc/munge.logrotate.conf
 /src/etc/munge.pkgconfig.pc
 /src/etc/munge.systemd.service
@@ -46,7 +46,7 @@
 /src/munge/munge
 /src/munge/remunge
 /src/munge/unmunge
-/src/munged/base64_test
+/src/munged/base64.test
 /src/munged/munged
 /src/mungekey/mungekey
 /stamp-h1

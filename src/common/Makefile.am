@@ -5,15 +5,17 @@
 
 include $(top_srcdir)/Make-inc.mk
 
-LOG_DRIVER = \
+TEST_EXTENSIONS = .test
+
+TEST_LOG_DRIVER = \
 	env AM_TAP_AWK='$(AWK)' $(SHELL) $(top_srcdir)/build-aux/tap-driver.sh
 
 AM_TESTSUITE_SUMMARY_HEADER = ' of src/common/ for $(PACKAGE_STRING)'
 
 TESTS = \
-	hkdf_api_test \
-	hkdf_rfc_test \
-	mac_test \
+	hkdf_api.test \
+	hkdf_rfc.test \
+	mac.test \
 	# End of TESTS
 
 check_PROGRAMS = \

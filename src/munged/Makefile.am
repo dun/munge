@@ -129,13 +129,15 @@ man_MANS = \
 	munged.8 \
 	# End of man_MANS
 
-LOG_DRIVER = \
+TEST_EXTENSIONS = .test
+
+TEST_LOG_DRIVER = \
 	env AM_TAP_AWK='$(AWK)' $(SHELL) $(top_srcdir)/build-aux/tap-driver.sh
 
 AM_TESTSUITE_SUMMARY_HEADER = ' of src/munged/ for $(PACKAGE_STRING)'
 
 TESTS = \
-	base64_test \
+	base64.test \
 	# End of TESTS
 
 check_PROGRAMS = \
