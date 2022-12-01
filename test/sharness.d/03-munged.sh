@@ -141,25 +141,30 @@ munged_stop()
             "$@"
 }
 
-# Kill an errant munged process running in the background from a previous test.
-# This situation is most likely to occur if a munged test is expected to fail
-#   and instead erroneously succeeds.
+# Kill an errant munged process from a previous test that is still running in
+#   the background.  This situation is most likely to occur if a test starting
+#   munged is expected to fail and instead erroneously succeeds.
 # Only check for the pid named in ${MUNGE_PIDFILE} to avoid interfering with
 #   munged processes belonging to other tests or system use.  And check that
 #   the named pid is a munged process and not one recycled by the system for
 #   some other running process.
-# A SIGTERM is used here instead of "munged --stop" in case the latter has a
-#   bug introduced that prevents cleanup from occurring.
-# A SIGKILL would prevent the munged process from cleaning up which could cause
-#   other tests to inadvertently fail.
+# A SIGKILL is sent instead of SIGTERM in case the signal handler has a bug
+#   preventing graceful termination.  Since SIGKILL prevents the process from
+#   cleaning up after itself, that cleanup must be performed here afterwards.
+# The rm of the MUNGE_SOCKET glob also matches the corresponding lockfile.
 #
 munged_kill()
 {
-    local PID
-    PID=$(cat "${MUNGE_PIDFILE}" 2>/dev/null)
-    if ps -p "${PID}" -ww 2>/dev/null | grep munged; then
-        kill "${PID}"
-        test_debug "echo \"Terminated errant munged pid ${PID}\""
+    local pid
+    pid=$(cat "${MUNGE_PIDFILE}" 2>/dev/null)
+    if test "x${pid}" != x; then
+        if ps -p "${pid}" -ww 2>/dev/null | grep munged; then
+            kill -9 "${pid}"
+            echo "WARNING: Killed errant munged pid ${pid}"
+        else
+            echo "WARNING: Found stale pidfile for munged pid ${pid}"
+        fi
+        rm -f "${MUNGE_PIDFILE}" "${MUNGE_SOCKET}"*
     fi
 }
 
