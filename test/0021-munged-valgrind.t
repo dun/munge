@@ -18,7 +18,7 @@ fi
 test_expect_success 'start munged under valgrind' '
     munged_setup &&
     munged_create_key &&
-    munged_start_daemon t-exec="${VALGRIND_CMD}"
+    munged_start t-exec="${VALGRIND_CMD}"
 '
 
 test_expect_success 'encode credential' '
@@ -34,7 +34,7 @@ test_expect_success 'replay credential' '
 '
 
 test_expect_success 'stop munged' '
-    munged_stop_daemon
+    munged_stop
 '
 
 test_expect_success 'check valgrind log for errors in munged' '

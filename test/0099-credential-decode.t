@@ -15,7 +15,7 @@ test_expect_success 'setup' '
 # Force the daemon to run since the key may have the wrong permissions.
 #
 test_expect_success 'start munged with known key' '
-    munged_start_daemon --force \
+    munged_start --force \
             --key-file="${SHARNESS_TEST_SRCDIR}/0099-credential-decode.key"
 '
 
@@ -39,7 +39,7 @@ test_expect_success 'verify expected output' '
 # Stop the daemon process.
 #
 test_expect_success 'stop munged' '
-    munged_stop_daemon
+    munged_stop
 '
 
 # Perform any housekeeping to clean up afterwards.

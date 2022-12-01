@@ -26,7 +26,7 @@ test_expect_success 'check keyfile creation' '
 # Start the daemon process.
 #
 test_expect_success 'start munged' '
-    munged_start_daemon
+    munged_start
 '
 
 # Verify the pidfile has been created.
@@ -87,7 +87,7 @@ test_expect_success 'check logfile for replay' '
 # Stop the daemon process.
 #
 test_expect_success 'stop munged' '
-    munged_stop_daemon
+    munged_stop
 '
 
 # Verify the daemon process is no longer running.

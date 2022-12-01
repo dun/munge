@@ -21,8 +21,8 @@ test_expect_success 'logfile regular file' '
     rm -f "${MUNGE_LOGFILE}" &&
     touch "${MUNGE_LOGFILE}" &&
     INODE0=$(ls -i "${MUNGE_LOGFILE}" | awk "{ print \$1 }") &&
-    munged_start_daemon t-keep-logfile &&
-    munged_stop_daemon &&
+    munged_start t-keep-logfile &&
+    munged_stop &&
     INODE1=$(ls -i "${MUNGE_LOGFILE}" | awk "{ print \$1 }") &&
     test "${INODE0}" -eq "${INODE1}" &&
     test -s "${MUNGE_LOGFILE}"
@@ -36,7 +36,7 @@ test_expect_success 'logfile symlink to regular file failure' '
     ln -s -f "${MUNGE_LOGFILE}" "${MY_LOGFILE}" &&
     rm -f "${MUNGE_LOGFILE}" &&
     touch "${MUNGE_LOGFILE}" &&
-    test_must_fail munged_start_daemon t-keep-logfile \
+    test_must_fail munged_start t-keep-logfile \
             --log-file="${MY_LOGFILE}" 2>err.$$ &&
     grep "Error:.* Logfile.* should not be a symbolic link" err.$$
 '
@@ -50,9 +50,9 @@ test_expect_success 'logfile symlink to regular file override' '
     ln -s -f "${MUNGE_LOGFILE}" "${MY_LOGFILE}" &&
     rm -f "${MUNGE_LOGFILE}" &&
     touch "${MUNGE_LOGFILE}" &&
-    munged_start_daemon t-keep-logfile --log-file="${MY_LOGFILE}" --force \
+    munged_start t-keep-logfile --log-file="${MY_LOGFILE}" --force \
             2>err.$$ &&
-    munged_stop_daemon &&
+    munged_stop &&
     grep "Warning:.* Logfile.* should not be a symbolic link" err.$$
 '
 
@@ -61,8 +61,8 @@ test_expect_success 'logfile symlink to regular file override' '
 #   after the daemon terminates.
 #
 test_expect_success 'logfile missing' '
-    munged_start_daemon &&
-    munged_stop_daemon &&
+    munged_start &&
+    munged_stop &&
     test -s "${MUNGE_LOGFILE}"
 '
 
@@ -73,7 +73,7 @@ test_expect_success 'logfile symlink to missing file failure' '
     local MY_LOGFILE &&
     MY_LOGFILE="${MUNGE_LOGFILE}.symlink" &&
     ln -s -f "${MUNGE_LOGFILE}" "${MY_LOGFILE}" &&
-    test_must_fail munged_start_daemon --log-file="${MY_LOGFILE}" 2>err.$$ &&
+    test_must_fail munged_start --log-file="${MY_LOGFILE}" 2>err.$$ &&
     grep "Error:.* Logfile.* should not be a symbolic link" err.$$
 '
 
@@ -86,8 +86,8 @@ test_expect_success 'logfile symlink to missing file override' '
     local MY_LOGFILE &&
     MY_LOGFILE="${MUNGE_LOGFILE}.symlink" &&
     ln -s -f "${MUNGE_LOGFILE}" "${MY_LOGFILE}" &&
-    munged_start_daemon --log-file="${MY_LOGFILE}" --force 2>err.$$ &&
-    munged_stop_daemon &&
+    munged_start --log-file="${MY_LOGFILE}" --force 2>err.$$ &&
+    munged_stop &&
     grep "Warning:.* Logfile.* should not be a symbolic link" err.$$ &&
     test -s "${MUNGE_LOGFILE}"
 '
@@ -100,7 +100,7 @@ test_expect_success 'logfile non-regular-file failure' '
     MUNGE_LOGFILE="${MUNGE_LOGDIR}/munged.log.$$.non-regular-file" &&
     rm -f "${MUNGE_LOGFILE}" &&
     mkdir "${MUNGE_LOGFILE}" &&
-    test_must_fail munged_start_daemon t-keep-logfile 2>err.$$ &&
+    test_must_fail munged_start t-keep-logfile 2>err.$$ &&
     grep "Error:.* Logfile.* must be a regular file" err.$$ &&
     rmdir "${MUNGE_LOGFILE}"
 '
@@ -113,7 +113,7 @@ test_expect_success 'logfile non-regular-file override failure' '
     MUNGE_LOGFILE="${MUNGE_LOGDIR}/munged.log.$$.non-regular-file" &&
     rm -f "${MUNGE_LOGFILE}" &&
     mkdir "${MUNGE_LOGFILE}" &&
-    test_must_fail munged_start_daemon t-keep-logfile --force 2>err.$$ &&
+    test_must_fail munged_start t-keep-logfile --force 2>err.$$ &&
     grep "Error:.* Logfile.* must be a regular file" err.$$ &&
     rmdir "${MUNGE_LOGFILE}"
 '
@@ -126,7 +126,7 @@ test_expect_success !ROOT 'logfile not writable by user failure' '
     rm -f "${MUNGE_LOGFILE}" &&
     touch "${MUNGE_LOGFILE}" &&
     chmod 0400 "${MUNGE_LOGFILE}" &&
-    test_must_fail munged_start_daemon t-keep-logfile 2>err.$$ &&
+    test_must_fail munged_start t-keep-logfile 2>err.$$ &&
     grep "Error:.* Failed to open logfile.* Permission denied" err.$$
 '
 
@@ -139,8 +139,8 @@ test_expect_failure 'logfile writable by trusted group ' '
     touch "${MUNGE_LOGFILE}" &&
     chmod 0620 "${MUNGE_LOGFILE}" &&
     GID=$(ls -l -n "${MUNGE_LOGFILE}" | awk "{ print \$4 }") &&
-    munged_start_daemon t-keep-logfile --trusted-group="${GID}" &&
-    munged_stop_daemon
+    munged_start t-keep-logfile --trusted-group="${GID}" &&
+    munged_stop
 '
 
 # Check for an error when the logfile is writable by a group that does not
@@ -153,7 +153,7 @@ test_expect_success 'logfile writable by untrusted group failure' '
     chmod 0620 "${MUNGE_LOGFILE}" &&
     GID=$(ls -l -n "${MUNGE_LOGFILE}" | awk "{ print \$4 }") &&
     GID=$(( ${GID} + 1 )) &&
-    test_must_fail munged_start_daemon t-keep-logfile --trusted-group="${GID}"
+    test_must_fail munged_start t-keep-logfile --trusted-group="${GID}"
 '
 
 # Check for an error when the logfile is writable by group.
@@ -162,7 +162,7 @@ test_expect_success 'logfile writable by group failure' '
     rm -f "${MUNGE_LOGFILE}" &&
     touch "${MUNGE_LOGFILE}" &&
     chmod 0620 "${MUNGE_LOGFILE}" &&
-    test_must_fail munged_start_daemon t-keep-logfile 2>err.$$ &&
+    test_must_fail munged_start t-keep-logfile 2>err.$$ &&
     grep "Error:.* Logfile.* writable.* by.* group" err.$$
 '
 
@@ -172,8 +172,8 @@ test_expect_success 'logfile writable by group override' '
     rm -f "${MUNGE_LOGFILE}" &&
     touch "${MUNGE_LOGFILE}" &&
     chmod 0620 "${MUNGE_LOGFILE}" &&
-    munged_start_daemon t-keep-logfile --force 2>err.$$ &&
-    munged_stop_daemon &&
+    munged_start t-keep-logfile --force 2>err.$$ &&
+    munged_stop &&
     grep "Warning:.* Logfile.* writable.* by.* group" err.$$
 '
 
@@ -183,7 +183,7 @@ test_expect_success 'logfile writable by other failure' '
     rm -f "${MUNGE_LOGFILE}" &&
     touch "${MUNGE_LOGFILE}" &&
     chmod 0602 "${MUNGE_LOGFILE}" &&
-    test_must_fail munged_start_daemon t-keep-logfile 2>err.$$ &&
+    test_must_fail munged_start t-keep-logfile 2>err.$$ &&
     grep "Error:.* Logfile.* writable.* by.* other" err.$$
 '
 
@@ -193,8 +193,8 @@ test_expect_success 'logfile writable by other override' '
     rm -f "${MUNGE_LOGFILE}" &&
     touch "${MUNGE_LOGFILE}" &&
     chmod 0602 "${MUNGE_LOGFILE}" &&
-    munged_start_daemon t-keep-logfile --force 2>err.$$ &&
-    munged_stop_daemon &&
+    munged_start t-keep-logfile --force 2>err.$$ &&
+    munged_stop &&
     grep "Warning:.* Logfile.* writable.* by.* other" err.$$
 '
 
@@ -204,8 +204,8 @@ test_expect_success 'logfile readable by all' '
     rm -f "${MUNGE_LOGFILE}" &&
     touch "${MUNGE_LOGFILE}" &&
     chmod 0644 "${MUNGE_LOGFILE}" &&
-    munged_start_daemon t-keep-logfile &&
-    munged_stop_daemon
+    munged_start t-keep-logfile &&
+    munged_stop
 '
 
 # Check a logfile dir that is owned by the EUID.
@@ -215,8 +215,8 @@ test_expect_success 'logfile dir owned by euid' '
     DIR_UID=$(ls -d -l -n "${MUNGE_LOGDIR}" | awk "{ print \$3 }") &&
     MY_EUID=$(id -u) &&
     test "${DIR_UID}" = "${MY_EUID}" &&
-    munged_start_daemon &&
-    munged_stop_daemon
+    munged_start &&
+    munged_stop
 '
 
 # Create an alternate logfile dir that can be chown'd.
@@ -236,8 +236,8 @@ test_expect_success SUDO 'alt logfile dir setup' '
 test_expect_success ALT,SUDO 'logfile dir owned by root' '
     sudo chown root "${ALT_LOGDIR}" &&
     > "${ALT_LOGFILE}" &&
-    munged_start_daemon --log-file="${ALT_LOGFILE}" &&
-    munged_stop_daemon
+    munged_start --log-file="${ALT_LOGFILE}" &&
+    munged_stop
 '
 
 # Check for an error when the logfile dir is not owned by the EUID or root.
@@ -246,7 +246,7 @@ test_expect_success ALT,SUDO 'logfile dir owned by other failure' '
     test "$(id -u)" != "1" &&
     sudo chown 1 "${ALT_LOGDIR}" &&
     > "${ALT_LOGFILE}" &&
-    test_must_fail munged_start_daemon --log-file="${ALT_LOGFILE}" 2>err.$$ &&
+    test_must_fail munged_start --log-file="${ALT_LOGFILE}" 2>err.$$ &&
     grep "Error:.* Logfile.* invalid ownership of \"${ALT_LOGDIR}\"" err.$$
 '
 
@@ -257,8 +257,8 @@ test_expect_success ALT,SUDO 'logfile dir owned by other override' '
     test "$(id -u)" != "1" &&
     sudo chown 1 "${ALT_LOGDIR}" &&
     > "${ALT_LOGFILE}" &&
-    munged_start_daemon --log-file="${ALT_LOGFILE}" --force 2>err.$$ &&
-    munged_stop_daemon &&
+    munged_start --log-file="${ALT_LOGFILE}" --force 2>err.$$ &&
+    munged_stop &&
     grep "Warning:.* Logfile.* invalid ownership of \"${ALT_LOGDIR}\"" err.$$
 '
 
@@ -278,8 +278,8 @@ test_expect_success 'logfile dir writable by trusted group ' '
     local GID &&
     GID=$(ls -d -l -n "${MUNGE_LOGDIR}" | awk "{ print \$4 }") &&
     chmod 0770 "${MUNGE_LOGDIR}" &&
-    munged_start_daemon --trusted-group="${GID}" &&
-    munged_stop_daemon &&
+    munged_start --trusted-group="${GID}" &&
+    munged_stop &&
     chmod 0755 "${MUNGE_LOGDIR}"
 '
 
@@ -292,8 +292,8 @@ test_expect_success 'logfile dir writable by untrusted group failure' '
     GID=$(ls -d -l -n "${MUNGE_LOGDIR}" | awk "{ print \$4 }") &&
     GID=$(( ${GID} + 1 )) &&
     chmod 0770 "${MUNGE_LOGDIR}" &&
-    munged_start_daemon --trusted-group="${GID}" &&
-    munged_stop_daemon &&
+    munged_start --trusted-group="${GID}" &&
+    munged_stop &&
     chmod 0755 "${MUNGE_LOGDIR}"
 '
 
@@ -302,8 +302,8 @@ test_expect_success 'logfile dir writable by untrusted group failure' '
 #
 test_expect_success 'logfile dir writable by group' '
     chmod 0770 "${MUNGE_LOGDIR}" &&
-    munged_start_daemon &&
-    munged_stop_daemon &&
+    munged_start &&
+    munged_stop &&
     chmod 0755 "${MUNGE_LOGDIR}"
 '
 
@@ -311,8 +311,8 @@ test_expect_success 'logfile dir writable by group' '
 #
 test_expect_success 'logfile dir writable by group with sticky bit' '
     chmod 1770 "${MUNGE_LOGDIR}" &&
-    munged_start_daemon &&
-    munged_stop_daemon &&
+    munged_start &&
+    munged_stop &&
     chmod 0755 "${MUNGE_LOGDIR}"
 '
 
@@ -321,7 +321,7 @@ test_expect_success 'logfile dir writable by group with sticky bit' '
 #
 test_expect_success 'logfile dir writable by other failure' '
     chmod 0707 "${MUNGE_LOGDIR}" &&
-    test_must_fail munged_start_daemon 2>err.$$ &&
+    test_must_fail munged_start 2>err.$$ &&
     chmod 0755 "${MUNGE_LOGDIR}" &&
     grep "Error:.* world-writable permissions without sticky bit set" err.$$
 '
@@ -331,8 +331,8 @@ test_expect_success 'logfile dir writable by other failure' '
 #
 test_expect_success 'logfile dir writable by other override' '
     chmod 0707 "${MUNGE_LOGDIR}" &&
-    munged_start_daemon --force 2>err.$$ &&
-    munged_stop_daemon &&
+    munged_start --force 2>err.$$ &&
+    munged_stop &&
     chmod 0755 "${MUNGE_LOGDIR}" &&
     grep "Warning:.* world-writable permissions without sticky bit set" err.$$
 '
@@ -341,8 +341,8 @@ test_expect_success 'logfile dir writable by other override' '
 #
 test_expect_success 'logfile dir writable by other with sticky bit' '
     chmod 1707 "${MUNGE_LOGDIR}" &&
-    munged_start_daemon &&
-    munged_stop_daemon &&
+    munged_start &&
+    munged_stop &&
     chmod 0755 "${MUNGE_LOGDIR}"
 '
 
@@ -356,7 +356,7 @@ test_expect_success 'logfile failure writes single message to stderr' '
     rm -f "${MUNGE_LOGFILE}" &&
     touch "${MUNGE_LOGFILE}" &&
     chmod 0602 "${MUNGE_LOGFILE}" &&
-    test_must_fail munged_start_daemon t-keep-logfile 2>err.$$ &&
+    test_must_fail munged_start t-keep-logfile 2>err.$$ &&
     cat err.$$ &&
     ERR=$(sed -n -e "s/.*Error: //p" err.$$ | sort | uniq -c | sort -n -r) &&
     NUM=$(echo "${ERR}" | awk "{ print \$1; exit }") &&

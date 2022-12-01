@@ -33,7 +33,7 @@ done
 test_expect_success 'start munged' '
     munged_setup &&
     munged_create_key &&
-    munged_start_daemon
+    munged_start
 '
 
 for OPT_SOCKET in '-S' '--socket'; do
@@ -613,7 +613,7 @@ test_expect_success 'munge --ttl for invalid negative number' '
 '
 
 test_expect_success 'stop munged' '
-    munged_stop_daemon
+    munged_stop
 '
 
 test_expect_success 'cleanup' '

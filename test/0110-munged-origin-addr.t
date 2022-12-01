@@ -22,23 +22,23 @@ test_expect_success 'munged --origin help' '
 # Check for an error when an invalid origin address is specified.
 #
 test_expect_success 'munged --origin failure' '
-    test_must_fail munged_start_daemon --origin=invalid.$$
+    test_must_fail munged_start --origin=invalid.$$
 '
 
 # Check if the error can be overridden when an invalid origin address is
 #   specified.
 #
 test_expect_success 'munged --origin override' '
-    munged_start_daemon --origin=invalid.$$ --force &&
-    munged_stop_daemon
+    munged_start --origin=invalid.$$ --force &&
+    munged_stop
 '
 
 # Check if the origin address is set to the null address when address lookup
 #   fails and the error is overridden.
 #
 test_expect_success 'munged --origin null address' '
-    munged_start_daemon --origin=invalid.$$ --force &&
-    munged_stop_daemon &&
+    munged_start --origin=invalid.$$ --force &&
+    munged_stop &&
     grep -E "Set origin address to 0\.0\.0\.0( |$)" "${MUNGE_LOGFILE}"
 '
 
@@ -46,11 +46,11 @@ test_expect_success 'munged --origin null address' '
 #   metadata when address lookup fails and the error is overridden.
 #
 test_expect_success 'munged --origin null address metadata' '
-    munged_start_daemon --origin=invalid.$$ --force &&
+    munged_start --origin=invalid.$$ --force &&
     "${MUNGE}" --socket="${MUNGE_SOCKET}" --no-input --output=cred.$$ &&
     "${UNMUNGE}" --socket="${MUNGE_SOCKET}" --input=cred.$$ \
             --metadata=meta.$$ --keys=ENCODE_HOST --numeric &&
-    munged_stop_daemon &&
+    munged_stop &&
     grep -E "^ENCODE_HOST:.* 0\.0\.0\.0( |$)" meta.$$
 '
 
@@ -58,8 +58,8 @@ test_expect_success 'munged --origin null address metadata' '
 #   to the null address.
 #
 test_expect_success 'munged --origin null address warning' '
-    munged_start_daemon --origin=invalid.$$ --force 2>err.$$ &&
-    munged_stop_daemon &&
+    munged_start --origin=invalid.$$ --force 2>err.$$ &&
+    munged_stop &&
     grep "Warning:.* origin set to null address" err.$$
 '
 
@@ -67,8 +67,8 @@ test_expect_success 'munged --origin null address warning' '
 #
 test_expect_success 'munged --origin local IP address' '
     rm -f ifname0.$$ &&
-    munged_start_daemon --origin=127.0.0.1 &&
-    munged_stop_daemon &&
+    munged_start --origin=127.0.0.1 &&
+    munged_stop &&
     grep -E "Set origin address to 127\.0\.0\.1( |$)" "${MUNGE_LOGFILE}"
 '
 
@@ -77,11 +77,11 @@ test_expect_success 'munged --origin local IP address' '
 #   an address assigned to a local network interface.
 #
 test_expect_success 'munged --origin local IP address metadata' '
-    munged_start_daemon --origin=127.0.0.1 &&
+    munged_start --origin=127.0.0.1 &&
     "${MUNGE}" --socket="${MUNGE_SOCKET}" --no-input --output=cred.$$ &&
     "${UNMUNGE}" --socket="${MUNGE_SOCKET}" --input=cred.$$ \
             --metadata=meta.$$ --keys=ENCODE_HOST --numeric &&
-    munged_stop_daemon &&
+    munged_stop &&
     grep -E "^ENCODE_HOST:.* 127\.0\.0\.1( |$)" meta.$$
 '
 
@@ -102,8 +102,8 @@ test_expect_success GETIFADDRS 'munged --origin interface name lookup' '
 #   interface name.
 #
 test_expect_success IFNAME 'munged --origin interface name' '
-    munged_start_daemon --origin="$(cat ifname0.$$)" &&
-    munged_stop_daemon &&
+    munged_start --origin="$(cat ifname0.$$)" &&
+    munged_stop &&
     grep -E "Set origin address to 127\.0\.0\.1( |$)" "${MUNGE_LOGFILE}" &&
     sed -n -e "s/.*Set origin address.*(\([^)]*\)).*/\1/p" "${MUNGE_LOGFILE}" \
             >ifname1.$$ &&
@@ -114,11 +114,11 @@ test_expect_success IFNAME 'munged --origin interface name' '
 #   credential metadata when specifying the loopback network interface name.
 #
 test_expect_success IFNAME 'munged --origin interface name metadata' '
-    munged_start_daemon --origin="$(cat ifname0.$$)" &&
+    munged_start --origin="$(cat ifname0.$$)" &&
     "${MUNGE}" --socket="${MUNGE_SOCKET}" --no-input --output=cred.$$ &&
     "${UNMUNGE}" --socket="${MUNGE_SOCKET}" --input=cred.$$ \
             --metadata=meta.$$ --keys=ENCODE_HOST --numeric &&
-    munged_stop_daemon &&
+    munged_stop &&
     grep -E "^ENCODE_HOST:.* 127\.0\.0\.1( |$)" meta.$$
 '
 
@@ -131,8 +131,8 @@ test_expect_success IFNAME 'munged --origin interface name metadata' '
 #   interface name does not follow the IP address.
 #
 test_expect_success 'munged --origin non-interface IP address' '
-    munged_start_daemon --origin=192.0.0.255 &&
-    munged_stop_daemon &&
+    munged_start --origin=192.0.0.255 &&
+    munged_stop &&
     grep "Set origin address to 192\.0\.0\.255$" "${MUNGE_LOGFILE}"
 '
 
@@ -141,11 +141,11 @@ test_expect_success 'munged --origin non-interface IP address' '
 #   match an address assigned to a local network interface.
 #
 test_expect_success 'munged --origin non-interface IP address metadata' '
-    munged_start_daemon --origin=192.0.0.255 &&
+    munged_start --origin=192.0.0.255 &&
     "${MUNGE}" --socket="${MUNGE_SOCKET}" --no-input --output=cred.$$ &&
     "${UNMUNGE}" --socket="${MUNGE_SOCKET}" --input=cred.$$ \
             --metadata=meta.$$ --keys=ENCODE_HOST --numeric &&
-    munged_stop_daemon &&
+    munged_stop &&
     grep -E "^ENCODE_HOST:.* 192\.0\.0\.255( |$)" meta.$$
 '
 

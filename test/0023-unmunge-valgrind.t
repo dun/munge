@@ -18,7 +18,7 @@ fi
 test_expect_success 'start munged' '
     munged_setup &&
     munged_create_key &&
-    munged_start_daemon
+    munged_start
 '
 
 test_expect_success 'encode credential' '
@@ -30,7 +30,7 @@ test_expect_success 'decode credential under valgrind' '
 '
 
 test_expect_success 'stop munged' '
-    munged_stop_daemon
+    munged_stop
 '
 
 test_expect_success 'check valgrind log for errors in unmunge' '

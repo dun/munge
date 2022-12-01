@@ -21,7 +21,7 @@ test_expect_success 'start munged with open umask' '
     local MASK &&
     MASK=$(umask) &&
     umask 0 &&
-    munged_start_daemon &&
+    munged_start &&
     umask "${MASK}"
 '
 
@@ -54,7 +54,7 @@ test_expect_success 'check lockfile permissions' '
 #   The lockfile should prevent this.
 #
 test_expect_success 'start munged with in-use socket' '
-    test_must_fail munged_start_daemon t-keep-process &&
+    test_must_fail munged_start t-keep-process &&
     grep "Error:.* Failed to lock \"${MUNGE_LOCKFILE}\"" "${MUNGE_LOGFILE}"
 '
 
@@ -73,7 +73,7 @@ test_expect_success 'check pidfile after munged failure' '
 #   removal.
 #
 test_expect_success 'stop munged using lockfile-derived pid' '
-    munged_stop_daemon 2>&1 | grep "Terminated daemon"
+    munged_stop 2>&1 | grep "Terminated daemon"
 '
 
 # Check if the lockfile was removed when munged shut down.
@@ -89,7 +89,7 @@ test_expect_success 'start munged with 0600 bogus lockfile' '
     rm -f "${MUNGE_LOCKFILE}" &&
     touch "${MUNGE_LOCKFILE}" &&
     chmod 0600 "${MUNGE_LOCKFILE}" &&
-    test_must_fail munged_start_daemon &&
+    test_must_fail munged_start &&
     grep "Error:.* \"${MUNGE_LOCKFILE}\" .* permissions for write by user" \
             "${MUNGE_LOGFILE}"
 '
@@ -101,7 +101,7 @@ test_expect_success 'start munged with 0222 bogus lockfile' '
     rm -f "${MUNGE_LOCKFILE}" &&
     touch "${MUNGE_LOCKFILE}" &&
     chmod 0222 "${MUNGE_LOCKFILE}" &&
-    test_must_fail munged_start_daemon &&
+    test_must_fail munged_start &&
     grep "Error:.* \"${MUNGE_LOCKFILE}\" .* permissions for write by user" \
             "${MUNGE_LOGFILE}"
 '
@@ -114,7 +114,7 @@ test_expect_success 'start munged with inactive non-zero-length lockfile' '
     echo "$$" > "${MUNGE_LOCKFILE}" &&
     chmod 0200 "${MUNGE_LOCKFILE}" &&
     test -s "${MUNGE_LOCKFILE}" &&
-    munged_start_daemon
+    munged_start
 '
 
 # Check if the lockfile gets truncated.
@@ -161,7 +161,7 @@ test_expect_success 'check for leftover pidfile from unclean shutdown' '
 #   attempts to give the old lock a chance to clear before admitting defeat.
 #
 test_expect_success 'start munged with leftover socket from unclean shutdown' '
-    retry 5 "munged_start_daemon"
+    retry 5 munged_start
 '
 
 # Stop the munged that was started for the preceding test.
@@ -170,7 +170,7 @@ test_expect_success 'start munged with leftover socket from unclean shutdown' '
 #   removal.
 #
 test_expect_success 'stop munged' '
-    munged_stop_daemon 2>&1 | grep "Terminated daemon"
+    munged_stop 2>&1 | grep "Terminated daemon"
 '
 
 # Check if the lockfile was removed when munged shut down.
@@ -187,10 +187,10 @@ test_expect_success 'check lockfile removal again' '
 #   non-privileged user and return a failure status.
 #
 test_expect_success SUDO 'stop unprivileged munged as root' '
-    munged_start_daemon &&
-    if munged_stop_daemon \
+    munged_start &&
+    if munged_stop \
             t-exec="sudo LD_LIBRARY_PATH=${LD_LIBRARY_PATH}"; then :; else
-        munged_stop_daemon; false;
+        munged_stop; false;
     fi
 '
 

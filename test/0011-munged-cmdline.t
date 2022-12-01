@@ -39,7 +39,7 @@ done
 
 for OPT_STOP in '-s' '--stop'; do
     test_expect_success "munged ${OPT_STOP}" '
-        munged_start_daemon &&
+        munged_start &&
         "${MUNGED}" "${OPT_STOP}" --socket="${MUNGE_SOCKET}"
     '
 done
@@ -53,7 +53,7 @@ test_expect_success 'munged --stop for missing socket' '
 
 for OPT_VERBOSE in '-v' '--verbose'; do
     test_expect_success "munged ${OPT_VERBOSE}" '
-        munged_start_daemon &&
+        munged_start &&
         "${MUNGED}" "${OPT_VERBOSE}" --stop --socket="${MUNGE_SOCKET}" 2>&1 |
         grep -E "(Terminated|Killed) daemon"
     '
@@ -64,8 +64,8 @@ done
 #
 test_expect_success 'munged seedfile creation with relative pathname' '
     local SEEDFILE="seed.$$" &&
-    munged_start_daemon --seed-file="${SEEDFILE}" &&
-    munged_stop_daemon &&
+    munged_start --seed-file="${SEEDFILE}" &&
+    munged_stop &&
     test -s "${SEEDFILE}"
 '
 
@@ -78,8 +78,8 @@ test_expect_success 'munged seedfile creation with relative pathname' '
 test_expect_success 'munged socket cleanup with relative pathname' '
     local SOCKET="socket.$$" &&
     cd "${MUNGE_SOCKETDIR}" &&
-    munged_start_daemon --socket="${SOCKET}" &&
-    munged_stop_daemon --socket="${SOCKET}" &&
+    munged_start --socket="${SOCKET}" &&
+    munged_stop --socket="${SOCKET}" &&
     test ! -S "${SOCKET}"
 '
 

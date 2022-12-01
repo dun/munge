@@ -22,8 +22,8 @@ test_expect_success 'setup' '
 test_expect_success 'socket dir perms' '
     test "$(find "${MUNGE_SOCKETDIR}" -type d -perm 1777)" = \
             "${MUNGE_SOCKETDIR}" &&
-    munged_start_daemon &&
-    munged_stop_daemon
+    munged_start &&
+    munged_stop
 '
 
 # Check the file type and permissions on the socket.
@@ -34,10 +34,10 @@ test_expect_success 'socket dir perms' '
 #
 test_expect_success 'socket type and perms' '
     local TYPE PERM &&
-    munged_start_daemon &&
+    munged_start &&
     TYPE=$(find "${MUNGE_SOCKET}" -type s) &&
     PERM=$(find "${MUNGE_SOCKET}" -perm 0777) &&
-    munged_stop_daemon &&
+    munged_stop &&
     test "${TYPE}" = "${MUNGE_SOCKET}" &&
     test "${PERM}" = "${MUNGE_SOCKET}"
 '
@@ -49,8 +49,8 @@ test_expect_success 'socket dir owned by euid' '
     DIR_UID=$(ls -d -l -n "${MUNGE_SOCKETDIR}" | awk "{ print \$3 }") &&
     MY_EUID=$(id -u) &&
     test "${DIR_UID}" = "${MY_EUID}" &&
-    munged_start_daemon &&
-    munged_stop_daemon
+    munged_start &&
+    munged_stop
 '
 
 # Create an alternate socket dir that can be chwon'd.
@@ -68,8 +68,8 @@ test_expect_success SUDO 'alt socket dir setup' '
 #
 test_expect_success ALT,SUDO 'socket dir owned by root' '
     sudo chown root "${ALT_SOCKETDIR}" &&
-    munged_start_daemon --socket="${ALT_SOCKET}" &&
-    munged_stop_daemon --socket="${ALT_SOCKET}"
+    munged_start --socket="${ALT_SOCKET}" &&
+    munged_stop --socket="${ALT_SOCKET}"
 '
 
 # Check for an error when the socket dir is not owned by the EUID or root.
@@ -77,7 +77,7 @@ test_expect_success ALT,SUDO 'socket dir owned by root' '
 test_expect_success ALT,SUDO 'socket dir owned by other failure' '
     test "$(id -u)" != "1" &&
     sudo chown 1 "${ALT_SOCKETDIR}" &&
-    test_must_fail munged_start_daemon --socket="${ALT_SOCKET}" &&
+    test_must_fail munged_start --socket="${ALT_SOCKET}" &&
     grep "Error:.* Socket.* invalid ownership of \"${ALT_SOCKETDIR}\"" \
             "${MUNGE_LOGFILE}"
 '
@@ -88,8 +88,8 @@ test_expect_success ALT,SUDO 'socket dir owned by other failure' '
 test_expect_success ALT,SUDO 'socket dir owned by other override' '
     test "$(id -u)" != "1" &&
     sudo chown 1 "${ALT_SOCKETDIR}" &&
-    munged_start_daemon --socket="${ALT_SOCKET}" --force &&
-    munged_stop_daemon --socket="${ALT_SOCKET}" &&
+    munged_start --socket="${ALT_SOCKET}" --force &&
+    munged_stop --socket="${ALT_SOCKET}" &&
     grep "Warning:.* Socket.* invalid ownership of \"${ALT_SOCKETDIR}\"" \
             "${MUNGE_LOGFILE}"
 '
@@ -109,8 +109,8 @@ test_expect_success 'socket dir writable by trusted group' '
     local GID &&
     GID=$(ls -d -l -n "${MUNGE_SOCKETDIR}" | awk "{ print \$4 }") &&
     chmod 0771 "${MUNGE_SOCKETDIR}" &&
-    munged_start_daemon --trusted-group="${GID}" &&
-    munged_stop_daemon &&
+    munged_start --trusted-group="${GID}" &&
+    munged_stop &&
     chmod 1777 "${MUNGE_SOCKETDIR}"
 '
 
@@ -122,7 +122,7 @@ test_expect_success 'socket dir writable by untrusted group failure' '
     GID=$(ls -d -l -n "${MUNGE_SOCKETDIR}" | awk "{ print \$4 }") &&
     GID=$(( ${GID} + 1 )) &&
     chmod 0771 "${MUNGE_SOCKETDIR}" &&
-    test_must_fail munged_start_daemon --trusted-group="${GID}" &&
+    test_must_fail munged_start --trusted-group="${GID}" &&
     chmod 1777 "${MUNGE_SOCKETDIR}"
 '
 
@@ -131,7 +131,7 @@ test_expect_success 'socket dir writable by untrusted group failure' '
 #
 test_expect_success 'socket dir writable by group failure' '
     chmod 0771 "${MUNGE_SOCKETDIR}" &&
-    test_must_fail munged_start_daemon &&
+    test_must_fail munged_start &&
     chmod 1777 "${MUNGE_SOCKETDIR}" &&
     grep "Error:.* group-writable permissions without sticky bit set" \
             "${MUNGE_LOGFILE}"
@@ -142,8 +142,8 @@ test_expect_success 'socket dir writable by group failure' '
 #
 test_expect_success 'socket dir writable by group override' '
     chmod 0771 "${MUNGE_SOCKETDIR}" &&
-    munged_start_daemon --force &&
-    munged_stop_daemon &&
+    munged_start --force &&
+    munged_stop &&
     chmod 1777 "${MUNGE_SOCKETDIR}" &&
     grep "Warning:.* group-writable permissions without sticky bit set" \
             "${MUNGE_LOGFILE}"
@@ -153,8 +153,8 @@ test_expect_success 'socket dir writable by group override' '
 #
 test_expect_success 'socket dir writable by group with sticky bit' '
     chmod 1771 "${MUNGE_SOCKETDIR}" &&
-    munged_start_daemon &&
-    munged_stop_daemon &&
+    munged_start &&
+    munged_stop &&
     chmod 1777 "${MUNGE_SOCKETDIR}"
 '
 
@@ -163,7 +163,7 @@ test_expect_success 'socket dir writable by group with sticky bit' '
 #
 test_expect_success 'socket dir writable by other failure' '
     chmod 0717 "${MUNGE_SOCKETDIR}" &&
-    test_must_fail munged_start_daemon &&
+    test_must_fail munged_start &&
     chmod 1777 "${MUNGE_SOCKETDIR}" &&
     grep "Error:.* world-writable permissions without sticky bit set" \
             "${MUNGE_LOGFILE}"
@@ -174,8 +174,8 @@ test_expect_success 'socket dir writable by other failure' '
 #
 test_expect_success 'socket dir writable by other override' '
     chmod 0717 "${MUNGE_SOCKETDIR}" &&
-    munged_start_daemon --force &&
-    munged_stop_daemon &&
+    munged_start --force &&
+    munged_stop &&
     chmod 1777 "${MUNGE_SOCKETDIR}" &&
     grep "Warning:.* world-writable permissions without sticky bit set" \
             "${MUNGE_LOGFILE}"
@@ -185,8 +185,8 @@ test_expect_success 'socket dir writable by other override' '
 #
 test_expect_success 'socket dir writable by other with sticky bit' '
     chmod 1717 "${MUNGE_SOCKETDIR}" &&
-    munged_start_daemon &&
-    munged_stop_daemon &&
+    munged_start &&
+    munged_stop &&
     chmod 1777 "${MUNGE_SOCKETDIR}"
 '
 
@@ -195,7 +195,7 @@ test_expect_success 'socket dir writable by other with sticky bit' '
 #
 test_expect_success 'socket dir inaccessible by all failure' '
     chmod 0700 "${MUNGE_SOCKETDIR}" &&
-    test_must_fail munged_start_daemon &&
+    test_must_fail munged_start &&
     chmod 1777 "${MUNGE_SOCKETDIR}" &&
     grep "Error:.* Socket is inaccessible.* \"${MUNGE_SOCKETDIR}\"" \
             "${MUNGE_LOGFILE}"
@@ -207,8 +207,8 @@ test_expect_success 'socket dir inaccessible by all failure' '
 #
 test_expect_success 'socket dir inaccessible by all override' '
     chmod 0700 "${MUNGE_SOCKETDIR}" &&
-    munged_start_daemon --force &&
-    munged_stop_daemon &&
+    munged_start --force &&
+    munged_stop &&
     chmod 1777 "${MUNGE_SOCKETDIR}" &&
     grep "Warning:.* Socket is inaccessible.* \"${MUNGE_SOCKETDIR}\"" \
             "${MUNGE_LOGFILE}"

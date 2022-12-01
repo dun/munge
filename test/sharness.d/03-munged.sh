@@ -78,7 +78,7 @@ munged_create_key()
 #   t-keep-process - do not kill previous munged process.
 # Remaining args will be appended to the munged command-line.
 #
-munged_start_daemon()
+munged_start()
 {
     local EXEC= KEEP_LOGFILE= KEEP_PROCESS= &&
     while true; do
@@ -94,7 +94,7 @@ munged_start_daemon()
         rm -f "${MUNGE_LOGFILE}"
     fi &&
     if test "${KEEP_PROCESS}" != 1; then
-        munged_kill_daemon
+        munged_kill
     fi &&
     test_debug "echo ${EXEC} \"${MUNGED}\" \
             --socket=\"${MUNGE_SOCKET}\" \
@@ -119,7 +119,7 @@ munged_start_daemon()
 #   t-exec=ARG - use ARG to exec munged.
 # Remaining args will be appended to the munged command-line.
 #
-munged_stop_daemon()
+munged_stop()
 {
     local EXEC= &&
     while true; do
@@ -153,7 +153,7 @@ munged_stop_daemon()
 # A SIGKILL would prevent the munged process from cleaning up which could cause
 #   other tests to inadvertently fail.
 #
-munged_kill_daemon()
+munged_kill()
 {
     local PID
     PID=$(cat "${MUNGE_PIDFILE}" 2>/dev/null)
@@ -170,5 +170,5 @@ munged_kill_daemon()
 #
 munged_cleanup()
 {
-    munged_kill_daemon
+    munged_kill
 }
