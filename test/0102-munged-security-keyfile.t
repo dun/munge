@@ -23,8 +23,7 @@ test_expect_success 'keyfile regular file' '
 # Check for an error when the keyfile is missing.
 #
 test_expect_success 'keyfile missing failure' '
-    local MUNGE_KEYFILE &&
-    MUNGE_KEYFILE="${MUNGE_KEYDIR}/munged.key.$$.missing" &&
+    local MUNGE_KEYFILE="${MUNGE_KEYDIR}/munged.key.$$.missing" &&
     test_must_fail munged_start &&
     grep "Error:.* Failed to find keyfile.*: No such file" "${MUNGE_LOGFILE}"
 '
@@ -33,8 +32,7 @@ test_expect_success 'keyfile missing failure' '
 # Using a directory for the non-regular-file seems the most portable solution.
 #
 test_expect_success 'keyfile non-regular-file failure' '
-    local MUNGE_KEYFILE &&
-    MUNGE_KEYFILE="${MUNGE_KEYDIR}/munged.key.$$.non-regular-file" &&
+    local MUNGE_KEYFILE="${MUNGE_KEYDIR}/munged.key.$$.non-regular-file" &&
     rm -r -f "${MUNGE_KEYFILE}" &&
     mkdir "${MUNGE_KEYFILE}" &&
     test_must_fail munged_start &&
@@ -46,8 +44,7 @@ test_expect_success 'keyfile non-regular-file failure' '
 #   file.
 #
 test_expect_success 'keyfile non-regular-file override failure' '
-    local MUNGE_KEYFILE &&
-    MUNGE_KEYFILE="${MUNGE_KEYDIR}/munged.key.$$.non-regular-file" &&
+    local MUNGE_KEYFILE="${MUNGE_KEYDIR}/munged.key.$$.non-regular-file" &&
     rm -r -f "${MUNGE_KEYFILE}" &&
     mkdir "${MUNGE_KEYFILE}" &&
     test_must_fail munged_start --force &&
@@ -58,10 +55,9 @@ test_expect_success 'keyfile non-regular-file override failure' '
 # Check for an error when the keyfile is a symlink to a regular file.
 #
 test_expect_success 'keyfile symlink to regular file failure' '
-    local MY_KEYFILE &&
-    MY_KEYFILE="${MUNGE_KEYFILE}.symlink" &&
-    ln -s -f "${MUNGE_KEYFILE}" "${MY_KEYFILE}" &&
-    test_must_fail munged_start --key-file="${MY_KEYFILE}" &&
+    local keyfile="${MUNGE_KEYFILE}.symlink" &&
+    ln -s -f "${MUNGE_KEYFILE}" "${keyfile}" &&
+    test_must_fail munged_start --key-file="${keyfile}" &&
     grep "Error:.* Keyfile.* a symbolic link" "${MUNGE_LOGFILE}"
 '
 
@@ -69,10 +65,9 @@ test_expect_success 'keyfile symlink to regular file failure' '
 #   regular file.
 #
 test_expect_success 'keyfile symlink to regular file override' '
-    local MY_KEYFILE &&
-    MY_KEYFILE="${MUNGE_KEYFILE}.symlink" &&
-    ln -s -f "${MUNGE_KEYFILE}" "${MY_KEYFILE}" &&
-    munged_start --key-file="${MY_KEYFILE}" --force &&
+    local keyfile="${MUNGE_KEYFILE}.symlink" &&
+    ln -s -f "${MUNGE_KEYFILE}" "${keyfile}" &&
+    munged_start --key-file="${keyfile}" --force &&
     munged_stop &&
     grep "Warning:.* Keyfile.* a symbolic link" "${MUNGE_LOGFILE}"
 '
@@ -80,10 +75,10 @@ test_expect_success 'keyfile symlink to regular file override' '
 # Check a keyfile owned by the EUID.
 #
 test_expect_success 'keyfile owned by euid' '
-    local KEY_UID MY_EUID &&
-    KEY_UID=$(ls -l -n "${MUNGE_KEYFILE}" | awk "{ print \$3 }") &&
-    MY_EUID=$(id -u) &&
-    test "${KEY_UID}" = "${MY_EUID}" &&
+    local key_uid my_euid &&
+    key_uid=$(ls -l -n "${MUNGE_KEYFILE}" | awk "{ print \$3 }") &&
+    my_euid=$(id -u) &&
+    test "${key_uid}" = "${my_euid}" &&
     munged_start &&
     munged_stop
 '
@@ -92,10 +87,10 @@ test_expect_success 'keyfile owned by euid' '
 #   trusted group.
 #
 test_expect_failure 'keyfile readable by trusted group' '
-    local GID &&
-    GID=$(ls -l -n "${MUNGE_KEYFILE}" | awk "{ print \$4 }") &&
+    local gid &&
+    gid=$(ls -l -n "${MUNGE_KEYFILE}" | awk "{ print \$4 }") &&
     chmod 0640 "${MUNGE_KEYFILE}" &&
-    munged_start --trusted-group="${GID}" &&
+    munged_start --trusted-group="${gid}" &&
     munged_stop
 '
 
@@ -103,21 +98,21 @@ test_expect_failure 'keyfile readable by trusted group' '
 #   match the specified trusted group.
 #
 test_expect_success 'keyfile readable by untrusted group failure' '
-    local GID &&
-    GID=$(ls -l -n "${MUNGE_KEYFILE}" | awk "{ print \$4 }") &&
-    GID=$((GID + 1)) &&
+    local gid &&
+    gid=$(ls -l -n "${MUNGE_KEYFILE}" | awk "{ print \$4 }") &&
+    gid=$((gid + 1)) &&
     chmod 0640 "${MUNGE_KEYFILE}" &&
-    test_must_fail munged_start --trusted-group="${GID}"
+    test_must_fail munged_start --trusted-group="${gid}"
 '
 
 # Check if the keyfile can be writable by a group that matches the specified
 #   trusted group.
 #
 test_expect_failure 'keyfile writable by trusted group' '
-    local GID &&
-    GID=$(ls -l -n "${MUNGE_KEYFILE}" | awk "{ print \$4 }") &&
+    local gid &&
+    gid=$(ls -l -n "${MUNGE_KEYFILE}" | awk "{ print \$4 }") &&
     chmod 0620 "${MUNGE_KEYFILE}" &&
-    munged_start --trusted-group="${GID}" &&
+    munged_start --trusted-group="${gid}" &&
     munged_stop
 '
 
@@ -125,11 +120,11 @@ test_expect_failure 'keyfile writable by trusted group' '
 #   match the specified trusted group.
 #
 test_expect_success 'keyfile writable by untrusted group failure' '
-    local GID &&
-    GID=$(ls -l -n "${MUNGE_KEYFILE}" | awk "{ print \$4 }") &&
-    GID=$((GID + 1)) &&
+    local gid &&
+    gid=$(ls -l -n "${MUNGE_KEYFILE}" | awk "{ print \$4 }") &&
+    gid=$((gid + 1)) &&
     chmod 0620 "${MUNGE_KEYFILE}" &&
-    test_must_fail munged_start --trusted-group="${GID}"
+    test_must_fail munged_start --trusted-group="${gid}"
 '
 
 # Check for an error when the keyfile is readable by group.
@@ -212,10 +207,10 @@ test_expect_success 'keyfile secure perms' '
 # Check a keyfile dir that is owned by the EUID.
 #
 test_expect_success 'keyfile dir owned by euid' '
-    local DIR_UID MY_EUID &&
-    DIR_UID=$(ls -d -l -n "${MUNGE_KEYDIR}" | awk "{ print \$3 }") &&
-    MY_EUID=$(id -u) &&
-    test "${DIR_UID}" = "${MY_EUID}" &&
+    local dir_uid my_euid &&
+    dir_uid=$(ls -d -l -n "${MUNGE_KEYDIR}" | awk "{ print \$3 }") &&
+    my_euid=$(id -u) &&
+    test "${dir_uid}" = "${my_euid}" &&
     munged_start &&
     munged_stop
 '
@@ -275,10 +270,10 @@ test_expect_success ALT,SUDO 'alt keyfile dir cleanup' '
 #   that matches the specified trusted group.
 #
 test_expect_success 'keyfile dir writable by trusted group' '
-    local GID &&
-    GID=$(ls -d -l -n "${MUNGE_KEYDIR}" | awk "{ print \$4 }") &&
+    local gid &&
+    gid=$(ls -d -l -n "${MUNGE_KEYDIR}" | awk "{ print \$4 }") &&
     chmod 0770 "${MUNGE_KEYDIR}" &&
-    munged_start --trusted-group="${GID}" &&
+    munged_start --trusted-group="${gid}" &&
     munged_stop &&
     chmod 0755 "${MUNGE_KEYDIR}"
 '
@@ -287,11 +282,11 @@ test_expect_success 'keyfile dir writable by trusted group' '
 #   by a group that does not match the specified trusted group.
 #
 test_expect_success 'keyfile dir writable by untrusted group failure' '
-    local GID &&
-    GID=$(ls -d -l -n "${MUNGE_KEYDIR}" | awk "{ print \$4 }") &&
-    GID=$((GID + 1)) &&
+    local gid &&
+    gid=$(ls -d -l -n "${MUNGE_KEYDIR}" | awk "{ print \$4 }") &&
+    gid=$((gid + 1)) &&
     chmod 0770 "${MUNGE_KEYDIR}" &&
-    test_must_fail munged_start --trusted-group="${GID}" &&
+    test_must_fail munged_start --trusted-group="${gid}" &&
     chmod 0755 "${MUNGE_KEYDIR}"
 '
 

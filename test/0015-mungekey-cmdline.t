@@ -85,12 +85,12 @@ done
 #
 for OPT_CREATE in '-c' '--create'; do
     test_expect_success "mungekey ${OPT_CREATE}" '
-        local KEYFILE=key.$$ &&
-        rm -f "${KEYFILE}" &&
-        test ! -f "${KEYFILE}" &&
-        "${MUNGEKEY}" "${OPT_CREATE}" --keyfile="${KEYFILE}" &&
-        test -f "${KEYFILE}" &&
-        test "$(find ${KEYFILE} -perm 0600)" = "${KEYFILE}"
+        local keyfile=key.$$ &&
+        rm -f "${keyfile}" &&
+        test ! -f "${keyfile}" &&
+        "${MUNGEKEY}" "${OPT_CREATE}" --keyfile="${keyfile}" &&
+        test -f "${keyfile}" &&
+        test "$(find ${keyfile} -perm 0600)" = "${keyfile}"
     '
 done
 
@@ -99,130 +99,130 @@ done
 #
 for OPT_BITS in '-b' '--bits'; do
     test_expect_success "mungekey ${OPT_BITS}" '
-        local KEYFILE=key.$$ NUM_BITS=1000 FILE_SIZE &&
-        rm -f "${KEYFILE}" &&
-        test ! -f "${KEYFILE}" &&
-        "${MUNGEKEY}" --create --keyfile="${KEYFILE}" \
-                "${OPT_BITS}" "${NUM_BITS}" &&
-        test -f "${KEYFILE}" &&
-        FILE_SIZE=$(wc -c < "${KEYFILE}") &&
-        test "${FILE_SIZE}" -eq "$((NUM_BITS / 8))"
+        local keyfile=key.$$ num_bits=1000 file_size &&
+        rm -f "${keyfile}" &&
+        test ! -f "${keyfile}" &&
+        "${MUNGEKEY}" --create --keyfile="${keyfile}" \
+                "${OPT_BITS}" "${num_bits}" &&
+        test -f "${keyfile}" &&
+        file_size=$(wc -c < "${keyfile}") &&
+        test "${file_size}" -eq "$((num_bits / 8))"
     '
 done
 
 # Check if the number of bits is rounded-up to the next byte if it is not
-#   evenly divisible by 8.  NUM_BITS is set to 1 bit above the requested
-#   NUM_BYTES.
+#   evenly divisible by 8.  [num_bits] is set to 1 bit above the requested
+#   [num_bytes].
 #
 test_expect_success 'mungekey --bits rounding-up to next byte' '
-    local KEYFILE=key.$$ NUM_BYTES=128 NUM_BITS NUM_BYTES_ROUNDED FILE_SIZE &&
-    NUM_BITS=$(((NUM_BYTES * 8) + 1)) &&
-    rm -f "${KEYFILE}" &&
-    test ! -f "${KEYFILE}" &&
-    "${MUNGEKEY}" --create --keyfile="${KEYFILE}" --bits="${NUM_BITS}" &&
-    test -f "${KEYFILE}" &&
-    NUM_BYTES_ROUNDED=$(((NUM_BITS + 7) / 8)) &&
-    test "${NUM_BYTES_ROUNDED}" = "$((NUM_BYTES + 1))" &&
-    FILE_SIZE=$(wc -c < "${KEYFILE}") &&
-    test "${FILE_SIZE}" -eq "${NUM_BYTES_ROUNDED}"
+    local keyfile=key.$$ num_bytes=128 num_bits num_bytes_rounded file_size &&
+    num_bits=$(((num_bytes * 8) + 1)) &&
+    rm -f "${keyfile}" &&
+    test ! -f "${keyfile}" &&
+    "${MUNGEKEY}" --create --keyfile="${keyfile}" --bits="${num_bits}" &&
+    test -f "${keyfile}" &&
+    num_bytes_rounded=$(((num_bits + 7) / 8)) &&
+    test "${num_bytes_rounded}" = "$((num_bytes + 1))" &&
+    file_size=$(wc -c < "${keyfile}") &&
+    test "${file_size}" -eq "${num_bytes_rounded}"
 '
 
 # Check if the default def is used when the number of bits is unspecified.
 #
 test_expect_success 'mungekey --bits unspecified and using default' '
-    local KEYFILE=key.$$ DEFS NUM_BYTES NUM_BITS FILE_SIZE &&
-    DEFS="${MUNGE_SOURCE_DIR}/src/libcommon/munge_defs.h" &&
-    test -f "${DEFS}" &&
-    NUM_BYTES=$(awk "/MUNGE_KEY_LEN_DFL_BYTES/ { print \$3 }" "${DEFS}") &&
-    NUM_BITS=$((NUM_BYTES * 8)) &&
-    rm -f "${KEYFILE}" &&
-    test ! -f "${KEYFILE}" &&
-    "${MUNGEKEY}" --create --keyfile="${KEYFILE}" &&
-    test -f "${KEYFILE}" &&
-    FILE_SIZE=$(wc -c < "${KEYFILE}") &&
-    test "${FILE_SIZE}" -eq "${NUM_BYTES}"
+    local keyfile=key.$$ defs num_bytes num_bits file_size &&
+    defs="${MUNGE_SOURCE_DIR}/src/libcommon/munge_defs.h" &&
+    test -f "${defs}" &&
+    num_bytes=$(awk "/MUNGE_KEY_LEN_DFL_BYTES/ { print \$3 }" "${defs}") &&
+    num_bits=$((num_bytes * 8)) &&
+    rm -f "${keyfile}" &&
+    test ! -f "${keyfile}" &&
+    "${MUNGEKEY}" --create --keyfile="${keyfile}" &&
+    test -f "${keyfile}" &&
+    file_size=$(wc -c < "${keyfile}") &&
+    test "${file_size}" -eq "${num_bytes}"
 '
 
 # Check the boundary case for the minimum number of bits.
 #
 test_expect_success 'mungekey --bits with minimum value' '
-    local KEYFILE=key.$$ DEFS NUM_BYTES NUM_BITS FILE_SIZE &&
-    DEFS="${MUNGE_SOURCE_DIR}/src/libcommon/munge_defs.h" &&
-    test -f "${DEFS}" &&
-    NUM_BYTES=$(awk "/MUNGE_KEY_LEN_MIN_BYTES/ { print \$3 }" "${DEFS}") &&
-    NUM_BITS=$((NUM_BYTES * 8)) &&
-    rm -f "${KEYFILE}" &&
-    test ! -f "${KEYFILE}" &&
-    "${MUNGEKEY}" --create --keyfile="${KEYFILE}" --bits="${NUM_BITS}" &&
-    test -f "${KEYFILE}" &&
-    FILE_SIZE=$(wc -c < "${KEYFILE}") &&
-    test "${FILE_SIZE}" -eq "${NUM_BYTES}"
+    local keyfile=key.$$ defs num_bytes num_bits file_size &&
+    defs="${MUNGE_SOURCE_DIR}/src/libcommon/munge_defs.h" &&
+    test -f "${defs}" &&
+    num_bytes=$(awk "/MUNGE_KEY_LEN_MIN_BYTES/ { print \$3 }" "${defs}") &&
+    num_bits=$((num_bytes * 8)) &&
+    rm -f "${keyfile}" &&
+    test ! -f "${keyfile}" &&
+    "${MUNGEKEY}" --create --keyfile="${keyfile}" --bits="${num_bits}" &&
+    test -f "${keyfile}" &&
+    file_size=$(wc -c < "${keyfile}") &&
+    test "${file_size}" -eq "${num_bytes}"
 '
 
 # Check the boundary case for the maximum number of bits.
 #
 test_expect_success 'mungekey --bits with maximum value' '
-    local KEYFILE=key.$$ DEFS NUM_BYTES NUM_BITS FILE_SIZE &&
-    DEFS="${MUNGE_SOURCE_DIR}/src/libcommon/munge_defs.h" &&
-    test -f "${DEFS}" &&
-    NUM_BYTES=$(awk "/MUNGE_KEY_LEN_MAX_BYTES/ { print \$3 }" "${DEFS}") &&
-    NUM_BITS=$((NUM_BYTES * 8)) &&
-    rm -f "${KEYFILE}" &&
-    test ! -f "${KEYFILE}" &&
-    "${MUNGEKEY}" --create --keyfile="${KEYFILE}" --bits="${NUM_BITS}" &&
-    test -f "${KEYFILE}" &&
-    FILE_SIZE=$(wc -c < "${KEYFILE}") &&
-    test "${FILE_SIZE}" -eq "${NUM_BYTES}"
+    local keyfile=key.$$ defs num_bytes num_bits file_size &&
+    defs="${MUNGE_SOURCE_DIR}/src/libcommon/munge_defs.h" &&
+    test -f "${defs}" &&
+    num_bytes=$(awk "/MUNGE_KEY_LEN_MAX_BYTES/ { print \$3 }" "${defs}") &&
+    num_bits=$((num_bytes * 8)) &&
+    rm -f "${keyfile}" &&
+    test ! -f "${keyfile}" &&
+    "${MUNGEKEY}" --create --keyfile="${keyfile}" --bits="${num_bits}" &&
+    test -f "${keyfile}" &&
+    file_size=$(wc -c < "${keyfile}") &&
+    test "${file_size}" -eq "${num_bytes}"
 '
 
 # Check the boundary case below the minimum number of bits.
 #
 test_expect_success 'mungekey --bits below minimum value' '
-    local DEFS NUM_BYTES NUM_BITS &&
-    DEFS="${MUNGE_SOURCE_DIR}/src/libcommon/munge_defs.h" &&
-    test -f "${DEFS}" &&
-    NUM_BYTES=$(awk "/MUNGE_KEY_LEN_MIN_BYTES/ { print \$3 }" "${DEFS}") &&
-    NUM_BITS=$(((NUM_BYTES * 8) - 1)) &&
+    local defs num_bytes num_bits &&
+    defs="${MUNGE_SOURCE_DIR}/src/libcommon/munge_defs.h" &&
+    test -f "${defs}" &&
+    num_bytes=$(awk "/MUNGE_KEY_LEN_MIN_BYTES/ { print \$3 }" "${defs}") &&
+    num_bits=$(((num_bytes * 8) - 1)) &&
     test_must_fail "${MUNGEKEY}" --create --keyfile=key.$$ \
-            --bits="${NUM_BITS}" 2>err.$$ &&
-    grep -q "Option \"--bits\" has invalid value \"${NUM_BITS}\"" err.$$
+            --bits="${num_bits}" 2>err.$$ &&
+    grep -q "Option \"--bits\" has invalid value \"${num_bits}\"" err.$$
 '
 
 # Check the boundary case above the maximum number of bits.
 #
 test_expect_success 'mungekey --bits above maximum value' '
-    local DEFS NUM_BYTES NUM_BITS &&
-    DEFS="${MUNGE_SOURCE_DIR}/src/libcommon/munge_defs.h" &&
-    test -f "${DEFS}" &&
-    NUM_BYTES=$(awk "/MUNGE_KEY_LEN_MAX_BYTES/ { print \$3 }" "${DEFS}") &&
-    NUM_BITS=$(((NUM_BYTES * 8) + 1)) &&
+    local defs num_bytes num_bits &&
+    defs="${MUNGE_SOURCE_DIR}/src/libcommon/munge_defs.h" &&
+    test -f "${defs}" &&
+    num_bytes=$(awk "/MUNGE_KEY_LEN_MAX_BYTES/ { print \$3 }" "${defs}") &&
+    num_bits=$(((num_bytes * 8) + 1)) &&
     test_must_fail "${MUNGEKEY}" --create --keyfile=key.$$ \
-            --bits="${NUM_BITS}" 2>err.$$ &&
-    grep -q "Option \"--bits\" has invalid value \"${NUM_BITS}\"" err.$$
+            --bits="${num_bits}" 2>err.$$ &&
+    grep -q "Option \"--bits\" has invalid value \"${num_bits}\"" err.$$
 '
 
 # Check if the minimum number of bits is displayed in the error message.
 #
 test_expect_success 'mungekey --bits error message with minimum value' '
-    local DEFS NUM_BYTES NUM_BITS &&
-    DEFS="${MUNGE_SOURCE_DIR}/src/libcommon/munge_defs.h" &&
-    test -f "${DEFS}" &&
-    NUM_BYTES=$(awk "/MUNGE_KEY_LEN_MIN_BYTES/ { print \$3 }" "${DEFS}") &&
-    NUM_BITS=$((NUM_BYTES * 8)) &&
+    local defs num_bytes num_bits &&
+    defs="${MUNGE_SOURCE_DIR}/src/libcommon/munge_defs.h" &&
+    test -f "${defs}" &&
+    num_bytes=$(awk "/MUNGE_KEY_LEN_MIN_BYTES/ { print \$3 }" "${defs}") &&
+    num_bits=$((num_bytes * 8)) &&
     test_must_fail "${MUNGEKEY}" --create --keyfile=key.$$ --bits=1 2>err.$$ &&
-    grep -q -- "${NUM_BITS}-" err.$$
+    grep -q -- "${num_bits}-" err.$$
 '
 
 # Check if the maximum number of bits is displayed in the error message.
 #
 test_expect_success 'mungekey --bits error message with maximum value' '
-    local DEFS NUM_BYTES NUM_BITS &&
-    DEFS="${MUNGE_SOURCE_DIR}/src/libcommon/munge_defs.h" &&
-    test -f "${DEFS}" &&
-    NUM_BYTES=$(awk "/MUNGE_KEY_LEN_MAX_BYTES/ { print \$3 }" "${DEFS}") &&
-    NUM_BITS=$((NUM_BYTES * 8)) &&
+    local defs num_bytes num_bits &&
+    defs="${MUNGE_SOURCE_DIR}/src/libcommon/munge_defs.h" &&
+    test -f "${defs}" &&
+    num_bytes=$(awk "/MUNGE_KEY_LEN_MAX_BYTES/ { print \$3 }" "${defs}") &&
+    num_bits=$((num_bytes * 8)) &&
     test_must_fail "${MUNGEKEY}" --create --keyfile=key.$$ --bits=1 2>err.$$ &&
-    grep -q -- "-${NUM_BITS}" err.$$
+    grep -q -- "-${num_bits}" err.$$
 '
 
 # Check the case for zero number of bits.
@@ -260,25 +260,25 @@ test_expect_success 'mungekey --bits without required value' '
 #
 for OPT_FORCE in '-f' '--force'; do
     test_expect_success "mungekey ${OPT_FORCE}" '
-        local KEYFILE=key.$$ &&
-        rm -f "${KEYFILE}" &&
-        touch "${KEYFILE}" &&
-        test ! -s "${KEYFILE}" &&
-        "${MUNGEKEY}" --create --keyfile="${KEYFILE}" "${OPT_FORCE}" &&
-        test -s "${KEYFILE}"
+        local keyfile=key.$$ &&
+        rm -f "${keyfile}" &&
+        touch "${keyfile}" &&
+        test ! -s "${keyfile}" &&
+        "${MUNGEKEY}" --create --keyfile="${keyfile}" "${OPT_FORCE}" &&
+        test -s "${keyfile}"
     '
 done
 
 # Check if the lack of --force preserves an existing and writable keyfile.
 #
 test_expect_success 'mungekey without --force and with existing keyfile' '
-    local KEYFILE=key.$$ &&
-    rm -f "${KEYFILE}" &&
-    echo -n xyzzy-$$ > "${KEYFILE}" &&
-    chmod 0600 "${KEYFILE}" &&
-    test_must_fail "${MUNGEKEY}" --create --keyfile="${KEYFILE}" 2>err.$$ &&
+    local keyfile=key.$$ &&
+    rm -f "${keyfile}" &&
+    echo -n xyzzy-$$ > "${keyfile}" &&
+    chmod 0600 "${keyfile}" &&
+    test_must_fail "${MUNGEKEY}" --create --keyfile="${keyfile}" 2>err.$$ &&
     grep -q "File exists" err.$$ &&
-    test "$(cat ${KEYFILE})" = xyzzy-$$
+    test "$(cat ${keyfile})" = xyzzy-$$
 '
 
 # Check if an alternate keyfile can be specified.
@@ -287,11 +287,11 @@ test_expect_success 'mungekey without --force and with existing keyfile' '
 #
 for OPT_KEYFILE in '-k' '--keyfile'; do
     test_expect_success "mungekey ${OPT_KEYFILE}" '
-        local KEYFILE=key.$$ &&
-        rm -f "${KEYFILE}" &&
-        test ! -f "${KEYFILE}" &&
-        "${MUNGEKEY}" --create "${OPT_KEYFILE}" "${KEYFILE}" &&
-        test -f "${KEYFILE}"
+        local keyfile=key.$$ &&
+        rm -f "${keyfile}" &&
+        test ! -f "${keyfile}" &&
+        "${MUNGEKEY}" --create "${OPT_KEYFILE}" "${keyfile}" &&
+        test -f "${keyfile}"
     '
 done
 
@@ -316,13 +316,13 @@ test_expect_success 'mungekey --keyfile without required value' '
 #
 for OPT_VERBOSE in '-v' '--verbose'; do
     test_expect_success "mungekey ${OPT_VERBOSE}" '
-        local KEYFILE=key.$$ &&
-        rm -f "${KEYFILE}" &&
-        test ! -f "${KEYFILE}" &&
-        "${MUNGEKEY}" --create --keyfile="${KEYFILE}" "${OPT_VERBOSE}" \
+        local keyfile=key.$$ &&
+        rm -f "${keyfile}" &&
+        test ! -f "${keyfile}" &&
+        "${MUNGEKEY}" --create --keyfile="${keyfile}" "${OPT_VERBOSE}" \
                 2>err.$$ &&
-        test -f "${KEYFILE}" &&
-        grep -q "Created \"${KEYFILE}\"" err.$$
+        test -f "${keyfile}" &&
+        grep -q "Created \"${keyfile}\"" err.$$
     '
 done
 
@@ -330,25 +330,25 @@ done
 #   contains the number of bits used.
 #
 test_expect_success 'mungekey --verbose number of bits' '
-    local KEYFILE=key.$$ NUM_BITS=1000 NUM_BITS_USED &&
-    rm -f "${KEYFILE}" &&
-    test ! -f "${KEYFILE}" &&
-    "${MUNGEKEY}" --create --keyfile="${KEYFILE}" --bits="${NUM_BITS}" \
+    local keyfile=key.$$ num_bits=1000 num_bits_used &&
+    rm -f "${keyfile}" &&
+    test ! -f "${keyfile}" &&
+    "${MUNGEKEY}" --create --keyfile="${keyfile}" --bits="${num_bits}" \
             --verbose 2>err.$$ &&
-    test -f "${KEYFILE}" &&
-    NUM_BITS_USED=$(sed -n -e "s/.* \([0-9][0-9]*\)-bit.*/\\1/p" err.$$) &&
-    test "${NUM_BITS_USED}" -eq "${NUM_BITS}"
+    test -f "${keyfile}" &&
+    num_bits_used=$(sed -n -e "s/.* \([0-9][0-9]*\)-bit.*/\\1/p" err.$$) &&
+    test "${num_bits_used}" -eq "${num_bits}"
 '
 
 # Check that nothing is written to stdout or stderr when successfully creating
 #   a key without --verbose (unless configured with --enable-debug).
 #
 test_expect_success !DEBUG 'mungekey without --verbose' '
-    local KEYFILE=key.$$ &&
-    rm -f "${KEYFILE}" &&
-    test ! -f "${KEYFILE}" &&
-    "${MUNGEKEY}" --create --keyfile="${KEYFILE}" >out.$$ 2>err.$$ &&
-    test -f "${KEYFILE}" &&
+    local keyfile=key.$$ &&
+    rm -f "${keyfile}" &&
+    test ! -f "${keyfile}" &&
+    "${MUNGEKEY}" --create --keyfile="${keyfile}" >out.$$ 2>err.$$ &&
+    test -f "${keyfile}" &&
     test ! -s out.$$ &&
     test ! -s err.$$
 '
@@ -372,11 +372,11 @@ test_expect_success 'mungekey long_ind re-initialized for getopt_long()' '
 #   specified here to prevent writing a key somewhere it shouldn't.
 #
 test_expect_success 'mungekey defaults to create key' '
-    local KEYFILE=key.$$ &&
-    rm -f "${KEYFILE}" &&
-    test ! -f "${KEYFILE}" &&
-    "${MUNGEKEY}" --keyfile="${KEYFILE}" &&
-    test -f "${KEYFILE}"
+    local keyfile=key.$$ &&
+    rm -f "${keyfile}" &&
+    test ! -f "${keyfile}" &&
+    "${MUNGEKEY}" --keyfile="${keyfile}" &&
+    test -f "${keyfile}"
 '
 
 test_done

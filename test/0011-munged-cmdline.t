@@ -63,10 +63,10 @@ done
 #   failing to be created at exit.
 #
 test_expect_success 'munged seedfile creation with relative pathname' '
-    local SEEDFILE="seed.$$" &&
-    munged_start --seed-file="${SEEDFILE}" &&
+    local seedfile="seed.$$" &&
+    munged_start --seed-file="${seedfile}" &&
     munged_stop &&
-    test -s "${SEEDFILE}"
+    test -s "${seedfile}"
 '
 
 # Check for a regression of a socket being specified by a relative pathname
@@ -76,11 +76,11 @@ test_expect_success 'munged seedfile creation with relative pathname' '
 #   for a Unix domain socket.  Without this, "make distcheck" failed.
 #
 test_expect_success 'munged socket cleanup with relative pathname' '
-    local SOCKET="socket.$$" &&
+    local socket="socket.$$" &&
     cd "${MUNGE_SOCKETDIR}" &&
-    munged_start --socket="${SOCKET}" &&
-    munged_stop --socket="${SOCKET}" &&
-    test ! -S "${SOCKET}"
+    munged_start --socket="${socket}" &&
+    munged_stop --socket="${socket}" &&
+    test ! -S "${socket}"
 '
 
 test_expect_failure 'finish writing tests' '

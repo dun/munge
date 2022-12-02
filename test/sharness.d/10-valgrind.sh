@@ -36,16 +36,16 @@ VALGRIND_CMD="libtool --mode=execute valgrind --tool=memcheck \
 #
 valgrind_check_log()
 {
-    local ERR &&
+    local rv &&
     if test ! -s "${VALGRIND_LOGFILE}"; then
         echo "ERROR: Valgrind logfile [${VALGRIND_LOGFILE}] not found."
-        ERR=1
+        rv=1
     elif grep -q 'ERROR SUMMARY: [^0]' "${VALGRIND_LOGFILE}"; then
         cat "${VALGRIND_LOGFILE}"
-        ERR=1
+        rv=1
     else
         test_debug 'cat "${VALGRIND_LOGFILE}"'
-        ERR=0
+        rv=0
     fi &&
-    return ${ERR}
+    return ${rv}
 }

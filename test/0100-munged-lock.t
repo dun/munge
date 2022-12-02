@@ -18,11 +18,10 @@ test_expect_success 'setup' '
 #   its permissions set properly.
 #
 test_expect_success 'start munged with open umask' '
-    local MASK &&
-    MASK=$(umask) &&
+    local mask=$(umask) &&
     umask 0 &&
     munged_start &&
-    umask "${MASK}"
+    umask "${mask}"
 '
 
 # Check if the pidfile has been created, and if it contains the pid of an
@@ -128,11 +127,10 @@ test_expect_success 'check for lockfile truncation after successful start' '
 #   munged can recover from a dead socket and lockfile.
 #
 test_expect_success 'stop munged using sigkill to prevent cleanup' '
-    local PID &&
-    PID=$(cat "${MUNGE_PIDFILE}") &&
-    ps -p "${PID}" -ww | grep munged &&
-    while kill -s KILL "${PID}" 2>/dev/null; do :; done &&
-    ! ps -p "${PID}" >/dev/null
+    local pid=$(cat "${MUNGE_PIDFILE}") &&
+    ps -p "${pid}" -ww | grep munged &&
+    while kill -s KILL "${pid}" 2>/dev/null; do :; done &&
+    ! ps -p "${pid}" >/dev/null
 '
 
 # Check for the leftover socket since munged was prevented from cleaning up.

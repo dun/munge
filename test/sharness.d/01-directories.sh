@@ -4,12 +4,12 @@
 #
 search_dirs()
 {
-    local START_DIR=$1
-    local FIND_FILE=$2
+    local start_dir=$1
+    local target_file=$2
     (
-        cd "${START_DIR}" &&
+        cd "${start_dir}" &&
         while test "$(pwd)" != "/"; do
-            test -e "${FIND_FILE}" && pwd && break
+            test -e "${target_file}" && pwd && break
             cd ..
         done
     )
@@ -40,12 +40,12 @@ set_build_dir()
 #
 set_source_dir()
 {
-    local DIR
+    local dir
 
     if test -z "${MUNGE_SOURCE_DIR}"; then
 
-        DIR=$(dirname "${SHARNESS_TEST_FILE}")
-        MUNGE_SOURCE_DIR=$(search_dirs "${DIR}" "configure.ac")
+        dir=$(dirname "${SHARNESS_TEST_FILE}")
+        MUNGE_SOURCE_DIR=$(search_dirs "${dir}" "configure.ac")
 
         if test -z "${MUNGE_SOURCE_DIR}"; then
             echo "ERROR: Failed to locate source directory."

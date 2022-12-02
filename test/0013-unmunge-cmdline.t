@@ -88,8 +88,8 @@ test_expect_success 'unmunge --input from missing file' '
 
 for OPT_NO_OUTPUT in '-n' '--no-output'; do
     test_expect_success "unmunge ${OPT_NO_OUTPUT}" '
-        local PAYLOAD=xyzzy-$$ &&
-        "${MUNGE}" --socket="${MUNGE_SOCKET}" --string="${PAYLOAD}" |
+        local payload=xyzzy-$$ &&
+        "${MUNGE}" --socket="${MUNGE_SOCKET}" --string="${payload}" |
         "${UNMUNGE}" --socket="${MUNGE_SOCKET}" "${OPT_NO_OUTPUT}" >out.$$ &&
         test ! -s out.$$
     '
@@ -97,58 +97,58 @@ done
 
 for OPT_METADATA in '-m' '--metadata'; do
     test_expect_success "unmunge ${OPT_METADATA}" '
-        local PAYLOAD=xyzzy-$$ &&
-        "${MUNGE}" --socket="${MUNGE_SOCKET}" --string="${PAYLOAD}" |
+        local payload=xyzzy-$$ &&
+        "${MUNGE}" --socket="${MUNGE_SOCKET}" --string="${payload}" |
         "${UNMUNGE}" --socket="${MUNGE_SOCKET}" "${OPT_METADATA}" meta.$$ \
                 >out.$$ &&
         grep -q "^STATUS:" meta.$$ &&
-        grep -q -v "^${PAYLOAD}" meta.$$ &&
-        test "$(cat out.$$)" = "${PAYLOAD}"
+        grep -q -v "^${payload}" meta.$$ &&
+        test "$(cat out.$$)" = "${payload}"
     '
 done
 
 test_expect_success 'unmunge --metadata to stdout via "-" along with payload' '
-    local PAYLOAD=xyzzy-$$ &&
-    "${MUNGE}" --socket="${MUNGE_SOCKET}" --string="${PAYLOAD}" |
+    local payload=xyzzy-$$ &&
+    "${MUNGE}" --socket="${MUNGE_SOCKET}" --string="${payload}" |
     "${UNMUNGE}" --socket="${MUNGE_SOCKET}" --metadata=- >meta.out.$$ &&
     grep -q "^STATUS:" meta.out.$$ &&
-    grep -q "^${PAYLOAD}" meta.out.$$
+    grep -q "^${payload}" meta.out.$$
 '
 
 test_expect_success 'unmunge --metadata to /dev/null with payload on stdout' '
-    local PAYLOAD=xyzzy-$$ &&
-    "${MUNGE}" --socket="${MUNGE_SOCKET}" --string="${PAYLOAD}" |
+    local payload=xyzzy-$$ &&
+    "${MUNGE}" --socket="${MUNGE_SOCKET}" --string="${payload}" |
     "${UNMUNGE}" --socket="${MUNGE_SOCKET}" --metadata=/dev/null >out.$$ &&
     grep -q -v "^STATUS:" out.$$ &&
-    test "$(cat out.$$)" = "${PAYLOAD}"
+    test "$(cat out.$$)" = "${payload}"
 '
 
 for OPT_OUTPUT in '-o' '--output'; do
     test_expect_success "unmunge ${OPT_OUTPUT}" '
-        local PAYLOAD=xyzzy-$$ &&
-        "${MUNGE}" --socket="${MUNGE_SOCKET}" --string="${PAYLOAD}" |
+        local payload=xyzzy-$$ &&
+        "${MUNGE}" --socket="${MUNGE_SOCKET}" --string="${payload}" |
         "${UNMUNGE}" --socket="${MUNGE_SOCKET}" "${OPT_OUTPUT}" out.$$ \
                 >meta.$$ &&
         grep -q "^STATUS:" meta.$$ &&
-        grep -q -v "^${PAYLOAD}" meta.$$ &&
-        test "$(cat out.$$)" = "${PAYLOAD}"
+        grep -q -v "^${payload}" meta.$$ &&
+        test "$(cat out.$$)" = "${payload}"
     '
 done
 
 test_expect_success 'unmunge --output to stdout via "-" along with metadata' '
-    local PAYLOAD=xyzzy-$$ &&
-    "${MUNGE}" --socket="${MUNGE_SOCKET}" --string="${PAYLOAD}" |
+    local payload=xyzzy-$$ &&
+    "${MUNGE}" --socket="${MUNGE_SOCKET}" --string="${payload}" |
     "${UNMUNGE}" --socket="${MUNGE_SOCKET}" --output=- >meta.out.$$ &&
     grep -q "^STATUS:" meta.out.$$ &&
-    grep -q "^${PAYLOAD}" meta.out.$$
+    grep -q "^${payload}" meta.out.$$
 '
 
 test_expect_success 'unmunge --output to /dev/null with metadata on stdout' '
-    local PAYLOAD=xyzzy-$$ &&
-    "${MUNGE}" --socket="${MUNGE_SOCKET}" --string="${PAYLOAD}" |
+    local payload=xyzzy-$$ &&
+    "${MUNGE}" --socket="${MUNGE_SOCKET}" --string="${payload}" |
     "${UNMUNGE}" --socket="${MUNGE_SOCKET}" --output=/dev/null >meta.$$ &&
     grep -q "^STATUS:" meta.$$ &&
-    grep -q -v "${PAYLOAD}" meta.$$
+    grep -q -v "${payload}" meta.$$
 '
 
 for OPT_LIST_KEYS in '-K' '--list-keys'; do
@@ -160,11 +160,11 @@ done
 
 for OPT_KEYS in '-k' '--keys'; do
     test_expect_success "unmunge ${OPT_KEYS}" '
-        local KEY=LENGTH &&
+        local key=LENGTH &&
         "${MUNGE}" --socket="${MUNGE_SOCKET}" --no-input |
-        "${UNMUNGE}" --socket="${MUNGE_SOCKET}" "${OPT_KEYS}" ${KEY} |
-        awk "/${KEY}:/ { gsub(/:/, \"\"); print \$1 }" >meta.$$ &&
-        test "$(cat meta.$$)" = "${KEY}"
+        "${UNMUNGE}" --socket="${MUNGE_SOCKET}" "${OPT_KEYS}" ${key} |
+        awk "/${key}:/ { gsub(/:/, \"\"); print \$1 }" >meta.$$ &&
+        test "$(cat meta.$$)" = "${key}"
     '
 done
 

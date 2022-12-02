@@ -12,12 +12,12 @@ MUNGEKEY="${MUNGE_BUILD_DIR}/src/mungekey/mungekey"
 #
 check_executables()
 {
-    local EXEC
+    local prog
 
-    for EXEC in "${MUNGE}" "${UNMUNGE}" "${REMUNGE}" "${MUNGED}" "${MUNGEKEY}"
+    for prog in "${MUNGE}" "${UNMUNGE}" "${REMUNGE}" "${MUNGED}" "${MUNGEKEY}"
     do
-        if test ! -x "${EXEC}"; then
-            echo "ERROR: MUNGE has not been built: ${EXEC} not found."
+        if test ! -x "${prog}"; then
+            echo "ERROR: MUNGE has not been built: ${prog} not found."
             exit 1
         fi
     done

@@ -84,15 +84,15 @@ test_expect_success MUNGE_DIST 'build srpm' '
 # Install build dependencies needed for building the binary RPMs.
 #
 test_expect_success MUNGE_SRPM 'install builddeps' '
-    local BUILDDEP &&
+    local builddep &&
     if command -v dnf >/dev/null 2>&1; then
-        BUILDDEP="dnf builddep --assumeyes"
+        builddep="dnf builddep --assumeyes"
     elif command -v yum-builddep >/dev/null 2>&1; then
-        BUILDDEP="yum-builddep"
+        builddep="yum-builddep"
     else
         echo "builddep command not found"; false
     fi &&
-    sudo ${BUILDDEP} "${MUNGE_RPM_DIR}"/SRPMS/*.src.rpm
+    sudo ${builddep} "${MUNGE_RPM_DIR}"/SRPMS/*.src.rpm
 '
 
 # Build in binary RPMs.
@@ -193,10 +193,10 @@ test_expect_success MUNGE_INSTALL 'verify rpm removal' '
 #   "/munge".
 #
 test_expect_success MUNGE_INSTALL 'remove key' '
-    local MUNGE_KEYFILEDIR=$(dirname "${MUNGE_KEYFILE}") &&
-    expr "${MUNGE_KEYFILEDIR}" : "/.*/munge$" >/dev/null 2>&1 &&
-    echo "${MUNGE_KEYFILEDIR}" &&
-    sudo rm -rf "${MUNGE_KEYFILEDIR}"
+    local keyfiledir=$(dirname "${MUNGE_KEYFILE}") &&
+    expr "${keyfiledir}" : "/.*/munge$" >/dev/null 2>&1 &&
+    echo "${keyfiledir}" &&
+    sudo rm -rf "${keyfiledir}"
 '
 
 # Remove the scratch directory unless [debug] is set.

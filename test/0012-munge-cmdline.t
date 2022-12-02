@@ -81,10 +81,10 @@ done
 
 for OPT_STRING in '-s' '--string'; do
     test_expect_success "munge ${OPT_STRING}" '
-        local PAYLOAD=xyzzy-$$ &&
-        "${MUNGE}" --socket="${MUNGE_SOCKET}" "${OPT_STRING}" "${PAYLOAD}" |
+        local payload=xyzzy-$$ &&
+        "${MUNGE}" --socket="${MUNGE_SOCKET}" "${OPT_STRING}" "${payload}" |
         "${UNMUNGE}" --socket="${MUNGE_SOCKET}" --no-output --output=out.$$ &&
-        test "$(cat out.$$)" = "${PAYLOAD}"
+        test "$(cat out.$$)" = "${payload}"
     '
 done
 
@@ -186,40 +186,40 @@ test_expect_success 'munge --cipher for invalid negative number' '
 '
 
 test_expect_success 'munge --cipher for each cipher by name' '
-    local META NAME NUM EXTRA &&
+    local meta name num extra &&
     >fail.$$ &&
     "${MUNGE}" --list-ciphers |
     awk "/([0-9]+)/ { gsub(/[()]/, \"\"); print \$2, \$1 }" |
-    while read NUM NAME EXTRA; do
-        "${MUNGE}" --socket="${MUNGE_SOCKET}" --no-input --cipher="${NAME}" |
+    while read num name extra; do
+        "${MUNGE}" --socket="${MUNGE_SOCKET}" --no-input --cipher="${name}" |
         "${UNMUNGE}" --socket="${MUNGE_SOCKET}" |
         awk "/^CIPHER:/ { print \$2 }" >meta.$$ &&
-        META=$(cat meta.$$) &&
-        if test "${NAME}" = "${META}" || test "${NAME}" = default; then
-            test_debug "echo \"Decoded cipher [${NUM}/${NAME}] as [${META}]\""
+        meta=$(cat meta.$$) &&
+        if test "${name}" = "${meta}" || test "${name}" = default; then
+            test_debug "echo \"Decoded cipher [${num}/${name}] as [${meta}]\""
         else
-            echo "Error: munge --cipher=${NAME} failed"
-            echo "cipher ${NUM} ${NAME} ${META}" >>fail.$$;
+            echo "Error: munge --cipher=${name} failed"
+            echo "cipher ${num} ${name} ${meta}" >>fail.$$;
         fi
     done &&
     test ! -s fail.$$
 '
 
 test_expect_success 'munge --cipher for each cipher by number' '
-    local META NAME NUM EXTRA &&
+    local meta name num extra &&
     >fail.$$ &&
     "${MUNGE}" --list-ciphers |
     awk "/([0-9]+)/ { gsub(/[()]/, \"\"); print \$2, \$1 }" |
-    while read NUM NAME EXTRA; do
-        "${MUNGE}" --socket="${MUNGE_SOCKET}" --no-input --cipher="${NUM}" |
+    while read num name extra; do
+        "${MUNGE}" --socket="${MUNGE_SOCKET}" --no-input --cipher="${num}" |
         "${UNMUNGE}" --socket="${MUNGE_SOCKET}" |
         awk "/^CIPHER:/ { print \$2 }" >meta.$$ &&
-        META=$(cat meta.$$) &&
-        if test "${NAME}" = "${META}" || test "${NAME}" = default; then
-            test_debug "echo \"Decoded cipher [${NUM}/${NAME}] as [${META}]\""
+        meta=$(cat meta.$$) &&
+        if test "${name}" = "${meta}" || test "${name}" = default; then
+            test_debug "echo \"Decoded cipher [${num}/${name}] as [${meta}]\""
         else
-            echo "Error: munge --cipher=${NUM} failed"
-            echo "cipher ${NUM} ${NAME} ${META}" >>fail.$$;
+            echo "Error: munge --cipher=${num} failed"
+            echo "cipher ${num} ${name} ${meta}" >>fail.$$;
         fi
     done &&
     test ! -s fail.$$
@@ -266,40 +266,40 @@ test_expect_success 'munge --mac for invalid negative number' '
 '
 
 test_expect_success 'munge --mac for each mac by name' '
-    local META NAME NUM EXTRA &&
+    local meta name num extra &&
     >fail.$$ &&
     "${MUNGE}" --list-macs |
     awk "/([0-9]+)/ { gsub(/[()]/, \"\"); print \$2, \$1 }" |
-    while read NUM NAME EXTRA; do
-        "${MUNGE}" --socket="${MUNGE_SOCKET}" --no-input --mac="${NAME}" |
+    while read num name extra; do
+        "${MUNGE}" --socket="${MUNGE_SOCKET}" --no-input --mac="${name}" |
         "${UNMUNGE}" --socket="${MUNGE_SOCKET}" |
         awk "/^MAC:/ { print \$2 }" >meta.$$ &&
-        META=$(cat meta.$$) &&
-        if test "${NAME}" = "${META}" || test "${NAME}" = default; then
-            test_debug "echo \"Decoded mac [${NUM}/${NAME}] as [${META}]\""
+        meta=$(cat meta.$$) &&
+        if test "${name}" = "${meta}" || test "${name}" = default; then
+            test_debug "echo \"Decoded mac [${num}/${name}] as [${meta}]\""
         else
-            echo "Error: munge --mac=${NAME} failed"
-            echo "mac ${NUM} ${NAME} ${META}" >>fail.$$;
+            echo "Error: munge --mac=${name} failed"
+            echo "mac ${num} ${name} ${meta}" >>fail.$$;
         fi
     done &&
     test ! -s fail.$$
 '
 
 test_expect_success 'munge --mac for each mac by number' '
-    local META NAME NUM EXTRA &&
+    local meta name num extra &&
     >fail.$$ &&
     "${MUNGE}" --list-macs |
     awk "/([0-9]+)/ { gsub(/[()]/, \"\"); print \$2, \$1 }" |
-    while read NUM NAME EXTRA; do
-        "${MUNGE}" --socket="${MUNGE_SOCKET}" --no-input --mac="${NUM}" |
+    while read num name extra; do
+        "${MUNGE}" --socket="${MUNGE_SOCKET}" --no-input --mac="${num}" |
         "${UNMUNGE}" --socket="${MUNGE_SOCKET}" |
         awk "/^MAC:/ { print \$2 }" >meta.$$ &&
-        META=$(cat meta.$$) &&
-        if test "${NAME}" = "${META}" || test "${NAME}" = default; then
-            test_debug "echo \"Decoded mac [${NUM}/${NAME}] as [${META}]\""
+        meta=$(cat meta.$$) &&
+        if test "${name}" = "${meta}" || test "${name}" = default; then
+            test_debug "echo \"Decoded mac [${num}/${name}] as [${meta}]\""
         else
-            echo "Error: munge --mac=${NUM} failed"
-            echo "mac ${NUM} ${NAME} ${META}" >>fail.$$;
+            echo "Error: munge --mac=${num} failed"
+            echo "mac ${num} ${name} ${meta}" >>fail.$$;
         fi
     done &&
     test ! -s fail.$$
@@ -360,42 +360,42 @@ test_expect_success 'munge --zip for invalid negative number' '
 '
 
 test_expect_success 'munge --zip for each zip by name' '
-    local META NAME NUM EXTRA &&
+    local meta name num extra &&
     >fail.$$ &&
     "${MUNGE}" --list-zips |
     awk "/([0-9]+)/ { gsub(/[()]/, \"\"); print \$2, \$1 }" |
-    while read NUM NAME EXTRA; do
-        "${MUNGE}" --socket="${MUNGE_SOCKET}" --no-input --zip="${NAME}" \
+    while read num name extra; do
+        "${MUNGE}" --socket="${MUNGE_SOCKET}" --no-input --zip="${name}" \
                 --string="$(printf %0128d 0)" |
         "${UNMUNGE}" --socket="${MUNGE_SOCKET}" |
         awk "/^ZIP:/ { print \$2 }" >meta.$$ &&
-        META=$(cat meta.$$) &&
-        if test "${NAME}" = "${META}" || test "${NAME}" = default; then
-            test_debug "echo \"Decoded zip [${NUM}/${NAME}] as [${META}]\""
+        meta=$(cat meta.$$) &&
+        if test "${name}" = "${meta}" || test "${name}" = default; then
+            test_debug "echo \"Decoded zip [${num}/${name}] as [${meta}]\""
         else
-            echo "Error: munge --zip=${NAME} failed"
-            echo "zip ${NUM} ${NAME} ${META}" >>fail.$$;
+            echo "Error: munge --zip=${name} failed"
+            echo "zip ${num} ${name} ${meta}" >>fail.$$;
         fi
     done &&
     test ! -s fail.$$
 '
 
 test_expect_success 'munge --zip for each zip by number' '
-    local META NAME NUM EXTRA &&
+    local meta name num extra &&
     >fail.$$ &&
     "${MUNGE}" --list-zips |
     awk "/([0-9]+)/ { gsub(/[()]/, \"\"); print \$2, \$1 }" |
-    while read NUM NAME EXTRA; do
-        "${MUNGE}" --socket="${MUNGE_SOCKET}" --no-input --zip="${NUM}" \
+    while read num name extra; do
+        "${MUNGE}" --socket="${MUNGE_SOCKET}" --no-input --zip="${num}" \
                 --string="$(printf %0128d 0)" |
         "${UNMUNGE}" --socket="${MUNGE_SOCKET}" |
         awk "/^ZIP:/ { print \$2 }" >meta.$$ &&
-        META=$(cat meta.$$) &&
-        if test "${NAME}" = "${META}" || test "${NAME}" = default; then
-            test_debug "echo \"Decoded zip [${NUM}/${NAME}] as [${META}]\""
+        meta=$(cat meta.$$) &&
+        if test "${name}" = "${meta}" || test "${name}" = default; then
+            test_debug "echo \"Decoded zip [${num}/${name}] as [${meta}]\""
         else
-            echo "Error: munge --zip=${NUM} failed"
-            echo "zip ${NUM} ${NAME} ${META}" >>fail.$$;
+            echo "Error: munge --zip=${num} failed"
+            echo "zip ${num} ${name} ${meta}" >>fail.$$;
         fi
     done &&
     test ! -s fail.$$
@@ -403,25 +403,25 @@ test_expect_success 'munge --zip for each zip by number' '
 
 for OPT_RESTRICT_UID in '-u' '--restrict-uid'; do
     test_expect_success "munge ${OPT_RESTRICT_UID} by name" '
-        local ID=$(id -u -n) META &&
+        local id=$(id -u -n) meta &&
         "${MUNGE}" --socket="${MUNGE_SOCKET}" --no-input \
-                "${OPT_RESTRICT_UID}" "${ID}" |
+                "${OPT_RESTRICT_UID}" "${id}" |
         "${UNMUNGE}" --socket="${MUNGE_SOCKET}" |
         awk "/^UID_RESTRICTION:/ { print \$2 }" >meta.$$ &&
-        META=$(cat meta.$$) &&
-        test "${ID}" = "${META}" &&
-        test_debug "echo \"UID Restriction user [${ID}] matches [${META}]\""
+        meta=$(cat meta.$$) &&
+        test "${id}" = "${meta}" &&
+        test_debug "echo \"UID Restriction user [${id}] matches [${meta}]\""
     '
 done
 
 test_expect_success 'munge --restrict-uid by number' '
-    local ID=$(id -u) META &&
-    "${MUNGE}" --socket="${MUNGE_SOCKET}" --no-input --restrict-uid="${ID}" |
+    local id=$(id -u) meta &&
+    "${MUNGE}" --socket="${MUNGE_SOCKET}" --no-input --restrict-uid="${id}" |
     "${UNMUNGE}" --socket="${MUNGE_SOCKET}" |
     awk "/^UID_RESTRICTION:/ { gsub(/[()]/, \"\"); print \$3 }" >meta.$$ &&
-    META=$(cat meta.$$) &&
-    test "${ID}" = "${META}" &&
-    test_debug "echo \"UID Restriction user [${ID}] matches [${META}]\""
+    meta=$(cat meta.$$) &&
+    test "${id}" = "${meta}" &&
+    test_debug "echo \"UID Restriction user [${id}] matches [${meta}]\""
 '
 
 test_expect_success 'munge --restrict-uid for invalid name' '
@@ -436,46 +436,46 @@ test_expect_success 'munge --restrict-uid for invalid number' '
 
 for OPT_UID in '-U' '--uid'; do
     test_expect_success "munge ${OPT_UID} for effective user by name" '
-        local ID=$(id -u -n) META &&
-        "${MUNGE}" --socket="${MUNGE_SOCKET}" --no-input "${OPT_UID}" "${ID}" |
+        local id=$(id -u -n) meta &&
+        "${MUNGE}" --socket="${MUNGE_SOCKET}" --no-input "${OPT_UID}" "${id}" |
         "${UNMUNGE}" --socket="${MUNGE_SOCKET}" |
         awk "/^UID:/ { print \$2 }" >meta.$$ &&
-        META=$(cat meta.$$) &&
-        test "${ID}" = "${META}" &&
-        test_debug "echo \"Effective user [${ID}] matches [${META}]\""
+        meta=$(cat meta.$$) &&
+        test "${id}" = "${meta}" &&
+        test_debug "echo \"Effective user [${id}] matches [${meta}]\""
     '
 done
 
 test_expect_success 'munge --uid for effective user by number' '
-    local ID=$(id -u) META &&
-    "${MUNGE}" --socket="${MUNGE_SOCKET}" --no-input --uid="${ID}" |
+    local id=$(id -u) meta &&
+    "${MUNGE}" --socket="${MUNGE_SOCKET}" --no-input --uid="${id}" |
     "${UNMUNGE}" --socket="${MUNGE_SOCKET}" |
     awk "/^UID:/ { gsub(/[()]/, \"\"); print \$3 }" >meta.$$ &&
-    META=$(cat meta.$$) &&
-    test "${ID}" = "${META}" &&
-    test_debug "echo \"Effective uid [${ID}] matches [${META}]\""
+    meta=$(cat meta.$$) &&
+    test "${id}" = "${meta}" &&
+    test_debug "echo \"Effective uid [${id}] matches [${meta}]\""
 '
 
 test_expect_success SUDO 'munge --uid for root user by name via sudo' '
-    local ID=root META &&
+    local id=root meta &&
     sudo LD_LIBRARY_PATH="${LD_LIBRARY_PATH}" "${MUNGE}" \
-            --socket="${MUNGE_SOCKET}" --no-input --uid="${ID}" |
+            --socket="${MUNGE_SOCKET}" --no-input --uid="${id}" |
     "${UNMUNGE}" --socket="${MUNGE_SOCKET}" |
     awk "/^UID:/ { print \$2 }" >meta.$$ &&
-    META=$(cat meta.$$) &&
-    test "${ID}" = "${META}" &&
-    test_debug "echo \"sudo user [${ID}] matches [${META}]\""
+    meta=$(cat meta.$$) &&
+    test "${id}" = "${meta}" &&
+    test_debug "echo \"sudo user [${id}] matches [${meta}]\""
 '
 
 test_expect_success SUDO 'munge --uid for root user by number via sudo' '
-    local ID=0 META &&
+    local id=0 meta &&
     sudo LD_LIBRARY_PATH="${LD_LIBRARY_PATH}" "${MUNGE}" \
-            --socket="${MUNGE_SOCKET}" --no-input --uid="${ID}" |
+            --socket="${MUNGE_SOCKET}" --no-input --uid="${id}" |
     "${UNMUNGE}" --socket="${MUNGE_SOCKET}" |
     awk "/^UID:/ { gsub(/[()]/, \"\"); print \$3 }" >meta.$$ &&
-    META=$(cat meta.$$) &&
-    test "${ID}" = "${META}" &&
-    test_debug "echo \"sudo uid [${ID}] matches [${META}]\""
+    meta=$(cat meta.$$) &&
+    test "${id}" = "${meta}" &&
+    test_debug "echo \"sudo uid [${id}] matches [${meta}]\""
 '
 
 test_expect_success 'munge --uid for invalid name' '
@@ -489,25 +489,25 @@ test_expect_success 'munge --uid for invalid number' '
 
 for OPT_RESTRICT_GID in '-g' '--restrict-gid'; do
     test_expect_success "munge ${OPT_RESTRICT_GID} by name" '
-        local ID=$(id -g -n) META &&
+        local id=$(id -g -n) meta &&
         "${MUNGE}" --socket="${MUNGE_SOCKET}" --no-input \
-                "${OPT_RESTRICT_GID}" "${ID}" |
+                "${OPT_RESTRICT_GID}" "${id}" |
         "${UNMUNGE}" --socket="${MUNGE_SOCKET}" |
         awk "/^GID_RESTRICTION:/ { print \$2 }" >meta.$$ &&
-        META=$(cat meta.$$) &&
-        test "${ID}" = "${META}" &&
-        test_debug "echo \"GID Restriction GROUP [${ID}] matches [${META}]\""
+        meta=$(cat meta.$$) &&
+        test "${id}" = "${meta}" &&
+        test_debug "echo \"GID Restriction GROUP [${id}] matches [${meta}]\""
     '
 done
 
 test_expect_success 'munge --restrict-gid by number' '
-    local ID=$(id -g) META &&
-    "${MUNGE}" --socket="${MUNGE_SOCKET}" --no-input --restrict-gid="${ID}" |
+    local id=$(id -g) meta &&
+    "${MUNGE}" --socket="${MUNGE_SOCKET}" --no-input --restrict-gid="${id}" |
     "${UNMUNGE}" --socket="${MUNGE_SOCKET}" |
     awk "/^GID_RESTRICTION:/ { gsub(/[()]/, \"\"); print \$3 }" >meta.$$ &&
-    META=$(cat meta.$$) &&
-    test "${ID}" = "${META}" &&
-    test_debug "echo \"GID Restriction GROUP [${ID}] matches [${META}]\""
+    meta=$(cat meta.$$) &&
+    test "${id}" = "${meta}" &&
+    test_debug "echo \"GID Restriction GROUP [${id}] matches [${meta}]\""
 '
 
 test_expect_success 'munge --restrict-gid for invalid name' '
@@ -522,49 +522,49 @@ test_expect_success 'munge --restrict-gid for invalid number' '
 
 for OPT_GID in '-G' '--gid'; do
     test_expect_success "munge ${OPT_GID} for effective group by name" '
-        local ID=$(id -g -n) META &&
-        "${MUNGE}" --socket="${MUNGE_SOCKET}" --no-input "${OPT_GID}" "${ID}" |
+        local id=$(id -g -n) meta &&
+        "${MUNGE}" --socket="${MUNGE_SOCKET}" --no-input "${OPT_GID}" "${id}" |
         "${UNMUNGE}" --socket="${MUNGE_SOCKET}" |
         awk "/^GID:/ { print \$2 }" >meta.$$ &&
-        META=$(cat meta.$$) &&
-        test "${ID}" = "${META}" &&
-        test_debug "echo \"Effective group [${ID}] matches [${META}]\""
+        meta=$(cat meta.$$) &&
+        test "${id}" = "${meta}" &&
+        test_debug "echo \"Effective group [${id}] matches [${meta}]\""
     '
 done
 
 test_expect_success 'munge --gid for effective group by number' '
-    local ID=$(id -g) META &&
-    "${MUNGE}" --socket="${MUNGE_SOCKET}" --no-input --gid="${ID}" |
+    local id=$(id -g) meta &&
+    "${MUNGE}" --socket="${MUNGE_SOCKET}" --no-input --gid="${id}" |
     "${UNMUNGE}" --socket="${MUNGE_SOCKET}" |
     awk "/^GID:/ { gsub(/[()]/, \"\"); print \$3 }" >meta.$$ &&
-    META=$(cat meta.$$) &&
-    test "${ID}" = "${META}" &&
-    test_debug "echo \"Effective gid [${ID}] matches [${META}]\""
+    meta=$(cat meta.$$) &&
+    test "${id}" = "${meta}" &&
+    test_debug "echo \"Effective gid [${id}] matches [${meta}]\""
 '
 
 # Since FreeBSD uses the wheel group instead of the root group,
 #   query root's group via id.
 #
 test_expect_success SUDO 'munge --gid for root group by name via sudo' '
-    local ID=$(id -g -n root) META &&
+    local id=$(id -g -n root) meta &&
     sudo LD_LIBRARY_PATH="${LD_LIBRARY_PATH}" "${MUNGE}" \
-            --socket="${MUNGE_SOCKET}" --no-input --gid="${ID}" |
+            --socket="${MUNGE_SOCKET}" --no-input --gid="${id}" |
     "${UNMUNGE}" --socket="${MUNGE_SOCKET}" |
     awk "/^GID:/ { print \$2 }" >meta.$$ &&
-    META=$(cat meta.$$) &&
-    test "${ID}" = "${META}" &&
-    test_debug "echo \"sudo group [${ID}] matches [${META}]\""
+    meta=$(cat meta.$$) &&
+    test "${id}" = "${meta}" &&
+    test_debug "echo \"sudo group [${id}] matches [${meta}]\""
 '
 
 test_expect_success SUDO 'munge --gid for root group by number via sudo' '
-    local ID=0 META &&
+    local id=0 meta &&
     sudo LD_LIBRARY_PATH="${LD_LIBRARY_PATH}" "${MUNGE}" \
-            --socket="${MUNGE_SOCKET}" --no-input --gid="${ID}" |
+            --socket="${MUNGE_SOCKET}" --no-input --gid="${id}" |
     "${UNMUNGE}" --socket="${MUNGE_SOCKET}" |
     awk "/^GID:/ { gsub(/[()]/, \"\"); print \$3 }" >meta.$$ &&
-    META=$(cat meta.$$) &&
-    test "${ID}" = "${META}" &&
-    test_debug "echo \"sudo gid [${ID}] matches [${META}]\""
+    meta=$(cat meta.$$) &&
+    test "${id}" = "${meta}" &&
+    test_debug "echo \"sudo gid [${id}] matches [${meta}]\""
 '
 
 test_expect_success 'munge --gid for invalid name' '
@@ -589,13 +589,13 @@ test_expect_success 'munge --ttl for maximum value' '
 '
 
 test_expect_success 'munge --ttl for non-default value' '
-    local TTL=88 META &&
-    "${MUNGE}" --socket="${MUNGE_SOCKET}" --no-input --ttl="${TTL}" |
+    local ttl=88 meta &&
+    "${MUNGE}" --socket="${MUNGE_SOCKET}" --no-input --ttl="${ttl}" |
     "${UNMUNGE}" --socket="${MUNGE_SOCKET}" |
     awk "/^TTL:/ { print \$2 }" >meta.$$ &&
-    META=$(cat meta.$$) &&
-    test "${TTL}" = "${META}" &&
-    test_debug "echo \"TTL [${TTL}] matches [${META}]\""
+    meta=$(cat meta.$$) &&
+    test "${ttl}" = "${meta}" &&
+    test_debug "echo \"TTL [${ttl}] matches [${meta}]\""
 '
 
 test_expect_success 'munge --ttl for invalid string value' '
