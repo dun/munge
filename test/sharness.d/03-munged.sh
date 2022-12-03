@@ -10,34 +10,34 @@
 #
 munged_setup()
 {
-    umask 0022 &&
+    umask 0022
 
-    : "${MUNGE_ROOT:="$(pwd)"}" &&
-    mkdir -m 0755 -p "${MUNGE_ROOT}" &&
+    : "${MUNGE_ROOT:="$(pwd)"}"
+    mkdir -m 0755 -p "${MUNGE_ROOT}"
 
-    : "${MUNGE_SOCKETDIR:="${TMPDIR:-"/tmp"}"}" &&
-    MUNGE_SOCKET="${MUNGE_SOCKETDIR}/munged.sock.$$" &&
-    mkdir -m 1777 -p "${MUNGE_SOCKETDIR}" &&
-    test_debug "echo MUNGE_SOCKET=\"${MUNGE_SOCKET}\"" &&
+    : "${MUNGE_SOCKETDIR:="${TMPDIR:-"/tmp"}"}"
+    MUNGE_SOCKET="${MUNGE_SOCKETDIR}/munged.sock.$$"
+    mkdir -m 1777 -p "${MUNGE_SOCKETDIR}"
+    test_debug "echo MUNGE_SOCKET=\"${MUNGE_SOCKET}\""
 
-    : "${MUNGE_KEYDIR:="${MUNGE_ROOT}/etc-$$"}" &&
-    MUNGE_KEYFILE="${MUNGE_KEYDIR}/munged.key.$$" &&
-    mkdir -m 0755 -p "${MUNGE_KEYDIR}" &&
-    test_debug "echo MUNGE_KEYFILE=\"${MUNGE_KEYFILE}\"" &&
+    : "${MUNGE_KEYDIR:="${MUNGE_ROOT}/etc-$$"}"
+    MUNGE_KEYFILE="${MUNGE_KEYDIR}/munged.key.$$"
+    mkdir -m 0755 -p "${MUNGE_KEYDIR}"
+    test_debug "echo MUNGE_KEYFILE=\"${MUNGE_KEYFILE}\""
 
-    : "${MUNGE_LOGDIR:="${MUNGE_ROOT}/log-$$"}" &&
-    MUNGE_LOGFILE="${MUNGE_LOGDIR}/munged.log.$$" &&
-    mkdir -m 0755 -p "${MUNGE_LOGDIR}" &&
-    test_debug "echo MUNGE_LOGFILE=\"${MUNGE_LOGFILE}\"" &&
+    : "${MUNGE_LOGDIR:="${MUNGE_ROOT}/log-$$"}"
+    MUNGE_LOGFILE="${MUNGE_LOGDIR}/munged.log.$$"
+    mkdir -m 0755 -p "${MUNGE_LOGDIR}"
+    test_debug "echo MUNGE_LOGFILE=\"${MUNGE_LOGFILE}\""
 
-    : "${MUNGE_PIDDIR:="${MUNGE_ROOT}/run-$$"}" &&
-    MUNGE_PIDFILE="${MUNGE_PIDDIR}/munged.pid.$$" &&
-    mkdir -m 0755 -p "${MUNGE_PIDDIR}" &&
-    test_debug "echo MUNGE_PIDFILE=\"${MUNGE_PIDFILE}\"" &&
+    : "${MUNGE_PIDDIR:="${MUNGE_ROOT}/run-$$"}"
+    MUNGE_PIDFILE="${MUNGE_PIDDIR}/munged.pid.$$"
+    mkdir -m 0755 -p "${MUNGE_PIDDIR}"
+    test_debug "echo MUNGE_PIDFILE=\"${MUNGE_PIDFILE}\""
 
-    : "${MUNGE_SEEDDIR:="${MUNGE_ROOT}/lib-$$"}" &&
-    MUNGE_SEEDFILE="${MUNGE_SEEDDIR}/munged.seed.$$" &&
-    mkdir -m 0755 -p "${MUNGE_SEEDDIR}" &&
+    : "${MUNGE_SEEDDIR:="${MUNGE_ROOT}/lib-$$"}"
+    MUNGE_SEEDFILE="${MUNGE_SEEDDIR}/munged.seed.$$"
+    mkdir -m 0755 -p "${MUNGE_SEEDDIR}"
     test_debug "echo MUNGE_SEEDFILE=\"${MUNGE_SEEDFILE}\""
 }
 
@@ -48,20 +48,20 @@ munged_setup()
 #
 munged_create_key()
 {
-    local exec= &&
+    local exec=
     while true; do
         case $1 in
             t-exec=*) exec=$(echo "$1" | sed 's/^[^=]*=//');;
             *) break;;
         esac
         shift
-    done &&
+    done
     if test ! -r "${MUNGE_KEYFILE}"; then
         test_debug "echo ${exec} \"${MUNGEKEY}\" \
                 --create \
                 --keyfile=\"${MUNGE_KEYFILE}\" \
                 --bits=256 \
-                $*" &&
+                $*"
         ${exec} "${MUNGEKEY}" \
                 --create \
                 --keyfile="${MUNGE_KEYFILE}" \
@@ -80,7 +80,7 @@ munged_create_key()
 #
 munged_start()
 {
-    local exec= keep_logfile= keep_process= &&
+    local exec= keep_logfile= keep_process=
     while true; do
         case $1 in
             t-exec=*) exec=$(echo "$1" | sed 's/^[^=]*=//');;
@@ -89,13 +89,13 @@ munged_start()
             *) break;;
         esac
         shift
-    done &&
+    done
     if test "${keep_logfile}" != 1; then
         rm -f "${MUNGE_LOGFILE}"
-    fi &&
+    fi
     if test "${keep_process}" != 1; then
         munged_kill
-    fi &&
+    fi
     test_debug "echo ${exec} \"${MUNGED}\" \
             --socket=\"${MUNGE_SOCKET}\" \
             --key-file=\"${MUNGE_KEYFILE}\" \
@@ -103,7 +103,7 @@ munged_start()
             --pid-file=\"${MUNGE_PIDFILE}\" \
             --seed-file=\"${MUNGE_SEEDFILE}\" \
             --group-update-time=-1 \
-            $*" &&
+            $*"
     ${exec} "${MUNGED}" \
             --socket="${MUNGE_SOCKET}" \
             --key-file="${MUNGE_KEYFILE}" \
@@ -121,19 +121,19 @@ munged_start()
 #
 munged_stop()
 {
-    local exec= &&
+    local exec=
     while true; do
         case $1 in
             t-exec=*) exec=$(echo "$1" | sed 's/^[^=]*=//');;
             *) break;;
         esac
         shift
-    done &&
+    done
     test_debug "echo ${exec} \"${MUNGED}\" \
             --socket=\"${MUNGE_SOCKET}\" \
             --stop \
             --verbose \
-            $*" &&
+            $*"
     ${exec} "${MUNGED}" \
             --socket="${MUNGE_SOCKET}" \
             --stop \
