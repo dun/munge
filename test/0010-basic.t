@@ -124,6 +124,12 @@ test_expect_success 'check logfile for final message' '
     grep "Stopping" "${MUNGE_LOGFILE}"
 '
 
+# Check the logfile for errors.
+#
+test_expect_success 'check logfile for errors' '
+    ! grep -E -i "(Emergency|Alert|Critical|Error):" "${MUNGE_LOGFILE}"
+'
+
 # Perform housekeeping to clean up afterwards.
 #
 test_expect_success 'cleanup' '
