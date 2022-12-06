@@ -115,8 +115,8 @@ test_expect_success MUNGE_DIST 'build rpm' '
 #
 test_expect_success MUNGE_RPM 'install rpm' '
     sudo rpm --install --verbose "${MUNGE_RPM_DIR}"/RPMS/*/*.rpm \
-            >rpm.install.out.$$ &&
-    cat rpm.install.out.$$ &&
+            >rpm.install.$$ &&
+    cat rpm.install.$$ &&
     test_set_prereq MUNGE_INSTALL
 '
 
@@ -177,7 +177,7 @@ test_expect_success MUNGE_INSTALL 'stop munge service' '
 # Remove the binary RPMs installed earlier in the test.
 #
 test_expect_success MUNGE_INSTALL 'remove rpm' '
-    grep ^munge- rpm.install.out.$$ >rpm.pkgs.$$ &&
+    grep ^munge- rpm.install.$$ >rpm.pkgs.$$ &&
     sudo rpm --erase --verbose $(cat rpm.pkgs.$$)
 '
 
@@ -185,8 +185,8 @@ test_expect_success MUNGE_INSTALL 'remove rpm' '
 #   would prevent this test from running again.
 #
 test_expect_success MUNGE_INSTALL 'verify rpm removal' '
-    rpm --query --all >rpm.query.out.$$ &&
-    ! grep ^munge- rpm.query.out.$$
+    rpm --query --all >rpm.query.$$ &&
+    ! grep ^munge- rpm.query.$$
 '
 
 # Remove the key dir after checking to make sure the derived pathname ends with
