@@ -116,14 +116,15 @@ test_expect_success MUNGE_DIST 'build rpm' '
 test_expect_success MUNGE_RPM 'install rpm' '
     sudo rpm --install --verbose "${MUNGE_RPM_DIR}"/RPMS/*/*.rpm \
             >rpm.install.out.$$ &&
-    cat rpm.install.out.$$
+    cat rpm.install.out.$$ &&
+    test_set_prereq MUNGE_INSTALL
 '
 
 # Create a new key, overwriting an existing key if necessary.
 # Run as the munge user since the key dir is 0700 and owned by munge.
 # Save the name of the key file for later cleanup.
 #
-test_expect_success MUNGE_RPM 'create key' '
+test_expect_success MUNGE_INSTALL 'create key' '
     sudo --user=munge /usr/sbin/mungekey --force --verbose 2>mungekey.err.$$ &&
     cat mungekey.err.$$ &&
     MUNGE_KEYFILE=$(sed -ne "s/.*\"\([^\"]*\)\".*/\1/p" mungekey.err.$$) &&
@@ -133,49 +134,49 @@ test_expect_success MUNGE_RPM 'create key' '
 # Check if the key file has been created.
 # Run as the munge user since the key dir is 0700 and owned by munge.
 #
-test_expect_success MUNGE_RPM 'check key' '
+test_expect_success MUNGE_INSTALL 'check key' '
     sudo --user=munge test -f "${MUNGE_KEYFILE}"
 '
 
 # Start the munge service.
 #
-test_expect_success MUNGE_RPM 'start munge service' '
+test_expect_success MUNGE_INSTALL 'start munge service' '
     sudo systemctl start munge.service
 '
 
 # Check if the munge service is running.
 #
-test_expect_success MUNGE_RPM 'check service status' '
+test_expect_success MUNGE_INSTALL 'check service status' '
     systemctl status --full --no-pager munge.service
 '
 
 # Encode a credential, saving the resulting output for multiple decodes.
 #
-test_expect_success MUNGE_RPM 'encode credential' '
+test_expect_success MUNGE_INSTALL 'encode credential' '
     munge </dev/null >cred.$$
 '
 
 # Decode the credential.
 #
-test_expect_success MUNGE_RPM 'decode credential' '
+test_expect_success MUNGE_INSTALL 'decode credential' '
     unmunge <cred.$$
 '
 
 # Decode the same credential again to verify replay detection.
 #
-test_expect_success MUNGE_RPM 'replay credential' '
+test_expect_success MUNGE_INSTALL 'replay credential' '
     test_must_fail unmunge <cred.$$
 '
 
 # Stop the munge service.
 #
-test_expect_success MUNGE_RPM 'stop munge service' '
+test_expect_success MUNGE_INSTALL 'stop munge service' '
     sudo systemctl stop munge.service
 '
 
 # Remove the binary RPMs installed earlier in the test.
 #
-test_expect_success MUNGE_RPM 'remove rpm' '
+test_expect_success MUNGE_INSTALL 'remove rpm' '
     grep ^munge- rpm.install.out.$$ >rpm.pkgs.$$ &&
     sudo rpm --erase --verbose $(cat rpm.pkgs.$$)
 '
@@ -183,7 +184,7 @@ test_expect_success MUNGE_RPM 'remove rpm' '
 # Verify all of the munge RPMs have been removed since their continued presence
 #   would prevent this test from running again.
 #
-test_expect_success MUNGE_RPM 'verify rpm removal' '
+test_expect_success MUNGE_INSTALL 'verify rpm removal' '
     rpm --query --all >rpm.query.out.$$ &&
     ! grep ^munge- rpm.query.out.$$
 '
@@ -191,7 +192,7 @@ test_expect_success MUNGE_RPM 'verify rpm removal' '
 # Remove the key dir after checking to make sure the derived pathname ends with
 #   "/munge".
 #
-test_expect_success MUNGE_RPM 'remove key' '
+test_expect_success MUNGE_INSTALL 'remove key' '
     local MUNGE_KEYFILEDIR=$(dirname "${MUNGE_KEYFILE}") &&
     expr "${MUNGE_KEYFILEDIR}" : "/.*/munge$" >/dev/null 2>&1 &&
     echo "${MUNGE_KEYFILEDIR}" &&
