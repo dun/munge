@@ -23,7 +23,7 @@ test_expect_success 'check keyfile creation' '
     test -s "${MUNGE_KEYFILE}"
 '
 
-# Start the daemon process.
+# Start the daemon.
 #
 test_expect_success 'start munged' '
     munged_start
@@ -36,6 +36,7 @@ test_expect_success 'check pidfile creation' '
 '
 
 # Verify the pid in the pidfile matches a running munged process.
+# Provide [PID] for later checks.
 #
 test_expect_success 'check process is running' '
     PID=$(cat "${MUNGE_PIDFILE}") &&
@@ -84,13 +85,13 @@ test_expect_success 'check logfile for replay' '
     grep "Replayed credential" "${MUNGE_LOGFILE}"
 '
 
-# Stop the daemon process.
+# Stop the daemon.
 #
 test_expect_success 'stop munged' '
     munged_stop
 '
 
-# Verify the daemon process is no longer running.
+# Verify the daemon is no longer running.
 #
 test_expect_success 'check process has exited' '
     test "x${PID}" != x &&
@@ -119,11 +120,11 @@ test_expect_success 'check seedfile creation' '
 
 # Check if the final log message for stopping the daemon has been written out.
 #
-test_expect_success 'check logfile for stop' '
+test_expect_success 'check logfile for final message' '
     grep "Stopping" "${MUNGE_LOGFILE}"
 '
 
-# Perform any housekeeping to clean up afterwards.
+# Perform housekeeping to clean up afterwards.
 #
 test_expect_success 'cleanup' '
     munged_cleanup

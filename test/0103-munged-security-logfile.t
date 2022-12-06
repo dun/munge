@@ -213,8 +213,9 @@ test_expect_success 'logfile dir owned by euid' '
 '
 
 # Create an alternate logfile dir that can be chown'd.
-# This dir is placed in a subdir of TMPDIR since chowning something as root can
-#   fail if NFS is configured for squashed access.
+# This dir is placed in a subdir of [TMPDIR] since chowning something as root
+#   can fail if NFS is configured for squashed access.
+# Provide [ALT_LOGDIR] and [ALT_LOGFILE] for later checks.
 #
 test_expect_success SUDO 'alt logfile dir setup' '
     ALT_LOGDIR="${TMPDIR:-"/tmp"}/munge-$$/alt-log-$$" &&

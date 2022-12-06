@@ -6,8 +6,8 @@ test_description='Check munged security of socket'
 . "${SHARNESS_TEST_SRCDIR}/sharness.sh"
 
 # Set up the environment for checking the socket.
-# MUNGE_SOCKETDIR is redefined to add a sub-directory for testing changes to
-#   directory ownership and permissions.  It is kept in TMPDIR since NFS can
+# Redefine [MUNGE_SOCKETDIR] to add a sub-directory for testing changes to
+#   directory ownership and permissions.  It is kept in [TMPDIR] since NFS can
 #   cause problems for the lockfile (the location of which is derived from the
 #   socket name),
 #
@@ -27,7 +27,7 @@ test_expect_success 'socket dir perms' '
 '
 
 # Check the file type and permissions on the socket.
-# MUNGE_SOCKET must be examined while munged is running since the socket is
+# [MUNGE_SOCKET] must be examined while munged is running since the socket is
 #   removed when the daemon terminates.
 # Testing [match_type] and [match_perm] after munged terminates ensures the
 #   daemon is stopped even if the matching tests fail.
@@ -54,8 +54,9 @@ test_expect_success 'socket dir owned by euid' '
 '
 
 # Create an alternate socket dir that can be chwon'd.
-# This dir is placed in a subdir of TMPDIR since chowning something as root can
-#   fail if NFS is configured for squashed access.
+# This dir is placed in a subdir of [TMPDIR] since chowning something as root
+#   can fail if NFS is configured for squashed access.
+# Provide [ALT_SOCKETDIR] and [ALT_SOCKET] for later checks.
 #
 test_expect_success SUDO 'alt socket dir setup' '
     ALT_SOCKETDIR="${TMPDIR:-"/tmp"}/munge-$$/alt-socketdir-$$" &&
@@ -216,8 +217,8 @@ test_expect_success 'socket dir inaccessible by all override' '
 
 # Clean up detritus from testing.  This may include an errant munged process
 #   that has not terminated.
-# MUNGE_SOCKETDIR should be empty if munged gracefully terminated, so list the
-#   directory contents to aid in debugging if needed.
+# [MUNGE_SOCKETDIR] should be empty if munged gracefully terminated, so list
+#   the directory contents to aid in debugging if needed.
 #
 test_expect_success 'cleanup' '
     munged_cleanup &&

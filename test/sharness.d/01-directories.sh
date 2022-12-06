@@ -1,5 +1,5 @@
-# Search from directory [$1] on up to root, looking for the directory that
-#   contains [$2].
+# Search from directory [start_dir] up to the root directory, looking for a
+#   directory that contains [target_file].
 # Output the resulting directory if a match is found.
 #
 search_dirs()
@@ -15,7 +15,9 @@ search_dirs()
     )
 }
 
-# Set the top-level build directory.
+# Set the top-level build directory (which should contain "config.status" once
+#   "./configure" has been run).
+# Provide [MUNGE_BUILD_DIR].
 #
 set_build_dir()
 {
@@ -26,7 +28,8 @@ set_build_dir()
     fi
 }
 
-# Set the top-level source directory.
+# Set the top-level source directory (which should contain "configure.ac").
+# Provide [MUNGE_SOURCE_DIR].
 #
 set_source_dir()
 {

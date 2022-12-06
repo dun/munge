@@ -1,12 +1,13 @@
-# Requires MUNGED and MUNGEKEY.
-
-# Set up directory tree and shell variables for starting munged.
-# MUNGE_ROOT, MUNGE_SOCKETDIR, MUNGE_KEYDIR, MUNGE_LOGDIR, MUNGE_PIDDIR, and
-#   MUNGE_SEEDDIR can be overridden by setting them beforehand.
-# MUNGE_SOCKET is placed in TMPDIR by default since NFS can cause problems for
-#   the lockfile.  Debian 3.1 returns an incorrect PID for the process holding
-#   the lock across an NFS mount.  FreeBSD cannot create a lockfile across an
-#   NFS mount.
+# Set up the directory tree and shell variables for starting munged.
+# [MUNGE_ROOT], [MUNGE_SOCKETDIR], [MUNGE_KEYDIR], [MUNGE_LOGDIR],
+#   [MUNGE_PIDDIR], and [MUNGE_SEEDDIR] can be overridden by setting them
+#   beforehand.
+# [MUNGE_SOCKET] is placed in [TMPDIR] by default since NFS can cause problems
+#   for the lockfile.  Debian 3.1 returns an incorrect pid for the process
+#   holding the lock across an NFS mount.  FreeBSD cannot create a lockfile
+#   across an NFS mount.
+# Provides [MUNGE_SOCKET], [MUNGE_KEYFILE], [MUNGE_LOGFILE], [MUNGE_PIDFILE],
+#   and [MUNGE_SEEDFILE].
 #
 munged_setup()
 {
@@ -150,14 +151,14 @@ munged_stop()
 # Kill an errant munged process from a previous test that is still running in
 #   the background.  This situation is most likely to occur if a test starting
 #   munged is expected to fail and instead erroneously succeeds.
-# Only check for the pid named in ${MUNGE_PIDFILE} to avoid interfering with
+# Only check for the pid named in [MUNGE_PIDFILE] to avoid interfering with
 #   munged processes belonging to other tests or system use.  And check that
 #   the named pid is a munged process and not one recycled by the system for
 #   some other running process.
 # A SIGKILL is sent instead of SIGTERM in case the signal handler has a bug
 #   preventing graceful termination.  Since SIGKILL prevents the process from
 #   cleaning up after itself, that cleanup must be performed here afterwards.
-# The rm of the MUNGE_SOCKET glob also matches the corresponding lockfile.
+# The rm of the [MUNGE_SOCKET] glob also matches the corresponding lockfile.
 #
 munged_kill()
 {
@@ -174,9 +175,9 @@ munged_kill()
     fi
 }
 
-# Perform any housekeeping to clean up after munged.  This should be called
-#   at the end of any test script that starts a munged process.
-# This function must be at the start of any &&-chain to ensure it cannot be
+# Perform housekeeping to clean up after munged.
+# This should be called at the end of any test script that starts a munged
+#   process.  It must be at the start of any &&-chain to ensure it cannot be
 #   prevented from running by a preceding failure in the chain.
 #
 munged_cleanup()

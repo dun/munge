@@ -7,6 +7,7 @@ test_description='Check munged socket lock'
 
 # Set up the environment for testing.
 # The location of the lockfile is derived from the name of the socket.
+# Provide [MUNGE_LOCKFILE] for later checks.
 #
 test_expect_success 'setup' '
     munged_setup &&

@@ -46,6 +46,7 @@ if rpm --query --all | grep ^munge-; then
 fi
 
 # Create a scratch directory for the RPM build.
+# Provide [MUNGE_RPM_DIR] for later checks.
 #
 test_expect_success 'setup' '
     MUNGE_RPM_DIR="${TMPDIR:-"/tmp"}/munge-rpm-$$" &&
@@ -53,6 +54,7 @@ test_expect_success 'setup' '
 '
 
 # Create the dist tarball for rpmbuild and stash it in the scratch directory.
+# Provide [MUNGE_TARBALL] for later checks.
 #
 test_expect_success 'create dist tarball' '
     cd "${MUNGE_BUILD_DIR}" &&
@@ -111,7 +113,7 @@ test_expect_success MUNGE_DIST 'build rpm' '
 '
 
 # Install the binary RPMs.
-# Save the resulting output for later removing the RPMs that were installed.
+# Save the resulting output for later removal of the RPMs that were installed.
 #
 test_expect_success MUNGE_RPM 'install rpm' '
     sudo rpm --install --verbose "${MUNGE_RPM_DIR}"/RPMS/*/*.rpm \
@@ -121,8 +123,8 @@ test_expect_success MUNGE_RPM 'install rpm' '
 '
 
 # Create a new key, overwriting an existing key if necessary.
-# Run as the munge user since the key dir is 0700 and owned by munge.
-# Save the name of the key file for later cleanup.
+# Run as the munge user since the keyfile dir is 0700 and owned by munge.
+# Provide [MUNGE_KEYFILE] for later cleanup.
 #
 test_expect_success MUNGE_INSTALL 'create key' '
     sudo --user=munge /usr/sbin/mungekey --force --verbose 2>mungekey.err.$$ &&
@@ -131,8 +133,8 @@ test_expect_success MUNGE_INSTALL 'create key' '
     test -n "${MUNGE_KEYFILE}"
 '
 
-# Check if the key file has been created.
-# Run as the munge user since the key dir is 0700 and owned by munge.
+# Check if the keyfile has been created.
+# Run as the munge user since the keyfile dir is 0700 and owned by munge.
 #
 test_expect_success MUNGE_INSTALL 'check key' '
     sudo --user=munge test -f "${MUNGE_KEYFILE}"
@@ -174,7 +176,7 @@ test_expect_success MUNGE_INSTALL 'stop munge service' '
     sudo systemctl stop munge.service
 '
 
-# Remove the binary RPMs installed earlier in the test.
+# Remove the binary RPMs installed previously.
 #
 test_expect_success MUNGE_INSTALL 'remove rpm' '
     grep ^munge- rpm.install.$$ >rpm.pkgs.$$ &&
@@ -189,8 +191,8 @@ test_expect_success MUNGE_INSTALL 'verify rpm removal' '
     ! grep ^munge- rpm.query.$$
 '
 
-# Remove the key dir after checking to make sure the derived pathname ends with
-#   "/munge".
+# Remove the keyfile dir after checking to make sure the derived pathname ends
+#   with "/munge".
 #
 test_expect_success MUNGE_INSTALL 'remove key' '
     local keyfiledir=$(dirname "${MUNGE_KEYFILE}") &&

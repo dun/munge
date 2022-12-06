@@ -42,7 +42,7 @@ test_expect_success 'stop munged' '
     munged_stop
 '
 
-# Perform any housekeeping to clean up afterwards.
+# Perform housekeeping to clean up afterwards.
 #
 test_expect_success 'cleanup' '
     munged_cleanup

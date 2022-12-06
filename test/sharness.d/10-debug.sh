@@ -1,4 +1,4 @@
-# Requires MUNGE_BUILD_DIR.
+# [MUNGE_BUILD_DIR] is set in "01-directories.sh".
 
 # Is debug enabled?
 #

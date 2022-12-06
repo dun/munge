@@ -5,7 +5,6 @@ if valgrind --version >/dev/null 2>&1; then
 fi
 
 # Set the name of the valgrind log file.
-# Referenced by VALGRIND_CMD, valgrind_check_log(), and ".travis.yml".
 #
 VALGRIND_LOGFILE="valgrind.log.$$"
 

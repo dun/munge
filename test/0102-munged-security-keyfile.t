@@ -216,8 +216,9 @@ test_expect_success 'keyfile dir owned by euid' '
 '
 
 # Create an alternate keyfile dir that can be chown'd.
-# This dir is placed in a subdir of TMPDIR since chowning something as root can
-#   fail if NFS is configured for squashed access.
+# This dir is placed in a subdir of [TMPDIR] since chowning something as root
+#   can fail if NFS is configured for squashed access.
+# Provide [ALT_KEYDIR] and [ALT_KEYFILE] for later checks.
 #
 test_expect_success SUDO 'alt keyfile dir setup' '
     ALT_KEYDIR="${TMPDIR:-"/tmp"}/munge-$$/alt-etc-$$" &&
