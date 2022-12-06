@@ -196,15 +196,13 @@ test_expect_success MUNGE_INSTALL 'remove key' '
     local MUNGE_KEYFILEDIR=$(dirname "${MUNGE_KEYFILE}") &&
     expr "${MUNGE_KEYFILEDIR}" : "/.*/munge$" >/dev/null 2>&1 &&
     echo "${MUNGE_KEYFILEDIR}" &&
-    sudo rm -rf "${MUNGE_KEYFILEDIR}" &&
-    test_set_prereq SUCCESS
+    sudo rm -rf "${MUNGE_KEYFILEDIR}"
 '
 
-# Remove the scratch directory if all tests succeeded unless MUNGE_NOCLEAN
-#   is set.
+# Remove the scratch directory unless [debug] is set.
 #
-test_expect_success SUCCESS 'cleanup' '
-    if test "x${MUNGE_NOCLEAN}" = xt; then
+test_expect_success 'cleanup' '
+    if test "x${debug}" = xt; then
         echo "rpm dir is \"${MUNGE_RPM_DIR}\""
     else
         rm -rf "${MUNGE_RPM_DIR}"
