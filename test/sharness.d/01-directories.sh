@@ -19,20 +19,10 @@ search_dirs()
 #
 set_build_dir()
 {
+    MUNGE_BUILD_DIR=$(search_dirs "." "config.status")
     if test -z "${MUNGE_BUILD_DIR}"; then
-
-        if test "x${builddir}" != x; then
-            MUNGE_BUILD_DIR=${builddir}
-        else
-            MUNGE_BUILD_DIR=$(search_dirs "." "config.status")
-        fi
-
-        if test -z "${MUNGE_BUILD_DIR}"; then
-            echo "ERROR: MUNGE has not been configured."
-            exit 1
-        fi
-
-        export MUNGE_BUILD_DIR
+        echo "ERROR: Failed to set MUNGE_BUILD_DIR: not configured"
+        exit 1
     fi
 }
 
@@ -40,19 +30,11 @@ set_build_dir()
 #
 set_source_dir()
 {
-    local dir
-
+    MUNGE_SOURCE_DIR=$(search_dirs \
+            $(dirname "${SHARNESS_TEST_FILE}") "configure.ac")
     if test -z "${MUNGE_SOURCE_DIR}"; then
-
-        dir=$(dirname "${SHARNESS_TEST_FILE}")
-        MUNGE_SOURCE_DIR=$(search_dirs "${dir}" "configure.ac")
-
-        if test -z "${MUNGE_SOURCE_DIR}"; then
-            echo "ERROR: Failed to locate source directory."
-            exit 1
-        fi
-
-        export MUNGE_SOURCE_DIR
+        echo "ERROR: Failed to set MUNGE_SOURCE_DIR: cannot locate source"
+        exit 1
     fi
 }
 

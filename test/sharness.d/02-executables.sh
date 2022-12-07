@@ -10,10 +10,9 @@ MUNGEKEY="${MUNGE_BUILD_DIR}/src/mungekey/mungekey"
 
 # Require executables to be built before tests can proceed.
 #
-check_executables()
+set_executables()
 {
     local prog
-
     for prog in "${MUNGE}" "${UNMUNGE}" "${REMUNGE}" "${MUNGED}" "${MUNGEKEY}"
     do
         if test ! -x "${prog}"; then
@@ -23,4 +22,4 @@ check_executables()
     done
 }
 
-check_executables
+set_executables
