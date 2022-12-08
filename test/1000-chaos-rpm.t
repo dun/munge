@@ -62,13 +62,13 @@ test_expect_success 'create dist tarball' '
     cd &&
     MUNGE_TARBALL=$(ls "${MUNGE_RPM_DIR}"/munge-*.tar*) &&
     test -f "${MUNGE_TARBALL}" &&
-    test_set_prereq MUNGE_TARBALL
+    test_set_prereq MUNGE_DIST
 '
 
 # Build the source RPM which is needed to install dependencies for building the
 #   binary RPMs.
 #
-test_expect_success MUNGE_TARBALL 'build srpm' '
+test_expect_success MUNGE_DIST 'build srpm' '
     rpmbuild -ts --without=check --without=verify \
             --define="_builddir %{_topdir}/BUILD" \
             --define="_buildrootdir %{_topdir}/BUILDROOT" \
@@ -97,7 +97,7 @@ test_expect_success MUNGE_SRPM 'install builddeps' '
 
 # Build in binary RPMs.
 #
-test_expect_success MUNGE_TARBALL 'build rpm' '
+test_expect_success MUNGE_DIST 'build rpm' '
     rpmbuild -tb --without=check --without=verify \
             --define="_builddir %{_topdir}/BUILD" \
             --define="_buildrootdir %{_topdir}/BUILDROOT" \
