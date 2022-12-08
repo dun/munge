@@ -21,16 +21,6 @@ else
     test_done
 fi
 
-# Ensure none of the munge RPMs are currently installed in order to prevent
-#   overwriting an existing installation.
-# It would be quicker to just "rpm --query munge", but that could miss RPMs
-#   from a partial (un)install that would interfere with the new installation.
-#
-if rpm --query --all | grep ^munge-; then
-    skip_all='skipping rpm test; munge rpm already installed'
-    test_done
-fi
-
 # Ensure the rpmbuild executable is already installed.
 #
 if command -v rpmbuild >/dev/null 2>&1; then :; else
@@ -42,6 +32,16 @@ fi
 #
 if test_have_prereq SUDO; then :; else
     skip_all='skipping rpm test; sudo not enabled'
+    test_done
+fi
+
+# Ensure none of the munge RPMs are currently installed in order to prevent
+#   overwriting an existing installation.
+# It would be quicker to just "rpm --query munge", but that could miss RPMs
+#   from a partial (un)install that would interfere with the new installation.
+#
+if rpm --query --all | grep ^munge-; then
+    skip_all='skipping rpm test; munge rpm already installed'
     test_done
 fi
 
