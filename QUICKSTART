@@ -410,7 +410,16 @@ MUNGE Installation Guide
          not running.  Try starting it.  If it fails to start, check the
          log for an error message.
 
-      2. unmunge: Error: Invalid credential
+      2. munge: Error: Failed to access "/run/munge/munge.socket.2":
+         Permission denied
+
+         The client received a "permission denied" error when trying
+         to connect to the munged daemon listening on the socket
+         "/run/munge/munge.socket.2".  The permissions on the "/run/munge"
+         directory are likely incorrect; they should be 0755.  And the socket
+         should have permissions 0777.
+
+      3. unmunge: Error: Invalid credential
 
          The munged daemon decoding the credential is likely using a different
          key than the daemon that encoded it.  First check the key files for
@@ -418,7 +427,7 @@ MUNGE Installation Guide
          the key file is read when the daemon starts, a running daemon could
          be using a key that differs from the current contents of its key file.
 
-      3. unmunge: Error: Expired credential
+      4. unmunge: Error: Expired credential
 
          The current time (according to the local clock on the host decoding
          the credential) exceeds the creation time of the credential (according
@@ -426,7 +435,7 @@ MUNGE Installation Guide
          time-to-live value.  Either the clocks are out of sync, or too much
          time has passed since the credential was created.
 
-      4. unmunge: Error: Rewound credential
+      5. unmunge: Error: Rewound credential
 
          The current time (according to the local clock on the host decoding
          the credential) precedes the creation time of the credential
@@ -434,11 +443,11 @@ MUNGE Installation Guide
          Either the clocks are out of sync, or you've opened a rift in the
          space-time continuum.
 
-      5. unmunge: Error: Replayed credential
+      6. unmunge: Error: Replayed credential
 
          The credential has previously been decoded by this munged daemon.
 
-      6. unmunge: Error: Unauthorized credential for client UID=1234 GID=1234
+      7. unmunge: Error: Unauthorized credential for client UID=1234 GID=1234
 
          Either the UID of the client decoding the credential does not
          match the UID restriction with which the credential was encoded,
@@ -446,14 +455,14 @@ MUNGE Installation Guide
          supplementary group GIDs) does not match the GID restriction with
          which the credential was encoded.
 
-      7. munged: Error: Failed to find keyfile "/etc/munge/munge.key":
+      8. munged: Error: Failed to find keyfile "/etc/munge/munge.key":
          No such file or directory (Did you run mungekey?)
 
          A key has not been created.  See mungekey(8).  Note that this
          file will need to be securely propagated to all hosts within the
          security realm.
 
-      8. munged: Error: Found pid 1234 bound to socket
+      9. munged: Error: Found pid 1234 bound to socket
          "/run/munge/munge.socket.2"
 
          A munged daemon (pid 1234) is already listening on the socket
