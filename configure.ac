@@ -127,6 +127,6 @@ AC_CONFIG_FILES( \
   src/munge/Makefile \
   src/munged/Makefile \
   src/mungekey/Makefile \
-  test/Makefile \
+  tests/Makefile \
 )
 AC_OUTPUT

@@ -9,7 +9,7 @@ ACLOCAL_AMFLAGS = -I m4
 
 SUBDIRS = \
 	src \
-	test \
+	tests \
 	# End of SUBDIRS
 
 EXTRA_DIST = \
@@ -69,7 +69,7 @@ MAINTAINERCLEANFILES = \
 	src/libmunge/Makefile.in \
 	src/munge/Makefile.in \
 	src/munged/Makefile.in \
-	test/Makefile.in \
+	tests/Makefile.in \
 	# End of MAINTAINERCLEANFILES
 
 TEMPLATE_FILES = \

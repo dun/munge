@@ -1,4 +1,4 @@
-# MUNGE test/Makefile.am
+# MUNGE tests/Makefile.am
 #
 # This file is part of the MUNGE Uid 'N' Gid Emporium (MUNGE).
 # For details, see <https://dun.github.io/munge/>.
