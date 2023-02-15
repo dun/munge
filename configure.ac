@@ -29,7 +29,7 @@ AM_INIT_AUTOMAKE([1.12 foreign dist-xz no-dist-gzip])
 AM_MAINTAINER_MODE
 AM_SILENT_RULES([yes])
 AC_USE_SYSTEM_EXTENSIONS
-m4_ifdef([LT_INIT], [LT_INIT], [AC_PROG_LIBTOOL])
+LT_INIT
 
 ##
 # Checks for programs.
