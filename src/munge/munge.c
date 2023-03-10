@@ -77,6 +77,7 @@ struct option long_opts[] = {
     { "gid",          required_argument, NULL, 'G' },
     { "ttl",          required_argument, NULL, 't' },
     { "socket",       required_argument, NULL, 'S' },
+    { "realm",        required_argument, NULL, 'R' },
     {  NULL,          0,                 NULL,  0  }
 };
 
@@ -391,6 +392,15 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                         munge_ctx_strerror (conf->ctx));
                 }
                 break;
+            case 'R':
+                e = munge_ctx_set (conf->ctx, MUNGE_OPT_REALM, optarg);
+                if (e != EMUNGE_SUCCESS) {
+                    log_err (EMUNGE_SNAFU, LOG_ERR,
+                        "Failed to set realm: %s",
+                        munge_ctx_strerror (conf->ctx));
+                }
+                break;
+
             case '?':
                 if (optopt > 0) {
                     log_err (EMUNGE_SNAFU, LOG_ERR,
@@ -516,6 +526,10 @@ display_help (char *prog)
 
     printf ("  %*s %s\n", w, "-S, --socket=PATH",
             "Specify local socket for munged");
+
+    printf ("  %*s %s\n", w, "-R, --realm=REALM",
+            "Specify security realm");
+
 
     printf ("\n");
     printf ("By default, payload read from stdin, "
