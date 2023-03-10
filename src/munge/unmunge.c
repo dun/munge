@@ -105,6 +105,7 @@ void display_gid (conf_t conf);
 void display_uid_restriction (conf_t conf);
 void display_gid_restriction (conf_t conf);
 void display_length (conf_t conf);
+void display_realm (conf_t conf);
 void display_data (conf_t conf);
 int key_str_to_val (const char *str);
 const char * key_val_to_str (int val);
@@ -128,6 +129,7 @@ typedef enum {
     MUNGE_KEY_UID_RESTRICTION,
     MUNGE_KEY_GID_RESTRICTION,
     MUNGE_KEY_LENGTH,
+    MUNGE_KEY_REALM,
     MUNGE_KEY_LAST
 } munge_key_t;
 
@@ -145,6 +147,7 @@ display_key_t munge_keys[] = {
     { MUNGE_KEY_UID_RESTRICTION, "UID_RESTRICTION", display_uid_restriction },
     { MUNGE_KEY_GID_RESTRICTION, "GID_RESTRICTION", display_gid_restriction },
     { MUNGE_KEY_LENGTH,          "LENGTH",          display_length          },
+    { MUNGE_KEY_REALM ,          "REALM",           display_realm           },
     { MUNGE_KEY_LAST,             NULL,             NULL }
 };
 
@@ -194,6 +197,7 @@ struct conf {
     char         key[ MUNGE_KEY_LAST ]; /* key flag array (true if enabled)  */
     int          key_width;             /* num chars reserved for key field  */
     unsigned     got_numeric:1;         /* flag for NUMERIC option           */
+    unsigned     got_keys:1;            /* flag for KEYS option              */
 };
 
 
@@ -280,6 +284,7 @@ create_conf (void)
     }
     conf->key_width = maxlen + 1;       /* separate longest key by one space */
     conf->got_numeric = 0;
+    conf->got_keys = 0;
 
     return (conf);
 }
@@ -337,7 +342,6 @@ destroy_conf (conf_t conf)
 void
 parse_cmdline (conf_t conf, int argc, char **argv)
 {
-    int          got_keys = 0;
     char        *prog;
     int          c;
     munge_err_t  e;
@@ -382,7 +386,7 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                 conf->fn_out = optarg;
                 break;
             case 'k':
-                got_keys = 1;
+                conf->got_keys = 1;
                 parse_keys (conf, optarg);
                 break;
             case 'K':
@@ -448,7 +452,7 @@ parse_cmdline (conf_t conf, int argc, char **argv)
     }
     /*  Enable all metadata keys if a subset was not specified.
      */
-    if (!got_keys) {
+    if (!conf->got_keys) {
         for (i = 0; i < MUNGE_KEY_LAST; i++) {
             conf->key[i] = 1;
         }
@@ -1032,6 +1036,23 @@ display_length (conf_t conf)
     key = key_val_to_str (MUNGE_KEY_LENGTH);
     num_spaces = conf->key_width - strlen (key);
     fprintf (conf->fp_meta, "%s:%*c%d\n", key, num_spaces, 0x20, conf->dlen);
+    return;
+}
+
+void
+display_realm (conf_t conf)
+{
+    const char *key, *s;
+    int         num_spaces;
+    munge_err_t    err;
+
+    assert (conf != NULL);
+
+    key = key_val_to_str (MUNGE_KEY_REALM);
+    num_spaces = conf->key_width - strlen (key);
+    err = munge_ctx_get (conf->ctx, MUNGE_OPT_REALM, &s);
+    if (s || conf->got_keys)
+	    fprintf (conf->fp_meta, "%s:%*c%s\n", key, num_spaces, 0x20, s);
     return;
 }
 
