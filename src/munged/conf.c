@@ -135,6 +135,10 @@ static void _conf_set_origin_addr (conf_t conf);
 
 static int _conf_open_keyfile (const char *keyfile, int got_force);
 
+static conf_realm_t _conf_create_realm (conf_t conf, const char *realm_str);
+
+static int _conf_destroy_realm (void *data, const void *key, void *arg);
+
 
 /*****************************************************************************
  *  Global Variables
@@ -151,6 +155,7 @@ conf_t
 create_conf (void)
 {
     conf_t conf;
+    conf_realm_t realm;
 
     if (!(conf = malloc (sizeof (struct conf)))) {
         log_errno (EMUNGE_NO_MEMORY, LOG_ERR, "Failed to allocate conf");
@@ -197,14 +202,6 @@ create_conf (void)
         log_errno (EMUNGE_NO_MEMORY, LOG_ERR,
             "Failed to copy seed-file name default string");
     }
-    if (!(conf->key_name = strdup (MUNGE_KEYFILE_PATH))) {
-        log_errno (EMUNGE_NO_MEMORY, LOG_ERR,
-            "Failed to copy key-file name default string");
-    }
-    conf->dek_key = NULL;
-    conf->dek_key_len = 0;
-    conf->mac_key = NULL;
-    conf->mac_key_len = 0;
     conf->origin_name = NULL;
     conf->origin_ifname = NULL;
     memset (&conf->addr, 0, sizeof (conf->addr));
@@ -226,9 +223,57 @@ create_conf (void)
     }
 #endif /* AUTH_METHOD_RECVFD_MKFIFO || AUTH_METHOD_RECVFD_MKNOD */
 
+    conf->realms = hash_create (1023,
+            (hash_key_f) hash_key_string,
+            (hash_cmp_f) strcmp,
+            (hash_del_f) free);
+    if (!conf->realms)
+        log_errno (EMUNGE_NO_MEMORY, LOG_ERR, "Failed to allocate realms hash");
+
+    realm = _conf_create_realm(conf, "");
+    if (!(realm->key_name = strdup (MUNGE_KEYFILE_PATH)))
+        log_errno (EMUNGE_NO_MEMORY, LOG_ERR,
+            "Failed to copy key-file name default string");
+
     return (conf);
 }
 
+static conf_realm_t _conf_create_realm (conf_t conf, const char *realm_str)
+{
+    conf_realm_t realm;
+
+    realm = malloc (sizeof *realm);
+    if (!realm)
+        log_err (EMUNGE_NO_MEMORY, LOG_ERR, "Failed to allocate conf realm");
+
+    realm_str = strdup (realm_str);
+    if (!realm_str) {
+        free (realm);
+        log_err (EMUNGE_NO_MEMORY, LOG_ERR, "Failed to copy realm_str");
+    }
+
+    realm->key_name = NULL;
+    realm->dek_key = NULL;
+    realm->dek_key_len = 0;
+    realm->mac_key = NULL;
+    realm->mac_key_len = 0;
+
+    void *ret = hash_insert(conf->realms, realm_str, realm);
+    if (!ret) {
+        free ((void*)realm_str);
+        free (realm);
+    }
+
+    return ret;
+}
+
+static conf_realm_t _conf_get_or_create_realm (conf_t conf, const char *realm_str)
+{
+    conf_realm_t realm = get_realm(conf, realm_str);
+    if (!realm)
+        realm = _conf_create_realm(conf, realm_str);
+    return realm;
+}
 
 void
 destroy_conf (conf_t conf, int do_unlink)
@@ -277,20 +322,6 @@ destroy_conf (conf_t conf, int do_unlink)
         free (conf->seed_name);
         conf->seed_name = NULL;
     }
-    if (conf->key_name) {
-        free (conf->key_name);
-        conf->key_name = NULL;
-    }
-    if (conf->dek_key) {
-        memburn (conf->dek_key, 0, conf->dek_key_len);
-        free (conf->dek_key);
-        conf->dek_key = NULL;
-    }
-    if (conf->mac_key) {
-        memburn (conf->mac_key, 0, conf->mac_key_len);
-        free (conf->mac_key);
-        conf->mac_key = NULL;
-    }
     if (conf->origin_name) {
         free (conf->origin_name);
         conf->origin_name = NULL;
@@ -307,9 +338,41 @@ destroy_conf (conf_t conf, int do_unlink)
         free (conf->auth_client_dir);
         conf->auth_client_dir = NULL;
     }
+    if (conf->realms) {
+        hash_for_each (conf->realms, _conf_destroy_realm, NULL);
+        /* hash_destroy (conf->realms); */
+        /* conf->realms = NULL; */
+    }
+
     free (conf);
 
     return;
+}
+
+static int _conf_destroy_realm (void *data, const void *key, void *arg)
+{
+    conf_realm_t realm = data;
+    if (!realm)
+        abort();
+
+    return 0;
+
+    if (realm->key_name) {
+        free (realm->key_name);
+        realm->key_name = NULL;
+    }
+    if (realm->dek_key) {
+        memburn (realm->dek_key, 0, realm->dek_key_len);
+        free (realm->dek_key);
+        realm->dek_key = NULL;
+    }
+    if (realm->mac_key) {
+        memburn (realm->mac_key, 0, realm->mac_key_len);
+        free (realm->mac_key);
+        realm->mac_key = NULL;
+    }
+
+    return 1;
 }
 
 
@@ -320,6 +383,7 @@ parse_cmdline (conf_t conf, int argc, char **argv)
     int   c;
     long  l;
     char *p;
+    conf_realm_t realm;
 
     assert (conf != NULL);
 
@@ -404,7 +468,8 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                 conf->gids_update_secs = l;
                 break;
             case OPT_KEY_FILE:
-                _conf_set_string (&conf->key_name, optarg, conf->cwd,
+                realm = _conf_get_or_create_realm(conf, "");
+                _conf_set_string (&realm->key_name, optarg, conf->cwd,
                         "key-file name");
                 break;
             case OPT_LOG_FILE:
@@ -540,9 +605,8 @@ write_origin_addr (conf_t conf)
     return;
 }
 
-
 void
-create_subkeys (conf_t conf)
+create_subkeys (conf_t conf, conf_realm_t realm)
 {
     int fd;
     int n;
@@ -552,28 +616,28 @@ create_subkeys (conf_t conf)
     md_ctx mac_ctx;
 
     assert (conf != NULL);
-    assert (conf->dek_key == NULL);
-    assert (conf->mac_key == NULL);
+    assert (realm->dek_key == NULL);
+    assert (realm->mac_key == NULL);
 
     /*  Allocate memory for subkeys.
      */
-    if ((conf->dek_key_len = md_size (MUNGE_MAC_SHA1)) <= 0) {
+    if ((realm->dek_key_len = md_size (MUNGE_MAC_SHA1)) <= 0) {
         log_err (EMUNGE_NO_MEMORY, LOG_ERR,
             "Failed to determine DEK key length");
     }
-    if (!(conf->dek_key = malloc (conf->dek_key_len))) {
+    if (!(realm->dek_key = malloc (realm->dek_key_len))) {
         log_err (EMUNGE_NO_MEMORY, LOG_ERR,
             "Failed to allocate %d bytes for cipher subkey",
-            conf->dek_key_len);
+            realm->dek_key_len);
     }
-    if ((conf->mac_key_len = md_size (MUNGE_MAC_SHA1)) <= 0) {
+    if ((realm->mac_key_len = md_size (MUNGE_MAC_SHA1)) <= 0) {
         log_err (EMUNGE_NO_MEMORY, LOG_ERR,
             "Failed to determine MAC key length");
     }
-    if (!(conf->mac_key = malloc (conf->mac_key_len))) {
+    if (!(realm->mac_key = malloc (realm->mac_key_len))) {
         log_err (EMUNGE_NO_MEMORY, LOG_ERR,
             "Failed to allocate %d bytes for MAC subkey",
-            conf->mac_key_len);
+            realm->mac_key_len);
     }
     if (md_init (&dek_ctx, MUNGE_MAC_SHA1) < 0) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
@@ -581,7 +645,7 @@ create_subkeys (conf_t conf)
     }
     /*  Compute keyfile's message digest.
      */
-    fd = _conf_open_keyfile (conf->key_name, conf->got_force);
+    fd = _conf_open_keyfile (realm->key_name, conf->got_force);
     assert (fd >= 0);
 
     n_total = 0;
@@ -593,7 +657,7 @@ create_subkeys (conf_t conf)
             continue;
         if (n < 0)
             log_errno (EMUNGE_SNAFU, LOG_ERR,
-                "Failed to read keyfile \"%s\"", conf->key_name);
+                "Failed to read keyfile \"%s\"", realm->key_name);
         if (md_update (&dek_ctx, buf, n) < 0)
             log_err (EMUNGE_SNAFU, LOG_ERR,
                 "Failed to compute subkeys: Cannot update md ctx");
@@ -601,7 +665,7 @@ create_subkeys (conf_t conf)
     }
     if (close (fd) < 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR,
-            "Failed to close keyfile \"%s\"", conf->key_name);
+            "Failed to close keyfile \"%s\"", realm->key_name);
     }
     if (n_total < MUNGE_KEY_LEN_MIN_BYTES) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
@@ -613,27 +677,34 @@ create_subkeys (conf_t conf)
     }
     /*  Append "1" to keyfile in order to compute cipher subkey.
      */
-    n = conf->dek_key_len;
+    n = realm->dek_key_len;
     if ( (md_update (&dek_ctx, "1", 1) < 0)
-      || (md_final (&dek_ctx, conf->dek_key, &n) < 0)
+      || (md_final (&dek_ctx, realm->dek_key, &n) < 0)
       || (md_cleanup (&dek_ctx) < 0) ) {
         log_err (EMUNGE_SNAFU, LOG_ERR, "Failed to compute cipher subkey");
     }
-    assert (n <= conf->dek_key_len);
+    assert (n <= realm->dek_key_len);
 
     /*  Append "2" to keyfile in order to compute mac subkey.
      */
-    n = conf->mac_key_len;
+    n = realm->mac_key_len;
     if ( (md_update (&mac_ctx, "2", 1) < 0)
-      || (md_final (&mac_ctx, conf->mac_key, &n) < 0)
+      || (md_final (&mac_ctx, realm->mac_key, &n) < 0)
       || (md_cleanup (&mac_ctx) < 0) ) {
         log_err (EMUNGE_SNAFU, LOG_ERR, "Failed to compute MAC subkey");
     }
-    assert (n <= conf->mac_key_len);
+    assert (n <= realm->mac_key_len);
 
     return;
 }
 
+
+conf_realm_t get_realm(conf_t conf, const char *realm)
+{
+    if (!realm)
+        realm = "";
+    return hash_find(conf->realms, realm);
+}
 
 /*****************************************************************************
  *  Internal Functions
