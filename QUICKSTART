@@ -14,14 +14,14 @@ MUNGE Installation Guide
 
       Since authentication is based on UID and GID, users authenticating
       with MUNGE need to have consistent UID/GID mappings across all nodes
-      within the security realm.  Since the "munge" user is a system account,
-      its UID and GID do not need to be kept in sync across nodes.
+      within the security domain.  Since the "munge" user is a system
+      account, its UID and GID do not need to be kept in sync across nodes.
 
    C. Keep system clocks in sync
 
       MUNGE credentials are valid for a limited time defined by their embedded
       time-to-live value (5 minutes by default).  The fastest and slowest
-      system clocks across all nodes within the security realm should be
+      system clocks across all nodes within the security domain should be
       within this time interval.
 
 2. Software dependencies
@@ -237,9 +237,10 @@ MUNGE Installation Guide
 
    A. Creating a key
 
-      All munged daemons within a security realm share a common key.  This key
-      is used to cryptographically protect the credential.  Consequently,
-      credentials are only valid within a given security realm.
+      All munged daemons within a security domain share a common key.  This
+      key is used to cryptographically protect the credential.
+      Consequently, credentials are only valid within a given security
+      domain.
 
       The "mungekey" executable is the key management utility.  To ensure the
       key file maintains the correct ownership and permissions, it should
@@ -252,7 +253,7 @@ MUNGE Installation Guide
       be owned by the same user ID that will run the munged daemon process,
       and its permissions should be set to 0600.  Additionally, this key
       file will need to be securely propagated (e.g., via ssh) to all hosts
-      within the security realm.
+      within the security domain.
 
    B. Setting command-line options
 
@@ -460,7 +461,7 @@ MUNGE Installation Guide
 
          A key has not been created.  See mungekey(8).  Note that this
          file will need to be securely propagated to all hosts within the
-         security realm.
+         security domain.
 
       9. munged: Error: Found pid 1234 bound to socket
          "/run/munge/munge.socket.2"

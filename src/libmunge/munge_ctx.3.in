@@ -102,7 +102,7 @@ Get or set the compression type (see \fBCOMPRESSION TYPES\fR).
 \fBMUNGE_OPT_REALM\fR , \fIchar *\fR
 Get or set the security realm, where the \fIchar *\fR type is a NUL-terminated
 character string.  The string returned by \fBmunge_ctx_get\fR() should not
-be freed or modified by the caller.  \fBNOT CURRENTLY SUPPORTED\fR.
+be freed or modified by the caller.
 .TP
 \fBMUNGE_OPT_TTL\fR , \fIint\fR
 Get or set the time-to-live (in seconds) (see \fBTTL TYPES\fR).  This value

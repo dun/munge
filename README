@@ -5,7 +5,7 @@ INTRODUCTION
   scalable for use in an HPC cluster environment.  It provides a portable
   API for encoding the user's identity into a tamper-proof credential
   that can be obtained by an untrusted client and forwarded by untrusted
-  intermediaries within a security realm.  Clients within this realm can
+  intermediaries within a security domain.  Clients within this domain can
   create and validate credentials without the use of root privileges,
   reserved ports, or platform-specific methods.
 
@@ -38,7 +38,7 @@ USAGE
   MUNGE service, either via the munge_encode() C library call or the
   munge executable.  The encoded credential contains the UID and GID of
   the originating process.  This process sends the credential to another
-  process within the security realm as a means of proving its identity.
+  process within the security domain as a means of proving its identity.
   The receiving process validates the credential with the use of its local
   MUNGE service, either via the munge_decode() C library call or the unmunge
   executable.  The decoded credential provides the receiving process with a
@@ -49,10 +49,10 @@ USAGE
 DETAILS
 
   The contents of the credential (including any optional payload data) are
-  encrypted with a key shared by all munged daemons within the security realm.
+  encrypted with a key shared by all munged daemons within the security domain.
   The integrity of the credential is ensured by a message authentication
   code (MAC).  The credential is valid for a limited time defined by its
-  time-to-live (TTL); this presumes clocks within a security realm are
+  time-to-live (TTL); this presumes clocks within a security domain are
   in sync.  Unexpired credentials are tracked by the local munged daemon in
   order to prevent replay attacks on a given host.  Decoding of a credential
   can be restricted to a particular user and/or group ID.  The payload data
