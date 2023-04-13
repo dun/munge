@@ -201,6 +201,13 @@ test_expect_success MUNGE_INSTALL 'remove key' '
     sudo rm -rf "${keyfiledir}"
 '
 
+# Remove the munge user and group created in the RPM specfile to ensure they
+#   will be recreated when the binary RPMs are installed.
+#
+test_expect_success MUNGE_INSTALL 'remove munge user' '
+    sudo userdel munge
+'
+
 # Remove the scratch directory unless [debug] is set.
 #
 test_expect_success 'cleanup' '
