@@ -2,6 +2,7 @@
 
 test_description="Because nothing is so simple that it can't still go wrong"
 
+: "${SHARNESS_TEST_OUTDIR:=$(pwd)}"
 : "${SHARNESS_TEST_SRCDIR:=$(cd "$(dirname "$0")" && pwd)}"
 . "${SHARNESS_TEST_SRCDIR}/sharness.sh"
 

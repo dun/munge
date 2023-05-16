@@ -2,6 +2,7 @@
 
 test_description='Check credential decode to verify crypto portability'
 
+: "${SHARNESS_TEST_OUTDIR:=$(pwd)}"
 : "${SHARNESS_TEST_SRCDIR:=$(cd "$(dirname "$0")" && pwd)}"
 . "${SHARNESS_TEST_SRCDIR}/sharness.sh"
 

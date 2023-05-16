@@ -2,6 +2,7 @@
 
 test_description='Check munged security of seedfile'
 
+: "${SHARNESS_TEST_OUTDIR:=$(pwd)}"
 : "${SHARNESS_TEST_SRCDIR:=$(cd "$(dirname "$0")" && pwd)}"
 . "${SHARNESS_TEST_SRCDIR}/sharness.sh"
 
