@@ -78,7 +78,8 @@
 #define OPT_SEED_FILE           268
 #define OPT_TRUSTED_GROUP       269
 #define OPT_ORIGIN              270
-#define OPT_LAST                271
+#define OPT_LISTEN_BACKLOG      271
+#define OPT_LAST                272
 
 const char * const short_opts = ":hLVfFMsS:v";
 
@@ -102,6 +103,7 @@ struct option long_opts[] = {
     { "group-check-mtime", required_argument, NULL, OPT_GROUP_CHECK   },
     { "group-update-time", required_argument, NULL, OPT_GROUP_UPDATE  },
     { "key-file",          required_argument, NULL, OPT_KEY_FILE      },
+    { "listen-backlog",    required_argument, NULL, OPT_LISTEN_BACKLOG},
     { "log-file",          required_argument, NULL, OPT_LOG_FILE      },
     { "max-ttl",           required_argument, NULL, OPT_MAX_TTL       },
     { "num-threads",       required_argument, NULL, OPT_NUM_THREADS   },
@@ -178,6 +180,7 @@ create_conf (void)
     conf->config_name = NULL;
     conf->lockfile_fd = -1;
     conf->lockfile_name = NULL;
+    conf->listen_backlog = MUNGE_SOCKET_BACKLOG;
 
     _conf_set_cwd (conf);
 
@@ -406,6 +409,17 @@ parse_cmdline (conf_t conf, int argc, char **argv)
             case OPT_KEY_FILE:
                 _conf_set_string (&conf->key_name, optarg, conf->cwd,
                         "key-file name");
+                break;
+            case OPT_LISTEN_BACKLOG:
+                errno = 0;
+                l = strtol (optarg, &p, 10);
+                if (((errno == ERANGE) && ((l == LONG_MIN) || (l == LONG_MAX)))
+                        || (optarg == p) || (*p != '\0')
+                        || (l <= 0) || (l > INT_MAX)) {
+                    log_err (EMUNGE_SNAFU, LOG_ERR,
+                        "Invalid value \"%s\" for listen-backlog", optarg);
+                }
+                conf->listen_backlog = l;
                 break;
             case OPT_LOG_FILE:
                 _conf_set_string (&conf->logfile_name, optarg, conf->cwd,
@@ -750,6 +764,9 @@ _conf_display_help (char *prog)
 
     printf ("  %*s %s [%s]\n", w, "--key-file=PATH",
             "Specify key file", MUNGE_KEYFILE_PATH);
+
+    printf ("  %*s %s [%d]\n", w, "--listen-backlog=INT",
+            "Specify listen backlog limit of socket", MUNGE_SOCKET_BACKLOG);
 
     printf ("  %*s %s [%s]\n", w, "--log-file=PATH",
             "Specify log file", MUNGE_LOGFILE_PATH);

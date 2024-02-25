@@ -131,6 +131,9 @@ triggered by a \fBSIGHUP\fR).  A value of \-1 causes it to be disabled.
 .BI "\-\-key\-file " path
 Specify an alternate pathname to the key file.
 .TP
+.BI "\-\-listen\-backlog " integer
+Specify an alternate listen backlog size of the local domain socket.
+.TP
 .BI "\-\-log\-file " path
 Specify an alternate pathname to the log file.
 .TP
