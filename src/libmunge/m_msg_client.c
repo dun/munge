@@ -214,10 +214,13 @@ _m_msg_client_connect (m_msg_t m, char *path)
     i = 1;
     while (1) {
         /*
-         * If a call to connect() for a Unix domain stream socket finds that
-         *   the listening socket's queue is full, ECONNREFUSED is returned
-         *   immediately.  (cf, Stevens UNPv1, s14.4, p378)
-         * If ECONNREFUSED, try again up to MUNGE_SOCKET_CONNECT_ATTEMPTS.
+         * Retry transient errors up to MUNGE_SOCKET_CONNECT_ATTEMPTS after a
+         *   linearly increasing backoff.
+         * Linux: connect() returns EAGAIN for nonblocking UNIX domain sockets
+         *   if the connection cannot be completed immediately.
+         *   [Linux man-pages 6.05.01]
+         * BSD: connect() returns ECONNREFUSED for UNIX domain stream sockets
+         *   when the listening socket's queue is full. [Stevens UNPv1]
          */
         n = connect (sd, (struct sockaddr *) &addr, sizeof (addr));
 
@@ -227,7 +230,7 @@ _m_msg_client_connect (m_msg_t m, char *path)
         if (errno == EINTR) {
             continue;
         }
-        if (errno != ECONNREFUSED) {
+        if ((errno != EAGAIN) && (errno != ECONNREFUSED)) {
             break;
         }
         if (i >= MUNGE_SOCKET_CONNECT_ATTEMPTS) {
