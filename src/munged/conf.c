@@ -415,11 +415,19 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                 l = strtol (optarg, &p, 10);
                 if (((errno == ERANGE) && ((l == LONG_MIN) || (l == LONG_MAX)))
                         || (optarg == p) || (*p != '\0')
-                        || (l <= 0) || (l > INT_MAX)) {
+                        || (l < -1) || (l > INT_MAX)) {
                     log_err (EMUNGE_SNAFU, LOG_ERR,
                         "Invalid value \"%s\" for listen-backlog", optarg);
                 }
-                conf->listen_backlog = l;
+                else if (l == 0) {
+                    conf->listen_backlog = MUNGE_SOCKET_BACKLOG;
+                }
+                else if (l == -1) {
+                    conf->listen_backlog = SOMAXCONN;
+                }
+                else {
+                    conf->listen_backlog = l;
+                }
                 break;
             case OPT_LOG_FILE:
                 _conf_set_string (&conf->logfile_name, optarg, conf->cwd,
