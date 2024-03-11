@@ -1,7 +1,7 @@
 # MUNGE src/libcommon/Makefile.am
 #
 # This file is part of the MUNGE Uid 'N' Gid Emporium (MUNGE).
-# For details, see <https://dun.github.io/munge/>.
+# For details, see <https://github.com/dun/munge>.
 
 include $(top_srcdir)/Make-inc.mk
 
