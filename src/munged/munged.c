@@ -670,12 +670,14 @@ sock_create (conf_t conf)
         log_errno (EMUNGE_SNAFU, LOG_ERR,
             "Failed to bind socket \"%s\"", conf->socket_name);
     }
-    if (listen (sd, MUNGE_SOCKET_BACKLOG) < 0) {
+    if (listen (sd, conf->listen_backlog) < 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR,
             "Failed to listen on socket \"%s\"", conf->socket_name);
     }
     conf->ld = sd;
     log_msg (LOG_INFO, "Created socket \"%s\"", conf->socket_name);
+    log_msg (LOG_INFO, "Set socket listen backlog to %d",
+            conf->listen_backlog);
     return;
 }
 

@@ -131,6 +131,12 @@ triggered by a \fBSIGHUP\fR).  A value of \-1 causes it to be disabled.
 .BI "\-\-key\-file " path
 Specify an alternate pathname to the key file.
 .TP
+.BI "\-\-listen\-backlog " integer
+Specify the socket's listen backlog limit; note that the kernel may impose
+a lower limit.  A value of 0 uses the software default.  A value of \-1
+specifies \fBSOMAXCONN\fR, the maximum listen backlog queue length defined
+in \fI<sys/socket.h>\fR.
+.TP
 .BI "\-\-log\-file " path
 Specify an alternate pathname to the log file.
 .TP
