@@ -1,7 +1,4 @@
 #******************************************************************************
-#  AUTHOR:
-#    Chris Dunlap <cdunlap@llnl.gov>
-#
 #  SYNOPSIS:
 #    X_AC_CHECK_OPENSSL
 #
