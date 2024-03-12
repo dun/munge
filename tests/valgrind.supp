@@ -1,4 +1,13 @@
 {
+   dl_open_worker-leak
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:?alloc
+   ...
+   fun:dl_open_worker
+}
+
+{
    dlopen-_dlerror_run-leak
    Memcheck:Leak
    match-leak-kinds: reachable
