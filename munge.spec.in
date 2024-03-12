@@ -1,3 +1,8 @@
+# This rpm specfile has been tested on the following systems:
+# - AlmaLinux 9, 8
+# - CentOS Stream 9, Stream 8, 7.9.2009
+# - Fedora 39, 38, 37
+
 Name:		munge
 Version:	@VERSION@
 Release:	1%{?dist}
