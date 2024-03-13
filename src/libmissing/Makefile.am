@@ -14,9 +14,6 @@ libmissing_la_LIBADD = \
 	# End of libmissing_la_LIBADD
 
 libmissing_la_SOURCES = \
-	getopt.h \
-	getopt.c \
-	getopt1.c \
 	missing.h \
 	# End of libmissing_la_SOURCES
 
