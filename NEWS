@@ -1,3 +1,7 @@
+munge-0.5.16 (2024-03-15):
+- Fixed connect failure retry for full socket listen queue. (f528358)
+- Added --listen-backlog cmdline opt. (#139)
+
 munge-0.5.15 (2022-06-22):
 - Added support for OpenSSL 3.0. (#110)
 - Fixed "make install" conflict with systemd RuntimeDirectory. (#82)

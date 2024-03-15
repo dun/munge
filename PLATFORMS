@@ -1,24 +1,22 @@
-MUNGE 0.5.15 has been built and tested on the following systems:
+MUNGE 0.5.16 has been built and tested on the following systems:
 
-- AlmaLinux 9.0, 8.6
+- AlmaLinux 9.3, 8.9
 - Arch Linux
-- CentOS Linux Stream 9, Stream 8, 8.5.2111, 7.9.2009, 6.10
-- Debian GNU/kFreeBSD bookworm/sid [amd64, i386]
-- Debian GNU/Linux sid, 11.3, 10.12, 9.13, 8.11, 7.11, 6.0.10, 5.0.10, 4.0
-- Fedora Linux 36, 35, 34
-- FreeBSD 13.1, 13.0, 12.3
-- NetBSD 9.2, 9.1, 9.0
-- OpenBSD 7.1, 7.0, 6.9
-- openSUSE Leap 15.4, 15.3, 15.2, 15.1
-- Raspbian GNU/Linux 10.12 [armv7l]
-- Ubuntu 22.04, 20.04.4, 18.04.6, 16.04.7, 14.04.6, 12.04.5
+- CentOS Linux Stream 9, Stream 8, 7.9.2009, 6.10
+- Debian sid, 12.5, 11.9, 10.13, 9.13, 8.11, 7.11, 6.0.10, 5.0.10, 4.0
+- Fedora 39, 38, 37
+- FreeBSD 14.0, 13.3, 13.2
+- NetBSD 9.3
+- OpenBSD 7.4, 7.3
+- openSUSE 15.5, 15.4
+- Ubuntu 23.10, 22.04.4, 20.04.6, 18.04.6, 16.04.7, 14.04.6
 
 RPMs built directly from the dist tarball have been installed and tested
 on the following x86_64 systems:
 
-- AlmaLinux 9.0, 8.6
-- CentOS Linux Stream 9, Stream 8, 8.5.2111, 7.9.2009
-- Fedora Linux 36, 35, 34
+- AlmaLinux 9.3, 8.9
+- CentOS Linux Stream 9, Stream 8, 7.9.2009
+- Fedora 39, 38, 37
 
 This release is backwards-compatible to 0.5; however, credentials
 encoded with the current default of MUNGE_MAC_SHA256 cannot be decoded
