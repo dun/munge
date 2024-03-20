@@ -557,6 +557,12 @@ dec_decrypt (munge_cred_t c)
     if (m->cipher == MUNGE_CIPHER_NONE) {
         return (0);
     }
+
+    conf_realm_t realm = get_realm(conf, m->realm_str);
+    if (!realm)
+        return (m_msg_set_err (m, EMUNGE_BAD_REALM,
+            strdup ("Unknown realm")));
+
     /*  Compute DEK.
      *  msg-dek = MAC (msg-mac) using DEK subkey
      */
@@ -569,7 +575,7 @@ dec_decrypt (munge_cred_t c)
     assert (c->dek_len <= sizeof (c->dek));
 
     n = c->dek_len;
-    if (mac_block (m->mac, conf->dek_key, conf->dek_key_len,
+    if (mac_block (m->mac, realm->dek_key, realm->dek_key_len,
             c->dek, &n, c->mac, c->mac_len) < 0) {
         return (m_msg_set_err (m, EMUNGE_SNAFU,
             strdup ("Failed to compute DEK")));
@@ -646,9 +652,14 @@ dec_validate_mac (munge_cred_t c)
     unsigned char  mac[MAX_MAC];        /* message authentication code       */
     int            n;                   /* all-purpose int                   */
 
+    conf_realm_t realm = get_realm (conf, m->realm_str);
+    if (!realm)
+        return (m_msg_set_err (m, EMUNGE_BAD_REALM,
+            strdup ("Unknown realm")));
+
     /*  Compute MAC.
      */
-    if (mac_init (&x, m->mac, conf->mac_key, conf->mac_key_len) < 0) {
+    if (mac_init (&x, m->mac, realm->mac_key, realm->mac_key_len) < 0) {
         goto err;
     }
     if (mac_update (&x, c->outer, c->outer_len) < 0) {

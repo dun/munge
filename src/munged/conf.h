@@ -33,11 +33,22 @@
 #include <munge.h>
 #include <netinet/in.h>
 #include "gids.h"
+#include "hash.h"
 
 
 /*****************************************************************************
  *  Data Types
  *****************************************************************************/
+
+struct conf_realm {
+    char           *key_name;           /* symmetric key filename            */
+    unsigned char  *dek_key;            /* subkey for cipher ops             */
+    int             dek_key_len;        /* length of cipher subkey           */
+    unsigned char  *mac_key;            /* subkey for mac ops                */
+    int             mac_key_len;        /* length of mac subkey              */
+};
+
+typedef struct conf_realm * conf_realm_t;
 
 struct conf {
     int             ld;                 /* listening socket descriptor       */
@@ -66,11 +77,7 @@ struct conf {
     char           *socket_name;        /* unix domain socket filename       */
     int             listen_backlog;     /* unix domain socket listen backlog */
     char           *seed_name;          /* random seed filename              */
-    char           *key_name;           /* symmetric key filename            */
-    unsigned char  *dek_key;            /* subkey for cipher ops             */
-    int             dek_key_len;        /* length of cipher subkey           */
-    unsigned char  *mac_key;            /* subkey for mac ops                */
-    int             mac_key_len;        /* length of mac subkey              */
+    hash_t          realms;             /* map of security realms by name    */
     char           *origin_name;        /* origin addr hostname/IP string    */
     char           *origin_ifname;      /* origin addr n/w interface name    */
     struct in_addr  addr;               /* origin addr in n/w byte order     */
@@ -106,7 +113,9 @@ void process_conf (conf_t conf);
 
 void write_origin_addr (conf_t conf);
 
-void create_subkeys (conf_t conf);
+void create_subkeys (conf_t conf, conf_realm_t realm);
+
+conf_realm_t get_realm (conf_t conf, const char *realm);
 
 
 #endif /* !MUNGE_CONF_H */

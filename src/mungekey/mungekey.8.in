@@ -32,6 +32,7 @@ mungekey \- MUNGE key management utility
 .SH SYNOPSIS
 .B mungekey
 [\fB\-c\fR] [\fB\-b\fR \fIbits\fR] [\fB\-f\fR] [\fB\-k\fR \fIkeyfile\fR]
+[\fB\-K\fR \fIkeydir\fR] [\fB\-r\fR \fIrealm\fR]
 [\fB\-v\fR]
 .br
 
@@ -40,12 +41,13 @@ The \fBmungekey\fR executable is the key management utility for MUNGE.
 It should be run by the same user that starts the \fBmunged\fR daemon.
 .PP
 If no options are specified, \fBmungekey\fR will attempt to create a new
-key using the default settings; this will fail if the keyfile already exists.
+key using the default settings; this will fail if the default \fIrealm\fR's
+keyfile already exists.
 .PP
-All \fBmunged\fR daemons within a security realm must use the same key.
-In other words, all hosts within an administrative group (or cluster)
-using MUNGE for authentication must use the same key; this keyfile can be
-created on one host and then securely copied to all other hosts.
+All hosts using MUNGE for authentication within an security domain must use
+the same shared symmetric key for each \fIrealm\fR each host should have
+access to; these keyfiles should be created on one host and then securely
+copied to other hosts.
 
 .SH OPTIONS
 .TP
@@ -62,7 +64,13 @@ Force the keyfile to be overwritten if it already exists.
 Display a summary of the command-line options.
 .TP
 .BI "\-k, \-\-keyfile " path
-Specify the keyfile pathname.
+Set keyfile to create. This can be overriden by \fB\-\-realm\fR.
+.TP
+.BI "\-K, \-\-keydir " path
+Directory for per-realm key files.
+.TP
+.BI "\-r, \-\-realm " realm
+Set keyfile to create based on \fB\-\-keydir\fR path and \fIrealm\fR name.
 .TP
 .BI "\-L, \-\-license"
 Display license information.

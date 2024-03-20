@@ -142,7 +142,7 @@ main (int argc, char *argv[])
             conf->seed_name = NULL;
         }
     }
-    create_subkeys (conf);
+    create_subkeys (conf, get_realm(conf, ""));
     conf->gids = gids_create (conf->gids_update_secs, conf->got_group_stat);
     replay_init ();
     timer_init ();

@@ -613,6 +613,13 @@ test_expect_success 'munge --ttl for invalid negative number' '
     test_must_fail "${MUNGE}" --socket="${MUNGE_SOCKET}" --no-input --ttl=-2
 '
 
+test_expect_success 'munge --realm roundtrip' '
+    "${MUNGE}" --socket="${MUNGE_SOCKET}" --no-input --realm=winterfell | \
+    "${UNMUNGE}" --socket="${MUNGE_SOCKET}" --key REALM | \
+    grep -q "^REALM: *winterfell"
+'
+
+
 test_expect_success 'stop munged' '
     munged_stop
 '

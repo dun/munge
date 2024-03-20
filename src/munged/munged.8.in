@@ -37,10 +37,11 @@ munged \- MUNGE daemon
 The \fBmunged\fR daemon is responsible for authenticating local MUNGE
 clients and servicing their credential encode & decode requests.
 .PP
-All \fBmunged\fR daemons within a security realm share a common key.
-All hosts within this realm are expected to have common users/UIDs and
-groups/GIDs.  The key is used to cryptographically protect the credentials;
-it is created with the \fBmungekey\fR command.
+All \fBmunged\fR daemons within a security domain share common keys for
+configured realms.  All hosts within this domain are expected to have
+common users/UIDs and groups/GIDs.  The keys are used to cryptographically
+validate the authenticity of credentials; they are created with the
+\fBmungekey\fR command.
 .PP
 When a credential is created, \fBmunged\fR embeds metadata within it
 including the effective UID and GID of the requesting client (as determined
@@ -128,7 +129,15 @@ A value of 0 causes it to be computed initially but never updated (unless
 triggered by a \fBSIGHUP\fR).  A value of \-1 causes it to be disabled.
 .TP
 .BI "\-\-key\-file " path
-Specify an alternate pathname to the key file.
+Specify pathname to the default realm's key file.
+.TP
+.BI "\-\-keydir " path
+Specify pathname to directory containing per-realm key files.
+.TP
+.BI "\-\-realm " realm
+Enable service for the given realm in addition to the default
+realm. Per-realm key file path is constructed from preceeding --keyfile
+option.
 .TP
 .BI "\-\-listen\-backlog " integer
 Specify the socket's listen backlog limit; note that the kernel may impose
@@ -185,12 +194,12 @@ Terminate the daemon.
 .\" .SH FILES
 
 .SH NOTES
-All clocks within a security realm must be kept in sync within the credential
-time-to-live setting.
+All clocks within a security domain must be kept in sync within the
+credential time-to-live setting.
 .PP
 While \fBmunged\fR prevents a given credential from being decoded on a
 particular host more than once, nothing prevents a credential from being
-decoded on multiple hosts within the security realm before it expires.
+decoded on multiple hosts within the security domain before it expires.
 
 .SH AUTHOR
 Chris Dunlap <cdunlap@llnl.gov>
