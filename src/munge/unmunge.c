@@ -48,9 +48,9 @@
 #include <unistd.h>
 #include <munge.h>
 #include "common.h"
+#include "inet_ntop.h"
 #include "license.h"
 #include "log.h"
-#include "missing.h"                    /* for inet_ntop()                   */
 #include "read.h"
 #include "version.h"
 #include "xsignal.h"

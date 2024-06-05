@@ -58,12 +58,12 @@
 #include "lock.h"
 #include "log.h"
 #include "md.h"
-#include "missing.h"
 #include "munge_defs.h"
 #include "path.h"
 #include "random.h"
 #include "replay.h"
 #include "str.h"
+#include "strlcpy.h"
 #include "timer.h"
 #include "xsignal.h"
 

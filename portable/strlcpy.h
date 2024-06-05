@@ -1,8 +1,13 @@
+#ifndef MUNGE_STRLCPY_H
+#define MUNGE_STRLCPY_H
+
 #if HAVE_CONFIG_H
-#  include "config.h"
+#include "config.h"
 #endif /* HAVE_CONFIG_H */
 
-#if !HAVE_STRLCPY
+#if HAVE_STRLCPY
+#include <string.h>
+#else /* !HAVE_STRLCPY */
 size_t strlcpy(char *dst, const char *src, size_t siz);
 /*
  *  Copy src to string dst of size siz.  At most siz-1 characters
@@ -10,3 +15,5 @@ size_t strlcpy(char *dst, const char *src, size_t siz);
  *  Returns strlen(src); if retval >= siz, truncation occurred.
  */
 #endif /* !HAVE_STRLCPY */
+
+#endif /* !MUNGE_STRLCPY_H */

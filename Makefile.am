@@ -35,6 +35,9 @@ EXTRA_DIST = \
 	build-aux/gen-version \
 	build-aux/tap-driver.sh \
 	doc \
+	portable/inet_ntop.h \
+	portable/strlcat.h \
+	portable/strlcpy.h \
 	$(TEMPLATE_FILES) \
 	# End of EXTRA_DIST
 
@@ -65,7 +68,6 @@ MAINTAINERCLEANFILES = \
 	src/Makefile.in \
 	src/etc/Makefile.in \
 	src/libcommon/Makefile.in \
-	src/libmissing/Makefile.in \
 	src/libmunge/Makefile.in \
 	src/munge/Makefile.in \
 	src/munged/Makefile.in \

@@ -39,13 +39,11 @@ mungekey_CPPFLAGS = \
 	-DSYSCONFDIR='"$(sysconfdir)"' \
 	-I$(top_srcdir)/src/common \
 	-I$(top_srcdir)/src/libcommon \
-	-I$(top_srcdir)/src/libmissing \
 	-I$(top_srcdir)/src/libmunge \
 	# End of mungekey_CPPFLAGS
 
 mungekey_LDADD = \
 	$(top_builddir)/src/libcommon/libcommon.la \
-	$(top_builddir)/src/libmissing/libmissing.la \
 	$(top_builddir)/src/libmunge/libmunge.la \
 	$(CRYPTO_LIBS) \
 	# End of mungekey_LDADD

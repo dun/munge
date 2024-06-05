@@ -9,7 +9,6 @@ SUBDIRS = \
 	common \
 	etc \
 	libcommon \
-	libmissing \
 	libmunge \
 	libtap \
 	munge \
