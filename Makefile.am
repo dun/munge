@@ -65,7 +65,6 @@ MAINTAINERCLEANFILES = \
 	src/Makefile.in \
 	src/etc/Makefile.in \
 	src/libcommon/Makefile.in \
-	src/libmissing/Makefile.in \
 	src/libmunge/Makefile.in \
 	src/munge/Makefile.in \
 	src/munged/Makefile.in \

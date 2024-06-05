@@ -41,13 +41,11 @@ bin_PROGRAMS = \
 munge_CPPFLAGS = \
 	-I$(top_srcdir)/src/common \
 	-I$(top_srcdir)/src/libcommon \
-	-I$(top_srcdir)/src/libmissing \
 	-I$(top_srcdir)/src/libmunge \
 	# End of munge_CPPFLAGS
 
 munge_LDADD = \
 	$(top_builddir)/src/libcommon/libcommon.la \
-	$(top_builddir)/src/libmissing/libmissing.la \
 	$(top_builddir)/src/libmunge/libmunge.la \
 	# End of munge_LDADD
 
@@ -69,13 +67,11 @@ remunge_CPPFLAGS = \
 	-DWITH_PTHREADS \
 	-I$(top_srcdir)/src/common \
 	-I$(top_srcdir)/src/libcommon \
-	-I$(top_srcdir)/src/libmissing \
 	-I$(top_srcdir)/src/libmunge \
 	# End of remunge_CPPFLAGS
 
 remunge_LDADD = \
 	$(top_builddir)/src/libcommon/libcommon.la \
-	$(top_builddir)/src/libmissing/libmissing.la \
 	$(top_builddir)/src/libmunge/libmunge.la \
 	$(LIBPTHREAD) \
 	# End of remunge_LDADD
@@ -93,15 +89,15 @@ remunge_SOURCES = \
 	# End of remunge_SOURCES
 
 unmunge_CPPFLAGS = \
+	-I$(top_srcdir)/portable \
 	-I$(top_srcdir)/src/common \
 	-I$(top_srcdir)/src/libcommon \
-	-I$(top_srcdir)/src/libmissing \
 	-I$(top_srcdir)/src/libmunge \
 	# End of unmunge_CPPFLAGS
 
 unmunge_LDADD = \
+	$(LIBOBJS) \
 	$(top_builddir)/src/libcommon/libcommon.la \
-	$(top_builddir)/src/libmissing/libmissing.la \
 	$(top_builddir)/src/libmunge/libmunge.la \
 	# End of unmunge_LDADD
 

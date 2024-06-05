@@ -25,13 +25,22 @@
  *****************************************************************************/
 
 
-#ifndef MUNGE_MISSING_H
-#define MUNGE_MISSING_H
+#ifndef MUNGE_INET_NTOP_H
+#define MUNGE_INET_NTOP_H
 
-/*  These contain prototypes and whatnot for libmissing.
- */
-#include "inet_ntop.h"
-#include "strlcat.h"
-#include "strlcpy.h"
+#if HAVE_CONFIG_H
+#include "config.h"
+#endif /* HAVE_CONFIG_H */
 
-#endif /* !MUNGE_MISSING_H */
+#ifndef INET_ADDRSTRLEN
+#define INET_ADDRSTRLEN 16
+#endif /* !INET_ADDRSTRLEN */
+
+#if HAVE_INET_NTOP
+#include <arpa/inet.h>
+#else  /* !HAVE_INET_NTOP */
+#include <sys/socket.h>
+const char *inet_ntop (int af, const void *src, char *dst, socklen_t cnt);
+#endif /* !HAVE_INET_NTOP */
+
+#endif /* !MUNGE_INET_NTOP_H */

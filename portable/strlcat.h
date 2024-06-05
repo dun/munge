@@ -1,8 +1,13 @@
+#ifndef MUNGE_STRLCAT_H
+#define MUNGE_STRLCAT_H
+
 #if HAVE_CONFIG_H
-#  include "config.h"
+#include "config.h"
 #endif /* HAVE_CONFIG_H */
 
-#if !HAVE_STRLCAT
+#if HAVE_STRLCAT
+#include <string.h>
+#else /* !HAVE_STRLCAT */
 size_t strlcat(char *dst, const char *src, size_t siz);
 /*
  *  Appends src to string dst of size siz (unlike strncat, siz is the
@@ -12,3 +17,5 @@ size_t strlcat(char *dst, const char *src, size_t siz);
  *  If retval >= siz, truncation occurred.
  */
 #endif /* !HAVE_STRLCAT */
+
+#endif /* !MUNGE_STRLCAT_H */

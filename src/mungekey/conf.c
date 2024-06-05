@@ -40,7 +40,6 @@
 #include "conf.h"
 #include "license.h"
 #include "log.h"
-#include "missing.h"
 #include "munge_defs.h"
 #include "version.h"
 

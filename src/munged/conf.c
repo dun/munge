@@ -29,7 +29,6 @@
 #  include <config.h>
 #endif /* HAVE_CONFIG_H */
 
-#include <arpa/inet.h>                  /* for inet_ntop() */
 #include <assert.h>
 #include <errno.h>
 #include <fcntl.h>
@@ -45,11 +44,11 @@
 #include <munge.h>
 #include "clock.h"
 #include "conf.h"
+#include "inet_ntop.h"
 #include "license.h"
 #include "lock.h"
 #include "log.h"
 #include "md.h"
-#include "missing.h"                    /* for inet_ntop() */
 #include "munge_defs.h"
 #include "net.h"
 #include "path.h"

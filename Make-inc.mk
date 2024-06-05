@@ -6,7 +6,6 @@
 # Dependencies to ensure libraries get rebuilt.
 #
 $(top_builddir)/src/libcommon/libcommon.la \
-$(top_builddir)/src/libmissing/libmissing.la \
 $(top_builddir)/src/libmunge/libmunge.la \
 $(top_builddir)/src/libtap/libtap.la \
 : force-dependency-check

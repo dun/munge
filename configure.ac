@@ -12,6 +12,7 @@ AC_SUBST([DATE], m4_esyscmd([build-aux/gen-date]))
 
 AC_CONFIG_AUX_DIR([build-aux])
 AC_CONFIG_HEADERS([config.h])
+AC_CONFIG_LIBOBJ_DIR([portable])
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_SRCDIR([src/libmunge/munge.h])
 AC_REQUIRE_AUX_FILE([tap-driver.sh])
@@ -25,7 +26,7 @@ X_AC_WITH_LOGROTATEDDIR
 X_AC_WITH_PKGCONFIGDIR
 X_AC_HUMOR
 
-AM_INIT_AUTOMAKE([1.12 foreign dist-xz no-dist-gzip])
+AM_INIT_AUTOMAKE([1.12 foreign dist-xz no-dist-gzip subdir-objects])
 AM_MAINTAINER_MODE
 AM_SILENT_RULES([yes])
 AC_USE_SYSTEM_EXTENSIONS
@@ -121,7 +122,6 @@ AC_CONFIG_FILES( \
   src/common/Makefile \
   src/etc/Makefile \
   src/libcommon/Makefile \
-  src/libmissing/Makefile \
   src/libmunge/Makefile \
   src/libtap/Makefile \
   src/munge/Makefile \

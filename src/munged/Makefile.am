@@ -40,15 +40,15 @@ munged_CPPFLAGS = \
 	-DRUNSTATEDIR='"$(runstatedir)"' \
 	-DSYSCONFDIR='"$(sysconfdir)"' \
 	-DWITH_PTHREADS \
+	-I$(top_srcdir)/portable \
 	-I$(top_srcdir)/src/common \
 	-I$(top_srcdir)/src/libcommon \
-	-I$(top_srcdir)/src/libmissing \
 	-I$(top_srcdir)/src/libmunge \
 	# End of munged_CPPFLAGS
 
 munged_LDADD = \
+	$(LIBOBJS) \
 	$(top_builddir)/src/libcommon/libcommon.la \
-	$(top_builddir)/src/libmissing/libmissing.la \
 	$(top_builddir)/src/libmunge/libmunge.la \
 	$(LIBPTHREAD) \
 	$(LIBBZ2) \
