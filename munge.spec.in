@@ -91,6 +91,8 @@ sed -i 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' libtool
 
 %install
 %make_install
+mkdir -p %{buildroot}%{_sysconfdir}/munge
+mkdir -p %{buildroot}%{_localstatedir}/(lib,log}/munge
 touch %{buildroot}%{_sysconfdir}/munge/munge.key
 touch %{buildroot}%{_localstatedir}/lib/munge/munged.seed
 touch %{buildroot}%{_localstatedir}/log/munge/munged.log
