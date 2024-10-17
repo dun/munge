@@ -22,6 +22,9 @@ TESTS = \
 	0022-munge-valgrind.t \
 	0023-unmunge-valgrind.t \
 	0025-mungekey-valgrind.t \
+	0096-credential-expired.t \
+	0097-credential-rewound.t \
+	0098-credential-replayed.t \
 	0099-credential-decode.t \
 	0100-munged-lock.t \
 	0101-munged-security-socket.t \
