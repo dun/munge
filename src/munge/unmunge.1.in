@@ -81,6 +81,12 @@ to group names, and cipher/mac/zip type lookups.
 .TP
 .BI "\-S, \-\-socket " path
 Specify the local socket for connecting with \fBmunged\fR.
+.TP
+.BI "\-\-ignore\-ttl"
+Ignore expired, rewound, and replayed errors.
+.TP
+.BI "\-\-ignore\-replay"
+Ignore replayed errors.
 
 .SH "METADATA KEYS"
 The following metadata keys are supported.

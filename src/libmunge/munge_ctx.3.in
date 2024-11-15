@@ -134,6 +134,17 @@ Get or set the GID allowed to decode the credential (see \fBUID & GID
 TYPES\fR).  This value will be matched against the effective group ID of
 the process requesting the credential decode, as well as each supplementary
 group of which the effective user ID of that process is a member.
+.TP
+\fBMUNGE_OPT_IGNORE_TTL\fR , \fIint\fR
+Get or set the "ignore-ttl" flag.  If this is set to 1, TTL-related errors will
+be ignored.  \fBmunge_decode()\fR will return \fBEMUNGE_SUCCESS\fR instead of
+\fBEMUNGE_CRED_EXPIRED\fR, \fBEMUNGE_CRED_REWOUND\fR, or
+\fBEMUNGE_CRED_REPLAYED\fR.
+.TP
+\fBMUNGE_OPT_IGNORE_REPLAY\fR , \fIint\fR
+Get or set the "ignore-replay" flag.  If this is set to 1, replay errors will
+be ignored.  \fBmunge_decode()\fR will return \fBEMUNGE_SUCCESS\fR instead of
+\fBEMUNGE_CRED_REPLAYED\fR.
 
 .SH "CIPHER TYPES"
 Credentials can be encrypted using the secret key shared by all \fBmunged\fR

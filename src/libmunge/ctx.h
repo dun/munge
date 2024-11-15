@@ -53,7 +53,14 @@ struct munge_ctx {
     char               *socket_str;     /* munge domain sock filename w/ NUL */
     munge_err_t         error_num;      /* munge error status                */
     char               *error_str;      /* munge error string with NUL       */
+    unsigned            flags;          /* bitwise-flags                     */
 };
+
+typedef enum munge_ctx_flag {
+    MUNGE_CTX_FLAG_NONE                 = 0x00,
+    MUNGE_CTX_FLAG_IGNORE_TTL           = 0x01,
+    MUNGE_CTX_FLAG_IGNORE_REPLAY        = 0x02
+} munge_ctx_flag_t;
 
 
 /*****************************************************************************

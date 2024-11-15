@@ -152,22 +152,29 @@ display_key_t munge_keys[] = {
  *  Command-Line Options
  *****************************************************************************/
 
+/*  Long-opt-only values
+ */
+#define OPT_IGNORE_TTL          256
+#define OPT_IGNORE_REPLAY       257
+
 const char * const short_opts = ":hLVi:nm:o:k:KNS:";
 
 #include <getopt.h>
 struct option long_opts[] = {
-    { "help",      no_argument,       NULL, 'h' },
-    { "license",   no_argument,       NULL, 'L' },
-    { "version",   no_argument,       NULL, 'V' },
-    { "input",     required_argument, NULL, 'i' },
-    { "no-output", no_argument,       NULL, 'n' },
-    { "metadata",  required_argument, NULL, 'm' },
-    { "output",    required_argument, NULL, 'o' },
-    { "keys",      required_argument, NULL, 'k' },
-    { "list-keys", no_argument,       NULL, 'K' },
-    { "numeric",   no_argument,       NULL, 'N' },
-    { "socket",    required_argument, NULL, 'S' },
-    {  NULL,       0,                 NULL,  0  }
+    { "help", no_argument, NULL, 'h' },
+    { "license", no_argument, NULL, 'L' },
+    { "version", no_argument, NULL, 'V' },
+    { "input", required_argument, NULL, 'i' },
+    { "no-output", no_argument, NULL, 'n' },
+    { "metadata", required_argument, NULL, 'm' },
+    { "output", required_argument, NULL, 'o' },
+    { "keys", required_argument, NULL, 'k' },
+    { "list-keys", no_argument, NULL, 'K' },
+    { "numeric", no_argument, NULL, 'N' },
+    { "socket", required_argument, NULL, 'S' },
+    { "ignore-ttl", no_argument, NULL, OPT_IGNORE_TTL },
+    { "ignore-replay", no_argument, NULL, OPT_IGNORE_REPLAY },
+    { NULL, 0, NULL, 0 }
 };
 
 
@@ -193,6 +200,8 @@ struct conf {
     char         key[ MUNGE_KEY_LAST ]; /* key flag array (true if enabled)  */
     int          key_width;             /* num chars reserved for key field  */
     unsigned     got_numeric:1;         /* flag for NUMERIC option           */
+    unsigned     is_ttl_ignored:1;
+    unsigned     is_replay_ignored:1;
 };
 
 
@@ -279,6 +288,8 @@ create_conf (void)
     }
     conf->key_width = maxlen + 1;       /* separate longest key by one space */
     conf->got_numeric = 0;
+    conf->is_ttl_ignored = 0;
+    conf->is_replay_ignored = 0;
 
     return (conf);
 }
@@ -400,6 +411,12 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                             (p ? p : "Unspecified error"));
                 }
                 break;
+            case OPT_IGNORE_TTL:
+                conf->is_ttl_ignored = 1;
+                break;
+            case OPT_IGNORE_REPLAY:
+                conf->is_replay_ignored = 1;
+                break;
             case '?':
                 if (optopt > 0) {
                     log_err (EMUNGE_SNAFU, LOG_ERR,
@@ -452,6 +469,21 @@ parse_cmdline (conf_t conf, int argc, char **argv)
             conf->key[i] = 1;
         }
     }
+    if (conf->is_ttl_ignored) {
+        munge_err_t e;
+        e = munge_ctx_set (conf->ctx, MUNGE_OPT_IGNORE_TTL, 1);
+        if (e != EMUNGE_SUCCESS) {
+            log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to ignore ttl errors");
+        }
+    }
+    if (conf->is_replay_ignored) {
+        munge_err_t e;
+        e = munge_ctx_set (conf->ctx, MUNGE_OPT_IGNORE_REPLAY, 1);
+        if (e != EMUNGE_SUCCESS) {
+            log_errno (EMUNGE_SNAFU, LOG_ERR,
+                    "Failed to ignore replay errors");
+        }
+    }
     return;
 }
 
@@ -502,6 +534,13 @@ display_help (char *prog)
 
     printf ("  %*s %s\n", w, "-S, --socket=PATH",
             "Specify local socket for munged");
+
+    printf ("\n");
+
+    printf ("  %*s %s\n", w, "--ignore-ttl",
+            "Ignore expired, rewound, and replayed errors");
+
+    printf ("  %*s %s\n", w, "--ignore-replay", "Ignore replayed errors");
 
     printf ("\n");
     printf ("By default, credential read from stdin, "

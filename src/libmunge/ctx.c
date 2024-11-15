@@ -65,6 +65,7 @@ munge_ctx_create (void)
     ctx->socket_str = strdup (MUNGE_SOCKET_NAME);
     ctx->error_num = EMUNGE_SUCCESS;
     ctx->error_str = NULL;
+    ctx->flags = 0;
 
     if (!ctx->socket_str) {
         munge_ctx_destroy (ctx);
@@ -218,6 +219,14 @@ munge_ctx_get (munge_ctx_t ctx, int opt, ...)
             p2gid = va_arg (vargs, gid_t *);
             *p2gid = ctx->auth_gid;
             break;
+        case MUNGE_OPT_IGNORE_TTL:
+            p2int = va_arg (vargs, int *);
+            *p2int = !!(ctx->flags & MUNGE_CTX_FLAG_IGNORE_TTL);
+            break;
+        case MUNGE_OPT_IGNORE_REPLAY:
+            p2int = va_arg (vargs, int *);
+            *p2int = !!(ctx->flags & MUNGE_CTX_FLAG_IGNORE_REPLAY);
+            break;
         default:
             ctx->error_num = EMUNGE_BAD_ARG;
             break;
@@ -295,6 +304,18 @@ munge_ctx_set (munge_ctx_t ctx, int opt, ...)
             break;
         case MUNGE_OPT_GID_RESTRICTION:
             ctx->auth_gid = va_arg (vargs, gid_t);
+            break;
+        case MUNGE_OPT_IGNORE_TTL:
+            if (va_arg (vargs, int))
+                ctx->flags |= MUNGE_CTX_FLAG_IGNORE_TTL;
+            else
+                ctx->flags &= ~MUNGE_CTX_FLAG_IGNORE_TTL;
+            break;
+        case MUNGE_OPT_IGNORE_REPLAY:
+            if (va_arg (vargs, int))
+                ctx->flags |= MUNGE_CTX_FLAG_IGNORE_REPLAY;
+            else
+                ctx->flags &= ~MUNGE_CTX_FLAG_IGNORE_REPLAY;
             break;
         case MUNGE_OPT_ADDR4:
             /* this option cannot be set; fall through to error case */

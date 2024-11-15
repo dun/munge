@@ -55,6 +55,8 @@ static munge_err_t _decode_req (m_msg_t m, munge_ctx_t ctx,
 static munge_err_t _decode_rsp (m_msg_t m, munge_ctx_t ctx,
     void **buf, int *len, uid_t *uid, gid_t *gid);
 
+static munge_err_t _decode_ignore (m_msg_t m, munge_ctx_t ctx);
+
 
 /*****************************************************************************
  *  Public Functions
@@ -91,6 +93,9 @@ munge_decode (const char *cred, munge_ctx_t ctx,
     /*  Clean up and return.
      */
     if (ctx) {
+        if ((e != EMUNGE_SUCCESS) && ctx->flags) {
+            e = _decode_ignore (m, ctx);
+        }
         _munge_ctx_set_err (ctx, e, m->error_str);
         m->error_is_copy = 1;
     }
@@ -213,6 +218,44 @@ _decode_rsp (m_msg_t m, munge_ctx_t ctx,
     }
     if (gid) {
         *gid = m->cred_gid;
+    }
+    return (m->error_num);
+}
+
+
+static munge_err_t
+_decode_ignore (m_msg_t m, munge_ctx_t ctx)
+{
+/*  Process the IGNORE_TTL and IGNORE_REPLAY flags in the client to avoid
+ *    changing the client/server protocol and breaking the ABI.
+ *  The IGNORE_TTL flag causes SUCCESS to be returned instead of EXPIRED,
+ *    REWOUND, or REPLAYED errors.  EXPIRED and REWOUND directly rely on the
+ *    ttl skew from the decode time, whereas REPLAYED state is only held until
+ *    the credential has expired as determined by its ttl).
+ *  The IGNORE_REPLAY flag causes SUCCESS to be returned instead of REPLAYED
+ *    errors only.
+ *  Note that when an error is ignored, only error_num is updated here;
+ *    error_str is left unchanged for m_msg_destroy() to clean up.
+ *  FIXME: Move this processing to the server when the protocol is revisited.
+ */
+    assert (m != NULL);
+    assert (ctx != NULL);
+
+    switch (m->error_num) {
+        case EMUNGE_CRED_EXPIRED:
+            /* fall-thru */
+        case EMUNGE_CRED_REWOUND:
+            if (ctx->flags & MUNGE_CTX_FLAG_IGNORE_TTL) {
+                m->error_num = EMUNGE_SUCCESS;
+            }
+            break;
+        case EMUNGE_CRED_REPLAYED:
+            if (ctx->flags &
+                    (MUNGE_CTX_FLAG_IGNORE_TTL |
+                     MUNGE_CTX_FLAG_IGNORE_REPLAY)) {
+                m->error_num = EMUNGE_SUCCESS;
+            }
+            break;
     }
     return (m->error_num);
 }

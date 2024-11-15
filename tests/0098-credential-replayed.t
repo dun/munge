@@ -61,6 +61,26 @@ test_expect_success 'verify replayed credential output' '
     test_cmp cred.$$.initial.match cred.$$.replayed.match
 '
 
+# Decode the same (replayed unexpired) credential with --ignore-replay
+#   (MUNGE_OPT_IGNORE_REPLAY).
+#
+test_expect_success 'replay credential with --ignore-replay' '
+    "${UNMUNGE}" --socket="${MUNGE_SOCKET}" --ignore-replay --numeric \
+        <cred.$$ >cred.$$.replayed.ignore.replay.out &&
+    cat cred.$$.replayed.ignore.replay.out && echo
+'
+
+# Decode the same (replayed unexpired) credential with --ignore-ttl
+#   (MUNGE_OPT_IGNORE_TTL).
+# This should also cause replay errors to be ignored since the replay state is
+#   only held until the credential has expired as determined by its ttl.
+#
+test_expect_success 'replay credential with --ignore-ttl' '
+    "${UNMUNGE}" --socket="${MUNGE_SOCKET}" --ignore-ttl --numeric \
+        <cred.$$ >cred.$$.replayed.ignore.ttl.out &&
+    cat cred.$$.replayed.ignore.ttl.out && echo
+'
+
 # Stop the daemon.
 #
 test_expect_success 'stop munged' '

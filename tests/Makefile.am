@@ -10,7 +10,7 @@ TEST_EXTENSIONS = .t
 T_LOG_DRIVER = \
 	env AM_TAP_AWK='$(AWK)' $(SHELL) $(top_srcdir)/build-aux/tap-driver.sh
 
-TESTS = \
+test_scripts = \
 	0001-env-vars.t \
 	0002-smiple.t \
 	0010-basic.t \
@@ -34,10 +34,33 @@ TESTS = \
 	0105-munged-security-seedfile.t \
 	0110-munged-origin-addr.t \
 	1000-chaos-rpm.t \
+	# End of test_scripts
+
+test_programs = \
+	ctx_opt_ignore.t \
+	# End of test_programs
+
+ctx_opt_ignore_t_CPPFLAGS = \
+	-I$(top_srcdir)/src/libmunge \
+	-I$(top_srcdir)/src/libtap \
+	# End of ctx_opt_ignore_t_CPPFLAGS
+
+ctx_opt_ignore_t_LDADD = \
+	$(top_builddir)/src/libmunge/libmunge.la \
+	$(top_builddir)/src/libtap/libtap.la \
+	# End of ctx_opt_ignore_t_LDADD
+
+ctx_opt_ignore_t_SOURCES = \
+	ctx_opt_ignore.c \
+	# End of ctx_opt_ignore_t_SOURCES
+
+TESTS = \
+	$(test_scripts) \
+	$(test_programs) \
 	# End of TESTS
 
 EXTRA_DIST = \
-	$(TESTS) \
+	$(test_scripts) \
 	0099-credential-decode.cred \
 	0099-credential-decode.key \
 	0099-credential-decode.out \
@@ -47,6 +70,11 @@ EXTRA_DIST = \
 	valgrind.supp \
 	# End of EXTRA_DIST
 
+EXTRA_PROGRAMS = \
+	$(test_programs) \
+	# End of EXTRA_PROGRAMS
+
 clean-local:
+	-rm -f $(test_programs)
 	-rm -rf test-results
 	-rm -rf trash*directory.*

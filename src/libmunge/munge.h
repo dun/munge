@@ -67,7 +67,9 @@ typedef enum munge_opt {
     MUNGE_OPT_DECODE_TIME       =  7,   /* time when cred decoded (time_t)   */
     MUNGE_OPT_SOCKET            =  8,   /* socket for comm w/ daemon (str)   */
     MUNGE_OPT_UID_RESTRICTION   =  9,   /* UID able to decode cred (uid_t)   */
-    MUNGE_OPT_GID_RESTRICTION   = 10    /* GID able to decode cred (gid_t)   */
+    MUNGE_OPT_GID_RESTRICTION   = 10,   /* GID able to decode cred (gid_t)   */
+    MUNGE_OPT_IGNORE_TTL        = 11,   /* ignore ttl/replay errors (int)    */
+    MUNGE_OPT_IGNORE_REPLAY     = 12    /* ignore replay errors (int)        */
 } munge_opt_t;
 
 /*  MUNGE symmetric cipher types

@@ -41,7 +41,7 @@ lib_LTLIBRARIES = \
 	# End of lib_LTLIBRARIES
 
 LT_CURRENT = 2
-LT_REVISION = 0
+LT_REVISION = 1
 LT_AGE = 0
 
 libmunge_la_CPPFLAGS = \

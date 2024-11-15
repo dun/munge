@@ -37,7 +37,8 @@ test_expect_success 'start munged' '
     munged_start
 '
 
-# Encode a credential.
+# Encode some credentials.  The second one is for testing --ignore-ttl without
+#   relying on the behavior of restarting munged to clear its replay cache.
 # Provide [TTL], [TTL_SKEW], and [NOW] for later checks.
 #
 test_expect_success 'encode credential' '
@@ -45,7 +46,9 @@ test_expect_success 'encode credential' '
     TTL_SKEW=5 &&
     NOW=$(date +%s) &&
     "${MUNGE}" --socket="${MUNGE_SOCKET}" --string="xyzzy-$$" --ttl=${TTL} \
-        </dev/null >cred.$$
+        </dev/null >cred.$$ &&
+    "${MUNGE}" --socket="${MUNGE_SOCKET}" --string="xyzzy-$$" --ttl=${TTL} \
+        </dev/null >cred2.$$
 '
 
 # Stop the daemon.
@@ -139,6 +142,25 @@ test_expect_success 'verify replayed expired credential output' '
     grep -E -v "DECODE_TIME:" <cred.$$.expired.out >cred.$$.expired.match &&
     grep -E -v "DECODE_TIME:" <cred.$$.replayed.out >cred.$$.replayed.match &&
     test_cmp cred.$$.expired.match cred.$$.replayed.match
+'
+
+# Decode the same (replayed expired) credential yet again but now with
+#   --ignore-ttl (MUNGE_OPT_IGNORE_TTL).
+# Expect success instead of EMUNGE_CRED_REPLAYED since --ignore-ttl will ignore
+#   expired, rewound, and replayed errors.
+#
+test_expect_success 'replay expired credential with --ignore-ttl' '
+    "${UNMUNGE}" --socket="${MUNGE_SOCKET}" --ignore-ttl --numeric <cred.$$ \
+        >cred.$$.replayed.ignore.ttl.out &&
+    cat cred.$$.replayed.ignore.ttl.out && echo
+'
+
+# Decode a new expired credential with --ignore-ttl (MUNGE_OPT_IGNORE_TTL).
+#
+test_expect_success 'decode new expired credential with --ignore-ttl' '
+    "${UNMUNGE}" --socket="${MUNGE_SOCKET}" --ignore-ttl --numeric <cred2.$$ \
+        >cred.$$.expired.ignore.ttl.out &&
+    cat cred.$$.expired.ignore.ttl.out && echo
 '
 
 # Stop the daemon.

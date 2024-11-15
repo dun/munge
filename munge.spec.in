@@ -197,4 +197,4 @@ systemd-tmpfiles --create %{_tmpfilesdir}/munge.conf
 
 %files libs
 %{_libdir}/libmunge.so.2
-%{_libdir}/libmunge.so.2.0.0
+%{_libdir}/libmunge.so.2.0.1
