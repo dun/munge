@@ -127,18 +127,18 @@ and decoding hosts do not match.  Another possibility is that the credential
 has been altered since it was encoded.
 .TP
 .B EMUNGE_CRED_EXPIRED
-The credential has expired.  This means more than TTL seconds have elapsed
-since the credential was encoded.  Another possibility is that the clocks
-on the encoding and decoding hosts are out of sync.
+The credential was successfully decoded, but its decode time is later than its
+encode time by more than its TTL.  The clocks on the encoding and decoding
+hosts could be out of sync.
 .TP
 .B EMUNGE_CRED_REWOUND
-The credential appears to have been encoded at some point in the future.
-This means the clock on the decoding host is slower than that of the
-encoding host by more than the allowable clock skew.  More than likely,
-the clocks on the encoding and decoding hosts are out of sync.
+The credential was successfully decoded, but its decode time is earlier than
+its encode time by more than its TTL.  The clocks on the encoding and decoding
+hosts are out of sync.
 .TP
 .B EMUNGE_CRED_REPLAYED
-The credential has been previously decoded on this host.
+The credential was successfully decoded, but it has been previously decoded on
+this host within its TTL skew.
 .TP
 .B EMUNGE_CRED_UNAUTHORIZED
 The client is not authorized to decode the credential based upon the
