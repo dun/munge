@@ -149,29 +149,29 @@ The following example program illustrates the use of a MUNGE credential to
 ascertain the effective user and group ID of the encoding process.
 .PP
 .nf
-#include <stdio.h>                      /* for printf() */
-#include <stdlib.h>                     /* for exit() & free() */
-#include <unistd.h>                     /* for uid_t & gid_t */
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
 #include <munge.h>
 .sp
 int
 main (int argc, char *argv[])
 {
-    char        *cred;
-    munge_err_t  err;
-    uid_t        uid;
-    gid_t        gid;
+    char *cred;
+    munge_err_t err;
+    uid_t uid;
+    gid_t gid;
 .sp
     err = munge_encode (&cred, NULL, NULL, 0);
-.sp
     if (err != EMUNGE_SUCCESS) {
-        fprintf (stderr, "ERROR: %s\\n", munge_strerror (err));
+        fprintf (stderr, "Error: Failed to encode credential: %s\\n",
+                munge_strerror (err));
         exit (1);
     }
     err = munge_decode (cred, NULL, NULL, NULL, &uid, &gid);
-.sp
     if (err != EMUNGE_SUCCESS) {
-        fprintf (stderr, "ERROR: %s\\n", munge_strerror (err));
+        fprintf (stderr, "Error: Failed to decode credential: %s\\n",
+                munge_strerror (err));
         exit (1);
     }
     printf ("uid=%d gid=%d\\n", uid, gid);

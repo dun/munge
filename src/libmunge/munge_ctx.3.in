@@ -272,32 +272,33 @@ The following example program illustrates the use of the MUNGE context to
 query the location of the \fBmunged\fR domain socket.
 .PP
 .nf
-#include <stdio.h>                      /* for printf() */
-#include <stdlib.h>                     /* for exit() */
+#include <stdio.h>
+#include <stdlib.h>
 #include <munge.h>
 .sp
 int
 main (int argc, char *argv[])
 {
-    munge_ctx_t  ctx;
-    munge_err_t  err;
-    char        *str;
+    munge_ctx_t ctx;
+    munge_err_t err;
+    char *str;
 .sp
-    if (!(ctx = munge_ctx_create ())) {
-        fprintf (stderr, "ERROR: Unable to create MUNGE context\\n");
+    ctx = munge_ctx_create ();
+    if (ctx == NULL) {
+        fprintf (stderr, "Error: Failed to create munge ctx\\n");
         exit (1);
     }
+    /*  Query the socket name.  Note that the returned 'str' resides
+     *    in the 'ctx' and will be de-allocated via munge_ctx_destroy().
+     */
     err = munge_ctx_get (ctx, MUNGE_OPT_SOCKET, &str);
-.sp
     if (err != EMUNGE_SUCCESS) {
-        fprintf (stderr, "ERROR: %s\\n", munge_ctx_strerror (ctx));
+        fprintf (stderr, "Error: Failed to get munge socket name: %s\\n",
+                munge_ctx_strerror (ctx));
         exit (1);
     }
     printf ("socket=%s\\n", str);
-    /*
-     *  Note that 'str' is not to be free()d since
-     *    it points to a string within the 'ctx'.
-     */
+.sp
     munge_ctx_destroy (ctx);
     exit (0);
 }

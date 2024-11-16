@@ -86,16 +86,16 @@ The following example program illustrates how a list of available cipher
 types can be queried.
 .PP
 .nf
-#include <stdio.h>                      /* for printf() */
-#include <stdlib.h>                     /* for exit() */
+#include <stdio.h>
+#include <stdlib.h>
 #include <munge.h>
 .sp
 int
 main (int argc, char *argv[])
 {
-    int           i;
-    const char   *p;
-    munge_enum_t  t = MUNGE_ENUM_CIPHER;
+    int i;
+    const char *p;
+    munge_enum_t t = MUNGE_ENUM_CIPHER;
 .sp
     for (i = 0; (p = munge_enum_int_to_str (t, i)) != NULL; i++) {
         if (munge_enum_is_valid (t, i)) {
