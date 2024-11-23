@@ -285,6 +285,7 @@ query the location of the \fBmunged\fR domain socket.
 .nf
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include <munge.h>
 .sp
 int
@@ -293,6 +294,9 @@ main (int argc, char *argv[])
     munge_ctx_t ctx;
     munge_err_t err;
     char *str;
+    char buf[4096];
+    uid_t uid;
+    gid_t gid;
 .sp
     ctx = munge_ctx_create ();
     if (ctx == NULL) {
@@ -309,6 +313,27 @@ main (int argc, char *argv[])
         exit (1);
     }
     printf ("socket=%s\\n", str);
+.sp
+    /*  Read and decode a credential from the standard input.
+     *  Ignore expired, rewound, and replayed errors.
+     */
+    err = munge_ctx_set (ctx, MUNGE_OPT_IGNORE_TTL, 1);
+    if (err != EMUNGE_SUCCESS) {
+        fprintf (stderr, "Error: Failed to set ignore-ttl opt: %s\\n",
+                munge_ctx_strerror (ctx));
+        exit (1);
+    }
+    if (fgets (buf, sizeof (buf), stdin) == NULL) {
+        fprintf (stderr, "Error: Failed to read credential\\n");
+        exit (1);
+    }
+    err = munge_decode (buf, ctx, NULL, NULL, &uid, &gid);
+    if (err != EMUNGE_SUCCESS) {
+        fprintf (stderr, "Error: Failed to decode credential: %s\\n",
+                munge_ctx_strerror (ctx));
+        exit (1);
+    }
+    printf ("uid=%d gid=%d\\n", uid, gid);
 .sp
     munge_ctx_destroy (ctx);
     exit (0);
