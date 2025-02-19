@@ -140,7 +140,8 @@ path_is_accessible (const char *path, char *errbuf, size_t errbuflen)
     if (n >= sizeof (buf)) {
         errno = ENAMETOOLONG;
         return (_path_set_err (-1, errbuf, errbuflen,
-            "cannot canonicalize \"%s\": exceeded max path length", path));
+            "cannot canonicalize \"%s\": exceeded max path length of %zu bytes",
+            path, (sizeof (buf) - 1)));
     }
     if (lstat (buf, &st) < 0) {
         return (_path_set_err (-1, errbuf, errbuflen,
@@ -159,12 +160,14 @@ path_is_accessible (const char *path, char *errbuf, size_t errbuflen)
         if (!S_ISDIR (st.st_mode)) {
             errno = EINVAL;
             return (_path_set_err (-1, errbuf, errbuflen,
-                "cannot check \"%s\": unexpected file type", buf));
+                "cannot check \"%s\": unexpected file type (st_mode=0%o)",
+                buf, st.st_mode));
         }
         if ((st.st_mode & (S_IXUSR | S_IXGRP | S_IXOTH))
                 != (S_IXUSR | S_IXGRP | S_IXOTH)) {
             return (_path_set_err (0, errbuf, errbuflen,
-                "execute permissions for all required on \"%s\"", buf));
+                "execute permissions for all required on \"%s\" (st_mode=0%o)",
+                buf, st.st_mode));
         }
         if (!(p = strrchr (buf, '/'))) {
             errno = EINVAL;
@@ -198,7 +201,8 @@ path_is_secure (const char *path, char *errbuf, size_t errbuflen,
     if (n >= sizeof (buf)) {
         errno = ENAMETOOLONG;
         return (_path_set_err (-1, errbuf, errbuflen,
-            "cannot canonicalize \"%s\": exceeded max path length", path));
+            "cannot canonicalize \"%s\": exceeded max path length of %zu bytes",
+            path, (sizeof (buf) - 1)));
     }
     if (lstat (buf, &st) < 0) {
         return (_path_set_err (-1, errbuf, errbuflen,
@@ -219,11 +223,13 @@ path_is_secure (const char *path, char *errbuf, size_t errbuflen,
         if (!S_ISDIR (st.st_mode)) {
             errno = EINVAL;
             return (_path_set_err (-1, errbuf, errbuflen,
-                "cannot check \"%s\": unexpected file type", buf));
+                "cannot check \"%s\": unexpected file type (st_mode=0%o)",
+                buf, st.st_mode));
         }
         if ((st.st_uid != 0) && (st.st_uid != euid)) {
             return (_path_set_err (0, errbuf, errbuflen,
-                "invalid ownership of \"%s\"", buf));
+                "invalid ownership of \"%s\" (uid=%lu)",
+                buf, (unsigned long) st.st_uid));
         }
         if (!(flags & PATH_SECURITY_IGNORE_GROUP_WRITE) &&
              (st.st_mode & S_IWGRP)                     &&
