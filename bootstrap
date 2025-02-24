@@ -1,6 +1,7 @@
 #!/bin/sh
 set -e
 autoreconf --force --install --verbose --warnings=none
+rm -rf autom4te.cache
 
 # Output the package string containing the auto-generated version for
 #   informational purposes.
