@@ -1,4 +1,8 @@
 #!/bin/sh
 set -e
 autoreconf --force --install --verbose --warnings=none
+
+# Output the package string containing the auto-generated version for
+#   informational purposes.
+#
 sed -ne "s/^PACKAGE_STRING='\([^']*\)'$/\1/p" configure
