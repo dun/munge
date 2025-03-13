@@ -55,12 +55,7 @@ X_AC_CHECK_COND_LIB(rt, clock_gettime)
 X_AC_CHECK_COND_LIB(z, compress)
 AC_SEARCH_LIBS(gethostbyname, nsl)
 AC_SEARCH_LIBS(socket, socket)
-m4_ifdef([AM_PATH_LIBGCRYPT], [AM_PATH_LIBGCRYPT])
-X_AC_PATH_OPENSSL
 X_AC_SELECT_CRYPTO_LIB
-if test "${CRYPTO_PKG}" = "openssl"; then
-  X_AC_CHECK_OPENSSL
-fi
 
 ##
 # Checks for header files.

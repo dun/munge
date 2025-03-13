@@ -4,17 +4,14 @@
 #
 #  DESCRIPTION:
 #    Check for OpenSSL behavior.
-#
-#  NOTES:
-#    This must be called after X_AC_PATH_OPENSSL since it depends on the
-#    makefile variables OPENSSL_CFLAGS and OPENSSL_LIBS.
 #******************************************************************************
 
 AC_DEFUN([X_AC_CHECK_OPENSSL], [
+  AC_REQUIRE([X_AC_WITH_OPENSSL])
   ac_save_CFLAGS="${CFLAGS}"
   ac_save_LIBS="${LIBS}"
-  CFLAGS="${CFLAGS} ${OPENSSL_CFLAGS}"
-  LIBS="${LIBS} ${OPENSSL_LIBS}"
+  CFLAGS="${CFLAGS} ${LIBCRYPTO_CFLAGS}"
+  LIBS="${LIBS} ${LIBCRYPTO_LIBS}"
   AC_CHECK_FUNCS( \
     CRYPTO_THREADID_set_callback \
     CRYPTO_num_locks \
