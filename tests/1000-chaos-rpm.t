@@ -73,6 +73,7 @@ test_expect_success 'create dist tarball' '
 #
 test_expect_success MUNGE_DIST 'build srpm' '
     rpmbuild -ts --without=check --without=verify \
+            --define="source_date_epoch_from_changelog 0" \
             --define="_builddir %{_topdir}/BUILD" \
             --define="_buildrootdir %{_topdir}/BUILDROOT" \
             --define="_rpmdir %{_topdir}/RPMS" \
@@ -102,6 +103,7 @@ test_expect_success MUNGE_SRPM 'install builddeps' '
 #
 test_expect_success MUNGE_DIST 'build rpm' '
     rpmbuild -tb --without=check --without=verify \
+            --define="source_date_epoch_from_changelog 0" \
             --define="_builddir %{_topdir}/BUILD" \
             --define="_buildrootdir %{_topdir}/BUILDROOT" \
             --define="_rpmdir %{_topdir}/RPMS" \
