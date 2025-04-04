@@ -275,7 +275,7 @@ done
 test_expect_success 'mungekey without --force and with existing keyfile' '
     local keyfile=key.$$ &&
     rm -f "${keyfile}" &&
-    echo -n xyzzy-$$ > "${keyfile}" &&
+    echo xyzzy-$$ > "${keyfile}" &&
     chmod 0600 "${keyfile}" &&
     test_must_fail "${MUNGEKEY}" --create --keyfile="${keyfile}" 2>err.$$ &&
     grep -q "File exists" err.$$ &&

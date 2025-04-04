@@ -58,7 +58,7 @@ test_expect_success 'munge --socket for invalid socket (directory)' '
 '
 
 test_expect_success 'munge reading from stdin' '
-    echo -n xyzzy-$$ >in.$$ &&
+    echo xyzzy-$$ >in.$$ &&
     "${MUNGE}" --socket="${MUNGE_SOCKET}" <in.$$ |
     "${UNMUNGE}" --socket="${MUNGE_SOCKET}" --no-output --output=out.$$ &&
     test_cmp in.$$ out.$$
@@ -91,7 +91,7 @@ done
 
 for OPT_INPUT in '-i' '--input'; do
     test_expect_success "munge ${OPT_INPUT}" '
-        echo -n xyzzy-$$ >in.$$ &&
+        echo xyzzy-$$ >in.$$ &&
         "${MUNGE}" --socket="${MUNGE_SOCKET}" "${OPT_INPUT}" in.$$ |
         "${UNMUNGE}" --socket="${MUNGE_SOCKET}" --no-output --output=out.$$ &&
         test_cmp in.$$ out.$$
@@ -99,7 +99,7 @@ for OPT_INPUT in '-i' '--input'; do
 done
 
 test_expect_success 'munge --input from stdin via "-"' '
-    echo -n xyzzy-$$ >in.$$ &&
+    echo xyzzy-$$ >in.$$ &&
     "${MUNGE}" --socket="${MUNGE_SOCKET}" --input=- <in.$$ |
     "${UNMUNGE}" --socket="${MUNGE_SOCKET}" --no-output --output=out.$$ &&
     test_cmp in.$$ out.$$
@@ -118,7 +118,7 @@ test_expect_success 'munge --input from missing file' '
 
 for OPT_OUTPUT in '-o' '--output'; do
     test_expect_success "munge ${OPT_OUTPUT}" '
-        echo -n xyzzy-$$ >in.$$ &&
+        echo xyzzy-$$ >in.$$ &&
         "${MUNGE}" --socket="${MUNGE_SOCKET}" "${OPT_OUTPUT}" cred.$$ <in.$$ &&
         "${UNMUNGE}" --socket="${MUNGE_SOCKET}" --input=cred.$$ --no-output \
                 --output=out.$$ &&
@@ -127,14 +127,14 @@ for OPT_OUTPUT in '-o' '--output'; do
 done
 
 test_expect_success 'munge --output to stdout via "-"' '
-    echo -n xyzzy-$$ >in.$$ &&
+    echo xyzzy-$$ >in.$$ &&
     "${MUNGE}" --socket="${MUNGE_SOCKET}" --output=- <in.$$ |
     "${UNMUNGE}" --socket="${MUNGE_SOCKET}" --no-output --output=out.$$ &&
     test_cmp in.$$ out.$$
 '
 
 test_expect_success 'munge --output to /dev/null' '
-    echo -n xyzzy-$$ >in.$$ &&
+    echo xyzzy-$$ >in.$$ &&
     "${MUNGE}" --socket="${MUNGE_SOCKET}" --output=/dev/null <in.$$ >out.$$ &&
     test ! -s out.$$
 '
