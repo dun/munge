@@ -54,7 +54,7 @@ test_expect_success 'socket dir owned by euid' '
     munged_stop
 '
 
-# Create an alternate socket dir that can be chwon'd.
+# Create an alternate socket dir that can be chown'd.
 # This dir is placed in a subdir of [TMPDIR] since chowning something as root
 #   can fail if NFS is configured for squashed access.
 # Provide [ALT_SOCKETDIR] and [ALT_SOCKET] for later checks.
