@@ -48,7 +48,7 @@ test_expect_success 'check lockfile type' '
 # Check if the lockfile has the expected permissions for a write-lock.
 #
 test_expect_success 'check lockfile permissions' '
-    test "$(find ${MUNGE_LOCKFILE} -perm 0200)" = "${MUNGE_LOCKFILE}"
+    ls -ld "${MUNGE_LOCKFILE}" | grep "^--w-------"
 '
 
 # Try starting a new munged process using a socket that is already in use.

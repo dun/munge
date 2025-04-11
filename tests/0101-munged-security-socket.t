@@ -21,26 +21,23 @@ test_expect_success 'setup' '
 # Check the permissions on the socket dir.
 #
 test_expect_success 'socket dir perms' '
-    test "$(find "${MUNGE_SOCKETDIR}" -type d -perm 1777)" = \
-            "${MUNGE_SOCKETDIR}" &&
+    ls -ld "${MUNGE_SOCKETDIR}" | grep "^drwxrwxrwt" &&
     munged_start &&
     munged_stop
 '
 
 # Check the file type and permissions on the socket.
 # [MUNGE_SOCKET] must be examined while munged is running since the socket is
-#   removed when the daemon terminates.
-# Testing [match_type] and [match_perm] after munged terminates ensures the
-#   daemon is stopped even if the matching tests fail.
+#   removed when the daemon terminates.  The type and permission check must be
+#   done after the daemon is stopped in case the check fails and breaks the
+#   &&-chain.
 #
 test_expect_success 'socket type and perms' '
-    local match_type match_perm &&
+    local ls_out &&
     munged_start &&
-    match_type=$(find "${MUNGE_SOCKET}" -type s) &&
-    match_perm=$(find "${MUNGE_SOCKET}" -perm 0777) &&
+    ls_out=$(ls -ld "${MUNGE_SOCKET}") &&
     munged_stop &&
-    test "${match_type}" = "${MUNGE_SOCKET}" &&
-    test "${match_perm}" = "${MUNGE_SOCKET}"
+    echo "${ls_out}" | grep "^srwxrwxrwx"
 '
 
 # Check a socket dir that is owned by the EUID.

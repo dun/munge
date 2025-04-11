@@ -91,7 +91,7 @@ for OPT_CREATE in '-c' '--create'; do
         test ! -f "${keyfile}" &&
         "${MUNGEKEY}" "${OPT_CREATE}" --keyfile="${keyfile}" &&
         test -f "${keyfile}" &&
-        test "$(find ${keyfile} -perm 0600)" = "${keyfile}"
+        ls -ld "${keyfile}" | grep "^-rw-------"
     '
 done
 
