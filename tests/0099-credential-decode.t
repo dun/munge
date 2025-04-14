@@ -12,11 +12,11 @@ test_expect_success 'setup' '
     munged_setup
 '
 
-# Start the daemon process with the known key.
+# Start the daemon process with the known key, or bail out.
 # Force the daemon to run since the key may have the wrong permissions.
 #
 test_expect_success 'start munged with known key' '
-    munged_start --force \
+    munged_start t-bail-out-on-error --force \
             --key-file="${SHARNESS_TEST_SRCDIR}/0099-credential-decode.key"
 '
 

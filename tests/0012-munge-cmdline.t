@@ -6,6 +6,25 @@ test_description='Check munge command-line options'
 : "${SHARNESS_TEST_SRCDIR:=$(cd "$(dirname "$0")" && pwd)}"
 . "${SHARNESS_TEST_SRCDIR}/sharness.sh"
 
+# Set up the environment.
+#
+test_expect_success 'setup' '
+    munged_setup
+'
+
+# Create a key, or bail out.
+#
+test_expect_success 'create key' '
+    munged_create_key t-bail-out-on-error &&
+    test -f "${MUNGE_KEYFILE}"
+'
+
+# Start the daemon, or bail out.
+#
+test_expect_success 'start munged' '
+    munged_start t-bail-out-on-error
+'
+
 test_expect_success 'munge invalid option' '
     test_must_fail "${MUNGE}" --invalid-option
 '
@@ -30,12 +49,6 @@ for OPT_VERSION in '-V' '--version'; do
         grep -q "^munge-[0-9][0-9a-f.]* "
     '
 done
-
-test_expect_success 'start munged' '
-    munged_setup &&
-    munged_create_key &&
-    munged_start
-'
 
 for OPT_SOCKET in '-S' '--socket'; do
     test_expect_success "munge ${OPT_SOCKET}" '

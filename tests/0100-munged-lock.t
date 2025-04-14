@@ -6,14 +6,27 @@ test_description='Check munged socket lock'
 : "${SHARNESS_TEST_SRCDIR:=$(cd "$(dirname "$0")" && pwd)}"
 . "${SHARNESS_TEST_SRCDIR}/sharness.sh"
 
-# Set up the environment for testing.
+# Set up the environment.
 # The location of the lockfile is derived from the name of the socket.
 # Provide [MUNGE_LOCKFILE] for later checks.
 #
 test_expect_success 'setup' '
     munged_setup &&
-    munged_create_key &&
     MUNGE_LOCKFILE="${MUNGE_SOCKET}.lock"
+'
+
+# Create a key, or bail out.
+#
+test_expect_success 'create key' '
+    munged_create_key t-bail-out-on-error &&
+    test -f "${MUNGE_KEYFILE}"
+'
+
+# Verify the daemon can start, or bail out.
+#
+test_expect_success 'check munged startup' '
+    munged_start t-bail-out-on-error &&
+    munged_stop
 '
 
 # The umask is cleared here to be able to later check if the lockfile has had

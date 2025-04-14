@@ -6,18 +6,23 @@ test_description='Check munged security of keyfile'
 : "${SHARNESS_TEST_SRCDIR:=$(cd "$(dirname "$0")" && pwd)}"
 . "${SHARNESS_TEST_SRCDIR}/sharness.sh"
 
-# Set up the environment for checking the keyfile.
+# Set up the environment.
 #
 test_expect_success 'setup' '
-    munged_setup &&
-    munged_create_key
+    munged_setup
 '
 
-# Check a keyfile that is a regular file.
+# Create a key, or bail out.
 #
-test_expect_success 'keyfile regular file' '
-    test -f "${MUNGE_KEYFILE}" &&
-    munged_start &&
+test_expect_success 'create key' '
+    munged_create_key t-bail-out-on-error &&
+    test -f "${MUNGE_KEYFILE}"
+'
+
+# Verify the daemon can start, or bail out.
+#
+test_expect_success 'check munged startup' '
+    munged_start t-bail-out-on-error &&
     munged_stop
 '
 

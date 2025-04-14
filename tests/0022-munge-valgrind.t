@@ -16,10 +16,23 @@ if test_have_prereq VALGRIND; then :; else
     test_done
 fi
 
+# Set up the environment.
+#
+test_expect_success 'setup' '
+    munged_setup
+'
+
+# Create a key, or bail out.
+#
+test_expect_success 'create key' '
+    munged_create_key t-bail-out-on-error &&
+    test -f "${MUNGE_KEYFILE}"
+'
+
+# Start the daemon, or bail out.
+#
 test_expect_success 'start munged' '
-    munged_setup &&
-    munged_create_key &&
-    munged_start
+    munged_start t-bail-out-on-error
 '
 
 test_expect_success 'encode credential under valgrind' '

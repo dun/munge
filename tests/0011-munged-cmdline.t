@@ -6,11 +6,24 @@ test_description='Check munged command-line options'
 : "${SHARNESS_TEST_SRCDIR:=$(cd "$(dirname "$0")" && pwd)}"
 . "${SHARNESS_TEST_SRCDIR}/sharness.sh"
 
-# Set up the test environment.
+# Set up the environment.
 #
 test_expect_success 'setup' '
-    munged_setup &&
-    munged_create_key
+    munged_setup
+'
+
+# Create a key, or bail out.
+#
+test_expect_success 'create key' '
+    munged_create_key t-bail-out-on-error &&
+    test -f "${MUNGE_KEYFILE}"
+'
+
+# Verify the daemon can start, or bail out.
+#
+test_expect_success 'check munged startup' '
+    munged_start t-bail-out-on-error &&
+    munged_stop
 '
 
 test_expect_success 'munged invalid option' '

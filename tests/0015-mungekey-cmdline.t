@@ -6,6 +6,25 @@ test_description='Check mungekey command-line options'
 : "${SHARNESS_TEST_SRCDIR:=$(cd "$(dirname "$0")" && pwd)}"
 . "${SHARNESS_TEST_SRCDIR}/sharness.sh"
 
+# Set up the environment.
+#
+test_expect_success 'setup' '
+    munged_setup
+'
+
+# Check that a key does not already exist.
+#
+test_expect_success 'mungekey key not found' '
+    test ! -f "${MUNGE_KEYFILE}"
+'
+
+# Create a key, or bail out.
+#
+test_expect_success 'mungekey key create' '
+    munged_create_key t-bail-out-on-error &&
+    test -f "${MUNGE_KEYFILE}"
+'
+
 # Check if an invalid short-option displays the expected option text in the
 #   error message.
 #

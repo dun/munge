@@ -6,7 +6,7 @@ test_description='Check munged security of socket'
 : "${SHARNESS_TEST_SRCDIR:=$(cd "$(dirname "$0")" && pwd)}"
 . "${SHARNESS_TEST_SRCDIR}/sharness.sh"
 
-# Set up the environment for checking the socket.
+# Set up the environment.
 # Redefine [MUNGE_SOCKETDIR] to add a sub-directory for testing changes to
 #   directory ownership and permissions.  It is kept in [TMPDIR] since NFS can
 #   cause problems for the lockfile (the location of which is derived from the
@@ -14,8 +14,21 @@ test_description='Check munged security of socket'
 #
 test_expect_success 'setup' '
     MUNGE_SOCKETDIR="${TMPDIR:-"/tmp"}/munge-$$/socketdir-$$" &&
-    munged_setup &&
-    munged_create_key
+    munged_setup
+'
+
+# Create a key, or bail out.
+#
+test_expect_success 'create key' '
+    munged_create_key t-bail-out-on-error &&
+    test -f "${MUNGE_KEYFILE}"
+'
+
+# Verify the daemon can start, or bail out.
+#
+test_expect_success 'check munged startup' '
+    munged_start t-bail-out-on-error &&
+    munged_stop
 '
 
 # Check the permissions on the socket dir.

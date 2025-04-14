@@ -12,10 +12,11 @@ test_expect_success 'setup' '
     munged_setup
 '
 
-# Create a key for the daemon.
+# Create a key, or bail out.
 #
 test_expect_success 'create key' '
-    munged_create_key
+    munged_create_key t-bail-out-on-error &&
+    test -f "${MUNGE_KEYFILE}"
 '
 
 # Verify the key has been created.
@@ -24,10 +25,10 @@ test_expect_success 'check keyfile creation' '
     test -s "${MUNGE_KEYFILE}"
 '
 
-# Start the daemon.
+# Start the daemon, or bail out.
 #
 test_expect_success 'start munged' '
-    munged_start
+    munged_start t-bail-out-on-error
 '
 
 # Verify the pidfile has been created.
