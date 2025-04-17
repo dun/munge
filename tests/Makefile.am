@@ -8,7 +8,8 @@ include $(top_srcdir)/Make-inc.mk
 TEST_EXTENSIONS = .t
 
 T_LOG_DRIVER = \
-	env AM_TAP_AWK='$(AWK)' $(SHELL) $(top_srcdir)/build-aux/tap-driver.sh
+	env AM_TAP_AWK='$(AWK)' $(SHELL) \
+	$(top_srcdir)/build-aux/tap-driver.sh --merge
 
 test_scripts = \
 	0001-env-vars.t \

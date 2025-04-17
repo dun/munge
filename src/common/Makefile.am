@@ -8,7 +8,8 @@ include $(top_srcdir)/Make-inc.mk
 TEST_EXTENSIONS = .test
 
 TEST_LOG_DRIVER = \
-	env AM_TAP_AWK='$(AWK)' $(SHELL) $(top_srcdir)/build-aux/tap-driver.sh
+	env AM_TAP_AWK='$(AWK)' $(SHELL) \
+	$(top_srcdir)/build-aux/tap-driver.sh --merge
 
 AM_TESTSUITE_SUMMARY_HEADER = ' of src/common/ for $(PACKAGE_STRING)'
 
