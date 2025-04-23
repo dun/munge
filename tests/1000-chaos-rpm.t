@@ -111,6 +111,7 @@ test_expect_success MUNGE_DIST 'build rpm' '
             --define="_specdir %{_topdir}/SPECS" \
             --define="_srcrpmdir %{_topdir}/SRPMS" \
             --define="_topdir ${MUNGE_RPM_DIR}" \
+            --pipe="sed \"s/^\(\(not \)\?ok\)\b/ \1/\"" \
             "${MUNGE_TARBALL}" &&
     test_set_prereq MUNGE_RPM
 '
