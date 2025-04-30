@@ -289,13 +289,20 @@ test_expect_success 'mungekey --bits without required value' '
 '
 
 # Check if --force removes an existing keyfile.
+# The hard link ensures the inode number inode0 is kept in use and cannot be
+#   immediately reused when the keyfile is created.
 #
 for OPT_FORCE in '-f' '--force'; do
     test_expect_success "mungekey ${OPT_FORCE}" '
+        local inode0 inode1 &&
         rm -f "${MUNGE_KEYFILE}" &&
         touch "${MUNGE_KEYFILE}" &&
+        ln -f "${MUNGE_KEYFILE}" "${MUNGE_KEYFILE}.link" &&
+        inode0=$(ls -i "${MUNGE_KEYFILE}" | awk "{ print \$1 }") &&
         "${MUNGEKEY}" --create --keyfile="${MUNGE_KEYFILE}" "${OPT_FORCE}" &&
-        test -s "${MUNGE_KEYFILE}"
+        inode1=$(ls -i "${MUNGE_KEYFILE}" | awk "{ print \$1 }") &&
+        test "${inode0}" -ne "${inode1}" &&
+        rm -f "${MUNGE_KEYFILE}.link"
     '
 done
 
