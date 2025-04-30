@@ -97,12 +97,38 @@
 }
 
 {
+   libcrypto-cond
+   Memcheck:Cond
+   obj:*/libcrypto.so.1.1
+}
+
+{
    libcrypto-CRYPTO_THREAD_lock_new-leak
    Memcheck:Leak
    fun:malloc
    fun:CRYPTO_zalloc
    fun:CRYPTO_THREAD_lock_new
    obj:*/libcrypto.so.1.1
+}
+
+{
+   libcrypto-drbg_seed
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:*alloc
+   ...
+   fun:drbg_seed
+   ...
+   fun:random_init
+}
+
+{
+   libcrypto-EVP_*_fetch
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:*alloc
+   ...
+   fun:EVP_*_fetch
 }
 
 {
@@ -114,9 +140,42 @@
 }
 
 {
-   libcrypto-cond
-   Memcheck:Cond
-   obj:*/libcrypto.so.1.1
+   libcrypto-OSSL_PROVIDER_load_ex
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   ...
+   fun:OSSL_PROVIDER_load_ex
+   fun:crypto_init
+}
+
+{
+   libcrypto-OSSL_PROVIDER_try_load_ex
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   ...
+   fun:OSSL_PROVIDER_try_load_ex
+   fun:crypto_init
+}
+
+{
+   libcrypto-RAND_bytes_ex
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   ...
+   fun:RAND_bytes_ex
+   fun:_random_bytes
+}
+
+{
+   libcrypto-RAND_seed
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   ...
+   fun:RAND_seed
+   ...
+   fun:random_init
 }
 
 {
