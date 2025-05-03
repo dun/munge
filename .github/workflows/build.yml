@@ -1,0 +1,66 @@
+name: build
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+      - build
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+          - macos-latest
+        lib:
+          - openssl
+          - libgcrypt
+        cc:
+          - gcc
+          - clang
+        exclude:
+          - os: macos-latest
+            lib: libgcrypt
+    runs-on: ${{ matrix.os }}
+    continue-on-error: false
+    steps:
+      - name: Get OS version
+        run: |
+          if expr "${{ matrix.os }}" : "ubuntu" >/dev/null; then
+            cat /etc/os-release
+          elif expr "${{ matrix.os }}" : "macos" >/dev/null; then
+            sw_vers
+          fi
+      - name: Get uname
+        run: uname -a
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install deps
+        run: |
+          if expr "${{ matrix.os }}" : "ubuntu" >/dev/null; then
+            sudo apt install autoconf automake libtool \
+              libgcrypt20-dev libssl-dev zlib1g-dev libbz2-dev
+          elif expr "${{ matrix.os }}" : "macos" >/dev/null; then
+            brew install autoconf automake libtool
+          fi
+      - name: Bootstrap
+        run: ./bootstrap
+      - name: Configure
+        run: >
+          ./configure --with-crypto-lib="${{ matrix.lib }}"
+          CC="${{ matrix.cc }}" CFLAGS="-Wall"
+      - name: Get config.log
+        run: cat config.log
+      - name: Build
+        run: make V=1
+      - name: Test
+        run: |
+          expr "${{ matrix.os }}" : "macos" >/dev/null && tmp="/private/tmp"
+          make check chain_lint=t verbose=t VERBOSE=t \
+            TMPDIR="${tmp:-/tmp}" root="${tmp:-/tmp}/munge-test-$$"
+      - name: Get test-suite.log
+        if: ${{ failure() }}
+        run: find . -type f -name "test-suite.log" -execdir cat {} \;
