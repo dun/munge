@@ -255,7 +255,7 @@ test_expect_success ALT,SUDO 'logfile dir owned by other failure' '
     sudo chown 1 "${ALT_LOGDIR}" &&
     > "${ALT_LOGFILE}" &&
     test_must_fail munged_start --log-file="${ALT_LOGFILE}" 2>err.$$ &&
-    grep "Error:.* Logfile.* invalid ownership of \"${ALT_LOGDIR}\"" err.$$
+    grep "Error:.* Logfile is insecure: invalid ownership" err.$$
 '
 
 # Check if the error can be overridden when the logfile dir is not owned by
@@ -267,7 +267,7 @@ test_expect_success ALT,SUDO 'logfile dir owned by other override' '
     > "${ALT_LOGFILE}" &&
     munged_start --log-file="${ALT_LOGFILE}" --force 2>err.$$ &&
     munged_stop &&
-    grep "Warning:.* Logfile.* invalid ownership of \"${ALT_LOGDIR}\"" err.$$
+    grep "Warning:.* Logfile is insecure: invalid ownership" err.$$
 '
 
 # Cleanup the alternate logfile dir.

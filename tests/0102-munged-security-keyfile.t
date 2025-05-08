@@ -248,8 +248,7 @@ test_expect_success ALT,SUDO 'keyfile dir owned by other failure' '
     test "$(id -u)" != "1" &&
     sudo chown 1 "${ALT_KEYDIR}" &&
     test_must_fail munged_start --key-file="${ALT_KEYFILE}" &&
-    grep "Error:.* Keyfile.* invalid ownership of \"${ALT_KEYDIR}\"" \
-            "${MUNGE_LOGFILE}"
+    grep "Error:.* Keyfile is insecure: invalid ownership" "${MUNGE_LOGFILE}"
 '
 
 # Check if the error can be overridden when the keyfile dir is not owned by
@@ -260,8 +259,7 @@ test_expect_success ALT,SUDO 'keyfile dir owned by other override' '
     sudo chown 1 "${ALT_KEYDIR}" &&
     munged_start --key-file="${ALT_KEYFILE}" --force &&
     munged_stop &&
-    grep "Warning:.* Keyfile.* invalid ownership of \"${ALT_KEYDIR}\"" \
-            "${MUNGE_LOGFILE}"
+    grep "Warning:.* Keyfile is insecure: invalid ownership" "${MUNGE_LOGFILE}"
 '
 
 # Cleanup the alternate keyfile dir.

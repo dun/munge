@@ -90,8 +90,7 @@ test_expect_success ALT,SUDO 'socket dir owned by other failure' '
     test "$(id -u)" != "1" &&
     sudo chown 1 "${ALT_SOCKETDIR}" &&
     test_must_fail munged_start --socket="${ALT_SOCKET}" &&
-    grep "Error:.* Socket.* invalid ownership of \"${ALT_SOCKETDIR}\"" \
-            "${MUNGE_LOGFILE}"
+    grep "Error:.* Socket is insecure: invalid ownership" "${MUNGE_LOGFILE}"
 '
 
 # Check if the error can be overridden when the socket dir is not owned by the
@@ -102,8 +101,7 @@ test_expect_success ALT,SUDO 'socket dir owned by other override' '
     sudo chown 1 "${ALT_SOCKETDIR}" &&
     munged_start --socket="${ALT_SOCKET}" --force &&
     munged_stop --socket="${ALT_SOCKET}" &&
-    grep "Warning:.* Socket.* invalid ownership of \"${ALT_SOCKETDIR}\"" \
-            "${MUNGE_LOGFILE}"
+    grep "Warning:.* Socket is insecure: invalid ownership" "${MUNGE_LOGFILE}"
 '
 
 # Cleanup the alternate socket dir.
@@ -209,7 +207,7 @@ test_expect_success 'socket dir inaccessible by all failure' '
     chmod 0700 "${MUNGE_SOCKETDIR}" &&
     test_must_fail munged_start &&
     chmod 1777 "${MUNGE_SOCKETDIR}" &&
-    grep "Error:.* Socket is inaccessible.* \"${MUNGE_SOCKETDIR}\"" \
+    grep "Error:.* Socket.* execute permissions for all required" \
             "${MUNGE_LOGFILE}"
 '
 
@@ -222,7 +220,7 @@ test_expect_success 'socket dir inaccessible by all override' '
     munged_start --force &&
     munged_stop &&
     chmod 1777 "${MUNGE_SOCKETDIR}" &&
-    grep "Warning:.* Socket is inaccessible.* \"${MUNGE_SOCKETDIR}\"" \
+    grep "Warning:.* Socket.* execute permissions for all required" \
             "${MUNGE_LOGFILE}"
 '
 
