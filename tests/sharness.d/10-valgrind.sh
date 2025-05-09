@@ -1,7 +1,13 @@
 # Is valgrind installed?
+# Require 3.10.0 or later.
 #
-if valgrind --version >/dev/null 2>&1; then
-    test_set_prereq VALGRIND
+VALGRIND_VERSION=$(valgrind --version 2>/dev/null)
+if test "$?" -eq 0; then
+    x=$(echo "${VALGRIND_VERSION}" | sed -ne 's/[^-]*-\([0-9]*\).*/\1/p')
+    y=$(echo "${VALGRIND_VERSION}" | sed -ne 's/[^.]*.\([0-9]*\).*/\1/p')
+    if { test "$x" -eq 3 && test "$y" -ge 10; } || { test "$x" -gt 3; } then
+        test_set_prereq VALGRIND
+    fi
 fi
 
 # Set the name of the valgrind log file.
