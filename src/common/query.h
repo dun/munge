@@ -32,20 +32,8 @@
 
 
 int query_uid (const char *user, uid_t *uid_ptr);
-/*
- *  Queries for the User ID using the [user] string which can specify the
- *    user name or UID number.
- *  Returns 0 on success with the UID stored at [uid_ptr] (if non-NULL).
- *    Returns -1 on error without updating [uid_ptr].
- */
 
 int query_gid (const char *group, gid_t *gid_ptr);
-/*
- *  Queries for the Group ID using the [group] string which can specify the
- *    group name or GID number.
- *  Returns 0 on success with the GID stored at [gid_ptr] (if non-NULL).
- *    Returns -1 on error without updating [gid_ptr].
- */
 
 
 #endif /* !MUNGE_QUERY_H */

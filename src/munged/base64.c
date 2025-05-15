@@ -101,6 +101,9 @@ static const unsigned char asc2bin[256] = {
  *  Extern Functions
  *****************************************************************************/
 
+/*  Initializes the base64 context [x] for base64 encoding/decoding of data.
+ *  Returns 0 on success, or -1 on error.
+ */
 int
 base64_init (base64_ctx *x)
 {
@@ -114,6 +117,11 @@ base64_init (base64_ctx *x)
 }
 
 
+/*  Updates the base64 context [x], encoding [srclen] bytes from [src]
+ *    into [dst], and setting [dstlen] to the number of bytes written.
+ *  This can be called multiple times to process successive blocks of data.
+ *  Returns 0 on success, or -1 on error.
+ */
 int
 base64_encode_update (base64_ctx *x, void *vdst, int *dstlen,
                       const void *vsrc, int srclen)
@@ -167,6 +175,13 @@ base64_encode_update (base64_ctx *x, void *vdst, int *dstlen,
 }
 
 
+/*  Finalizes the base64 context [x], encoding the "final" data remaining
+ *    in a partial block into [dst], and setting [dstlen] to the number of
+ *    bytes written.
+ *  After calling this function, no further updates should be made to [x]
+ *    without re-initializing it first.
+ *  Returns 0 on success, or -1 on error.
+ */
 int
 base64_encode_final (base64_ctx *x, void *dst, int *dstlen)
 {
@@ -190,6 +205,11 @@ base64_encode_final (base64_ctx *x, void *dst, int *dstlen)
 }
 
 
+/*  Updates the base64 context [x], decoding [srclen] bytes from [src]
+ *    into [dst], and setting [dstlen] to the number of bytes written.
+ *  This can be called multiple times to process successive blocks of data.
+ *  Returns 0 on success, or -1 on error.
+ */
 int
 base64_decode_update (base64_ctx *x, void *dst, int *dstlen,
                       const void *src, int srclen)
@@ -270,6 +290,13 @@ base64_decode_update (base64_ctx *x, void *dst, int *dstlen,
 }
 
 
+/*  Finalizes the base64 context [x], decoding the "final" data remaining
+ *    in a partial block into [dst], and setting [dstlen] to the number of
+ *    bytes written.
+ *  After calling this function, no further updates should be made to [x]
+ *    without re-initializing it first.
+ *  Returns 0 on success, or -1 on error.
+ */
 int
 base64_decode_final (base64_ctx *x, void *dst, int *dstlen)
 {
@@ -288,6 +315,9 @@ base64_decode_final (base64_ctx *x, void *dst, int *dstlen)
 }
 
 
+/*  Clears the base64 context [x].
+ *  Returns 0 on success, or -1 on error.
+ */
 int
 base64_cleanup (base64_ctx *x)
 {
@@ -300,6 +330,10 @@ base64_cleanup (base64_ctx *x)
 }
 
 
+/*  Base64-encodes [srclen] bytes from the contiguous [src] into [dst],
+ *    and sets [dstlen] to the number of bytes written.
+ *  Returns 0 on success, or -1 on error.
+ */
 int
 base64_encode_block (void *dst, int *dstlen, const void *src, int srclen)
 {
@@ -339,6 +373,10 @@ base64_encode_block (void *dst, int *dstlen, const void *src, int srclen)
 }
 
 
+/*  Base64-decodes [srclen] bytes from the contiguous [src] into [dst],
+ *    and sets [dstlen] to the number of bytes written.
+ *  Returns 0 on success, or -1 on error.
+ */
 int
 base64_decode_block (void *dst, int *dstlen, const void *src, int srclen)
 {
@@ -346,6 +384,9 @@ base64_decode_block (void *dst, int *dstlen, const void *src, int srclen)
 }
 
 
+/*  Returns the size (in bytes) of the destination memory block required
+ *    for base64 encoding a block of [srclen] bytes.
+ */
 int
 base64_encode_length (int srclen)
 {
@@ -357,6 +398,9 @@ base64_encode_length (int srclen)
 }
 
 
+/*  Returns the size (in bytes) of the destination memory block required
+ *    for base64 decoding a block of [srclen] bytes.
+ */
 int
 base64_decode_length (int srclen)
 {

@@ -46,6 +46,8 @@
 static void _check_auth_server_dir (const char *dir, int got_force);
 static void _check_auth_client_dir (const char *dir, int got_force);
 
+/*  Checks for required privileges needed to perform client authentication.
+ */
 void
 auth_recv_init (const char *srvrdir, const char *clntdir, int got_force)
 {
@@ -229,6 +231,11 @@ _check_auth_client_dir (const char *dir, int got_force)
 #include <sys/socket.h>
 #include <sys/types.h>
 
+/*  Receives the identity of the client that sent msg [m],
+ *    storing the result in the output parms [uid] and [gid].
+ *  Note that the server NEVER simply trusts the client to
+ *    directly provide its identity.
+ */
 int
 auth_recv (m_msg_t m, uid_t *uid, gid_t *gid)
 {
@@ -250,6 +257,11 @@ auth_recv (m_msg_t m, uid_t *uid, gid_t *gid)
 
 #include <ucred.h>
 
+/*  Receives the identity of the client that sent msg [m],
+ *    storing the result in the output parms [uid] and [gid].
+ *  Note that the server NEVER simply trusts the client to
+ *    directly provide its identity.
+ */
 int
 auth_recv (m_msg_t m, uid_t *uid, gid_t *gid)
 {
@@ -294,6 +306,11 @@ auth_recv (m_msg_t m, uid_t *uid, gid_t *gid)
 typedef int socklen_t;                  /* socklen_t is uint32_t in Posix.1g */
 #endif /* !HAVE_SOCKLEN_T */
 
+/*  Receives the identity of the client that sent msg [m],
+ *    storing the result in the output parms [uid] and [gid].
+ *  Note that the server NEVER simply trusts the client to
+ *    directly provide its identity.
+ */
 int
 auth_recv (m_msg_t m, uid_t *uid, gid_t *gid)
 {
@@ -327,6 +344,11 @@ auth_recv (m_msg_t m, uid_t *uid, gid_t *gid)
 typedef int socklen_t;                  /* socklen_t is uint32_t in Posix.1g */
 #endif /* !HAVE_SOCKLEN_T */
 
+/*  Receives the identity of the client that sent msg [m],
+ *    storing the result in the output parms [uid] and [gid].
+ *  Note that the server NEVER simply trusts the client to
+ *    directly provide its identity.
+ */
 int
 auth_recv (m_msg_t m, uid_t *uid, gid_t *gid)
 {
@@ -366,6 +388,11 @@ auth_recv (m_msg_t m, uid_t *uid, gid_t *gid)
 static int _name_auth_pipe (char **pipe_name_p);
 static int _send_auth_req (int sd, const char *pipe_name);
 
+/*  Receives the identity of the client that sent msg [m],
+ *    storing the result in the output parms [uid] and [gid].
+ *  Note that the server NEVER simply trusts the client to
+ *    directly provide its identity.
+ */
 int
 auth_recv (m_msg_t m, uid_t *uid, gid_t *gid)
 {
@@ -460,6 +487,11 @@ static int _s_pipe (int fd[2]);
 static int _name_auth_pipe (char **dst);
 static int _send_auth_req (int sd, const char *pipe_name);
 
+/*  Receives the identity of the client that sent msg [m],
+ *    storing the result in the output parms [uid] and [gid].
+ *  Note that the server NEVER simply trusts the client to
+ *    directly provide its identity.
+ */
 int
 auth_recv (m_msg_t m, uid_t *uid, gid_t *gid)
 {

@@ -82,6 +82,10 @@ typedef struct {
  *  Public Functions
  *****************************************************************************/
 
+/*  Returns non-zero if the given [type] is a supported valid MUNGE compression
+ *    type according to the current configuration.  The NONE and DEFAULT types
+ *    are not considered valid types by this routine.
+ */
 int
 zip_is_valid_type (munge_zip_t type)
 {
@@ -99,6 +103,13 @@ zip_is_valid_type (munge_zip_t type)
 }
 
 
+/*  Compresses the [src] buffer of length [srclen] in a single pass using the
+ *    compression method [type].  The resulting compressed output is stored
+ *    in the [dst] buffer.
+ *  Upon entry, [*pdstlen] must be set to the size of the [dst] buffer.
+ *  Upon exit, [*pdstlen] is set to the size of the compressed data.
+ *  Returns 0 on success, or -1 or error.
+ */
 int
 zip_compress_block (munge_zip_t type,
                     void *dst, int *pdstlen, const void *src, int srclen)
@@ -158,6 +169,13 @@ zip_compress_block (munge_zip_t type,
 }
 
 
+/*  Decompresses the [src] buffer of length [srclen] in a single pass using the
+ *    compression method [type].  The resulting decompressed (original) output
+ *    is stored in the [dst] buffer.
+ *  Upon entry, [*pdstlen] must be set to the size of the [dst] buffer.
+ *  Upon exit, [*pdstlen] is set to the size of the decompressed data.
+ *  Returns 0 on success, or -1 or error.
+ */
 int
 zip_decompress_block (munge_zip_t type,
                       void *dst, int *pdstlen, const void *src, int srclen)
@@ -218,6 +236,10 @@ zip_decompress_block (munge_zip_t type,
 }
 
 
+/*  Returns a worst-case estimate for the buffer length needed to compress data
+ *    in the [src] buffer of length [len] using the compression method [type],
+ *    or -1 on error.
+ */
 int
 zip_compress_length (munge_zip_t type, const void *src, int len)
 {
@@ -244,6 +266,9 @@ zip_compress_length (munge_zip_t type, const void *src, int len)
 }
 
 
+/*  Returns the decompressed (original) length of the compressed data
+ *    in the [src] buffer of length [len], or -1 on error.
+ */
 int
 zip_decompress_length (munge_zip_t type, const void *src, int len)
 {
@@ -264,6 +289,9 @@ zip_decompress_length (munge_zip_t type, const void *src, int len)
 }
 
 
+/*  Returns [type] if that compression type is supported by the current
+ *    configuration; otherwise, returns an acceptible default type.
+ */
 munge_zip_t
 zip_select_default_type (munge_zip_t type)
 {

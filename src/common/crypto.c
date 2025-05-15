@@ -51,6 +51,8 @@ GCRY_THREAD_OPTION_PTHREAD_IMPL;
 #endif /* GCRYPT_VERSION_NUMBER */
 
 
+/*  Initializes the cryptographic subsystem.
+ */
 void
 crypto_init (void)
 {
@@ -97,6 +99,8 @@ crypto_init (void)
 }
 
 
+/*  Shuts down the cryptographic subsystem.
+ */
 void
 crypto_fini (void)
 {
@@ -419,6 +423,11 @@ _openssl_thread_cleanup (void)
  *  Common Functions
  *****************************************************************************/
 
+/*  Compares the first [n] bytes of the memory regions [s1] and [s2] in an
+ *    amount of time dependent upon the length [n], but independent of the
+ *    contents of either [s1] or [s2].
+ *  Returns 0 if the memory regions are equal, or non-zero otherwise.
+ */
 int
 crypto_memcmp (const void *s1, const void *s2, size_t n)
 {

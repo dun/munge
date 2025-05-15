@@ -60,6 +60,9 @@ static int _md_map_enum (munge_mac_t md, void *dst);
  *  Public Functions
  *****************************************************************************/
 
+/*  Initializes the message digest subsystem.
+ *  WARNING: This routine is *NOT* guaranteed to be thread-safe.
+ */
 void
 md_init_subsystem (void)
 {
@@ -73,6 +76,9 @@ md_init_subsystem (void)
 }
 
 
+/*  Initializes a new message digest context [x] with the message digest [md].
+ *  Returns 0 on success, or -1 on error.
+ */
 int
 md_init (md_ctx *x, munge_mac_t md)
 {
@@ -88,6 +94,10 @@ md_init (md_ctx *x, munge_mac_t md)
 }
 
 
+/*  Updates the message digest context [x], reading [srclen] bytes from [src].
+ *    This can be called multiple times to process successive blocks of data.
+ *  Returns 0 on success, or -1 on error.
+ */
 int
 md_update (md_ctx *x, const void *src, int srclen)
 {
@@ -103,6 +113,13 @@ md_update (md_ctx *x, const void *src, int srclen)
 }
 
 
+/*  Finalizes the message digest context [x], placing the digest in [dst]
+ *    of length [dstlenp].  The [dst] buffer must have sufficient space for
+ *    the message digest output (md_size).
+ *  After this function, no further calls to md_update() should be made.
+ *  Returns 0 on success, or -1 on error; in addition, [dstlenp] will be set
+ *    to the number of bytes written to [dst].
+ */
 int
 md_final (md_ctx *x, void *dst, int *dstlenp)
 {
@@ -118,6 +135,9 @@ md_final (md_ctx *x, void *dst, int *dstlenp)
 }
 
 
+/*  Clears the message digest context [x].
+ *  Returns 0 on success, or -1 on error.
+ */
 int
 md_cleanup (md_ctx *x)
 {
@@ -134,6 +154,12 @@ md_cleanup (md_ctx *x)
 }
 
 
+/*  Initializes a new message digest context [xdst], and copies the state
+ *    from the [xsrc] context to the new [xdst] context.
+ *  This is useful if large amounts of data are to be hashed which only differ
+ *    in the last few bytes.
+ *  Returns 0 on success, or -1 on error.
+ */
 int
 md_copy (md_ctx *xdst, md_ctx *xsrc)
 {
@@ -150,6 +176,8 @@ md_copy (md_ctx *xdst, md_ctx *xsrc)
 }
 
 
+/*  Returns the size (in bytes) of the message digest [md], or -1 on error.
+ */
 int
 md_size (munge_mac_t md)
 {
@@ -159,6 +187,13 @@ md_size (munge_mac_t md)
 }
 
 
+/*  Map the specified [md] algorithm to the internal representation used
+ *    by the underlying cryptographic library.
+ *  If [dst] is non-NULL, write the cryptographic library's internal
+ *    representation of the message digest algorithm to [dst]; otherwise, just
+ *    validate the specified [md] algorithm.
+ *  Returns 0 on success, or -1 on error.
+ */
 int
 md_map_enum (munge_mac_t md, void *dst)
 {

@@ -36,6 +36,8 @@
 #include "xsignal.h"
 
 
+/*  Ignore the signal specified by [sig].
+ */
 void
 xsignal_ignore (int sig)
 {

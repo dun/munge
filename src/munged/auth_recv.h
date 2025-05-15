@@ -34,17 +34,8 @@
 
 
 void auth_recv_init (const char *srvrdir, const char *clntdir, int got_force);
-/*
- *  Checks for required privileges needed to perform client authentication.
- */
 
 int auth_recv (m_msg_t m, uid_t *uid, gid_t *gid);
-/*
- *  Receives the identity of the client that sent msg [m],
- *    storing the result in the output parms [uid] and [gid].
- *  Note that the server NEVER simply trusts the client to
- *    directly provide its identity.
- */
 
 
 #endif /* !MUNGE_AUTH_RECV_H */

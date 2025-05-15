@@ -172,6 +172,13 @@ static void         _gids_ghost_node_dump (const char *data, const char *user,
  *  Public Functions
  *****************************************************************************/
 
+/*  Creates a list of supplementary GIDs for each UID based on information
+ *    from getgrent().
+ *  The [interval_secs] is the number of seconds between updates.
+ *  The [do_group_stat] flag specifies whether the /etc/group mtime is
+ *    checked to determine if updates are needed.
+ *  Returns a GIDs mapping or dies trying.
+ */
 gids_t
 gids_create (int interval_secs, int do_group_stat)
 {
@@ -217,6 +224,8 @@ gids_create (int interval_secs, int do_group_stat)
 }
 
 
+/*  Destroys the GIDs mapping [gids].
+ */
 void
 gids_destroy (gids_t gids)
 {
@@ -247,6 +256,8 @@ gids_destroy (gids_t gids)
 }
 
 
+/*  Updates the GIDs mapping [gids].
+ */
 void
 gids_update (gids_t gids)
 {
@@ -279,6 +290,9 @@ gids_update (gids_t gids)
 }
 
 
+/*  Returns true (non-zero) if user [uid] is a member of the supplementary
+ *    group [gid] according to the GIDs mapping [gids]; o/w, returns false.
+ */
 int
 gids_is_member (gids_t gids, uid_t uid, gid_t gid)
 {

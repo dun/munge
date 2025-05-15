@@ -91,61 +91,19 @@ typedef struct {
  *****************************************************************************/
 
 int mac_init (mac_ctx *x, munge_mac_t md, const void *key, int keylen);
-/*
- *  Initializes the message authentication code (MAC) context [x]
- *    with the message digest [md] and key [key] of [keylen] bytes.
- *  Returns 0 on success, or -1 on error.
- */
 
 int mac_update (mac_ctx *x, const void *src, int srclen);
-/*
- *  Updates the MAC context [x], reading [srclen] bytes from [src].
- *    This can be called multiple times to process successive blocks of data.
- *  Returns 0 on success, or -1 on error.
- */
 
 int mac_final (mac_ctx *x, void *dst, int *dstlenp);
-/*
- *  Finalizes the MAC context [x], placing the MAC in [dst] of length
- *    [dstlenp].  The [dst] buffer must have sufficient space for the MAC
- *    output (mac_size).
- *  After this function, no further calls to md_update() should be made.
- *  Returns 0 on success, or -1 on error; in addition, [dstlenp] will be set
- *    to the number of bytes written to [dst].
- */
 
 int mac_cleanup (mac_ctx *x);
-/*
- *  Clears the MAC context [x].
- *  Returns 0 on success, or -1 on error.
- */
 
 int mac_size (munge_mac_t md);
-/*
- *  Returns the size (in bytes) of the message digest [md], or -1 on error.
- */
 
 int mac_block (munge_mac_t md, const void *key, int keylen,
                void *dst, int *dstlenp, const void *src, int srclen);
-/*
- *  Computes the MAC without the need of a context; this requires
- *    the [src] to be contiguous.
- *  Uses the message digest [md] and key [key] of [keylen] bytes.
- *  Reads [srclen] bytes of data from [src], and writes the MAC to [dst]
- *    of length [dstlenp].
- *  Returns 0 on success, or -1 on error; in addition, [dstlenp] will be set
- *    to the number of bytes written to [dst].
- */
 
 int mac_map_enum (munge_mac_t md, void *dst);
-/*
- *  Map the specified [md] algorithm to the internal representation used
- *    by the underlying cryptographic library.
- *  If [dst] is non-NULL, write the cryptographic library's internal
- *    representation of the message digest algorithm to [dst]; otherwise, just
- *    validate the specified [md] algorithm.
- *  Returns 0 on success, or -1 on error.
- */
 
 
 #endif /* !MAC_H */

@@ -112,6 +112,18 @@ static pthread_mutex_t hash_free_list_lock = PTHREAD_MUTEX_INITIALIZER;
  *  Functions
  *****************************************************************************/
 
+/*  Creates and returns a new hash table on success.
+ *    Returns NULL with errno=EINVAL if [keyf] or [cmpf] is not specified.
+ *    Returns NULL with errno=ENOMEM if memory allocation fails.
+ *  The [size] is the number of slots in the table; a larger table requires
+ *    more memory, but generally provide quicker access times.  If set <= 0,
+ *    the default size is used.
+ *  The [keyf] function converts a key into a hash value.
+ *  The [cmpf] function determines whether two keys are equal.
+ *  The [delf] function de-allocates memory used by items in the hash;
+ *    if set to NULL, memory associated with these items will not be freed
+ *    when the hash is destroyed.
+ */
 hash_t
 hash_create (int size, hash_key_f key_f, hash_cmp_f cmp_f, hash_del_f del_f)
 {
@@ -141,6 +153,10 @@ hash_create (int size, hash_key_f key_f, hash_cmp_f cmp_f, hash_del_f del_f)
 }
 
 
+/*  Destroys hash table [h].  If a deletion function was specified when the
+ *    hash was created, it will be called for each item contained within.
+ *  Abadoning a hash without calling hash_destroy() will cause a memory leak.
+ */
 void
 hash_destroy (hash_t h)
 {
@@ -168,6 +184,10 @@ hash_destroy (hash_t h)
 }
 
 
+/*  Resets hash table [h] back to an empty state.  If a deletion function was
+ *    specified when the hash was created, it will be called for each item
+ *    contained within.
+ */
 void hash_reset (hash_t h)
 {
     int i;
@@ -193,6 +213,9 @@ void hash_reset (hash_t h)
 }
 
 
+/*  Returns 1 if hash table [h] is empty, or 0 if not empty.
+ *    Returns -1 with errno=EINVAL if [h] is NULL.
+ */
 int
 hash_is_empty (hash_t h)
 {
@@ -209,6 +232,9 @@ hash_is_empty (hash_t h)
 }
 
 
+/*  Returns the number of items in hash table [h].
+ *    Returns -1 with errno=EINVAL if [h] is NULL.
+ */
 int
 hash_count (hash_t h)
 {
@@ -225,6 +251,11 @@ hash_count (hash_t h)
 }
 
 
+/*  Searches for the item corresponding to [key] in hash table [h].
+ *  Returns a ptr to the found item's data on success.
+ *    Returns NULL with errno=0 if no matching item is found.
+ *    Returns NULL with errno=EINVAL if [key] is not specified.
+ */
 void *
 hash_find (hash_t h, const void *key)
 {
@@ -255,6 +286,13 @@ hash_find (hash_t h, const void *key)
 }
 
 
+/*  Inserts [data] with the corresponding [key] into hash table [h];
+ *    note that it is permissible for [key] to be set equal to [data].
+ *  Returns a ptr to the inserted item's data on success.
+ *    Returns NULL with errno=EEXIST if [key] already exists in the hash.
+ *    Returns NULL with errno=EINVAL if [key] or [data] is not specified.
+ *    Returns NULL with errno=ENOMEM if memory allocation fails.
+ */
 void *
 hash_insert (hash_t h, const void *key, void *data)
 {
@@ -297,6 +335,11 @@ end:
 }
 
 
+/*  Removes the item corresponding to [key] from hash table [h].
+ *  Returns a ptr to the removed item's data on success.
+ *    Returns NULL with errno=0 if no matching item is found.
+ *    Returns NULL with errno=EINVAL if [key] is not specified.
+ */
 void *
 hash_remove (hash_t h, const void *key)
 {
@@ -331,6 +374,13 @@ hash_remove (hash_t h, const void *key)
 }
 
 
+/*  Conditionally deletes (and de-allocates) items from hash table [h].
+ *  The [argf] function is invoked once for each item in the hash, with
+ *    [arg] being passed in as an argument.  Items for which [argf] returns
+ *    greater-than-zero are deleted.
+ *  Returns the number of items deleted.
+ *    Returns -1 with errno=EINVAL if [argf] is not specified.
+ */
 int
 hash_delete_if (hash_t h, hash_arg_f arg_f, void *arg)
 {
@@ -365,6 +415,11 @@ hash_delete_if (hash_t h, hash_arg_f arg_f, void *arg)
 }
 
 
+/*  Invokes the [argf] function once for each item in hash table [h],
+ *    with [arg] being passed in as an argument.
+ *  Returns the number of items for which [argf] returns greater-than-zero.
+ *    Returns -1 with errno=EINVAL if [argf] is not specified.
+ */
 int
 hash_for_each (hash_t h, hash_arg_f arg_f, void *arg)
 {
@@ -389,6 +444,12 @@ hash_for_each (hash_t h, hash_arg_f arg_f, void *arg)
 }
 
 
+/*  Frees memory that has been internally allocated.  No reference counting is
+ *    performed to determine whether memory regions are still in use.
+ *  This may be useful for explicitly de-allocating memory before program
+ *    termination when checking for memory leaks.
+ *  WARNING: Do not call this routine until ALL hashes have been destroyed.
+ */
 void
 hash_drop_memory (void)
 {
@@ -410,6 +471,8 @@ hash_drop_memory (void)
  *  Hash Functions
  *****************************************************************************/
 
+/*  A hash_key_f function that hashes the string [str].
+ */
 unsigned int
 hash_key_string (const char *str)
 {
