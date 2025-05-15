@@ -697,7 +697,6 @@ enc_armor (munge_cred_t c)
         buf_ptr += prefix_len;
     }
     /*  Base64-encode the chewy-internals of the credential.
-     *  The data will be NUL-terminated by in the process.
      */
     if (base64_init (&x) < 0) {
         goto err;
