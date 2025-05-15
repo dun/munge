@@ -71,6 +71,9 @@ static int _recv_auth_req (int sd, char **pipe_name_p, char **file_dir_p);
 static int _name_auth_file (const char *pipe_name, const char *file_dir,
         char **file_name_p);
 
+/*  Sends data needed to prove the identity of the client to the server
+ *    that sent the auth req msg [m].
+ */
 int
 auth_send (m_msg_t m)
 {

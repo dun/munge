@@ -32,22 +32,8 @@
 
 
 void read_data_from_file (FILE *fp, void **buf, int *len);
-/*
- *  Malloc()s a buffer and reads data from file pointer [fp] into it,
- *    ensuring the buffer contains a terminating NUL.
- *  The reference parm [buf] is set to the address of the malloc'd buffer,
- *    and [len] is set to the length of the data (not including the
- *    terminating NUL character).
- */
 
 void read_data_from_string (const char *s, void **buf, int *len);
-/*
- *  Malloc()s a buffer and copies data from string [s] into it,
- *    ensuring the buffer contains a terminating NUL.
- *  The reference parm [buf] is set to the address of the malloc'd buffer,
- *    and [len] is set to the length of the string (not including the
- *    terminating NUL character).
- */
 
 
 #endif /* !MUNGE_READ_H */

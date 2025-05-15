@@ -32,10 +32,6 @@
 
 
 int auth_send (m_msg_t m);
-/*
- *  Sends data needed to prove the identity of the client to the server
- *    that sent the auth req msg [m].
- */
 
 
 #endif /* !MUNGE_AUTH_SEND_H */

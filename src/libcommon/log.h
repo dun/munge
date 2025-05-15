@@ -44,71 +44,22 @@
 
 
 int log_open_file (FILE *fp, const char *identity, int priority, int options);
-/*
- *  If [fp] is non-NULL, log messages at the [priority] level and higher
- *    (ie, below) to the specified file stream.
- *  If [identity] is non-NULL, its trailing "filename" component will
- *    be prepended to each message.
- *  The [options] parameter is a bitwise-OR of any "LOG_OPT_" defines
- *    specified above.
- *  Messages can be concurrently logged to syslog and one file stream.
- *  Returns 0 if the file is opened, or -1 on error;
- *    on error, the previous file stream remains open.
- */
 
 void log_close_file (void);
-/*
- *  Close the logging file stream (if open).
- */
 
 int log_open_syslog (const char *identity, int facility);
-/*
- *  If [identity] is non-NULL, log messages to syslog at the specified
- *    [facility] (cf, syslog(3)) prepending the trailing "filename" component
- *    of [identity] to each message.
- *  Messages can be concurrently logged to syslog and one file stream.
- *  Returns 0 on success, -1 on error.
- */
 
 void log_close_syslog (void);
-/*
- *  Closes the file descriptor used to write to the system logger (if open).
- */
 
 void log_close_all (void);
-/*
- *  Closes all logging devices that are open.
- */
 
 void log_err (int status, int priority, const char *format, ...);
-/*
- *  Logs a fatal message at the specified [priority] level according to
- *    the printf-style [format] string, after which it exits the program
- *    with the specified [status] value.
- */
 
 void log_errno (int status, int priority, const char *format, ...);
-/*
- *  Logs a fatal message at the specified [priority] level according to
- *    the printf-style [format] string, after which it exits the program
- *    with the specified [status] value.
- *  An error string will be appended to the message if the format string
- *    is not terminated with a newline and errno is non-zero.
- */
 
 void log_msg (int priority, const char *format, ...);
-/*
- *  Logs a non-fatal message at the specified [priority] level according to
- *    the printf-style [format] string.
- */
 
 void log_err_or_warn (int got_force, const char *format, ...);
-/*
- *  If [got_force] is false, log a fatal error message with the printf-style
- *    [format] string.
- *  If [got_force] is true, the fatal error is converted into a non-fatal
- *    warning.
- */
 
 
 #endif /* !LOG_H */

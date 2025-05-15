@@ -102,6 +102,9 @@ static timer_p         _timer_inactive = NULL;
  *  Public Functions
  *****************************************************************************/
 
+/*  Initialize the timer thread.  Timers can be set before calling this
+ *    routine, but expired timers will not be processed until it is called.
+ */
 void
 timer_init (void)
 {
@@ -140,6 +143,8 @@ timer_init (void)
 }
 
 
+/*  Cancels the timer thread and all pending timers.
+ */
 void
 timer_fini (void)
 {
@@ -189,6 +194,10 @@ timer_fini (void)
 }
 
 
+/*  Sets a timer to expire at the absolute time specified by [tsp].
+ *    At expiration, the callback function [cb] will be invoked with [arg].
+ *  Returns a timer ID > 0, or -1 on error (with errno set appropriately).
+ */
 long
 timer_set_absolute (callback_f cb, void *arg, const struct timespec *tsp)
 {
@@ -246,6 +255,10 @@ timer_set_absolute (callback_f cb, void *arg, const struct timespec *tsp)
 }
 
 
+/*  Sets a timer to expire at [msec] milliseconds past the current time.
+ *    At expiration, the callback function [cb] will be invoked with [arg].
+ *  Returns a timer ID > 0, or -1 on error (with errno set appropriately).
+ */
 long
 timer_set_relative (callback_f cb, void *arg, long msec)
 {
@@ -262,6 +275,10 @@ timer_set_relative (callback_f cb, void *arg, long msec)
 }
 
 
+/*  Cancels the timer specified by [id] before it expires.
+ *  Returns 1 on success, 0 if the [id] did not match an active timer,
+ *    and -1 on error (with errno set appropriately).
+ */
 int
 timer_cancel (long id)
 {

@@ -48,64 +48,17 @@ typedef enum path_security_flags {
 
 
 int path_canonicalize (const char *src, char *dst, int dstlen);
-/*
- *  Canonicalizes the path [src], returning an absolute pathname in the
- *    buffer [dst] of length [dstlen].
- *  Canonicalization expands all symbolic links and resolves references to
- *    '/./', '/../', and extra '/' characters.
- *  Returns the strlen() of the canonicalized path; if retval >= dstlen,
- *    truncation occurred.
- *  Returns -1 on error (with errno set).
- */
 
 int path_dirname (const char *src, char *dst, size_t dstlen);
-/*
- *  Copies the parent directory name of [src] into the buffer [dst] of
- *    length [dstlen].  Trailing '/' characters in the path are removed.
- *    If [src] does not contain a '/', then [dst] is set to the string ".".
- *  Returns 0 on success, or -1 on error (with errno set).
- */
 
 int path_is_accessible (const char *path, char *errbuf, size_t errbuflen);
-/*
- *  Checks if the specified [path] is accessible by all users.
- *  Returns 1 if all checks pass, 0 if any checks fail, or -1 on error
- *    (with errno set).
- *  If [errbuf] is non-NULL, a message describing the inaccessibility or error
- *    will be written to the buffer [errbuf] of length [errbuflen].
- */
 
 int path_is_secure (const char *path, char *errbuf, size_t errbuflen,
     path_security_flag_t flags);
-/*
- *  Checks if the specified [path] is secure, ensuring that the base directory
- *    cannot be modified by anyone other than the current user, the trusted
- *    group (if set), or root.
- *  Returns 1 if all checks pass, 0 if any checks fail, or -1 on error
- *    (with errno set).
- *  If [errbuf] is non-NULL, a message describing the insecurity or error
- *    will be written to the buffer [errbuf] of length [errbuflen].
- */
 
 int path_get_trusted_group (gid_t *gid_ptr);
-/*
- *  Gets the "trusted group" for permission checks on a directory hierarchy,
- *    storing the GID at [gid_ptr].
- *  Returns 0 on success with the "trusted group" GID stored at [gid_ptr]
- *    (if non-NULL).  Returns -1 on error without updating [gid_ptr].
- *  Warning: Not thread-safe.
- */
 
 int path_set_trusted_group (const char *group);
-/*
- *  Sets the "trusted group" for permission checks on a directory hierarchy.
- *    Directories with write permissions for group are allowed if they are
- *    owned by the trusted group.
- *  The [group] string can specify either a group name or GID.
- *    If [group] is NULL, the trusted group setting is cleared.
- *  Returns 0 on success, or -1 on error.
- *  Warning: Not thread-safe.
- */
 
 
 #endif /* !PATH_H */

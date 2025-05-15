@@ -80,6 +80,11 @@ static void * _work_dequeue (work_p wp);
  *  Public Functions
  *****************************************************************************/
 
+/*  Initializes the work crew comprised of [n_threads] workers.
+ *    The work function [f] will be invoked to process each work element
+ *    queued by work_queue().
+ *  Returns a ptr to the work crew, or NULL on error (with errno set).
+ */
 work_p
 work_init (work_func_t f, int n_threads)
 {
@@ -163,6 +168,11 @@ work_init (work_func_t f, int n_threads)
 }
 
 
+/*  Stops the work crew [wp], canceling all worker threads and releasing
+ *    associated resources.  If [do_wait] is non-zero, all currently-queued
+ *    work will be processed before the work crew is stopped; new work is
+ *    prevented from being added to the queue during this time.
+ */
 void
 work_fini (work_p wp, int do_wait)
 {
@@ -245,6 +255,10 @@ work_fini (work_p wp, int do_wait)
 }
 
 
+/*  Queues the [work] element for processing by the work crew [wp].
+ *    The [work] will be passed to the function specified during work_init().
+ *  Returns 0 on success, or -1 on error (with errno set).
+ */
 int
 work_queue (work_p wp, void *work)
 {
@@ -288,6 +302,8 @@ work_queue (work_p wp, void *work)
 }
 
 
+/*  Waits until all queued work is processed by the work crew [wp].
+ */
 void
 work_wait (work_p wp)
 {

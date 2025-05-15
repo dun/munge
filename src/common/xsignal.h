@@ -30,9 +30,6 @@
 
 
 void xsignal_ignore (int sig);
-/*
- *  Ignore the signal specified by [sig].
- */
 
 
 #endif /* !XSIGNAL_H */
