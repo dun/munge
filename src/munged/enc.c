@@ -690,10 +690,10 @@ enc_armor (munge_cred_t c)
     }
     buf_ptr = buf;
 
-    /*  Add the prefix string.
+    /*  Add the prefix string w/o null termination since more data will follow.
      */
     if (prefix_len > 0) {
-        strcpy ((char *) buf_ptr, MUNGE_CRED_PREFIX); /* strcpy() safe here */
+        memcpy (buf_ptr, MUNGE_CRED_PREFIX, prefix_len);
         buf_ptr += prefix_len;
     }
     /*  Base64-encode the chewy-internals of the credential.
@@ -727,10 +727,10 @@ enc_armor (munge_cred_t c)
     }
     n++;                                /* count the terminating NUL char */
 
-    /*  Add the suffix string.
+    /*  Add the suffix string with null termination since this is the end.
      */
     if (suffix_len > 0) {
-        strcpy ((char *) buf_ptr, MUNGE_CRED_SUFFIX); /* strcpy() safe here */
+        memcpy (buf_ptr, MUNGE_CRED_SUFFIX, suffix_len + 1);
         buf_ptr += suffix_len;
     }
     assert ((buf_ptr - buf) < buf_len);
