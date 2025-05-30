@@ -646,7 +646,7 @@ _xgetgrbuf_copy_string (const char *src, char **dstp,
     if (*buflenp < n) {
         return (-1);
     }
-    *dstp = strcpy (*bufp, src);
+    *dstp = memcpy (*bufp, src, n);
     *bufp += n;
     *buflenp -= n;
     return (n);
