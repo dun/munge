@@ -385,12 +385,11 @@ _log_aux (int errnum, int priority, char *msgbuf, int msgbuflen,
     /*  Add truncation string if buffer was overrun.
      */
     if (len <= 0) {
-        char *q;
-        n = strlen (LOG_TRUNC_SUFFIX);
-        q = buf + sizeof (buf) - 1 - append_nl - n;
+        size_t suffix_len = sizeof LOG_TRUNC_SUFFIX - 1;
+        char *q = buf + sizeof buf - suffix_len - append_nl - 1;
         p = (p < q) ? p : q;
-        strcpy (p, LOG_TRUNC_SUFFIX);
-        p += n;
+        memcpy (p, LOG_TRUNC_SUFFIX, suffix_len);
+        p += suffix_len;
     }
     /*  Terminate buffer with trailing newline and terminating NUL.
      */
