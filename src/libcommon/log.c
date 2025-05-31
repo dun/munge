@@ -94,7 +94,7 @@ static char * _log_prefix (int priority);
 /*  If [fp] is non-NULL, log messages at the [priority] level and higher
  *    (ie, below) to the specified file stream.
  *  If [identity] is non-NULL, its trailing "filename" component will
- *    be prepended to each message.
+ *    be prepended to each message; this string will be truncated if necessary.
  *  The [options] parameter is a bitwise-OR of any "LOG_OPT_" defines
  *    specified above.
  *  Messages can be concurrently logged to syslog and one file stream.
@@ -117,12 +117,14 @@ log_open_file (FILE *fp, const char *identity, int priority, int options)
         return (-1);
     }
     log_ctx.fp = fp;
-    memset (log_ctx.id, 0, sizeof (log_ctx.id));
     if (identity) {
         p = (p = strrchr (identity, '/')) ? p + 1 : identity;
-        if (strlen (p) < sizeof (log_ctx.id)) {
-            strcpy (log_ctx.id, p);
+        if (memccpy (log_ctx.id, p, '\0', sizeof log_ctx.id) == NULL) {
+            log_ctx.id[sizeof log_ctx.id - 1] = '\0';
         }
+    }
+    else {
+        log_ctx.id[0] = '\0';
     }
     log_ctx.priority = (priority > 0) ? priority : 0;
     log_ctx.options = options;
