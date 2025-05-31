@@ -243,8 +243,8 @@ dec_unarmor (munge_cred_t c)
     unsigned char *base64_tmp;          /* base64 data tmp ptr               */
     int            n;                   /* all-purpose int                   */
 
-    prefix_len = strlen (MUNGE_CRED_PREFIX);
-    suffix_len = strlen (MUNGE_CRED_SUFFIX);
+    prefix_len = sizeof MUNGE_CRED_PREFIX - 1;
+    suffix_len = sizeof MUNGE_CRED_SUFFIX - 1;
 
     base64_ptr = m->data;
     base64_len = m->data_len;
