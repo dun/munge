@@ -677,8 +677,8 @@ enc_armor (munge_cred_t c)
     base64_ctx     x;                   /* base64 context                    */
     int            n, n2;               /* all-purpose ints                  */
 
-    prefix_len = strlen (MUNGE_CRED_PREFIX);
-    suffix_len = strlen (MUNGE_CRED_SUFFIX);
+    prefix_len = sizeof MUNGE_CRED_PREFIX - 1;
+    suffix_len = sizeof MUNGE_CRED_SUFFIX - 1;
 
     /*  Allocate memory for armor'd data.
      */
