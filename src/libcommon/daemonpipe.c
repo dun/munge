@@ -203,8 +203,9 @@ daemonpipe_read (int *statusptr, int *priorityptr,
         if ((m >= 0) && (buf[m] == '\n')) {
             buf[m] = '\0';
         }
-        strncpy (dstbufptr, buf, dstbuflen);
-        dstbufptr[dstbuflen - 1] = '\0';
+        if (memccpy (dstbufptr, buf, '\0', dstbuflen) == NULL) {
+            dstbufptr[dstbuflen - 1] = '\0';
+        }
     }
     return (0);
 }
