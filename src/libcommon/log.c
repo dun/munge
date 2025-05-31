@@ -404,8 +404,9 @@ _log_aux (int errnum, int priority, char *msgbuf, int msgbuflen,
      */
     if (msgbuf && (msgbuflen > 0)) {
         if (sbuf) {
-            strncpy (msgbuf, sbuf, msgbuflen);
-            msgbuf[msgbuflen - 1] = '\0';
+            if (memccpy (msgbuf, sbuf, '\0', msgbuflen) == NULL) {
+                msgbuf[msgbuflen - 1] = '\0';
+            }
         }
         else {
             msgbuf[0] = '\0';
