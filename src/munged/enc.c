@@ -678,7 +678,9 @@ enc_armor (munge_cred_t c)
     int            n, n2;               /* all-purpose ints                  */
 
     prefix_len = sizeof MUNGE_CRED_PREFIX - 1;
+    assert (prefix_len > 0);
     suffix_len = sizeof MUNGE_CRED_SUFFIX - 1;
+    assert (suffix_len > 0);
 
     /*  Allocate memory for armor'd data.
      */
@@ -692,10 +694,9 @@ enc_armor (munge_cred_t c)
 
     /*  Add the prefix string w/o null termination since more data will follow.
      */
-    if (prefix_len > 0) {
-        memcpy (buf_ptr, MUNGE_CRED_PREFIX, prefix_len);
-        buf_ptr += prefix_len;
-    }
+    memcpy (buf_ptr, MUNGE_CRED_PREFIX, prefix_len);
+    buf_ptr += prefix_len;
+
     /*  Base64-encode the chewy-internals of the credential.
      */
     if (base64_init (&x) < 0) {
@@ -729,10 +730,8 @@ enc_armor (munge_cred_t c)
 
     /*  Add the suffix string with null termination since this is the end.
      */
-    if (suffix_len > 0) {
-        memcpy (buf_ptr, MUNGE_CRED_SUFFIX, suffix_len + 1);
-        buf_ptr += suffix_len;
-    }
+    memcpy (buf_ptr, MUNGE_CRED_SUFFIX, suffix_len + 1);
+    buf_ptr += suffix_len;
     assert ((buf_ptr - buf) < buf_len);
 
     /*  Replace "outer+inner" data with armor'd data.

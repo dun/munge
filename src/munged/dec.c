@@ -244,7 +244,9 @@ dec_unarmor (munge_cred_t c)
     int            n;                   /* all-purpose int                   */
 
     prefix_len = sizeof MUNGE_CRED_PREFIX - 1;
+    assert (prefix_len > 0);
     suffix_len = sizeof MUNGE_CRED_SUFFIX - 1;
+    assert (suffix_len > 0);
 
     base64_ptr = m->data;
     base64_len = m->data_len;
@@ -262,14 +264,13 @@ dec_unarmor (munge_cred_t c)
     /*  Remove the prefix string.
      *  The prefix specifies the start of the base64-encoded data.
      */
-    if (prefix_len > 0) {
-        if (strncmp ((char *) base64_ptr, MUNGE_CRED_PREFIX, prefix_len)) {
-            return (m_msg_set_err (m, EMUNGE_BAD_CRED,
-                strdup ("Failed to match armor prefix")));
-        }
-        base64_ptr += prefix_len;
-        base64_len -= prefix_len;
+    if (strncmp ((char *) base64_ptr, MUNGE_CRED_PREFIX, prefix_len)) {
+        return (m_msg_set_err (m, EMUNGE_BAD_CRED,
+            strdup ("Failed to match armor prefix")));
     }
+    base64_ptr += prefix_len;
+    base64_len -= prefix_len;
+
     /*  Remove the suffix string.
      *  The suffix specifies the end of the base64-encoded data.
      *    We can't rely on the base64 pad character to detect the end,
@@ -282,19 +283,18 @@ dec_unarmor (munge_cred_t c)
      *       If all goes well, the suffix will match on the 3rd comparison
      *       due to the trailing "\n\0".
      */
-    if (suffix_len > 0) {
-        base64_tmp = base64_ptr + base64_len - suffix_len;
-        while (base64_tmp >= base64_ptr) {
-            if (!strncmp ((char *) base64_tmp, MUNGE_CRED_SUFFIX, suffix_len))
-                break;
-            base64_tmp--;
-        }
-        if (base64_tmp < base64_ptr) {
-            return (m_msg_set_err (m, EMUNGE_BAD_CRED,
-                strdup ("Failed to match armor suffix")));
-        }
-        base64_len = base64_tmp - base64_ptr;
+    base64_tmp = base64_ptr + base64_len - suffix_len;
+    while (base64_tmp >= base64_ptr) {
+        if (!strncmp ((char *) base64_tmp, MUNGE_CRED_SUFFIX, suffix_len))
+            break;
+        base64_tmp--;
     }
+    if (base64_tmp < base64_ptr) {
+        return (m_msg_set_err (m, EMUNGE_BAD_CRED,
+            strdup ("Failed to match armor suffix")));
+    }
+    base64_len = base64_tmp - base64_ptr;
+
     /*  Allocate memory for unarmor'd data.
      */
     c->outer_mem_len = base64_decode_length (base64_len);
