@@ -675,7 +675,7 @@ enc_armor (munge_cred_t c)
     unsigned char *buf;                 /* armor'd data buffer               */
     unsigned char *buf_ptr;             /* ptr into armor'd data buffer      */
     base64_ctx     x;                   /* base64 context                    */
-    int            n, n2;               /* all-purpose ints                  */
+    int            n;                   /* temporary int                     */
 
     prefix_len = sizeof MUNGE_CRED_PREFIX - 1;
     assert (prefix_len > 0);
@@ -702,32 +702,25 @@ enc_armor (munge_cred_t c)
     if (base64_init (&x) < 0) {
         goto err;
     }
-    n = 0;
-    if (base64_encode_update (&x, buf_ptr, &n2, c->outer, c->outer_len) < 0) {
+    if (base64_encode_update (&x, buf_ptr, &n, c->outer, c->outer_len) < 0) {
         goto err_cleanup;
     }
-    buf_ptr += n2;
-    n += n2;
-    if (base64_encode_update (&x, buf_ptr, &n2, c->mac, c->mac_len) < 0) {
+    buf_ptr += n;
+    if (base64_encode_update (&x, buf_ptr, &n, c->mac, c->mac_len) < 0) {
         goto err_cleanup;
     }
-    buf_ptr += n2;
-    n += n2;
-    if (base64_encode_update (&x, buf_ptr, &n2, c->inner, c->inner_len) < 0) {
+    buf_ptr += n;
+    if (base64_encode_update (&x, buf_ptr, &n, c->inner, c->inner_len) < 0) {
         goto err_cleanup;
     }
-    buf_ptr += n2;
-    n += n2;
-    if (base64_encode_final (&x, buf_ptr, &n2) < 0) {
+    buf_ptr += n;
+    if (base64_encode_final (&x, buf_ptr, &n) < 0) {
         goto err_cleanup;
     }
-    buf_ptr += n2;
-    n += n2;
+    buf_ptr += n;
     if (base64_cleanup (&x) < 0) {
         goto err;
     }
-    n++;                                /* count the terminating NUL char */
-
     /*  Add the suffix string with null termination since this is the end.
      */
     memcpy (buf_ptr, MUNGE_CRED_SUFFIX, suffix_len + 1);
