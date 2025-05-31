@@ -154,6 +154,7 @@ m_msg_client_xfer (m_msg_t *pm, m_msg_type_t mreq_type, munge_ctx_t ctx)
 static munge_err_t
 _m_msg_client_connect (m_msg_t m, char *path)
 {
+    size_t              path_len;
     struct stat         st;
     struct sockaddr_un  addr;
     int                 sd;
@@ -168,6 +169,13 @@ _m_msg_client_connect (m_msg_t m, char *path)
         m_msg_set_err (m, EMUNGE_SOCKET,
             strdup ("MUNGE socket name is undefined"));
         return (EMUNGE_SOCKET);
+    }
+    path_len = strnlen (path, sizeof addr.sun_path);
+    if (path_len >= sizeof addr.sun_path) {
+        m_msg_set_err (m, EMUNGE_OVERFLOW,
+            strdupf ("Exceeded maximum length of %lu bytes for socket pathname",
+                sizeof addr.sun_path));
+        return (EMUNGE_OVERFLOW);
     }
     if (stat (path, &st) < 0) {
         if (errno == ENOENT) {
@@ -201,15 +209,7 @@ _m_msg_client_connect (m_msg_t m, char *path)
     }
     memset (&addr, 0, sizeof (addr));
     addr.sun_family = AF_UNIX;
-    addr.sun_path[ sizeof (addr.sun_path) - 1 ] = '\0';
-    strncpy (addr.sun_path, path, sizeof (addr.sun_path));
-    if (addr.sun_path[ sizeof (addr.sun_path) - 1 ] != '\0') {
-        close (sd);
-        m_msg_set_err (m, EMUNGE_OVERFLOW,
-            strdupf ("Exceeded maximum length of %lu bytes "
-            "for socket pathname", sizeof (addr.sun_path)));
-        return (EMUNGE_OVERFLOW);
-    }
+    memcpy (addr.sun_path, path, path_len + 1);
     i = 1;
     while (1) {
         /*
