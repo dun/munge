@@ -149,43 +149,23 @@ read_data_from_file (FILE *fp, void **buf, int *len)
 }
 
 
-/*  Malloc()s a buffer and copies data from string [s] into it,
- *    ensuring the buffer contains a terminating NUL.
- *  The reference parm [buf] is set to the address of the malloc'd buffer,
- *    and [len] is set to the length of the string (not including the
- *    terminating NUL character).
+/*  Duplicate string [s], storing its address in [*buf] and length in [*len].
+ *  Note that [len] does not include the terminating null character.
  */
 void
 read_data_from_string (const char *s, void **buf, int *len)
 {
-    size_t  n;
-    char   *p;
-
     assert (buf != NULL);
     assert (len != NULL);
 
-    *buf = NULL;
-    *len = 0;
-
-    if (s == NULL) {
+    if (!s) {
+        *buf = NULL;
+        *len = 0;
         return;
     }
-    n = strlen (s);
-    if (n == 0) {
-        return;
+    *buf = strdup (s);
+    if (*buf == NULL) {
+        log_errno (EMUNGE_NO_MEMORY, LOG_ERR, "Failed to copy payload string");
     }
-    p = malloc (n + 1);
-    if (p == NULL) {
-        log_errno (EMUNGE_NO_MEMORY, LOG_ERR,
-            "Failed to allocate %lu bytes", n + 1);
-    }
-    strncpy (p, s, n + 1);
-    p[n] = '\0';        /* null termination here is technically unnecessary */
-
-    if (n > INT_MAX) {
-        log_err (EMUNGE_SNAFU, LOG_ERR, "Exceeded maximum string size");
-    }
-    *buf = p;
-    *len = (int) n;
-    return;
+    *len = strlen (*buf);
 }
