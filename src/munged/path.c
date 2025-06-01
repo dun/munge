@@ -41,7 +41,6 @@
 #include "common.h"
 #include "path.h"
 #include "query.h"
-#include "strlcpy.h"
 
 
 /*****************************************************************************
@@ -67,17 +66,16 @@ static int _path_set_err (int rc, char *buf, size_t buflen,
  *    buffer [dst] of length [dstlen].
  *  Canonicalization expands all symbolic links and resolves references to
  *    '/./', '/../', and extra '/' characters.
- *  Returns the strlen() of the canonicalized path; if retval >= dstlen,
- *    truncation occurred.
+ *  Returns the strlen() of the canonicalized path on success.
  *  Returns -1 on error (with errno set).
  */
 int
 path_canonicalize (const char *src, char *dst, int dstlen)
 {
-    char buf [PATH_MAX];
-    int  n = 0;
+    char buf [PATH_MAX];                /* realpath() requires PATH_MAX bytes */
+    size_t buflen;
 
-    if (!src || !*src) {
+    if (!src || !*src || !dst) {
         errno = EINVAL;
         return (-1);
     }
@@ -88,10 +86,13 @@ path_canonicalize (const char *src, char *dst, int dstlen)
         errno = EINVAL;
         return (-1);
     }
-    if ((dst != NULL) && (dstlen > 0)) {
-        n = strlcpy (dst, buf, dstlen);
+    buflen = strnlen (buf, dstlen);
+    if (buflen >= dstlen) {
+        errno = ENAMETOOLONG;
+        return (-1);
     }
-    return (n);
+    memcpy (dst, buf, buflen + 1);
+    return (buflen);
 }
 
 
@@ -103,18 +104,22 @@ path_canonicalize (const char *src, char *dst, int dstlen)
 int
 path_dirname (const char *src, char *dst, size_t dstlen)
 {
+    size_t srclen;
     char *p = NULL;
     enum { start, last_slash, last_word, prev_slash } state = start;
 
-    if ((src == NULL) || (dst == NULL) || (dstlen <= 1)) {
+    if (!src || !*src || !dst) {
         errno = EINVAL;
         return (-1);
     }
-    if (strlcpy (dst, src, dstlen) >= dstlen) {
+    srclen = strnlen (src, dstlen);
+    if (srclen >= dstlen) {
         errno = ENAMETOOLONG;
         return (-1);
     }
-    for (p = dst + strlen (dst) - 1; p >= dst; p--) {
+    memcpy (dst, src, srclen + 1);
+
+    for (p = dst + srclen - 1; p >= dst; p--) {
         if (state == start) {
             state = (*p == '/') ? last_slash : last_word;
         }
@@ -155,12 +160,6 @@ path_is_accessible (const char *path, char *errbuf, size_t errbuflen)
     if (n < 0) {
         return (_path_set_err (-1, errbuf, errbuflen,
             "cannot canonicalize \"%s\": %s", path, strerror (errno)));
-    }
-    if (n >= sizeof (buf)) {
-        errno = ENAMETOOLONG;
-        return (_path_set_err (-1, errbuf, errbuflen,
-            "cannot canonicalize \"%s\": exceeded max path length of %zu bytes",
-            path, (sizeof (buf) - 1)));
     }
     if (lstat (buf, &st) < 0) {
         return (_path_set_err (-1, errbuf, errbuflen,
@@ -224,12 +223,6 @@ path_is_secure (const char *path, char *errbuf, size_t errbuflen,
     if (n < 0) {
         return (_path_set_err (-1, errbuf, errbuflen,
             "cannot canonicalize \"%s\": %s", path, strerror (errno)));
-    }
-    if (n >= sizeof (buf)) {
-        errno = ENAMETOOLONG;
-        return (_path_set_err (-1, errbuf, errbuflen,
-            "cannot canonicalize \"%s\": exceeded max path length of %zu bytes",
-            path, (sizeof (buf) - 1)));
     }
     if (lstat (buf, &st) < 0) {
         return (_path_set_err (-1, errbuf, errbuflen,
