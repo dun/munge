@@ -90,8 +90,6 @@ AC_CHECK_FUNCS( \
 )
 AC_REPLACE_FUNCS( \
   inet_ntop \
-  strlcat \
-  strlcpy \
 )
 X_AC_GETGRENT
 X_AC_GETGRNAM

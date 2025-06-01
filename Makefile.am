@@ -36,8 +36,6 @@ EXTRA_DIST = \
 	build-aux/tap-driver.sh \
 	doc \
 	portable/inet_ntop.h \
-	portable/strlcat.h \
-	portable/strlcpy.h \
 	$(TEMPLATE_FILES) \
 	# End of EXTRA_DIST
 
