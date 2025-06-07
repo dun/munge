@@ -202,10 +202,9 @@ _job_exec (m_msg_t m)
                 break;
         }
     }
-    /*  For certain MUNGE "cred" errors, the credential has been successfully
-     *    decoded but is deemed invalid for other reasons.  In these cases,
-     *    the origin IP address is added to the logged error message to aid
-     *    in troubleshooting.
+    /*  For some errors, the credential was successfully decoded but deemed
+     *    invalid for policy reasons.  In these cases, the origin IP address
+     *    is added to the error message to aid in troubleshooting.
      */
     if (m->error_num != EMUNGE_SUCCESS) {
         p = (m->error_str != NULL)
@@ -219,11 +218,12 @@ _job_exec (m_msg_t m)
                     char ip_addr_buf [INET_ADDRSTRLEN];
                     if (inet_ntop (AF_INET, &m->addr, ip_addr_buf,
                                    sizeof (ip_addr_buf)) != NULL) {
-                        log_msg (LOG_INFO, "%s from %s", p, ip_addr_buf);
+                        log_msg (LOG_DEBUG, "%s from %s", p, ip_addr_buf);
                         break;
                     }
                 }
-                /* fall-through */
+                log_msg (LOG_DEBUG, "%s", p);
+                break;
             default:
                 log_msg (LOG_INFO, "%s", p);
                 break;

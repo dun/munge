@@ -81,12 +81,6 @@ test_expect_success 'replay credential' '
     test_must_fail "${UNMUNGE}" --socket="${MUNGE_SOCKET}" <cred.$$ >/dev/null
 '
 
-# Check if a message has been logged for the replayed credential.
-#
-test_expect_success 'check logfile for replay' '
-    grep "Replayed credential" "${MUNGE_LOGFILE}"
-'
-
 # Stop the daemon.
 #
 test_expect_success 'stop munged' '
