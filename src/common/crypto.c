@@ -423,21 +423,25 @@ _openssl_thread_cleanup (void)
  *  Common Functions
  *****************************************************************************/
 
-/*  Compares the first [n] bytes of the memory regions [s1] and [s2] in an
- *    amount of time dependent upon the length [n], but independent of the
- *    contents of either [s1] or [s2].
- *  Returns 0 if the memory regions are equal, or non-zero otherwise.
+/*  Perform a timing-attack-resistant memory comparison.
+ *  Compare [len] bytes pointed to by [a] and [b] for equality in an amount of
+ *    time dependent on the length [len], but independent on the contents of
+ *    the memory regions pointed to by [a] and [b].
+ *  Return 0 if the memory regions are equal, or 1 if they differ.
+ *  This implementation is based on pseudo-code from Nate Lawson:
+ *  - https://rdist.root.org/2009/05/28/timing-attack-in-google-keyczar-library/
+ *  - https://rdist.root.org/2010/01/07/timing-independent-array-comparison/
  */
 int
-crypto_memcmp (const void *s1, const void *s2, size_t n)
+crypto_memcmp (const void *a, const void *b, size_t len)
 {
-    const unsigned char *a = s1;
-    const unsigned char *b = s2;
-    size_t               i;
-    unsigned char        x;
+    const unsigned char *x = a;
+    const unsigned char *y = b;
+    unsigned char z;
+    size_t i;
 
-    for (i = 0, x = 0; i < n; i++) {
-        x |= a[i] ^ b[i];
+    for (z = 0, i = 0; i < len; i++) {
+        z |= x[i] ^ y[i];
     }
-    return (x != 0);
+    return (z != 0);
 }
