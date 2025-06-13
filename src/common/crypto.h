@@ -44,7 +44,7 @@ void crypto_init (void);
 
 void crypto_fini (void);
 
-int crypto_memcmp (const void *s1, const void *s2, size_t n);
+int crypto_memcmp (const void *a, const void *b, size_t len);
 
 
 #endif /* !CRYPTO_H */
