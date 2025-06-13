@@ -428,13 +428,17 @@ _openssl_thread_cleanup (void)
  *    time dependent on the length [len], but independent on the contents of
  *    the memory regions pointed to by [a] and [b].
  *  Return 0 if the memory regions are equal, or 1 if they differ.
- *  This implementation is based on pseudo-code from Nate Lawson:
+ *  Use CRYPTO_memcmp() if available; it first appeared in OpenSSL 1.0.1d.
+ *  Otherwise, use an implementation based on pseudo-code from Nate Lawson:
  *  - https://rdist.root.org/2009/05/28/timing-attack-in-google-keyczar-library/
  *  - https://rdist.root.org/2010/01/07/timing-independent-array-comparison/
  */
 int
 crypto_memcmp (const void *a, const void *b, size_t len)
 {
+#if HAVE_OPENSSL && HAVE_CRYPTO_MEMCMP
+    return CRYPTO_memcmp (a, b, len);
+#else /* !(HAVE_OPENSSL && HAVE_CRYPTO_MEMCMP) */
     const unsigned char *x = a;
     const unsigned char *y = b;
     unsigned char z;
@@ -444,4 +448,5 @@ crypto_memcmp (const void *a, const void *b, size_t len)
         z |= x[i] ^ y[i];
     }
     return (z != 0);
+#endif /* !(HAVE_OPENSSL && HAVE_CRYPTO_MEMCMP) */
 }
