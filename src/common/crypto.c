@@ -441,7 +441,7 @@ crypto_memcmp (const void *a, const void *b, size_t len)
 #else /* !(HAVE_OPENSSL && HAVE_CRYPTO_MEMCMP) */
     const unsigned char *x = a;
     const unsigned char *y = b;
-    unsigned char z;
+    volatile unsigned char z;
     size_t i;
 
     if (!a || !b) {
