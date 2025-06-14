@@ -444,6 +444,9 @@ crypto_memcmp (const void *a, const void *b, size_t len)
     unsigned char z;
     size_t i;
 
+    if (!a || !b) {
+        return (a != b);
+    }
     for (z = 0, i = 0; i < len; i++) {
         z |= x[i] ^ y[i];
     }
