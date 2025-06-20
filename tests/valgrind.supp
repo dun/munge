@@ -168,6 +168,23 @@
 }
 
 {
+   libcrypto-RAND_get0_primary
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:CRYPTO_zalloc
+   ...
+   obj:/usr/lib64/libcrypto.so.3.2.2
+   fun:RAND_get0_primary
+   obj:/usr/lib64/libcrypto.so.3.2.2
+   fun:_random_add
+   fun:_random_read_entropy_from_kernel
+   fun:random_init
+   fun:main
+}
+
+{
    libcrypto-RAND_seed
    Memcheck:Leak
    match-leak-kinds: reachable
