@@ -47,7 +47,7 @@ typedef enum path_security_flags {
 } path_security_flag_t;
 
 
-int path_canonicalize (const char *src, char *dst, int dstlen);
+int path_canonicalize (const char *src, char *dst, size_t dstlen);
 
 int path_dirname (const char *src, char *dst, size_t dstlen);
 

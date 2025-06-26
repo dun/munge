@@ -70,7 +70,7 @@ static int _path_set_err (int rc, char *buf, size_t buflen,
  *  Returns -1 on error (with errno set).
  */
 int
-path_canonicalize (const char *src, char *dst, int dstlen)
+path_canonicalize (const char *src, char *dst, size_t dstlen)
 {
     char buf [PATH_MAX];                /* realpath() requires PATH_MAX bytes */
     size_t buflen;
