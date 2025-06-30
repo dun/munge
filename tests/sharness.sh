@@ -20,21 +20,23 @@
 
 if test -n "${ZSH_VERSION-}"
 then
-	emulate sh
-	ARGZERO="$ZSH_ARGZERO"
+	# shellcheck disable=SC2296
+	SHARNESS_SOURCE=${(%):-%x}
+	emulate sh -o POSIX_ARGZERO
 else
-	ARGZERO="$0"
+	# shellcheck disable=SC3028
+	SHARNESS_SOURCE=${BASH_SOURCE-$0}
 fi
 
 # Public: Current version of Sharness.
-SHARNESS_VERSION="1.2.0"
+SHARNESS_VERSION="1.2.1"
 export SHARNESS_VERSION
 
 : "${SHARNESS_TEST_EXTENSION:=t}"
 # Public: The file extension for tests.  By default, it is set to "t".
 export SHARNESS_TEST_EXTENSION
 
-: "${SHARNESS_TEST_DIRECTORY:=$(dirname "$ARGZERO")}"
+: "${SHARNESS_TEST_DIRECTORY:=$(dirname "$0")}"
 # ensure that SHARNESS_TEST_DIRECTORY is an absolute path so that it
 # is valid even if the current working directory is changed
 SHARNESS_TEST_DIRECTORY=$(cd "$SHARNESS_TEST_DIRECTORY" && pwd) || exit 1
@@ -42,8 +44,7 @@ SHARNESS_TEST_DIRECTORY=$(cd "$SHARNESS_TEST_DIRECTORY" && pwd) || exit 1
 # e.g. for testing Sharness itself.
 export SHARNESS_TEST_DIRECTORY
 
-# shellcheck disable=SC3028
-: "${SHARNESS_TEST_SRCDIR:=$(cd "$(dirname "${BASH_SOURCE-$0}")" && pwd)}"
+: "${SHARNESS_TEST_SRCDIR:=$(cd "$(dirname "$SHARNESS_SOURCE")" && pwd)}"
 # Public: Source directory of test code and sharness library.
 # This directory may be different from the directory in which tests are
 # being run.
@@ -73,7 +74,7 @@ done,*)
 	;;
 *' --tee '*|*' --verbose-log '*)
 	mkdir -p "$SHARNESS_TEST_OUTDIR/test-results"
-	BASE="$SHARNESS_TEST_OUTDIR/test-results/$(basename "$ARGZERO" ".$SHARNESS_TEST_EXTENSION")"
+	BASE="$SHARNESS_TEST_OUTDIR/test-results/$(basename "$0" ".$SHARNESS_TEST_EXTENSION")"
 
 	# Make this filename available to the sub-process in case it is using
 	# --verbose-log.
@@ -84,7 +85,7 @@ done,*)
 	# from any previous runs.
 	: >"$SHARNESS_TEST_TEE_OUTPUT_FILE"
 
-	(SHARNESS_TEST_TEE_STARTED="done" ${SHELL_PATH} "$ARGZERO" "$@" 2>&1;
+	(SHARNESS_TEST_TEE_STARTED="done" ${SHELL_PATH} "$0" "$@" 2>&1;
 	 echo $? >"$BASE.exit") | tee -a "$SHARNESS_TEST_TEE_OUTPUT_FILE"
 	test "$(cat "$BASE.exit")" = 0
 	exit
@@ -671,7 +672,7 @@ PATH="$SHARNESS_BUILD_DIRECTORY:$PATH"
 export PATH
 
 # Public: Path to test script currently executed.
-SHARNESS_TEST_FILE="$ARGZERO"
+SHARNESS_TEST_FILE="$0"
 export SHARNESS_TEST_FILE
 
 # Prepare test area.
