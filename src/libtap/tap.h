@@ -67,7 +67,7 @@ void    tap_end_todo    (void);
 
 #ifdef _WIN32
 #define like(...)        tap_skip(1, "like is not implemented on Windows")
-#define unlike           tap_skip(1, "unlike is not implemented on Windows")
+#define unlike(...)      tap_skip(1, "unlike is not implemented on Windows")
 #define dies_ok_common(...) \
                          tap_skip(1, "Death detection is not supported on Windows")
 #else
