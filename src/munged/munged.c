@@ -63,7 +63,6 @@
 #include "random.h"
 #include "replay.h"
 #include "str.h"
-#include "strlcpy.h"
 #include "timer.h"
 #include "xsignal.h"
 
@@ -589,18 +588,24 @@ lock_memory (void)
 static void
 sock_create (conf_t conf)
 {
+    size_t              path_len;
     char                sockdir [PATH_MAX];
     char                ebuf [1024];
     int                 sd;
     struct sockaddr_un  addr;
     mode_t              mask;
     int                 rv;
-    size_t              n;
 
     assert (conf != NULL);
 
     if ((conf->socket_name == NULL) || (*conf->socket_name == '\0')) {
         log_err (EMUNGE_SNAFU, LOG_ERR, "MUNGE socket name is undefined");
+    }
+    path_len = strnlen (conf->socket_name, sizeof addr.sun_path);
+    if (path_len >= sizeof addr.sun_path) {
+        log_err (EMUNGE_SNAFU, LOG_ERR,
+            "Exceeded maximum length of %lu bytes for socket pathname",
+            sizeof addr.sun_path);
     }
     /*  Ensure socket dir is secure against modification by others.
      */
@@ -653,13 +658,9 @@ sock_create (conf_t conf)
     }
     memset (&addr, 0, sizeof (addr));
     addr.sun_family = AF_UNIX;
-    n = strlcpy (addr.sun_path, conf->socket_name, sizeof (addr.sun_path));
-    if (n >= sizeof (addr.sun_path)) {
-        log_err (EMUNGE_SNAFU, LOG_ERR,
-            "Exceeded maximum length of %lu bytes for socket pathname",
-            sizeof (addr.sun_path));
-    }
-    /*  Ensure socket is accessible by all.
+    memcpy (addr.sun_path, conf->socket_name, path_len + 1);
+    /*
+     *  Ensure socket is accessible by all.
      */
     mask = umask (0);
     rv = bind (sd, (struct sockaddr *) &addr, sizeof (addr));
