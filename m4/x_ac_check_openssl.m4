@@ -14,6 +14,7 @@ AC_DEFUN([X_AC_CHECK_OPENSSL], [
   LIBS="${LIBS} ${LIBCRYPTO_LIBS}"
   AC_CHECK_FUNCS( \
     CRYPTO_THREADID_set_callback \
+    CRYPTO_memcmp \
     CRYPTO_num_locks \
     CRYPTO_set_id_callback \
     CRYPTO_set_locking_callback \
