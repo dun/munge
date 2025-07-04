@@ -3,9 +3,10 @@
 #
 VALGRIND_VERSION=$(valgrind --version 2>/dev/null)
 if test "$?" -eq 0; then
-    _x=$(echo "${VALGRIND_VERSION}" | sed -ne 's/[^-]*-\([0-9]*\).*/\1/p')
-    _y=$(echo "${VALGRIND_VERSION}" | sed -ne 's/[^.]*.\([0-9]*\).*/\1/p')
-    if { test "$_x" -eq 3 && test "$_y" -ge 10; } || { test "$_x" -gt 3; } then
+    _major=$(echo "${VALGRIND_VERSION}" | sed -ne 's/[^-]*-\([0-9]*\).*/\1/p')
+    _minor=$(echo "${VALGRIND_VERSION}" | sed -ne 's/[^.]*.\([0-9]*\).*/\1/p')
+    if { test "${_major}" -eq 3 && test "${_minor}" -ge 10; } || \
+       { test "${_major}" -gt 3; }; then
         test_set_prereq VALGRIND
     fi
 fi
