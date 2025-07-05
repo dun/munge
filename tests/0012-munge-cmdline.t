@@ -95,7 +95,7 @@ done
 
 for OPT_STRING in '-s' '--string'; do
     test_expect_success "munge ${OPT_STRING}" '
-        local payload=xyzzy-$$ &&
+        payload=xyzzy-$$ &&
         "${MUNGE}" --socket="${MUNGE_SOCKET}" "${OPT_STRING}" "${payload}" |
         "${UNMUNGE}" --socket="${MUNGE_SOCKET}" --no-output --output=out.$$ &&
         test "$(cat out.$$)" = "${payload}"
@@ -200,7 +200,6 @@ test_expect_success 'munge --cipher for invalid negative number' '
 '
 
 test_expect_success 'munge --cipher for each cipher by name' '
-    local meta name num extra &&
     >fail.$$ &&
     "${MUNGE}" --list-ciphers |
     awk "/([0-9]+)/ { gsub(/[()]/, \"\"); print \$2, \$1 }" |
@@ -220,7 +219,6 @@ test_expect_success 'munge --cipher for each cipher by name' '
 '
 
 test_expect_success 'munge --cipher for each cipher by number' '
-    local meta name num extra &&
     >fail.$$ &&
     "${MUNGE}" --list-ciphers |
     awk "/([0-9]+)/ { gsub(/[()]/, \"\"); print \$2, \$1 }" |
@@ -280,7 +278,6 @@ test_expect_success 'munge --mac for invalid negative number' '
 '
 
 test_expect_success 'munge --mac for each mac by name' '
-    local meta name num extra &&
     >fail.$$ &&
     "${MUNGE}" --list-macs |
     awk "/([0-9]+)/ { gsub(/[()]/, \"\"); print \$2, \$1 }" |
@@ -300,7 +297,6 @@ test_expect_success 'munge --mac for each mac by name' '
 '
 
 test_expect_success 'munge --mac for each mac by number' '
-    local meta name num extra &&
     >fail.$$ &&
     "${MUNGE}" --list-macs |
     awk "/([0-9]+)/ { gsub(/[()]/, \"\"); print \$2, \$1 }" |
@@ -374,7 +370,6 @@ test_expect_success 'munge --zip for invalid negative number' '
 '
 
 test_expect_success 'munge --zip for each zip by name' '
-    local meta name num extra &&
     >fail.$$ &&
     "${MUNGE}" --list-zips |
     awk "/([0-9]+)/ { gsub(/[()]/, \"\"); print \$2, \$1 }" |
@@ -395,7 +390,6 @@ test_expect_success 'munge --zip for each zip by name' '
 '
 
 test_expect_success 'munge --zip for each zip by number' '
-    local meta name num extra &&
     >fail.$$ &&
     "${MUNGE}" --list-zips |
     awk "/([0-9]+)/ { gsub(/[()]/, \"\"); print \$2, \$1 }" |
@@ -417,7 +411,7 @@ test_expect_success 'munge --zip for each zip by number' '
 
 for OPT_RESTRICT_UID in '-u' '--restrict-uid'; do
     test_expect_success "munge ${OPT_RESTRICT_UID} by name" '
-        local id=$(id -u -n) meta &&
+        id=$(id -u -n) &&
         "${MUNGE}" --socket="${MUNGE_SOCKET}" --no-input \
                 "${OPT_RESTRICT_UID}" "${id}" |
         "${UNMUNGE}" --socket="${MUNGE_SOCKET}" |
@@ -429,7 +423,7 @@ for OPT_RESTRICT_UID in '-u' '--restrict-uid'; do
 done
 
 test_expect_success 'munge --restrict-uid by number' '
-    local id=$(id -u) meta &&
+    id=$(id -u) &&
     "${MUNGE}" --socket="${MUNGE_SOCKET}" --no-input --restrict-uid="${id}" |
     "${UNMUNGE}" --socket="${MUNGE_SOCKET}" |
     awk "/^UID_RESTRICTION:/ { gsub(/[()]/, \"\"); print \$3 }" >meta.$$ &&
@@ -450,7 +444,7 @@ test_expect_success 'munge --restrict-uid for invalid number' '
 
 for OPT_UID in '-U' '--uid'; do
     test_expect_success "munge ${OPT_UID} for effective user by name" '
-        local id=$(id -u -n) meta &&
+        id=$(id -u -n) &&
         "${MUNGE}" --socket="${MUNGE_SOCKET}" --no-input "${OPT_UID}" "${id}" |
         "${UNMUNGE}" --socket="${MUNGE_SOCKET}" |
         awk "/^UID:/ { print \$2 }" >meta.$$ &&
@@ -461,7 +455,7 @@ for OPT_UID in '-U' '--uid'; do
 done
 
 test_expect_success 'munge --uid for effective user by number' '
-    local id=$(id -u) meta &&
+    id=$(id -u) &&
     "${MUNGE}" --socket="${MUNGE_SOCKET}" --no-input --uid="${id}" |
     "${UNMUNGE}" --socket="${MUNGE_SOCKET}" |
     awk "/^UID:/ { gsub(/[()]/, \"\"); print \$3 }" >meta.$$ &&
@@ -471,7 +465,7 @@ test_expect_success 'munge --uid for effective user by number' '
 '
 
 test_expect_success SUDO 'munge --uid for root user by name via sudo' '
-    local id=root meta &&
+    id=root &&
     sudo LD_LIBRARY_PATH="${LD_LIBRARY_PATH}" "${MUNGE}" \
             --socket="${MUNGE_SOCKET}" --no-input --uid="${id}" |
     "${UNMUNGE}" --socket="${MUNGE_SOCKET}" |
@@ -482,7 +476,7 @@ test_expect_success SUDO 'munge --uid for root user by name via sudo' '
 '
 
 test_expect_success SUDO 'munge --uid for root user by number via sudo' '
-    local id=0 meta &&
+    id=0 &&
     sudo LD_LIBRARY_PATH="${LD_LIBRARY_PATH}" "${MUNGE}" \
             --socket="${MUNGE_SOCKET}" --no-input --uid="${id}" |
     "${UNMUNGE}" --socket="${MUNGE_SOCKET}" |
@@ -503,7 +497,7 @@ test_expect_success 'munge --uid for invalid number' '
 
 for OPT_RESTRICT_GID in '-g' '--restrict-gid'; do
     test_expect_success "munge ${OPT_RESTRICT_GID} by name" '
-        local id=$(id -g -n) meta &&
+        id=$(id -g -n) &&
         "${MUNGE}" --socket="${MUNGE_SOCKET}" --no-input \
                 "${OPT_RESTRICT_GID}" "${id}" |
         "${UNMUNGE}" --socket="${MUNGE_SOCKET}" |
@@ -515,7 +509,7 @@ for OPT_RESTRICT_GID in '-g' '--restrict-gid'; do
 done
 
 test_expect_success 'munge --restrict-gid by number' '
-    local id=$(id -g) meta &&
+    id=$(id -g) &&
     "${MUNGE}" --socket="${MUNGE_SOCKET}" --no-input --restrict-gid="${id}" |
     "${UNMUNGE}" --socket="${MUNGE_SOCKET}" |
     awk "/^GID_RESTRICTION:/ { gsub(/[()]/, \"\"); print \$3 }" >meta.$$ &&
@@ -536,7 +530,7 @@ test_expect_success 'munge --restrict-gid for invalid number' '
 
 for OPT_GID in '-G' '--gid'; do
     test_expect_success "munge ${OPT_GID} for effective group by name" '
-        local id=$(id -g -n) meta &&
+        id=$(id -g -n) &&
         "${MUNGE}" --socket="${MUNGE_SOCKET}" --no-input "${OPT_GID}" "${id}" |
         "${UNMUNGE}" --socket="${MUNGE_SOCKET}" |
         awk "/^GID:/ { print \$2 }" >meta.$$ &&
@@ -547,7 +541,7 @@ for OPT_GID in '-G' '--gid'; do
 done
 
 test_expect_success 'munge --gid for effective group by number' '
-    local id=$(id -g) meta &&
+    id=$(id -g) &&
     "${MUNGE}" --socket="${MUNGE_SOCKET}" --no-input --gid="${id}" |
     "${UNMUNGE}" --socket="${MUNGE_SOCKET}" |
     awk "/^GID:/ { gsub(/[()]/, \"\"); print \$3 }" >meta.$$ &&
@@ -560,7 +554,7 @@ test_expect_success 'munge --gid for effective group by number' '
 #   query root's group via id.
 #
 test_expect_success SUDO 'munge --gid for root group by name via sudo' '
-    local id=$(id -g -n root) meta &&
+    id=$(id -g -n root) &&
     sudo LD_LIBRARY_PATH="${LD_LIBRARY_PATH}" "${MUNGE}" \
             --socket="${MUNGE_SOCKET}" --no-input --gid="${id}" |
     "${UNMUNGE}" --socket="${MUNGE_SOCKET}" |
@@ -571,7 +565,7 @@ test_expect_success SUDO 'munge --gid for root group by name via sudo' '
 '
 
 test_expect_success SUDO 'munge --gid for root group by number via sudo' '
-    local id=0 meta &&
+    id=0 &&
     sudo LD_LIBRARY_PATH="${LD_LIBRARY_PATH}" "${MUNGE}" \
             --socket="${MUNGE_SOCKET}" --no-input --gid="${id}" |
     "${UNMUNGE}" --socket="${MUNGE_SOCKET}" |
@@ -603,7 +597,7 @@ test_expect_success 'munge --ttl for maximum value' '
 '
 
 test_expect_success 'munge --ttl for non-default value' '
-    local ttl=88 meta &&
+    ttl=88 &&
     "${MUNGE}" --socket="${MUNGE_SOCKET}" --no-input --ttl="${ttl}" |
     "${UNMUNGE}" --socket="${MUNGE_SOCKET}" |
     awk "/^TTL:/ { print \$2 }" >meta.$$ &&

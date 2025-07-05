@@ -52,34 +52,36 @@ munged_setup()
 #
 munged_create_key()
 {
-    local can_bail_out= exec= rv=0
+    _can_bail_out=
+    _exec=
+    _rv=0
 
     while true; do
         case $1 in
-            t-bail-out-on-error) can_bail_out=1;;
-            t-exec=*) exec=$(echo "$1" | sed 's/^[^=]*=//');;
+            t-bail-out-on-error) _can_bail_out=1;;
+            t-exec=*) _exec=$(echo "$1" | sed 's/^[^=]*=//');;
             *) break;;
         esac
         shift
     done
 
     if test ! -r "${MUNGE_KEYFILE}"; then
-        test_debug "echo ${exec} \"${MUNGEKEY}\" \
+        test_debug "echo ${_exec} \"${MUNGEKEY}\" \
                 --create \
                 --keyfile=\"${MUNGE_KEYFILE}\" \
                 --bits=256 \
                 $*"
-        ${exec} "${MUNGEKEY}" \
+        ${_exec} "${MUNGEKEY}" \
                 --create \
                 --keyfile="${MUNGE_KEYFILE}" \
                 --bits=256 \
                 "$@"
-        rv=$?
-        if test "${rv}" -ne 0 && test "${can_bail_out}" = 1; then
+        _rv=$?
+        if test "${_rv}" -ne 0 && test "${_can_bail_out}" = 1; then
             bail_out "Failed to create key"
         fi
     fi
-    return ${rv}
+    return ${_rv}
 }
 
 # Start munged, removing an existing logfile or killing an errant munged
@@ -95,26 +97,30 @@ munged_create_key()
 #
 munged_start()
 {
-    local can_bail_out= exec= keep_logfile= keep_process= rv=0
+    _can_bail_out=
+    _exec=
+    _keep_logfile=
+    _keep_process=
+    _rv=
 
     while true; do
         case $1 in
-            t-bail-out-on-error) can_bail_out=1;;
-            t-exec=*) exec=$(echo "$1" | sed 's/^[^=]*=//');;
-            t-keep-logfile) keep_logfile=1;;
-            t-keep-process) keep_process=1;;
+            t-bail-out-on-error) _can_bail_out=1;;
+            t-exec=*) _exec=$(echo "$1" | sed 's/^[^=]*=//');;
+            t-keep-logfile) _keep_logfile=1;;
+            t-keep-process) _keep_process=1;;
             *) break;;
         esac
         shift
     done
 
-    if test "${keep_logfile}" != 1; then
+    if test "${_keep_logfile}" != 1; then
         rm -f "${MUNGE_LOGFILE}"
     fi
-    if test "${keep_process}" != 1; then
+    if test "${_keep_process}" != 1; then
         munged_kill
     fi
-    test_debug "echo ${exec} \"${MUNGED}\" \
+    test_debug "echo ${_exec} \"${MUNGED}\" \
             --socket=\"${MUNGE_SOCKET}\" \
             --key-file=\"${MUNGE_KEYFILE}\" \
             --log-file=\"${MUNGE_LOGFILE}\" \
@@ -122,7 +128,7 @@ munged_start()
             --seed-file=\"${MUNGE_SEEDFILE}\" \
             --group-update-time=-1 \
             $*"
-    ${exec} "${MUNGED}" \
+    ${_exec} "${MUNGED}" \
             --socket="${MUNGE_SOCKET}" \
             --key-file="${MUNGE_KEYFILE}" \
             --log-file="${MUNGE_LOGFILE}" \
@@ -130,11 +136,11 @@ munged_start()
             --seed-file="${MUNGE_SEEDFILE}" \
             --group-update-time=-1 \
             "$@"
-    rv=$?
-    if test "${rv}" -ne 0 && test "${can_bail_out}" = 1; then
+    _rv=$?
+    if test "${_rv}" -ne 0 && test "${_can_bail_out}" = 1; then
         bail_out "Failed to start munged"
     fi
-    return ${rv}
+    return ${_rv}
 }
 
 # Stop munged.
@@ -144,22 +150,22 @@ munged_start()
 #
 munged_stop()
 {
-    local exec=
+    _exec=
 
     while true; do
         case $1 in
-            t-exec=*) exec=$(echo "$1" | sed 's/^[^=]*=//');;
+            t-exec=*) _exec=$(echo "$1" | sed 's/^[^=]*=//');;
             *) break;;
         esac
         shift
     done
 
-    test_debug "echo ${exec} \"${MUNGED}\" \
+    test_debug "echo ${_exec} \"${MUNGED}\" \
             --socket=\"${MUNGE_SOCKET}\" \
             --stop \
             --verbose \
             $*"
-    ${exec} "${MUNGED}" \
+    ${_exec} "${MUNGED}" \
             --socket="${MUNGE_SOCKET}" \
             --stop \
             --verbose \
@@ -180,14 +186,13 @@ munged_stop()
 #
 munged_kill()
 {
-    local pid
-    pid=$(cat "${MUNGE_PIDFILE}" 2>/dev/null)
-    if test "x${pid}" != x; then
-        if ps -p "${pid}" -ww 2>/dev/null | grep munged; then
-            kill -9 "${pid}"
-            echo "WARNING: Killed errant munged pid ${pid}"
+    _pid=$(cat "${MUNGE_PIDFILE}" 2>/dev/null)
+    if test "x${_pid}" != x; then
+        if ps -p "${_pid}" -ww 2>/dev/null | grep munged; then
+            kill -9 "${_pid}"
+            echo "WARNING: Killed errant munged pid ${_pid}"
         else
-            echo "WARNING: Found stale pidfile for munged pid ${pid}"
+            echo "WARNING: Found stale pidfile for munged pid ${_pid}"
         fi
         rm -f "${MUNGE_PIDFILE}" "${MUNGE_SOCKET}"*
     fi
