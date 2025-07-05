@@ -102,7 +102,7 @@ test_expect_success 'unmunge --input from missing file' '
 
 for OPT_NO_OUTPUT in '-n' '--no-output'; do
     test_expect_success "unmunge ${OPT_NO_OUTPUT}" '
-        local payload=xyzzy-$$ &&
+        payload=xyzzy-$$ &&
         "${MUNGE}" --socket="${MUNGE_SOCKET}" --string="${payload}" |
         "${UNMUNGE}" --socket="${MUNGE_SOCKET}" "${OPT_NO_OUTPUT}" >out.$$ &&
         test ! -s out.$$
@@ -111,7 +111,7 @@ done
 
 for OPT_METADATA in '-m' '--metadata'; do
     test_expect_success "unmunge ${OPT_METADATA}" '
-        local payload=xyzzy-$$ &&
+        payload=xyzzy-$$ &&
         "${MUNGE}" --socket="${MUNGE_SOCKET}" --string="${payload}" |
         "${UNMUNGE}" --socket="${MUNGE_SOCKET}" "${OPT_METADATA}" meta.$$ \
                 >out.$$ &&
@@ -122,7 +122,7 @@ for OPT_METADATA in '-m' '--metadata'; do
 done
 
 test_expect_success 'unmunge --metadata to stdout via "-" along with payload' '
-    local payload=xyzzy-$$ &&
+    payload=xyzzy-$$ &&
     "${MUNGE}" --socket="${MUNGE_SOCKET}" --string="${payload}" |
     "${UNMUNGE}" --socket="${MUNGE_SOCKET}" --metadata=- >meta.out.$$ &&
     grep -q "^STATUS:" meta.out.$$ &&
@@ -130,7 +130,7 @@ test_expect_success 'unmunge --metadata to stdout via "-" along with payload' '
 '
 
 test_expect_success 'unmunge --metadata to /dev/null with payload on stdout' '
-    local payload=xyzzy-$$ &&
+    payload=xyzzy-$$ &&
     "${MUNGE}" --socket="${MUNGE_SOCKET}" --string="${payload}" |
     "${UNMUNGE}" --socket="${MUNGE_SOCKET}" --metadata=/dev/null >out.$$ &&
     grep -q -v "^STATUS:" out.$$ &&
@@ -139,7 +139,7 @@ test_expect_success 'unmunge --metadata to /dev/null with payload on stdout' '
 
 for OPT_OUTPUT in '-o' '--output'; do
     test_expect_success "unmunge ${OPT_OUTPUT}" '
-        local payload=xyzzy-$$ &&
+        payload=xyzzy-$$ &&
         "${MUNGE}" --socket="${MUNGE_SOCKET}" --string="${payload}" |
         "${UNMUNGE}" --socket="${MUNGE_SOCKET}" "${OPT_OUTPUT}" out.$$ \
                 >meta.$$ &&
@@ -150,7 +150,7 @@ for OPT_OUTPUT in '-o' '--output'; do
 done
 
 test_expect_success 'unmunge --output to stdout via "-" along with metadata' '
-    local payload=xyzzy-$$ &&
+    payload=xyzzy-$$ &&
     "${MUNGE}" --socket="${MUNGE_SOCKET}" --string="${payload}" |
     "${UNMUNGE}" --socket="${MUNGE_SOCKET}" --output=- >meta.out.$$ &&
     grep -q "^STATUS:" meta.out.$$ &&
@@ -158,7 +158,7 @@ test_expect_success 'unmunge --output to stdout via "-" along with metadata' '
 '
 
 test_expect_success 'unmunge --output to /dev/null with metadata on stdout' '
-    local payload=xyzzy-$$ &&
+    payload=xyzzy-$$ &&
     "${MUNGE}" --socket="${MUNGE_SOCKET}" --string="${payload}" |
     "${UNMUNGE}" --socket="${MUNGE_SOCKET}" --output=/dev/null >meta.$$ &&
     grep -q "^STATUS:" meta.$$ &&
@@ -174,7 +174,7 @@ done
 
 for OPT_KEYS in '-k' '--keys'; do
     test_expect_success "unmunge ${OPT_KEYS}" '
-        local key=LENGTH &&
+        key=LENGTH &&
         "${MUNGE}" --socket="${MUNGE_SOCKET}" --no-input |
         "${UNMUNGE}" --socket="${MUNGE_SOCKET}" "${OPT_KEYS}" ${key} |
         awk "/${key}:/ { gsub(/:/, \"\"); print \$1 }" >meta.$$ &&

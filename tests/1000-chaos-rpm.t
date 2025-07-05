@@ -88,7 +88,6 @@ test_expect_success MUNGE_DIST 'build srpm' '
 # Install build dependencies needed for building the binary RPMs.
 #
 test_expect_success MUNGE_SRPM 'install builddeps' '
-    local builddep &&
     if command -v dnf >/dev/null 2>&1; then
         builddep="dnf builddep --assumeyes"
     elif command -v yum-builddep >/dev/null 2>&1; then
@@ -199,7 +198,7 @@ test_expect_success MUNGE_INSTALL 'verify rpm removal' '
 #   with "/munge".
 #
 test_expect_success MUNGE_INSTALL 'remove key' '
-    local keyfiledir=$(dirname "${MUNGE_KEYFILE}") &&
+    keyfiledir=$(dirname "${MUNGE_KEYFILE}") &&
     expr "${keyfiledir}" : "/.*/munge$" >/dev/null 2>&1 &&
     echo "${keyfiledir}" &&
     sudo rm -rf "${keyfiledir}"

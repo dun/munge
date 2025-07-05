@@ -42,7 +42,6 @@ VALGRIND_CMD="libtool --mode=execute valgrind --tool=memcheck \
 #
 valgrind_check_log()
 {
-    local rv
     if test ! -s "${VALGRIND_LOGFILE}"; then
         echo "ERROR: Valgrind logfile [${VALGRIND_LOGFILE}] not found."
         rv=1

@@ -12,7 +12,6 @@ MUNGEKEY="${MUNGE_BUILD_DIR}/src/mungekey/mungekey"
 #
 set_executables()
 {
-    local prog
     for prog in "${MUNGE}" "${UNMUNGE}" "${REMUNGE}" "${MUNGED}" "${MUNGEKEY}"
     do
         if test ! -x "${prog}"; then

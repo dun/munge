@@ -52,7 +52,9 @@ munged_setup()
 #
 munged_create_key()
 {
-    local can_bail_out= exec= rv=0
+    can_bail_out=
+    exec=
+    rv=0
 
     while true; do
         case $1 in
@@ -95,7 +97,11 @@ munged_create_key()
 #
 munged_start()
 {
-    local can_bail_out= exec= keep_logfile= keep_process= rv=0
+    can_bail_out=
+    exec=
+    keep_logfile=
+    keep_process=
+    rv=
 
     while true; do
         case $1 in
@@ -144,7 +150,7 @@ munged_start()
 #
 munged_stop()
 {
-    local exec=
+    exec=
 
     while true; do
         case $1 in
@@ -180,7 +186,6 @@ munged_stop()
 #
 munged_kill()
 {
-    local pid
     pid=$(cat "${MUNGE_PIDFILE}" 2>/dev/null)
     if test "x${pid}" != x; then
         if ps -p "${pid}" -ww 2>/dev/null | grep munged; then

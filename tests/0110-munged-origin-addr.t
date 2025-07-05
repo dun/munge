@@ -104,7 +104,6 @@ test_expect_success 'munged --origin local IP address metadata' '
 # Set the IFNAME prereq if "ifname0.$$" contains a non-empty string.
 #
 test_expect_success GETIFADDRS 'munged --origin interface name lookup' '
-    local ifname &&
     sed -n -e "s/.*Set origin address.*(\([^)]*\)).*/\1/p" "${MUNGE_LOGFILE}" \
             >ifname0.$$ &&
     ifname=$(cat ifname0.$$) &&

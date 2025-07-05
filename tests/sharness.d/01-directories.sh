@@ -4,12 +4,12 @@
 #
 search_dirs()
 {
-    local start_dir=$1
-    local target_file=$2
+    search_start_dir=$1
+    search_target_file=$2
     (
-        cd "${start_dir}" &&
+        cd "${search_start_dir}" &&
         while test "$(pwd)" != "/"; do
-            test -e "${target_file}" && pwd && break
+            test -e "${search_target_file}" && pwd && break
             cd ..
         done
     )
