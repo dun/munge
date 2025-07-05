@@ -1,15 +1,15 @@
-# Search from directory [start_dir] up to the root directory, looking for a
-#   directory that contains [target_file].
+# Search from the start directory [$1] up to the root directory, looking for a
+#   directory that contains the target_file [$2].
 # Output the resulting directory if a match is found.
 #
 search_dirs()
 {
-    local start_dir=$1
-    local target_file=$2
+    _search_start_dir=$1
+    _search_target_file=$2
     (
-        cd "${start_dir}" &&
+        cd "${_search_start_dir}" &&
         while test "$(pwd)" != "/"; do
-            test -e "${target_file}" && pwd && break
+            test -e "${_search_target_file}" && pwd && break
             cd ..
         done
     )
