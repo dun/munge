@@ -50,15 +50,19 @@ jobs:
           elif expr "${{ matrix.os }}" : "macos" >/dev/null; then
             brew install autoconf automake libtool
           fi
-          printf "%s\n" "gpgrt-config --cflags libgcrypt = $(gpgrt-config --cflags libgcrypt)"
-          printf "%s\n" "pkg-config --cflags libgcrypt = $(pkg-config --cflags libgcrypt)"
-          printf "%s\n" "pkg-config --cflags libgcrypt gpg-error = $(pkg-config --cflags libgcrypt gpg-error)"
-          printf "%s\n" "pkg-config --libs libgcrypt = $(pkg-config --libs libgcrypt)"
-          printf "%s\n" "pkg-config --libs libgcrypt gpg-error = $(pkg-config --libs libgcrypt gpg-error)"
+#         printf "%s\n" "gpgrt-config --cflags libgcrypt = $(gpgrt-config --cflags libgcrypt)"
+#         printf "%s\n" "pkg-config --cflags libgcrypt = $(pkg-config --cflags libgcrypt)"
+#         printf "%s\n" "pkg-config --cflags libgcrypt gpg-error = $(pkg-config --cflags libgcrypt gpg-error)"
+#         printf "%s\n" "pkg-config --libs libgcrypt = $(pkg-config --libs libgcrypt)"
+#         printf "%s\n" "pkg-config --libs libgcrypt gpg-error = $(pkg-config --libs libgcrypt gpg-error)"
       - name: Bootstrap
         run: ./bootstrap
       - name: Configure
         run: >
+          if expr "${{ matrix.os }}" : "macos" >/dev/null; then
+            export LIBGCRYPT_CONFIG="pkg-config libgcrypt"
+          fi
+          echo "LIBGCRYPT_CONFIG=${LIBGCRYPT_CONFIG}"
           ./configure --with-crypto-lib="${{ matrix.lib }}"
           CC="${{ matrix.cc }}" CFLAGS="-Wall"
       - name: Get config.log
