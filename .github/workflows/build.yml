@@ -16,15 +16,15 @@ jobs:
 #         - ubuntu-latest
 #         - ubuntu-24.04-arm
 #         - macos-latest
-          - macos-13
-          - macos-14
+#         - macos-13
+#         - macos-14
           - macos-15
         lib:
           - openssl
-#         - libgcrypt
+          - libgcrypt
         cc:
-          - gcc
-#         - clang
+#         - gcc
+          - clang
         exclude:
           - os: macos-latest
             lib: libgcrypt
