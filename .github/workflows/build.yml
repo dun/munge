@@ -58,13 +58,13 @@ jobs:
       - name: Bootstrap
         run: ./bootstrap
       - name: Configure
-        run: >
+        run: |
           if expr "${{ matrix.os }}" : "macos" >/dev/null; then
             export LIBGCRYPT_CONFIG="pkg-config libgcrypt"
           fi
           echo "LIBGCRYPT_CONFIG=${LIBGCRYPT_CONFIG}"
-          ./configure --with-crypto-lib="${{ matrix.lib }}"
-          CC="${{ matrix.cc }}" CFLAGS="-Wall"
+          ./configure --with-crypto-lib="${{ matrix.lib }}" \
+            CC="${{ matrix.cc }}" CFLAGS="-Wall"
       - name: Get config.log
         run: cat config.log
       - name: Build
