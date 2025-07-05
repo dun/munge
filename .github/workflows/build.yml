@@ -15,19 +15,19 @@ jobs:
         os:
 #         - ubuntu-latest
 #         - ubuntu-24.04-arm
-#         - macos-latest
+          - macos-latest
 #         - macos-13
 #         - macos-14
-          - macos-15
+#         - macos-15
         lib:
-          - openssl
+#         - openssl
           - libgcrypt
         cc:
-#         - gcc
+          - gcc
           - clang
-        exclude:
-          - os: macos-latest
-            lib: libgcrypt
+#       exclude:
+#         - os: macos-latest
+#           lib: libgcrypt
     runs-on: ${{ matrix.os }}
     continue-on-error: false
     steps:
@@ -48,7 +48,7 @@ jobs:
             sudo apt install autoconf automake libtool \
               libgcrypt20-dev libssl-dev zlib1g-dev libbz2-dev
           elif expr "${{ matrix.os }}" : "macos" >/dev/null; then
-            brew install autoconf automake libtool
+            brew install autoconf automake libtool libgpg-error
           fi
       - name: Bootstrap
         run: ./bootstrap
