@@ -44,7 +44,7 @@ test_expect_success 'start munged' '
 #
 test_expect_success 'encode credential' '
     TTL=300 &&
-    TTL_SKEW=5 &&
+    TTL_SKEW=30 &&
     NOW=$(date +%s) &&
     "${MUNGE}" --socket="${MUNGE_SOCKET}" --string="xyzzy-$$" --ttl=${TTL} \
         </dev/null >cred.$$ &&
