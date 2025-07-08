@@ -5,4 +5,5 @@
     compress
     nodelaycompress
     missingok
+    su munge munge
 }
