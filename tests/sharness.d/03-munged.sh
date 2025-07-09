@@ -53,25 +53,25 @@ munged_setup()
 munged_create_key()
 {
     _can_bail_out=
-    _exec=
+    _cmd=
     _rv=0
 
     while true; do
         case $1 in
             t-bail-out-on-error) _can_bail_out=1;;
-            t-exec=*) _exec=$(echo "$1" | sed 's/^[^=]*=//');;
+            t-exec=*) _cmd=$(echo "$1" | sed 's/^[^=]*=//');;
             *) break;;
         esac
         shift
     done
 
     if test ! -r "${MUNGE_KEYFILE}"; then
-        test_debug "echo ${_exec} \"${MUNGEKEY}\" \
+        test_debug "echo ${_cmd} \"${MUNGEKEY}\" \
                 --create \
                 --keyfile=\"${MUNGE_KEYFILE}\" \
                 --bits=256 \
                 $*"
-        ${_exec} "${MUNGEKEY}" \
+        ${_cmd} "${MUNGEKEY}" \
                 --create \
                 --keyfile="${MUNGE_KEYFILE}" \
                 --bits=256 \
@@ -98,7 +98,7 @@ munged_create_key()
 munged_start()
 {
     _can_bail_out=
-    _exec=
+    _cmd=
     _keep_logfile=
     _keep_process=
     _rv=
@@ -106,7 +106,7 @@ munged_start()
     while true; do
         case $1 in
             t-bail-out-on-error) _can_bail_out=1;;
-            t-exec=*) _exec=$(echo "$1" | sed 's/^[^=]*=//');;
+            t-exec=*) _cmd=$(echo "$1" | sed 's/^[^=]*=//');;
             t-keep-logfile) _keep_logfile=1;;
             t-keep-process) _keep_process=1;;
             *) break;;
@@ -120,7 +120,7 @@ munged_start()
     if test "${_keep_process}" != 1; then
         munged_kill
     fi
-    test_debug "echo ${_exec} \"${MUNGED}\" \
+    test_debug "echo ${_cmd} \"${MUNGED}\" \
             --socket=\"${MUNGE_SOCKET}\" \
             --key-file=\"${MUNGE_KEYFILE}\" \
             --log-file=\"${MUNGE_LOGFILE}\" \
@@ -128,7 +128,7 @@ munged_start()
             --seed-file=\"${MUNGE_SEEDFILE}\" \
             --group-update-time=-1 \
             $*"
-    ${_exec} "${MUNGED}" \
+    ${_cmd} "${MUNGED}" \
             --socket="${MUNGE_SOCKET}" \
             --key-file="${MUNGE_KEYFILE}" \
             --log-file="${MUNGE_LOGFILE}" \
@@ -150,22 +150,22 @@ munged_start()
 #
 munged_stop()
 {
-    _exec=
+    _cmd=
 
     while true; do
         case $1 in
-            t-exec=*) _exec=$(echo "$1" | sed 's/^[^=]*=//');;
+            t-exec=*) _cmd=$(echo "$1" | sed 's/^[^=]*=//');;
             *) break;;
         esac
         shift
     done
 
-    test_debug "echo ${_exec} \"${MUNGED}\" \
+    test_debug "echo ${_cmd} \"${MUNGED}\" \
             --socket=\"${MUNGE_SOCKET}\" \
             --stop \
             --verbose \
             $*"
-    ${_exec} "${MUNGED}" \
+    ${_cmd} "${MUNGED}" \
             --socket="${MUNGE_SOCKET}" \
             --stop \
             --verbose \
