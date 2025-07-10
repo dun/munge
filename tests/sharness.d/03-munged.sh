@@ -54,7 +54,7 @@ munged_create_key()
 {
     _can_bail_out=
     _cmd=
-    _rv=0
+    _rv=
 
     while true; do
         case $1 in
@@ -65,21 +65,22 @@ munged_create_key()
         shift
     done
 
-    if test ! -r "${MUNGE_KEYFILE}"; then
-        test_debug "echo ${_cmd} \"${MUNGEKEY}\" \
-                --create \
-                --keyfile=\"${MUNGE_KEYFILE}\" \
-                --bits=256 \
-                $*"
-        ${_cmd} "${MUNGEKEY}" \
-                --create \
-                --keyfile="${MUNGE_KEYFILE}" \
-                --bits=256 \
-                "$@"
-        _rv=$?
-        if test "${_rv}" -ne 0 && test "${_can_bail_out}" = 1; then
-            bail_out "Failed to create key"
-        fi
+    if test -r "${MUNGE_KEYFILE}"; then
+        return 0
+    fi
+    test_debug "echo ${_cmd} \"${MUNGEKEY}\" \
+            --create \
+            --keyfile=\"${MUNGE_KEYFILE}\" \
+            --bits=256 \
+            $*"
+    ${_cmd} "${MUNGEKEY}" \
+            --create \
+            --keyfile="${MUNGE_KEYFILE}" \
+            --bits=256 \
+            "$@"
+    _rv=$?
+    if test "${_rv}" -ne 0 && test "${_can_bail_out}" = 1; then
+        bail_out "Failed to create key"
     fi
     return ${_rv}
 }
