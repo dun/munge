@@ -43,7 +43,7 @@ jobs:
         run: |
           if expr "${{ matrix.os }}" : "ubuntu" >/dev/null; then
             sudo apt install autoconf automake libtool \
-              libgcrypt20-dev libssl-dev zlib1g-dev libbz2-dev
+              libgcrypt20-dev libssl-dev zlib1g-dev libbz2-dev faketime
           elif expr "${{ matrix.os }}" : "macos" >/dev/null; then
             brew install autoconf automake libtool
           fi
