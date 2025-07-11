@@ -144,6 +144,28 @@ munged_start()
     return ${rv}
 }
 
+# Wait for munged to be ready to accept client connections.
+# This function polls for the munged pidfile, which is created after the socket
+#   has been bound and placed in the listen state.  The pidfile serves as a
+#   reliable indicator that munged is ready to process requests.
+# This synchronization is necessary when munged's built-in daemonization is
+#   bypassed (e.g., when using faketime which causes hangs during double-fork).
+#   In such cases, munged is backgrounded at the shell level and this function
+#   replaces the normal parent/child synchronization via daemonpipe.
+# Returns 0 on success (munged ready), 1 on timeout (5 seconds).
+#
+munged_wait()
+{
+    attempts=50
+
+    while test "${attempts}" -gt 0; do
+        test -f "${MUNGE_PIDFILE}" && return 0
+        sleep 0.1
+        attempts=$((attempts - 1))
+    done
+    return 1
+}
+
 # Stop munged.
 # The following leading args are recognized:
 #   t-exec=ARG - use ARG to exec munged.

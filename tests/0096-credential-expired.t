@@ -11,14 +11,6 @@ if test_have_prereq FAKETIME; then :; else
     test_done
 fi
 
-# FIXME: Require EXPENSIVE prereq until munged bug with faketime is resolved.
-#   The current work-around using sleep could cause false failures.
-#
-if test_have_prereq EXPENSIVE; then :; else
-    skip_all='skipping tests; long test not specified'
-    test_done
-fi
-
 # Set up the environment.
 #
 test_expect_success 'setup' '
@@ -65,15 +57,15 @@ test_expect_success 'stop munged' '
 #   in its embedded args (e.g., "faketime \"301 seconds\"").  To work around
 #   this limitation, compute the new time as seconds since the Epoch and
 #   specify faketime's timestamp using the @ prefix -- no whitespace required!
-# FIXME: The munged parent process hangs during the double-fork while
-#   attempting to background itself when called via faketime, so explicitly
-#   background munged at the shell.  The subsequent sleep is needed since
-#   backgrounding munged at the shell could cause the next sharness test to
-#   start executing (and fail) before the daemon has entered its event loop.
+# FIXME: faketime interferes with munged's double-fork daemonization, causing
+#   the parent process to hang indefinitely.  Work around this by backgrounding
+#   munged at the shell level instead.  Since this bypasses munged's normal
+#   startup synchronization (via daemonpipe), we must explicitly wait for
+#   munged to be ready before proceeding.
 #
 test_expect_success 'start munged with later time within ttl skew' '
     new_time=$((NOW + TTL - TTL_SKEW)) &&
-    ( munged_start t-exec="faketime @${new_time}" & ) && sleep 1
+    ( munged_start t-exec="faketime @${new_time}" & ) && munged_wait
 '
 
 # Decode a valid positively-skewed credential -- one with an encode time prior
@@ -94,11 +86,11 @@ test_expect_success 'stop munged' '
 # Start the daemon with a time in the future outside the credential's ttl skew
 #   to check how an expired credential decode is handled.
 # Note that restarting munged will clear its replay cache.
-# FIXME: The munged parent process hangs so background munged at the shell.
+# FIXME: faketime interferes with munged's double-fork daemonization as above.
 #
 test_expect_success 'start munged with later time outside ttl skew' '
     new_time=$((NOW + TTL + TTL_SKEW)) &&
-    ( munged_start t-exec="faketime @${new_time}" & ) && sleep 1
+    ( munged_start t-exec="faketime @${new_time}" & ) && munged_wait
 '
 
 # Decode an expired credential -- one with an encode time prior to its decode
