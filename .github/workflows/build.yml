@@ -50,9 +50,9 @@ jobs:
       - name: Bootstrap
         run: ./bootstrap
       - name: Configure
-        run: >
-          ./configure --with-crypto-lib="${{ matrix.lib }}"
-          CC="${{ matrix.cc }}" CFLAGS="-Wall"
+        run: |
+          ./configure --with-crypto-lib="${{ matrix.lib }}" \
+            CC="${{ matrix.cc }}" CFLAGS="-Wall"
       - name: Get config.log
         run: cat config.log
       - name: Build
