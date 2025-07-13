@@ -159,9 +159,11 @@ test_expect_success 'check for leftover lockfile from unclean shutdown' '
 '
 
 # Check for the leftover pidfile since munged was prevented from cleaning up.
+# Remove the pidfile to prevent munged_kill() from logging an error.
 #
 test_expect_success 'check for leftover pidfile from unclean shutdown' '
-    test -f "${MUNGE_PIDFILE}"
+    test -f "${MUNGE_PIDFILE}" &&
+    rm "${MUNGE_PIDFILE}"
 '
 
 # Check if munged can recover from an unclean shutdown.  While the socket and
