@@ -184,6 +184,7 @@ munged_stop()
 #   preventing graceful termination.  Since SIGKILL prevents the process from
 #   cleaning up after itself, that cleanup must be performed here afterwards.
 # The rm of the [MUNGE_SOCKET] glob also matches the corresponding lockfile.
+# Returns 0 if no cleanup was needed, 1 if remnants were found and cleaned.
 #
 munged_kill()
 {
@@ -196,7 +197,9 @@ munged_kill()
             say_color >&5 error "Found stale pidfile for munged pid ${_pid}"
         fi
         rm -f "${MUNGE_PIDFILE}" "${MUNGE_SOCKET}"*
+        return 1
     fi
+    return 0
 }
 
 # Perform housekeeping to clean up after munged.
