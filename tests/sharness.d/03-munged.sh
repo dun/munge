@@ -154,14 +154,7 @@ munged_start()
 #
 munged_wait()
 {
-    _attempts=50
-
-    while test "${_attempts}" -gt 0; do
-        test -f "${MUNGE_PIDFILE}" && return 0
-        sleep 0.1
-        _attempts=$((_attempts - 1))
-    done
-    return 1
+    wait_for "test -f \"${MUNGE_PIDFILE}\""
 }
 
 # Stop munged.
