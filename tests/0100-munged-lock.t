@@ -142,8 +142,8 @@ test_expect_success 'check for lockfile truncation after successful start' '
 test_expect_success 'stop munged using sigkill to prevent cleanup' '
     pid=$(cat "${MUNGE_PIDFILE}") &&
     ps -p "${pid}" -ww | grep munged &&
-    while kill -s KILL "${pid}" 2>/dev/null; do :; done &&
-    ! ps -p "${pid}" >/dev/null
+    kill -s KILL "${pid}" &&
+    wait_for "! ps -p \"${pid}\""
 '
 
 # Check for the leftover socket since munged was prevented from cleaning up.
