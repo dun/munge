@@ -169,12 +169,9 @@ test_expect_success 'check for leftover pidfile from unclean shutdown' '
 # Check if munged can recover from an unclean shutdown.  While the socket and
 #   lockfile still exist, the advisory lock will have been automatically
 #   dropped when the previous munged died.
-# On Debian 3.1 (Linux 2.4.27-3-386), the advisory lock seems to stay held for
-#   a few seconds after the process has terminated.  Therefore, make a few
-#   attempts to give the old lock a chance to clear before admitting defeat.
 #
 test_expect_success 'start munged with leftover socket from unclean shutdown' '
-    retry 5 munged_start
+    munged_start
 '
 
 # Stop the munged that was started for the preceding test.
