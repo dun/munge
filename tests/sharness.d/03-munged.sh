@@ -3,9 +3,7 @@
 #   [MUNGE_PIDDIR], and [MUNGE_SEEDDIR] can be overridden by setting them
 #   beforehand.
 # [MUNGE_SOCKET] is placed in [TMPDIR] by default since NFS can cause problems
-#   for the lockfile.  Debian 3.1 returns an incorrect pid for the process
-#   holding the lock across an NFS mount.  FreeBSD cannot create a lockfile
-#   across an NFS mount.
+#   for the lockfile.  FreeBSD cannot create a lockfile across an NFS mount.
 # Provides [MUNGE_SOCKET], [MUNGE_KEYFILE], [MUNGE_LOGFILE], [MUNGE_PIDFILE],
 #   and [MUNGE_SEEDFILE].
 #
