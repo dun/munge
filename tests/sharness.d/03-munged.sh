@@ -205,7 +205,11 @@ munged_kill()
     if test "x${_pid}" != x; then
         if ps -p "${_pid}" -ww 2>/dev/null | grep munged; then
             kill -9 "${_pid}"
-            say_color >&5 error "Killed errant munged pid ${_pid}"
+            if wait_for "! ps -p \"${_pid}\""; then
+                say_color >&5 error "Killed errant munged pid ${_pid}"
+            else
+                say_color >&5 error "Failed to kill munged pid ${_pid}"
+            fi
         else
             say_color >&5 error "Found stale pidfile for munged pid ${_pid}"
         fi
