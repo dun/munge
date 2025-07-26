@@ -29,10 +29,12 @@
 #  include <config.h>
 #endif /* HAVE_CONFIG_H */
 
+#include <arpa/inet.h>                  /* for inet_ntop() */
 #include <assert.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <limits.h>
+#include <netinet/in.h>                 /* for INET_ADDRSTRLEN */
 #include <signal.h>
 #include <stdlib.h>
 #include <string.h>
@@ -44,7 +46,6 @@
 #include <munge.h>
 #include "clock.h"
 #include "conf.h"
-#include "inet_ntop.h"
 #include "license.h"
 #include "lock.h"
 #include "log.h"

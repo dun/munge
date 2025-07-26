@@ -35,7 +35,6 @@ EXTRA_DIST = \
 	build-aux/gen-version \
 	build-aux/tap-driver.sh \
 	doc \
-	portable/inet_ntop.h \
 	$(TEMPLATE_FILES) \
 	# End of EXTRA_DIST
 

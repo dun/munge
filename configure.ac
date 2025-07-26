@@ -88,9 +88,6 @@ AC_CHECK_FUNCS( \
   mlockall \
   sysconf \
 )
-AC_REPLACE_FUNCS( \
-  inet_ntop \
-)
 X_AC_GETGRENT
 X_AC_GETGRNAM
 X_AC_GETPWNAM

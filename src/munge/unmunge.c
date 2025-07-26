@@ -30,13 +30,14 @@
 #endif /* HAVE_CONFIG_H */
 
 #include <sys/types.h>                  /* include before in.h for bsd       */
-#include <netinet/in.h>                 /* include before inet.h for bsd     */
+#include <arpa/inet.h>                  /* for inet_ntop() */
 #include <assert.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <grp.h>
 #include <limits.h>
 #include <netdb.h>                      /* for gethostbyaddr()               */
+#include <netinet/in.h>                 /* for INET_ADDRSTRLEN */
 #include <pwd.h>
 #include <signal.h>
 #include <stdio.h>
@@ -48,7 +49,6 @@
 #include <unistd.h>
 #include <munge.h>
 #include "common.h"
-#include "inet_ntop.h"
 #include "license.h"
 #include "log.h"
 #include "read.h"
