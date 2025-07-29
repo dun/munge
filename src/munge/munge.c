@@ -29,7 +29,6 @@
 #  include "config.h"
 #endif /* HAVE_CONFIG_H */
 
-#include <sys/types.h>                  /* include before grp.h for bsd */
 #include <assert.h>
 #include <ctype.h>
 #include <errno.h>
@@ -38,6 +37,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/types.h>
 #include <unistd.h>
 #include <munge.h>
 #include "common.h"

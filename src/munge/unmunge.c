@@ -29,7 +29,6 @@
 #  include "config.h"
 #endif /* HAVE_CONFIG_H */
 
-#include <sys/types.h>                  /* include before in.h for bsd       */
 #include <arpa/inet.h>                  /* for inet_ntop() */
 #include <assert.h>
 #include <errno.h>
@@ -45,6 +44,7 @@
 #include <string.h>
 #include <sys/socket.h>                 /* for AF_INET                       */
 #include <sys/stat.h>
+#include <sys/types.h>
 #include <time.h>
 #include <unistd.h>
 #include <munge.h>

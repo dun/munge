@@ -31,7 +31,6 @@
 #  include "config.h"
 #endif /* HAVE_CONFIG_H */
 
-#include <sys/types.h>                  /* include before grp.h for bsd */
 #include <assert.h>
 #include <errno.h>
 #include <pthread.h>
@@ -40,6 +39,7 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <sys/time.h>
+#include <sys/types.h>
 #include <munge.h>
 #include "common.h"
 #include "conf.h"

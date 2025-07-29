@@ -30,11 +30,11 @@
 #endif /* HAVE_CONFIG_H */
 
 #include <assert.h>
-#include <sys/types.h>                  /* include before in.h for bsd */
 #include <netinet/in.h>
 #include <stdarg.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/types.h>
 #include <munge.h>
 #include "ctx.h"
 #include "munge_defs.h"

@@ -31,7 +31,6 @@
 
 #include <assert.h>
 #include <errno.h>
-#include <sys/types.h>                  /* before ifaddrs.h for NetBSD 7.1.2 */
 #if HAVE_IFADDRS_H
 #include <ifaddrs.h>
 #endif /* HAVE_IFADDRS_H */
@@ -41,6 +40,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/socket.h>                 /* AF_INET, sockaddr */
+#include <sys/types.h>
 #include <unistd.h>
 #include <munge.h>
 #include "net.h"
