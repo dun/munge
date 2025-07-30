@@ -35,14 +35,14 @@
 #include <fcntl.h>
 #include <grp.h>
 #include <limits.h>
-#include <netdb.h>                      /* for gethostbyaddr()               */
+#include <netdb.h>                      /* for getnameinfo */
 #include <netinet/in.h>                 /* for INET_ADDRSTRLEN */
 #include <pwd.h>
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/socket.h>                 /* for AF_INET                       */
+#include <sys/socket.h>                 /* for AF_INET, getnameinfo */
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <time.h>
@@ -694,7 +694,6 @@ display_encode_host (conf_t conf)
     const char           *p;
     struct in_addr        addr;
     char                  addr_str[ INET_ADDRSTRLEN ];
-    struct hostent       *hostent_ptr;
 
     assert (conf != NULL);
 
@@ -714,9 +713,17 @@ display_encode_host (conf_t conf)
         fprintf (conf->fp_meta, "%s:%*c%s\n", key, num_spaces, 0x20, addr_str);
     }
     else {
-        hostent_ptr = gethostbyaddr (&addr, sizeof (addr), AF_INET);
+        struct sockaddr_in sin;
+        char hostname[NI_MAXHOST];
+        int rv;
+
+        memset (&sin, 0, sizeof sin);
+        sin.sin_family = AF_INET;
+        sin.sin_addr = addr;
+        rv = getnameinfo ((struct sockaddr *) &sin, sizeof sin,
+                hostname, sizeof hostname, NULL, 0, NI_NAMEREQD);
         fprintf (conf->fp_meta, "%s:%*c%s (%s)\n", key, num_spaces, 0x20,
-                (hostent_ptr ? hostent_ptr->h_name : "???"), addr_str);
+                (rv == 0 ? hostname : "???"), addr_str);
     }
     return;
 }
