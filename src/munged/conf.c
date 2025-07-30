@@ -33,7 +33,7 @@
 #include <assert.h>
 #include <errno.h>
 #include <fcntl.h>
-#include <limits.h>
+#include <limits.h>                     /* for _POSIX_HOST_NAME_MAX */
 #include <netinet/in.h>                 /* for INET_ADDRSTRLEN */
 #include <signal.h>
 #include <stdlib.h>
@@ -988,6 +988,7 @@ _conf_set_origin_addr (conf_t conf)
  *  If an orgin is not specified or the error is overridden, a warning is
  *    logged and the origin address is set to the null address.
  */
+    char hostname[_POSIX_HOST_NAME_MAX + 1];
     int is_origin_specified;
     int rv = 0;
 
@@ -999,9 +1000,18 @@ _conf_set_origin_addr (conf_t conf)
     is_origin_specified = (conf->origin_name != NULL) ? 1 : 0;
 
     if (conf->origin_name == NULL) {
-        rv = net_get_hostname (&conf->origin_name);
+        rv = gethostname (hostname, sizeof hostname);
         if (rv < 0) {
-            log_msg (LOG_WARNING, "Failed to get name of current host");
+            log_msg (LOG_WARNING, "Failed to get system hostname");
+        }
+        else {
+            /* POSIX doesn't guarantee null-termination if truncated */
+            hostname[sizeof hostname - 1] = '\0';
+            conf->origin_name = strdup (hostname);
+            if (conf->origin_name == NULL) {
+                log_msg (LOG_WARNING, "Failed to copy hostname string");
+                rv = -1;
+            }
         }
     }
     if (conf->origin_name != NULL) {

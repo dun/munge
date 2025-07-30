@@ -32,8 +32,6 @@
 #include <netinet/in.h>
 
 
-int net_get_hostname (char **result);
-
 int net_get_hostaddr (const char *name, struct in_addr *inaddrp,
         char **ifnamep);
 

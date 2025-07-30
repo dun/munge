@@ -34,28 +34,14 @@
 #if HAVE_IFADDRS_H
 #include <ifaddrs.h>
 #endif /* HAVE_IFADDRS_H */
-#include <limits.h>                     /* _POSIX_HOST_NAME_MAX */
 #include <netdb.h>
 #include <netinet/in.h>                 /* in_addr, sockaddr_in */
 #include <stdlib.h>
 #include <string.h>
 #include <sys/socket.h>                 /* AF_INET, sockaddr */
 #include <sys/types.h>
-#include <unistd.h>
 #include <munge.h>
 #include "net.h"
-
-/*  _HOST_NAME_MAX:
- *  The maximum length of a hostname as returned by gethostname(),
- *    not including the terminating null byte.
- *  _POSIX_HOST_NAME_MAX is the most restrictive value for this according to
- *    POSIX.1-2001.  If it is not defined, assume a conservative value.
- */
-#ifdef _POSIX_HOST_NAME_MAX
-#define _HOST_NAME_MAX  _POSIX_HOST_NAME_MAX
-#else  /* !_POSIX_HOST_NAME_MAX */
-#define _HOST_NAME_MAX  255
-#endif /* !_POSIX_HOST_NAME_MAX */
 
 
 /*****************************************************************************
@@ -79,37 +65,6 @@ static const struct ifaddrs * _net_get_ifa_via_addr (
 /*****************************************************************************
  *  External Functions
  *****************************************************************************/
-
-/*  Lookup the hostname for the current machine.
- *  Return 0 on success with [result] set to a null-terminated string,
- *    or -1 on error.
- */
-int
-net_get_hostname (char **result)
-{
-    char  buf[_HOST_NAME_MAX + 1];      /* +1 for terminating null byte */
-    char *p;
-
-    if (result == NULL) {
-        errno = EINVAL;
-        return -1;
-    }
-    /*  When gethostname() is passed an array of insufficient length, the
-     *    returned name shall be truncated, and it is unspecified whether
-     *    the string will be null-terminated.
-     *  When gethostname() fails, it is unspecified whether it sets errno.
-     */
-    if (gethostname (buf, sizeof (buf)) == -1) {
-        return -1;
-    }
-    p = strdup (buf);
-    if (p == NULL) {
-        return -1;
-    }
-    *result = p;
-    return 0;
-}
-
 
 /*  Lookup the network address for the [name] string which can be a hostname,
  *    IPv4 address, or local network interface name.
