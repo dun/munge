@@ -34,7 +34,7 @@
 #if HAVE_IFADDRS_H
 #include <ifaddrs.h>
 #endif /* HAVE_IFADDRS_H */
-#include <netdb.h>
+#include <netdb.h>                      /* getaddrinfo */
 #include <netinet/in.h>                 /* in_addr, sockaddr_in */
 #include <stdlib.h>
 #include <string.h>
@@ -48,16 +48,16 @@
  *  Internal Prototypes
  *****************************************************************************/
 
-static int _net_get_hostaddr_via_ifaddrs (
+static int _net_resolve_local_interface (
         const char *name, struct in_addr *inaddrp, char **ifnamep);
 
 #if HAVE_GETIFADDRS
 
-static const struct ifaddrs * _net_get_ifa_via_ifname (
+static const struct ifaddrs * _net_find_interface_by_name (
         const char *name, const struct ifaddrs *ifa_list);
 
-static const struct ifaddrs * _net_get_ifa_via_addr (
-        const struct hostent *h, const struct ifaddrs *ifa_list);
+static const struct ifaddrs * _net_find_interface_by_addrinfo (
+        const struct addrinfo *ai, const struct ifaddrs *ifa_list);
 
 #endif /* HAVE_GETIFADDRS */
 
@@ -66,37 +66,72 @@ static const struct ifaddrs * _net_get_ifa_via_addr (
  *  External Functions
  *****************************************************************************/
 
-/*  Lookup the network address for the [name] string which can be a hostname,
- *    IPv4 address, or local network interface name.
- *  Return 0 on success, or -1 on error.
+/*  Resolve the network address for the [name] string which can be a hostname,
+ *  IPv4 address, or local network interface name.
+ *
+ *  Return 0 on success, or -1 on error (with errno set).
+ *
  *  On success, [inaddrp] will be set to this address, and [ifnamep] will be
- *    set to either a new string containing the name of the corresponding local
- *    network interface (if available) or NULL (if not).  The caller is
- *    responsible for freeing this new string.
+ *  set to either a new string containing the name of the corresponding local
+ *  network interface (if available) or NULL (if not).  The caller is
+ *  responsible for freeing this new string.
+ *
+ *  Note: Various getaddrinfo() failures are mapped to EHOSTUNREACH for
+ *  simplicity, though the standard strerror() message ("No route to host")
+ *  may not accurately describe DNS resolution failures.  Callers should
+ *  provide appropriate error messages based on context.
  */
 int
-net_get_hostaddr (const char *name, struct in_addr *inaddrp, char **ifnamep)
+net_resolve_address (const char *name, struct in_addr *inaddrp, char **ifnamep)
 {
-    struct hostent *h;
-    int             rv;
+    struct addrinfo hints, *res;
+    struct sockaddr_in *sin;
+    int rv;
 
-    if ((name == NULL) || (inaddrp == NULL) || (ifnamep == NULL)) {
+    if (!name || !inaddrp || !ifnamep) {
         errno = EINVAL;
         return -1;
     }
-    rv = _net_get_hostaddr_via_ifaddrs (name, inaddrp, ifnamep);
-    /*
-     *  If unable to set addr via getifaddrs(), fallback to traditional lookup.
-     *  FIXME: gethostbyname() obsolete as of POSIX.1-2001.  Use getaddrinfo().
+    /*  First try to resolve as a local network interface.
      */
-    if (rv < 0) {
-        h = gethostbyname (name);
-        if ((h != NULL) && (h->h_addrtype == AF_INET)) {
-            *inaddrp = * (struct in_addr *) h->h_addr;
-            rv = 0;
-        }
+    rv = _net_resolve_local_interface (name, inaddrp, ifnamep);
+    if (rv == 0) {
+        return 0;
     }
-    return rv;
+    /*  Then fall back to standard hostname/address resolution.
+     *  Set hints.ai_socktype since some older systems might return
+     *    duplicate results without it.
+     */
+    memset (&hints, 0, sizeof hints);
+    hints.ai_family = AF_INET;
+    hints.ai_socktype = SOCK_STREAM;
+
+    rv = getaddrinfo (name, NULL, &hints, &res);
+    if (rv != 0) {
+        switch (rv) {
+            case EAI_MEMORY:
+                errno = ENOMEM;
+                break;
+            case EAI_NONAME:
+            case EAI_NODATA:
+            case EAI_AGAIN:
+            case EAI_FAIL:
+                errno = EHOSTUNREACH;
+                break;
+            case EAI_SYSTEM:
+                /* errno already set */
+                break;
+            default:
+                errno = EINVAL;
+                break;
+        }
+        return -1;
+    }
+    sin = (struct sockaddr_in *) res->ai_addr;
+    *inaddrp = sin->sin_addr;
+    *ifnamep = NULL;
+    freeaddrinfo (res);
+    return 0;
 }
 
 
@@ -104,23 +139,31 @@ net_get_hostaddr (const char *name, struct in_addr *inaddrp, char **ifnamep)
  *  Internal Functions
  *****************************************************************************/
 
-/*  Check if [name] matches an address assigned to a local network interface.
- *  Return 0 if a matching address is found, or -1 on error.
- *  On success, [inaddrp] will be set to this address, and [ifnamep] will be
- *    set to either a new string containing the name of the corresponding local
- *    network interface (if available) or NULL (if not).  The caller is
- *    responsible for freeing this new string.
- *  Note: getifaddrs() is not in POSIX.1-2001.
+/*  Check if [name] matches a local network interface or resolves to an address
+ *  assigned to a local network interface.
+ *
+ *  [name] can be a:
+ *  - network interface name
+ *  - IPv4 address that is assigned to a local interface
+ *  - hostname that resolves to an IPv4 address assigned to a local interface
+ *
+ *  Return 0 if a matching local interface is found, or -1 on error.
+ *
+ *  On success, [inaddrp] will be set to the interface's address, and [ifnamep]
+ *  will be set to either a new string containing the name of the interface or
+ *  NULL (if the interface name is unavailable).  The caller is responsible for
+ *  freeing this string.
  */
 static int
-_net_get_hostaddr_via_ifaddrs (const char *name, struct in_addr *inaddrp,
+_net_resolve_local_interface (const char *name, struct in_addr *inaddrp,
         char **ifnamep)
 {
 #if HAVE_GETIFADDRS
-    struct ifaddrs       *ifa_list;
+    struct ifaddrs *ifa_list;
     const struct ifaddrs *ifa;
-    struct hostent       *h;
-    int                   rv = -1;
+    struct addrinfo hints, *res;
+    int gai_error;
+    int rv = -1;
 
     assert (name != NULL);
     assert (inaddrp != NULL);
@@ -129,39 +172,53 @@ _net_get_hostaddr_via_ifaddrs (const char *name, struct in_addr *inaddrp,
     if (getifaddrs (&ifa_list) < 0) {
         return -1;
     }
-    /*  Check if NAME matches the name of a local network interface.
+    /*  Try interface name match
      */
-    ifa = _net_get_ifa_via_ifname (name, ifa_list);
-    /*
-     *  Check if NAME matches a hostname or IP address assigned to a local
-     *    network interface.
-     *  FIXME: gethostbyname() obsolete as of POSIX.1-2001.  Use getaddrinfo().
-     */
+    ifa = _net_find_interface_by_name (name, ifa_list);
+
     if (ifa == NULL) {
-        h = gethostbyname (name);
-        if (h != NULL) {
-            ifa = _net_get_ifa_via_addr (h, ifa_list);
+        /*
+         *  Try numeric IP match
+         */
+        memset (&hints, 0, sizeof hints);
+        hints.ai_family = AF_INET;
+        hints.ai_flags = AI_NUMERICHOST;
+
+        gai_error = getaddrinfo (name, NULL, &hints, &res);
+        if (gai_error == 0) {
+            ifa = _net_find_interface_by_addrinfo (res, ifa_list);
+            freeaddrinfo (res);
+        }
+        else if (gai_error == EAI_NONAME) {
+            /*
+             *  Try hostname resolution match
+             */
+            hints.ai_flags = 0;
+            gai_error = getaddrinfo (name, NULL, &hints, &res);
+            if (gai_error == 0) {
+                ifa = _net_find_interface_by_addrinfo (res, ifa_list);
+                freeaddrinfo (res);
+            }
         }
     }
-    /*  If a match is found...
+    /*  If a matching interface is found, set [inaddrp] and [ifnamep].
      */
     if (ifa != NULL) {
         *inaddrp = ((struct sockaddr_in *) ifa->ifa_addr)->sin_addr;
         *ifnamep = ((ifa->ifa_name != NULL) && (ifa->ifa_name[0] != '\0'))
-                ? strdup (ifa->ifa_name)
-                : NULL;
-        rv = 0;
-    }
-    /*  If a match is not found, but host lookup succeeded...
-     */
-    else if ((h != NULL) && (h->h_addrtype == AF_INET)) {
-        *inaddrp = * (struct in_addr *) h->h_addr;
-        *ifnamep = NULL;
-        rv = 0;
+            ? strdup (ifa->ifa_name)
+            : NULL;
+        if ((*ifnamep == NULL) && (ifa->ifa_name != NULL)) {
+            /* strdup() failed */
+            errno = ENOMEM;
+            rv = -1;
+        }
+        else {
+            rv = 0;
+        }
     }
     freeifaddrs (ifa_list);
     return rv;
-
 #else  /* !HAVE_GETIFADDRS */
     errno = ENOTSUP;
     return -1;
@@ -172,11 +229,12 @@ _net_get_hostaddr_via_ifaddrs (const char *name, struct in_addr *inaddrp,
 #if HAVE_GETIFADDRS
 
 /*  Search the linked list of structures returned by getifaddrs() [ifa_list]
- *    for an interface name matching the string [name].
+ *  for an interface name matching the string [name].
+ *
  *  Return a ptr to the matching ifaddrs struct, or NULL if no match is found.
  */
 static const struct ifaddrs *
-_net_get_ifa_via_ifname (const char *name, const struct ifaddrs *ifa_list)
+_net_find_interface_by_name (const char *name, const struct ifaddrs *ifa_list)
 {
     const struct ifaddrs *ifa;
 
@@ -184,52 +242,48 @@ _net_get_ifa_via_ifname (const char *name, const struct ifaddrs *ifa_list)
     assert (ifa_list != NULL);
 
     for (ifa = ifa_list; ifa != NULL; ifa = ifa->ifa_next) {
-        if (ifa->ifa_addr == NULL) {
+        if (ifa->ifa_addr == NULL)
             continue;
-        }
-        if (ifa->ifa_addr->sa_family != AF_INET) {
+        if (ifa->ifa_addr->sa_family != AF_INET)
             continue;
-        }
-        if (ifa->ifa_name == NULL) {
+        if (ifa->ifa_name == NULL)
             continue;
-        }
-        if (strcmp (ifa->ifa_name, name) == 0) {
+        if (strcmp (ifa->ifa_name, name) == 0)
             return ifa;
-        }
     }
     return NULL;
 }
 
 
 /*  Search the linked list of structures returned by getifaddrs() [ifa_list]
- *    for an interface IPv4 address matching [name], where [name] is either a
- *    hostname or IP address.
+ *  for an interface IPv4 address matching any address in [ai].
+ *
  *  Return a ptr to the matching ifaddrs struct, or NULL if no match is found.
  */
 static const struct ifaddrs *
-_net_get_ifa_via_addr (const struct hostent *h, const struct ifaddrs *ifa_list)
+_net_find_interface_by_addrinfo (const struct addrinfo *ai,
+        const struct ifaddrs *ifa_list)
 {
-    const struct ifaddrs  *ifa;
-    struct sockaddr_in    *sai;
-    struct in_addr       **hap;
+    const struct ifaddrs *ifa;
+    struct sockaddr_in *ifa_addr, *ai_addr;
+    const struct addrinfo *aip;
 
-    assert (h != NULL);
+    assert (ai != NULL);
     assert (ifa_list != NULL);
 
-    if (h->h_addrtype != AF_INET) {
-        return NULL;
-    }
     for (ifa = ifa_list; ifa != NULL; ifa = ifa->ifa_next) {
-        if (ifa->ifa_addr == NULL) {
+        if (ifa->ifa_addr == NULL)
             continue;
-        }
-        if (ifa->ifa_addr->sa_family == AF_INET) {
-            sai = (struct sockaddr_in *) ifa->ifa_addr;
-            for (hap = (struct in_addr **) h->h_addr_list; *hap; hap++) {
-                if ((**hap).s_addr == sai->sin_addr.s_addr) {
-                    return ifa;
-                }
-            }
+        if (ifa->ifa_addr->sa_family != AF_INET)
+            continue;
+        ifa_addr = (struct sockaddr_in *) ifa->ifa_addr;
+
+        for (aip = ai; aip != NULL; aip = aip->ai_next) {
+            if (aip->ai_family != AF_INET)
+                continue;
+            ai_addr = (struct sockaddr_in *) aip->ai_addr;
+            if (ai_addr->sin_addr.s_addr == ifa_addr->sin_addr.s_addr)
+                return ifa;
         }
     }
     return NULL;

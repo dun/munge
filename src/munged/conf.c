@@ -1016,13 +1016,15 @@ _conf_set_origin_addr (conf_t conf)
     }
     if (conf->origin_name != NULL) {
         errno = 0;
-        rv = net_get_hostaddr (conf->origin_name, &conf->addr,
+        rv = net_resolve_address (conf->origin_name, &conf->addr,
                 &conf->origin_ifname);
         if (rv < 0) {
+            const char *err_str = (errno == EHOSTUNREACH)
+                ? "Host not found"
+                : strerror (errno);
             log_err_or_warn (conf->got_force || !is_origin_specified,
-                    "Failed to lookup origin \"%s\"%s%s", conf->origin_name,
-                    (errno != 0) ? ": " : "",
-                    (errno != 0) ? strerror (errno) : "");
+                    "Failed to lookup origin \"%s\": %s",
+                    conf->origin_name, err_str);
         }
     }
     if (rv != 0) {
