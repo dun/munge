@@ -128,7 +128,7 @@ main (int argc, char *argv[])
     log_msg (LOG_NOTICE, "Starting %s-%s daemon (pid %d)",
         PACKAGE, VERSION, (int) getpid ());
     handle_signals ();
-    write_origin_addr (conf);
+    log_origin_addr (conf);
     if (conf->got_mlockall) {
         lock_memory ();
     }
