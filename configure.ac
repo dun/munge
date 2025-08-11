@@ -12,7 +12,6 @@ AC_SUBST([DATE], m4_esyscmd([build-aux/gen-date]))
 
 AC_CONFIG_AUX_DIR([build-aux])
 AC_CONFIG_HEADERS([config.h])
-AC_CONFIG_LIBOBJ_DIR([portable])
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_SRCDIR([src/libmunge/munge.h])
 AC_REQUIRE_AUX_FILE([tap-driver.sh])
