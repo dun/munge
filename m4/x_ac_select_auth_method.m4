@@ -68,8 +68,22 @@ AC_DEFUN([X_AC_SELECT_AUTH_METHOD], [
   X_AC_CHECK_LOCAL_PEERCRED
   AC_CHECK_TYPES(struct strrecvfd, [], [], [#include <stropts.h>])
   X_AC_CHECK_FIFO_RECVFD
-  AC_CHECK_FILES(/dev/spx)
-
+  AC_CACHE_CHECK(
+    [for /dev/spx],
+    [ac_cv_file__dev_spx], [
+      if test "${cross_compiling}" = yes; then
+        case "${host_os}" in
+          aix*) ac_cv_file__dev_spx=yes ;;
+          *) ac_cv_file__dev_spx=unlikely ;;
+        esac
+      else
+        if test -e "/dev/spx"; then
+          ac_cv_file__dev_spx=yes
+        else
+          ac_cv_file__dev_spx=no
+        fi
+      fi]
+  )
   AC_MSG_CHECKING([for authentication method])
   if   test AS_VAR_GET(ac_cv_func_getpeereid) = yes ; then
     AUTH_METHOD=AUTH_METHOD_GETPEEREID
@@ -110,5 +124,5 @@ AC_DEFUN([X_AC_SELECT_AUTH_METHOD], [
     AC_MSG_RESULT([failed])
     AC_MSG_ERROR([cannot determine authentication method])
   fi
-  AC_MSG_RESULT([$AUTH_METHOD])
+  AC_MSG_RESULT([${AUTH_METHOD}])
 ])
