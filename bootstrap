@@ -1,9 +1,7 @@
 #!/bin/sh
 set -e
-autoreconf --force --install --verbose --warnings=none
+autoreconf --force --install --verbose ${AUTOCONF_FLAGS:-}
 rm -rf autom4te.cache
 
-# Output the package string containing the auto-generated version for
-#   informational purposes.
-#
+# Print package version for verification after bootstrap
 sed -ne "s/^PACKAGE_STRING='\([^']*\)'$/\1/p" configure
