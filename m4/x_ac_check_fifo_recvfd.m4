@@ -49,8 +49,9 @@ if ( ( mkfifo (name, S_IWUSR | S_IRUSR) == 0)
 unlink (name);
 return (rc); ]]
       )],
-      AS_VAR_SET(x_ac_cv_check_fifo_recvfd, yes),
-      AS_VAR_SET(x_ac_cv_check_fifo_recvfd, no)
+      [AS_VAR_SET(x_ac_cv_check_fifo_recvfd, yes)],
+      [AS_VAR_SET(x_ac_cv_check_fifo_recvfd, no)],
+      [AS_VAR_SET(x_ac_cv_check_fifo_recvfd, no)]
     )]
   )
   AS_IF([test AS_VAR_GET(x_ac_cv_check_fifo_recvfd) = yes],
