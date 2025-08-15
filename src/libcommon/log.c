@@ -418,6 +418,7 @@ _log_aux (int errnum, int priority, char *msgbuf, int msgbuflen,
         syslog (priority, "%s", sbuf);
     }
     if (log_ctx.fp && (priority <= log_ctx.priority)) {
+        int errno_save = errno;
         errno = 0;
         if (fprintf (log_ctx.fp, "%s", buf) == EOF) {
             if (!log_ctx.got_fprintf_error) {
@@ -430,6 +431,7 @@ _log_aux (int errnum, int priority, char *msgbuf, int msgbuflen,
         else if (log_ctx.got_fprintf_error) {
             log_ctx.got_fprintf_error = 0;
         }
+        errno = errno_save;
     }
     return;
 }
