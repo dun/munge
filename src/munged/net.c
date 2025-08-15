@@ -112,6 +112,9 @@ net_resolve_address (const char *name, struct in_addr *inaddrp, char **ifnamep)
             case EAI_MEMORY:
                 errno = ENOMEM;
                 break;
+            case EAI_ADDRFAMILY:
+                errno = ENOTSUP;
+                break;
             case EAI_NONAME:
             case EAI_NODATA:
             case EAI_AGAIN:

@@ -48,9 +48,11 @@ test_expect_success 'munged failure for invalid IPv4 address origin' '
 '
 
 # Check for a fatal error on stderr when the origin is an IPv6 address.
+# Linux returns "Operation not supported"; BSD returns "Host not found".
+#
 test_expect_success 'munged failure for IPv6 address origin' '
     test_must_fail munged_start --origin="::1" 2>err.$$ &&
-    grep -E "Error:.* Failed to lookup origin.* (Invalid|not found)" err.$$
+    grep -E "Error:.* Failed to lookup origin.* not (found|supported)" err.$$
 '
 
 # Check if the error can be overridden when the origin cannot be resolved.
