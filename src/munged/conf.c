@@ -33,7 +33,7 @@
 #include <assert.h>
 #include <errno.h>
 #include <fcntl.h>
-#include <limits.h>
+#include <limits.h>                     /* for _POSIX_HOST_NAME_MAX */
 #include <netinet/in.h>                 /* for INET_ADDRSTRLEN */
 #include <signal.h>
 #include <stdlib.h>
@@ -539,26 +539,63 @@ process_conf (conf_t conf)
 
 
 void
-write_origin_addr (conf_t conf)
+log_origin_addr (conf_t conf)
 {
-/*  Write a log message indicating the origin address that will be encoded into
- *    the credential metadata.
+/*  Log the origin address that will be encoded into credential metadata.
+ *  If the address is bound to a local network interface, that interface name
+ *  is included in parentheses.
+ *
+ *  Warnings are included for:
+ *  - Null address (0.0.0.0)
+ *  - Loopback addresses (127.0.0.0/8) - only meaningful on local host
+ *  - Link-local addresses (169.254.0.0/16) - only valid on local segment
+ *
+ *  The null address (0.0.0.0) indicates failed origin address resolution.
+ *
+ *  The 127.0.0.0/8 range is reserved for loopback.  Many Debian-based systems
+ *  use 127.0.1.1 in /etc/hosts to provide a stable hostname mapping that
+ *  doesn't depend on network configuration.  While this works locally, MUNGE
+ *  credentials with loopback origin addresses are problematic in a distributed
+ *  environment since the address is not meaningful to other hosts.
+ *
+ *  Link-local addresses (169.254.0.0/16) are automatically assigned by the OS
+ *  when DHCP fails.  These addresses are only valid on the local network
+ *  segment and cannot be routed.  While MUNGE credentials with link-local
+ *  origin addresses will work on the same network segment, they may cause
+ *  confusion in larger deployments where nodes are on different segments.
  */
-    char buf[INET_ADDRSTRLEN];
+    char addr_str[INET_ADDRSTRLEN];
+    uint32_t addr;
+    const char *warning = "";
+    int priority;
 
     assert (conf != NULL);
 
-    if (!inet_ntop (AF_INET, &conf->addr, buf, sizeof (buf))) {
-        log_msg (LOG_WARNING, "Failed to convert origin address to a string");
+    if (!inet_ntop (AF_INET, &conf->addr, addr_str, sizeof addr_str)) {
+        log_msg (LOG_WARNING, "Failed to convert origin address to string");
+        return;
     }
-    else if (conf->origin_ifname != NULL) {
-        log_msg (LOG_INFO, "Set origin address to %s (%s)", buf,
-                conf->origin_ifname);
+
+    addr = ntohl (conf->addr.s_addr);
+
+    if (conf->addr.s_addr == INADDR_ANY) {
+        warning = " - null address";
+    }
+    else if ((addr & 0xFF000000) == 0x7F000000) {
+        warning = " - loopback, only meaningful on local host";
+    }
+    else if ((addr & 0xFFFF0000) == 0xA9FE0000) {
+        warning = " - link-local, only valid on local segment";
+    }
+
+    priority = (*warning == '\0' ? LOG_INFO : LOG_WARNING);
+    if (conf->origin_ifname != NULL) {
+        log_msg (priority, "Set origin address to %s (%s)%s",
+                addr_str, conf->origin_ifname, warning);
     }
     else {
-        log_msg (LOG_INFO, "Set origin address to %s", buf);
+        log_msg (priority, "Set origin address to %s%s", addr_str, warning);
     }
-    return;
 }
 
 
@@ -983,42 +1020,66 @@ static void
 _conf_set_origin_addr (conf_t conf)
 {
 /*  Set the origin address to be encoded into credential metadata.
- *  If an origin is explicitly specified, failure to lookup its network address
- *    results in an error which can be overridden.
- *  If an orgin is not specified or the error is overridden, a warning is
- *    logged and the origin address is set to the null address.
+ *
+ *  The origin can be specified via the --origin opt (hostname/IP/interface).
+ *  If it is not specified, the system hostname is used as a fallback.
+ *
+ *  Resolution order:
+ *  1. Check if origin matches a local network interface name
+ *  2. Try to resolve as an IP address
+ *  3. Try to resolve as a hostname
+ *
+ *  On resolution failure:
+ *  - If origin was explicitly specified: fatal error (unless --force)
+ *  - If origin was auto-detected (from hostname): warning only
+ *  - Origin address is set to 0.0.0.0 (null address)
+ *
+ *  Memory allocation failures are fatal and will terminate the program.
  */
+    char hostname[_POSIX_HOST_NAME_MAX + 1];
     int is_origin_specified;
-    int rv = 0;
+    int rv;
 
     assert (conf != NULL);
 
-    memset (&conf->addr, 0, sizeof (conf->addr));
+    /*  Initialize to null address.
+     */
+    memset (&conf->addr, 0, sizeof conf->addr);
     conf->origin_ifname = NULL;
 
-    is_origin_specified = (conf->origin_name != NULL) ? 1 : 0;
+    is_origin_specified = (conf->origin_name != NULL);
 
-    if (conf->origin_name == NULL) {
-        rv = net_get_hostname (&conf->origin_name);
+    /*  If no origin is specified, try using the system hostname.
+     */
+    if (!is_origin_specified) {
+        rv = gethostname (hostname, sizeof hostname);
         if (rv < 0) {
-            log_msg (LOG_WARNING, "Failed to get name of current host");
+            log_msg (LOG_WARNING, "Failed to get system hostname");
+        }
+        else {
+            /* POSIX doesn't guarantee null-termination if truncated */
+            hostname[sizeof hostname - 1] = '\0';
+            conf->origin_name = strdup (hostname);
+            if (conf->origin_name == NULL) {
+                log_msg (LOG_WARNING, "Failed to copy hostname string");
+            }
         }
     }
+    /*  Attempt to resolve origin to network address.
+     */
     if (conf->origin_name != NULL) {
         errno = 0;
-        rv = net_get_hostaddr (conf->origin_name, &conf->addr,
+        rv = net_resolve_address (conf->origin_name, &conf->addr,
                 &conf->origin_ifname);
         if (rv < 0) {
+            const char *err_str = (errno == EHOSTUNREACH)
+                ? "Host not found"
+                : strerror (errno);
             log_err_or_warn (conf->got_force || !is_origin_specified,
-                    "Failed to lookup origin \"%s\"%s%s", conf->origin_name,
-                    (errno != 0) ? ": " : "",
-                    (errno != 0) ? strerror (errno) : "");
+                    "Failed to lookup origin \"%s\": %s",
+                    conf->origin_name, err_str);
         }
     }
-    if (rv != 0) {
-        log_msg (LOG_WARNING, "Continuing with origin set to null address");
-    }
-    return;
 }
 
 

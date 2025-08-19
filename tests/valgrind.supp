@@ -26,6 +26,19 @@
 }
 
 {
+   getaddrinfo-nss_module_load-leak
+   Memcheck:Leak
+   match-leak-kinds:definite
+   fun:malloc
+   ...
+   fun:_dl_map_object_deps
+   ...
+   fun:__nss_module_load
+   ...
+   fun:getaddrinfo
+}
+
+{
    getgrent_r-leak
    Memcheck:Leak
    match-leak-kinds: reachable

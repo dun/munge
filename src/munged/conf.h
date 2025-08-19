@@ -104,7 +104,7 @@ void parse_cmdline (conf_t conf, int argc, char **argv);
 
 void process_conf (conf_t conf);
 
-void write_origin_addr (conf_t conf);
+void log_origin_addr (conf_t conf);
 
 void create_subkeys (conf_t conf);
 
