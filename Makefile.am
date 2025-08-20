@@ -27,8 +27,6 @@ EXTRA_DIST = \
 	PLATFORMS \
 	QUICKSTART \
 	README \
-	README.AIX \
-	README.MULTILIB \
 	THANKS \
 	bootstrap \
 	build-aux/gen-date \
