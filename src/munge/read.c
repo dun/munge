@@ -147,25 +147,3 @@ read_data_from_file (FILE *fp, void **buf, int *len)
     *len = (int) n;
     return;
 }
-
-
-/*  Duplicate string [s], storing its address in [*buf] and length in [*len].
- *  Note that [len] does not include the terminating null character.
- */
-void
-read_data_from_string (const char *s, void **buf, int *len)
-{
-    assert (buf != NULL);
-    assert (len != NULL);
-
-    if (!s) {
-        *buf = NULL;
-        *len = 0;
-        return;
-    }
-    *buf = strdup (s);
-    if (*buf == NULL) {
-        log_errno (EMUNGE_NO_MEMORY, LOG_ERR, "Failed to copy payload string");
-    }
-    *len = strlen (*buf);
-}

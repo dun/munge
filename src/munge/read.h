@@ -33,7 +33,5 @@
 
 void read_data_from_file (FILE *fp, void **buf, int *len);
 
-void read_data_from_string (const char *s, void **buf, int *len);
-
 
 #endif /* !MUNGE_READ_H */

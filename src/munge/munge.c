@@ -135,7 +135,8 @@ main (int argc, char *argv[])
     open_files (conf);
 
     if (conf->string) {
-        read_data_from_string (conf->string, &conf->data, &conf->dlen);
+        conf->data = conf->string;
+        conf->dlen = strlen (conf->string);
     }
     else if (conf->fn_in) {
         read_data_from_file (conf->fp_in, &conf->data, &conf->dlen);
@@ -202,8 +203,10 @@ destroy_conf (conf_t conf)
         conf->fp_out = NULL;
     }
     if (conf->data != NULL) {
-        memburn (conf->data, 0, conf->dlen);
-        free (conf->data);
+        if (conf->data != conf->string) {
+            memburn (conf->data, 0, conf->dlen);
+            free (conf->data);
+        }
         conf->data = NULL;
     }
     if (conf->cred != NULL) {
