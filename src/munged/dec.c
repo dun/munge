@@ -223,7 +223,7 @@ dec_check_retry (munge_cred_t c)
     }
     if (m->retry > MUNGE_SOCKET_RETRY_ATTEMPTS) {
         return (m_msg_set_err (m, EMUNGE_SOCKET,
-            strdupf ("Exceeded maximum number of decode attempts")));
+            strdup ("Exceeded maximum number of decode attempts")));
     }
     return (0);
 }
