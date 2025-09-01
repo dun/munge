@@ -25,8 +25,9 @@ test_expect_success 'setup' '
 # Create a key, or bail out.
 #
 test_expect_success 'create key under valgrind' '
-    munged_create_key t-bail-out-on-error t-exec="${VALGRIND_CMD}"
+    munged_create_key t-exec="${VALGRIND_CMD}"
 '
+test -f "${MUNGE_KEYFILE}" || bail_out "Failed to create key"
 
 test_expect_success 'check valgrind log for errors in mungekey' '
     valgrind_check_log

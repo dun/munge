@@ -16,9 +16,10 @@ test_expect_success 'setup' '
 # Force the daemon to run since the key may have the wrong permissions.
 #
 test_expect_success 'start munged with known key' '
-    munged_start t-bail-out-on-error --force \
+    munged_start --force \
             --key-file="${SHARNESS_TEST_SRCDIR}/0099-credential-decode.key"
 '
+test "${MUNGED_START_STATUS}" = 0 || bail_out "Failed to start munged"
 
 # Decode a known credential.
 # Expect an expired credential (STATUS=15).
