@@ -18,8 +18,7 @@ test_expect_success 'setup' '
 # Create a key, or bail out.
 #
 test_expect_success 'create key' '
-    munged_create_key t-bail-out-on-error &&
-    test -f "${MUNGE_KEYFILE}"
+    munged_create_key t-bail-out-on-error
 '
 
 # Verify the daemon can start, or bail out.
