@@ -17,17 +17,18 @@ test_expect_success 'setup' '
     munged_setup
 '
 
-# Create a key, or bail out.
+# Create a key.
 #
 test_expect_success 'create key' '
-    munged_create_key t-bail-out-on-error
+    munged_create_key
 '
 
 # Start the daemon, or bail out.
 #
 test_expect_success 'start munged' '
-    munged_start t-bail-out-on-error
+    munged_start
 '
+test "${MUNGED_START_STATUS}" = 0 || bail_out "Failed to start munged"
 
 # Encode some credentials.  The second one is for testing --ignore-ttl without
 #   relying on the behavior of restarting munged to clear its replay cache.

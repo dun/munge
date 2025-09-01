@@ -22,17 +22,18 @@ test_expect_success 'setup' '
     munged_setup
 '
 
-# Create a key, or bail out.
+# Create a key.
 #
 test_expect_success 'create key' '
-    munged_create_key t-bail-out-on-error
+    munged_create_key
 '
 
 # Start the daemon, or bail out.
 #
 test_expect_success 'start munged under valgrind' '
-    munged_start t-bail-out-on-error t-exec="${VALGRIND_CMD}"
+    munged_start t-exec="${VALGRIND_CMD}"
 '
+test "${MUNGED_START_STATUS}" = 0 || bail_out "Failed to start munged"
 
 test_expect_success 'encode credential' '
     "${MUNGE}" --socket="${MUNGE_SOCKET}" </dev/null >cred.$$

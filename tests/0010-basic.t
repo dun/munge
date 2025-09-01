@@ -12,10 +12,10 @@ test_expect_success 'setup' '
     munged_setup
 '
 
-# Create a key, or bail out.
+# Create a key.
 #
 test_expect_success 'create key' '
-    munged_create_key t-bail-out-on-error
+    munged_create_key
 '
 
 # Verify the key has been created.
@@ -27,7 +27,14 @@ test_expect_success 'check keyfile creation' '
 # Start the daemon, or bail out.
 #
 test_expect_success 'start munged' '
-    munged_start t-bail-out-on-error
+    munged_start
+'
+test "${MUNGED_START_STATUS}" = 0 || bail_out "Failed to start munged"
+
+# Verify the socket has been created.
+#
+test_expect_success 'check socket creation' '
+    test -S "${MUNGE_SOCKET}"
 '
 
 # Verify the pidfile has been created.
@@ -42,12 +49,6 @@ test_expect_success 'check pidfile creation' '
 test_expect_success 'check process is running' '
     PID=$(cat "${MUNGE_PIDFILE}") &&
     ps -p "${PID}" -ww | grep munged
-'
-
-# Verify the socket has been created.
-#
-test_expect_success 'check socket creation' '
-    test -S "${MUNGE_SOCKET}"
 '
 
 # Verify the logfile has been created.

@@ -42,21 +42,15 @@ munged_setup()
 
 # Create the smallest-allowable key if one does not already exist.
 # The following leading args are recognized:
-#   t-bail-out-on-error - bail out if mungekey fails.
 #   t-exec=ARG - use ARG to exec mungekey.
 # Remaining args will be appended to the mungekey command-line.
-# When using t-bail-out-on-error, munged_create_key should be at the start of
-#   the &&-chain to ensure Bail Out will occur on error.
 #
 munged_create_key()
 {
-    _can_bail_out=
     _cmd=
-    _rv=
 
     while true; do
         case $1 in
-            t-bail-out-on-error) _can_bail_out=1;;
             t-exec=*) _cmd=$(echo "$1" | sed 's/^[^=]*=//');;
             *) break;;
         esac
@@ -76,35 +70,25 @@ munged_create_key()
             --keyfile="${MUNGE_KEYFILE}" \
             --bits=256 \
             "$@"
-    _rv=$?
-    if test "${_rv}" -ne 0 && test "${_can_bail_out}" = 1; then
-        bail_out "Failed to create key"
-    fi
-    return ${_rv}
 }
 
 # Start munged, removing an existing logfile or killing an errant munged
 #   process (from a previous run) if needed.
+# Set MUNGED_START_STATUS to the exit status of starting munged.
 # The following leading args are recognized:
-#   t-bail-out-on-error - bail out if munged fails.
 #   t-exec=ARG - use ARG to exec munged.
 #   t-keep-logfile - do not remove logfile before starting munged.
 #   t-keep-process - do not kill previous munged process.
 # Remaining args will be appended to the munged command-line.
-# When using t-bail-out-on-error, munged_start should be at the start of
-#   the &&-chain to ensure Bail Out will occur on error.
 #
 munged_start()
 {
-    _can_bail_out=
     _cmd=
     _keep_logfile=
     _keep_process=
-    _rv=
 
     while true; do
         case $1 in
-            t-bail-out-on-error) _can_bail_out=1;;
             t-exec=*) _cmd=$(echo "$1" | sed 's/^[^=]*=//');;
             t-keep-logfile) _keep_logfile=1;;
             t-keep-process) _keep_process=1;;
@@ -135,11 +119,8 @@ munged_start()
             --seed-file="${MUNGE_SEEDFILE}" \
             --group-update-time=-1 \
             "$@"
-    _rv=$?
-    if test "${_rv}" -ne 0 && test "${_can_bail_out}" = 1; then
-        bail_out "Failed to start munged"
-    fi
-    return ${_rv}
+    MUNGED_START_STATUS=$?
+    return ${MUNGED_START_STATUS}
 }
 
 # Wait for munged to be ready to accept client connections.

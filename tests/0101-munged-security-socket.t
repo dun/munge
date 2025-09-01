@@ -17,18 +17,19 @@ test_expect_success 'setup' '
     munged_setup
 '
 
-# Create a key, or bail out.
+# Create a key.
 #
 test_expect_success 'create key' '
-    munged_create_key t-bail-out-on-error
+    munged_create_key
 '
 
 # Verify the daemon can start, or bail out.
 #
 test_expect_success 'check munged startup' '
-    munged_start t-bail-out-on-error &&
+    munged_start &&
     munged_stop
 '
+test "${MUNGED_START_STATUS}" = 0 || bail_out "Failed to start munged"
 
 # Check the permissions on the socket dir.
 #

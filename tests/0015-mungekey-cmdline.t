@@ -21,8 +21,9 @@ test_expect_success 'mungekey key not found' '
 # Create a key, or bail out.
 #
 test_expect_success 'mungekey key create' '
-    munged_create_key t-bail-out-on-error
+    munged_create_key
 '
+test -f "${MUNGE_KEYFILE}" || bail_out "Failed to create key"
 
 # Check if the keyfile has a non-zero file size.
 #
