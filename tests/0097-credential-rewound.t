@@ -6,7 +6,7 @@ test_description='Check decode of a rewound credential'
 : "${SHARNESS_TEST_SRCDIR:=$(cd "$(dirname "$0")" && pwd)}"
 . "${SHARNESS_TEST_SRCDIR}/sharness.sh"
 
-if test_have_prereq FAKETIME; then :; else
+if ! test_have_prereq FAKETIME; then
     skip_all='skipping tests; faketime not installed'
     test_done
 fi

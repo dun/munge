@@ -15,7 +15,7 @@ fi
 
 # Ensure long tests are specified.
 #
-if test_have_prereq EXPENSIVE; then :; else
+if ! test_have_prereq EXPENSIVE; then
     skip_all='skipping rpm test; long test not specified'
     test_done
 fi
@@ -23,22 +23,21 @@ fi
 # Ensure this is a RedHat-based system.
 # This regexp matches recent AlmaLinux, CentOS, and Fedora.
 #
-if grep -E '^ID.*=.*\b(rhel|fedora)\b' /etc/os-release >/dev/null 2>&1; then :
-else
+if ! grep -E -q '^ID.*=.*\b(rhel|fedora)\b' /etc/os-release; then
     skip_all='skipping rpm test; not a supported redhat-based system'
     test_done
 fi
 
 # Ensure the rpmbuild executable is already installed.
 #
-if command -v rpmbuild >/dev/null 2>&1; then :; else
+if ! command -v rpmbuild >/dev/null 2>&1; then
     skip_all='skipping rpm test; rpmbuild not installed'
     test_done
 fi
 
 # Ensure that non-interactive sudo is available.
 #
-if test_have_prereq SUDO; then :; else
+if ! test_have_prereq SUDO; then
     skip_all='skipping rpm test; sudo not enabled'
     test_done
 fi
