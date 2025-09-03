@@ -198,8 +198,7 @@ test_expect_success 'check lockfile removal again' '
 #
 test_expect_success SUDO 'stop unprivileged munged as root' '
     munged_start &&
-    if munged_stop \
-            t-exec="sudo LD_LIBRARY_PATH=${LD_LIBRARY_PATH}"; then :; else
+    if ! munged_stop t-exec="sudo LD_LIBRARY_PATH=${LD_LIBRARY_PATH}"; then
         munged_stop; false;
     fi
 '
