@@ -13,6 +13,13 @@ if test "x${MUNGE_CHAOS}" != xt; then
     test_done
 fi
 
+# Ensure long tests are specified.
+#
+if test_have_prereq EXPENSIVE; then :; else
+    skip_all='skipping rpm test; long test not specified'
+    test_done
+fi
+
 # Ensure this is a RedHat-based system.
 # This regexp matches recent AlmaLinux, CentOS, and Fedora.
 #
