@@ -25,14 +25,11 @@
  *****************************************************************************/
 
 
-#ifndef MUNGE_READ_H
-#define MUNGE_READ_H
-
-#include <stdio.h>
-#include <stddef.h>
+#ifndef MUNGE_TEST_H
+#define MUNGE_TEST_H
 
 
-void read_data_from_file (FILE *fp, void **dst, int *dst_len, size_t max_size);
+int test_get_env_int (const char *name, int *dst_val);
 
 
-#endif /* !MUNGE_READ_H */
+#endif /* !MUNGE_TEST_H */

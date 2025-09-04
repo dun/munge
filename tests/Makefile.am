@@ -23,6 +23,7 @@ test_scripts = \
 	0022-munge-valgrind.t \
 	0023-unmunge-valgrind.t \
 	0025-mungekey-valgrind.t \
+	0095-credential-payload.t \
 	0096-credential-expired.t \
 	0097-credential-rewound.t \
 	0098-credential-replayed.t \

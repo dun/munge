@@ -100,9 +100,17 @@
  */
 #define MUNGE_MINIMUM_MD_LEN            16
 
-/*  Integer for the maximum size (in bytes) of a munge request message.
+/*  Integer for the maximum size (in bytes) of a munge credential payload.
  */
-#define MUNGE_MAXIMUM_REQ_LEN           1048576
+#define MUNGE_MAXIMUM_PAYLOAD_LEN       1048576
+
+/*  Integer for the maximum size (in bytes) of a munge request message.
+ *  An encode request may contain a payload, and a decode request will contain
+ *    a base64-encoded credential (~33% larger than the original payload).
+ *  Set the maximum request size to 2x the maximum payload size to account for
+ *    additional metadata and overhead.
+ */
+#define MUNGE_MAXIMUM_REQ_LEN           (MUNGE_MAXIMUM_PAYLOAD_LEN * 2)
 
 /*  Flag to denote whether group information comes from "/etc/group".
  *  If set, group information will not be updated unless this file

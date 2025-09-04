@@ -51,6 +51,7 @@
 #include "common.h"
 #include "license.h"
 #include "log.h"
+#include "munge_defs.h"
 #include "read.h"
 #include "version.h"
 #include "xsignal.h"
@@ -223,7 +224,11 @@ main (int argc, char *argv[])
     parse_cmdline (conf, argc, argv);
     open_files (conf);
 
-    read_data_from_file (conf->fp_in, (void **) &conf->cred, &conf->clen);
+    /*  Maximum credential size will be ~33% larger than the maximum payload
+     *    due to base64-encoding plus additional overhead.  Use max req len.
+     */
+    read_data_from_file (conf->fp_in, (void **) &conf->cred, &conf->clen,
+        MUNGE_MAXIMUM_REQ_LEN);
 
     conf->status = munge_decode (conf->cred, conf->ctx,
             &conf->data, &conf->dlen, &conf->uid, &conf->gid);

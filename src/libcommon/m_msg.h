@@ -34,8 +34,9 @@
 #endif /* HAVE_CONFIG_H */
 
 #include <inttypes.h>
-#include <munge.h>
 #include <netinet/in.h>                 /* for struct in_addr                */
+#include <stddef.h>
+#include <munge.h>
 
 
 /*****************************************************************************
@@ -130,9 +131,9 @@ void m_msg_reset (m_msg_t m);
 
 munge_err_t m_msg_bind (m_msg_t m, int sd);
 
-munge_err_t m_msg_send (m_msg_t m, m_msg_type_t type, int maxlen);
+munge_err_t m_msg_send (m_msg_t m, m_msg_type_t type, size_t maxlen);
 
-munge_err_t m_msg_recv (m_msg_t m, m_msg_type_t type, int maxlen);
+munge_err_t m_msg_recv (m_msg_t m, m_msg_type_t type, size_t maxlen);
 
 int m_msg_set_err (m_msg_t m, munge_err_t e, char *s);
 

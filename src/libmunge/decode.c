@@ -39,6 +39,7 @@
 #include "ctx.h"
 #include "m_msg.h"
 #include "m_msg_client.h"
+#include "munge_defs.h"
 #include "str.h"
 
 
@@ -165,6 +166,15 @@ _decode_req (m_msg_t m, munge_ctx_t ctx, const char *cred)
     m->data_len = strlen (cred) + 1;
     m->data = (void *) cred;
     m->data_is_copy = 1;
+
+    /*  Validate credential size against maximum limit.
+     */
+    if (m->data_len > MUNGE_MAXIMUM_REQ_LEN) {
+        m_msg_set_err (m, EMUNGE_BAD_LENGTH,
+            strdupf ("Credential size %lu exceeded maximum of %lu",
+                m->data_len, MUNGE_MAXIMUM_REQ_LEN));
+        return (EMUNGE_BAD_LENGTH);
+    }
     return (EMUNGE_SUCCESS);
 }
 

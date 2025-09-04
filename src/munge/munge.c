@@ -43,6 +43,7 @@
 #include "common.h"
 #include "license.h"
 #include "log.h"
+#include "munge_defs.h"
 #include "query.h"
 #include "read.h"
 #include "version.h"
@@ -139,7 +140,8 @@ main (int argc, char *argv[])
         conf->dlen = strlen (conf->string);
     }
     else if (conf->fn_in) {
-        read_data_from_file (conf->fp_in, &conf->data, &conf->dlen);
+        read_data_from_file (conf->fp_in, &conf->data, &conf->dlen,
+            MUNGE_MAXIMUM_PAYLOAD_LEN);
     }
     if (encode_cred (conf) < 0) {
         if (!(p = munge_ctx_strerror (conf->ctx))) {

@@ -38,6 +38,7 @@
 #include "ctx.h"
 #include "m_msg.h"
 #include "m_msg_client.h"
+#include "munge_defs.h"
 #include "str.h"
 
 
@@ -162,6 +163,15 @@ _encode_req (m_msg_t m, munge_ctx_t ctx, const void *buf, int len)
     m->data_len = len;
     m->data = (void *) buf;
     m->data_is_copy = 1;
+
+    /*  Validate payload size against maximum limit.
+     */
+    if (m->data_len > MUNGE_MAXIMUM_PAYLOAD_LEN) {
+        m_msg_set_err (m, EMUNGE_BAD_LENGTH,
+            strdupf ("Payload size %lu exceeded maximum of %lu",
+                m->data_len, MUNGE_MAXIMUM_PAYLOAD_LEN));
+        return (EMUNGE_BAD_LENGTH);
+    }
     return (EMUNGE_SUCCESS);
 }
 

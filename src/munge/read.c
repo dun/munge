@@ -30,120 +30,113 @@
 #endif /* HAVE_CONFIG_H */
 
 #include <assert.h>
-#include <errno.h>
 #include <limits.h>
+#include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <munge.h>
 #include "log.h"
-#include "munge_defs.h"
+#include "test.h"
 
 
-#define INITIAL_BUFFER_SIZE     4096
-#define MAXIMUM_BUFFER_SIZE     MUNGE_MAXIMUM_REQ_LEN
-/*
- *  MUNGE_MAXIMUM_REQ_LEN (in munge_defs.h) specifies the maximum size of a
- *    request message transmitted over the unix domain socket.  Since messages
- *    greater than this length will be rejected, MAXIMUM_BUFFER_SIZE is used to
- *    limit the size of the memory allocation for bufmem.
- */
-
-
-/*  Malloc()s a buffer and reads data from file pointer [fp] into it,
- *    ensuring the buffer contains a terminating NUL.
- *  The reference parm [buf] is set to the address of the malloc'd buffer,
- *    and [len] is set to the length of the data (not including the
- *    terminating NUL character).
- */
+/*****************************************************************************
+ *  Read data from file pointer into a dynamically allocated buffer.
+ *
+ *  Reads all data from [fp] into a malloc'd buffer, ensuring the buffer
+ *  contains a terminating NUL character. The buffer grows exponentially to
+ *  minimize realloc() calls when reading from potentially non-seekable
+ *  streams.
+ *
+ *  Args:
+ *    fp:       Input file pointer
+ *    dst:      Pointer to allocated buffer (caller must free)
+ *    dst_len:  Number of bytes read (not including terminating NUL)
+ *    max_size: Maximum allowed buffer size
+ *
+ *  The function terminates the program on error.
+ *****************************************************************************/
 void
-read_data_from_file (FILE *fp, void **buf, int *len)
+read_data_from_file (FILE *fp, void **dst, int *dst_len, size_t max_size)
 {
-    unsigned char *bufmem;              /* base ptr to buffer memory         */
-    unsigned char *bufptr;              /* current ptr to unused bufmem      */
-    unsigned char *buftmp;              /* tmp ptr to bufmem for realloc()   */
-    size_t         bufsiz;              /* size allocated for bufmem         */
-    size_t         buflen;              /* num bytes of unused bufmem        */
-    size_t         bufuse;              /* num bytes of used bufmem          */
-    size_t         n;
+    const size_t read_chunk = 8192;
+    unsigned char read_buf[read_chunk];
+    unsigned char *dst_buf = NULL;
+    size_t dst_used = 0;
+    size_t dst_size = 0;
+    size_t n;
 
     assert (fp != NULL);
-    assert (buf != NULL);
-    assert (len != NULL);
+    assert (dst != NULL);
+    assert (dst_len != NULL);
+    assert (max_size > 0);
 
-    bufsiz = INITIAL_BUFFER_SIZE;
-    bufmem = bufptr = malloc (bufsiz);
-    if (bufmem == NULL) {
-        log_errno (EMUNGE_NO_MEMORY, LOG_ERR,
-            "Failed to allocate %lu bytes", bufsiz);
+#ifndef NDEBUG
+    /*  Check if the client max_size limit should be bypassed in order to
+     *    test libmunge enforcement of the limit.
+     */
+    int bypass;
+    if (!test_get_env_int ("MUNGE_TEST_CLIENT_LIMIT_BYPASS", &bypass)) {
+        if (bypass == 1) {
+            log_msg (LOG_INFO, "Bypassing client input limit");
+            max_size++;
+        }
     }
-    buflen = bufsiz;
+#endif /* !NDEBUG */
 
-    /*  Since this reads from a standard I/O stream, there is no guarantee that
-     *    the stream provides random access (e.g., when reading from a pipe).
-     *    As such, it cannot rely on seeking to the end of the stream to
-     *    determine the file length before seeking back to the beginning to
-     *    start reading.  Consequently, this routine realloc()s the buffer to
-     *    grow it as needed while reading from the fp steam.
+    /*  Read data in chunks since size is unknown in advance.
      */
-    for (;;) {
-        n = fread (bufptr, 1, buflen, fp);
-        bufptr += n;
-        buflen -= n;
-        if (buflen > 0) {
-            if (feof (fp)) {
-                break;
-            }
-            else if (ferror (fp)) {
-                log_err (EMUNGE_SNAFU, LOG_ERR,
-                    "Failed to read from file");
-            }
-            else {
-                log_err (EMUNGE_SNAFU, LOG_ERR,
-                    "Failed to read from file: Unexpected short count");
-            }
+    while ((n = fread (read_buf, 1, sizeof read_buf, fp)) > 0) {
+
+        /*  Check size limit before allocating more memory.
+         *  Use subtraction instead of addition to avoid integer overflow.
+         */
+        if (dst_used > max_size - n) {
+            free (dst_buf);
+            log_err (EMUNGE_SNAFU, LOG_ERR,
+                    "Input size exceeded maximum of %lu", max_size);
         }
-        assert (buflen == 0);
-        assert (bufsiz == bufptr - bufmem);
-        bufuse = bufsiz;
-        bufsiz *= 2;
-        if (bufsiz > MAXIMUM_BUFFER_SIZE) {
-            free (bufmem);
-            log_errno (EMUNGE_SNAFU, LOG_ERR,
-                "Exceeded maximum memory allocation");
+        /*  Grow buffer exponentially to minimize realloc() calls.
+         */
+        if (dst_used + n > dst_size) {
+            size_t new_size = (dst_size == 0 ? read_chunk : dst_size * 2);
+            if (new_size > max_size) {
+                new_size = max_size;
+            }
+            /*  Allocate with +1 for terminating NUL.
+             */
+            unsigned char *new_buf = realloc (dst_buf, new_size + 1);
+            if (!new_buf) {
+                free (dst_buf);
+                log_errno (EMUNGE_NO_MEMORY, LOG_ERR,
+                        "Failed to allocate %lu bytes", new_size + 1);
+            }
+            dst_buf = new_buf;
+            dst_size = new_size;
         }
-        buftmp = realloc (bufmem, bufsiz);
-        if (buftmp == NULL) {
-            free (bufmem);
-            log_errno (EMUNGE_NO_MEMORY, LOG_ERR,
-                "Failed to allocate %lu bytes", bufsiz);
-        }
-        buflen = bufsiz - bufuse;
-        bufptr = buftmp + bufuse;
-        bufmem = buftmp;
+        /*  Copy the new chunk into the destination buffer.
+         */
+        memcpy (dst_buf + dst_used, read_buf, n);
+        dst_used += n;
     }
-    n = bufptr - bufmem;
-    if (n == 0) {
-        free (bufmem);
-        *buf = NULL;
-        *len = 0;
-        return;
-    }
-    /*  If the fp has exactly 'len' bytes remaining, fread (ptr, 1, len, fp)
-     *    will return a value equal to 'len'.  But the EOF will not be detected
-     *    until the next fread() which will return a value of 0.  Consequently,
-     *    realloc() will double the buffer before this final iteration of the
-     *    loop thereby guaranteeing (buflen > 0).  The if-guard here is just
-     *    for safety/paranoia.
+    /*  Check for read errors.
      */
-    assert (buflen > 0);
-    if (buflen > 0) {
-        bufmem[n] = '\0';
+    if (ferror (fp)) {
+        free (dst_buf);
+        log_err (EMUNGE_SNAFU, LOG_ERR, "Failed to read");
     }
-    if (n > INT_MAX) {
-        log_err (EMUNGE_SNAFU, LOG_ERR, "Exceeded maximum file size");
+    /*  Check for integer overflow.
+     */
+    if (dst_used > INT_MAX) {
+        free (dst_buf);
+        log_err (EMUNGE_SNAFU, LOG_ERR, "Exceeded max int value");
     }
-    *buf = bufmem;
-    *len = (int) n;
-    return;
+    /*  NULL-terminate if needed and store results.
+     *  Note: dst_buf will be NULL if dst_used is 0.
+     */
+    if (dst_used > 0) {
+        dst_buf[dst_used] = '\0';
+    }
+    *dst = dst_buf;
+    *dst_len = (int) dst_used;
 }

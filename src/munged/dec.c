@@ -155,6 +155,9 @@ static int
 dec_validate_msg (m_msg_t m)
 {
 /*  Validates a credential exists for decoding.
+ *  Note: Maximum credential size is bounded by MUNGE_MAXIMUM_REQ_LEN.
+ *    Request size is already validated by m_msg_recv() in _job_exec(),
+ *    so no additional size check is needed here.
  */
     assert (m != NULL);
     assert (m->type == MUNGE_MSG_DEC_REQ);
@@ -905,7 +908,7 @@ dec_unpack_inner (munge_cred_t c)
     assert (n == 4);
     if (n > len) {
         return (m_msg_set_err (m, EMUNGE_BAD_CRED,
-            strdup ("Truncated data length")));
+            strdup ("Truncated payload length")));
     }
     memcpy (&u, p, n);                  /* ensure proper byte-alignment */
     m->data_len = ntohl (u);
@@ -916,11 +919,16 @@ dec_unpack_inner (munge_cred_t c)
      *  The 'data' memory is owned by the cred struct, so it will be
      *    free()d by cred_destroy() called from dec_process_msg().
      */
-    if (m->data_len > 0) {
-        if (m->data_len > len) {
-            return (m_msg_set_err (m, EMUNGE_BAD_CRED,
-                strdup ("Truncated data")));
-        }
+    if (m->data_len > len) {
+        return (m_msg_set_err (m, EMUNGE_BAD_CRED,
+            strdup ("Truncated payload data")));
+    }
+    else if (m->data_len > MUNGE_MAXIMUM_PAYLOAD_LEN) {
+        return (m_msg_set_err (m, EMUNGE_BAD_LENGTH,
+            strdupf ("Payload size %lu exceeded maximum of %lu",
+                m->data_len, MUNGE_MAXIMUM_PAYLOAD_LEN)));
+    }
+    else if (m->data_len > 0) {
         m->data = p;                    /* data resides in (inner|outer)_mem */
         p += m->data_len;
         len -= m->data_len;

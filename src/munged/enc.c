@@ -182,6 +182,11 @@ enc_validate_msg (m_msg_t m)
     if (m->data_len == 0) {
         m->zip = MUNGE_ZIP_NONE;
     }
+    else if (m->data_len > MUNGE_MAXIMUM_PAYLOAD_LEN) {
+        return (m_msg_set_err (m, EMUNGE_BAD_LENGTH,
+            strdupf ("Payload size %lu exceeded maximum of %lu",
+                m->data_len, MUNGE_MAXIMUM_PAYLOAD_LEN)));
+    }
     /*  Validate realm.
      *
      *  FIXME: Validate realm and set default string if needed.

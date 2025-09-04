@@ -34,6 +34,7 @@
 #include <errno.h>
 #include <inttypes.h>
 #include <munge.h>
+#include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/time.h>                   /* gettimeofday */
@@ -186,7 +187,7 @@ m_msg_bind (m_msg_t m, int sd)
 
 
 munge_err_t
-m_msg_send (m_msg_t m, m_msg_type_t type, int maxlen)
+m_msg_send (m_msg_t m, m_msg_type_t type, size_t maxlen)
 {
 /*  Sends the message [m] of type [type] to the recipient at the other end
  *    of the already-specified socket.
@@ -249,9 +250,9 @@ m_msg_send (m_msg_t m, m_msg_type_t type, int maxlen)
     /*  Check if the message exceeds the maximum allowed length.
      */
     if ((maxlen > 0) && (m->pkt_len > maxlen)) {
-        m_msg_set_err (m, EMUNGE_SOCKET,
+        m_msg_set_err (m, EMUNGE_BAD_LENGTH,
             strdupf ("Failed to send message: "
-                "length of %d exceeds max of %d", m->pkt_len, maxlen));
+                "Size %lu exceeded maximum of %lu", m->pkt_len, maxlen));
         return (EMUNGE_BAD_LENGTH);
     }
     /*  Always repack the message header.
@@ -297,7 +298,7 @@ m_msg_send (m_msg_t m, m_msg_type_t type, int maxlen)
 
 
 munge_err_t
-m_msg_recv (m_msg_t m, m_msg_type_t type, int maxlen)
+m_msg_recv (m_msg_t m, m_msg_type_t type, size_t maxlen)
 {
 /*  Receives a message from the sender at the other end of the
  *    already-specified socket.  This message is stored in the
@@ -357,9 +358,9 @@ m_msg_recv (m_msg_t m, m_msg_type_t type, int maxlen)
         return (EMUNGE_SOCKET);
     }
     else if ((maxlen > 0) && (m->pkt_len > maxlen)) {
-        m_msg_set_err (m, EMUNGE_SOCKET,
+        m_msg_set_err (m, EMUNGE_BAD_LENGTH,
             strdupf ("Failed to receive message: "
-                "length of %d exceeds max of %d", m->pkt_len, maxlen));
+                "Size %lu exceeded maximum of %lu", m->pkt_len, maxlen));
         return (EMUNGE_BAD_LENGTH);
     }
     else if (!(m->pkt = malloc (m->pkt_len))) {
