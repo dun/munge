@@ -56,10 +56,10 @@
  *  Notes
  *****************************************************************************
  *
- *  The gid_hash is used to quickly lookup whether a given UID is a member of a
- *  particular supplementary group GID.  It contains a gid_head for each UID
- *  pointing to a singly-linked list of gid_nodes for each supplementary group
- *  of which that UID is a member.  The list of gid_nodes is sorted in
+ *  The gid_hash is used to quickly determine whether a given UID is a member
+ *  of a particular supplementary group GID.  It contains a gid_head for each
+ *  UID pointing to a singly-linked list of gid_nodes for each supplementary
+ *  group of which that UID is a member.  The list of gid_nodes is sorted in
  *  increasing order of GIDs without duplicates.  This hash is constructed
  *  outside of the gids mutex, and switched in while the mutex is held during
  *  an update to replace the old gid_hash.
@@ -570,7 +570,7 @@ static int
 _gids_user_to_uid (hash_t uid_hash, hash_t ghost_hash,
         const char *user, uid_t *uid_resultp, xpwbuf_p pwbufp)
 {
-/*  Lookup the UID of [user].
+/*  Get the UID of [user].
  *    [pwbufp] is a pre-allocated buffer for xgetpwnam() (see above comments).
  *  Set [*uid_resultp] (if non-NULL), and return 0 on success or -1 on error.
  */

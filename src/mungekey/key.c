@@ -154,7 +154,7 @@ _create_key_secret (unsigned char *buf, size_t buflen)
      */
     md_str = munge_enum_int_to_str (MUNGE_ENUM_MAC, md);
     if (md_str == NULL) {
-        log_msg (LOG_ERR, "Failed to lookup text string for md=%d", md);
+        log_msg (LOG_ERR, "Failed to get text string for md=%d", md);
         rv = -1;
         goto err;
     }
