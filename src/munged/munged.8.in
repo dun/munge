@@ -154,7 +154,7 @@ Specify the origin address that will be encoded into credential metadata.
 This can be a hostname or IPv4 address; it can also be the name of a local
 network interface, in which case the first IPv4 address found assigned to
 that interface will be used.  The default value is the IPv4 address of the
-hostname returned by \fBgethostname()\fR.  Failure to lookup the address will
+hostname returned by \fBgethostname()\fR.  Failure to resolve the address will
 result in an error; if overridden, the origin will be set to the null address.
 .TP
 .BI "\-\-pid\-file " path

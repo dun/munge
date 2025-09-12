@@ -37,14 +37,14 @@ test_expect_success 'munged --help output shows --origin' '
 #
 test_expect_success 'munged failure for nonexistent origin' '
     test_must_fail munged_start --origin="nonexistent.host" 2>err.$$ &&
-    grep "Error:.* Failed to lookup origin.*: Host not found" err.$$
+    grep "Error:.* Failed to resolve origin.*: Host not found" err.$$
 '
 
 # Check for a fatal error on stderr when the origin is an invalid IPv4 address.
 #
 test_expect_success 'munged failure for invalid IPv4 address origin' '
     test_must_fail munged_start --origin="999.999.999.999" 2>err.$$ &&
-    grep "Error:.* Failed to lookup origin.*: Host not found" err.$$
+    grep "Error:.* Failed to resolve origin.*: Host not found" err.$$
 '
 
 # Check for a fatal error on stderr when the origin is an IPv6 address.
@@ -52,7 +52,7 @@ test_expect_success 'munged failure for invalid IPv4 address origin' '
 #
 test_expect_success 'munged failure for IPv6 address origin' '
     test_must_fail munged_start --origin="::1" 2>err.$$ &&
-    grep -E "Error:.* Failed to lookup origin.* not (found|supported)" err.$$
+    grep -E "Error:.* Failed to resolve origin.* not (found|supported)" err.$$
 '
 
 # Check if the error can be overridden when the origin cannot be resolved.
@@ -72,7 +72,7 @@ test_expect_success 'munged failure override for nonexistent origin' '
 #   error is overridden.
 #
 test_expect_success NONEXISTENT 'munged warning for nonexistent origin override' '
-    grep "Warning:.* Failed to lookup origin" err.$$
+    grep "Warning:.* Failed to resolve origin" err.$$
 '
 
 # Check the logfile to verify the origin is set to the null address when

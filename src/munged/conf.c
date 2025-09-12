@@ -1076,7 +1076,7 @@ _conf_set_origin_addr (conf_t conf)
                 ? "Host not found"
                 : strerror (errno);
             log_err_or_warn (conf->got_force || !is_origin_specified,
-                    "Failed to lookup origin \"%s\": %s",
+                    "Failed to resolve origin \"%s\": %s",
                     conf->origin_name, err_str);
         }
     }
