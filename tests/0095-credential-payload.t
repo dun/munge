@@ -6,26 +6,19 @@ test_description='Check maximum credential payload'
 : "${SHARNESS_TEST_SRCDIR:=$(cd "$(dirname "$0")" && pwd)}"
 . "${SHARNESS_TEST_SRCDIR}/sharness.sh"
 
-# Ensure cpp is available for processing "munge_defs.h".
-#
-if ! command -v cpp >/dev/null 2>&1; then
-    skip_all='skipping maximum credential payload test; cpp not found'
-    test_done
-fi
-
 # Get the maximum payload & request sizes, or bail out.
 #
 get_munge_define()
 {
     macro="$1"
-    hdr="${MUNGE_SOURCE_DIR}/src/libcommon/munge_defs.h"
-    defs=$(grep -E '^#define MUNGE_MAXIMUM_(REQ|PAYLOAD)_LEN' "${hdr}")
-    out=$({ echo "${defs}"; echo ${macro}; } | cpp | grep -Ev '^#|^$' |tail -1)
-    echo "${out}" | grep -q "^${macro}$" && return 1
-    val=$(eval "echo \$((${out}))" 2>/dev/null) || return 1
-    test "${val}" -gt 0 || return 1
-    echo "${val}"
-    return 0
+    cc=$(sed -n "s/^CC *= *//p" "${MUNGE_BUILD_DIR}/Makefile" | head -1)
+    cat >getval.$$.c <<-EOF
+	#include <stdio.h>
+	#include "${MUNGE_SOURCE_DIR}/src/libcommon/munge_defs.h"
+	int main(void) {printf("%lu\n", (unsigned long)(${macro})); return 0;}
+	EOF
+    inc="${MUNGE_SOURCE_DIR}/src/libmunge"
+    ${cc:-cc} -I"${inc}" -o getval.$$ getval.$$.c 2>/dev/null && ./getval.$$
 }
 MAX_PAYLOAD=$(get_munge_define MUNGE_MAXIMUM_PAYLOAD_LEN) || \
         bail_out "Failed to get MUNGE_MAXIMUM_PAYLOAD_LEN"
