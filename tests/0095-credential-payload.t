@@ -65,8 +65,8 @@ test_expect_success BZLIB 'reject encoding max+1 payload (min overhead)' '
     size=$((MAX_PAYLOAD + 1)) &&
     dd if=/dev/zero bs="${size}" count=1 2>/dev/null | \
     test_must_fail "${MUNGE}" --socket="${MUNGE_SOCKET}" --output=cred.$$ \
-            --cipher=none --mac=md5 --zip=bzlib 2>err.$$ &&
-    grep "Input size exceeded maximum of ${MAX_PAYLOAD}" err.$$
+            --cipher=none --mac=md5 --zip=bzlib 2>err04.$$ &&
+    grep "Input size exceeded maximum of ${MAX_PAYLOAD}" err04.$$
 '
 
 # Test that munge enforces max payload limit even with max encoding overhead.
@@ -77,8 +77,8 @@ test_expect_success 'reject encoding max+1 payload (max overhead)' '
     size=$((MAX_PAYLOAD + 1)) &&
     dd if=/dev/zero bs="${size}" count=1 2>/dev/null | \
     test_must_fail "${MUNGE}" --socket="${MUNGE_SOCKET}" --output=cred.$$ \
-            --cipher=aes256 --mac=sha512 --zip=none 2>err.$$ &&
-    grep "Input size exceeded maximum of ${MAX_PAYLOAD}" err.$$
+            --cipher=aes256 --mac=sha512 --zip=none 2>err05.$$ &&
+    grep "Input size exceeded maximum of ${MAX_PAYLOAD}" err05.$$
 '
 
 # Test that unmunge enforces maximum input (credential) limit.
@@ -87,8 +87,8 @@ test_expect_success 'reject decoding max+1 input' '
     size=$((MAX_REQUEST + 1)) &&
     dd if=/dev/zero bs="${size}" count=1 2>/dev/null | \
     test_must_fail "${UNMUNGE}" --socket="${MUNGE_SOCKET}" \
-            >/dev/null 2>err.$$ &&
-    grep "Input size exceeded maximum of ${MAX_REQUEST}" err.$$
+            >/dev/null 2>err06.$$ &&
+    grep "Input size exceeded maximum of ${MAX_REQUEST}" err06.$$
 '
 
 ###############################################################################
@@ -104,8 +104,8 @@ test_expect_success 'reject oversized request message on send' '
     dd if=/dev/zero bs="${size}" count=1 2>/dev/null | \
     tr "\0" "X" | \
     test_must_fail "${UNMUNGE}" --socket="${MUNGE_SOCKET}" \
-            >/dev/null 2>err.$$ &&
-    grep "Failed to send message:.*exceeded maximum of ${MAX_REQUEST}" err.$$
+            >/dev/null 2>err07.$$ &&
+    grep "Failed to send message:.*exceeded maximum of ${MAX_REQUEST}" err07.$$
 '
 
 ###############################################################################
@@ -148,10 +148,10 @@ test_expect_success DEBUG 'reject encoding max+1 payload via libmunge' '
     export MUNGE_TEST_CLIENT_LIMIT_BYPASS=1 &&
     dd if=/dev/zero bs="${size}" count=1 2>/dev/null | \
     test_must_fail "${MUNGE}" --socket="${MUNGE_SOCKET}" --output=cred.$$ \
-            --cipher=aes256 --mac=sha512 --zip=none 2>err.$$ &&
+            --cipher=aes256 --mac=sha512 --zip=none 2>err11.$$ &&
     unset MUNGE_TEST_CLIENT_LIMIT_BYPASS &&
-    grep "Bypassing client input limit" err.$$ &&
-    grep "Payload size ${size} exceeded maximum of ${MAX_PAYLOAD}" err.$$
+    grep "Bypassing client input limit" err11.$$ &&
+    grep "Payload size ${size} exceeded maximum of ${MAX_PAYLOAD}" err11.$$
 '
 
 # Test that libmunge enforces the credential limit independently of the client.
@@ -166,11 +166,11 @@ test_expect_success DEBUG 'reject decoding max+1 input via libmunge' '
     dd if=/dev/zero bs="${size}" count=1 2>/dev/null | \
     tr "\0" "X" | \
     test_must_fail "${UNMUNGE}" --socket="${MUNGE_SOCKET}" \
-            >/dev/null 2>err.$$ &&
+            >/dev/null 2>err12.$$ &&
     unset MUNGE_TEST_CLIENT_LIMIT_BYPASS &&
-    grep "Bypassing client input limit" err.$$ &&
+    grep "Bypassing client input limit" err12.$$ &&
     grep "Credential size $((size + 1)) exceeded maximum of ${MAX_REQUEST}" \
-            err.$$
+            err12.$$
 '
 
 ###############################################################################
@@ -183,9 +183,11 @@ test_expect_success 'stop munged' '
 '
 
 # Perform housekeeping to clean up afterwards.
+# Show captured stderr from failed tests (verbose mode only).
 #
 test_expect_success 'cleanup' '
-    munged_cleanup
+    munged_cleanup &&
+    for e in $(ls err*.$$ 2>/dev/null); do echo "${e}:"; cat "${e}"; echo; done
 '
 
 test_done
