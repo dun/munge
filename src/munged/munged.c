@@ -555,33 +555,38 @@ write_pidfile (const char *pidfile, int got_force)
 static void
 lock_memory (void)
 {
-/*  Lock all current and future pages in the virtual memory address space.
- *    Access to locked pages will never be delayed by a page fault.
- *  EAGAIN is tested for up to max_tries in case this is a transient error.
- *    Should there be a nanosleep() between attempts?
+/*  Lock all memory pages to prevent the daemon from being swapped to disk.
+ *  This can prevent authentication delays under extreme memory pressure.
  */
 #if ! HAVE_MLOCKALL
     errno = ENOSYS;
-    log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to lock pages in memory");
-#else
-    int       rv;
-    int       i = 0;
-    const int max_tries = 10;
-
-    while (1) {
-        i++;
-        rv = mlockall (MCL_CURRENT | MCL_FUTURE);
-        if (rv == 0) {
-            break;
+    log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to lock pages into memory");
+#else /* HAVE_MLOCKALL */
+    char rlimit_msg[64] = "";
+#if HAVE_DECL_RLIMIT_MEMLOCK
+    struct rlimit rlim;
+    if (getrlimit (RLIMIT_MEMLOCK, &rlim) == 0) {
+        if (rlim.rlim_cur == RLIM_INFINITY) {
+            snprintf (rlimit_msg, sizeof rlimit_msg,
+                    " (RLIMIT_MEMLOCK=infinity)");
         }
-        if ((errno == EAGAIN) && (i < max_tries)) {
-            continue;
+        else {
+            snprintf (rlimit_msg, sizeof rlimit_msg,
+                    " (RLIMIT_MEMLOCK=%lu / %lu KB)",
+                    (unsigned long) rlim.rlim_cur,
+                    (unsigned long) rlim.rlim_cur / 1024);
         }
-        log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to lock pages in memory");
     }
-    log_msg (LOG_INFO, "Locked all pages in memory");
-#endif /* ! HAVE_MLOCKALL */
-    return;
+#endif /* HAVE_DECL_RLIMIT_MEMLOCK */
+    if (mlockall (MCL_CURRENT | MCL_FUTURE) < 0) {
+        log_err (EMUNGE_SNAFU, LOG_ERR,
+                "Failed to lock pages into memory: %s%s",
+                strerror (errno), rlimit_msg);
+    }
+    else {
+        log_msg (LOG_INFO, "Locked pages into memory%s", rlimit_msg);
+    }
+#endif /* HAVE_MLOCKALL */
 }
 
 

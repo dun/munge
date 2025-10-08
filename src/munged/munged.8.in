@@ -80,11 +80,10 @@ can affect security.
 Run the daemon in the foreground.
 .TP
 .BI "\-M, \-\-mlockall"
-Lock all current and future pages in the virtual memory address space.
-Access to locked pages will never be delayed by a page fault.  This can
-improve performance and help the daemon remain responsive when the system
-is under heavy memory pressure.  This typically requires root privileges
-or the CAP_IPC_LOCK capability.
+Lock pages into memory to prevent the daemon from being swapped to disk.
+This can prevent authentication delays under extreme memory pressure.
+Requires sufficient memory lock limits.  See the \fBMEMORY LOCKING\fR
+section below.
 .TP
 .BI "\-s, \-\-stop"
 Stop the daemon bound to the socket and wait for it to shut down.  Use with
@@ -140,11 +139,12 @@ in \fI<sys/socket.h>\fR.
 Specify an alternate pathname to the log file.
 .TP
 .BI "\-\-max\-ttl " integer
-Specify the maximum allowable time-to-live value (in seconds) for a credential.
-This setting has an upper-bound imposed by the hard-coded MUNGE_MAXIMUM_TTL
-value.  Reducing it will limit the maximum growth of the credential replay
-cache.  This is viable if clocks within the MUNGE realm can be kept in sync
-with minimal skew.
+Specify the maximum time-to-live (in seconds) for credentials.  This value
+caps the TTL during both encoding and decoding.  The hard-coded upper bound
+is 3600 seconds (1 hour); the default is 3600.  Reducing this value will
+limit the maximum retention time for replay cache entries, which is viable
+if clocks within the MUNGE realm can be kept in sync with minimal skew.
+
 .TP
 .BI "\-\-num\-threads " integer
 Specify the number of threads to spawn for processing credential requests.
@@ -171,6 +171,78 @@ Specify the group name or GID of the "trusted group".  This is used for
 permission checks on a directory hierarchy.  Directories with group write
 permissions are allowed if they are owned by the trusted group (or the sticky
 bit is set).
+
+.SH "MEMORY LOCKING"
+The \fB\-\-mlockall\fR option locks pages into memory to prevent swapping under
+memory pressure.
+.PP
+Memory usage scales with the number of worker threads, size of the user and
+group databases (when supplementary group mapping is enabled), and the rate of
+credential decoding (which grows the replay cache).
+.PP
+Many systems default to an insufficient memory lock limit.  A minimum of 16 MB
+is required for basic operation; 64-256 MB is recommended for typical
+configurations.  Increase it in one of the following ways:
+.PP
+.SS "systemd-based systems"
+Create \fI/etc/systemd/system/munge.service.d/memlock.conf\fR:
+.RS
+.nf
+[Service]
+LimitMEMLOCK=256M
+.fi
+.RE
+.PP
+Then reload and restart:
+.RS
+.nf
+systemctl daemon-reload
+systemctl restart munge.service
+.fi
+.RE
+.PP
+.SS "PAM limits"
+Add to \fI/etc/security/limits.conf\fR (values in KB):
+.RS
+.nf
+munge  soft  memlock  262144
+munge  hard  memlock  262144
+.fi
+.RE
+.PP
+On systemd-based systems, PAM limits are ignored for services.  Use the systemd
+configuration instead.
+.PP
+.SS "Shell environment (for testing)"
+Set the limit before starting \fBmunged\fR (value in KB):
+.RS
+.nf
+ulimit \-l 262144
+munged \-\-mlockall
+.fi
+.RE
+.PP
+.SS "Security Considerations"
+The replay cache is unbounded and grows with credential decode rate.  Replay
+entries are retained until credentials expire based on their time-to-live
+(TTL).  Credentials have a default TTL of 5 minutes; clients can specify up
+to the maximum TTL configured on the encoding munged (1 hour by default,
+configurable via \fB\-\-max\-ttl\fR).  During decoding, the credential's
+TTL is capped at the decoding munged's maximum TTL.  When \fB\-\-mlockall\fR
+is specified, replay entries are locked in physical memory.
+.PP
+On systems with untrusted local users, an attacker could encode credentials
+with the maximum TTL (1 hour by default) and decode them repeatedly to fill
+the replay cache.  Once the memory lock limit is reached, \fBmunged\fR will
+likely terminate when attempting to allocate additional memory, causing a
+denial of service.
+.PP
+Use this option only on trusted systems where local users are controlled,
+or set the memory lock limit to a reasonable upper bound rather than
+unlimited.  Monitor \fBmunged\fR's locked memory usage on high-volume
+systems to ensure the limit is not approached during normal operation.
+Reducing \fB\-\-max\-ttl\fR can limit replay cache growth but requires
+tight clock synchronization.
 
 .SH SIGNALS
 .TP

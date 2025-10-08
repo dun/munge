@@ -35,6 +35,7 @@ test_scripts = \
 	0104-munged-security-pidfile.t \
 	0105-munged-security-seedfile.t \
 	0110-munged-origin-addr.t \
+	0111-munged-mlockall.t \
 	1000-chaos-rpm.t \
 	# End of test_scripts
 

@@ -774,7 +774,7 @@ _conf_display_help (char *prog)
             "Run daemon in the foreground (do not fork)");
 
     printf ("  %*s %s\n", w, "-M, --mlockall",
-            "Lock all pages in memory");
+            "Lock pages into memory");
 
     printf ("  %*s %s\n", w, "-s, --stop",
             "Stop daemon bound to socket");
