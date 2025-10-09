@@ -64,6 +64,7 @@
 #include "replay.h"
 #include "str.h"
 #include "timer.h"
+#include "work.h"
 #include "xsignal.h"
 
 
@@ -101,6 +102,7 @@ main (int argc, char *argv[])
     char *log_identity = argv[0];
     int   log_priority = LOG_INFO;
     int   log_options = LOG_OPT_PRIORITY;
+    work_p workers;
 
 #ifndef NDEBUG
     log_priority = LOG_DEBUG;
@@ -129,9 +131,6 @@ main (int argc, char *argv[])
         PACKAGE, VERSION, (int) getpid ());
     handle_signals ();
     log_origin_addr (conf);
-    if (conf->got_mlockall) {
-        lock_memory ();
-    }
     crypto_init ();
     cipher_init_subsystem ();
     md_init_subsystem ();
@@ -147,12 +146,16 @@ main (int argc, char *argv[])
     timer_init ();
     sock_create (conf);
     write_pidfile (conf->pidfile_name, conf->got_force);
-
+    workers = work_init ((work_func_t) job_exec, conf->nthreads);
+    if (conf->got_mlockall) {
+        lock_memory ();
+    }
     if (!conf->got_foreground) {
         daemonize_fini ();
     }
-    job_accept (conf);
+    job_accept (conf, workers);
 
+    work_fini (workers, 1);
     sock_destroy (conf);
     timer_fini ();
     replay_fini ();

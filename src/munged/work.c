@@ -83,7 +83,7 @@ static void * _work_dequeue (work_p wp);
 /*  Initializes the work crew comprised of [n_threads] workers.
  *    The work function [f] will be invoked to process each work element
  *    queued by work_queue().
- *  Returns a ptr to the work crew, or NULL on error (with errno set).
+ *  Returns a ptr to the work crew, or terminates on error.
  */
 work_p
 work_init (work_func_t f, int n_threads)
@@ -93,16 +93,9 @@ work_init (work_func_t f, int n_threads)
     size_t stacksize = 256 * 1024;
     int i;
 
-    /*  Check args.
-     */
-    if (f == NULL) {
-        errno = EINVAL;
-        return (NULL);
-    }
-    if (n_threads <= 0) {
-        errno = EINVAL;
-        return (NULL);
-    }
+    assert (f != NULL);
+    assert (n_threads > 0);
+
     /*  Allocate memory.
      */
     if (!(wp = malloc (sizeof (work_t)))) {
@@ -164,6 +157,8 @@ work_init (work_func_t f, int n_threads)
         log_errno (EMUNGE_SNAFU, LOG_ERR,
             "Failed to destroy work thread attribute");
     }
+    log_msg (LOG_INFO, "Created %d work thread%s", n_threads,
+            ((n_threads > 1) ? "s" : ""));
     return (wp);
 }
 

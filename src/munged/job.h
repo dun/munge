@@ -30,9 +30,12 @@
 
 
 #include "m_msg.h"
+#include "work.h"
 
 
-void job_accept (conf_t conf);
+void job_accept (conf_t conf, work_p w);
+
+void job_exec (m_msg_t m);
 
 
 #endif /* !JOB_H */

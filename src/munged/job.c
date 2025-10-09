@@ -42,6 +42,7 @@
 #include "dec.h"
 #include "enc.h"
 #include "fd.h"
+#include "job.h"
 #include "log.h"
 #include "m_msg.h"
 #include "munge_defs.h"
@@ -64,20 +65,15 @@ extern volatile sig_atomic_t got_terminate;     /* defined in munged.c       */
 
 
 /*****************************************************************************
- *  Private Prototypes
- *****************************************************************************/
-
-static void _job_exec (m_msg_t m);
-
-
-/*****************************************************************************
  *  Public Functions
  *****************************************************************************/
 
 void
-job_accept (conf_t conf)
+job_accept (conf_t conf, work_p w)
 {
-    work_p  w;
+/*  Accepts client connections and queues requests to the work crew [w].
+ *  Exits when SIGINT or SIGTERM is received.
+ */
     m_msg_t m;
     int     sd;
     int     curr_errno;
@@ -87,14 +83,7 @@ job_accept (conf_t conf)
 
     assert (conf != NULL);
     assert (conf->ld >= 0);
-
-    if (!(w = work_init ((work_func_t) _job_exec, conf->nthreads))) {
-        log_errno (EMUNGE_SNAFU, LOG_ERR,
-            "Failed to create %d work thread%s", conf->nthreads,
-            ((conf->nthreads > 1) ? "s" : ""));
-    }
-    log_msg (LOG_INFO, "Created %d work thread%s", conf->nthreads,
-            ((conf->nthreads > 1) ? "s" : ""));
+    assert (w != NULL);
 
     while (!got_terminate) {
         if (got_reconfig) {
@@ -168,17 +157,12 @@ job_accept (conf_t conf)
     }
     log_msg (LOG_NOTICE, "Exiting on signal %d (%s)",
             got_terminate, strsignal (got_terminate));
-    work_fini (w, 1);
     return;
 }
 
 
-/*****************************************************************************
- *  Private Functions
- *****************************************************************************/
-
-static void
-_job_exec (m_msg_t m)
+void
+job_exec (m_msg_t m)
 {
 /*  Receives and responds to the message request [m].
  */
