@@ -1,3 +1,7 @@
+# Set safe umask to prevent new files/dirs from being writable by group/other.
+#
+umask 022
+
 # Set up the directory tree and shell variables for starting munged.
 # [MUNGE_ROOT], [MUNGE_SOCKETDIR], [MUNGE_KEYDIR], [MUNGE_LOGDIR],
 #   [MUNGE_PIDDIR], and [MUNGE_SEEDDIR] can be overridden by setting them
