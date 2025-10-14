@@ -167,17 +167,17 @@ main (int argc, char *argv[])
     if (err != EMUNGE_SUCCESS) {
         fprintf (stderr, "Error: Failed to encode credential: %s\\n",
                 munge_strerror (err));
-        exit (1);
+        exit (EXIT_FAILURE);
     }
     err = munge_decode (cred, NULL, NULL, NULL, &uid, &gid);
     if (err != EMUNGE_SUCCESS) {
         fprintf (stderr, "Error: Failed to decode credential: %s\\n",
                 munge_strerror (err));
-        exit (1);
+        exit (EXIT_FAILURE);
     }
     printf ("uid=%d gid=%d\\n", uid, gid);
     free (cred);
-    exit (0);
+    exit (EXIT_SUCCESS);
 }
 .fi
 

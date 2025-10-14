@@ -301,7 +301,7 @@ main (int argc, char *argv[])
     ctx = munge_ctx_create ();
     if (ctx == NULL) {
         fprintf (stderr, "Error: Failed to create munge ctx\\n");
-        exit (1);
+        exit (EXIT_FAILURE);
     }
     /*  Query the socket name.  Note that the returned 'str' resides
      *    in the 'ctx' and will be de-allocated via munge_ctx_destroy().
@@ -310,7 +310,7 @@ main (int argc, char *argv[])
     if (err != EMUNGE_SUCCESS) {
         fprintf (stderr, "Error: Failed to get munge socket name: %s\\n",
                 munge_ctx_strerror (ctx));
-        exit (1);
+        exit (EXIT_FAILURE);
     }
     printf ("socket=%s\\n", str);
 .sp
@@ -321,22 +321,22 @@ main (int argc, char *argv[])
     if (err != EMUNGE_SUCCESS) {
         fprintf (stderr, "Error: Failed to set ignore-ttl opt: %s\\n",
                 munge_ctx_strerror (ctx));
-        exit (1);
+        exit (EXIT_FAILURE);
     }
     if (fgets (buf, sizeof (buf), stdin) == NULL) {
         fprintf (stderr, "Error: Failed to read credential\\n");
-        exit (1);
+        exit (EXIT_FAILURE);
     }
     err = munge_decode (buf, ctx, NULL, NULL, &uid, &gid);
     if (err != EMUNGE_SUCCESS) {
         fprintf (stderr, "Error: Failed to decode credential: %s\\n",
                 munge_ctx_strerror (ctx));
-        exit (1);
+        exit (EXIT_FAILURE);
     }
     printf ("uid=%d gid=%d\\n", uid, gid);
 .sp
     munge_ctx_destroy (ctx);
-    exit (0);
+    exit (EXIT_SUCCESS);
 }
 .fi
 

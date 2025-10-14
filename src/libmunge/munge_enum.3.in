@@ -102,7 +102,7 @@ main (int argc, char *argv[])
             printf ("%2d = %s\\n", i, p);
         }
     }
-    exit (0);
+    exit (EXIT_SUCCESS);
 }
 .fi
 
