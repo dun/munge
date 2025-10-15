@@ -385,7 +385,7 @@ err:
 
 
 /*  Reads at most [maxlen-1] bytes up to a newline from [fd] into [buf].
- *  The [buf] is guaranteed to be NUL-terminated and will contain the
+ *  The [buf] is guaranteed to be null-terminated and will contain the
  *    newline if it is encountered within [maxlen-1] bytes.
  *  Returns the number of bytes read, 0 on EOF, or -1 on error.
  */
@@ -397,7 +397,7 @@ fd_read_line (int fd, void *buf, size_t maxlen)
 
     n = 0;
     p = buf;
-    while (n < maxlen - 1) {            /* reserve space for NUL-termination */
+    while (n < maxlen - 1) {            /* -1 for terminating null byte */
 
         if ((rc = read (fd, &c, 1)) == 1) {
             n++;
@@ -418,7 +418,7 @@ fd_read_line (int fd, void *buf, size_t maxlen)
         }
     }
 
-    *p = '\0';                          /* NUL-terminate, like fgets() */
+    *p = '\0';                          /* null-terminate */
     return (n);
 }
 

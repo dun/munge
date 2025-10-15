@@ -98,7 +98,7 @@ struct conf {
     int          dlen;                  /* payload data length               */
     void        *data;                  /* payload data                      */
     int          clen;                  /* munged credential length          */
-    char        *cred;                  /* munged credential nul-terminated  */
+    char        *cred;                  /* munged credential null-terminated */
 };
 
 typedef struct conf * conf_t;

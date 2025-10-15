@@ -46,19 +46,19 @@ munge_encode, munge_decode, munge_strerror \- MUNGE core functions
 
 .SH DESCRIPTION
 The \fBmunge_encode\fR() function creates a credential contained in a
-NUL-terminated base64 string.  A payload specified by a buffer \fIbuf\fR
+null-terminated base64 string.  A payload specified by a buffer \fIbuf\fR
 of length \fIlen\fR can be encapsulated in as well.  If the MUNGE context
 \fIctx\fR is NULL, the default context will be used.  A pointer to the
 resulting credential is returned via \fIcred\fR; on error, it is set to NULL.
 The caller is responsible for freeing the memory referenced by \fIcred\fR.
 .PP
-The \fBmunge_decode\fR() function validates the NUL-terminated credential
+The \fBmunge_decode\fR() function validates the null-terminated credential
 \fIcred\fR.  If the MUNGE context \fIctx\fR is not NULL, it will be set to
 that used to encode the credential.  If \fIbuf\fR and \fIlen\fR are not NULL,
 memory will be allocated for the encapsulated payload (up to 1 MB),
 \fIbuf\fR will be set
 to point to this data, and \fIlen\fR will be set to its length.  An additional
-NUL character will be appended to this payload data but not included in its
+null byte will be appended to this payload data but not included in its
 length.  If no payload exists, \fIbuf\fR will be set to NULL and \fIlen\fR
 will be set to 0.  For certain errors (i.e., \fBEMUNGE_CRED_EXPIRED\fR,
 \fBEMUNGE_CRED_REWOUND\fR, \fBEMUNGE_CRED_REPLAYED\fR), payload memory will
@@ -75,7 +75,7 @@ The \fBmunge_encode\fR() and \fBmunge_decode\fR() functions return
 context was used, it may contain a more detailed error message accessible
 via \fBmunge_ctx_strerror\fR().
 .PP
-The \fBmunge_strerror\fR() function returns a pointer to a NUL-terminated
+The \fBmunge_strerror\fR() function returns a pointer to a null-terminated
 constant text string; this string should not be freed or modified by
 the caller.
 

@@ -184,7 +184,7 @@ _encode_rsp (m_msg_t m, char **cred)
  *    error_num, error_len, error_str, data_len, data.
  *  Note that error_num and error_str are set by _munge_ctx_set_err()
  *    called from munge_encode() (ie, the parent of this stack frame).
- *  Note that the [cred] is NUL-terminated.
+ *  Note that the [cred] is null-terminated.
  */
     assert (m != NULL);
     assert (cred != NULL);

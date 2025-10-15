@@ -175,7 +175,7 @@ BEGIN_C_DECLS
 munge_err_t munge_encode (char **cred, munge_ctx_t ctx,
                           const void *buf, int len);
 /*
- *  Creates a credential contained in a NUL-terminated base64 string.
+ *  Creates a credential contained in a null-terminated base64 string.
  *    A payload specified by a buffer [buf] of length [len] can be
  *    encapsulated in as well.
  *  If the munge context [ctx] is NULL, the default context will be used.
@@ -190,12 +190,12 @@ munge_err_t munge_encode (char **cred, munge_ctx_t ctx,
 munge_err_t munge_decode (const char *cred, munge_ctx_t ctx,
                           void **buf, int *len, uid_t *uid, gid_t *gid);
 /*
- *  Validates the NUL-terminated credential [cred].
+ *  Validates the null-terminated credential [cred].
  *  If the munge context [ctx] is not NULL, it will be set to that used
  *    to encode the credential.
  *  If [buf] and [len] are not NULL, memory will be allocated for the
  *    encapsulated payload, [buf] will be set to point to this data, and [len]
- *    will be set to its length.  An additional NUL character will be appended
+ *    will be set to its length.  An additional null byte will be appended
  *    to this payload data but not included in its length.  If no payload
  *    exists, [buf] will be set to NULL and [len] will be set to 0.
  *    For certain errors (ie, EMUNGE_CRED_EXPIRED, EMUNGE_CRED_REWOUND,
@@ -301,13 +301,13 @@ const char * munge_enum_int_to_str (munge_enum_t type, int val);
 /*
  *  Converts the munge enumeration [val] of the specified type [type]
  *    into a text string.
- *  Returns a NUL-terminated constant text string, or NULL on error;
+ *  Returns a null-terminated constant text string, or NULL on error;
  *    this string should not be freed or modified by the caller.
  */
 
 int munge_enum_str_to_int (munge_enum_t type, const char *str);
 /*
- *  Converts the NUL-terminated case-insensitive string [str] into the
+ *  Converts the null-terminated case-insensitive string [str] into the
  *    corresponding munge enumeration of the specified type [type].
  *  Returns a munge enumeration on success (>=0), or -1 on error.
  */

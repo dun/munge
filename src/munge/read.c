@@ -44,14 +44,14 @@
  *  Read data from file pointer into a dynamically allocated buffer.
  *
  *  Reads all data from [fp] into a malloc'd buffer, ensuring the buffer
- *  contains a terminating NUL character. The buffer grows exponentially to
+ *  contains a terminating null byte. The buffer grows exponentially to
  *  minimize realloc() calls when reading from potentially non-seekable
  *  streams.
  *
  *  Args:
  *    fp:       Input file pointer
  *    dst:      Pointer to allocated buffer (caller must free)
- *    dst_len:  Number of bytes read (not including terminating NUL)
+ *    dst_len:  Number of bytes read (not including the terminating null byte)
  *    max_size: Maximum allowed buffer size
  *
  *  The function terminates the program on error.
@@ -103,7 +103,7 @@ read_data_from_file (FILE *fp, void **dst, int *dst_len, size_t max_size)
             if (new_size > max_size) {
                 new_size = max_size;
             }
-            /*  Allocate with +1 for terminating NUL.
+            /*  Allocate with +1 for terminating null byte.
              */
             unsigned char *new_buf = realloc (dst_buf, new_size + 1);
             if (!new_buf) {
@@ -131,7 +131,7 @@ read_data_from_file (FILE *fp, void **dst, int *dst_len, size_t max_size)
         free (dst_buf);
         log_err (EMUNGE_SNAFU, LOG_ERR, "Exceeded max int value");
     }
-    /*  NULL-terminate if needed and store results.
+    /*  Null-terminate if needed and store results.
      *  Note: dst_buf will be NULL if dst_used is 0.
      */
     if (dst_used > 0) {

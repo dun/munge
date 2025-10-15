@@ -393,7 +393,7 @@ _log_aux (int errnum, int priority, char *msgbuf, int msgbuflen,
         memcpy (p, LOG_TRUNC_SUFFIX, suffix_len);
         p += suffix_len;
     }
-    /*  Terminate buffer with trailing newline and terminating NUL.
+    /*  Terminate buffer with trailing newline and null byte.
      */
     if (append_nl) {
         *p++ = '\n';

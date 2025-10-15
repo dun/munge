@@ -161,7 +161,7 @@ _decode_req (m_msg_t m, munge_ctx_t ctx, const char *cred)
     assert (cred != NULL);
     assert (strlen (cred) > 0);
 
-    /*  Pass the NUL-terminated credential to be decoded.
+    /*  Pass the null-terminated credential to be decoded.
      */
     m->data_len = strlen (cred) + 1;
     m->data = (void *) cred;

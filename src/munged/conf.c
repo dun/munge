@@ -1057,7 +1057,7 @@ _conf_set_origin_addr (conf_t conf)
             log_msg (LOG_WARNING, "Failed to get system hostname");
         }
         else {
-            /* POSIX doesn't guarantee null-termination if truncated */
+            /* POSIX doesn't guarantee null termination if truncated */
             hostname[sizeof hostname - 1] = '\0';
             conf->origin_name = strdup (hostname);
             if (conf->origin_name == NULL) {

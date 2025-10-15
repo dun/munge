@@ -471,7 +471,7 @@ dec_unpack_outer (munge_cred_t c)
     len -= n;
     /*
      *  Unpack the unterminated realm string (if present).
-     *    Note that the realm string is NUL-terminated after unpacking.
+     *    Note that the realm string is null-terminated after unpacking.
      */
     if (m->realm_len > 0) {
         if (m->realm_len > len) {

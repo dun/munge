@@ -106,9 +106,9 @@ test_expect_success 'reject decoding max+1 input' '
 # Message Transport Limit Tests
 
 # Test that libmunge enforces a maximum size limit on sending requests.
-# Decode request message format: 4-byte length + credential + NUL.
+# Decode request message format: 4-byte length + credential + null byte.
 # Sending (MAX_REQUEST - 1) credential creates (MAX_REQUEST + 4) request.
-# Input NULs are replaced with 'X' since credentials cannot contain NULs.
+# Input null bytes are replaced with 'X' since credentials cannot contain them.
 #
 test_expect_success 'reject oversized request message on send' '
     size=$((MAX_REQUEST - 1)) &&
@@ -171,8 +171,8 @@ test_expect_success DEBUG 'reject encoding max+1 payload via libmunge' '
 # Test that libmunge enforces the credential limit independently of the client.
 # Use MUNGE_TEST_CLIENT_LIMIT_BYPASS to bypass client's input limit in order to
 #   test libmunge's enforcement of the limit.
-# Input NULs are replaced with 'X' since credentials cannot contain NULs.
-# Note: libmunge adds +1 to the decode req data_len to account for the NUL.
+# Input null bytes are replaced with 'X' since credentials cannot contain them.
+# Note: libmunge adds +1 to decode req data_len for the terminating null byte.
 #
 test_expect_success DEBUG 'reject decoding max+1 input via libmunge' '
     size=$((MAX_REQUEST + 1)) &&

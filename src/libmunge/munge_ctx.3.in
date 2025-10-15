@@ -75,7 +75,7 @@ subsequent argument.
 The \fBmunge_ctx_create\fR() and \fBmunge_ctx_copy\fR() functions return
 a newly allocated MUNGE context, or NULL on error.
 .PP
-The \fBmunge_ctx_strerror\fR() function returns a pointer to a NUL-terminated
+The \fBmunge_ctx_strerror\fR() function returns a pointer to a null-terminated
 constant text string, or NULL if no error condition exists.  This string
 should not be freed or modified by the caller.
 .PP
@@ -99,7 +99,7 @@ Get or set the MAC type (see \fBMAC TYPES\fR).
 Get or set the compression type (see \fBCOMPRESSION TYPES\fR).
 .TP
 \fBMUNGE_OPT_REALM\fR , \fIchar *\fR
-Get or set the security realm, where the \fIchar *\fR type is a NUL-terminated
+Get or set the security realm, where the \fIchar *\fR type is a null-terminated
 character string.  The string returned by \fBmunge_ctx_get\fR() should not
 be freed or modified by the caller.  \fBNOT CURRENTLY SUPPORTED\fR.
 .TP
@@ -121,7 +121,7 @@ This option cannot be explicitly set.
 .TP
 \fBMUNGE_OPT_SOCKET\fR , \fIchar *\fR
 Get or set the local domain socket for connecting with \fBmunged\fR, where the
-\fIchar *\fR type is a NUL-terminated character string.  The string returned
+\fIchar *\fR type is a null-terminated character string.  The string returned
 by \fBmunge_ctx_get\fR() should not be freed or modified by the caller.
 .TP
 \fBMUNGE_OPT_UID_RESTRICTION\fR , \fIuid_t\fR

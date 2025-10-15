@@ -67,7 +67,7 @@ strdupf (const char *fmt, ...)
     vsnprintf (buf, sizeof (buf), fmt, vargs);
     va_end (vargs);
 
-    buf[sizeof (buf) - 1] = '\0';        /* ensure buf is NUL-terminated */
+    buf[sizeof (buf) - 1] = '\0';        /* ensure buf is null-terminated */
 
     if (!(p = strdup (buf))) {
         return (NULL);
@@ -77,11 +77,11 @@ strdupf (const char *fmt, ...)
 
 
 /*  Concatenates the string specified by the format-string [fmt] to
- *    the NUL-terminated string [dst] within a buffer of size [size].
+ *    the null-terminated string [dst] within a buffer of size [size].
  *    Note that [size] is the full size of [dst], not the space remaining.
- *  Returns the new length of the NUL-terminated string [dst], or -1 if
+ *  Returns the new length of the null-terminated string [dst], or -1 if
  *    truncation occurred.  The string in [dst] is guaranteed to be
- *    NUL-terminated.
+ *    null-terminated.
  */
 int
 strcatf (char *dst, size_t size, const char *fmt, ...)
@@ -98,11 +98,11 @@ strcatf (char *dst, size_t size, const char *fmt, ...)
     }
     p = dst;
     q = dst + size;
-    while ((*p) && (p < q)) {           /* walk dst in case NUL not present */
+    while ((*p) && (p < q)) {           /* walk dst in case of no null byte */
         p++;
     }
     len = p - dst;
-    if (len >= size) {                  /* dst not NUL-terminated */
+    if (len >= size) {                  /* dst not null-terminated */
         dst[size - 1] = '\0';
         return (-1);
     }
@@ -118,17 +118,17 @@ strcatf (char *dst, size_t size, const char *fmt, ...)
     va_end (vargs);
 
     if ((n < 0) || (n >= nleft)) {
-        dst[size - 1] = '\0';           /* ensure dst is NUL-terminated */
+        dst[size - 1] = '\0';           /* ensure dst is null-terminated */
         return (-1);
     }
     return (len + n);
 }
 
 
-/*  Converts the buffer [src] of length [srclen] into a NUL-terminated
+/*  Converts the buffer [src] of length [srclen] into a null-terminated
  *    hexadecimal string, storing the result in the buffer [dst] of
  *    length [dstlen].
- *  Returns the length of the NUL-terminated string [dst], or 0 if the
+ *  Returns the length of the null-terminated string [dst], or 0 if the
  *    buffer [dst] is too small (ie, less than ((srclen * 2) + 1) bytes).
  */
 int
@@ -201,9 +201,9 @@ strhex2bin (void *dst, size_t dstlen, const char *src, size_t srclen)
 /*  Formats the time [t] to the local time according to the strftime()
  *    format [tfmt], storing the resulting string in the buffer [dst] of
  *    length [dstlen].
- *  Returns the length of the NUL-terminated string [dst], -1 on error
+ *  Returns the length of the null-terminated string [dst], -1 on error
  *    (with errno set), or 0 if truncation occurred.  Upon success (ie, >0),
- *    the string in [dst] is guaranteed to be NUL-terminated.
+ *    the string in [dst] is guaranteed to be null-terminated.
  *  If [t] is 0, the current time will be used.
  */
 int

@@ -392,7 +392,7 @@ base64_encode_length (int srclen)
 {
 /*  When encoding, 3 bytes are encoded into 4 characters.
  *  Add 2 bytes to ensure a partial 3-byte chunk will be accounted for
- *    during integer division, then add 1 byte for the terminating NUL.
+ *    during integer division, then add 1 byte for the terminating null byte.
  */
     return (((srclen + 2) / 3) * 4) + 1;
 }
@@ -406,7 +406,7 @@ base64_decode_length (int srclen)
 {
 /*  When decoding, 4 characters are decoded into 3 bytes.
  *  Add 3 bytes to ensure a partial 4-byte chunk will be accounted for
- *    during integer division, then add 1 byte for the terminating NUL.
+ *    during integer division, then add 1 byte for the terminating null byte.
  */
     return (((srclen + 3) / 4) * 3) + 1;
 }

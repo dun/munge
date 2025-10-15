@@ -190,7 +190,7 @@ enc_validate_msg (m_msg_t m)
     /*  Validate realm.
      *
      *  FIXME: Validate realm and set default string if needed.
-     *         Validate that the realm string is NUL-terminated.
+     *         Validate that the realm string is null-terminated.
      */
     /*  Validate time-to-live.
      *  Ensure it is bounded by the configuration's max ttl.
