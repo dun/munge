@@ -108,7 +108,7 @@ getent group munge >/dev/null || \
     groupadd -r munge
 getent passwd munge >/dev/null || \
     useradd -c "MUNGE authentication service" -d "%{_sysconfdir}/munge" \
-    -g munge -s /sbin/nologin -r munge
+    -g munge -s /usr/sbin/nologin -r munge
 exit 0
 
 %post
