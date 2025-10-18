@@ -12,7 +12,6 @@ TEMPLATE_FILES = \
 	munge.systemd.sysconfig.in \
 	munge.sysvinit.init.in \
 	munge.sysvinit.sysconfig.in \
-	munge.tmpfiles.conf.in \
 	# End of TEMPLATE_FILES
 
 SUBSTITUTE_FILES = \
@@ -22,7 +21,6 @@ SUBSTITUTE_FILES = \
 	munge.systemd.sysconfig \
 	munge.sysvinit.init \
 	munge.sysvinit.sysconfig \
-	munge.tmpfiles.conf \
 	# End of SUBSTITUTE_FILES
 
 EXTRA_DIST = \
@@ -42,7 +40,6 @@ munge.systemd.service: munge.systemd.service.in
 munge.systemd.sysconfig: munge.systemd.sysconfig.in
 munge.sysvinit.init: munge.sysvinit.init.in
 munge.sysvinit.sysconfig: munge.sysvinit.sysconfig.in
-munge.tmpfiles.conf: munge.tmpfiles.conf.in
 
 noinst_DATA = \
 	$(SUBSTITUTE_FILES) \

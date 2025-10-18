@@ -1,7 +1,7 @@
 # This rpm specfile has been tested on the following systems:
-# - AlmaLinux 9, 8
-# - CentOS Stream 9, Stream 8, 7.9.2009
-# - Fedora 39, 38, 37
+# - AlmaLinux 10, 9, 8
+# - CentOS Stream 9
+# - Fedora 42, 41
 
 Name:		munge
 Version:	@VERSION@
@@ -33,7 +33,7 @@ BuildRequires:	bzip2-devel
 BuildRequires:	openssl-devel
 BuildRequires:	zlib-devel
 BuildRequires:	procps
-BuildRequires:	%{?el7:systemd}%{!?el7:systemd-rpm-macros}
+BuildRequires:	systemd-rpm-macros
 Requires:	%{name}-libs%{?_isa} = %{version}-%{release}
 Requires:	logrotate
 Requires(pre):	shadow-utils
@@ -96,12 +96,6 @@ touch %{buildroot}%{_localstatedir}/lib/munge/munged.seed
 touch %{buildroot}%{_localstatedir}/log/munge/munged.log
 mkdir -p %{buildroot}%{_rundir}/munge
 touch %{buildroot}%{_rundir}/munge/munged.pid
-#
-%if 0%{?rhel} == 7
-sed -i '/^RuntimeDirectory/ s/^/#/' %{buildroot}%{_unitdir}/munge.service
-mkdir -p %{buildroot}%{_tmpfilesdir}
-install -m 0644 src/etc/munge.tmpfiles.conf %{buildroot}%{_tmpfilesdir}/munge.conf
-%endif
 
 %pre
 getent group munge >/dev/null || \
@@ -118,10 +112,6 @@ if test ! -f %{_sysconfdir}/munge/munge.key; then
     echo "Refer to the mungekey(8) manpage for more information."
 fi
 %systemd_post munge.service
-#
-%if 0%{?rhel} == 7
-systemd-tmpfiles --create %{_tmpfilesdir}/munge.conf
-%endif
 
 %post libs -p /sbin/ldconfig
 
@@ -167,10 +157,6 @@ systemd-tmpfiles --create %{_tmpfilesdir}/munge.conf
 %{_mandir}/man8/munged.8.gz
 %{_mandir}/man8/mungekey.8.gz
 %{_unitdir}/munge.service
-#
-%if 0%{?rhel} == 7
-%{_tmpfilesdir}/munge.conf
-%endif
 
 %files devel
 %{_includedir}/munge.h
