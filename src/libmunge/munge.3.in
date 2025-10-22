@@ -55,7 +55,7 @@ The caller is responsible for freeing the memory referenced by \fIcred\fR.
 The \fBmunge_decode\fR() function validates the NUL-terminated credential
 \fIcred\fR.  If the MUNGE context \fIctx\fR is not NULL, it will be set to
 that used to encode the credential.  If \fIbuf\fR and \fIlen\fR are not NULL,
-memory will be allocated for the encapsulated payload (up to 1 MiB),
+memory will be allocated for the encapsulated payload (up to 1 MB),
 \fIbuf\fR will be set
 to point to this data, and \fIlen\fR will be set to its length.  An additional
 NUL character will be appended to this payload data but not included in its

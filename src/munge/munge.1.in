@@ -35,7 +35,7 @@ munge \- MUNGE credential encoder
 
 .SH DESCRIPTION
 The \fBmunge\fR program creates an MUNGE credential containing the UID and
-GID of the calling process.  Additional payload data (up to 1 MiB) can be
+GID of the calling process.  Additional payload data (up to 1 MB) can be
 encapsulated in as well.  The returned credential can be passed to another
 process which can validate its contents (e.g., via the \fBunmunge\fR program).
 This allows an unrelated and potentially remote process to ascertain the
