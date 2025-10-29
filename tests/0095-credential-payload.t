@@ -201,7 +201,6 @@ test_expect_success 'stop munged' '
 # Show captured stderr from failed tests (verbose mode only).
 #
 test_expect_success 'cleanup' '
-    munged_cleanup &&
     for e in $(ls err*.$$ 2>/dev/null); do echo "${e}:"; cat "${e}"; echo; done
 '
 

@@ -203,10 +203,4 @@ test_expect_success SUDO 'stop unprivileged munged as root' '
     fi
 '
 
-# Clean up after a munged process that may not have terminated.
-#
-test_expect_success 'cleanup' '
-    munged_cleanup
-'
-
 test_done

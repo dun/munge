@@ -192,10 +192,4 @@ test_expect_success TESTNET 'credential metadata shows test-net origin' '
     grep "^ENCODE_HOST:.* ${TESTNET_IP}$" meta.$$
 '
 
-# Clean up after a munged process that may not have terminated.
-#
-test_expect_success 'cleanup' '
-    munged_cleanup
-'
-
 test_done

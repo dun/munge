@@ -244,8 +244,4 @@ test_expect_success 'stop munged' '
     munged_stop
 '
 
-test_expect_success 'cleanup' '
-    munged_cleanup
-'
-
 test_done

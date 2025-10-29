@@ -162,10 +162,4 @@ test_expect_success 'stop munged' '
     munged_stop
 '
 
-# Perform housekeeping to clean up afterwards.
-#
-test_expect_success 'cleanup' '
-    munged_cleanup
-'
-
 test_done

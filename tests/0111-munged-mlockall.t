@@ -81,10 +81,4 @@ test_expect_success 'check logfile for errors' '
     ! grep -i "Error:" "${MUNGE_LOGFILE}"
 '
 
-# Perform housekeeping to clean up afterwards.
-#
-test_expect_success 'cleanup' '
-    munged_cleanup
-'
-
 test_done

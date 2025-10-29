@@ -47,8 +47,4 @@ test_expect_success 'check valgrind log for errors in munge' '
     valgrind_check_log
 '
 
-test_expect_success 'cleanup' '
-    munged_cleanup
-'
-
 test_done

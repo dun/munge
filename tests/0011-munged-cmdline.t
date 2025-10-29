@@ -101,10 +101,4 @@ test_expect_failure 'finish writing tests' '
     false
 '
 
-# Clean up after a munged process that may not have terminated.
-#
-test_expect_success 'cleanup' '
-    munged_cleanup
-'
-
 test_done

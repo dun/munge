@@ -124,6 +124,15 @@ munged_start()
             --group-update-time=-1 \
             "$@"
     MUNGED_START_STATUS=$?
+    if test "${MUNGED_START_STATUS}" = 0 &&
+            test "${MUNGED_CLEANUP_REGISTERED}" != 1; then
+        # trap handles interrupts when running tests directly or via prove; it
+        # doesn't work under "make check" due to tap-driver.sh signal handling.
+        trap 'munged_cleanup; EXIT_OK=t; exit 130' INT
+        trap 'munged_cleanup; EXIT_OK=t; exit 143' TERM
+        cleanup munged_cleanup
+        MUNGED_CLEANUP_REGISTERED=1
+    fi
     return ${MUNGED_START_STATUS}
 }
 
