@@ -81,10 +81,16 @@ CLEANFILES = \
 	$(SUBSTITUTE_FILES) \
 	# End of CLEANFILES
 
-$(SUBSTITUTE_FILES): Makefile
-	$(AM_V_GEN)$(substitute) < '$(srcdir)/$@.in' > '$(builddir)/$@'
+munge.spec: Makefile munge.spec.in src/etc/munge.systemd.sysusers.conf
+	$(AM_V_GEN) { \
+	    SYSUSERS_CONF=$$(cat src/etc/munge.systemd.sysusers.conf | \
+	        sed 's/[&/\|]/\\&/g'); \
+	    $(substitute) -e "s|[@]SYSUSERS_CONF[@]|$${SYSUSERS_CONF}|g" \
+	        < '$(srcdir)/$@.in' > '$(builddir)/$@'; \
+	}
 
-munge.spec: munge.spec.in
+src/etc/munge.systemd.sysusers.conf: src/etc/munge.systemd.sysusers.conf.in
+	@cd `dirname $@` && $(MAKE) $(AM_MAKEFLAGS) `basename $@`
 
 noinst_DATA = \
 	$(SUBSTITUTE_FILES) \

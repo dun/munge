@@ -104,7 +104,7 @@ touch %{buildroot}%{_rundir}/munge/munged.pid
 %pre
 %if 0%{?fedora} == 0 || 0%{?fedora} < 43
 systemd-sysusers --replace=%{_sysusersdir}/munge.conf - <<'EOF'
-u munge - "MUNGE authentication service" %{_sysconfdir}/munge /usr/sbin/nologin
+@SYSUSERS_CONF@
 EOF
 %endif
 
