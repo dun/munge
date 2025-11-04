@@ -10,6 +10,7 @@ TEMPLATE_FILES = \
 	munge.pkgconfig.pc.in \
 	munge.systemd.service.in \
 	munge.systemd.sysconfig.in \
+	munge.systemd.sysusers.conf.in \
 	munge.sysvinit.init.in \
 	munge.sysvinit.sysconfig.in \
 	# End of TEMPLATE_FILES
@@ -19,6 +20,7 @@ SUBSTITUTE_FILES = \
 	munge.pkgconfig.pc \
 	munge.systemd.service \
 	munge.systemd.sysconfig \
+	munge.systemd.sysusers.conf \
 	munge.sysvinit.init \
 	munge.sysvinit.sysconfig \
 	# End of SUBSTITUTE_FILES
@@ -38,6 +40,7 @@ munge.logrotate.conf: munge.logrotate.conf.in
 munge.pkgconfig.pc: munge.pkgconfig.pc.in
 munge.systemd.service: munge.systemd.service.in
 munge.systemd.sysconfig: munge.systemd.sysconfig.in
+munge.systemd.sysusers.conf: munge.systemd.sysusers.conf.in
 munge.sysvinit.init: munge.sysvinit.init.in
 munge.sysvinit.sysconfig: munge.sysvinit.sysconfig.in
 
@@ -92,7 +95,7 @@ uninstall-pkgconfig:
 	  rm -f '$(DESTDIR)$(pkgconfigdir)/$(PACKAGE).pc'; \
 	fi
 
-install-systemd: munge.systemd.service install-systemd-sysconfig
+install-systemd: munge.systemd.service install-systemd-sysconfig install-systemd-sysusers
 	@if test 'x$(systemdunitdir)' != x; then \
 	  echo $(MKDIR_P) "'$(DESTDIR)$(systemdunitdir)'"; \
 	  $(MKDIR_P) '$(DESTDIR)$(systemdunitdir)'; \
@@ -105,7 +108,7 @@ install-systemd: munge.systemd.service install-systemd-sysconfig
 	  $(MKDIR_P) -m 0755 '$(DESTDIR)$(runstatedir)/munge'; \
 	fi
 
-uninstall-systemd: uninstall-systemd-sysconfig
+uninstall-systemd: uninstall-systemd-sysconfig uninstall-systemd-sysusers
 	@if test 'x$(systemdunitdir)' != x; then \
 	  echo rm -f "'$(DESTDIR)$(systemdunitdir)/$(PACKAGE).service'"; \
 	  rm -f '$(DESTDIR)$(systemdunitdir)/$(PACKAGE).service'; \
@@ -127,6 +130,22 @@ uninstall-systemd-sysconfig:
 	      && test 'x$(sysconfigdir)' != x; then \
 	  echo rm -f "'$(DESTDIR)$(sysconfigdir)/$(PACKAGE)'"; \
 	  rm -f '$(DESTDIR)$(sysconfigdir)/$(PACKAGE)'; \
+	fi
+
+install-systemd-sysusers:
+	@if test 'x$(systemdsysusersdir)' != x; then \
+	  echo $(MKDIR_P) "'$(DESTDIR)$(systemdsysusersdir)'"; \
+	  $(MKDIR_P) '$(DESTDIR)$(systemdsysusersdir)'; \
+	  echo $(INSTALL_DATA) "'$(builddir)/munge.systemd.sysusers.conf'" \
+	      "'$(DESTDIR)$(systemdsysusersdir)/$(PACKAGE).conf'"; \
+	  $(INSTALL_DATA) '$(builddir)/munge.systemd.sysusers.conf' \
+	      '$(DESTDIR)$(systemdsysusersdir)/$(PACKAGE).conf'; \
+	fi
+
+uninstall-systemd-sysusers:
+	@if test 'x$(systemdsysusersdir)' != x; then \
+	  echo rm -f "'$(DESTDIR)$(systemdsysusersdir)/$(PACKAGE).conf'"; \
+	  rm -f '$(DESTDIR)$(systemdsysusersdir)/$(PACKAGE).conf'; \
 	fi
 
 install-sysvinit: munge.sysvinit.init install-sysvinit-sysconfig

@@ -1,0 +1,1 @@
+u munge - "MUNGE authentication service" @sysconfdir@/munge /usr/sbin/nologin

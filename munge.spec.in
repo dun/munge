@@ -1,7 +1,7 @@
 # This rpm specfile has been tested on the following systems:
 # - AlmaLinux 10, 9, 8
 # - CentOS Stream 9
-# - Fedora 42, 41
+# - Fedora 43, 42
 
 Name:		munge
 Version:	@VERSION@
@@ -33,11 +33,14 @@ BuildRequires:	bzip2-devel
 BuildRequires:	openssl-devel
 BuildRequires:	zlib-devel
 BuildRequires:	procps
-BuildRequires:	systemd-rpm-macros
 Requires:	%{name}-libs%{?_isa} = %{version}-%{release}
 Requires:	logrotate
-Requires(pre):	shadow-utils
+
+BuildRequires:	systemd-rpm-macros
 %{?systemd_requires}
+%if 0%{?fedora} == 0 || 0%{?fedora} < 43
+Requires(pre):	/usr/bin/systemd-sysusers
+%endif
 
 %description
 MUNGE (MUNGE Uid 'N' Gid Emporium) is an authentication service for creating
@@ -77,6 +80,7 @@ The shared library (libmunge) for running applications that use MUNGE.
     --with-logrotateddir=%{_sysconfdir}/logrotate.d \
     --with-pkgconfigdir=%{_libdir}/pkgconfig \
     --with-runstatedir=%{_rundir} \
+    --with-systemdsysusersdir=%{_sysusersdir} \
     --with-systemdunitdir=%{_unitdir}
 sed -i 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g' libtool
 sed -i 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' libtool
@@ -98,12 +102,11 @@ mkdir -p %{buildroot}%{_rundir}/munge
 touch %{buildroot}%{_rundir}/munge/munged.pid
 
 %pre
-getent group munge >/dev/null || \
-    groupadd -r munge
-getent passwd munge >/dev/null || \
-    useradd -c "MUNGE authentication service" -d "%{_sysconfdir}/munge" \
-    -g munge -s /usr/sbin/nologin -r munge
-exit 0
+%if 0%{?fedora} == 0 || 0%{?fedora} < 43
+systemd-sysusers --replace=%{_sysusersdir}/munge.conf - <<'EOF'
+u munge - "MUNGE authentication service" %{_sysconfdir}/munge /usr/sbin/nologin
+EOF
+%endif
 
 %post
 if test ! -f %{_sysconfdir}/munge/munge.key; then
@@ -156,6 +159,7 @@ fi
 %{_mandir}/man7/munge.7.gz
 %{_mandir}/man8/munged.8.gz
 %{_mandir}/man8/mungekey.8.gz
+%{_sysusersdir}/munge.conf
 %{_unitdir}/munge.service
 
 %files devel
