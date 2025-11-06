@@ -200,6 +200,14 @@ test_expect_success MUNGE_INSTALL 'verify rpm removal' '
     ! grep ^munge- rpm.query.$$
 '
 
+# Verify the ldconfig cache has been updated to remove libmunge entries.
+# The %postun scriptlet should call ldconfig after package removal.
+#
+test_expect_success MUNGE_INSTALL 'verify libmunge not in ldconfig' '
+    ldconfig -p >ldconfig.out.$$ &&
+    ! grep libmunge ldconfig.out.$$
+'
+
 # Remove the keyfile dir after checking to make sure the derived pathname ends
 #   with "/munge".
 #
