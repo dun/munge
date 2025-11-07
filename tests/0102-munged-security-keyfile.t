@@ -62,7 +62,7 @@ test_expect_success 'keyfile non-regular-file override failure' '
 #
 test_expect_success 'keyfile symlink to regular file failure' '
     keyfile="${MUNGE_KEYFILE}.symlink" &&
-    ln -s -f "${MUNGE_KEYFILE}" "${keyfile}" &&
+    ln -s -f -n "${MUNGE_KEYFILE}" "${keyfile}" &&
     test_must_fail munged_start --key-file="${keyfile}" &&
     grep "Error:.* Keyfile.* a symbolic link" "${MUNGE_LOGFILE}"
 '
@@ -72,7 +72,7 @@ test_expect_success 'keyfile symlink to regular file failure' '
 #
 test_expect_success 'keyfile symlink to regular file override' '
     keyfile="${MUNGE_KEYFILE}.symlink" &&
-    ln -s -f "${MUNGE_KEYFILE}" "${keyfile}" &&
+    ln -s -f -n "${MUNGE_KEYFILE}" "${keyfile}" &&
     munged_start --key-file="${keyfile}" --force &&
     munged_stop &&
     grep "Warning:.* Keyfile.* a symbolic link" "${MUNGE_LOGFILE}"

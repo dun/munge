@@ -45,7 +45,7 @@ test_expect_success 'logfile regular file' '
 #
 test_expect_success 'logfile symlink to regular file failure' '
     logfile="${MUNGE_LOGFILE}.symlink" &&
-    ln -s -f "${MUNGE_LOGFILE}" "${logfile}" &&
+    ln -s -f -n "${MUNGE_LOGFILE}" "${logfile}" &&
     rm -f "${MUNGE_LOGFILE}" &&
     touch "${MUNGE_LOGFILE}" &&
     test_must_fail munged_start t-keep-logfile \
@@ -58,7 +58,7 @@ test_expect_success 'logfile symlink to regular file failure' '
 #
 test_expect_success 'logfile symlink to regular file override' '
     logfile="${MUNGE_LOGFILE}.symlink" &&
-    ln -s -f "${MUNGE_LOGFILE}" "${logfile}" &&
+    ln -s -f -n "${MUNGE_LOGFILE}" "${logfile}" &&
     rm -f "${MUNGE_LOGFILE}" &&
     touch "${MUNGE_LOGFILE}" &&
     munged_start t-keep-logfile --log-file="${logfile}" --force 2>err.$$ &&
@@ -81,7 +81,7 @@ test_expect_success 'logfile missing' '
 #
 test_expect_success 'logfile symlink to missing file failure' '
     logfile="${MUNGE_LOGFILE}.symlink" &&
-    ln -s -f "${MUNGE_LOGFILE}" "${logfile}" &&
+    ln -s -f -n "${MUNGE_LOGFILE}" "${logfile}" &&
     test_must_fail munged_start --log-file="${logfile}" 2>err.$$ &&
     grep "Error:.* Logfile.* should not be a symbolic link" err.$$
 '
@@ -93,7 +93,7 @@ test_expect_success 'logfile symlink to missing file failure' '
 #
 test_expect_success 'logfile symlink to missing file override' '
     logfile="${MUNGE_LOGFILE}.symlink" &&
-    ln -s -f "${MUNGE_LOGFILE}" "${logfile}" &&
+    ln -s -f -n "${MUNGE_LOGFILE}" "${logfile}" &&
     munged_start --log-file="${logfile}" --force 2>err.$$ &&
     munged_stop &&
     grep "Warning:.* Logfile.* should not be a symbolic link" err.$$ &&
