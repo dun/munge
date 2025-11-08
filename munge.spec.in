@@ -26,13 +26,11 @@ Source1:	https://github.com/dun/munge/releases/download/%{name}-%{version}/%{nam
 Source2:	https://github.com/dun.gpg
 %endif
 
-BuildRequires:	gnupg2
 BuildRequires:	make
 BuildRequires:	gcc
 BuildRequires:	bzip2-devel
 BuildRequires:	openssl-devel
 BuildRequires:	zlib-devel
-BuildRequires:	procps
 Requires:	%{name}-libs%{?_isa} = %{version}-%{release}
 Requires:	logrotate
 
@@ -40,6 +38,15 @@ BuildRequires:	systemd-rpm-macros
 %{?systemd_requires}
 %if 0%{?fedora} == 0 || 0%{?fedora} < 43
 Requires(pre):	/usr/bin/systemd-sysusers
+%endif
+
+%if %{with check}
+BuildRequires:	procps-ng
+BuildRequires:	util-linux
+%endif
+
+%if %{with verify}
+BuildRequires:	gpgverify
 %endif
 
 %description
@@ -130,14 +137,11 @@ fi
 %license COPYING
 %license COPYING.LESSER
 %doc AUTHORS
-%doc DISCLAIMER.LLNS
-%doc DISCLAIMER.UC
 %doc JARGON
 %doc NEWS
 %doc QUICKSTART
 %doc README
 %doc THANKS
-%doc doc/credential_v3_format.txt
 %dir %attr(0700,munge,munge) %{_sysconfdir}/munge
 %attr(0600,munge,munge) %config(noreplace) %ghost %{_sysconfdir}/munge/munge.key
 %config(noreplace) %{_sysconfdir}/logrotate.d/munge
@@ -153,12 +157,12 @@ fi
 %{_bindir}/unmunge
 %{_sbindir}/munged
 %{_sbindir}/mungekey
-%{_mandir}/man1/munge.1.gz
-%{_mandir}/man1/remunge.1.gz
-%{_mandir}/man1/unmunge.1.gz
-%{_mandir}/man7/munge.7.gz
-%{_mandir}/man8/munged.8.gz
-%{_mandir}/man8/mungekey.8.gz
+%{_mandir}/man1/munge.1*
+%{_mandir}/man1/remunge.1*
+%{_mandir}/man1/unmunge.1*
+%{_mandir}/man7/munge.7*
+%{_mandir}/man8/munged.8*
+%{_mandir}/man8/mungekey.8*
 %{_sysusersdir}/munge.conf
 %{_unitdir}/munge.service
 
@@ -169,21 +173,21 @@ fi
 %endif
 %{_libdir}/libmunge.so
 %{_libdir}/pkgconfig/munge.pc
-%{_mandir}/man3/munge.3.gz
-%{_mandir}/man3/munge_ctx.3.gz
-%{_mandir}/man3/munge_ctx_copy.3.gz
-%{_mandir}/man3/munge_ctx_create.3.gz
-%{_mandir}/man3/munge_ctx_destroy.3.gz
-%{_mandir}/man3/munge_ctx_get.3.gz
-%{_mandir}/man3/munge_ctx_set.3.gz
-%{_mandir}/man3/munge_ctx_strerror.3.gz
-%{_mandir}/man3/munge_decode.3.gz
-%{_mandir}/man3/munge_encode.3.gz
-%{_mandir}/man3/munge_enum.3.gz
-%{_mandir}/man3/munge_enum_int_to_str.3.gz
-%{_mandir}/man3/munge_enum_is_valid.3.gz
-%{_mandir}/man3/munge_enum_str_to_int.3.gz
-%{_mandir}/man3/munge_strerror.3.gz
+%{_mandir}/man3/munge.3*
+%{_mandir}/man3/munge_ctx.3*
+%{_mandir}/man3/munge_ctx_copy.3*
+%{_mandir}/man3/munge_ctx_create.3*
+%{_mandir}/man3/munge_ctx_destroy.3*
+%{_mandir}/man3/munge_ctx_get.3*
+%{_mandir}/man3/munge_ctx_set.3*
+%{_mandir}/man3/munge_ctx_strerror.3*
+%{_mandir}/man3/munge_decode.3*
+%{_mandir}/man3/munge_encode.3*
+%{_mandir}/man3/munge_enum.3*
+%{_mandir}/man3/munge_enum_int_to_str.3*
+%{_mandir}/man3/munge_enum_is_valid.3*
+%{_mandir}/man3/munge_enum_str_to_int.3*
+%{_mandir}/man3/munge_strerror.3*
 
 %files libs
 %{_libdir}/libmunge.so.2
