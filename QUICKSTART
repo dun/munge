@@ -60,8 +60,8 @@ MUNGE Installation Guide
       The typical commands "./configure; make; make install" should configure,
       build, and install the software.  Adjust as needed for your environment.
 
-         $ tar xJf munge-0.5.15.tar.xz
-         $ cd munge-0.5.15
+         $ tar xJf munge-0.5.16.tar.xz
+         $ cd munge-0.5.16
          $ ./configure \
             --prefix=/usr \
             --sysconfdir=/etc \
@@ -140,10 +140,10 @@ MUNGE Installation Guide
       (ending with ".zip" or ".tar.gz").  Build dependencies can be installed
       from an SRPM if necessary, and the SRPM can be built from the tarball:
 
-         $ rpmbuild -ts munge-0.5.15.tar.xz
-         Wrote: SRPMS/munge-0.5.15-1.el9.src.rpm
+         $ rpmbuild -ts munge-0.5.16.tar.xz
+         Wrote: SRPMS/munge-0.5.16-1.el9.src.rpm
 
-         $ sudo dnf builddep SRPMS/munge-0.5.15-1.el9.src.rpm
+         $ sudo dnf builddep SRPMS/munge-0.5.16-1.el9.src.rpm
          Package bzip2-devel-1.0.8-8.el9.x86_64 is already installed.
          Package gcc-11.2.1-9.4.el9.alma.x86_64 is already installed.
          Package gnupg2-2.3.3-1.el9.x86_64 is already installed.
@@ -156,21 +156,21 @@ MUNGE Installation Guide
       As of 0.5.14, GPG verification of the source can be enabled by
       specifying "--with=verify" to rpmbuild.  This requires the public key
       <https://github.com/dun.gpg> and corresponding detached GPG signature
-      (munge-0.5.15.tar.xz.asc) to reside in the same directory as the
-      release tarball (munge-0.5.15.tar.xz):
+      (munge-0.5.16.tar.xz.asc) to reside in the same directory as the
+      release tarball (munge-0.5.16.tar.xz):
 
          $ ls
-         dun.gpg  munge-0.5.15.tar.xz  munge-0.5.15.tar.xz.asc
+         dun.gpg  munge-0.5.16.tar.xz  munge-0.5.16.tar.xz.asc
 
-         $ rpmbuild -tb --with=verify munge-0.5.15.tar.xz
+         $ rpmbuild -tb --with=verify munge-0.5.16.tar.xz
 
       The test suite can be run by specifying "--with=check":
 
-         $ rpmbuild -tb --with=verify --with=check munge-0.5.15.tar.xz
+         $ rpmbuild -tb --with=verify --with=check munge-0.5.16.tar.xz
 
       Or it can be disabled by specifying "--without=check":
 
-         $ rpmbuild -tb --with=verify --without=check munge-0.5.15.tar.xz
+         $ rpmbuild -tb --with=verify --without=check munge-0.5.16.tar.xz
 
       Three or more binary RPMs will be generated: munge, munge-devel,
       munge-libs, and potentially a debugsource and a couple debuginfo RPMs.
@@ -183,12 +183,12 @@ MUNGE Installation Guide
       The binary RPMs can be installed with rpm.  For example:
 
          $ sudo rpm --install --verbose \
-            RPMS/x86_64/munge-0.5.15-1.el9.x86_64.rpm \
-            RPMS/x86_64/munge-debuginfo-0.5.15-1.el9.x86_64.rpm \
-            RPMS/x86_64/munge-debugsource-0.5.15-1.el9.x86_64.rpm \
-            RPMS/x86_64/munge-devel-0.5.15-1.el9.x86_64.rpm \
-            RPMS/x86_64/munge-libs-0.5.15-1.el9.x86_64.rpm \
-            RPMS/x86_64/munge-libs-debuginfo-0.5.15-1.el9.x86_64.rpm
+            RPMS/x86_64/munge-0.5.16-1.el9.x86_64.rpm \
+            RPMS/x86_64/munge-debuginfo-0.5.16-1.el9.x86_64.rpm \
+            RPMS/x86_64/munge-debugsource-0.5.16-1.el9.x86_64.rpm \
+            RPMS/x86_64/munge-devel-0.5.16-1.el9.x86_64.rpm \
+            RPMS/x86_64/munge-libs-0.5.16-1.el9.x86_64.rpm \
+            RPMS/x86_64/munge-libs-debuginfo-0.5.16-1.el9.x86_64.rpm
 
 4. Securing the installation
 
