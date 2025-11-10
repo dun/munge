@@ -74,11 +74,12 @@ test_expect_success 'create dist tarball' '
     test_set_prereq MUNGE_DIST
 '
 
-# Build the source RPM which is needed to install dependencies for building the
-#   binary RPMs.
+# Build the source RPM to enable dependency installation via builddep.
+# Use --with=check so conditional BuildRequires for testing are included.
+# Use --without=verify since signature verification requires manual key entry.
 #
 test_expect_success MUNGE_DIST 'build srpm' '
-    rpmbuild -ts --without=check --without=verify \
+    rpmbuild -ts --with=check --without=verify \
             --define="source_date_epoch_from_changelog 0" \
             --define="_builddir %{_topdir}/BUILD" \
             --define="_buildrootdir %{_topdir}/BUILDROOT" \
@@ -104,7 +105,9 @@ test_expect_success MUNGE_SRPM 'install builddeps' '
     sudo ${builddep} "${MUNGE_RPM_DIR}"/SRPMS/*.src.rpm
 '
 
-# Build in binary RPMs.
+# Build binary RPMs.
+# Use --without=check to skip the test suite.  The nested make check fails
+#   under automake's test harness (unable to create .trs/.log files).
 #
 test_expect_success MUNGE_DIST 'build rpm' '
     rpmbuild -tb --without=check --without=verify \
