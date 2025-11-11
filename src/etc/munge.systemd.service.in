@@ -14,7 +14,7 @@ RuntimeDirectory=munge
 RuntimeDirectoryMode=0755
 User=munge
 Group=munge
-Restart=on-abort
+Restart=on-abnormal
 
 [Install]
 WantedBy=multi-user.target
