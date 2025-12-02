@@ -30,7 +30,8 @@
 #endif /* HAVE_CONFIG_H */
 
 #include <errno.h>
-#include <time.h>
+#include <sys/time.h>                   /* gettimeofday */
+#include <time.h>                       /* clock_gettime */
 #include "clock.h"
 
 
@@ -47,10 +48,21 @@ clock_get_timespec (struct timespec *tsp, long msecs)
         errno = EINVAL;
         return -1;
     }
+#if HAVE_CLOCK_GETTIME
     rv = clock_gettime (CLOCK_REALTIME, tsp);
     if (rv < 0) {
         return -1;
     }
+#else  /* !HAVE_CLOCK_GETTIME */
+    struct timeval tv;
+    rv = gettimeofday (&tv, NULL);
+    if (rv < 0) {
+        return -1;
+    }
+    tsp->tv_sec = tv.tv_sec;
+    tsp->tv_nsec = tv.tv_usec * 1000;
+#endif /* !HAVE_CLOCK_GETTIME */
+
     if (msecs > 0) {
         tsp->tv_sec += msecs / 1000;
         tsp->tv_nsec += (msecs % 1000) * 1000 * 1000;
