@@ -80,6 +80,13 @@ AC_CHECK_TYPES(socklen_t, [], [], [#include <sys/types.h>
 ##
 # Checks for library functions.
 ##
+# Check for clock_gettime() with librt if needed.
+#
+save_LIBS="${LIBS}"
+AS_IF([test "x${ac_cv_lib_rt_clock_gettime}" = xyes], [LIBS="${LIBS} -lrt"])
+AC_CHECK_FUNCS([clock_gettime])
+LIBS="${save_LIBS}"
+
 AC_CHECK_FUNCS( \
   clock_nanosleep \
   getentropy \
