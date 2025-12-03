@@ -220,6 +220,101 @@
 }
 
 {
+   libcrypto-3.5-EVP_RAND_CTX_new-leak
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:CRYPTO_zalloc
+   obj:*/libcrypto.so.3.*
+   fun:EVP_RAND_CTX_new
+   ...
+   fun:_random_add
+   fun:_random_read_entropy_from_kernel
+   fun:random_init
+   fun:main
+}
+
+{
+   libcrypto-3.5-EVP_RAND_instantiate-leak
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:CRYPTO_malloc
+   ...
+   fun:EVP_RAND_instantiate
+   ...
+   fun:_random_add
+   fun:_random_read_entropy_from_kernel
+   fun:random_init
+   fun:main
+}
+
+{
+   libcrypto-3.5-OPENSSL_LH_insert-leak
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:OPENSSL_LH_insert
+   ...
+   fun:EVP_RAND_instantiate
+   ...
+   fun:_random_add
+   fun:_random_read_entropy_from_kernel
+   fun:random_init
+   fun:main
+}
+
+{
+   libcrypto-3.5-OPENSSL_LH_new-leak
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:CRYPTO_zalloc
+   fun:OPENSSL_LH_new
+   ...
+   fun:EVP_RAND_instantiate
+   ...
+   fun:_random_add
+   fun:_random_read_entropy_from_kernel
+   fun:random_init
+   fun:main
+}
+
+{
+   libcrypto-3.5-OPENSSL_sk_insert-realloc-leak
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:realloc
+   obj:*/libcrypto.so.3.*
+   fun:OPENSSL_sk_insert
+   ...
+   fun:EVP_RAND_instantiate
+   ...
+   fun:_random_add
+   fun:_random_read_entropy_from_kernel
+   fun:random_init
+   fun:main
+}
+
+{
+   libcrypto-3.5-random_init-internal-leak
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:CRYPTO_malloc
+   fun:CRYPTO_zalloc
+   obj:*/libcrypto.so.3.*
+   ...
+   fun:_random_add
+   fun:_random_read_entropy_from_kernel
+   fun:random_init
+   fun:main
+}
+
+{
    libgcrypt-_gcry_check_version-leak
    Memcheck:Leak
    match-leak-kinds: reachable
