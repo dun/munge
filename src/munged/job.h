@@ -33,7 +33,7 @@
 #include "work.h"
 
 
-void job_accept (conf_t conf, work_p w);
+void job_accept (conf_t conf, work_p workers);
 
 void job_exec (m_msg_t m);
 

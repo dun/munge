@@ -29,11 +29,11 @@
 #  include "config.h"
 #endif /* HAVE_CONFIG_H */
 
-#include <arpa/inet.h>                  /* for inet_ntop() */
+#include <arpa/inet.h>                  /* inet_ntop() */
 #include <assert.h>
 #include <errno.h>
 #include <munge.h>
-#include <netinet/in.h>                 /* for INET_ADDRSTRLEN */
+#include <netinet/in.h>                 /* INET_ADDRSTRLEN */
 #include <signal.h>
 #include <string.h>
 #include <sys/socket.h>
@@ -68,22 +68,22 @@ extern volatile sig_atomic_t got_terminate;     /* defined in munged.c       */
  *  Public Functions
  *****************************************************************************/
 
-void
-job_accept (conf_t conf, work_p w)
-{
-/*  Accepts client connections and queues requests to the work crew [w].
- *  Exits when SIGINT or SIGTERM is received.
+/*  Accept client connections and queue requests to the workers.
+ *  Handle SIGHUP (for configuration reloads) and exit on SIGINT/SIGTERM.
  */
+void
+job_accept (conf_t conf, work_p workers)
+{
     m_msg_t m;
-    int     sd;
-    int     curr_errno;
-    time_t  curr_time;
-    int     last_log_errno = 0;
-    time_t  last_log_time = 0;
+    int sd;
+    int curr_errno;
+    time_t curr_time;
+    int last_log_errno = 0;
+    time_t last_log_time = 0;
 
     assert (conf != NULL);
     assert (conf->ld >= 0);
-    assert (w != NULL);
+    assert (workers != NULL);
 
     while (!got_terminate) {
         if (got_reconfig) {
@@ -94,6 +94,17 @@ job_accept (conf_t conf, work_p w)
         }
         sd = accept (conf->ld, NULL, NULL);
         if (sd < 0) {
+            /*  Handle accept() failure.
+             *  Transient errors are ignored and retried.
+             *  Resource exhaustion errors trigger throttled logging and
+             *    backlog processing to prevent log flooding while allowing
+             *    the system to recover.
+             *  ENOMEM here often indicates socket buffer exhaustion rather
+             *    than general memory depletion, and processing the backlog
+             *    may free socket resources.  This differs from its typical
+             *    handling where memory exhaustion is treated as fatal.
+             *  All other errors are considered fatal.
+             */
             switch (errno) {
                 case ECONNABORTED:
                 case EINTR:
@@ -102,12 +113,17 @@ job_accept (conf_t conf, work_p w)
                 case ENFILE:
                 case ENOBUFS:
                 case ENOMEM:
-                    curr_errno = errno; /* save errno before calling time() */
+                    /*  Preserve errno before calling time().
+                     */
+                    curr_errno = errno;
                     curr_time = time (NULL);
                     if (curr_time == (time_t) -1) {
                         log_errno (EMUNGE_SNAFU, LOG_ERR,
                                 "Failed to query current time");
                     }
+                    /*  Log if sufficient time has elapsed since last log, or
+                     *    if errno has changed (different resource exhausted).
+                     */
                     if ((curr_time > last_log_time + LOG_LIMIT_SECS) ||
                             (curr_errno != last_log_errno)) {
                         log_msg (LOG_INFO, "Failed to accept connection: %s",
@@ -117,30 +133,24 @@ job_accept (conf_t conf, work_p w)
                     }
                     /*  Process backlog before accepting new connections.
                     */
-                    work_wait (w);
+                    work_wait (workers);
                     continue;
                 default:
                     log_errno (EMUNGE_SNAFU, LOG_ERR,
-                        "Failed to accept connection");
+                            "Failed to accept connection");
                     break;
             }
         }
-        /*  With fd_timed_read_n(), a poll() is performed before any read()
-         *    in order to provide timeouts and ensure the read() won't block.
-         *    As such, it shouldn't be necessary to set the client socket as
-         *    non-blocking.  However according to the Linux poll(2) and
-         *    select(2) manpages, spurious readiness notifications can occur.
-         *    poll()/select() may report a socket as ready for reading while
-         *    the subsequent read() blocks.  This could happen when data has
-         *    arrived, but upon examination is discarded due to an invalid
-         *    checksum.  To protect against this, the client socket is set
-         *    non-blocking and EAGAIN is handled appropriately.
+        /*  Handle successful accept().
+         *  Set the client socket non-blocking to guard against spurious
+         *    readiness notifications that could cause functions to block.
+         *  Create, bind, and queue message to the workers for processing.
          */
         if (fd_set_nonblocking (sd) < 0) {
             close (sd);
             log_msg (LOG_WARNING,
-                "Failed to set nonblocking client socket: %s",
-                strerror (errno));
+                    "Failed to set nonblocking client socket: %s",
+                    strerror (errno));
         }
         else if (m_msg_create (&m) != EMUNGE_SUCCESS) {
             close (sd);
@@ -150,24 +160,24 @@ job_accept (conf_t conf, work_p w)
             m_msg_destroy (m);
             log_msg (LOG_WARNING, "Failed to bind socket for client request");
         }
-        else if (work_queue (w, m) < 0) {
+        else if (work_queue (workers, m) < 0) {
             m_msg_destroy (m);
             log_msg (LOG_WARNING, "Failed to queue client request");
         }
     }
     log_msg (LOG_NOTICE, "Exiting on signal %d (%s)",
             got_terminate, strsignal (got_terminate));
-    return;
 }
 
 
+/*  Receive and process a client message request, logging any errors.
+ */
 void
 job_exec (m_msg_t m)
 {
-/*  Receives and responds to the message request [m].
- */
-    munge_err_t  e;
-    const char  *p;
+    munge_err_t e;
+    const char *err_msg;
+    const char *ip_addr_str;
 
     assert (m != NULL);
 
@@ -182,37 +192,44 @@ job_exec (m_msg_t m)
                 break;
             default:
                 m_msg_set_err (m, EMUNGE_SNAFU,
-                    strdupf ("Invalid message type %d", m->type));
+                        strdupf ("Invalid message type %d", m->type));
                 break;
         }
     }
-    /*  For some errors, the credential was successfully decoded but deemed
-     *    invalid for policy reasons.  In these cases, the origin IP address
-     *    is added to the error message to aid in troubleshooting.
+    /*  Some errors indicate the credential was successfully decoded but
+     *    rejected for policy reasons.  In these cases, the origin IP address
+     *    is available from the decoded credential and logged to identify the
+     *    source.  These use LOG_DEBUG since clients can ignore these errors,
+     *    avoiding log noise for operations that succeed from the client's
+     *    perspective.  This is a temporary mitigation until this error
+     *    handling can be moved into munged itself.  Other errors are logged
+     *    at the typical LOG_INFO.
      */
     if (m->error_num != EMUNGE_SUCCESS) {
-        p = (m->error_str != NULL)
-            ? m->error_str
-            : munge_strerror (m->error_num);
+        err_msg = (m->error_str != NULL)
+                ? m->error_str
+                : munge_strerror (m->error_num);
+        ip_addr_str = NULL;
         switch (m->error_num) {
             case EMUNGE_CRED_EXPIRED:
             case EMUNGE_CRED_REWOUND:
             case EMUNGE_CRED_REPLAYED:
                 if (m->addr_len == 4) {
-                    char ip_addr_buf [INET_ADDRSTRLEN];
-                    if (inet_ntop (AF_INET, &m->addr, ip_addr_buf,
-                                   sizeof (ip_addr_buf)) != NULL) {
-                        log_msg (LOG_DEBUG, "%s from %s", p, ip_addr_buf);
-                        break;
-                    }
+                    char buf[INET_ADDRSTRLEN];
+                    ip_addr_str = inet_ntop (AF_INET, &m->addr,
+                            buf, sizeof buf);
                 }
-                log_msg (LOG_DEBUG, "%s", p);
+                if (ip_addr_str != NULL) {
+                    log_msg (LOG_DEBUG, "%s from %s", err_msg, ip_addr_str);
+                }
+                else {
+                    log_msg (LOG_DEBUG, "%s", err_msg);
+                }
                 break;
             default:
-                log_msg (LOG_INFO, "%s", p);
+                log_msg (LOG_INFO, "%s", err_msg);
                 break;
         }
     }
     m_msg_destroy (m);
-    return;
 }
