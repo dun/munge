@@ -51,12 +51,6 @@
 
 
 /*****************************************************************************
- *  Constants
- *****************************************************************************/
-#define LOG_LIMIT_SECS  60
-
-
-/*****************************************************************************
  *  Extern Variables
  *****************************************************************************/
 
@@ -80,6 +74,7 @@ job_accept (conf_t conf, work_p workers)
     time_t curr_time;
     int last_log_errno = 0;
     time_t last_log_time = 0;
+    const int log_limit_secs = 300;
 
     assert (conf != NULL);
     assert (conf->ld >= 0);
@@ -124,9 +119,10 @@ job_accept (conf_t conf, work_p workers)
                     /*  Log if sufficient time has elapsed since last log, or
                      *    if errno has changed (different resource exhausted).
                      */
-                    if ((curr_time > last_log_time + LOG_LIMIT_SECS) ||
+                    if ((curr_time - last_log_time > log_limit_secs) ||
                             (curr_errno != last_log_errno)) {
-                        log_msg (LOG_INFO, "Failed to accept connection: %s",
+                        log_msg (LOG_WARNING,
+                                "Failed to accept connection: %s",
                                 strerror (curr_errno));
                         last_log_errno = curr_errno;
                         last_log_time = curr_time;
@@ -145,6 +141,10 @@ job_accept (conf_t conf, work_p workers)
          *  Set the client socket non-blocking to guard against spurious
          *    readiness notifications that could cause functions to block.
          *  Create, bind, and queue message to the workers for processing.
+         *
+         *  Note: Throttle state is not reset here to avoid excessive logging
+         *    during oscillating resource exhaustion.  The errno change
+         *    detection handles transitions between different resource types.
          */
         if (fd_set_nonblocking (sd) < 0) {
             close (sd);
