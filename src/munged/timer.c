@@ -26,8 +26,6 @@
  *  Based on ideas from:
  *  - David R. Butenhof's "Programming with POSIX Threads" (Section 3.3.4)
  *  - Jon C. Snader's "Effective TCP/IP Programming" (Tip #20)
- *****************************************************************************
- *  Refer to "timer.h" for documentation on public functions.
  *****************************************************************************/
 
 

@@ -22,8 +22,6 @@
  *  You should have received a copy of the GNU General Public License
  *  and GNU Lesser General Public License along with MUNGE.  If not, see
  *  <http://www.gnu.org/licenses/>.
- *****************************************************************************
- *  Refer to "fd.h" for documentation on public functions.
  *****************************************************************************/
 
 
