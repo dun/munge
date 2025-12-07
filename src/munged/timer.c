@@ -21,7 +21,7 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  and GNU Lesser General Public License along with MUNGE.  If not, see
- *  <http://www.gnu.org/licenses/>.
+ *  <https://www.gnu.org/licenses/>.
  *****************************************************************************
  *  Based on ideas from:
  *  - David R. Butenhof's "Programming with POSIX Threads" (Section 3.3.4)
