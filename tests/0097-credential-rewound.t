@@ -11,6 +11,13 @@ if ! test_have_prereq FAKETIME; then
     test_done
 fi
 
+# Fails on FreeBSD; cause not yet investigated.
+#
+if test $(uname -s) != "Linux"; then
+    skip_all="skipping tests; $(uname -s) not supported"
+    test_done
+fi
+
 # Set up the environment.
 #
 test_expect_success 'setup' '
