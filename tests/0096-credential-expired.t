@@ -7,14 +7,14 @@ test_description='Check decode of an expired credential'
 . "${SHARNESS_TEST_SRCDIR}/sharness.sh"
 
 if ! test_have_prereq FAKETIME; then
-    skip_all='skipping tests; faketime not installed'
+    skip_all="skipping tests: faketime not installed"
     test_done
 fi
 
 # Fails on FreeBSD; cause not yet investigated.
 #
 if test $(uname -s) != "Linux"; then
-    skip_all="skipping tests; $(uname -s) not supported"
+    skip_all="skipping tests: $(uname -s) not supported"
     test_done
 fi
 

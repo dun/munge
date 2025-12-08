@@ -9,7 +9,7 @@ test_description='Check munged --mlockall'
 # Require EXPENSIVE due to false positives if MIN_MEMLOCK is set too low.
 #
 if ! test_have_prereq EXPENSIVE; then
-    skip_all='skipping tests; long test not specified'
+    skip_all="skipping tests: --long-tests not specified"
     test_done
 fi
 
@@ -23,12 +23,12 @@ ulimit -S -l "$(ulimit -H -l)" 2>/dev/null
 MIN_MEMLOCK=16384
 ULIMIT_MEMLOCK=$(ulimit -S -l 2>/dev/null)
 if test -z "${ULIMIT_MEMLOCK}"; then
-    skip_all='skipping tests; memlock limit not supported'
+    skip_all="skipping tests: memlock limit not supported"
     test_done
 elif test "${ULIMIT_MEMLOCK}" = "unlimited"; then
     : # unlimited is acceptable, continue with tests
 elif test "${ULIMIT_MEMLOCK}" -lt "${MIN_MEMLOCK}"; then
-    skip_all="skipping tests; memlock limit too low (${ULIMIT_MEMLOCK} KB < ${MIN_MEMLOCK} KB minimum)"
+    skip_all="skipping tests: memlock limit too low (${ULIMIT_MEMLOCK} KB < ${MIN_MEMLOCK} KB minimum)"
     test_done
 fi
 

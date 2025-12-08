@@ -9,14 +9,14 @@ test_description='Check to build, install, and test RPMs'
 # Check for the guard variable.
 #
 if test "x${MUNGE_CHAOS}" != xt; then
-    skip_all='skipping rpm test; chaos not enabled'
+    skip_all="skipping tests: chaos not enabled"
     test_done
 fi
 
-# Ensure long tests are specified.
+# Ensure EXPENSIVE tests are allowed.
 #
 if ! test_have_prereq EXPENSIVE; then
-    skip_all='skipping rpm test; long test not specified'
+    skip_all="skipping tests: --long-tests not specified"
     test_done
 fi
 
@@ -24,21 +24,21 @@ fi
 # This regexp matches recent AlmaLinux, CentOS, and Fedora.
 #
 if ! grep -E -q '^ID.*=.*\b(rhel|fedora)\b' /etc/os-release; then
-    skip_all='skipping rpm test; not a supported redhat-based system'
+    skip_all="skipping tests: not a supported redhat-based system"
     test_done
 fi
 
 # Ensure the rpmbuild executable is already installed.
 #
 if ! command -v rpmbuild >/dev/null 2>&1; then
-    skip_all='skipping rpm test; rpmbuild not installed'
+    skip_all="skipping tests: rpmbuild not installed"
     test_done
 fi
 
 # Ensure that non-interactive sudo is available.
 #
 if ! test_have_prereq SUDO; then
-    skip_all='skipping rpm test; sudo not enabled'
+    skip_all="skipping tests: sudo not enabled"
     test_done
 fi
 
@@ -48,7 +48,7 @@ fi
 #   from a partial (un)install that would interfere with the new installation.
 #
 if rpm --query --all | grep ^munge-; then
-    skip_all='skipping rpm test; munge rpm already installed'
+    skip_all="skipping tests: munge rpm already installed"
     test_done
 fi
 

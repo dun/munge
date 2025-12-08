@@ -7,12 +7,12 @@ test_description='Check unmunge for resource leaks'
 . "${SHARNESS_TEST_SRCDIR}/sharness.sh"
 
 if ! test_have_prereq EXPENSIVE; then
-    skip_all='skipping valgrind tests; long test not specified'
+    skip_all="skipping tests: --long-tests not specified"
     test_done
 fi
 
 if ! test_have_prereq VALGRIND; then
-    skip_all='skipping valgrind tests; valgrind not installed'
+    skip_all="skipping tests: valgrind not installed"
     test_done
 fi
 
