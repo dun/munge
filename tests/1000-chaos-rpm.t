@@ -190,7 +190,7 @@ test_expect_success MUNGE_INSTALL 'stop munge service' '
 # Remove the binary RPMs installed previously.
 #
 test_expect_success MUNGE_INSTALL 'remove rpm' '
-    grep ^munge- rpm.install.$$ >rpm.pkgs.$$ &&
+    grep -E "^munge-([0-9]|debug|devel|libs)" rpm.install.$$ >rpm.pkgs.$$ &&
     sudo rpm --erase --verbose $(cat rpm.pkgs.$$)
 '
 
@@ -199,7 +199,7 @@ test_expect_success MUNGE_INSTALL 'remove rpm' '
 #
 test_expect_success MUNGE_INSTALL 'verify rpm removal' '
     rpm --query --all >rpm.query.$$ &&
-    ! grep ^munge- rpm.query.$$
+    ! grep -E "^munge-([0-9]|debug|devel|libs)" rpm.query.$$
 '
 
 # Verify the ldconfig cache has been updated to remove libmunge entries.
