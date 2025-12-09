@@ -42,16 +42,6 @@ if ! test_have_prereq SUDO; then
     test_done
 fi
 
-# Ensure none of the munge RPMs are currently installed in order to prevent
-#   overwriting an existing installation.
-# It would be quicker to just "rpm --query munge", but that could miss RPMs
-#   from a partial (un)install that would interfere with the new installation.
-#
-if rpm --query --all | grep ^munge-; then
-    skip_all="skipping tests: munge rpm already installed"
-    test_done
-fi
-
 # Create a scratch directory for the RPM build.
 # Provide [MUNGE_RPM_DIR] for later checks.
 #
@@ -122,6 +112,15 @@ test_expect_success MUNGE_DIST 'build rpm' '
             --pipe="sed \"s/^\(\(not \)\?ok\)\b/ \1/\"" \
             "${MUNGE_TARBALL}" &&
     test_set_prereq MUNGE_RPM
+'
+
+# Remove any existing munge RPMs to ensure a clean installation test.
+#
+test_expect_success MUNGE_RPM 'remove existing rpms' '
+    if pkgs=$(rpm --query --all |
+            grep -E "^munge-([0-9]|debug|devel|libs)"); then
+        sudo rpm --erase --verbose ${pkgs}
+    fi
 '
 
 # Install the binary RPMs.
