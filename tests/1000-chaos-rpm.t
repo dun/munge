@@ -20,11 +20,11 @@ if ! test_have_prereq EXPENSIVE; then
     test_done
 fi
 
-# Ensure this is a RedHat-based system.
-# This regexp matches recent AlmaLinux, CentOS, and Fedora.
+# Ensure this is a RHEL-based system (AlmaLinux, CentOS, Fedora).
 #
-if ! grep -E -q '^ID.*=.*\b(rhel|fedora)\b' /etc/os-release; then
-    skip_all="skipping tests: not a supported redhat-based system"
+if ! grep -E -q '^ID.*=.*\b(rhel|fedora)\b' /etc/os-release 2>/dev/null; then
+    id=$(sed -ne '/^ID=/!d; s/.*=//; s/"//g; p; q' /etc/os-release 2>/dev/null)
+    skip_all="skipping tests: ${id:+${id} }system type not supported"
     test_done
 fi
 
