@@ -7,6 +7,8 @@ test_description='Check to build, install, and test RPMs'
 . "${SHARNESS_TEST_SRCDIR}/sharness.sh"
 
 # Check for the guard variable.
+# Warning: This test performs system modifications: installs/removes RPMs,
+#   creates/removes users, and manages services.  Set MUNGE_CHAOS=t to enable.
 #
 if test "x${MUNGE_CHAOS}" != xt; then
     skip_all="skipping tests: chaos not enabled"
@@ -187,7 +189,7 @@ test_expect_success MUNGE_INSTALL 'stop munge service' '
     sudo systemctl stop munge.service
 '
 
-# Remove the binary RPMs installed previously.
+# Remove the munge RPMs installed previously.
 #
 test_expect_success MUNGE_INSTALL 'remove rpm' '
     grep -E "^munge-([0-9]|debug|devel|libs)" rpm.install.$$ >rpm.pkgs.$$ &&
@@ -210,8 +212,7 @@ test_expect_success MUNGE_INSTALL 'verify libmunge not in ldconfig' '
     ! grep libmunge ldconfig.out.$$
 '
 
-# Remove the keyfile dir after checking to make sure the derived pathname ends
-#   with "/munge".
+# Remove the keyfile directory after verifying the path ends with "/munge".
 #
 test_expect_success MUNGE_INSTALL 'remove key' '
     keyfiledir=$(dirname "${MUNGE_KEYFILE}") &&
