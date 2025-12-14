@@ -40,6 +40,7 @@
 /src/etc/munge.pkgconfig.pc
 /src/etc/munge.systemd.service
 /src/etc/munge.systemd.sysconfig
+/src/etc/munge.systemd.sysusers.conf
 /src/etc/munge.sysvinit.init
 /src/etc/munge.sysvinit.sysconfig
 /src/etc/munge.tmpfiles.conf
