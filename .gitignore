@@ -52,6 +52,7 @@
 /src/mungekey/mungekey
 /stamp-h1
 /tests/test-results/
+/tests/trash directory.*/
 Makefile
 Makefile.in
 TAGS
