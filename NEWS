@@ -13,6 +13,7 @@ munge-0.5.17 (2025-11-12):
 - Changed test suite to bail out immediately on munged startup failures. (4178e603)
 - Fixed encode/decode payload limit asymmetry. (#155, 3cc5a6ce)
 - Fixed cross-compilation support in configure script. (5c39e434, 3aa9c66d)
+- Improved configure script OpenSSL detection by adding pkgconf support. (7149743f)
 - Improved mlockall error diagnostics and documentation. (c52db232)
 - Improved origin address configuration warnings. (88b65e0c)
 
