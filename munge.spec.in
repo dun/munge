@@ -14,9 +14,6 @@ Release:	1%{?dist}
 # Requires a detached signature (Source1) and gpg public key (Source2).
 %bcond_with verify
 
-# Enable hardened build since munged is a long-running daemon.
-%global _hardened_build 1
-
 Summary:	MUNGE authentication service
 License:	GPL-3.0-or-later
 URL:		https://github.com/dun/munge
