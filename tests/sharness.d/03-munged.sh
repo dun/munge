@@ -126,8 +126,11 @@ munged_start()
     MUNGED_START_STATUS=$?
     if test "${MUNGED_START_STATUS}" = 0 &&
             test "${MUNGED_CLEANUP_REGISTERED}" != 1; then
-        # trap handles interrupts when running tests directly or via prove; it
-        # doesn't work under "make check" due to tap-driver.sh signal handling.
+        #
+        # trap handles interrupts when running tests directly or via prove.
+        # Under "make check", tap-driver.sh signal handling prevents traps
+        #   from firing, but cleanup() still runs on normal test completion.
+        #
         trap 'munged_cleanup; EXIT_OK=t; exit 130' INT
         trap 'munged_cleanup; EXIT_OK=t; exit 143' TERM
         cleanup munged_cleanup
@@ -213,10 +216,9 @@ munged_kill()
     return 0
 }
 
-# Perform housekeeping to clean up after munged.
-# This should be called at the end of any test script that starts a munged
-#   process.  It must be at the start of any &&-chain to ensure it cannot be
-#   prevented from running by a preceding failure in the chain.
+# Kill any remaining munged process and clean up test remnants.
+# This is called by the sharness cleanup() handler or signal traps registered
+#   in munged_start().
 #
 munged_cleanup()
 {
