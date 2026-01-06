@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  Copyright (C) 2007-2025 Lawrence Livermore National Security, LLC.
+ *  Copyright (C) 2007-2026 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2002-2007 The Regents of the University of California.
  *  UCRL-CODE-155910.
  *
