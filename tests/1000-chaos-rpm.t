@@ -44,12 +44,26 @@ if ! test_have_prereq SUDO; then
     test_done
 fi
 
+# Remove the scratch directory created by "setup" unless [debug] is set.
+# If called from a signal trap, always remove the directory.
+#
+rpm_dir_cleanup()
+{
+    local called_from_trap="${1:-}"
+    if test "x${debug}" != xt || test "x${called_from_trap}" = xt; then
+        rm -rf "${MUNGE_RPM_DIR}"
+    fi
+}
+
 # Create a scratch directory for the RPM build.
 # Provide [MUNGE_RPM_DIR] for later checks.
 #
 test_expect_success 'setup' '
     MUNGE_RPM_DIR="${TMPDIR:-"/tmp"}/munge-rpm-$$" &&
-    mkdir -p "${MUNGE_RPM_DIR}"
+    mkdir -p "${MUNGE_RPM_DIR}" &&
+    trap "rpm_dir_cleanup t; EXIT_OK=t; exit 130" INT &&
+    trap "rpm_dir_cleanup t; EXIT_OK=t; exit 143" TERM &&
+    cleanup rpm_dir_cleanup
 '
 
 # Create the dist tarball for rpmbuild and stash it in the scratch directory.
@@ -226,16 +240,6 @@ test_expect_success MUNGE_INSTALL 'remove key' '
 #
 test_expect_success MUNGE_INSTALL 'remove munge user' '
     sudo userdel munge
-'
-
-# Remove the scratch directory unless [debug] is set.
-#
-test_expect_success 'cleanup' '
-    if test "x${debug}" = xt; then
-        echo "rpm dir is \"${MUNGE_RPM_DIR}\""
-    else
-        rm -rf "${MUNGE_RPM_DIR}"
-    fi
 '
 
 test_done
