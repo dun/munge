@@ -5,15 +5,16 @@
 #
 wait_for()
 {
-    _wf_cmd="$1"
-    _wf_timeout_secs="${2:-5}"
-    _wf_delay_secs="${3:-0.1}"
-    _wf_count=$(awk "BEGIN {print int(${_wf_timeout_secs}/${_wf_delay_secs})}")
+    local cmd timeout_secs delay_secs count
+    cmd="$1"
+    timeout_secs="${2:-5}"
+    delay_secs="${3:-0.1}"
+    count=$(awk "BEGIN {print int(${timeout_secs}/${delay_secs})}")
 
-    while test "${_wf_count}" -gt 0; do
-        eval "${_wf_cmd}" >/dev/null 2>&1 && return 0
-        sleep "${_wf_delay_secs}"
-        _wf_count=$((_wf_count - 1))
+    while test "${count}" -gt 0; do
+        eval "${cmd}" >/dev/null 2>&1 && return 0
+        sleep "${delay_secs}"
+        count=$((count - 1))
     done
     return 1
 }

@@ -10,6 +10,7 @@ test_description='Check maximum credential payload'
 #
 get_munge_define()
 {
+    local macro cc inc
     macro="$1"
     cc=$(sed -n "s/^CC *= *//p" "${MUNGE_BUILD_DIR}/Makefile" | head -1)
     cat >getval.$$.c <<-EOF
@@ -70,6 +71,7 @@ test "${MUNGED_START_STATUS}" = 0 || bail_out "Failed to start munged"
 #   to verify the limit applies to the payload, not the encoded credential.
 #
 test_expect_success BZLIB 'reject encoding max+1 payload (min overhead)' '
+    local size &&
     size=$((MAX_PAYLOAD + 1)) &&
     dd if=/dev/zero bs="${size}" count=1 2>/dev/null | \
     test_must_fail "${MUNGE}" --socket="${MUNGE_SOCKET}" --output=cred.$$ \
@@ -83,6 +85,7 @@ test_expect_success BZLIB 'reject encoding max+1 payload (min overhead)' '
 #   maximum overhead to ensure the limit is applied at the payload level.
 #
 test_expect_success 'reject encoding max+1 payload (max overhead)' '
+    local size &&
     size=$((MAX_PAYLOAD + 1)) &&
     dd if=/dev/zero bs="${size}" count=1 2>/dev/null | \
     test_must_fail "${MUNGE}" --socket="${MUNGE_SOCKET}" --output=cred.$$ \
@@ -94,6 +97,7 @@ test_expect_success 'reject encoding max+1 payload (max overhead)' '
 # Test that unmunge enforces maximum input (credential) limit.
 #
 test_expect_success 'reject decoding max+1 input' '
+    local size &&
     size=$((MAX_REQUEST + 1)) &&
     dd if=/dev/zero bs="${size}" count=1 2>/dev/null | \
     test_must_fail "${UNMUNGE}" --socket="${MUNGE_SOCKET}" \
@@ -111,6 +115,7 @@ test_expect_success 'reject decoding max+1 input' '
 # Input null bytes are replaced with 'X' since credentials cannot contain them.
 #
 test_expect_success 'reject oversized request message on send' '
+    local size &&
     size=$((MAX_REQUEST - 1)) &&
     dd if=/dev/zero bs="${size}" count=1 2>/dev/null | \
     tr "\0" "X" | \
@@ -157,6 +162,7 @@ test_expect_success 'verify payload length is preserved' '
 #   test libmunge's enforcement of the limit.
 #
 test_expect_success DEBUG 'reject encoding max+1 payload via libmunge' '
+    local size &&
     size=$((MAX_PAYLOAD + 1)) &&
     export MUNGE_TEST_CLIENT_LIMIT_BYPASS=1 &&
     dd if=/dev/zero bs="${size}" count=1 2>/dev/null | \
@@ -175,6 +181,7 @@ test_expect_success DEBUG 'reject encoding max+1 payload via libmunge' '
 # Note: libmunge adds +1 to decode req data_len for the terminating null byte.
 #
 test_expect_success DEBUG 'reject decoding max+1 input via libmunge' '
+    local size &&
     size=$((MAX_REQUEST + 1)) &&
     export MUNGE_TEST_CLIENT_LIMIT_BYPASS=1 &&
     dd if=/dev/zero bs="${size}" count=1 2>/dev/null | \
@@ -201,6 +208,7 @@ test_expect_success 'stop munged' '
 # Show captured stderr from failed tests (verbose mode only).
 #
 test_expect_success 'cleanup' '
+    local e &&
     for e in $(ls err*.$$ 2>/dev/null); do echo "${e}:"; cat "${e}"; echo; done
 '
 

@@ -12,10 +12,12 @@ MUNGEKEY="${MUNGE_BUILD_DIR}/src/mungekey/mungekey"
 #
 set_executables()
 {
-    for _cmd in "${MUNGE}" "${UNMUNGE}" "${REMUNGE}" "${MUNGED}" "${MUNGEKEY}"
+    local cmd
+
+    for cmd in "${MUNGE}" "${UNMUNGE}" "${REMUNGE}" "${MUNGED}" "${MUNGEKEY}"
     do
-        if test ! -x "${_cmd}"; then
-            echo "ERROR: MUNGE has not been built: ${_cmd} not found."
+        if test ! -x "${cmd}"; then
+            echo "ERROR: MUNGE has not been built: ${cmd} not found."
             exit 1
         fi
     done

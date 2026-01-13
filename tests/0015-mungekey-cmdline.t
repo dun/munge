@@ -128,6 +128,7 @@ done
 #
 for OPT_BITS in '-b' '--bits'; do
     test_expect_success "mungekey ${OPT_BITS}" '
+        local num_bits file_size &&
         num_bits=1000 &&
         rm -f "${MUNGE_KEYFILE}" &&
         "${MUNGEKEY}" --create --keyfile="${MUNGE_KEYFILE}" \
@@ -142,6 +143,7 @@ done
 #   [num_bytes].
 #
 test_expect_success 'mungekey --bits rounding-up to next byte' '
+    local num_bytes num_bits num_bytes_rounded file_size &&
     num_bytes=128 &&
     num_bits=$(((num_bytes * 8) + 1)) &&
     rm -f "${MUNGE_KEYFILE}" &&
@@ -164,6 +166,7 @@ test_expect_success 'mungekey munge_defs.h exists' '
 # Check if the default def is used when the number of bits is unspecified.
 #
 test_expect_success DEFS 'mungekey --bits unspecified and using default' '
+    local num_bytes num_bits file_size &&
     num_bytes=$(awk "/MUNGE_KEY_LEN_DFL_BYTES/ { print \$3 }" \
             "${MUNGE_DEFS}") &&
     num_bits=$((num_bytes * 8)) &&
@@ -176,6 +179,7 @@ test_expect_success DEFS 'mungekey --bits unspecified and using default' '
 # Check the boundary case for the minimum number of bits.
 #
 test_expect_success DEFS 'mungekey --bits with minimum value' '
+    local num_bytes num_bits file_size &&
     num_bytes=$(awk "/MUNGE_KEY_LEN_MIN_BYTES/ { print \$3 }" \
             "${MUNGE_DEFS}") &&
     num_bits=$((num_bytes * 8)) &&
@@ -188,6 +192,7 @@ test_expect_success DEFS 'mungekey --bits with minimum value' '
 # Check the boundary case for the maximum number of bits.
 #
 test_expect_success DEFS 'mungekey --bits with maximum value' '
+    local num_bytes num_bits file_size &&
     num_bytes=$(awk "/MUNGE_KEY_LEN_MAX_BYTES/ { print \$3 }" \
             "${MUNGE_DEFS}") &&
     num_bits=$((num_bytes * 8)) &&
@@ -200,6 +205,7 @@ test_expect_success DEFS 'mungekey --bits with maximum value' '
 # Check the boundary case below the minimum number of bits.
 #
 test_expect_success DEFS 'mungekey --bits below minimum value' '
+    local num_bytes num_bits &&
     num_bytes=$(awk "/MUNGE_KEY_LEN_MIN_BYTES/ { print \$3 }" \
             "${MUNGE_DEFS}") &&
     num_bits=$(((num_bytes * 8) - 1)) &&
@@ -212,6 +218,7 @@ test_expect_success DEFS 'mungekey --bits below minimum value' '
 # Check the boundary case above the maximum number of bits.
 #
 test_expect_success DEFS 'mungekey --bits above maximum value' '
+    local num_bytes num_bits &&
     num_bytes=$(awk "/MUNGE_KEY_LEN_MAX_BYTES/ { print \$3 }" \
             "${MUNGE_DEFS}") &&
     num_bits=$(((num_bytes * 8) + 1)) &&
@@ -224,6 +231,7 @@ test_expect_success DEFS 'mungekey --bits above maximum value' '
 # Check if the minimum number of bits is displayed in the error message.
 #
 test_expect_success DEFS 'mungekey --bits error message with minimum value' '
+    local num_bytes num_bits &&
     num_bytes=$(awk "/MUNGE_KEY_LEN_MIN_BYTES/ { print \$3 }" \
             "${MUNGE_DEFS}") &&
     num_bits=$((num_bytes * 8)) &&
@@ -236,6 +244,7 @@ test_expect_success DEFS 'mungekey --bits error message with minimum value' '
 # Check if the maximum number of bits is displayed in the error message.
 #
 test_expect_success DEFS 'mungekey --bits error message with maximum value' '
+    local num_bytes num_bits &&
     num_bytes=$(awk "/MUNGE_KEY_LEN_MAX_BYTES/ { print \$3 }" \
             "${MUNGE_DEFS}") &&
     num_bits=$((num_bytes * 8)) &&
@@ -287,6 +296,7 @@ test_expect_success 'mungekey --bits without required value' '
 #
 for OPT_FORCE in '-f' '--force'; do
     test_expect_success "mungekey ${OPT_FORCE}" '
+        local inode0 inode1 &&
         rm -f "${MUNGE_KEYFILE}" &&
         touch "${MUNGE_KEYFILE}" &&
         ln -f "${MUNGE_KEYFILE}" "${MUNGE_KEYFILE}.link" &&
@@ -356,6 +366,7 @@ done
 #   contains the number of bits used.
 #
 test_expect_success 'mungekey --verbose number of bits' '
+    local num_bits num_bits_used &&
     num_bits=1000 &&
     rm -f "${MUNGE_KEYFILE}" &&
     "${MUNGEKEY}" --create --keyfile="${MUNGE_KEYFILE}" --bits="${num_bits}" \

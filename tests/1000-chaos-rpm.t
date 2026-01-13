@@ -25,6 +25,7 @@ fi
 # Ensure this is a RHEL-based system (AlmaLinux, CentOS, Fedora).
 #
 if ! grep -E -q '^ID.*=.*\b(rhel|fedora)\b' /etc/os-release 2>/dev/null; then
+    local id &&
     id=$(sed -ne '/^ID=/!d; s/.*=//; s/"//g; p; q' /etc/os-release 2>/dev/null)
     skip_all="skipping tests: ${id:+${id} }system type not supported"
     test_done
@@ -101,6 +102,7 @@ test_expect_success MUNGE_DIST 'build srpm' '
 # Install build dependencies needed for building the binary RPMs.
 #
 test_expect_success MUNGE_SRPM 'install builddeps' '
+    local builddep &&
     if command -v dnf >/dev/null 2>&1; then
         builddep="dnf builddep --assumeyes"
     elif command -v yum-builddep >/dev/null 2>&1; then
@@ -133,6 +135,7 @@ test_expect_success MUNGE_DIST 'build rpm' '
 # Remove any existing munge RPMs to ensure a clean installation test.
 #
 test_expect_success MUNGE_RPM 'remove existing rpms' '
+    local pkgs &&
     if pkgs=$(rpm --query --all |
             grep -E "^munge-([0-9]|debug|devel|libs)"); then
         sudo rpm --erase --verbose ${pkgs}
@@ -229,6 +232,7 @@ test_expect_success MUNGE_INSTALL 'verify libmunge not in ldconfig' '
 # Remove the keyfile directory after verifying the path ends with "/munge".
 #
 test_expect_success MUNGE_INSTALL 'remove key' '
+    local keyfiledir &&
     keyfiledir=$(dirname "${MUNGE_KEYFILE}") &&
     expr "${keyfiledir}" : "/.*/munge$" >/dev/null 2>&1 &&
     echo "${keyfiledir}" &&

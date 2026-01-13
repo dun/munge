@@ -3,10 +3,10 @@
 #
 VALGRIND_VERSION=$(valgrind --version 2>/dev/null)
 if test "$?" -eq 0; then
-    _major=$(echo "${VALGRIND_VERSION}" | sed -ne 's/[^-]*-\([0-9]*\).*/\1/p')
-    _minor=$(echo "${VALGRIND_VERSION}" | sed -ne 's/[^.]*.\([0-9]*\).*/\1/p')
-    if { test "${_major}" -eq 3 && test "${_minor}" -ge 10; } || \
-       { test "${_major}" -gt 3; }; then
+    major=$(echo "${VALGRIND_VERSION}" | sed -ne 's/[^-]*-\([0-9]*\).*/\1/p')
+    minor=$(echo "${VALGRIND_VERSION}" | sed -ne 's/[^.]*.\([0-9]*\).*/\1/p')
+    if { test "${major}" -eq 3 && test "${minor}" -ge 10; } || \
+       { test "${major}" -gt 3; }; then
         test_set_prereq VALGRIND
     fi
 fi
@@ -42,15 +42,16 @@ VALGRIND_CMD="libtool --mode=execute valgrind --tool=memcheck \
 #
 valgrind_check_log()
 {
+    local rv
     if test ! -s "${VALGRIND_LOGFILE}"; then
         echo "ERROR: Valgrind logfile [${VALGRIND_LOGFILE}] not found."
-        _rv=1
+        rv=1
     elif grep -q 'ERROR SUMMARY: [^0]' "${VALGRIND_LOGFILE}"; then
         cat "${VALGRIND_LOGFILE}"
-        _rv=1
+        rv=1
     else
         test_debug 'cat "${VALGRIND_LOGFILE}"'
-        _rv=0
+        rv=0
     fi
-    return ${_rv}
+    return ${rv}
 }
