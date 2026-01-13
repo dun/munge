@@ -57,7 +57,7 @@ rpm_dir_cleanup()
 }
 
 # Create a scratch directory for the RPM build.
-# Provide [MUNGE_RPM_DIR] for later checks.
+# Provide [MUNGE_RPM_DIR] for later tests.
 #
 test_expect_success 'setup' '
     MUNGE_RPM_DIR="${TMPDIR:-"/tmp"}/munge-rpm-$$" &&
@@ -68,7 +68,7 @@ test_expect_success 'setup' '
 '
 
 # Create the dist tarball for rpmbuild and stash it in the scratch directory.
-# Provide [MUNGE_TARBALL] for later checks.
+# Provide [MUNGE_TARBALL] for later tests.
 #
 test_expect_success 'create dist tarball' '
     cd "${MUNGE_BUILD_DIR}" &&
@@ -154,7 +154,7 @@ test_expect_success MUNGE_RPM 'install rpm' '
 
 # Create a new key, overwriting an existing key if necessary.
 # Run as the munge user since the keyfile dir is 0700 and owned by munge.
-# Provide [MUNGE_KEYFILE] for later cleanup.
+# Provide [MUNGE_KEYFILE] for later tests.
 #
 test_expect_success MUNGE_INSTALL 'create key' '
     sudo --user=munge /usr/sbin/mungekey --force --verbose 2>mungekey.err.$$ &&

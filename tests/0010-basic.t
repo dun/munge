@@ -44,7 +44,7 @@ test_expect_success 'check pidfile creation' '
 '
 
 # Verify the pid in the pidfile matches a running munged process.
-# Provide [PID] for later checks.
+# Provide [PID] for later tests.
 #
 test_expect_success 'check process is running' '
     PID=$(cat "${MUNGE_PIDFILE}") &&

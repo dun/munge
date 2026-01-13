@@ -39,7 +39,7 @@ test "${MUNGED_START_STATUS}" = 0 || bail_out "Failed to start munged"
 
 # Encode some credentials.  The second one is for testing --ignore-ttl without
 #   relying on the behavior of restarting munged to clear its replay cache.
-# Provide [TTL], [TTL_SKEW], and [NOW] for later checks.
+# Provide [TTL], [TTL_SKEW], and [NOW] for later tests.
 #
 test_expect_success 'encode credential' '
     TTL=300 &&

@@ -8,7 +8,7 @@ umask 022
 #   beforehand.
 # [MUNGE_SOCKET] is placed in [TMPDIR] by default since NFS can cause problems
 #   for the lockfile.  FreeBSD cannot create a lockfile across an NFS mount.
-# Provides [MUNGE_SOCKET], [MUNGE_KEYFILE], [MUNGE_LOGFILE], [MUNGE_PIDFILE],
+# Provide [MUNGE_SOCKET], [MUNGE_KEYFILE], [MUNGE_LOGFILE], [MUNGE_PIDFILE],
 #   and [MUNGE_SEEDFILE].
 #
 munged_setup()
