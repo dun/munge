@@ -7,6 +7,7 @@ test_description='Check maximum credential payload'
 . "${SHARNESS_TEST_SRCDIR}/sharness.sh"
 
 # Get the maximum payload & request sizes, or bail out.
+# Provide [MAX_PAYLOAD] and [MAX_REQUEST] for later tests.
 #
 get_munge_define()
 {

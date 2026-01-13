@@ -57,6 +57,7 @@ test_expect_success 'munged failure for IPv6 address origin' '
 
 # Check if the error can be overridden when the origin cannot be resolved.
 # On resolution failure, the origin should be set to the null address.
+# Provide [NULL_IP] for later tests.
 #
 test_expect_success 'munged failure override for nonexistent origin' '
     NULL_IP="0.0.0.0" &&
@@ -92,6 +93,7 @@ test_expect_success NONEXISTENT 'credential metadata shows null origin' '
 # Check if a loopback IP address can be specified for the origin.
 # Use localhost (127.0.0.1) since it will be bound to the loopback interface,
 #   and that interface name can be checked to verify it maps back to localhost.
+# Provide [LOCALHOST_IP] for later tests.
 #
 test_expect_success 'munged accepts localhost origin' '
     LOCALHOST_IP="127.0.0.1" &&
@@ -136,6 +138,7 @@ test_expect_success IFNAME 'munged accepts loopback interface name origin' '
 '
 
 # Check if a link-local IP address can be specified for the origin.
+# Provide [LINKLOCAL_IP] for later tests.
 #
 test_expect_success 'munged accepts link-local origin' '
     LINKLOCAL_IP="169.254.13.13" &&
@@ -165,6 +168,7 @@ test_expect_success LINKLOCAL 'credential metadata shows link-local origin' '
 #   specified for the origin.
 # RFC 5737 defines the following TEST-NET ranges which should never appear on
 #   real interfaces: 192.0.2.0/24, 198.51.100.0/24, and 203.0.113.0/24.
+# Provide [TESTNET_IP] for later tests.
 #
 test_expect_success 'munged accepts test-net origin' '
     TESTNET_IP="192.0.2.13" &&

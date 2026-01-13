@@ -155,7 +155,7 @@ test_expect_success 'mungekey --bits rounding-up to next byte' '
 '
 
 # Check for munge_defs.h existence.
-# Provide [MUNGE_DEFS] (and DEFS prereq) for later checks.
+# Provide [MUNGE_DEFS] (and DEFS prereq) for later tests.
 #
 test_expect_success 'mungekey munge_defs.h exists' '
     MUNGE_DEFS="${MUNGE_SOURCE_DIR}/src/libcommon/munge_defs.h" &&
