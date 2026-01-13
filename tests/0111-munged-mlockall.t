@@ -68,6 +68,7 @@ test_expect_success 'check process is running' '
 # In debug, dump relevant vm stats before terminating the process.
 #
 test_expect_success 'stop munged' '
+    local pid &&
     if test "x${debug}" = xt; then
         pid=$(cat "${MUNGE_PIDFILE}") &&
         grep -E "Vm(Peak|Size|Lck)" "/proc/${pid}/status" 2>/dev/null || :

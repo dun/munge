@@ -71,6 +71,7 @@ test_expect_success 'stop munged' '
 #   munged to be ready before proceeding.
 #
 test_expect_success 'start munged with later time within ttl skew' '
+    local new_time &&
     new_time=$((NOW + TTL - TTL_SKEW)) &&
     ( munged_start t-exec="faketime @${new_time}" & ) && munged_wait
 '
@@ -96,6 +97,7 @@ test_expect_success 'stop munged' '
 # FIXME: faketime interferes with munged's double-fork daemonization as above.
 #
 test_expect_success 'start munged with later time outside ttl skew' '
+    local new_time &&
     new_time=$((NOW + TTL + TTL_SKEW)) &&
     ( munged_start t-exec="faketime @${new_time}" & ) && munged_wait
 '

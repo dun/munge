@@ -51,11 +51,11 @@ munged_setup()
 #
 munged_create_key()
 {
-    _cmd=
+    local cmd=
 
     while true; do
         case $1 in
-            t-exec=*) _cmd=$(echo "$1" | sed 's/^[^=]*=//');;
+            t-exec=*) cmd=$(echo "$1" | sed 's/^[^=]*=//');;
             *) break;;
         esac
         shift
@@ -64,12 +64,12 @@ munged_create_key()
     if test -r "${MUNGE_KEYFILE}"; then
         return 0
     fi
-    test_debug "echo ${_cmd} \"${MUNGEKEY}\" \
+    test_debug "echo ${cmd} \"${MUNGEKEY}\" \
             --create \
             --keyfile=\"${MUNGE_KEYFILE}\" \
             --bits=256 \
             $*"
-    ${_cmd} "${MUNGEKEY}" \
+    ${cmd} "${MUNGEKEY}" \
             --create \
             --keyfile="${MUNGE_KEYFILE}" \
             --bits=256 \
@@ -87,27 +87,25 @@ munged_create_key()
 #
 munged_start()
 {
-    _cmd=
-    _keep_logfile=
-    _keep_process=
+    local cmd= keep_logfile= keep_process=
 
     while true; do
         case $1 in
-            t-exec=*) _cmd=$(echo "$1" | sed 's/^[^=]*=//');;
-            t-keep-logfile) _keep_logfile=1;;
-            t-keep-process) _keep_process=1;;
+            t-exec=*) cmd=$(echo "$1" | sed 's/^[^=]*=//');;
+            t-keep-logfile) keep_logfile=1;;
+            t-keep-process) keep_process=1;;
             *) break;;
         esac
         shift
     done
 
-    if test "${_keep_logfile}" != 1; then
+    if test "${keep_logfile}" != 1; then
         rm -f "${MUNGE_LOGFILE}"
     fi
-    if test "${_keep_process}" != 1; then
+    if test "${keep_process}" != 1; then
         munged_kill
     fi
-    test_debug "echo ${_cmd} \"${MUNGED}\" \
+    test_debug "echo ${cmd} \"${MUNGED}\" \
             --socket=\"${MUNGE_SOCKET}\" \
             --key-file=\"${MUNGE_KEYFILE}\" \
             --log-file=\"${MUNGE_LOGFILE}\" \
@@ -115,7 +113,7 @@ munged_start()
             --seed-file=\"${MUNGE_SEEDFILE}\" \
             --group-update-time=-1 \
             $*"
-    ${_cmd} "${MUNGED}" \
+    ${cmd} "${MUNGED}" \
             --socket="${MUNGE_SOCKET}" \
             --key-file="${MUNGE_KEYFILE}" \
             --log-file="${MUNGE_LOGFILE}" \
@@ -161,22 +159,22 @@ munged_wait()
 #
 munged_stop()
 {
-    _cmd=
+    local cmd=
 
     while true; do
         case $1 in
-            t-exec=*) _cmd=$(echo "$1" | sed 's/^[^=]*=//');;
+            t-exec=*) cmd=$(echo "$1" | sed 's/^[^=]*=//');;
             *) break;;
         esac
         shift
     done
 
-    test_debug "echo ${_cmd} \"${MUNGED}\" \
+    test_debug "echo ${cmd} \"${MUNGED}\" \
             --socket=\"${MUNGE_SOCKET}\" \
             --stop \
             --verbose \
             $*"
-    ${_cmd} "${MUNGED}" \
+    ${cmd} "${MUNGED}" \
             --socket="${MUNGE_SOCKET}" \
             --stop \
             --verbose \
@@ -198,17 +196,19 @@ munged_stop()
 #
 munged_kill()
 {
-    _pid=$(cat "${MUNGE_PIDFILE}" 2>/dev/null)
-    if test "x${_pid}" != x; then
-        if ps -p "${_pid}" -ww 2>/dev/null | grep munged; then
-            kill -9 "${_pid}"
-            if wait_for "! ps -p \"${_pid}\""; then
-                say_color >&5 error "Killed errant munged pid ${_pid}"
+    local pid
+
+    pid=$(cat "${MUNGE_PIDFILE}" 2>/dev/null)
+    if test "x${pid}" != x; then
+        if ps -p "${pid}" -ww 2>/dev/null | grep munged; then
+            kill -9 "${pid}"
+            if wait_for "! ps -p \"${pid}\""; then
+                say_color >&5 error "Killed errant munged pid ${pid}"
             else
-                say_color >&5 error "Failed to kill munged pid ${_pid}"
+                say_color >&5 error "Failed to kill munged pid ${pid}"
             fi
         else
-            say_color >&5 error "Found stale pidfile for munged pid ${_pid}"
+            say_color >&5 error "Found stale pidfile for munged pid ${pid}"
         fi
         rm -f "${MUNGE_PIDFILE}" "${MUNGE_SOCKET}"*
         return 1

@@ -31,6 +31,7 @@ test "${MUNGED_START_STATUS}" = 0 || bail_out "Failed to start munged"
 #   no longer be empty.
 #
 test_expect_success 'logfile regular file' '
+    local inode0 inode1 &&
     rm -f "${MUNGE_LOGFILE}" &&
     touch "${MUNGE_LOGFILE}" &&
     inode0=$(ls -i "${MUNGE_LOGFILE}" | awk "{ print \$1 }") &&
@@ -44,7 +45,7 @@ test_expect_success 'logfile regular file' '
 # Check for an error when the logfile is a symlink to a regular file.
 #
 test_expect_success 'logfile symlink to regular file failure' '
-    logfile="${MUNGE_LOGFILE}.symlink" &&
+    local logfile="${MUNGE_LOGFILE}.symlink" &&
     ln -s -f -n "${MUNGE_LOGFILE}" "${logfile}" &&
     rm -f "${MUNGE_LOGFILE}" &&
     touch "${MUNGE_LOGFILE}" &&
@@ -57,7 +58,7 @@ test_expect_success 'logfile symlink to regular file failure' '
 #   regular file.
 #
 test_expect_success 'logfile symlink to regular file override' '
-    logfile="${MUNGE_LOGFILE}.symlink" &&
+    local logfile="${MUNGE_LOGFILE}.symlink" &&
     ln -s -f -n "${MUNGE_LOGFILE}" "${logfile}" &&
     rm -f "${MUNGE_LOGFILE}" &&
     touch "${MUNGE_LOGFILE}" &&
@@ -80,7 +81,7 @@ test_expect_success 'logfile missing' '
 #   (by not specifying t-keep-logfile so as to remove an existing logfile).
 #
 test_expect_success 'logfile symlink to missing file failure' '
-    logfile="${MUNGE_LOGFILE}.symlink" &&
+    local logfile="${MUNGE_LOGFILE}.symlink" &&
     ln -s -f -n "${MUNGE_LOGFILE}" "${logfile}" &&
     test_must_fail munged_start --log-file="${logfile}" 2>err.$$ &&
     grep "Error:.* Logfile.* should not be a symbolic link" err.$$
@@ -92,7 +93,7 @@ test_expect_success 'logfile symlink to missing file failure' '
 #   terminates.
 #
 test_expect_success 'logfile symlink to missing file override' '
-    logfile="${MUNGE_LOGFILE}.symlink" &&
+    local logfile="${MUNGE_LOGFILE}.symlink" &&
     ln -s -f -n "${MUNGE_LOGFILE}" "${logfile}" &&
     munged_start --log-file="${logfile}" --force 2>err.$$ &&
     munged_stop &&
@@ -140,6 +141,7 @@ test_expect_success !ROOT 'logfile not writable by user failure' '
 #   trusted group.
 #
 test_expect_failure 'logfile writable by trusted group ' '
+    local gid &&
     rm -f "${MUNGE_LOGFILE}" &&
     touch "${MUNGE_LOGFILE}" &&
     chmod 0620 "${MUNGE_LOGFILE}" &&
@@ -152,6 +154,7 @@ test_expect_failure 'logfile writable by trusted group ' '
 #   match the specified trusted group.
 #
 test_expect_success 'logfile writable by untrusted group failure' '
+    local gid &&
     rm -f "${MUNGE_LOGFILE}" &&
     touch "${MUNGE_LOGFILE}" &&
     chmod 0620 "${MUNGE_LOGFILE}" &&
@@ -215,6 +218,7 @@ test_expect_success 'logfile readable by all' '
 # Check a logfile dir that is owned by the EUID.
 #
 test_expect_success 'logfile dir owned by euid' '
+    local dir_uid my_euid &&
     dir_uid=$(ls -d -l -n "${MUNGE_LOGDIR}" | awk "{ print \$3 }") &&
     my_euid=$(id -u) &&
     test "${dir_uid}" = "${my_euid}" &&
@@ -279,6 +283,7 @@ test_expect_success ALT,SUDO 'alt logfile dir cleanup' '
 #   that matches the specified trusted group.
 #
 test_expect_success 'logfile dir writable by trusted group ' '
+    local gid &&
     gid=$(ls -d -l -n "${MUNGE_LOGDIR}" | awk "{ print \$4 }") &&
     chmod 0770 "${MUNGE_LOGDIR}" &&
     munged_start --trusted-group="${gid}" &&
@@ -291,6 +296,7 @@ test_expect_success 'logfile dir writable by trusted group ' '
 # Group-writable permissions are allowed on the logfile dir (see Issue #31).
 #
 test_expect_success 'logfile dir writable by untrusted group failure' '
+    local gid &&
     gid=$(ls -d -l -n "${MUNGE_LOGDIR}" | awk "{ print \$4 }") &&
     gid=$((gid + 1)) &&
     chmod 0770 "${MUNGE_LOGDIR}" &&
@@ -354,6 +360,7 @@ test_expect_success 'logfile dir writable by other with sticky bit' '
 #
 #
 test_expect_success 'logfile failure writes single message to stderr' '
+    local err num &&
     rm -f "${MUNGE_LOGFILE}" &&
     touch "${MUNGE_LOGFILE}" &&
     chmod 0602 "${MUNGE_LOGFILE}" &&

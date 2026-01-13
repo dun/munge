@@ -46,6 +46,7 @@ test_expect_success 'socket dir perms' '
 #   &&-chain.
 #
 test_expect_success 'socket type and perms' '
+    local ls_out &&
     munged_start &&
     ls_out=$(ls -ld "${MUNGE_SOCKET}") &&
     munged_stop &&
@@ -55,6 +56,7 @@ test_expect_success 'socket type and perms' '
 # Check a socket dir that is owned by the EUID.
 #
 test_expect_success 'socket dir owned by euid' '
+    local dir_uid my_euid &&
     dir_uid=$(ls -d -l -n "${MUNGE_SOCKETDIR}" | awk "{ print \$3 }") &&
     my_euid=$(id -u) &&
     test "${dir_uid}" = "${my_euid}" &&
@@ -114,6 +116,7 @@ test_expect_success ALT 'alt socket dir cleanup' '
 #   when a trusted group is specified that matches the directory's group.
 #
 test_expect_success 'socket dir writable by trusted group' '
+    local gid &&
     gid=$(ls -d -l -n "${MUNGE_SOCKETDIR}" | awk "{ print \$4 }") &&
     chmod 0771 "${MUNGE_SOCKETDIR}" &&
     munged_start --trusted-group="${gid}" &&
@@ -125,6 +128,7 @@ test_expect_success 'socket dir writable by trusted group' '
 #   set) by a group that does not match the specified trusted group.
 #
 test_expect_success 'socket dir writable by untrusted group failure' '
+    local gid &&
     gid=$(ls -d -l -n "${MUNGE_SOCKETDIR}" | awk "{ print \$4 }") &&
     gid=$((gid + 1)) &&
     chmod 0771 "${MUNGE_SOCKETDIR}" &&
