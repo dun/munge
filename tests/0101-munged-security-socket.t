@@ -6,6 +6,10 @@ test_description='Check munged security of socket'
 : "${SHARNESS_TEST_SRCDIR:=$(cd "$(dirname "$0")" && pwd)}"
 . "${SHARNESS_TEST_SRCDIR}/sharness.sh"
 
+# Define an alternate unprivileged UID for file ownership testing.
+#
+test "$(id -u)" -ne 1 && ALT_UID=1 || ALT_UID=2
+
 # Set up the environment.
 # Redefine [MUNGE_SOCKETDIR] to add a sub-directory for testing changes to
 #   directory ownership and permissions.  It is kept in [TMPDIR] since NFS can
@@ -87,8 +91,7 @@ test_expect_success ALT,SUDO 'socket dir owned by root' '
 # Check for an error when the socket dir is not owned by the EUID or root.
 #
 test_expect_success ALT,SUDO 'socket dir owned by other failure' '
-    test "$(id -u)" != "1" &&
-    sudo chown 1 "${ALT_SOCKETDIR}" &&
+    sudo chown "${ALT_UID}" "${ALT_SOCKETDIR}" &&
     test_must_fail munged_start --socket="${ALT_SOCKET}" &&
     grep "Error:.* Socket is insecure: invalid ownership" "${MUNGE_LOGFILE}"
 '
@@ -97,8 +100,7 @@ test_expect_success ALT,SUDO 'socket dir owned by other failure' '
 #   EUID or root.
 #
 test_expect_success ALT,SUDO 'socket dir owned by other override' '
-    test "$(id -u)" != "1" &&
-    sudo chown 1 "${ALT_SOCKETDIR}" &&
+    sudo chown "${ALT_UID}" "${ALT_SOCKETDIR}" &&
     munged_start --socket="${ALT_SOCKET}" --force &&
     munged_stop --socket="${ALT_SOCKET}" &&
     grep "Warning:.* Socket is insecure: invalid ownership" "${MUNGE_LOGFILE}"

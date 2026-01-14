@@ -6,6 +6,10 @@ test_description='Check munged security of keyfile'
 : "${SHARNESS_TEST_SRCDIR:=$(cd "$(dirname "$0")" && pwd)}"
 . "${SHARNESS_TEST_SRCDIR}/sharness.sh"
 
+# Define an alternate unprivileged UID for file ownership testing.
+#
+test "$(id -u)" -ne 1 && ALT_UID=1 || ALT_UID=2
+
 # Set up the environment.
 #
 test_expect_success 'setup' '
@@ -245,8 +249,7 @@ test_expect_success ALT,SUDO 'keyfile dir owned by root' '
 # Check for an error when the keyfile dir is not owned by the EUID or root.
 #
 test_expect_success ALT,SUDO 'keyfile dir owned by other failure' '
-    test "$(id -u)" != "1" &&
-    sudo chown 1 "${ALT_KEYDIR}" &&
+    sudo chown "${ALT_UID}" "${ALT_KEYDIR}" &&
     test_must_fail munged_start --key-file="${ALT_KEYFILE}" &&
     grep "Error:.* Keyfile is insecure: invalid ownership" "${MUNGE_LOGFILE}"
 '
@@ -255,8 +258,7 @@ test_expect_success ALT,SUDO 'keyfile dir owned by other failure' '
 #   the EUID or root.
 #
 test_expect_success ALT,SUDO 'keyfile dir owned by other override' '
-    test "$(id -u)" != "1" &&
-    sudo chown 1 "${ALT_KEYDIR}" &&
+    sudo chown "${ALT_UID}" "${ALT_KEYDIR}" &&
     munged_start --key-file="${ALT_KEYFILE}" --force &&
     munged_stop &&
     grep "Warning:.* Keyfile is insecure: invalid ownership" "${MUNGE_LOGFILE}"
