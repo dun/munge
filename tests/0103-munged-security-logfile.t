@@ -6,6 +6,10 @@ test_description='Check munged security of logfile'
 : "${SHARNESS_TEST_SRCDIR:=$(cd "$(dirname "$0")" && pwd)}"
 . "${SHARNESS_TEST_SRCDIR}/sharness.sh"
 
+# Define an alternate unprivileged UID for file ownership testing.
+#
+test "$(id -u)" -ne 1 && ALT_UID=1 || ALT_UID=2
+
 # Set up the environment.
 #
 test_expect_success 'setup' '
@@ -251,8 +255,7 @@ test_expect_success ALT,SUDO 'logfile dir owned by root' '
 # Check for an error when the logfile dir is not owned by the EUID or root.
 #
 test_expect_success ALT,SUDO 'logfile dir owned by other failure' '
-    test "$(id -u)" != "1" &&
-    sudo chown 1 "${ALT_LOGDIR}" &&
+    sudo chown "${ALT_UID}" "${ALT_LOGDIR}" &&
     > "${ALT_LOGFILE}" &&
     test_must_fail munged_start --log-file="${ALT_LOGFILE}" 2>err.$$ &&
     grep "Error:.* Logfile is insecure: invalid ownership" err.$$
@@ -262,8 +265,7 @@ test_expect_success ALT,SUDO 'logfile dir owned by other failure' '
 #   the EUID or root.
 #
 test_expect_success ALT,SUDO 'logfile dir owned by other override' '
-    test "$(id -u)" != "1" &&
-    sudo chown 1 "${ALT_LOGDIR}" &&
+    sudo chown "${ALT_UID}" "${ALT_LOGDIR}" &&
     > "${ALT_LOGFILE}" &&
     munged_start --log-file="${ALT_LOGFILE}" --force 2>err.$$ &&
     munged_stop &&
