@@ -516,6 +516,9 @@ dec_unpack_outer (munge_cred_t c)
     /*
      *  Unpack the MAC.
      */
+    if (c->mac_len > len) {
+        return (m_msg_set_err (m, EMUNGE_BAD_CRED, strdup ("Truncated MAC")));
+    }
     memcpy (c->mac, p, c->mac_len);
     p += c->mac_len;
     len -= c->mac_len;
