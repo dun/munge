@@ -686,6 +686,7 @@ _msg_unpack (m_msg_t m, m_msg_type_t type, const void *src, int srclen)
             else if ( _copy (m->realm_str, p, m->realm_len, p, q, &p) < 0) ;
             else if (!_unpack (&(m->ttl), &p, sizeof (m->ttl), q)) ;
             else if (!_unpack (&(m->addr_len), &p, sizeof (m->addr_len), q)) ;
+            else if (m->addr_len > sizeof (m->addr)) goto err;
             else if ( _copy (&(m->addr), p, m->addr_len, p, q, &p) < 0) ;
             else if (!_unpack (&(m->time0), &p, sizeof (m->time0), q)) ;
             else if (!_unpack (&(m->time1), &p, sizeof (m->time1), q)) ;
