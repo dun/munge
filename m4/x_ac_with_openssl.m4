@@ -28,11 +28,14 @@ AC_DEFUN_ONCE([X_AC_WITH_OPENSSL],
 
   if test "x${withval}" != xno; then
     if test "x${withval}" = xyes || test "x${withval}" = x; then
-      m4_ifdef(
-        [PKG_CHECK_MODULES],
-        [PKG_CHECK_MODULES(
-          [LIBCRYPTO], [libcrypto], [have_libcrypto=yes], [:])],
-        [:])
+      m4_ifdef([PKG_PROG_PKG_CONFIG],
+        [PKG_PROG_PKG_CONFIG([0.9.0], [PKG_CONFIG="false"])])
+      if test "x${PKG_CONFIG}" != "xfalse"; then
+        m4_ifdef([PKG_CHECK_MODULES],
+          [PKG_CHECK_MODULES(
+            [LIBCRYPTO], [libcrypto], [have_libcrypto=yes], [:])],
+          [:])
+      fi
     elif expr match "${withval}" "[[^/]]" >/dev/null; then
       AC_MSG_ERROR([invalid value "${withval}" for --with-openssl-prefix])
     else
