@@ -1,3 +1,9 @@
+munge-0.5.18 (2026-02-10):
+- Fixed buffer overflow allowing key leakage and credential forgery. (CVE-2026-25506, bf40cc27)
+- Fixed out-of-bounds read in credential decoding. (5bd6d4db)
+- Fixed build failure on legacy macOS without clock_gettime(). (e9832894)
+- Fixed configure script failure when built with pkgconf-2.5.1. (b317eb91)
+
 munge-0.5.17 (2025-11-12):
 - Added MUNGE_OPT_IGNORE_TTL and MUNGE_OPT_IGNORE_REPLAY. (7f963842)
 - Added unmunge --ignore-ttl and --ignore-replay cmdline opts. (7f963842)

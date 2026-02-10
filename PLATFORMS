@@ -1,12 +1,11 @@
-MUNGE 0.5.17 has been built and tested on the following systems:
+MUNGE 0.5.18 has been built and tested on the following systems:
 
 - AlmaLinux 10, 9, 8
 - Arch Linux
 - CentOS Stream 9
 - Debian sid, 13, 12, 11
 - Fedora 43, 42
-- FreeBSD 14.3, 13.5
-- macOS 15
+- FreeBSD 15.0, 14.3
 - NetBSD 10.1, 9.4
 - OpenBSD 7.8, 7.7
 - openSUSE Leap 16.0, 15.6
