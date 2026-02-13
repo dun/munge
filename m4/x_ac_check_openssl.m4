@@ -124,28 +124,34 @@ AC_DEFUN([X_AC_CHECK_OPENSSL], [
 #   and the <INCLUDES> are the prologue of the test source to be linked.
 # The AC_LANG_PROGRAM #undef in the preamble is needed to thwart #define
 #   macros used for backwards-compatibility of deprecated functions.
+# This check only runs if AC_CHECK_FUNCS has determined the function exists
+#   (i.e., ac_cv_func_<NAME> = yes), preventing implicit function declaration
+#   warnings when testing non-existent functions.
 #
 AC_DEFUN([_X_AC_CHECK_OPENSSL_FUNC_RETURNS_INT], [
-  AC_CACHE_CHECK(
-    [if $1 returns int],
-    [ac_cv_func_$1_returns_int], [
-    AS_VAR_SET([ac_cv_func_$1_returns_int], no)
-    AC_LINK_IFELSE([
-      AC_LANG_PROGRAM(
-        [[
+  AS_IF(
+    [test "AS_VAR_GET([ac_cv_func_$1])" = yes], [
+    AC_CACHE_CHECK(
+      [if $1 returns int],
+      [ac_cv_func_$1_returns_int], [
+      AS_VAR_SET([ac_cv_func_$1_returns_int], no)
+      AC_LINK_IFELSE([
+        AC_LANG_PROGRAM(
+          [[
 $3
 #undef $1
 ]],
-        [[int rv = $1 ($2);]]
-      )],
-      AS_VAR_SET([ac_cv_func_$1_returns_int], yes),
-      AS_VAR_SET([ac_cv_func_$1_returns_int], no)
-    )]
-  )
-  AS_IF(
-    [test AS_VAR_GET([ac_cv_func_$1_returns_int]) = yes],
-    AC_DEFINE(AS_TR_CPP([HAVE_$1_RETURN_INT]), [1],
-      [Define to 1 if the `$1' function returns int.]
+          [[int rv = $1 ($2);]]
+        )],
+        AS_VAR_SET([ac_cv_func_$1_returns_int], yes),
+        AS_VAR_SET([ac_cv_func_$1_returns_int], no)
+      )]
     )
+    AS_IF(
+      [test AS_VAR_GET([ac_cv_func_$1_returns_int]) = yes],
+      AC_DEFINE(AS_TR_CPP([HAVE_$1_RETURN_INT]), [1],
+        [Define to 1 if the `$1' function returns int.]
+      )
+    )]
   )]
 )
