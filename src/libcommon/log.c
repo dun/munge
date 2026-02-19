@@ -153,7 +153,7 @@ log_close_file (void)
 int
 log_open_syslog (const char *identity, int facility)
 {
-    char *p;
+    const char *p;
 
     if (!identity) {
         errno = EINVAL;
