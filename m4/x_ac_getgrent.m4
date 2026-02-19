@@ -18,17 +18,18 @@
 
 AC_DEFUN([X_AC_GETGRENT], [
   AC_CHECK_FUNCS(getgrent)
+  _x_ac_getgrent_werror_save="${ac_c_werror_flag}"
+  ac_c_werror_flag=yes
   _X_AC_GETGRENT_R_AIX
   _X_AC_GETGRENT_R_GNU
   _X_AC_GETGRENT_R_SUN
+  ac_c_werror_flag="${_x_ac_getgrent_werror_save}"
 ])
 
 AC_DEFUN([_X_AC_GETGRENT_R_AIX], [
   AC_CACHE_CHECK(
     [for getgrent_r (AIX)],
     [x_ac_cv_have_getgrent_r_aix], [
-    _x_ac_getgrent_r_aix_c_werror_flag="$ac_c_werror_flag"
-    ac_c_werror_flag=yes
     AC_LINK_IFELSE([
       AC_LANG_PROGRAM([[
 #define _THREAD_SAFE 1
@@ -44,8 +45,7 @@ rv = getgrent_r (&gr, gr_buf, sizeof (gr_buf), &gr_fp); ]]
       )],
       AS_VAR_SET(x_ac_cv_have_getgrent_r_aix, yes),
       AS_VAR_SET(x_ac_cv_have_getgrent_r_aix, no)
-    )
-    ac_c_werror_flag="$_x_ac_getgrent_r_aix_c_werror_flag"]
+    )]
   )
   AS_IF([test AS_VAR_GET(x_ac_cv_have_getgrent_r_aix) = yes],
     AC_DEFINE([HAVE_GETGRENT_R_AIX], [1],
@@ -58,8 +58,6 @@ AC_DEFUN([_X_AC_GETGRENT_R_GNU], [
   AC_CACHE_CHECK(
     [for getgrent_r (GNU)],
     [x_ac_cv_have_getgrent_r_gnu], [
-    _x_ac_getgrent_r_gnu_c_werror_flag="$ac_c_werror_flag"
-    ac_c_werror_flag=yes
     AC_LINK_IFELSE([
       AC_LANG_PROGRAM([[
 #define _GNU_SOURCE 1
@@ -73,8 +71,7 @@ rv = getgrent_r (&gr, gr_buf, sizeof (gr_buf), &gr_ptr); ]]
       )],
       AS_VAR_SET(x_ac_cv_have_getgrent_r_gnu, yes),
       AS_VAR_SET(x_ac_cv_have_getgrent_r_gnu, no)
-    )
-    ac_c_werror_flag="$_x_ac_getgrent_r_gnu_c_werror_flag"]
+    )]
   )
   AS_IF([test AS_VAR_GET(x_ac_cv_have_getgrent_r_gnu) = yes],
     AC_DEFINE([HAVE_GETGRENT_R_GNU], [1],
@@ -87,8 +84,6 @@ AC_DEFUN([_X_AC_GETGRENT_R_SUN], [
   AC_CACHE_CHECK(
     [for getgrent_r (SunOS)],
     [x_ac_cv_have_getgrent_r_sun], [
-    _x_ac_getgrent_r_sun_c_werror_flag="$ac_c_werror_flag"
-    ac_c_werror_flag=yes
     AC_LINK_IFELSE([
       AC_LANG_PROGRAM([[
 #include <grp.h>
@@ -100,8 +95,7 @@ gr_ptr = getgrent_r (&gr, gr_buf, sizeof (gr_buf)); ]]
       )],
       AS_VAR_SET(x_ac_cv_have_getgrent_r_sun, yes),
       AS_VAR_SET(x_ac_cv_have_getgrent_r_sun, no)
-    )
-    ac_c_werror_flag="$_x_ac_getgrent_r_sun_c_werror_flag"]
+    )]
   )
   AS_IF([test AS_VAR_GET(x_ac_cv_have_getgrent_r_sun) = yes],
     AC_DEFINE([HAVE_GETGRENT_R_SUN], [1],
