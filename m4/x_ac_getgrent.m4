@@ -18,13 +18,36 @@
 
 AC_DEFUN([X_AC_GETGRENT], [
   AC_CHECK_FUNCS(getgrent)
+  _X_AC_GETGRENT_CHECK_WNO_IMPLICIT
+  _x_ac_getgrent_cflags_save="${CFLAGS}"
   _x_ac_getgrent_werror_save="${ac_c_werror_flag}"
+  CFLAGS="${CFLAGS} ${x_ac_getgrent_wno_implicit_flag}"
   ac_c_werror_flag=yes
   _X_AC_GETGRENT_R_AIX
   _X_AC_GETGRENT_R_GNU
   _X_AC_GETGRENT_R_SUN
+  CFLAGS="${_x_ac_getgrent_cflags_save}"
   ac_c_werror_flag="${_x_ac_getgrent_werror_save}"
 ])
+
+AC_DEFUN([_X_AC_GETGRENT_CHECK_WNO_IMPLICIT], [
+  AC_MSG_CHECKING([if ${CC} supports -Wno-implicit-function-declaration])
+  _x_ac_getgrent_check_cflags_save="${CFLAGS}"
+  CFLAGS="${CFLAGS} -Wno-implicit-function-declaration -Werror"
+  AC_COMPILE_IFELSE(
+    [AC_LANG_PROGRAM()],
+    [ x_ac_getgrent_have_wno_implicit=yes
+      x_ac_getgrent_wno_implicit_flag="-Wno-implicit-function-declaration" ],
+    [ x_ac_getgrent_have_wno_implicit=no
+      x_ac_getgrent_wno_implicit_flag="" ]
+  )
+  CFLAGS="${_x_ac_getgrent_check_cflags_save}"
+  AS_IF(
+    [test "x${x_ac_getgrent_have_wno_implicit}" = xyes],
+    [AC_MSG_RESULT([yes])],
+    [AC_MSG_RESULT([no])]
+  )]
+)
 
 AC_DEFUN([_X_AC_GETGRENT_R_AIX], [
   AC_CACHE_CHECK(
