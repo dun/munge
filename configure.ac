@@ -89,13 +89,17 @@ LIBS="${save_LIBS}"
 
 AC_CHECK_FUNCS( \
   clock_nanosleep \
+  explicit_bzero \
+  explicit_memset \
   getentropy \
   getifaddrs \
   getrandom \
   localtime_r \
+  memset_explicit \
   mlockall \
   sysconf \
 )
+X_AC_CHECK_MEMSET_S
 X_AC_GETGRENT
 X_AC_GETGRNAM
 X_AC_GETPWNAM

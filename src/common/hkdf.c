@@ -41,6 +41,7 @@
 #include "hkdf.h"
 #include "log.h"
 #include "mac.h"
+#include "memwipe.h"
 #include "str.h"
 
 
@@ -308,7 +309,7 @@ hkdf (hkdf_ctx_t *ctxp, void *dst, size_t *dstlenp)
 
 cleanup:
     if (prk != NULL) {
-        memburn (prk, 0, prklen);
+        memwipe (prk, prklen);
         free (prk);
     }
     return rv;
@@ -509,7 +510,7 @@ err:
         }
     }
     if (okm != NULL) {
-        memburn (okm, 0, ctxp->mdlen);
+        memwipe (okm, ctxp->mdlen);
         free (okm);
     }
     return rv;

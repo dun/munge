@@ -51,6 +51,7 @@
 #include "common.h"
 #include "license.h"
 #include "log.h"
+#include "memwipe.h"
 #include "munge_defs.h"
 #include "read.h"
 #include "version.h"
@@ -333,13 +334,13 @@ destroy_conf (conf_t conf)
     }
     if (conf->cred) {
         assert (conf->clen > 0);
-        memburn (conf->cred, 0, conf->clen);
+        memwipe (conf->cred, conf->clen);
         free (conf->cred);
         conf->cred = NULL;
     }
     if (conf->data) {
         assert (conf->dlen > 0);
-        memburn (conf->data, 0, conf->dlen);
+        memwipe (conf->data, conf->dlen);
         free (conf->data);
         conf->data = NULL;
     }

@@ -43,6 +43,7 @@
 #include "common.h"
 #include "license.h"
 #include "log.h"
+#include "memwipe.h"
 #include "munge_defs.h"
 #include "query.h"
 #include "read.h"
@@ -206,13 +207,13 @@ destroy_conf (conf_t conf)
     }
     if (conf->data != NULL) {
         if (conf->data != conf->string) {
-            memburn (conf->data, 0, conf->dlen);
+            memwipe (conf->data, conf->dlen);
             free (conf->data);
         }
         conf->data = NULL;
     }
     if (conf->cred != NULL) {
-        memburn (conf->cred, 0, conf->clen);
+        memwipe (conf->cred, conf->clen);
         free (conf->cred);
         conf->cred = NULL;
     }

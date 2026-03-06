@@ -46,6 +46,8 @@ hkdf_api_test_SOURCES = \
 	mac.h \
 	md.c \
 	md.h \
+	memwipe.c \
+	memwipe.h \
 	hkdf_api_test.c \
 	# End of hkdf_api_test_SOURCES
 
@@ -72,6 +74,8 @@ hkdf_rfc_test_SOURCES = \
 	mac.h \
 	md.c \
 	md.h \
+	memwipe.c \
+	memwipe.h \
 	hkdf_rfc_test.c \
 	# End of hkdf_rfc_test_SOURCES
 

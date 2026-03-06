@@ -1,4 +1,4 @@
-/*****************************************************************************
+/******************************************************************************
  *  Copyright (C) 2007-2026 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2002-2007 The Regents of the University of California.
  *  UCRL-CODE-155910.
@@ -24,60 +24,15 @@
  *  <https://www.gnu.org/licenses/>.
  *****************************************************************************/
 
+#ifndef MUNGE_MEMWIPE_H
+#define MUNGE_MEMWIPE_H
 
 #if HAVE_CONFIG_H
 #  include <config.h>
 #endif /* HAVE_CONFIG_H */
 
-#include <assert.h>
-#include <stdlib.h>
-#include <string.h>
-#include "cred.h"
-#include "m_msg.h"
-#include "memwipe.h"
-#include "munge_defs.h"
-#include "str.h"
+#include <stddef.h>
 
+void memwipe (void *v, size_t n);
 
-munge_cred_t
-cred_create (m_msg_t m)
-{
-    munge_cred_t c;
-
-    assert (m != NULL);
-
-    if (!(c = calloc (1, sizeof (*c)))) {
-        m_msg_set_err (m, EMUNGE_NO_MEMORY, NULL);
-        return (NULL);
-    }
-    c->version = MUNGE_CRED_VERSION;
-    c->msg = m;
-    return (c);
-}
-
-
-void
-cred_destroy (munge_cred_t c)
-{
-    if (!c) {
-        return;
-    }
-    if (c->outer_mem) {
-        assert (c->outer_mem_len > 0);
-        memset (c->outer_mem, 0, c->outer_mem_len);
-        free (c->outer_mem);
-    }
-    if (c->inner_mem) {
-        assert (c->inner_mem_len > 0);
-        memset (c->inner_mem, 0, c->inner_mem_len);
-        free (c->inner_mem);
-    }
-    if (c->realm_mem) {
-        assert (c->realm_mem_len > 0);
-        memset (c->realm_mem, 0, c->realm_mem_len);
-        free (c->realm_mem);
-    }
-    memwipe (c, sizeof *c);
-    free (c);
-    return;
-}
+#endif /* !MUNGE_MEMWIPE_H */

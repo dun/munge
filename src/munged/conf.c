@@ -50,6 +50,7 @@
 #include "lock.h"
 #include "log.h"
 #include "md.h"
+#include "memwipe.h"
 #include "munge_defs.h"
 #include "net.h"
 #include "path.h"
@@ -284,12 +285,12 @@ destroy_conf (conf_t conf, int do_unlink)
         conf->key_name = NULL;
     }
     if (conf->dek_key) {
-        memburn (conf->dek_key, 0, conf->dek_key_len);
+        memwipe (conf->dek_key, conf->dek_key_len);
         free (conf->dek_key);
         conf->dek_key = NULL;
     }
     if (conf->mac_key) {
-        memburn (conf->mac_key, 0, conf->mac_key_len);
+        memwipe (conf->mac_key, conf->mac_key_len);
         free (conf->mac_key);
         conf->mac_key = NULL;
     }

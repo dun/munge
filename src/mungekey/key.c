@@ -42,6 +42,7 @@
 #include "hkdf.h"
 #include "key.h"
 #include "log.h"
+#include "memwipe.h"
 #include "munge_defs.h"
 #include "str.h"
 
@@ -107,7 +108,7 @@ create_key (conf_t *confp)
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to close \"%s\"",
                 confp->key_path);
     }
-    (void) memburn (buf, 0, sizeof (buf));
+    memwipe (buf, sizeof buf);
     if (confp->do_verbose) {
         log_msg (LOG_INFO, "Created \"%s\" with %d-bit key",
                 confp->key_path, confp->key_num_bytes * 8);
@@ -202,8 +203,8 @@ _create_key_secret (unsigned char *buf, size_t buflen)
         goto err;
     }
 err:
-    (void) memburn (key, 0, sizeof (key));
-    (void) memburn (&salt, 0, sizeof (salt));
+    memwipe (key, sizeof key);
+    memwipe (&salt, sizeof salt);
     hkdf_ctx_destroy (hkdfp);
     return rv;
 }

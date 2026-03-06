@@ -237,32 +237,3 @@ strftimet (char *dst, size_t dstlen, const char *tfmt, time_t t)
     }
     return (n);
 }
-
-
-/*  Implementation of memset to prevent "dead store removal" optimization,
- *    thereby ensuring secrets are overwritten.
- *  Fills the first [n] bytes of the memory area pointed to by [v]
- *    with the constant byte [c].
- *  Returns a pointer to the memory area [v].
- */
-void *
-memburn (void *v, int c, size_t n)
-{
-/*  From David A. Wheeler's "Secure Programming for Linux and Unix HOWTO"
- *    <http://www.dwheeler.com/secure-programs/> (section 11.4):
- *  Many compilers, including many C/C++ compilers, remove writes to stores
- *    that are no longer used -- this is often referred to as "dead store
- *    removal".  Unfortunately, if the write is really to overwrite the value
- *    of a secret, this means that code that appears to be correct will be
- *    silently discarded.
- *  One approach that seems to work on all platforms is to write your own
- *    implementation of memset with internal "volatilization" of the first
- *    argument (this code is based on a workaround proposed by Michael Howard):
- */
-    volatile char *p = v;
-
-    while (n--) {
-        *p++ = c;
-    }
-    return (v);
-}
