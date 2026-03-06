@@ -4,7 +4,7 @@
 # For details, see <https://github.com/dun/munge>.
 
 ##
-# Prologue.
+# Prologue
 ##
 AC_PREREQ([2.61])
 AC_INIT([MUNGE], m4_esyscmd([build-aux/gen-version]))
@@ -16,15 +16,15 @@ AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_SRCDIR([src/libmunge/munge.h])
 AC_REQUIRE_AUX_FILE([tap-driver.sh])
 
+X_AC_HUMOR
 X_AC_WITH_MUNGE_SOCKET
-X_AC_WITH_RUNSTATEDIR
-X_AC_WITH_SYSTEMDUNITDIR
-X_AC_WITH_SYSTEMDSYSUSERSDIR
-X_AC_WITH_SYSVINITDDIR
-X_AC_WITH_SYSCONFIGDIR
 X_AC_WITH_LOGROTATEDDIR
 X_AC_WITH_PKGCONFIGDIR
-X_AC_HUMOR
+X_AC_WITH_RUNSTATEDIR
+X_AC_WITH_SYSCONFIGDIR
+X_AC_WITH_SYSTEMDSYSUSERSDIR
+X_AC_WITH_SYSTEMDUNITDIR
+X_AC_WITH_SYSVINITDDIR
 
 AM_INIT_AUTOMAKE([1.12 foreign dist-xz no-dist-gzip subdir-objects])
 AM_MAINTAINER_MODE
@@ -33,7 +33,7 @@ AC_USE_SYSTEM_EXTENSIONS
 LT_INIT
 
 ##
-# Checks for programs.
+# Checks for programs
 ##
 X_AC_ARCH
 AC_PROG_AWK
@@ -47,18 +47,20 @@ AM_PROG_CC_C_O
 X_AC_DEBUG
 
 ##
-# Checks for libraries.
+# Checks for libraries
 ##
 X_AC_CHECK_PTHREADS
-X_AC_CHECK_COND_LIB(bz2, BZ2_bzBuffToBuffCompress)
-X_AC_CHECK_COND_LIB(z, compress)
-AC_SEARCH_LIBS(gethostbyname, nsl)
-AC_SEARCH_LIBS(socket, socket)
+X_AC_CHECK_COND_LIB([bz2], [BZ2_bzBuffToBuffCompress])
+X_AC_CHECK_COND_LIB([z], [compress])
+AC_SEARCH_LIBS([gethostbyname], [nsl])
+AC_SEARCH_LIBS([socket], [socket])
 X_AC_SELECT_CRYPTO_LIB
 
 ##
-# Checks for header files.
+# Checks for header files
 ##
+# Autoconf 2.69 and earlier interpolate this list into a shell "for" loop
+# without normalizing it.  A bracketed multi-line list is a syntax error.
 AC_CHECK_HEADERS( \
   bzlib.h \
   ifaddrs.h \
@@ -74,12 +76,19 @@ AC_C_CONST
 AC_TYPE_UID_T
 X_AC_CHECK_LD_NO_UNDEFINED
 AC_CHECK_DECLS([RLIMIT_MEMLOCK], [], [], [[#include <sys/resource.h>]])
-AC_CHECK_TYPES(socklen_t, [], [], [#include <sys/types.h>
-#include <sys/socket.h>])
+AC_CHECK_TYPES(
+  [socklen_t], [], [],
+  [
+    #include <sys/types.h>
+    #include <sys/socket.h>
+  ]
+)
 
 ##
-# Checks for library functions.
+# Checks for library functions
 ##
+# Autoconf 2.69 and earlier interpolate this list into a shell "for" loop
+# without normalizing it.  A bracketed multi-line list is a syntax error.
 AC_CHECK_FUNCS( \
   clock_nanosleep \
   explicit_bzero \
@@ -102,18 +111,18 @@ X_AC_GETGRNAM
 X_AC_GETPWNAM
 
 ##
-# Checks for platform-specific issues.
+# Checks for platform-specific issues
 ##
 X_AC_AIX
 X_AC_DARWIN
 
 ##
-# Checks for client authentication method.
+# Checks for client authentication method
 ##
 X_AC_SELECT_AUTH_METHOD
 
 ##
-# Epilogue.
+# Epilogue
 ##
 AC_CONFIG_FILES( \
   Makefile \
