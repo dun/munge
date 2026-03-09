@@ -35,7 +35,6 @@ LT_INIT
 ##
 # Checks for programs
 ##
-X_AC_ARCH
 AC_PROG_AWK
 AC_PROG_CC
 AC_PROG_INSTALL
