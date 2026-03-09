@@ -88,37 +88,37 @@ AC_DEFUN([X_AC_SELECT_AUTH_METHOD], [
   if   test AS_VAR_GET(ac_cv_func_getpeereid) = yes ; then
     AUTH_METHOD=AUTH_METHOD_GETPEEREID
     AC_DEFINE([AUTH_METHOD_GETPEEREID], [1],
-      [Define to 1 if authenticating via AUTH_METHOD_GETPEEREID]
+      [Define to 1 if authenticating via AUTH_METHOD_GETPEEREID.]
     )
   elif test AS_VAR_GET(ac_cv_func_getpeerucred) = yes \
          -a AS_VAR_GET(ac_cv_header_ucred_h) = yes ; then
     AUTH_METHOD=AUTH_METHOD_GETPEERUCRED
     AC_DEFINE([AUTH_METHOD_GETPEERUCRED], [1],
-      [Define to 1 if authenticating via AUTH_METHOD_GETPEERUCRED]
+      [Define to 1 if authenticating via AUTH_METHOD_GETPEERUCRED.]
     )
   elif test AS_VAR_GET(ac_cv_type_struct_ucred) = yes \
          -a AS_VAR_GET(x_ac_cv_check_so_peercred) = yes ; then
     AUTH_METHOD=AUTH_METHOD_SO_PEERCRED
     AC_DEFINE([AUTH_METHOD_SO_PEERCRED], [1],
-      [Define to 1 if authenticating via AUTH_METHOD_SO_PEERCRED]
+      [Define to 1 if authenticating via AUTH_METHOD_SO_PEERCRED.]
     )
   elif test AS_VAR_GET(ac_cv_type_struct_xucred) = yes \
          -a AS_VAR_GET(x_ac_cv_check_local_peercred) = yes ; then
     AUTH_METHOD=AUTH_METHOD_LOCAL_PEERCRED
     AC_DEFINE([AUTH_METHOD_LOCAL_PEERCRED], [1],
-      [Define to 1 if authenticating via AUTH_METHOD_LOCAL_PEERCRED]
+      [Define to 1 if authenticating via AUTH_METHOD_LOCAL_PEERCRED.]
     )
   elif test AS_VAR_GET(ac_cv_type_struct_strrecvfd) = yes \
          -a AS_VAR_GET(x_ac_cv_check_fifo_recvfd) = yes ; then
     AUTH_METHOD=AUTH_METHOD_RECVFD_MKFIFO
     AC_DEFINE([AUTH_METHOD_RECVFD_MKFIFO], [1],
-      [Define to 1 if authenticating via AUTH_METHOD_RECVFD_MKFIFO]
+      [Define to 1 if authenticating via AUTH_METHOD_RECVFD_MKFIFO.]
     )
   elif test AS_VAR_GET(ac_cv_type_struct_strrecvfd) = yes \
          -a AS_VAR_GET(ac_cv_file__dev_spx) = yes ; then
     AUTH_METHOD=AUTH_METHOD_RECVFD_MKNOD
     AC_DEFINE([AUTH_METHOD_RECVFD_MKNOD], [1],
-      [Define to 1 if authenticating via AUTH_METHOD_RECVFD_MKNOD]
+      [Define to 1 if authenticating via AUTH_METHOD_RECVFD_MKNOD.]
     )
   else
     AC_MSG_RESULT([failed])
