@@ -112,7 +112,6 @@ X_AC_GETPWNAM
 ##
 # Checks for platform-specific issues
 ##
-X_AC_AIX
 X_AC_DARWIN
 
 ##
