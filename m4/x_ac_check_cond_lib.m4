@@ -1,39 +1,44 @@
-#******************************************************************************
-#  SYNOPSIS:
-#    X_AC_CHECK_COND_LIB(library, function)
+###############################################################################
+# SYNOPSIS:
+#   X_AC_CHECK_COND_LIB(library, function)
 #
-#  DESCRIPTION:
-#    Check whether a program can be linked with <library> to get <function>.
-#    Like AC_CHECK_LIB(), except that if the check succeeds, HAVE_LIB<library>
-#    will be defined and a shell variable LIB<library> containing "-l<library>"
-#    will be substituted via AC_SUBST().
+# DESCRIPTION:
+#   Check whether <function> resolves by linking with <library>.
+#   Define HAVE_LIB<library> in config.h, and substitute LIB<library> as
+#   "-l<library>".
 #
-#    In other words, this is just like the default action of AC_CHECK_LIB(),
-#    except that instead of modifying LIBS (which will affect the linking of
-#    all executables), the shell variable LIB<library> is defined so it can be
-#    added to the linking of just those executables needing this library.
-#    Also note that this checks to see if the library is even needed at all.
-#******************************************************************************
+#   Leave LIBS alone, so a caller links the library only where it is needed.
+#
+#   Skip the check if <function> already resolves in the default link
+#   environment.  LIB<library> stays unset.
+###############################################################################
 
 AC_DEFUN([X_AC_CHECK_COND_LIB], [
+  AC_REQUIRE([AC_PROG_CC])[]dnl
   AC_CACHE_CHECK(
-    [for $2 in default libs],
-    [x_ac_cv_lib_none_$2], [
-    AC_LINK_IFELSE(
-      [AC_LANG_CALL([], [$2])],
-      AS_VAR_SET(x_ac_cv_lib_none_$2, yes),
-      AS_VAR_SET(x_ac_cv_lib_none_$2, no)
-    )]
+    [whether $2 is available without -l$1],
+    [x_ac_cv_lib_none_$2],
+    [
+      AC_LINK_IFELSE(
+        [AC_LANG_CALL([], [$2])],
+        [x_ac_cv_lib_none_$2=yes],
+        [x_ac_cv_lib_none_$2=no]
+      )
+    ]
   )
-  AS_IF([test AS_VAR_GET(x_ac_cv_lib_none_$2) = no],
-    AC_CHECK_LIB(
-      [$1],
-      [$2], [
-        AH_CHECK_LIB([$1])
-        AS_TR_CPP([LIB$1])="-l$1";
-        AC_SUBST(AS_TR_CPP([LIB$1]))
-        AC_DEFINE_UNQUOTED(AS_TR_CPP([HAVE_LIB$1]))
-      ]
-    )
-  )]
-)
+  AS_IF(
+    [test "x${x_ac_cv_lib_none_$2}" = xno],
+    [
+      AC_CHECK_LIB(
+        [$1],
+        [$2],
+        [
+          AH_CHECK_LIB([$1])
+          AS_TR_CPP([LIB$1])="-l$1"
+          AC_SUBST(AS_TR_CPP([LIB$1]))
+          AC_DEFINE_UNQUOTED(AS_TR_CPP([HAVE_LIB$1]))
+        ]
+      )
+    ]
+  )
+])
