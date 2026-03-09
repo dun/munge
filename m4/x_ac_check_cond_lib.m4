@@ -33,10 +33,12 @@ AC_DEFUN([X_AC_CHECK_COND_LIB], [
         [$1],
         [$2],
         [
-          AH_CHECK_LIB([$1])
           AS_TR_CPP([LIB$1])="-l$1"
           AC_SUBST(AS_TR_CPP([LIB$1]))
-          AC_DEFINE_UNQUOTED(AS_TR_CPP([HAVE_LIB$1]))
+          AC_DEFINE_UNQUOTED(
+            AS_TR_CPP([HAVE_LIB$1]), [1],
+            [Define to 1 if you have the '$1' library (-l$1).]
+          )
         ]
       )
     ]
