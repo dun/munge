@@ -38,7 +38,7 @@ rv = getpwnam_r (user, &pw, pw_buf, sizeof (pw_buf)); ]]
   )
   AS_IF([test AS_VAR_GET(x_ac_cv_have_getpwnam_r_aix) = yes],
     AC_DEFINE([HAVE_GETPWNAM_R_AIX], [1],
-      [Define to 1 if you have the `getpwnam_r' function from AIX.]
+      [Define to 1 if you have the 'getpwnam_r' function from AIX.]
     )
   )]
 )
@@ -82,7 +82,7 @@ return ((rv == ERANGE || errno == ERANGE) ? EXIT_SUCCESS : EXIT_FAILURE); ]]
   )
   AS_IF([test AS_VAR_GET(x_ac_cv_have_getpwnam_r_posix) = yes],
     AC_DEFINE([HAVE_GETPWNAM_R_POSIX], [1],
-      [Define to 1 if you have the `getpwnam_r' function from POSIX.]
+      [Define to 1 if you have the 'getpwnam_r' function from POSIX.]
     )
   )]
 )
@@ -108,7 +108,7 @@ pw_ptr = getpwnam_r (user, &pw, pw_buf, sizeof (pw_buf)); ]]
   )
   AS_IF([test AS_VAR_GET(x_ac_cv_have_getpwnam_r_sun) = yes],
     AC_DEFINE([HAVE_GETPWNAM_R_SUN], [1],
-      [Define to 1 if you have the `getpwnam_r' function from SunOS.]
+      [Define to 1 if you have the 'getpwnam_r' function from SunOS.]
     )
   )]
 )

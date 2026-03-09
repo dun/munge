@@ -150,7 +150,7 @@ $3
     AS_IF(
       [test AS_VAR_GET([ac_cv_func_$1_returns_int]) = yes],
       AC_DEFINE(AS_TR_CPP([HAVE_$1_RETURN_INT]), [1],
-        [Define to 1 if the `$1' function returns int.]
+        [Define to 1 if the '$1' function returns int.]
       )
     )]
   )]

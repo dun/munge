@@ -33,7 +33,7 @@ AC_DEFUN_ONCE([X_AC_SELECT_CRYPTO_LIB],
     CRYPTO_LIBS="${LIBCRYPTO_LIBS}"
     CRYPTO_PKG="openssl"
     AC_DEFINE([HAVE_OPENSSL], [1],
-      [Define to 1 if you have the OpenSSL `crypto' library @{:@-lcrypto@:}@.])
+      [Define to 1 if you have the OpenSSL 'crypto' library @{:@-lcrypto@:}@.])
   elif (test "${CRYPTO_PKG}" = libgcrypt || test "x${CRYPTO_PKG}" = x) &&
       test "x${LIBGCRYPT_LIBS}" != x; then
     CRYPTO_CFLAGS="${LIBGCRYPT_CFLAGS}"

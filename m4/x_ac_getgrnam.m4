@@ -35,7 +35,7 @@ rv = getgrnam_r (name, &gr, gr_buf, sizeof (gr_buf), &gr_ptr); ]]
   )
   AS_IF([test AS_VAR_GET(x_ac_cv_have_getgrnam_r_posix) = yes],
     AC_DEFINE([HAVE_GETGRNAM_R_POSIX], [1],
-      [Define to 1 if you have the `getgrnam_r' function from POSIX.]
+      [Define to 1 if you have the 'getgrnam_r' function from POSIX.]
     )
   )]
 )
@@ -61,7 +61,7 @@ gr_ptr = getgrnam_r (name, &gr, gr_buf, sizeof (gr_buf)); ]]
   )
   AS_IF([test AS_VAR_GET(x_ac_cv_have_getgrnam_r_sun) = yes],
     AC_DEFINE([HAVE_GETGRNAM_R_SUN], [1],
-      [Define to 1 if you have the `getgrnam_r' function from SunOS.]
+      [Define to 1 if you have the 'getgrnam_r' function from SunOS.]
     )
   )]
 )

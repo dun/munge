@@ -72,7 +72,7 @@ rv = getgrent_r (&gr, gr_buf, sizeof (gr_buf), &gr_fp); ]]
   )
   AS_IF([test AS_VAR_GET(x_ac_cv_have_getgrent_r_aix) = yes],
     AC_DEFINE([HAVE_GETGRENT_R_AIX], [1],
-      [Define to 1 if you have the `getgrent_r' function from AIX.]
+      [Define to 1 if you have the 'getgrent_r' function from AIX.]
     )
   )]
 )
@@ -98,7 +98,7 @@ rv = getgrent_r (&gr, gr_buf, sizeof (gr_buf), &gr_ptr); ]]
   )
   AS_IF([test AS_VAR_GET(x_ac_cv_have_getgrent_r_gnu) = yes],
     AC_DEFINE([HAVE_GETGRENT_R_GNU], [1],
-      [Define to 1 if you have the `getgrent_r' function from GNU.]
+      [Define to 1 if you have the 'getgrent_r' function from GNU.]
     )
   )]
 )
@@ -122,7 +122,7 @@ gr_ptr = getgrent_r (&gr, gr_buf, sizeof (gr_buf)); ]]
   )
   AS_IF([test AS_VAR_GET(x_ac_cv_have_getgrent_r_sun) = yes],
     AC_DEFINE([HAVE_GETGRENT_R_SUN], [1],
-      [Define to 1 if you have the `getgrent_r' function from SunOS.]
+      [Define to 1 if you have the 'getgrent_r' function from SunOS.]
     )
   )]
 )
