@@ -1,17 +1,20 @@
-#******************************************************************************
-#  SYNOPSIS:
-#    X_AC_CHECK_OPENSSL
+###############################################################################
+# SYNOPSIS:
+#   X_AC_CHECK_OPENSSL
 #
-#  DESCRIPTION:
-#    Check for OpenSSL behavior.
-#******************************************************************************
+# DESCRIPTION:
+#   Check for OpenSSL functions, headers, and types.
+###############################################################################
 
 AC_DEFUN([X_AC_CHECK_OPENSSL], [
-  AC_REQUIRE([X_AC_WITH_OPENSSL])
-  ac_save_CFLAGS="${CFLAGS}"
-  ac_save_LIBS="${LIBS}"
+  AC_REQUIRE([AC_PROG_CC])[]dnl
+  AC_REQUIRE([X_AC_WITH_OPENSSL])[]dnl
+  x_ac_save_CFLAGS="${CFLAGS}"
+  x_ac_save_LIBS="${LIBS}"
   CFLAGS="${CFLAGS} ${LIBCRYPTO_CFLAGS}"
   LIBS="${LIBS} ${LIBCRYPTO_LIBS}"
+  # Autoconf 2.69 and earlier interpolate this list into a shell "for" loop
+  # without normalizing it.  A bracketed multi-line list is a syntax error.
   AC_CHECK_FUNCS( \
     CRYPTO_THREADID_set_callback \
     CRYPTO_memcmp \
@@ -101,6 +104,8 @@ AC_DEFUN([X_AC_CHECK_OPENSSL], [
     [NULL, NULL, 0],
     [#include <openssl/hmac.h>]
   )
+  # Autoconf 2.69 and earlier interpolate this list into a shell "for" loop
+  # without normalizing it.  A bracketed multi-line list is a syntax error.
   AC_CHECK_HEADERS( \
     openssl/core.h \
     openssl/core_names.h \
@@ -111,47 +116,71 @@ AC_DEFUN([X_AC_CHECK_OPENSSL], [
   AC_CHECK_TYPES([EVP_MAC *, EVP_MAC_CTX *], [], [], [#include <openssl/evp.h>])
   AC_CHECK_TYPES([OSSL_PARAM *], [], [], [#include <openssl/params.h>])
   AC_CHECK_TYPES([OSSL_PROVIDER *], [], [], [#include <openssl/provider.h>])
-  CFLAGS="${ac_save_CFLAGS}"
-  LIBS="${ac_save_LIBS}"
-  ]
-)
+  CFLAGS="${x_ac_save_CFLAGS}"
+  LIBS="${x_ac_save_LIBS}"
+])
 
-# _X_AC_CHECK_OPENSSL_FUNC_RETURNS_INT (name, args, includes)
+###############################################################################
+# SYNOPSIS:
+#   _X_AC_CHECK_OPENSSL_FUNC_RETURNS_INT(name, args, includes)
 #
-# Checks whether function <NAME> returns an integer result, and defines
-#   the C preprocessor macro for HAVE_<NAME>_RETURN_INT accordingly.
-# The <ARGS> are the argument list for the test function <NAME>,
-#   and the <INCLUDES> are the prologue of the test source to be linked.
-# The AC_LANG_PROGRAM #undef in the preamble is needed to thwart #define
-#   macros used for backwards-compatibility of deprecated functions.
-# This check only runs if AC_CHECK_FUNCS has determined the function exists
-#   (i.e., ac_cv_func_<NAME> = yes), preventing implicit function declaration
-#   warnings when testing non-existent functions.
+# DESCRIPTION:
+#   Check whether the OpenSSL function <name> returns int, and if so, define
+#   HAVE_<name>_RETURN_INT in config.h.  <args> is the argument list for the
+#   test call, and <includes> is the required header prologue.
 #
+#   Insert an #undef of <name> after the includes, so a backward-compatibility
+#   macro cannot interfere with the return-type check.
+#
+#   Skip the check unless AC_CHECK_FUNCS has confirmed <name> exists.  A
+#   missing function would otherwise produce an implicit-declaration warning.
+#
+# USAGE:
+#   Probe a function that AC_CHECK_FUNCS has already checked:
+#
+#     _X_AC_CHECK_OPENSSL_FUNC_RETURNS_INT(
+#       [HMAC_Update],
+#       [NULL, NULL, 0],
+#       [#include <openssl/hmac.h>]
+#     )
+#
+#   <args> is a bare argument list for the call.  Every argument may be
+#   NULL or 0.  The program is linked but never run.
+###############################################################################
+
 AC_DEFUN([_X_AC_CHECK_OPENSSL_FUNC_RETURNS_INT], [
+  AC_REQUIRE([AC_PROG_CC])[]dnl
   AS_IF(
-    [test "AS_VAR_GET([ac_cv_func_$1])" = yes], [
-    AC_CACHE_CHECK(
-      [if $1 returns int],
-      [ac_cv_func_$1_returns_int], [
-      AS_VAR_SET([ac_cv_func_$1_returns_int], no)
-      AC_LINK_IFELSE([
-        AC_LANG_PROGRAM(
-          [[
-$3
-#undef $1
-]],
-          [[int rv = $1 ($2);]]
-        )],
-        AS_VAR_SET([ac_cv_func_$1_returns_int], yes),
-        AS_VAR_SET([ac_cv_func_$1_returns_int], no)
-      )]
-    )
-    AS_IF(
-      [test AS_VAR_GET([ac_cv_func_$1_returns_int]) = yes],
-      AC_DEFINE(AS_TR_CPP([HAVE_$1_RETURN_INT]), [1],
-        [Define to 1 if the '$1' function returns int.]
+    [test "x${ac_cv_func_$1}" = xyes],
+    [
+      AC_CACHE_CHECK(
+        [if $1 returns int],
+        [x_ac_cv_have_$1_return_int],
+        [
+          x_ac_cv_have_$1_return_int=no
+          AC_LINK_IFELSE(
+            [
+              AC_LANG_PROGRAM([[
+                $3
+                #undef $1
+              ]], [[
+                int rv = $1 ($2);
+              ]])
+            ],
+            [x_ac_cv_have_$1_return_int=yes],
+            [x_ac_cv_have_$1_return_int=no]
+          )
+        ]
       )
-    )]
-  )]
-)
+      AS_IF(
+        [test "x${x_ac_cv_have_$1_return_int}" = xyes],
+        [
+          AC_DEFINE(
+            AS_TR_CPP([HAVE_$1_RETURN_INT]), [1],
+            [Define to 1 if the '$1' function returns int.]
+          )
+        ]
+      )
+    ]
+  )
+])
