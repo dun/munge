@@ -47,6 +47,20 @@
  *****************************************************************************/
 
 
+int hkdf_test (munge_mac_t md,
+        const unsigned char *ikm,  size_t ikmlen,
+        const unsigned char *salt, size_t saltlen,
+        const unsigned char *info, size_t infolen,
+        const unsigned char *okm,  size_t okmlen);
+int hkdf_test_1 (void);
+int hkdf_test_2 (void);
+int hkdf_test_3 (void);
+int hkdf_test_4 (void);
+int hkdf_test_5 (void);
+int hkdf_test_6 (void);
+int hkdf_test_7 (void);
+
+
 int
 hkdf_test (munge_mac_t md,
         const unsigned char *ikm,  size_t ikmlen,

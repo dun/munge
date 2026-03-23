@@ -39,6 +39,10 @@
 #include "tap.h"
 
 
+int check_mac (munge_mac_t m, const char *str, const char *key, int keylen,
+        const char *src, int srclen, const unsigned char *dst, int dstlen);
+
+
 int
 check_mac (munge_mac_t m, const char *str, const char *key, int keylen,
         const char *src, int srclen, const unsigned char *dst, int dstlen)

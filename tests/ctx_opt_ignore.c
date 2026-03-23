@@ -36,6 +36,9 @@
 #include "tap.h"
 
 
+void test_opt (int opt, const char *name);
+
+
 void
 test_opt (int opt, const char *name)
 {
