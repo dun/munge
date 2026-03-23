@@ -54,6 +54,8 @@ jobs:
             CC="${{ matrix.cc }}" CFLAGS="-Wall"
       - name: Get config.log
         run: cat config.log
+      - name: Get config.h
+        run: cat config.h
       - name: Build
         run: make V=1
       - name: Test
