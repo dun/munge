@@ -76,10 +76,10 @@ static void _entropy_rotate_right (unsigned *up, size_t n);
 int
 entropy_read (void *buf, size_t buflen, const char **srcp)
 {
-    size_t       len;
-    int          rv;
-    int          n = -1;
-    const char  *src = NULL;
+    size_t len;
+    int rv;
+    int n = -1;
+    const char *src = NULL;
 
     if (buf == NULL) {
         errno = EINVAL;
@@ -179,8 +179,8 @@ entropy_read (void *buf, size_t buflen, const char **srcp)
 int
 entropy_read_uint (unsigned *up)
 {
-    pid_t          pid;
-    clock_t        cpu_time;
+    pid_t pid;
+    clock_t cpu_time;
     struct timeval tv;
 
     if (up == NULL) {
