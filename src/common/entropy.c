@@ -236,7 +236,7 @@ _entropy_rotate_left (unsigned *up, size_t n)
     if (n == 0) {
         return;
     }
-    mask = ~0 << (ntotal - n);
+    mask = ~0U << (ntotal - n);
     move = *up & mask;
     move >>= ntotal - n;
     *up <<= n;
@@ -261,7 +261,7 @@ _entropy_rotate_right (unsigned *up, size_t n)
     if (n == 0) {
         return;
     }
-    mask = ~0 >> (ntotal - n);
+    mask = ~0U >> (ntotal - n);
     move = *up & mask;
     move <<= ntotal - n;
     *up >>= n;
