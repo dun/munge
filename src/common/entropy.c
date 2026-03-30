@@ -38,12 +38,12 @@
 #endif /* HAVE_SYS_RANDOM_H */
 #include <sys/stat.h>
 #include <sys/time.h>
+#include <sys/types.h>
 #include <time.h>
 #include <unistd.h>
 #include "common.h"
 #include "entropy.h"
 #include "log.h"
-#include "rotate.h"
 
 
 /*****************************************************************************
@@ -53,6 +53,14 @@
 /*  Pathname of the kernel urandom device.
  */
 #define ENTROPY_URANDOM_PATH            "/dev/urandom"
+
+
+/*****************************************************************************
+ *  Prototypes
+ *****************************************************************************/
+
+static void _entropy_rotate_left (unsigned *up, size_t n);
+static void _entropy_rotate_right (unsigned *up, size_t n);
 
 
 /*****************************************************************************
@@ -183,25 +191,79 @@ entropy_read_uint (unsigned *up)
 
     pid = getpid ();
     *up ^= (unsigned) pid;
-    rotate_left (up, *up);
+    _entropy_rotate_left (up, *up);
 
     pid = getppid ();
     *up ^= (unsigned) pid;
-    rotate_right (up, *up);
+    _entropy_rotate_right (up, *up);
 
     cpu_time = clock ();
     if (cpu_time != (clock_t) -1) {
         *up ^= (unsigned) cpu_time;
-        rotate_left (up, *up);
+        _entropy_rotate_left (up, *up);
     }
     /*  FIXME: Replace gettimeofday() (usec resolution) with
      *    clock_gettime() (nsec resolution) for more entropy.
      */
     if (gettimeofday (&tv, NULL) == 0) {
         *up ^= (unsigned) tv.tv_sec;
-        rotate_right (up, *up);
+        _entropy_rotate_right (up, *up);
         *up ^= (unsigned) tv.tv_usec;
-        rotate_left (up, *up);
+        _entropy_rotate_left (up, *up);
     }
     return 0;
+}
+
+
+/*****************************************************************************
+ *  Private Functions
+ *****************************************************************************/
+
+/*  Rotate the reference [*up] by [n] bits to the left.
+ *    Bits rotated off the left end are wrapped-around to the right.
+ */
+static void
+_entropy_rotate_left (unsigned *up, size_t n)
+{
+    unsigned ntotal;
+    unsigned mask;
+    unsigned move;
+
+    assert (up != NULL);
+
+    ntotal = sizeof (*up) * 8;
+    n %= ntotal;
+    if (n == 0) {
+        return;
+    }
+    mask = ~0 << (ntotal - n);
+    move = *up & mask;
+    move >>= ntotal - n;
+    *up <<= n;
+    *up |= move;
+}
+
+
+/*  Rotate the reference [*up] by [n] bits to the right.
+ *    Bits rotated off the right end are wrapped-around to the left.
+ */
+static void
+_entropy_rotate_right (unsigned *up, size_t n)
+{
+    unsigned ntotal;
+    unsigned mask;
+    unsigned move;
+
+    assert (up != NULL);
+
+    ntotal = sizeof (*up) * 8;
+    n %= ntotal;
+    if (n == 0) {
+        return;
+    }
+    mask = ~0 >> (ntotal - n);
+    move = *up & mask;
+    move <<= ntotal - n;
+    *up >>= n;
+    *up |= move;
 }
