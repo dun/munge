@@ -231,7 +231,7 @@ _entropy_rotate_left (unsigned *up, size_t n)
 
     assert (up != NULL);
 
-    ntotal = sizeof (*up) * 8;
+    ntotal = sizeof *up * 8;
     n %= ntotal;
     if (n == 0) {
         return;
@@ -256,7 +256,7 @@ _entropy_rotate_right (unsigned *up, size_t n)
 
     assert (up != NULL);
 
-    ntotal = sizeof (*up) * 8;
+    ntotal = sizeof *up * 8;
     n %= ntotal;
     if (n == 0) {
         return;
