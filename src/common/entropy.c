@@ -29,7 +29,6 @@
 #  include "config.h"
 #endif /* HAVE_CONFIG_H */
 
-#include <assert.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <string.h>
@@ -59,8 +58,7 @@
  *  Prototypes
  *****************************************************************************/
 
-static void _entropy_rotate_left (unsigned long *up, size_t n);
-static void _entropy_rotate_right (unsigned long *up, size_t n);
+static unsigned long _entropy_rotate (unsigned long value);
 
 
 /*****************************************************************************
@@ -179,7 +177,7 @@ entropy_read (void *buf, size_t buflen, const char **srcp)
 int
 entropy_read_weak (unsigned long *dst)
 {
-    pid_t pid;
+    unsigned long e = 0;
     clock_t cpu_time;
     struct timeval tv;
 
@@ -187,30 +185,21 @@ entropy_read_weak (unsigned long *dst)
         errno = EINVAL;
         return -1;
     }
-    *dst = 0;
-
-    pid = getpid ();
-    *dst ^= (unsigned long) pid;
-    _entropy_rotate_left (dst, *dst);
-
-    pid = getppid ();
-    *dst ^= (unsigned long) pid;
-    _entropy_rotate_right (dst, *dst);
+    e = _entropy_rotate (e ^ (unsigned long) getpid ());
+    e = _entropy_rotate (e ^ (unsigned long) getppid ());
 
     cpu_time = clock ();
     if (cpu_time != (clock_t) -1) {
-        *dst ^= (unsigned long) cpu_time;
-        _entropy_rotate_left (dst, *dst);
+        e = _entropy_rotate (e ^ (unsigned long) cpu_time);
     }
     /*  FIXME: Replace gettimeofday() (usec resolution) with
      *    clock_gettime() (nsec resolution) for more entropy.
      */
     if (gettimeofday (&tv, NULL) == 0) {
-        *dst ^= (unsigned long) tv.tv_sec;
-        _entropy_rotate_right (dst, *dst);
-        *dst ^= (unsigned long) tv.tv_usec;
-        _entropy_rotate_left (dst, *dst);
+        e = _entropy_rotate (e ^ (unsigned long) tv.tv_sec);
+        e = _entropy_rotate (e ^ (unsigned long) tv.tv_usec);
     }
+    *dst = e;
     return 0;
 }
 
@@ -219,51 +208,23 @@ entropy_read_weak (unsigned long *dst)
  *  Private Functions
  *****************************************************************************/
 
-/*  Rotate the reference [*up] by [n] bits to the left.
- *    Bits rotated off the left end are wrapped-around to the right.
+/*  Rotate the bits in [value] based on its actual value.
+ *  This distributes entropy that may primarily reside in the low-order bits.
+ *  Return the rotated result.
  */
-static void
-_entropy_rotate_left (unsigned long *up, size_t n)
+static unsigned long
+_entropy_rotate (unsigned long value)
 {
-    unsigned long ntotal;
-    unsigned long mask;
-    unsigned long move;
+    unsigned long nbits = sizeof value * 8;
+    unsigned long nrotate = value % nbits;
 
-    assert (up != NULL);
-
-    ntotal = sizeof *up * 8;
-    n %= ntotal;
-    if (n == 0) {
-        return;
+    if (nrotate == 0) {                 /* no rotation */
+        return value;
     }
-    mask = ~0UL << (ntotal - n);
-    move = *up & mask;
-    move >>= ntotal - n;
-    *up <<= n;
-    *up |= move;
-}
-
-
-/*  Rotate the reference [*up] by [n] bits to the right.
- *    Bits rotated off the right end are wrapped-around to the left.
- */
-static void
-_entropy_rotate_right (unsigned long *up, size_t n)
-{
-    unsigned long ntotal;
-    unsigned long mask;
-    unsigned long move;
-
-    assert (up != NULL);
-
-    ntotal = sizeof *up * 8;
-    n %= ntotal;
-    if (n == 0) {
-        return;
+    if (value & 1) {                    /* rotate left if odd */
+        return (value << nrotate) | (value >> (nbits - nrotate));
     }
-    mask = ~0UL >> (ntotal - n);
-    move = *up & mask;
-    move <<= ntotal - n;
-    *up >>= n;
-    *up |= move;
+    else {                              /* rotate right if even */
+        return (value >> nrotate) | (value << (nbits - nrotate));
+    }
 }
