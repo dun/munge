@@ -59,8 +59,8 @@
  *  Prototypes
  *****************************************************************************/
 
-static void _entropy_rotate_left (unsigned *up, size_t n);
-static void _entropy_rotate_right (unsigned *up, size_t n);
+static void _entropy_rotate_left (unsigned long *up, size_t n);
+static void _entropy_rotate_right (unsigned long *up, size_t n);
 
 
 /*****************************************************************************
@@ -169,47 +169,47 @@ entropy_read (void *buf, size_t buflen, const char **srcp)
 }
 
 
-/*  Read entropy into the unsigned integer referenced by [up].
+/*  Read entropy into [dst].
  *  This entropy will be from sources independent of the kernel's CSPRNG.
  *    It may be of lower quality and not uniformly distributed.
- *  The bits in the uint arg are rotated between entropic additions to better
+ *  The bits in [dst] are rotated between entropic additions to better
  *    distribute the entropy.  Spin the wheel of entropy and win a prize!
  *  Return 0 on success, or -1 on error (with errno set).
  */
 int
-entropy_read_uint (unsigned *up)
+entropy_read_weak (unsigned long *dst)
 {
     pid_t pid;
     clock_t cpu_time;
     struct timeval tv;
 
-    if (up == NULL) {
+    if (dst == NULL) {
         errno = EINVAL;
         return -1;
     }
-    *up = 0;
+    *dst = 0;
 
     pid = getpid ();
-    *up ^= (unsigned) pid;
-    _entropy_rotate_left (up, *up);
+    *dst ^= (unsigned long) pid;
+    _entropy_rotate_left (dst, *dst);
 
     pid = getppid ();
-    *up ^= (unsigned) pid;
-    _entropy_rotate_right (up, *up);
+    *dst ^= (unsigned long) pid;
+    _entropy_rotate_right (dst, *dst);
 
     cpu_time = clock ();
     if (cpu_time != (clock_t) -1) {
-        *up ^= (unsigned) cpu_time;
-        _entropy_rotate_left (up, *up);
+        *dst ^= (unsigned long) cpu_time;
+        _entropy_rotate_left (dst, *dst);
     }
     /*  FIXME: Replace gettimeofday() (usec resolution) with
      *    clock_gettime() (nsec resolution) for more entropy.
      */
     if (gettimeofday (&tv, NULL) == 0) {
-        *up ^= (unsigned) tv.tv_sec;
-        _entropy_rotate_right (up, *up);
-        *up ^= (unsigned) tv.tv_usec;
-        _entropy_rotate_left (up, *up);
+        *dst ^= (unsigned long) tv.tv_sec;
+        _entropy_rotate_right (dst, *dst);
+        *dst ^= (unsigned long) tv.tv_usec;
+        _entropy_rotate_left (dst, *dst);
     }
     return 0;
 }
@@ -223,11 +223,11 @@ entropy_read_uint (unsigned *up)
  *    Bits rotated off the left end are wrapped-around to the right.
  */
 static void
-_entropy_rotate_left (unsigned *up, size_t n)
+_entropy_rotate_left (unsigned long *up, size_t n)
 {
-    unsigned ntotal;
-    unsigned mask;
-    unsigned move;
+    unsigned long ntotal;
+    unsigned long mask;
+    unsigned long move;
 
     assert (up != NULL);
 
@@ -236,7 +236,7 @@ _entropy_rotate_left (unsigned *up, size_t n)
     if (n == 0) {
         return;
     }
-    mask = ~0U << (ntotal - n);
+    mask = ~0UL << (ntotal - n);
     move = *up & mask;
     move >>= ntotal - n;
     *up <<= n;
@@ -248,11 +248,11 @@ _entropy_rotate_left (unsigned *up, size_t n)
  *    Bits rotated off the right end are wrapped-around to the left.
  */
 static void
-_entropy_rotate_right (unsigned *up, size_t n)
+_entropy_rotate_right (unsigned long *up, size_t n)
 {
-    unsigned ntotal;
-    unsigned mask;
-    unsigned move;
+    unsigned long ntotal;
+    unsigned long mask;
+    unsigned long move;
 
     assert (up != NULL);
 
@@ -261,7 +261,7 @@ _entropy_rotate_right (unsigned *up, size_t n)
     if (n == 0) {
         return;
     }
-    mask = ~0U >> (ntotal - n);
+    mask = ~0UL >> (ntotal - n);
     move = *up & mask;
     move <<= ntotal - n;
     *up >>= n;

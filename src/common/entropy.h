@@ -46,7 +46,7 @@
 
 int entropy_read (void *buf, size_t buflen, const char **srcp);
 
-int entropy_read_uint (unsigned *up);
+int entropy_read_weak (unsigned long *dst);
 
 
 #endif /* !MUNGE_ENTROPY_H */
