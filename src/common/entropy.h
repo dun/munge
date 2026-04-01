@@ -35,7 +35,8 @@
  *  Constants
  *****************************************************************************/
 
-/*  Number of bytes guaranteed for reading in a single call to entropy_read().
+/*  Number of bytes guaranteed for reading in a single call to
+ *  entropy_read_csprng().
  */
 #define ENTROPY_NUM_BYTES_GUARANTEED    256
 
@@ -44,7 +45,7 @@
  *  Prototypes
  *****************************************************************************/
 
-int entropy_read (void *buf, size_t buflen, const char **srcp);
+int entropy_read_csprng (void *dst, size_t dstlen);
 
 int entropy_read_weak (unsigned long *dst);
 

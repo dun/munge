@@ -141,7 +141,7 @@ _create_key_secret (unsigned char *buf, size_t buflen)
 
     /*  Read entropy from the kernel's CSPRNG for the input keying material.
      */
-    rv = entropy_read (key, sizeof (key), NULL);
+    rv = entropy_read_csprng (key, sizeof (key));
     if (rv == -1) {
         goto err;
     }

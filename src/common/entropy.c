@@ -65,21 +65,18 @@ static unsigned long _entropy_rotate (unsigned long value);
  *  Public Functions
  *****************************************************************************/
 
-/*  Read up to [buflen] bytes of entropy from the kernel's CSPRNG,
- *    storing the data in [buf].
- *  If [srcp] is not NULL, it will be set to a static string identifying
- *    the entropy source on success or NULL on error.
+/*  Read up to [dstlen] bytes of entropy from the kernel's CSPRNG,
+ *    storing the data in [dst].
  *  Return the number of bytes read, or -1 on error (with errno set).
  */
 int
-entropy_read (void *buf, size_t buflen, const char **srcp)
+entropy_read_csprng (void *dst, size_t dstlen)
 {
     size_t len;
     int rv;
     int n = -1;
-    const char *src = NULL;
 
-    if (buf == NULL) {
+    if (dst == NULL) {
         errno = EINVAL;
         return -1;
     }
@@ -89,9 +86,9 @@ entropy_read (void *buf, size_t buflen, const char **srcp)
      *    will always return as many bytes as requested and not be interrupted
      *    by signals.  No such guarantees apply for larger buffer sizes.
      */
-    len = MIN(256, buflen);
+    len = MIN(256, dstlen);
     do {
-        rv = getrandom (buf, len, 0);
+        rv = getrandom (dst, len, 0);
     } while ((rv < 0) && (errno == EINTR));
 
     if (rv < 0) {
@@ -100,21 +97,19 @@ entropy_read (void *buf, size_t buflen, const char **srcp)
     }
     else if (rv > 0) {
         n = rv;
-        src = "getrandom()";
     }
 #elif HAVE_GETENTROPY
     /*
      *  The maximum buffer size permitted is 256 bytes.
      */
-    len = MIN(256, buflen);
-    rv = getentropy (buf, len);
+    len = MIN(256, dstlen);
+    rv = getentropy (dst, len);
     if (rv < 0) {
         log_msg (LOG_WARNING, "Failed to fill buffer via getentropy(): %s",
                 strerror (errno));
     }
     else if (rv == 0) {
         n = len;
-        src = "getentropy()";
     }
 #endif /* HAVE_GETENTROPY */
 
@@ -143,15 +138,14 @@ entropy_read (void *buf, size_t buflen, const char **srcp)
                         ENTROPY_URANDOM_PATH, (st.st_mode & S_IFMT));
             }
             else {
-                len = buflen;
-                rv = fd_read_n (fd, buf, len);
+                len = dstlen;
+                rv = fd_read_n (fd, dst, len);
                 if (rv < 0) {
                     log_msg (LOG_WARNING, "Failed to read from \"%s\": %s",
                             ENTROPY_URANDOM_PATH, strerror (errno));
                 }
                 else if (rv > 0) {
                     n = rv;
-                    src = "\"" ENTROPY_URANDOM_PATH "\"";
                 }
             }
             if (close (fd) < 0) {
@@ -159,9 +153,6 @@ entropy_read (void *buf, size_t buflen, const char **srcp)
                         ENTROPY_URANDOM_PATH, strerror (errno));
             }
         }
-    }
-    if (srcp != NULL) {
-        *srcp = src;
     }
     return n;
 }
