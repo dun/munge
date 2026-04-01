@@ -40,8 +40,8 @@
 #include <sys/types.h>
 #include <time.h>
 #include <unistd.h>
-#include "common.h"
 #include "entropy.h"
+#include "fd.h"
 #include "log.h"
 
 
@@ -86,7 +86,7 @@ entropy_read_csprng (void *dst, size_t dstlen)
      *    will always return as many bytes as requested and not be interrupted
      *    by signals.  No such guarantees apply for larger buffer sizes.
      */
-    len = MIN(256, dstlen);
+    len = (dstlen < 256) ? dstlen : 256;
     do {
         rv = getrandom (dst, len, 0);
     } while ((rv < 0) && (errno == EINTR));
@@ -102,7 +102,7 @@ entropy_read_csprng (void *dst, size_t dstlen)
     /*
      *  The maximum buffer size permitted is 256 bytes.
      */
-    len = MIN(256, dstlen);
+    len = (dstlen < 256) ? dstlen : 256;
     rv = getentropy (dst, len);
     if (rv < 0) {
         log_msg (LOG_WARNING, "Failed to fill buffer via getentropy(): %s",
