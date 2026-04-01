@@ -35,10 +35,10 @@
  *  Constants
  *****************************************************************************/
 
-/*  Number of bytes guaranteed for reading in a single call to
- *  entropy_read_csprng().
+/*  Maximum number of bytes guaranteed to be read in full by
+ *  entropy_read_csprng() in a single call.
  */
-#define ENTROPY_NUM_BYTES_GUARANTEED    256
+#define ENTROPY_CSPRNG_GUARANTEED_SIZE  256
 
 
 /*****************************************************************************

@@ -126,7 +126,7 @@ create_key (conf_t *confp)
 static int
 _create_key_secret (unsigned char *buf, size_t buflen)
 {
-    unsigned char      key[ENTROPY_NUM_BYTES_GUARANTEED];
+    unsigned char      key[ENTROPY_CSPRNG_GUARANTEED_SIZE];
     unsigned long      salt;
     const munge_mac_t  md = MUNGE_DEFAULT_MAC;
     const char        *md_str;
