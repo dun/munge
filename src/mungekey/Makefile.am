@@ -45,6 +45,7 @@ mungekey_CPPFLAGS = \
 mungekey_LDADD = \
 	$(top_builddir)/src/libcommon/libcommon.la \
 	$(top_builddir)/src/libmunge/libmunge.la \
+	$(LIBRT) \
 	$(CRYPTO_LIBS) \
 	# End of mungekey_LDADD
 

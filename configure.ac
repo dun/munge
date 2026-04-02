@@ -85,7 +85,10 @@ AC_CHECK_FUNCS( \
   explicit_memset \
   getentropy \
   getifaddrs \
+  getloadavg \
   getrandom \
+  getrusage \
+  gettimeofday \
   localtime_r \
   memset_explicit \
   mlockall \

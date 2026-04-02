@@ -30,16 +30,24 @@
 #endif /* HAVE_CONFIG_H */
 
 #include <errno.h>
-#include <fcntl.h>
-#include <string.h>
+#include <fcntl.h>                      /* open */
+#if HAVE_GETLOADAVG
+#  include <stdlib.h>                   /* getloadavg */
+#endif /* HAVE_GETLOADAVG */
+#include <string.h>                     /* memcpy, strerror */
 #if HAVE_SYS_RANDOM_H
-#include <sys/random.h>
+#  include <sys/random.h>               /* getrandom */
 #endif /* HAVE_SYS_RANDOM_H */
-#include <sys/stat.h>
-#include <sys/time.h>
+#if HAVE_GETRUSAGE
+#  include <sys/resource.h>             /* getrusage */
+#endif /* HAVE_GETRUSAGE */
+#include <sys/stat.h>                   /* fstat */
+#if HAVE_GETTIMEOFDAY
+#  include <sys/time.h>                 /* gettimeofday */
+#endif /* HAVE_GETTIMEOFDAY */
 #include <sys/types.h>
-#include <time.h>
-#include <unistd.h>
+#include <time.h>                       /* clock, clock_gettime */
+#include <unistd.h>                     /* getentropy, getpid, getppid */
 #include "entropy.h"
 #include "fd.h"
 #include "log.h"
@@ -172,7 +180,7 @@ entropy_read_csprng (void *dst, size_t dstlen)
 /*  Read entropy into [dst].
  *  This entropy will be from sources independent of the kernel's CSPRNG.
  *    It may be of lower quality and not uniformly distributed.
- *  The bits in [dst] are rotated between entropic additions to better
+ *  The accumulator is rotated between entropic additions to better
  *    distribute the entropy.  Spin the wheel of entropy and win a prize!
  *  Return 0 on success, or -1 on error (with errno set).
  */
@@ -180,27 +188,77 @@ int
 entropy_read_weak (unsigned long *dst)
 {
     unsigned long e = 0;
-    clock_t cpu_time;
-    struct timeval tv;
 
     if (dst == NULL) {
         errno = EINVAL;
         return -1;
     }
+    e = _entropy_rotate (e ^ (unsigned long) &entropy_read_weak);   /* ASLR */
+    e = _entropy_rotate (e ^ (unsigned long) &e);                   /* ASLR */
     e = _entropy_rotate (e ^ (unsigned long) getpid ());
     e = _entropy_rotate (e ^ (unsigned long) getppid ());
 
-    cpu_time = clock ();
+    clock_t cpu_time = clock ();
     if (cpu_time != (clock_t) -1) {
         e = _entropy_rotate (e ^ (unsigned long) cpu_time);
     }
-    /*  FIXME: Replace gettimeofday() (usec resolution) with
-     *    clock_gettime() (nsec resolution) for more entropy.
-     */
-    if (gettimeofday (&tv, NULL) == 0) {
-        e = _entropy_rotate (e ^ (unsigned long) tv.tv_sec);
-        e = _entropy_rotate (e ^ (unsigned long) tv.tv_usec);
+#if HAVE_CLOCK_GETTIME
+    {
+        struct timespec ts;
+        if (clock_gettime (CLOCK_REALTIME, &ts) == 0) {
+            e = _entropy_rotate (e ^ (unsigned long) ts.tv_sec);
+            e = _entropy_rotate (e ^ (unsigned long) ts.tv_nsec);
+        }
+#if HAVE_DECL_CLOCK_MONOTONIC
+        if (clock_gettime (CLOCK_MONOTONIC, &ts) == 0) {
+            e = _entropy_rotate (e ^ (unsigned long) ts.tv_sec);
+            e = _entropy_rotate (e ^ (unsigned long) ts.tv_nsec);
+        }
+#endif /* HAVE_DECL_CLOCK_MONOTONIC */
+#if HAVE_DECL_CLOCK_PROCESS_CPUTIME_ID
+        if (clock_gettime (CLOCK_PROCESS_CPUTIME_ID, &ts) == 0) {
+            e = _entropy_rotate (e ^ (unsigned long) ts.tv_sec);
+            e = _entropy_rotate (e ^ (unsigned long) ts.tv_nsec);
+        }
+#endif /* HAVE_DECL_CLOCK_PROCESS_CPUTIME_ID */
     }
+#elif HAVE_GETTIMEOFDAY
+    {
+        struct timeval tv;
+        if (gettimeofday (&tv, NULL) == 0) {
+            e = _entropy_rotate (e ^ (unsigned long) tv.tv_sec);
+            e = _entropy_rotate (e ^ (unsigned long) tv.tv_usec);
+        }
+    }
+#endif /* HAVE_GETTIMEOFDAY */
+#if HAVE_GETRUSAGE
+    {
+        struct rusage usage;
+        if (getrusage (RUSAGE_SELF, &usage) == 0) {
+            e = _entropy_rotate (e ^ (unsigned long) usage.ru_utime.tv_usec);
+            e = _entropy_rotate (e ^ (unsigned long) usage.ru_stime.tv_usec);
+            e = _entropy_rotate (e ^ (unsigned long) usage.ru_minflt);
+            e = _entropy_rotate (e ^ (unsigned long) usage.ru_majflt);
+            e = _entropy_rotate (e ^ (unsigned long) usage.ru_nvcsw);
+            e = _entropy_rotate (e ^ (unsigned long) usage.ru_nivcsw);
+        }
+    }
+#endif /* HAVE_GETRUSAGE */
+#if HAVE_GETLOADAVG
+    {
+        double loads[3];
+        int n = getloadavg (loads, 3);
+        for (int i = 0; i < n; i++) {
+            unsigned long load;
+            /*
+             *  Safe because sizeof (unsigned long) <= sizeof (double) on all
+             *  supported platforms (LP64: 8 <= 8; ILP32: 4 <= 8).
+             */
+            memcpy (&load, &loads[i], sizeof load);
+            e = _entropy_rotate (e ^ load);
+        }
+    }
+#endif /* HAVE_GETLOADAVG */
     *dst = e;
     return 0;
 }
