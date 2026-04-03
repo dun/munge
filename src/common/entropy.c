@@ -35,9 +35,13 @@
 #  include <stdlib.h>                   /* getloadavg */
 #endif /* HAVE_GETLOADAVG */
 #include <string.h>                     /* memcpy, strerror */
-#if HAVE_SYS_RANDOM_H
-#  include <sys/random.h>               /* getrandom */
-#endif /* HAVE_SYS_RANDOM_H */
+/*
+ *  <sys/random.h> on legacy macOS defines u_int instead of standard types,
+ *  causing compilation errors.  Only include it when needed.
+ */
+#if HAVE_SYS_RANDOM_H && (HAVE_GETRANDOM || HAVE_GETENTROPY)
+#  include <sys/random.h>               /* getrandom, getentropy (macOS) */
+#endif /* HAVE_SYS_RANDOM_H && (HAVE_GETRANDOM || HAVE_GETENTROPY) */
 #if HAVE_GETRUSAGE
 #  include <sys/resource.h>             /* getrusage */
 #endif /* HAVE_GETRUSAGE */
