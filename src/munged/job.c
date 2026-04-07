@@ -152,13 +152,17 @@ job_accept (conf_t conf, work_p workers)
          *    detection handles transitions between different resource types.
          */
         if (fd_set_nonblocking (sd) < 0) {
-            close (sd);
+            int errno_save = errno;
+            (void) close (sd);
+            errno = errno_save;
             log_msg (LOG_WARNING,
                     "Failed to set nonblocking client socket: %s",
                     strerror (errno));
         }
         else if (m_msg_create (&m) != EMUNGE_SUCCESS) {
-            close (sd);
+            int errno_save = errno;
+            (void) close (sd);
+            errno = errno_save;
             log_msg (LOG_WARNING, "Failed to create client request");
         }
         else if (m_msg_bind (m, sd) != EMUNGE_SUCCESS) {

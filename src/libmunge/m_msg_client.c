@@ -204,7 +204,9 @@ _m_msg_client_connect (m_msg_t m, char *path)
         return EMUNGE_SOCKET;
     }
     if (fd_set_nonblocking (sd) < 0) {
-        close (sd);
+        int errno_save = errno;
+        (void) close (sd);
+        errno = errno_save;
         m_msg_set_err (m, EMUNGE_SOCKET,
             strdupf ("Failed to set nonblocking socket: %s",
             strerror (errno)));
@@ -245,7 +247,9 @@ _m_msg_client_connect (m_msg_t m, char *path)
         i++;
     }
     if (n < 0) {
-        close (sd);
+        int errno_save = errno;
+        (void) close (sd);
+        errno = errno_save;
         m_msg_set_err (m, EMUNGE_SOCKET,
             strdupf ("Failed to connect to \"%s\": %s", path,
             strerror (errno)));
