@@ -50,7 +50,7 @@
 #include <sys/time.h>                   /* gettimeofday, timeval */
 #include <sys/types.h>                  /* uid_t, gid_t */
 #include <time.h>                       /* localtime(_r), strftime, time, time_t, tm */
-#include <unistd.h>                     /* close, sysconf, _POSIX_THREAD_ATTR_STACKSIZE */
+#include <unistd.h>                     /* sysconf, _POSIX_THREAD_ATTR_STACKSIZE */
 
 
 /******************************************************************************
@@ -199,11 +199,6 @@ main (int argc, char *argv[])
     xsignal_ignore (SIGHUP);
     xsignal_ignore (SIGPIPE);
 
-    /*  Close stdin since it is not used.
-     */
-    if (close (STDIN_FILENO) < 0) {
-        log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to close standard input");
-    }
     /*  Set stdout to be line buffered.
      */
     if (setvbuf (stdout, NULL, _IOLBF, 0) < 0) {
