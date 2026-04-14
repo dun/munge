@@ -1,4 +1,4 @@
-/*****************************************************************************
+/******************************************************************************
  *  Copyright (C) 2007-2026 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2002-2007 The Regents of the University of California.
  *  UCRL-CODE-155910.
@@ -23,7 +23,6 @@
  *  and GNU Lesser General Public License along with MUNGE.  If not, see
  *  <https://www.gnu.org/licenses/>.
  *****************************************************************************/
-
 
 #if HAVE_CONFIG_H
 #  include "config.h"
@@ -56,11 +55,6 @@
 #include "fd.h"
 #include "log.h"
 
-
-/*****************************************************************************
- *  Constants
- *****************************************************************************/
-
 /*  Maximum request size for entropy_read_csprng() syscall paths.
  *  For getrandom(2), reads up to this size return the full byte count and are
  *  not interrupted by signals.  For getentropy(2), this is a hard upper limit
@@ -72,17 +66,7 @@
  */
 #define ENTROPY_URANDOM_PATH            "/dev/urandom"
 
-
-/*****************************************************************************
- *  Prototypes
- *****************************************************************************/
-
 static unsigned long _entropy_rotate (unsigned long value);
-
-
-/*****************************************************************************
- *  Public Functions
- *****************************************************************************/
 
 /**
  *  Read up to [dstlen] bytes of entropy into [dst] from the kernel's CSPRNG.
@@ -136,7 +120,6 @@ entropy_read_csprng (void *dst, size_t dstlen)
 #endif /* HAVE_GETENTROPY */
 
     if (n < 0) {
-
         int fd;
         struct stat st;
 
@@ -178,7 +161,6 @@ entropy_read_csprng (void *dst, size_t dstlen)
     }
     return n;
 }
-
 
 /**
  *  Read weak entropy into [dst].
@@ -270,11 +252,6 @@ entropy_read_weak (unsigned long *dst)
     *dst = e;
     return 0;
 }
-
-
-/*****************************************************************************
- *  Private Functions
- *****************************************************************************/
 
 /**
  *  Rotate the bits in [value] based on its actual value in order to distribute
