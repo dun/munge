@@ -49,6 +49,13 @@
  *  Constants
  *****************************************************************************/
 
+/*  Maximum request size for entropy_read_csprng() syscall paths.
+ *  For getrandom(2), reads up to this size return the full byte count and are
+ *  not interrupted by signals.  For getentropy(2), this is a hard upper limit
+ *  imposed by the API.
+ */
+#define ENTROPY_CSPRNG_MAX_REQUEST      256
+
 /*  Pathname of the kernel urandom device.
  */
 #define ENTROPY_URANDOM_PATH            "/dev/urandom"
@@ -86,7 +93,9 @@ entropy_read_csprng (void *dst, size_t dstlen)
      *    will always return as many bytes as requested and not be interrupted
      *    by signals.  No such guarantees apply for larger buffer sizes.
      */
-    len = (dstlen < 256) ? dstlen : 256;
+    len = (dstlen < ENTROPY_CSPRNG_MAX_REQUEST)
+        ? dstlen
+        : ENTROPY_CSPRNG_MAX_REQUEST;
     do {
         rv = getrandom (dst, len, 0);
     } while ((rv < 0) && (errno == EINTR));
@@ -102,7 +111,9 @@ entropy_read_csprng (void *dst, size_t dstlen)
     /*
      *  The maximum buffer size permitted is 256 bytes.
      */
-    len = (dstlen < 256) ? dstlen : 256;
+    len = (dstlen < ENTROPY_CSPRNG_MAX_REQUEST)
+        ? dstlen
+        : ENTROPY_CSPRNG_MAX_REQUEST;
     rv = getentropy (dst, len);
     if (rv < 0) {
         log_msg (LOG_WARNING, "Failed to fill buffer via getentropy(): %s",
