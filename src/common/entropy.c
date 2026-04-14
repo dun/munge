@@ -84,8 +84,9 @@ static unsigned long _entropy_rotate (unsigned long value);
  *  Public Functions
  *****************************************************************************/
 
-/*  Read up to [dstlen] bytes of entropy from the kernel's CSPRNG,
- *    storing the data in [dst].
+/**
+ *  Read up to [dstlen] bytes of entropy into [dst] from the kernel's CSPRNG.
+ *
  *  Return the number of bytes read, or -1 on error (with errno set).
  */
 int
@@ -100,10 +101,9 @@ entropy_read_csprng (void *dst, size_t dstlen)
         return -1;
     }
 #if HAVE_GETRANDOM
-    /*
-     *  If the urandom source has been initialized, reads of up to 256 bytes
-     *    will always return as many bytes as requested and not be interrupted
-     *    by signals.  No such guarantees apply for larger buffer sizes.
+    /*  If the urandom source has been initialized, reads of up to 256 bytes
+     *  will always return as many bytes as requested and not be interrupted
+     *  by signals.  The EINTR retry is just an added precautionary measure.
      */
     len = (dstlen < ENTROPY_CSPRNG_MAX_REQUEST)
         ? dstlen
@@ -120,8 +120,7 @@ entropy_read_csprng (void *dst, size_t dstlen)
         n = rv;
     }
 #elif HAVE_GETENTROPY
-    /*
-     *  The maximum buffer size permitted is 256 bytes.
+    /*  The maximum permitted value for the length argument is 256 bytes.
      */
     len = (dstlen < ENTROPY_CSPRNG_MAX_REQUEST)
         ? dstlen
@@ -181,11 +180,16 @@ entropy_read_csprng (void *dst, size_t dstlen)
 }
 
 
-/*  Read entropy into [dst].
- *  This entropy will be from sources independent of the kernel's CSPRNG.
- *    It may be of lower quality and not uniformly distributed.
+/**
+ *  Read weak entropy into [dst].
+ *
+ *  This entropy comes from sources independent of the kernel's CSPRNG
+ *  and may be of lower quality and not uniformly distributed.
+ *
  *  The accumulator is rotated between entropic additions to better
- *    distribute the entropy.  Spin the wheel of entropy and win a prize!
+ *  distribute entropy that may reside primarily in the low-order bits.
+ *  Spin the wheel of entropy and win a prize!
+ *
  *  Return 0 on success, or -1 on error (with errno set).
  */
 int
@@ -272,8 +276,10 @@ entropy_read_weak (unsigned long *dst)
  *  Private Functions
  *****************************************************************************/
 
-/*  Rotate the bits in [value] based on its actual value.
- *  This distributes entropy that may primarily reside in the low-order bits.
+/**
+ *  Rotate the bits in [value] based on its actual value in order to distribute
+ *  entropy that may primarily reside in the low-order bits.
+ *
  *  Return the rotated result.
  */
 static unsigned long
