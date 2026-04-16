@@ -1,4 +1,4 @@
-/*****************************************************************************
+/******************************************************************************
  *  Copyright (C) 2007-2026 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2002-2007 The Regents of the University of California.
  *  UCRL-CODE-155910.
@@ -24,29 +24,18 @@
  *  <https://www.gnu.org/licenses/>.
  *****************************************************************************/
 
-
 #ifndef MUNGE_ENTROPY_H
 #define MUNGE_ENTROPY_H
 
 #include <sys/types.h>
 
-
-/*****************************************************************************
- *  Constants
- *****************************************************************************/
-
-/*  Number of bytes guaranteed for reading in a single call to entropy_read().
+/*  Maximum number of bytes guaranteed to be read in full by
+ *  entropy_read_csprng() in a single call.
  */
-#define ENTROPY_NUM_BYTES_GUARANTEED    256
+#define ENTROPY_CSPRNG_GUARANTEED_SIZE  256
 
+int entropy_read_csprng (void *dst, size_t dstlen);
 
-/*****************************************************************************
- *  Prototypes
- *****************************************************************************/
-
-int entropy_read (void *buf, size_t buflen, const char **srcp);
-
-int entropy_read_uint (unsigned *up);
-
+int entropy_read_weak (unsigned long *dst);
 
 #endif /* !MUNGE_ENTROPY_H */

@@ -246,10 +246,9 @@ _random_read_entropy_from_kernel (void)
  *  Returns the number of bytes of entropy added, or -1 on error.
  */
     int            n;
-    const char    *src;
     unsigned char  buf [RANDOM_SOURCE_BYTES];
 
-    n = entropy_read (buf, sizeof (buf), &src);
+    n = entropy_read_csprng (buf, sizeof (buf));
     if (n > 0) {
         if (_random_check_entropy (buf, n) < 0) {
             n = 0;
@@ -258,8 +257,8 @@ _random_read_entropy_from_kernel (void)
         }
         else {
             _random_add (buf, n);
-            log_msg (LOG_INFO, "Seeded PRNG with %d byte%s from %s",
-                    n, (n == 1 ? "" : "s"), (src != NULL) ? src : "???");
+            log_msg (LOG_INFO, "Seeded PRNG with %d byte%s",
+                    n, (n == 1 ? "" : "s"));
         }
     }
     return (n);
@@ -327,10 +326,10 @@ _random_read_entropy_from_process (void)
 /*  Reads entropy from sources related to the process.
  *  Returns the number of bytes of entropy added, or -1 on error.
  */
-    unsigned buf;
-    int      n = 0;
+    unsigned long buf;
+    int n = 0;
 
-    if (entropy_read_uint (&buf) != -1) {
+    if (entropy_read_weak (&buf) != -1) {
         _random_add (&buf, sizeof (buf));
         n += sizeof (buf);
     }
@@ -532,8 +531,8 @@ _random_stir_entropy (void *_arg_not_used_)
 {
 /*  Periodically stirs the entropy pool by mixing in new entropy.
  */
-    unsigned buf;
-    int      msecs;
+    unsigned long buf;
+    int msecs;
 
     assert (RANDOM_STIR_MAX_SECS > 0);
 
@@ -544,7 +543,7 @@ _random_stir_entropy (void *_arg_not_used_)
 
     log_msg (LOG_DEBUG, "Stirring PRNG entropy pool");
 
-    if (entropy_read_uint (&buf) != -1) {
+    if (entropy_read_weak (&buf) != -1) {
         _random_add (&buf, sizeof (buf));
     }
     /*  Perform an exponential backoff up to the maximum timeout.  This allows

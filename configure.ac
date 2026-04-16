@@ -51,7 +51,6 @@ X_AC_DEBUG
 ##
 X_AC_CHECK_PTHREADS
 X_AC_CHECK_COND_LIB(bz2, BZ2_bzBuffToBuffCompress)
-X_AC_CHECK_COND_LIB(rt, clock_gettime)
 X_AC_CHECK_COND_LIB(z, compress)
 AC_SEARCH_LIBS(gethostbyname, nsl)
 AC_SEARCH_LIBS(socket, socket)
@@ -80,25 +79,22 @@ AC_CHECK_TYPES(socklen_t, [], [], [#include <sys/types.h>
 ##
 # Checks for library functions.
 ##
-# Check for clock_gettime() with librt if needed.
-#
-save_LIBS="${LIBS}"
-AS_IF([test "x${ac_cv_lib_rt_clock_gettime}" = xyes], [LIBS="${LIBS} -lrt"])
-AC_CHECK_FUNCS([clock_gettime])
-LIBS="${save_LIBS}"
-
 AC_CHECK_FUNCS( \
   clock_nanosleep \
   explicit_bzero \
   explicit_memset \
   getentropy \
   getifaddrs \
+  getloadavg \
   getrandom \
+  getrusage \
+  gettimeofday \
   localtime_r \
   memset_explicit \
   mlockall \
   sysconf \
 )
+X_AC_CHECK_CLOCK_GETTIME
 X_AC_CHECK_MEMSET_S
 X_AC_GETGRENT
 X_AC_GETGRNAM

@@ -45,6 +45,7 @@ mungekey_CPPFLAGS = \
 mungekey_LDADD = \
 	$(top_builddir)/src/libcommon/libcommon.la \
 	$(top_builddir)/src/libmunge/libmunge.la \
+	$(LIBRT) \
 	$(CRYPTO_LIBS) \
 	# End of mungekey_LDADD
 
@@ -66,8 +67,6 @@ mungekey_SOURCES = \
 	$(top_srcdir)/src/common/md.h \
 	$(top_srcdir)/src/common/memwipe.c \
 	$(top_srcdir)/src/common/memwipe.h \
-	$(top_srcdir)/src/common/rotate.c \
-	$(top_srcdir)/src/common/rotate.h \
 	$(top_srcdir)/src/common/xsignal.c \
 	$(top_srcdir)/src/common/xsignal.h \
 	# End of mungekey_SOURCES

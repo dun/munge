@@ -126,8 +126,8 @@ create_key (conf_t *confp)
 static int
 _create_key_secret (unsigned char *buf, size_t buflen)
 {
-    unsigned char      key[ENTROPY_NUM_BYTES_GUARANTEED];
-    unsigned int       salt;
+    unsigned char      key[ENTROPY_CSPRNG_GUARANTEED_SIZE];
+    unsigned long      salt;
     const munge_mac_t  md = MUNGE_DEFAULT_MAC;
     const char        *md_str;
     const char        *info_prefix = "MUNGEKEY";
@@ -141,13 +141,13 @@ _create_key_secret (unsigned char *buf, size_t buflen)
 
     /*  Read entropy from the kernel's CSPRNG for the input keying material.
      */
-    rv = entropy_read (key, sizeof (key), NULL);
+    rv = entropy_read_csprng (key, sizeof (key));
     if (rv == -1) {
         goto err;
     }
     /*  Read entropy independent of the kernel's CSPRNG for use as a salt.
      */
-    rv = entropy_read_uint (&salt);
+    rv = entropy_read_weak (&salt);
     if (rv == -1) {
         goto err;
     }
