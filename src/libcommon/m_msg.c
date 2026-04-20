@@ -41,9 +41,9 @@
 #include <assert.h>
 #include <errno.h>
 #include <stddef.h>                     /* size_t */
-#include <stdint.h>                     /* uint8_t, uint16_t, uint32_t */
+#include <stdint.h>                     /* uint8_t, uint16_t, uint32_t, UINT8_MAX */
 #include <stdlib.h>                     /* calloc, malloc, free */
-#include <string.h>                     /* memcpy, strdup, strlen */
+#include <string.h>                     /* memccpy, memcpy, strdup, strlen */
 #include <sys/time.h>                   /* gettimeofday, timeval */
 #include <sys/uio.h>                    /* iovec */
 #include <unistd.h>                     /* close */
@@ -401,32 +401,31 @@ m_msg_recv (m_msg_t m, m_msg_type_t type, size_t maxlen)
 }
 
 
+/**
+ *  Set an error code [e] and error string [s] if an error is not already set.
+ *  Return -1 always and consume [s].
+ */
 int
 m_msg_set_err (m_msg_t m, munge_err_t e, char *s)
 {
-/*  Set an error code [e] and string [s] if an error condition
- *    does not already exist (ie, m->error_num == EMUNGE_SUCCESS).
- *    Thus, if multiple errors are set, only the first one is reported.
- *  If [s] is not NULL, that string (and _not_ a copy) will be stored
- *    and later free()'d by the message destructor; if [s] is NULL,
- *    munge_strerror() will be used to obtain a descriptive string.
- *  Always returns -1 and consumes [s].
- */
     assert (m != NULL);
 
     if ((m->error_num == EMUNGE_SUCCESS) && (e != EMUNGE_SUCCESS)) {
-        m->error_num = e;
+        const char *src = s ? s : munge_strerror (e);
+        char buf[UINT8_MAX];
+
         assert (m->error_str == NULL);
         assert (m->error_len == 0);
         assert (m->error_is_copy == 0);
-        m->error_str = (s != NULL) ? s : strdup (munge_strerror (e));
-        m->error_len = strlen (m->error_str) + 1;
+
+        if (memccpy (buf, src, '\0', sizeof buf) == NULL) {
+            buf[sizeof buf - 1] = '\0';
+        }
+        m->error_num = e;
+        m->error_str = strdup (buf);
+        m->error_len = m->error_str ? strlen (m->error_str) + 1 : 0;
     }
-    else if (s) {
-        free (s);
-    }
-    /*  "Screw you guys, I'm goin' home." -ecartman
-     */
+    free (s);
     return -1;
 }
 
