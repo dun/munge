@@ -947,7 +947,12 @@ dec_unpack_inner (munge_cred_t c)
     else {
         m->data = NULL;
     }
-    assert (len == 0);
+    /*  Verify no inner data remains after unpacking.
+     */
+    if (len != 0) {
+        return m_msg_set_err (m, EMUNGE_BAD_CRED,
+            strdup ("Trailing bytes in credential inner data"));
+    }
     return 0;
 }
 
