@@ -204,6 +204,12 @@ dec_authenticate (munge_cred_t c)
     uid_t *p_uid;
     gid_t *p_gid;
 
+    /*  Verify the uid & gid values will fit within a uint32_t field.
+     *  These should be static_assert()s but the codebase targets C99, not C11.
+     */
+    assert (sizeof (uid_t) <= sizeof m->client_uid);
+    assert (sizeof (gid_t) <= sizeof m->client_gid);
+
     p_uid = (uid_t *) &(m->client_uid);
     p_gid = (gid_t *) &(m->client_gid);
 
