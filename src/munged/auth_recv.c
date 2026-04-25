@@ -303,7 +303,7 @@ auth_recv (m_msg_t m, uid_t *uid, gid_t *gid)
 
 #include <sys/socket.h>
 
-#ifndef HAVE_SOCKLEN_T
+#if !HAVE_SOCKLEN_T
 typedef int socklen_t;                  /* socklen_t is uint32_t in Posix.1g */
 #endif /* !HAVE_SOCKLEN_T */
 
@@ -341,7 +341,7 @@ auth_recv (m_msg_t m, uid_t *uid, gid_t *gid)
 #include <sys/ucred.h>
 #include <sys/un.h>                     /* for FreeBSD */
 
-#ifndef HAVE_SOCKLEN_T
+#if !HAVE_SOCKLEN_T
 typedef int socklen_t;                  /* socklen_t is uint32_t in Posix.1g */
 #endif /* !HAVE_SOCKLEN_T */
 
