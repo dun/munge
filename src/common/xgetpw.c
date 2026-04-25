@@ -38,7 +38,7 @@
 #elif HAVE_GETPWNAM_R_SUN
 #undef _POSIX_PTHREAD_SEMANTICS
 #elif HAVE_GETPWNAM
-#ifdef WITH_PTHREADS
+#if WITH_PTHREADS
 #include <pthread.h>
 #endif /* WITH_PTHREADS */
 #else
@@ -176,7 +176,7 @@ xgetpwnam (const char *name, struct passwd *pwp, xpwbuf_p pwbufp)
 #elif HAVE_GETPWNAM_R_SUN
     struct passwd          *rv_pwp;
 #elif HAVE_GETPWNAM
-#ifdef WITH_PTHREADS
+#if WITH_PTHREADS
     static pthread_mutex_t  mutex = PTHREAD_MUTEX_INITIALIZER;
     int                     rv_mutex;
 #endif /* WITH_PTHREADS */
@@ -266,7 +266,7 @@ restart:
         }
     }
 #elif HAVE_GETPWNAM
-#ifdef WITH_PTHREADS
+#if WITH_PTHREADS
     if ((rv_mutex = pthread_mutex_lock (&mutex)) != 0) {
         errno = rv_mutex;
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to lock xgetpwnam mutex");
@@ -297,7 +297,7 @@ restart:
     else {
         rv_copy = _xgetpwbuf_copy_struct (rv_pwp, pwp, pwbufp);
     }
-#ifdef WITH_PTHREADS
+#if WITH_PTHREADS
     if ((rv_mutex = pthread_mutex_unlock (&mutex)) != 0) {
         errno = rv_mutex;
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to unlock xgetpwnam mutex");

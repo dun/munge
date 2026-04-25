@@ -38,7 +38,7 @@
 #elif HAVE_GETGRENT_R_SUN
 #define HAVE_GETGRENT_R_ERANGE_BROKEN 1
 #elif HAVE_GETGRENT
-#ifdef WITH_PTHREADS
+#if WITH_PTHREADS
 #include <pthread.h>
 #endif /* WITH_PTHREADS */
 #else
@@ -50,7 +50,7 @@
 #elif HAVE_GETGRNAM_R_SUN
 #undef _POSIX_PTHREAD_SEMANTICS
 #elif HAVE_GETGRNAM
-#ifdef WITH_PTHREADS
+#if WITH_PTHREADS
 #include <pthread.h>
 #endif /* WITH_PTHREADS */
 #else
@@ -214,7 +214,7 @@ xgetgrent (struct group *grp, xgrbuf_p grbufp)
 #elif HAVE_GETGRENT_R_SUN
     struct group           *rv_grp;
 #elif HAVE_GETGRENT
-#ifdef WITH_PTHREADS
+#if WITH_PTHREADS
     static pthread_mutex_t  mutex = PTHREAD_MUTEX_INITIALIZER;
     int                     rv_mutex;
 #endif /* WITH_PTHREADS */
@@ -267,7 +267,7 @@ restart:
         }
     }
 #elif HAVE_GETGRENT
-#ifdef WITH_PTHREADS
+#if WITH_PTHREADS
     if ((rv_mutex = pthread_mutex_lock (&mutex)) != 0) {
         errno = rv_mutex;
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to lock xgetgrent mutex");
@@ -286,7 +286,7 @@ restart:
     else {
         rv_copy = _xgetgrbuf_copy_struct (rv_grp, grp, grbufp);
     }
-#ifdef WITH_PTHREADS
+#if WITH_PTHREADS
     if ((rv_mutex = pthread_mutex_unlock (&mutex)) != 0) {
         errno = rv_mutex;
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to unlock xgetgrent mutex");
@@ -336,7 +336,7 @@ xgetgrnam (const char *name, struct group *grp, xgrbuf_p grbufp)
 #elif HAVE_GETGRNAM_R_SUN
     struct group           *rv_grp;
 #elif HAVE_GETGRNAM
-#ifdef WITH_PTHREADS
+#if WITH_PTHREADS
     static pthread_mutex_t  mutex = PTHREAD_MUTEX_INITIALIZER;
     int                     rv_mutex;
 #endif /* WITH_PTHREADS */
@@ -415,7 +415,7 @@ restart:
         }
     }
 #elif HAVE_GETGRNAM
-#ifdef WITH_PTHREADS
+#if WITH_PTHREADS
     if ((rv_mutex = pthread_mutex_lock (&mutex)) != 0) {
         errno = rv_mutex;
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to lock xgetgrnam mutex");
@@ -446,7 +446,7 @@ restart:
     else {
         rv_copy = _xgetgrbuf_copy_struct (rv_grp, grp, grbufp);
     }
-#ifdef WITH_PTHREADS
+#if WITH_PTHREADS
     if ((rv_mutex = pthread_mutex_unlock (&mutex)) != 0) {
         errno = rv_mutex;
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to unlock xgetgrnam mutex");
