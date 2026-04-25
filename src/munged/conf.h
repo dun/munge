@@ -109,4 +109,4 @@ void log_origin_addr (conf_t conf);
 void create_subkeys (conf_t conf);
 
 
-#endif /* !MUNGE_CONF_H */
+#endif /* MUNGE_CONF_H */

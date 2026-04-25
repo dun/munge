@@ -64,7 +64,7 @@ test_get_env_int (const char *name, int *dst_val)
     errno = ENOSYS;
     return -1;
 
-#else  /* !NDEBUG */
+#else
     const char *env;
     char *end;
     long val;
@@ -85,5 +85,5 @@ test_get_env_int (const char *name, int *dst_val)
     }
     *dst_val = (int) val;
     return 0;
-#endif /* !NDEBUG */
+#endif /* NDEBUG */
 }

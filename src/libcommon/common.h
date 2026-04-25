@@ -43,11 +43,11 @@
 
 #ifndef MAX
 #  define MAX(a,b) ((a >= b) ? (a) : (b))
-#endif /* !MAX */
+#endif /* MAX */
 
 #ifndef MIN
 #  define MIN(a,b) ((a <= b) ? (a) : (b))
-#endif /* !MIN */
+#endif /* MIN */
 
 #include <stdint.h>
 #include <unistd.h>
@@ -57,4 +57,4 @@
 #define GID_SENTINEL    ((gid_t) -1)
 
 
-#endif /* !MUNGE_COMMON_H */
+#endif /* MUNGE_COMMON_H */

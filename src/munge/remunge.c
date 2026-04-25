@@ -1248,9 +1248,9 @@ output_msg (const char *format, ...)
     }
 #if HAVE_LOCALTIME_R
     tm_ptr = localtime_r (&t, &tm);
-#else  /* !HAVE_LOCALTIME_R */
+#else
     tm_ptr = localtime (&t);
-#endif /* !HAVE_LOCALTIME_R */
+#endif /* HAVE_LOCALTIME_R */
 
     if (tm_ptr != NULL) {
         n = strftime (p, len, "%Y-%m-%d %H:%M:%S ", tm_ptr);

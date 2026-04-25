@@ -53,7 +53,7 @@ clock_get_timespec (struct timespec *tsp, long msecs)
     if (rv < 0) {
         return -1;
     }
-#else  /* !HAVE_CLOCK_GETTIME */
+#else
     struct timeval tv;
     rv = gettimeofday (&tv, NULL);
     if (rv < 0) {
@@ -61,7 +61,7 @@ clock_get_timespec (struct timespec *tsp, long msecs)
     }
     tsp->tv_sec = tv.tv_sec;
     tsp->tv_nsec = tv.tv_usec * 1000;
-#endif /* !HAVE_CLOCK_GETTIME */
+#endif /* HAVE_CLOCK_GETTIME */
 
     if (msecs > 0) {
         tsp->tv_sec += msecs / 1000;

@@ -108,4 +108,4 @@ void hash_drop_memory (void);
 unsigned int hash_key_string (const char *str);
 
 
-#endif /* !HASH_H */
+#endif /* HASH_H */

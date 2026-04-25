@@ -32,4 +32,4 @@
 void xsignal_ignore (int sig);
 
 
-#endif /* !XSIGNAL_H */
+#endif /* XSIGNAL_H */

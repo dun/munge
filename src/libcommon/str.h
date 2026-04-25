@@ -48,4 +48,4 @@ int strhex2bin (void *dst, size_t dstlen, const char *src, size_t srclen);
 int strftimet (char *dst, size_t dstlen, const char *tfmt, time_t t);
 
 
-#endif /* !STR_H */
+#endif /* STR_H */

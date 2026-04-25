@@ -29,7 +29,7 @@
 #  include "config.h"
 #endif /* HAVE_CONFIG_H */
 
-#if   HAVE_GETGRENT_R_GNU
+#if HAVE_GETGRENT_R_GNU
 #define _GNU_SOURCE 1
 #elif HAVE_GETGRENT_R_AIX
 #define HAVE_GETGRENT_R_ERANGE_BROKEN 1
@@ -43,9 +43,9 @@
 #endif /* WITH_PTHREADS */
 #else
 #error "getgrent() not supported"
-#endif
+#endif /* HAVE_GETGRENT_R_GNU */
 
-#if   HAVE_GETGRNAM_R_POSIX
+#if HAVE_GETGRNAM_R_POSIX
 #define _POSIX_PTHREAD_SEMANTICS 1      /* for SunOS */
 #elif HAVE_GETGRNAM_R_SUN
 #undef _POSIX_PTHREAD_SEMANTICS
@@ -55,7 +55,7 @@
 #endif /* WITH_PTHREADS */
 #else
 #error "getgrnam() not supported"
-#endif
+#endif /* HAVE_GETGRNAM_R_POSIX */
 
 #include <assert.h>
 #include <errno.h>
@@ -78,7 +78,7 @@
 #define _UNUSED_ __attribute__ ((unused))
 #else
 #define _UNUSED_
-#endif
+#endif /* __GNUC__ */
 
 
 /*****************************************************************************
@@ -104,7 +104,7 @@ struct xgrbuf_t {
 
 #if HAVE_GETGRENT_R_AIX
 static FILE *_gr_fp;
-#endif
+#endif /* HAVE_GETGRENT_R_AIX */
 
 
 /*****************************************************************************
@@ -189,7 +189,7 @@ xgetgrent_init (void)
  */
 #if HAVE_GETGRENT_R_AIX
     _gr_fp = NULL;
-#endif
+#endif /* HAVE_GETGRENT_R_AIX */
     setgrent ();
     return;
 }
@@ -208,7 +208,7 @@ xgetgrent (struct group *grp, xgrbuf_p grbufp)
  *    automatically restarted after resizing the buffer [grbufp].
  */
     int                     rv;
-#if   HAVE_GETGRENT_R_GNU
+#if HAVE_GETGRENT_R_GNU
     struct group           *rv_grp;
 #elif HAVE_GETGRENT_R_AIX
 #elif HAVE_GETGRENT_R_SUN
@@ -220,7 +220,7 @@ xgetgrent (struct group *grp, xgrbuf_p grbufp)
 #endif /* WITH_PTHREADS */
     int                     rv_copy;
     struct group           *rv_grp;
-#endif /* HAVE_GETGRENT */
+#endif /* HAVE_GETGRENT_R_GNU */
     int                     got_eof;
     int                     got_err;
 
@@ -236,7 +236,7 @@ restart:
     got_eof = 0;
     got_err = 0;
 
-#if   HAVE_GETGRENT_R_GNU
+#if HAVE_GETGRENT_R_GNU
     rv_grp = NULL;
     rv = getgrent_r (grp, grbufp->buf, grbufp->len, &rv_grp);
     if (((rv == ENOENT) || (rv == 0)) && (rv_grp == NULL)) {
@@ -295,7 +295,7 @@ restart:
     if (rv_copy < 0) {
         return (-1);
     }
-#endif /* HAVE_GETGRENT */
+#endif /* HAVE_GETGRENT_R_GNU */
 
     if (got_eof) {
         errno = ENOENT;
@@ -304,11 +304,11 @@ restart:
     if (got_err) {
         if (errno == ERANGE) {
             rv = _xgetgrbuf_grow (grbufp, 0);
-#if ! HAVE_GETGRENT_R_ERANGE_BROKEN
+#if !HAVE_GETGRENT_R_ERANGE_BROKEN
             if (rv == 0) {
                 goto restart;
             }
-#endif /* ! HAVE_GETGRENT_R_ERANGE_BROKEN */
+#endif /* !HAVE_GETGRENT_R_ERANGE_BROKEN */
         }
         return (-1);
     }
@@ -331,7 +331,7 @@ xgetgrnam (const char *name, struct group *grp, xgrbuf_p grbufp)
 {
 /*  Portable encapsulation of getgrnam_r().
  */
-#if   HAVE_GETGRNAM_R_POSIX
+#if HAVE_GETGRNAM_R_POSIX
     struct group           *rv_grp;
 #elif HAVE_GETGRNAM_R_SUN
     struct group           *rv_grp;
@@ -342,7 +342,7 @@ xgetgrnam (const char *name, struct group *grp, xgrbuf_p grbufp)
 #endif /* WITH_PTHREADS */
     int                     rv_copy;
     struct group           *rv_grp;
-#endif /* HAVE_GETGRNAM */
+#endif /* HAVE_GETGRNAM_R_POSIX */
     int                     rv;
     int                     got_err;
     int                     got_none;
@@ -363,7 +363,7 @@ restart:
     got_err = 0;
     got_none = 0;
 
-#if   HAVE_GETGRNAM_R_POSIX
+#if HAVE_GETGRNAM_R_POSIX
     rv_grp = NULL;
     rv = getgrnam_r (name, grp, grbufp->buf, grbufp->len, &rv_grp);
     /*
@@ -455,7 +455,7 @@ restart:
     if (rv_copy < 0) {
         return (-1);
     }
-#endif /* HAVE_GETGRNAM */
+#endif /* HAVE_GETGRNAM_R_POSIX */
 
     if (got_none) {
         errno = ENOENT;

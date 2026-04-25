@@ -35,4 +35,4 @@
 void read_data_from_file (FILE *fp, void **dst, int *dst_len, size_t max_size);
 
 
-#endif /* !MUNGE_READ_H */
+#endif /* MUNGE_READ_H */

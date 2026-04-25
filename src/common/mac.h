@@ -69,7 +69,7 @@ typedef struct {
     int                 diglen;
 } mac_ctx;
 
-#else  /* !HAVE_EVP_MAC_CTX_P */
+#else
 
 #if HAVE_OPENSSL_HMAC_H
 #include <openssl/hmac.h>
@@ -81,7 +81,7 @@ typedef struct {
     int                 diglen;
 } mac_ctx;
 
-#endif /* !HAVE_EVP_MAC_CTX_P */
+#endif /* HAVE_EVP_MAC_CTX_P && HAVE_EVP_MAC_CTX_NEW */
 
 #endif /* HAVE_OPENSSL */
 
@@ -106,4 +106,4 @@ int mac_block (munge_mac_t md, const void *key, int keylen,
 int mac_map_enum (munge_mac_t md, void *dst);
 
 
-#endif /* !MAC_H */
+#endif /* MAC_H */

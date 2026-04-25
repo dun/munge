@@ -35,4 +35,4 @@
 
 void memwipe (void *v, size_t n);
 
-#endif /* !MUNGE_MEMWIPE_H */
+#endif /* MUNGE_MEMWIPE_H */

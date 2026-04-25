@@ -609,9 +609,9 @@ _cipher_init (cipher_ctx *x, munge_cipher_t cipher,
 #if HAVE_EVP_CIPHER_CTX_NEW
     /*  OpenSSL >= 0.9.8b  */
     x->ctx = EVP_CIPHER_CTX_new ();
-#else  /* !HAVE_EVP_CIPHER_CTX_NEW */
+#else
     x->ctx = OPENSSL_malloc (sizeof (EVP_CIPHER_CTX));
-#endif /* !HAVE_EVP_CIPHER_CTX_NEW */
+#endif /* HAVE_EVP_CIPHER_CTX_NEW */
     if (x->ctx == NULL) {
         return (-1);
     }
@@ -635,9 +635,9 @@ _cipher_init (cipher_ctx *x, munge_cipher_t cipher,
     /*  EVP_CipherInit() implicitly initializes the EVP_CIPHER_CTX.  */
     /*  OpenSSL <= 0.9.5a  */
     EVP_CipherInit (x->ctx, algo, key, iv, enc);
-#else  /* !HAVE_EVP_CIPHERINIT */
+#else
 #error "No OpenSSL EVP_CipherInit"
-#endif /* !HAVE_EVP_CIPHERINIT */
+#endif /* HAVE_EVP_CIPHERINIT_EX */
 
     return (0);
 }
@@ -655,9 +655,9 @@ _cipher_update (cipher_ctx *x, void *dst, int *dstlenp,
 #elif HAVE_EVP_CIPHERUPDATE
     /*  OpenSSL <= 0.9.5a  */
     EVP_CipherUpdate (x->ctx, dst, dstlenp, (void *) src, srclen);
-#else  /* !HAVE_EVP_CIPHERUPDATE */
+#else
 #error "No OpenSSL EVP_CipherUpdate"
-#endif /* !HAVE_EVP_CIPHERUPDATE */
+#endif /* HAVE_EVP_CIPHERUPDATE_RETURN_INT */
 
     return (0);
 }
@@ -675,9 +675,9 @@ _cipher_final (cipher_ctx *x, void *dst, int *dstlenp)
     if (EVP_CipherFinal (x->ctx, dst, dstlenp) != 1) {
         return (-1);
     }
-#else  /* !HAVE_EVP_CIPHERFINAL */
+#else
 #error "No OpenSSL EVP_CipherFinal"
-#endif /* !HAVE_EVP_CIPHERFINAL */
+#endif /* HAVE_EVP_CIPHERFINAL_EX */
 
     return (0);
 }
@@ -691,7 +691,7 @@ _cipher_cleanup (cipher_ctx *x)
 #if HAVE_EVP_CIPHER_CTX_FREE
     /*  OpenSSL >= 0.9.8b  */
     EVP_CIPHER_CTX_free (x->ctx);
-#else  /* !HAVE_EVP_CIPHER_CTX_FREE */
+#else
 #if HAVE_EVP_CIPHER_CTX_CLEANUP_RETURN_INT
     /*  OpenSSL > 0.9.5a, < 1.1.0  */
     if (EVP_CIPHER_CTX_cleanup (x->ctx) != 1) {
@@ -700,9 +700,9 @@ _cipher_cleanup (cipher_ctx *x)
 #elif HAVE_EVP_CIPHER_CTX_CLEANUP
     /*  OpenSSL <= 0.9.5a  */
     EVP_CIPHER_CTX_cleanup (x->ctx);
-#endif /* HAVE_EVP_CIPHER_CTX_CLEANUP */
+#endif /* HAVE_EVP_CIPHER_CTX_CLEANUP_RETURN_INT */
     OPENSSL_free (x->ctx);
-#endif /* !HAVE_EVP_CIPHER_CTX_FREE */
+#endif /* HAVE_EVP_CIPHER_CTX_FREE */
 
     x->ctx = NULL;
     return (rv);

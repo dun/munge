@@ -387,9 +387,9 @@ _md_init (md_ctx *x, munge_mac_t md)
     /*  EVP_DigestInit() implicitly initializes the EVP_MD_CTX.  */
     /*  OpenSSL < 0.9.7  */
     EVP_DigestInit (x->ctx, algo);
-#else  /* !HAVE_EVP_DIGESTINIT */
+#else
 #error "No OpenSSL EVP_DigestInit"
-#endif /* !HAVE_EVP_DIGESTINIT */
+#endif /* HAVE_EVP_DIGESTINIT_EX */
 
     x->diglen = EVP_MD_size (algo);
     return (0);
@@ -405,7 +405,7 @@ _md_ctx_create (md_ctx *x)
 #elif HAVE_EVP_MD_CTX_CREATE
     /*  OpenSSL >= 0.9.7, < 1.1.0  */
     x->ctx = EVP_MD_CTX_create ();                      /* alloc & init */
-#else  /* !HAVE_EVP_MD_CTX_CREATE */
+#else
     x->ctx = OPENSSL_malloc (sizeof (EVP_MD_CTX));      /* allocate */
 #if HAVE_EVP_MD_CTX_INIT
     /*  OpenSSL >= 0.9.7, < 1.1.0  */
@@ -413,7 +413,7 @@ _md_ctx_create (md_ctx *x)
         EVP_MD_CTX_init (x->ctx);                       /* initialize */
     }
 #endif /* HAVE_EVP_MD_CTX_INIT */
-#endif /* !HAVE_EVP_MD_CTX_CREATE */
+#endif /* HAVE_EVP_MD_CTX_NEW */
     if (x->ctx == NULL) {
         return (-1);
     }
@@ -432,9 +432,9 @@ _md_update (md_ctx *x, const void *src, int srclen)
 #elif HAVE_EVP_DIGESTUPDATE
     /*  OpenSSL < 0.9.7  */
     EVP_DigestUpdate (x->ctx, src, (unsigned int) srclen);
-#else  /* !HAVE_EVP_DIGESTUPDATE */
+#else
 #error "No OpenSSL EVP_DigestUpdate"
-#endif /* !HAVE_EVP_DIGESTUPDATE */
+#endif /* HAVE_EVP_DIGESTUPDATE_RETURN_INT */
 
     return (0);
 }
@@ -454,9 +454,9 @@ _md_final (md_ctx *x, void *dst, int *dstlenp)
 #elif HAVE_EVP_DIGESTFINAL
     /*  OpenSSL < 0.9.7  */
     EVP_DigestFinal (x->ctx, dst, (unsigned int *) dstlenp);
-#else  /* !HAVE_EVP_DIGESTFINAL */
+#else
 #error "No OpenSSL EVP_DigestFinal"
-#endif /* !HAVE_EVP_DIGESTFINAL */
+#endif /* HAVE_EVP_DIGESTFINAL_EX */
 
     return (0);
 }
@@ -473,7 +473,7 @@ _md_cleanup (md_ctx *x)
 #elif HAVE_EVP_MD_CTX_DESTROY
     /*  OpenSSL >= 0.9.7, < 1.1.0  */
     EVP_MD_CTX_destroy (x->ctx);
-#else  /* !HAVE_EVP_MD_CTX_DESTROY */
+#else
 #if HAVE_EVP_MD_CTX_CLEANUP
     /*  OpenSSL >= 0.9.7, < 1.1.0  */
     if (EVP_MD_CTX_cleanup (x->ctx) != 1) {
@@ -481,7 +481,7 @@ _md_cleanup (md_ctx *x)
     }
 #endif /* HAVE_EVP_MD_CTX_CLEANUP */
     OPENSSL_free (x->ctx);
-#endif /* !HAVE_EVP_MD_CTX_DESTROY */
+#endif /* HAVE_EVP_MD_CTX_FREE */
 
     x->ctx = NULL;
     return (rc);
@@ -504,9 +504,9 @@ _md_copy (md_ctx *xdst, md_ctx *xsrc)
     if (!(EVP_MD_CTX_copy (xdst->ctx, xsrc->ctx))) {
         return (-1);
     }
-#else  /* !HAVE_EVP_MD_CTX_COPY */
+#else
 #error "No OpenSSL EVP_MD_CTX_copy"
-#endif /* !HAVE_EVP_MD_CTX_COPY */
+#endif /* HAVE_EVP_MD_CTX_COPY_EX */
 
     return (0);
 }

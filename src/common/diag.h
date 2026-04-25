@@ -62,4 +62,4 @@
 #  define DIAG_OFF(w)           /* empty */
 #endif /* (__GNUC__ >= 4.6) || (__clang__ >= 3.0) */
 
-#endif /* !MUNGE_DIAG_H */
+#endif /* MUNGE_DIAG_H */

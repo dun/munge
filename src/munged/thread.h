@@ -45,11 +45,11 @@
 #  ifdef WITH_LSD_FATAL_ERROR_FUNC
 #    undef lsd_fatal_error
      extern void lsd_fatal_error (char *file, int line, char *mesg);
-#  else /* !WITH_LSD_FATAL_ERROR_FUNC */
+#  else
 #    ifndef lsd_fatal_error
 #      define lsd_fatal_error(file, line, mesg) (abort ())
-#    endif /* !lsd_fatal_error */
-#  endif /* !WITH_LSD_FATAL_ERROR_FUNC */
+#    endif /* lsd_fatal_error */
+#  endif /* WITH_LSD_FATAL_ERROR_FUNC */
 
 #  define lsd_mutex_init(pmutex)                                              \
      do {                                                                     \
@@ -93,9 +93,9 @@
 
 #  ifndef NDEBUG
      int lsd_mutex_is_locked (pthread_mutex_t *pmutex);
-#  endif /* !NDEBUG */
+#  endif /* NDEBUG */
 
-#else /* !WITH_PTHREADS */
+#else
 
 #  define lsd_mutex_init(mutex)
 #  define lsd_mutex_lock(mutex)
@@ -103,7 +103,7 @@
 #  define lsd_mutex_destroy(mutex)
 #  define lsd_mutex_is_locked(mutex) (1)
 
-#endif /* !WITH_PTHREADS */
+#endif /* WITH_PTHREADS */
 
 
-#endif /* !LSD_THREAD_H */
+#endif /* LSD_THREAD_H */

@@ -70,4 +70,4 @@ typedef enum munge_ctx_flag {
 munge_err_t _munge_ctx_set_err (munge_ctx_t ctx, munge_err_t e, char *s);
 
 
-#endif /* !MUNGE_CTX_H */
+#endif /* MUNGE_CTX_H */

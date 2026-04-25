@@ -708,10 +708,10 @@ _random_pseudo_bytes (void *buf, int n)
         log_msg (LOG_WARNING, "RAND_pseudo_bytes failed: %s",
                 ERR_reason_error_string (e));
     }
-#else  /* !HAVE_RAND_PSEUDO_BYTES */
+#else
     _random_bytes (buf, n);
     (void) rc;                          /* suppress unused-variable warning */
-#endif /* !HAVE_RAND_PSEUDO_BYTES */
+#endif /* HAVE_RAND_PSEUDO_BYTES && (OPENSSL_VERSION_NUMBER < 0x10100000L) */
     return;
 }
 

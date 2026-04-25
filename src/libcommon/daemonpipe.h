@@ -48,4 +48,4 @@ int daemonpipe_read (int *statusptr, int *priorityptr, char *dstbufptr,
 int daemonpipe_write (int status, int priority, const char *msg);
 
 
-#endif /* !DAEMONPIPE_H */
+#endif /* DAEMONPIPE_H */

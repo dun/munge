@@ -61,4 +61,4 @@ long timer_set_relative (callback_f cb, void *arg, long msec);
 int timer_cancel (long id);
 
 
-#endif /* !TIMER_H */
+#endif /* TIMER_H */

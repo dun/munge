@@ -32,4 +32,4 @@
 void display_version (void);
 
 
-#endif /* !MUNGE_VERSION_H */
+#endif /* MUNGE_VERSION_H */

@@ -58,4 +58,4 @@ void xgetgrent_fini (void);
 int xgetgrnam (const char *name, struct group *grp, xgrbuf_p grbufp);
 
 
-#endif /* !XGETGR_H */
+#endif /* XGETGR_H */

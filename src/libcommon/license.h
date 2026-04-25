@@ -32,4 +32,4 @@
 void display_license (void);
 
 
-#endif /* !MUNGE_LICENSE_H */
+#endif /* MUNGE_LICENSE_H */

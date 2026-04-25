@@ -38,4 +38,4 @@ void lock_create (conf_t conf);
 pid_t lock_query (conf_t conf);
 
 
-#endif /* !MUNGE_LOCK_H */
+#endif /* MUNGE_LOCK_H */

@@ -37,7 +37,7 @@ typedef struct {
     int pad;
 #ifndef NDEBUG
     int finalized;
-#endif /* !NDEBUG */
+#endif /* NDEBUG */
 } base64_ctx;
 
 int base64_init (base64_ctx *x);
@@ -62,4 +62,4 @@ int base64_encode_length (int srclen);
 
 int base64_decode_length (int srclen);
 
-#endif /* !MUNGE_BASE64_H */
+#endif /* MUNGE_BASE64_H */

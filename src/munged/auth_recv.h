@@ -38,4 +38,4 @@ void auth_recv_init (const char *srvrdir, const char *clntdir, int got_force);
 int auth_recv (m_msg_t m, uid_t *uid, gid_t *gid);
 
 
-#endif /* !MUNGE_AUTH_RECV_H */
+#endif /* MUNGE_AUTH_RECV_H */

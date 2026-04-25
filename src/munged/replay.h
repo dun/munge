@@ -47,4 +47,4 @@ int replay_remove (munge_cred_t c);
 void replay_purge (void);
 
 
-#endif /* !REPLAY_H */
+#endif /* REPLAY_H */

@@ -222,10 +222,10 @@ _net_resolve_local_interface (const char *name, struct in_addr *inaddrp,
     }
     freeifaddrs (ifa_list);
     return rv;
-#else  /* !HAVE_GETIFADDRS */
+#else
     errno = ENOTSUP;
     return -1;
-#endif /* !HAVE_GETIFADDRS */
+#endif /* HAVE_GETIFADDRS */
 }
 
 

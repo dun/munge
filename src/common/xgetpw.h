@@ -52,4 +52,4 @@ size_t xgetpwbuf_get_len (xpwbuf_p pwbufp);
 int xgetpwnam (const char *name, struct passwd *pwp, xpwbuf_p pwbufp);
 
 
-#endif /* !XGETPW_H */
+#endif /* XGETPW_H */

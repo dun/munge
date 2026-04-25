@@ -61,4 +61,4 @@ int fd_set_nonblocking (int fd);
 int fd_is_nonblocking (int fd);
 
 
-#endif /* !FD_H */
+#endif /* FD_H */

@@ -32,4 +32,4 @@
 int test_get_env_int (const char *name, int *dst_val);
 
 
-#endif /* !MUNGE_TEST_H */
+#endif /* MUNGE_TEST_H */

@@ -44,37 +44,37 @@
 #  define MUNGE_CIPHER_AES128_FLAG      1
 #else
 #  define MUNGE_CIPHER_AES128_FLAG      0
-#endif
+#endif /* HAVE_LIBGCRYPT || HAVE_EVP_AES_128_CBC */
 
 #if HAVE_LIBGCRYPT || (HAVE_EVP_AES_256_CBC && HAVE_EVP_SHA256)
 #  define MUNGE_CIPHER_AES256_FLAG      1
 #else
 #  define MUNGE_CIPHER_AES256_FLAG      0
-#endif
+#endif /* HAVE_LIBGCRYPT || (HAVE_EVP_AES_256_CBC && HAVE_EVP_SHA256) */
 
 #if HAVE_LIBGCRYPT || HAVE_EVP_SHA256
 #  define MUNGE_MAC_SHA256_FLAG         1
 #else
 #  define MUNGE_MAC_SHA256_FLAG         0
-#endif
+#endif /* HAVE_LIBGCRYPT || HAVE_EVP_SHA256 */
 
 #if HAVE_LIBGCRYPT || HAVE_EVP_SHA512
 #  define MUNGE_MAC_SHA512_FLAG         1
 #else
 #  define MUNGE_MAC_SHA512_FLAG         0
-#endif
+#endif /* HAVE_LIBGCRYPT || HAVE_EVP_SHA512 */
 
 #if HAVE_BZLIB_H && HAVE_LIBBZ2
 #  define MUNGE_ZIP_BZLIB_FLAG          1
 #else
 #  define MUNGE_ZIP_BZLIB_FLAG          0
-#endif
+#endif /* HAVE_BZLIB_H && HAVE_LIBBZ2 */
 
 #if HAVE_ZLIB_H && HAVE_LIBZ
 #  define MUNGE_ZIP_ZLIB_FLAG           1
 #else
 #  define MUNGE_ZIP_ZLIB_FLAG           0
-#endif
+#endif /* HAVE_ZLIB_H && HAVE_LIBZ */
 
 
 /*****************************************************************************

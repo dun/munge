@@ -89,4 +89,4 @@ munge_cred_t cred_create (m_msg_t m);
 void cred_destroy (munge_cred_t c);
 
 
-#endif /* !CRED_H */
+#endif /* CRED_H */

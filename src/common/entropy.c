@@ -117,7 +117,7 @@ entropy_read_csprng (void *dst, size_t dstlen)
     else if (rv == 0) {
         n = len;
     }
-#endif /* HAVE_GETENTROPY */
+#endif /* HAVE_GETRANDOM */
 
     if (n < 0) {
         int fd;
@@ -220,7 +220,7 @@ entropy_read_weak (unsigned long *dst)
             e = _entropy_rotate (e ^ (unsigned long) tv.tv_usec);
         }
     }
-#endif /* HAVE_GETTIMEOFDAY */
+#endif /* HAVE_CLOCK_GETTIME */
 #if HAVE_GETRUSAGE
     {
         struct rusage usage;

@@ -29,7 +29,7 @@
 #  include "config.h"
 #endif /* HAVE_CONFIG_H */
 
-#if   HAVE_GETPWNAM_R_POSIX
+#if HAVE_GETPWNAM_R_POSIX
 #define _POSIX_PTHREAD_SEMANTICS 1      /* for SunOS */
 #elif HAVE_GETPWNAM_R_AIX
 #define _THREAD_SAFE 1
@@ -43,7 +43,7 @@
 #endif /* WITH_PTHREADS */
 #else
 #error "getpwnam() not supported"
-#endif
+#endif /* HAVE_GETPWNAM_R_POSIX */
 
 #include <assert.h>
 #include <errno.h>
@@ -66,7 +66,7 @@
 #define _UNUSED_ __attribute__ ((unused))
 #else
 #define _UNUSED_
-#endif
+#endif /* __GNUC__ */
 
 
 /*****************************************************************************
@@ -170,7 +170,7 @@ xgetpwnam (const char *name, struct passwd *pwp, xpwbuf_p pwbufp)
  *  Returns 0 on success, or -1 on error (with errno).
  *    Returns -1 with ENOENT when [name] is not found.
  */
-#if   HAVE_GETPWNAM_R_POSIX
+#if HAVE_GETPWNAM_R_POSIX
     struct passwd          *rv_pwp;
 #elif HAVE_GETPWNAM_R_AIX
 #elif HAVE_GETPWNAM_R_SUN
@@ -182,7 +182,7 @@ xgetpwnam (const char *name, struct passwd *pwp, xpwbuf_p pwbufp)
 #endif /* WITH_PTHREADS */
     int                     rv_copy;
     struct passwd          *rv_pwp;
-#endif /* HAVE_GETPWNAM */
+#endif /* HAVE_GETPWNAM_R_POSIX */
     int                     rv;
     int                     got_err;
     int                     got_none;
@@ -203,7 +203,7 @@ restart:
     got_err = 0;
     got_none = 0;
 
-#if   HAVE_GETPWNAM_R_POSIX
+#if HAVE_GETPWNAM_R_POSIX
     rv_pwp = NULL;
     rv = getpwnam_r (name, pwp, pwbufp->buf, pwbufp->len, &rv_pwp);
     /*
@@ -306,7 +306,7 @@ restart:
     if (rv_copy < 0) {
         return (-1);
     }
-#endif /* HAVE_GETPWNAM */
+#endif /* HAVE_GETPWNAM_R_POSIX */
 
     if (got_none) {
         errno = ENOENT;

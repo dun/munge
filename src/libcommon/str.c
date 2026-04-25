@@ -40,7 +40,7 @@
 
 #ifndef MAX_STR_SIZE
 #  define MAX_STR_SIZE 1024
-#endif /* !MAX_STR_SIZE */
+#endif /* MAX_STR_SIZE */
 
 
 /*****************************************************************************
@@ -209,7 +209,7 @@ strftimet (char *dst, size_t dstlen, const char *tfmt, time_t t)
 {
 #if HAVE_LOCALTIME_R
     struct tm  tm;
-#endif /* !HAVE_LOCALTIME_R */
+#endif /* HAVE_LOCALTIME_R */
     struct tm *tm_ptr;
     int        n;
 
@@ -224,9 +224,9 @@ strftimet (char *dst, size_t dstlen, const char *tfmt, time_t t)
     }
 #if HAVE_LOCALTIME_R
     tm_ptr = localtime_r (&t, &tm);
-#else  /* !HAVE_LOCALTIME_R */
+#else
     tm_ptr = localtime (&t);            /* FIXME: protect with mutex? */
-#endif /* !HAVE_LOCALTIME_R */
+#endif /* HAVE_LOCALTIME_R */
     if (tm_ptr == NULL) {
         return (-1);
     }

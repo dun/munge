@@ -98,4 +98,4 @@ int cipher_key_size (munge_cipher_t cipher);
 int cipher_map_enum (munge_cipher_t cipher, void *dst);
 
 
-#endif /* !CIPHER_H */
+#endif /* CIPHER_H */

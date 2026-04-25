@@ -36,4 +36,4 @@ int query_uid (const char *user, uid_t *uid_ptr);
 int query_gid (const char *group, gid_t *gid_ptr);
 
 
-#endif /* !MUNGE_QUERY_H */
+#endif /* MUNGE_QUERY_H */

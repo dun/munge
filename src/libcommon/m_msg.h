@@ -138,4 +138,4 @@ munge_err_t m_msg_recv (m_msg_t m, m_msg_type_t type, size_t maxlen);
 int m_msg_set_err (m_msg_t m, munge_err_t e, char *s);
 
 
-#endif /* !M_MSG_H */
+#endif /* M_MSG_H */

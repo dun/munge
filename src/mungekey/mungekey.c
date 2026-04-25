@@ -87,7 +87,7 @@ init_logging (const char *prog)
 
 #ifndef NDEBUG
     priority = LOG_DEBUG;
-#endif /* !NDEBUG */
+#endif /* NDEBUG */
     rv = log_open_file (stderr, prog, priority, options);
     if (rv == -1) {
         log_err (EMUNGE_SNAFU, LOG_ERR, "Failed to setup logging to stderr");

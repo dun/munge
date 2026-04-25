@@ -53,9 +53,9 @@
  */
 #ifdef NDEBUG
 #define GETOPT_DEBUG_SHORT_OPTS ""
-#else  /* !NDEBUG */
+#else
 #define GETOPT_DEBUG_SHORT_OPTS "8"
-#endif /* !NDEBUG */
+#endif /* NDEBUG */
 
 const char * const short_opts = ":b:cfhk:LvV" GETOPT_DEBUG_SHORT_OPTS ;
 

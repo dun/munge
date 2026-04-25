@@ -48,5 +48,5 @@ lsd_mutex_is_locked (pthread_mutex_t *mutex)
     rc = pthread_mutex_trylock (mutex);
     return (rc == EBUSY ? 1 : 0);
 }
-#endif /* !NDEBUG */
+#endif /* NDEBUG */
 #endif /* WITH_PTHREADS */

@@ -45,4 +45,4 @@ int zip_compress_length (munge_zip_t type, const void *src, int len);
 
 int zip_decompress_length (munge_zip_t type, const void *src, int len);
 
-#endif /* !MUNGE_ZIP_H */
+#endif /* MUNGE_ZIP_H */

@@ -57,18 +57,18 @@
  */
 #if HAVE_OPENSSL && !HAVE_EVP_AES_128_CBC
 #  define MUNGE_DEFAULT_CIPHER          MUNGE_CIPHER_CAST5
-#else  /* !HAVE_OPENSSL || HAVE_EVP_AES_128_CBC */
+#else
 #  define MUNGE_DEFAULT_CIPHER          MUNGE_CIPHER_AES128
-#endif /* !HAVE_OPENSSL || HAVE_EVP_AES_128_CBC */
+#endif /* HAVE_OPENSSL && !HAVE_EVP_AES_128_CBC */
 
 /*  Default munge_mac_t for validating credentials.
  *    This should NEVER be set to MUNGE_MAC_NONE.
  */
 #if HAVE_OPENSSL && !HAVE_EVP_SHA256
 #  define MUNGE_DEFAULT_MAC             MUNGE_MAC_SHA1
-#else  /* !HAVE_OPENSSL || HAVE_EVP_SHA256 */
+#else
 #  define MUNGE_DEFAULT_MAC             MUNGE_MAC_SHA256
-#endif /* !HAVE_OPENSSL || HAVE_EVP_SHA256 */
+#endif /* HAVE_OPENSSL && !HAVE_EVP_SHA256 */
 
 /*  Integer for the default number of seconds before a credential expires.
  */
@@ -145,7 +145,7 @@
  */
 #ifndef MUNGE_SOCKET_NAME
 #define MUNGE_SOCKET_NAME               RUNSTATEDIR "/munge/munge.socket.2"
-#endif /* !MUNGE_SOCKET_NAME */
+#endif /* MUNGE_SOCKET_NAME */
 
 /*  Number of attempts a client makes connecting to the server before failing.
  */
@@ -239,4 +239,4 @@
 #define MUNGE_SEEDFILE_PATH             LOCALSTATEDIR "/lib/munge/munged.seed"
 
 
-#endif /* !MUNGE_DEFS_H */
+#endif /* MUNGE_DEFS_H */

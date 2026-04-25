@@ -561,10 +561,10 @@ lock_memory (void)
 /*  Lock all memory pages to prevent the daemon from being swapped to disk.
  *  This can prevent authentication delays under extreme memory pressure.
  */
-#if ! HAVE_MLOCKALL
+#if !HAVE_MLOCKALL
     errno = ENOSYS;
     log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to lock pages into memory");
-#else /* HAVE_MLOCKALL */
+#else
     char rlimit_msg[64] = "";
 #if HAVE_DECL_RLIMIT_MEMLOCK
     struct rlimit rlim;
@@ -589,7 +589,7 @@ lock_memory (void)
     else {
         log_msg (LOG_INFO, "Locked pages into memory%s", rlimit_msg);
     }
-#endif /* HAVE_MLOCKALL */
+#endif /* !HAVE_MLOCKALL */
 }
 
 

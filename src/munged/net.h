@@ -36,4 +36,4 @@ int net_resolve_address (const char *name, struct in_addr *inaddrp,
         char **ifnamep);
 
 
-#endif /* !MUNGE_NET_H */
+#endif /* MUNGE_NET_H */

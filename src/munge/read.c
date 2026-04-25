@@ -83,7 +83,7 @@ read_data_from_file (FILE *fp, void **dst, int *dst_len, size_t max_size)
             max_size++;
         }
     }
-#endif /* !NDEBUG */
+#endif /* NDEBUG */
 
     /*  Read data in chunks since size is unknown in advance.
      */

@@ -94,7 +94,7 @@
 
 #ifndef _GIDS_DEBUG
 #define _GIDS_DEBUG     0
-#endif /* !_GIDS_DEBUG */
+#endif /* _GIDS_DEBUG */
 
 
 /*****************************************************************************

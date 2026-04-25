@@ -35,4 +35,4 @@
 int enc_process_msg (m_msg_t m);
 
 
-#endif /* !MUNGE_ENC_H */
+#endif /* MUNGE_ENC_H */

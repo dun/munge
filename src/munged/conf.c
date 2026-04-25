@@ -999,7 +999,7 @@ _conf_sleep (int msecs)
         log_errno (EMUNGE_SNAFU, LOG_ERR,
                 "Failed to sleep before checking for termination");
     }
-#else  /* !HAVE_CLOCK_NANOSLEEP */
+#else
     struct timespec check_reltime;
     int             rv;
 
@@ -1013,7 +1013,7 @@ _conf_sleep (int msecs)
         log_errno (EMUNGE_SNAFU, LOG_ERR,
                 "Failed to sleep before checking for termination");
     }
-#endif /* !HAVE_CLOCK_NANOSLEEP */
+#endif /* HAVE_CLOCK_NANOSLEEP */
 }
 
 

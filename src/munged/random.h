@@ -40,4 +40,4 @@ void random_bytes (void *buf, int n);
 void random_pseudo_bytes (void *buf, int n);
 
 
-#endif /* !RANDOM_H */
+#endif /* RANDOM_H */

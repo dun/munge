@@ -37,4 +37,4 @@ munge_err_t m_msg_client_xfer (
         m_msg_t *pm, m_msg_type_t mreq_type, munge_ctx_t ctx);
 
 
-#endif /* !M_MSG_CLIENT_H */
+#endif /* M_MSG_CLIENT_H */

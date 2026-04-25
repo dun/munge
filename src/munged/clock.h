@@ -44,4 +44,4 @@ int clock_is_timespec_le (
 int clock_is_timespec_expired (const struct timespec *tsp);
 
 
-#endif /* !CLOCK_H */
+#endif /* CLOCK_H */

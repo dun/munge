@@ -35,7 +35,7 @@
 
 #if HAVE_LIBGCRYPT && HAVE_OPENSSL
 #  error "Libgcrypt and OpenSSL are mutually-exclusive"
-#endif
+#endif /* HAVE_LIBGCRYPT && HAVE_OPENSSL */
 
 #include <sys/types.h>
 
@@ -47,4 +47,4 @@ void crypto_fini (void);
 int crypto_memcmp (const void *a, const void *b, size_t len);
 
 
-#endif /* !CRYPTO_H */
+#endif /* CRYPTO_H */

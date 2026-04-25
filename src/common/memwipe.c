@@ -82,5 +82,5 @@ memwipe (void *v, size_t n)
     while (n--) {
         *p++ = 0;
     }
-#endif
+#endif /* HAVE_MEMSET_EXPLICIT */
 }

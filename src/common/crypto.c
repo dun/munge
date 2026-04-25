@@ -48,7 +48,7 @@
 
 #if GCRYPT_VERSION_NUMBER < 0x010600
 GCRY_THREAD_OPTION_PTHREAD_IMPL;
-#endif /* GCRYPT_VERSION_NUMBER */
+#endif /* GCRYPT_VERSION_NUMBER < 0x010600 */
 
 
 /*  Initializes the cryptographic subsystem.
@@ -68,7 +68,7 @@ crypto_init (void)
         log_err (EMUNGE_SNAFU, LOG_ERR,
             "Failed to set Libgcrypt thread callbacks: %s", gcry_strerror (e));
     }
-#endif /* GCRYPT_VERSION_NUMBER */
+#endif /* GCRYPT_VERSION_NUMBER < 0x010600 */
 
     /*  gcry_check_version() must be called before any other Libgcrypt function
      *    (except the GCRYCTL_SET_THREAD_CBS command prior to Libgcrypt 1.6).
@@ -153,7 +153,7 @@ _openssl_thread_id_cb (void)
     return ((unsigned long) pthread_self ());
 }
 
-#endif /* HAVE_CRYPTO_SET_ID_CALLBACK */
+#endif /* HAVE_CRYPTO_THREADID_SET_CALLBACK */
 
 static void
 _openssl_thread_lock_cb (int mode, int n, const char *file, int line)
@@ -349,7 +349,7 @@ _openssl_thread_setup (void)
 #elif HAVE_CRYPTO_SET_ID_CALLBACK
     /*  OpenSSL < 1.0.0  */
     CRYPTO_set_id_callback (_openssl_thread_id_cb);
-#endif /* HAVE_CRYPTO_SET_ID_CALLBACK */
+#endif /* HAVE_CRYPTO_THREADID_SET_CALLBACK */
 
 #if HAVE_CRYPTO_SET_LOCKING_CALLBACK
     /*  OpenSSL < 1.1.0  */
@@ -384,7 +384,7 @@ _openssl_thread_cleanup (void)
 #elif HAVE_CRYPTO_SET_ID_CALLBACK
     /*  OpenSSL < 1.0.0  */
     CRYPTO_set_id_callback (NULL);
-#endif /* HAVE_CRYPTO_SET_ID_CALLBACK */
+#endif /* HAVE_CRYPTO_THREADID_SET_CALLBACK */
 
 #if HAVE_CRYPTO_SET_LOCKING_CALLBACK
     /*  OpenSSL < 1.1.0  */
@@ -438,7 +438,7 @@ crypto_memcmp (const void *a, const void *b, size_t len)
 {
 #if HAVE_OPENSSL && HAVE_CRYPTO_MEMCMP
     return CRYPTO_memcmp (a, b, len);
-#else /* !(HAVE_OPENSSL && HAVE_CRYPTO_MEMCMP) */
+#else
     const unsigned char *x = a;
     const unsigned char *y = b;
     volatile unsigned char z;
@@ -451,5 +451,5 @@ crypto_memcmp (const void *a, const void *b, size_t len)
         z |= x[i] ^ y[i];
     }
     return (z != 0);
-#endif /* !(HAVE_OPENSSL && HAVE_CRYPTO_MEMCMP) */
+#endif /* HAVE_OPENSSL && HAVE_CRYPTO_MEMCMP */
 }

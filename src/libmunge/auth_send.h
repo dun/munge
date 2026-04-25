@@ -34,4 +34,4 @@
 int auth_send (m_msg_t m);
 
 
-#endif /* !MUNGE_AUTH_SEND_H */
+#endif /* MUNGE_AUTH_SEND_H */

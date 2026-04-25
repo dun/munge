@@ -85,4 +85,4 @@ int md_size (munge_mac_t md);
 int md_map_enum (munge_mac_t md, void *dst);
 
 
-#endif /* !MD_H */
+#endif /* MD_H */

@@ -452,7 +452,7 @@ _log_die (int status, int priority, const char *msg)
     if ((status != EXIT_SUCCESS) && getenv ("DEBUG")) {
         abort ();
     }
-#endif /* !NDEBUG */
+#endif /* NDEBUG */
 
     exit (status);
 }

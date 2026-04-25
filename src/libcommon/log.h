@@ -62,4 +62,4 @@ void log_msg (int priority, const char *format, ...);
 void log_err_or_warn (int got_force, const char *format, ...);
 
 
-#endif /* !LOG_H */
+#endif /* LOG_H */

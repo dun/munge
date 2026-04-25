@@ -40,10 +40,10 @@
 #ifdef __cplusplus
 #  define BEGIN_C_DECLS         extern "C" {
 #  define END_C_DECLS           }
-#else  /* !__cplusplus */
+#else
 #  define BEGIN_C_DECLS         /* empty */
 #  define END_C_DECLS           /* empty */
-#endif /* !__cplusplus */
+#endif /* __cplusplus */
 
 
 /*****************************************************************************
@@ -315,4 +315,4 @@ int munge_enum_str_to_int (munge_enum_t type, const char *str);
 END_C_DECLS
 
 
-#endif /* !MUNGE_H */
+#endif /* MUNGE_H */

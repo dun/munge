@@ -53,4 +53,4 @@ void destroy_conf (conf_t *confp);
 void parse_cmdline (conf_t *confp, int argc, char **argv);
 
 
-#endif /* !MUNGEKEY_CONF_H */
+#endif /* MUNGEKEY_CONF_H */

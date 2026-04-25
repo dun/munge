@@ -38,7 +38,7 @@
 
 #ifndef PATH_MAX
 #  define PATH_MAX 4096
-#endif /* !PATH_MAX */
+#endif /* PATH_MAX */
 
 
 typedef enum path_security_flags {
@@ -61,4 +61,4 @@ int path_get_trusted_group (gid_t *gid_ptr);
 int path_set_trusted_group (const char *group);
 
 
-#endif /* !PATH_H */
+#endif /* PATH_H */

@@ -36,4 +36,4 @@
 void create_key (conf_t *confp);
 
 
-#endif /* !MUNGEKEY_KEY_H */
+#endif /* MUNGEKEY_KEY_H */

@@ -58,4 +58,4 @@ int hkdf_ctx_set_info (hkdf_ctx_t *ctxp, const void *info, size_t infolen);
 int hkdf (hkdf_ctx_t *ctxp, void *dst, size_t *dstlenp);
 
 
-#endif /* !MUNGE_HKDF_H */
+#endif /* MUNGE_HKDF_H */

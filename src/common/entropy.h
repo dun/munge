@@ -38,4 +38,4 @@ int entropy_read_csprng (void *dst, size_t dstlen);
 
 int entropy_read_weak (unsigned long *dst);
 
-#endif /* !MUNGE_ENTROPY_H */
+#endif /* MUNGE_ENTROPY_H */
