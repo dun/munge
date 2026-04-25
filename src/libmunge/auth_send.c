@@ -38,7 +38,7 @@
  *  null client
  *****************************************************************************/
 
-#if !defined(AUTH_METHOD_RECVFD_MKFIFO) && !defined(AUTH_METHOD_RECVFD_MKNOD)
+#if !(AUTH_METHOD_RECVFD_MKFIFO || AUTH_METHOD_RECVFD_MKNOD)
 
 int
 auth_send (m_msg_t m)
@@ -46,14 +46,14 @@ auth_send (m_msg_t m)
     return (EMUNGE_SUCCESS);
 }
 
-#endif /* !AUTH_METHOD_RECVFD_MKFIFO && !AUTH_METHOD_RECVFD_MKNOD */
+#endif /* !(AUTH_METHOD_RECVFD_MKFIFO || AUTH_METHOD_RECVFD_MKNOD) */
 
 
 /*****************************************************************************
  *  strrecvfd struct (common)
  *****************************************************************************/
 
-#if defined(AUTH_METHOD_RECVFD_MKFIFO) || defined(AUTH_METHOD_RECVFD_MKNOD)
+#if AUTH_METHOD_RECVFD_MKFIFO || AUTH_METHOD_RECVFD_MKNOD
 
 #include <assert.h>
 #include <errno.h>

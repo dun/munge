@@ -95,7 +95,7 @@ struct option long_opts[] = {
     { "socket",            required_argument, NULL, 'S'               },
     { "verbose",           no_argument,       NULL, 'v'               },
     { "advice",            no_argument,       NULL, OPT_ADVICE        },
-#if defined(AUTH_METHOD_RECVFD_MKFIFO) || defined(AUTH_METHOD_RECVFD_MKNOD)
+#if AUTH_METHOD_RECVFD_MKFIFO || AUTH_METHOD_RECVFD_MKNOD
     { "auth-server-dir",   required_argument, NULL, OPT_AUTH_SERVER   },
     { "auth-client-dir",   required_argument, NULL, OPT_AUTH_CLIENT   },
 #endif /* AUTH_METHOD_RECVFD_MKFIFO || AUTH_METHOD_RECVFD_MKNOD */
@@ -218,7 +218,7 @@ create_conf (void)
     conf->auth_client_dir = NULL;
     conf->auth_rnd_bytes = MUNGE_AUTH_RND_BYTES;
 
-#if defined(AUTH_METHOD_RECVFD_MKFIFO) || defined(AUTH_METHOD_RECVFD_MKNOD)
+#if AUTH_METHOD_RECVFD_MKFIFO || AUTH_METHOD_RECVFD_MKNOD
     if (!(conf->auth_server_dir = strdup (MUNGE_AUTH_SERVER_DIR))) {
         log_errno (EMUNGE_NO_MEMORY, LOG_ERR,
             "Failed to copy auth-server-dir default string");
@@ -372,7 +372,7 @@ parse_cmdline (conf_t conf, int argc, char **argv)
             case OPT_ADVICE:
                 printf ("Don't Panic!\n");
                 exit (42);
-#if defined(AUTH_METHOD_RECVFD_MKFIFO) || defined(AUTH_METHOD_RECVFD_MKNOD)
+#if AUTH_METHOD_RECVFD_MKFIFO || AUTH_METHOD_RECVFD_MKNOD
             case OPT_AUTH_SERVER:
                 _conf_set_string (&conf->auth_server_dir, optarg, conf->cwd,
                         "auth-server-dir name");
@@ -788,7 +788,7 @@ _conf_display_help (char *prog)
 
     printf ("\n");
 
-#if defined(AUTH_METHOD_RECVFD_MKFIFO) || defined(AUTH_METHOD_RECVFD_MKNOD)
+#if AUTH_METHOD_RECVFD_MKFIFO || AUTH_METHOD_RECVFD_MKNOD
     printf ("  %*s %s [%s]\n", w, "--auth-server-dir=DIR",
             "Specify auth-server directory", MUNGE_AUTH_SERVER_DIR);
 

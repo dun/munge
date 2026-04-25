@@ -52,7 +52,7 @@ static void _check_auth_client_dir (const char *dir, int got_force);
 void
 auth_recv_init (const char *srvrdir, const char *clntdir, int got_force)
 {
-#ifdef AUTH_METHOD_RECVFD_MKNOD
+#if AUTH_METHOD_RECVFD_MKNOD
     if (geteuid () != 0) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
             "Root privileges are required for munged");
@@ -68,7 +68,7 @@ auth_recv_init (const char *srvrdir, const char *clntdir, int got_force)
 static void
 _check_auth_server_dir (const char *dir, int got_force)
 {
-#if defined(AUTH_METHOD_RECVFD_MKFIFO) || defined(AUTH_METHOD_RECVFD_MKNOD)
+#if AUTH_METHOD_RECVFD_MKFIFO || AUTH_METHOD_RECVFD_MKNOD
     int          is_symlink;
     struct stat  st;
     int          n;
@@ -147,7 +147,7 @@ _check_auth_server_dir (const char *dir, int got_force)
 static void
 _check_auth_client_dir (const char *dir, int got_force)
 {
-#if defined(AUTH_METHOD_RECVFD_MKFIFO) || defined(AUTH_METHOD_RECVFD_MKNOD)
+#if AUTH_METHOD_RECVFD_MKFIFO || AUTH_METHOD_RECVFD_MKNOD
     int          is_symlink;
     struct stat  st;
     int          n;
@@ -227,7 +227,7 @@ _check_auth_client_dir (const char *dir, int got_force)
  *  getpeereid
  *****************************************************************************/
 
-#ifdef AUTH_METHOD_GETPEEREID
+#if AUTH_METHOD_GETPEEREID
 
 #include <sys/socket.h>
 #include <sys/types.h>
@@ -254,7 +254,7 @@ auth_recv (m_msg_t m, uid_t *uid, gid_t *gid)
  *  getpeerucred
  *****************************************************************************/
 
-#ifdef AUTH_METHOD_GETPEERUCRED
+#if AUTH_METHOD_GETPEERUCRED
 
 #include <ucred.h>
 
@@ -299,7 +299,7 @@ auth_recv (m_msg_t m, uid_t *uid, gid_t *gid)
  *  SO_PEERCRED sockopt
  *****************************************************************************/
 
-#ifdef AUTH_METHOD_SO_PEERCRED
+#if AUTH_METHOD_SO_PEERCRED
 
 #include <sys/socket.h>
 
@@ -334,7 +334,7 @@ auth_recv (m_msg_t m, uid_t *uid, gid_t *gid)
  *  LOCAL_PEERCRED sockopt
  *****************************************************************************/
 
-#ifdef AUTH_METHOD_LOCAL_PEERCRED
+#if AUTH_METHOD_LOCAL_PEERCRED
 
 #include <sys/param.h>                  /* for FreeBSD */
 #include <sys/socket.h>
@@ -377,7 +377,7 @@ auth_recv (m_msg_t m, uid_t *uid, gid_t *gid)
  *  strrecvfd struct (mkfifo)
  *****************************************************************************/
 
-#ifdef AUTH_METHOD_RECVFD_MKFIFO
+#if AUTH_METHOD_RECVFD_MKFIFO
 
 #include <assert.h>
 #include <fcntl.h>                      /* open, O_RDONLY */
@@ -472,7 +472,7 @@ err:
  *  strrecvfd struct (mknod)
  *****************************************************************************/
 
-#ifdef AUTH_METHOD_RECVFD_MKNOD
+#if AUTH_METHOD_RECVFD_MKNOD
 
 #include <assert.h>
 #include <fcntl.h>                      /* open, O_RDWR */
@@ -659,7 +659,7 @@ _s_pipe (int fd[2])
  *  strrecvfd struct (common)
  *****************************************************************************/
 
-#if defined(AUTH_METHOD_RECVFD_MKFIFO) || defined(AUTH_METHOD_RECVFD_MKNOD)
+#if AUTH_METHOD_RECVFD_MKFIFO || AUTH_METHOD_RECVFD_MKNOD
 
 #include <assert.h>
 #include <stdio.h>                      /* snprintf */
