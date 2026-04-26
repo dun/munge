@@ -25,8 +25,8 @@
  *****************************************************************************/
 
 
-#ifndef MAC_H
-#define MAC_H
+#ifndef MUNGE_MAC_H
+#define MUNGE_MAC_H
 
 
 #if HAVE_CONFIG_H
@@ -106,4 +106,4 @@ int mac_block (munge_mac_t md, const void *key, int keylen,
 int mac_map_enum (munge_mac_t md, void *dst);
 
 
-#endif /* MAC_H */
+#endif /* MUNGE_MAC_H */

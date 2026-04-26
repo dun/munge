@@ -25,8 +25,8 @@
  *****************************************************************************/
 
 
-#ifndef REPLAY_H
-#define REPLAY_H
+#ifndef MUNGE_REPLAY_H
+#define MUNGE_REPLAY_H
 
 
 #include "cred.h"
@@ -47,4 +47,4 @@ int replay_remove (munge_cred_t c);
 void replay_purge (void);
 
 
-#endif /* REPLAY_H */
+#endif /* MUNGE_REPLAY_H */

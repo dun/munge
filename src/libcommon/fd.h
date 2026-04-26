@@ -25,8 +25,8 @@
  *****************************************************************************/
 
 
-#ifndef FD_H
-#define FD_H
+#ifndef MUNGE_FD_H
+#define MUNGE_FD_H
 
 
 #if HAVE_CONFIG_H
@@ -61,4 +61,4 @@ int fd_set_nonblocking (int fd);
 int fd_is_nonblocking (int fd);
 
 
-#endif /* FD_H */
+#endif /* MUNGE_FD_H */

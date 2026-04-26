@@ -25,8 +25,8 @@
  *****************************************************************************/
 
 
-#ifndef CRED_H
-#define CRED_H
+#ifndef MUNGE_CRED_H
+#define MUNGE_CRED_H
 
 
 #include <inttypes.h>
@@ -89,4 +89,4 @@ munge_cred_t cred_create (m_msg_t m);
 void cred_destroy (munge_cred_t c);
 
 
-#endif /* CRED_H */
+#endif /* MUNGE_CRED_H */

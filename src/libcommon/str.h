@@ -25,8 +25,8 @@
  *****************************************************************************/
 
 
-#ifndef STR_H
-#define STR_H
+#ifndef MUNGE_STR_H
+#define MUNGE_STR_H
 
 
 #if HAVE_CONFIG_H
@@ -48,4 +48,4 @@ int strhex2bin (void *dst, size_t dstlen, const char *src, size_t srclen);
 int strftimet (char *dst, size_t dstlen, const char *tfmt, time_t t);
 
 
-#endif /* STR_H */
+#endif /* MUNGE_STR_H */

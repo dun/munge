@@ -25,8 +25,8 @@
  *****************************************************************************/
 
 
-#ifndef JOB_H
-#define JOB_H
+#ifndef MUNGE_JOB_H
+#define MUNGE_JOB_H
 
 
 #include "m_msg.h"
@@ -38,4 +38,4 @@ void job_accept (conf_t conf, work_p workers);
 void job_exec (m_msg_t m);
 
 
-#endif /* JOB_H */
+#endif /* MUNGE_JOB_H */

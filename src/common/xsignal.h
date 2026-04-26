@@ -25,11 +25,11 @@
  *****************************************************************************/
 
 
-#ifndef XSIGNAL_H
-#define XSIGNAL_H
+#ifndef MUNGE_XSIGNAL_H
+#define MUNGE_XSIGNAL_H
 
 
 void xsignal_ignore (int sig);
 
 
-#endif /* XSIGNAL_H */
+#endif /* MUNGE_XSIGNAL_H */

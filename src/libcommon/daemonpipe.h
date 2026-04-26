@@ -25,8 +25,8 @@
  *****************************************************************************/
 
 
-#ifndef DAEMONPIPE_H
-#define DAEMONPIPE_H
+#ifndef MUNGE_DAEMONPIPE_H
+#define MUNGE_DAEMONPIPE_H
 
 
 #if HAVE_CONFIG_H
@@ -48,4 +48,4 @@ int daemonpipe_read (int *statusptr, int *priorityptr, char *dstbufptr,
 int daemonpipe_write (int status, int priority, const char *msg);
 
 
-#endif /* DAEMONPIPE_H */
+#endif /* MUNGE_DAEMONPIPE_H */

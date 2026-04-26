@@ -25,8 +25,8 @@
  *****************************************************************************/
 
 
-#ifndef RANDOM_H
-#define RANDOM_H
+#ifndef MUNGE_RANDOM_H
+#define MUNGE_RANDOM_H
 
 
 int random_init (const char *seed_path);
@@ -40,4 +40,4 @@ void random_bytes (void *buf, int n);
 void random_pseudo_bytes (void *buf, int n);
 
 
-#endif /* RANDOM_H */
+#endif /* MUNGE_RANDOM_H */

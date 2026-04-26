@@ -25,8 +25,8 @@
  *****************************************************************************/
 
 
-#ifndef XGETGR_H
-#define XGETGR_H
+#ifndef MUNGE_XGETGR_H
+#define MUNGE_XGETGR_H
 
 #include <grp.h>
 #include <stddef.h>
@@ -58,4 +58,4 @@ void xgetgrent_fini (void);
 int xgetgrnam (const char *name, struct group *grp, xgrbuf_p grbufp);
 
 
-#endif /* XGETGR_H */
+#endif /* MUNGE_XGETGR_H */

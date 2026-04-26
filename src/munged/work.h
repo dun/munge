@@ -25,8 +25,8 @@
  *****************************************************************************/
 
 
-#ifndef WORK_H
-#define WORK_H
+#ifndef MUNGE_WORK_H
+#define MUNGE_WORK_H
 
 
 #if HAVE_CONFIG_H
@@ -56,4 +56,4 @@ int work_queue (work_p wp, void *work);
 void work_wait (work_p wp);
 
 
-#endif /* WORK_H */
+#endif /* MUNGE_WORK_H */

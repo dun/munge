@@ -25,8 +25,8 @@
  *****************************************************************************/
 
 
-#ifndef M_MSG_CLIENT_H
-#define M_MSG_CLIENT_H
+#ifndef MUNGE_MSG_CLIENT_H
+#define MUNGE_MSG_CLIENT_H
 
 
 #include <munge.h>
@@ -37,4 +37,4 @@ munge_err_t m_msg_client_xfer (
         m_msg_t *pm, m_msg_type_t mreq_type, munge_ctx_t ctx);
 
 
-#endif /* M_MSG_CLIENT_H */
+#endif /* MUNGE_MSG_CLIENT_H */

@@ -25,8 +25,8 @@
  *****************************************************************************/
 
 
-#ifndef GIDS_H
-#define GIDS_H
+#ifndef MUNGE_GIDS_H
+#define MUNGE_GIDS_H
 
 
 /*****************************************************************************
@@ -59,4 +59,4 @@ void gids_update (gids_t gids);
 int gids_is_member (gids_t gids, uid_t uid, gid_t gid);
 
 
-#endif /* GIDS_H */
+#endif /* MUNGE_GIDS_H */

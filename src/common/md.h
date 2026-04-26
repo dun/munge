@@ -25,8 +25,8 @@
  *****************************************************************************/
 
 
-#ifndef MD_H
-#define MD_H
+#ifndef MUNGE_MD_H
+#define MUNGE_MD_H
 
 
 #if HAVE_CONFIG_H
@@ -85,4 +85,4 @@ int md_size (munge_mac_t md);
 int md_map_enum (munge_mac_t md, void *dst);
 
 
-#endif /* MD_H */
+#endif /* MUNGE_MD_H */

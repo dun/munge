@@ -25,8 +25,8 @@
  *****************************************************************************/
 
 
-#ifndef CIPHER_H
-#define CIPHER_H
+#ifndef MUNGE_CIPHER_H
+#define MUNGE_CIPHER_H
 
 
 #if HAVE_CONFIG_H
@@ -98,4 +98,4 @@ int cipher_key_size (munge_cipher_t cipher);
 int cipher_map_enum (munge_cipher_t cipher, void *dst);
 
 
-#endif /* CIPHER_H */
+#endif /* MUNGE_CIPHER_H */

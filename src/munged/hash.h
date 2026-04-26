@@ -25,8 +25,8 @@
  *****************************************************************************/
 
 
-#ifndef HASH_H
-#define HASH_H
+#ifndef MUNGE_HASH_H
+#define MUNGE_HASH_H
 
 
 /*****************************************************************************
@@ -108,4 +108,4 @@ void hash_drop_memory (void);
 unsigned int hash_key_string (const char *str);
 
 
-#endif /* HASH_H */
+#endif /* MUNGE_HASH_H */

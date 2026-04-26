@@ -25,8 +25,8 @@
  *****************************************************************************/
 
 
-#ifndef PATH_H
-#define PATH_H
+#ifndef MUNGE_PATH_H
+#define MUNGE_PATH_H
 
 
 #if HAVE_CONFIG_H
@@ -61,4 +61,4 @@ int path_get_trusted_group (gid_t *gid_ptr);
 int path_set_trusted_group (const char *group);
 
 
-#endif /* PATH_H */
+#endif /* MUNGE_PATH_H */

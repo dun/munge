@@ -25,8 +25,8 @@
  *****************************************************************************/
 
 
-#ifndef CLOCK_H
-#define CLOCK_H
+#ifndef MUNGE_CLOCK_H
+#define MUNGE_CLOCK_H
 
 
 #if HAVE_CONFIG_H
@@ -44,4 +44,4 @@ int clock_is_timespec_le (
 int clock_is_timespec_expired (const struct timespec *tsp);
 
 
-#endif /* CLOCK_H */
+#endif /* MUNGE_CLOCK_H */

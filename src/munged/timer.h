@@ -25,8 +25,8 @@
  *****************************************************************************/
 
 
-#ifndef TIMER_H
-#define TIMER_H
+#ifndef MUNGE_TIMER_H
+#define MUNGE_TIMER_H
 
 
 #if HAVE_CONFIG_H
@@ -61,4 +61,4 @@ long timer_set_relative (callback_f cb, void *arg, long msec);
 int timer_cancel (long id);
 
 
-#endif /* TIMER_H */
+#endif /* MUNGE_TIMER_H */

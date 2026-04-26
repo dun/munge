@@ -25,8 +25,8 @@
  *****************************************************************************/
 
 
-#ifndef LOG_H
-#define LOG_H
+#ifndef MUNGE_LOG_H
+#define MUNGE_LOG_H
 
 
 #if HAVE_CONFIG_H
@@ -62,4 +62,4 @@ void log_msg (int priority, const char *format, ...);
 void log_err_or_warn (int got_force, const char *format, ...);
 
 
-#endif /* LOG_H */
+#endif /* MUNGE_LOG_H */

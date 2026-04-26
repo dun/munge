@@ -25,8 +25,8 @@
  *****************************************************************************/
 
 
-#ifndef XGETPW_H
-#define XGETPW_H
+#ifndef MUNGE_XGETPW_H
+#define MUNGE_XGETPW_H
 
 #include <pwd.h>
 #include <stddef.h>
@@ -52,4 +52,4 @@ size_t xgetpwbuf_get_len (xpwbuf_p pwbufp);
 int xgetpwnam (const char *name, struct passwd *pwp, xpwbuf_p pwbufp);
 
 
-#endif /* XGETPW_H */
+#endif /* MUNGE_XGETPW_H */

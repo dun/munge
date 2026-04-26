@@ -25,8 +25,8 @@
  *****************************************************************************/
 
 
-#ifndef CRYPTO_H
-#define CRYPTO_H
+#ifndef MUNGE_CRYPTO_H
+#define MUNGE_CRYPTO_H
 
 
 #if HAVE_CONFIG_H
@@ -47,4 +47,4 @@ void crypto_fini (void);
 int crypto_memcmp (const void *a, const void *b, size_t len);
 
 
-#endif /* CRYPTO_H */
+#endif /* MUNGE_CRYPTO_H */
