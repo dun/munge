@@ -624,14 +624,14 @@ _gids_gid_add (hash_t gid_hash, uid_t uid, gid_t gid)
 
     if (!(g = hash_find (gid_hash, &uid))) {
         if (!(g = _gids_gid_head_create (uid))) {
-            log_msg (LOG_WARNING, "Failed to allocate gid head for uid=%lu",
-                    (unsigned long) uid);
+            log_msg (LOG_WARNING, "Failed to allocate gid head for UID=%u",
+                    (unsigned) uid);
             return (-1);
         }
         if (!hash_insert (gid_hash, &g->uid, g)) {
             log_msg (LOG_WARNING,
-                    "Failed to insert gid head for uid=%lu into gid hash",
-                    (unsigned long) uid);
+                    "Failed to insert gid head for UID=%u into gid hash",
+                    (unsigned) uid);
             _gids_gid_head_destroy (g);
             return (-1);
         }
@@ -647,8 +647,8 @@ _gids_gid_add (hash_t gid_hash, uid_t uid, gid_t gid)
     }
     if (!(node = _gids_gid_node_create (gid))) {
         log_msg (LOG_WARNING,
-                "Failed to allocate gid node for uid=%lu gid=%lu",
-                (unsigned long) uid, (unsigned long) gid);
+                "Failed to allocate gid node for UID=%u GID=%u",
+                (unsigned) uid, (unsigned) gid);
         return (-1);
     }
     node->next = *nodep;
@@ -667,13 +667,13 @@ _gids_uid_add (hash_t uid_hash, const char *user, uid_t uid)
     uid_node_p u;
 
     if (!(u = _gids_uid_node_create (user, uid))) {
-        log_msg (LOG_WARNING, "Failed to allocate uid node for \"%s\" uid=%lu",
-                user, (unsigned long) uid);
+        log_msg (LOG_WARNING, "Failed to allocate uid node for \"%s\" UID=%u",
+                user, (unsigned) uid);
     }
     else if (!hash_insert (uid_hash, u->user, u)) {
         log_msg (LOG_WARNING,
-                "Failed to insert uid node for \"%s\" uid=%lu into uid hash",
-                user, (unsigned long) uid);
+                "Failed to insert uid node for \"%s\" UID=%u into uid hash",
+                user, (unsigned) uid);
         _gids_uid_node_destroy (u);
     }
     else {
@@ -878,9 +878,9 @@ _gids_gid_node_dump (gid_head_p g, const uid_t *uidp, const void *null)
 
     assert (g->uid == *uidp);
 
-    printf ("  %-10u:", (unsigned int) g->uid);
+    printf ("  %-10u:", (unsigned) g->uid);
     for (node = g->next; node; node = node->next) {
-        printf (" %u", (unsigned int) node->gid);
+        printf (" %u", (unsigned) node->gid);
     }
     printf ("\n");
     return;
@@ -908,7 +908,7 @@ _gids_uid_node_dump (uid_node_p u, const char *user, const void *null)
 {
     assert (u->user == user);
 
-    printf ("  %-10u: %s\n", (unsigned int) u->uid, u->user);
+    printf ("  %-10u: %s\n", (unsigned) u->uid, u->user);
     return;
 }
 

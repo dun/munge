@@ -965,12 +965,12 @@ display_uid (conf_t conf)
     num_spaces = conf->key_width - strlen (key);
     if (conf->got_numeric) {
         fprintf (conf->fp_meta, "%s:%*c%u\n", key, num_spaces, 0x20,
-                (unsigned int) conf->uid);
+                (unsigned) conf->uid);
     }
     else {
         pw_ptr = getpwuid (conf->uid);
         fprintf (conf->fp_meta, "%s:%*c%s (%u)\n", key, num_spaces, 0x20,
-                (pw_ptr ? pw_ptr->pw_name : "???"), (unsigned int) conf->uid);
+                (pw_ptr ? pw_ptr->pw_name : "???"), (unsigned) conf->uid);
     }
     return;
 }
@@ -989,12 +989,12 @@ display_gid (conf_t conf)
     num_spaces = conf->key_width - strlen (key);
     if (conf->got_numeric) {
         fprintf (conf->fp_meta, "%s:%*c%u\n", key, num_spaces, 0x20,
-                (unsigned int) conf->gid);
+                (unsigned) conf->gid);
     }
     else {
         gr_ptr = getgrgid (conf->gid);
         fprintf (conf->fp_meta, "%s:%*c%s (%u)\n", key, num_spaces, 0x20,
-                (gr_ptr ? gr_ptr->gr_name : "???"), (unsigned int) conf->gid);
+                (gr_ptr ? gr_ptr->gr_name : "???"), (unsigned) conf->gid);
     }
     return;
 }
@@ -1025,12 +1025,12 @@ display_uid_restriction (conf_t conf)
     }
     if (conf->got_numeric) {
         fprintf (conf->fp_meta, "%s:%*c%u\n", key, num_spaces, 0x20,
-                (unsigned int) i);
+                (unsigned) i);
     }
     else {
         pw_ptr = getpwuid (i);
         fprintf (conf->fp_meta, "%s:%*c%s (%u)\n", key, num_spaces, 0x20,
-                (pw_ptr ? pw_ptr->pw_name : "???"), (unsigned int) i);
+                (pw_ptr ? pw_ptr->pw_name : "???"), (unsigned) i);
     }
     return;
 }
@@ -1061,12 +1061,12 @@ display_gid_restriction (conf_t conf)
     }
     if (conf->got_numeric) {
         fprintf (conf->fp_meta, "%s:%*c%u\n", key, num_spaces, 0x20,
-                (unsigned int) i);
+                (unsigned) i);
     }
     else {
         gr_ptr = getgrgid (i);
         fprintf (conf->fp_meta, "%s:%*c%s (%u)\n", key, num_spaces, 0x20,
-                (gr_ptr ? gr_ptr->gr_name : "???"), (unsigned int) i);
+                (gr_ptr ? gr_ptr->gr_name : "???"), (unsigned) i);
     }
     return;
 }

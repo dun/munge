@@ -277,7 +277,7 @@ enc_check_retry (munge_cred_t c)
     if (m->retry > 0) {
         log_msg (LOG_INFO,
             "Encode retry #%d for client UID=%u GID=%u", m->retry,
-            (unsigned int) m->client_uid, (unsigned int) m->client_gid);
+            (unsigned) m->client_uid, (unsigned) m->client_gid);
     }
     if (m->retry > MUNGE_SOCKET_RETRY_ATTEMPTS) {
         return (m_msg_set_err (m, EMUNGE_SOCKET,

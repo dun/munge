@@ -227,7 +227,7 @@ dec_check_retry (munge_cred_t c)
     if (m->retry > 0) {
         log_msg (LOG_INFO,
             "Decode retry #%d for client UID=%u GID=%u", m->retry,
-            (unsigned int) m->client_uid, (unsigned int) m->client_gid);
+            (unsigned) m->client_uid, (unsigned) m->client_gid);
     }
     if (m->retry > MUNGE_SOCKET_RETRY_ATTEMPTS) {
         return (m_msg_set_err (m, EMUNGE_SOCKET,
@@ -981,7 +981,7 @@ dec_validate_auth (munge_cred_t c)
 unauthorized:
     return (m_msg_set_err (m, EMUNGE_CRED_UNAUTHORIZED,
         strdupf ("Unauthorized credential for client UID=%u GID=%u",
-            (unsigned int) m->client_uid, (unsigned int) m->client_gid)));
+            (unsigned) m->client_uid, (unsigned) m->client_gid)));
 }
 
 
@@ -1040,7 +1040,7 @@ dec_validate_replay (munge_cred_t c)
                 && (m->retry <= MUNGE_SOCKET_RETRY_ATTEMPTS)) {
             log_msg (LOG_INFO,
                 "Allowed credential replay for client UID=%u GID=%u",
-                (unsigned int) m->client_uid, (unsigned int) m->client_gid);
+                (unsigned) m->client_uid, (unsigned) m->client_gid);
             return (0);
         }
         else {

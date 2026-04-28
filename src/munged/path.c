@@ -249,8 +249,8 @@ path_is_secure (const char *path, char *errbuf, size_t errbuflen,
         }
         if ((st.st_uid != 0) && (st.st_uid != euid)) {
             return (_path_set_err (0, errbuf, errbuflen,
-                "invalid ownership of \"%s\" (uid=%lu)",
-                buf, (unsigned long) st.st_uid));
+                "invalid ownership of \"%s\" (UID=%u)",
+                buf, (unsigned) st.st_uid));
         }
         if (!(flags & PATH_SECURITY_IGNORE_GROUP_WRITE) &&
              (st.st_mode & S_IWGRP)                     &&
