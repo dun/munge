@@ -175,7 +175,7 @@ main (int argc, char *argv[])
                 munge_strerror (err));
         exit (EXIT_FAILURE);
     }
-    printf ("uid=%d gid=%d\\n", uid, gid);
+    printf ("uid=%u gid=%u\\n", (unsigned) uid, (unsigned) gid);
     free (cred);
     exit (EXIT_SUCCESS);
 }

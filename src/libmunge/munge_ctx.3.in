@@ -333,7 +333,7 @@ main (int argc, char *argv[])
                 munge_ctx_strerror (ctx));
         exit (EXIT_FAILURE);
     }
-    printf ("uid=%d gid=%d\\n", uid, gid);
+    printf ("uid=%u gid=%u\\n", (unsigned) uid, (unsigned) gid);
 .sp
     munge_ctx_destroy (ctx);
     exit (EXIT_SUCCESS);
