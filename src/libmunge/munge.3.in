@@ -152,7 +152,7 @@ ascertain the effective user and group ID of the encoding process.
 .nf
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
+#include <sys/types.h>
 #include <munge.h>
 .sp
 int

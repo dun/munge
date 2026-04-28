@@ -285,7 +285,7 @@ query the location of the \fBmunged\fR domain socket.
 .nf
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
+#include <sys/types.h>
 #include <munge.h>
 .sp
 int
