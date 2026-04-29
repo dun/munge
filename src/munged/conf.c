@@ -907,7 +907,7 @@ _conf_process_stop (conf_t conf)
         if (conf->got_verbose) {
             log_msg (LOG_NOTICE,
                     "Terminated daemon bound to socket \"%s\" (pid %d)",
-                    conf->socket_name, pid);
+                    conf->socket_name, (int) pid);
         }
         exit (EXIT_SUCCESS);
     }
@@ -918,7 +918,7 @@ _conf_process_stop (conf_t conf)
         if (conf->got_verbose) {
             log_msg (LOG_NOTICE,
                     "Killed daemon bound to socket \"%s\" (pid %d)",
-                    conf->socket_name, pid);
+                    conf->socket_name, (int) pid);
         }
         exit (EXIT_SUCCESS);
     }
@@ -926,7 +926,7 @@ _conf_process_stop (conf_t conf)
      */
     log_err (EMUNGE_SNAFU, LOG_ERR,
             "Failed to terminate daemon bound to socket \"%s\" (pid %d)",
-            conf->socket_name, pid);
+            conf->socket_name, (int) pid);
     exit (EXIT_FAILURE);
 }
 
@@ -960,7 +960,8 @@ _conf_send_signal (pid_t pid, int signum, int msecs)
                 return (0);
             }
             log_errno (EMUNGE_SNAFU, LOG_ERR,
-                    "Failed to signal daemon (pid %d, sig %d)", pid, sig);
+                    "Failed to signal daemon (pid %d, sig %d)",
+                    (int) pid, sig);
         }
         rv = clock_is_timespec_expired (&wait_abstime);
         if (rv < 0) {
