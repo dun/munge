@@ -29,14 +29,16 @@
 #  include "config.h"
 #endif /* HAVE_CONFIG_H */
 
-#include <stddef.h>                     /* size_t */
-#include <stdlib.h>                     /* exit, EXIT_SUCCESS */
-#include <string.h>                     /* memcmp */
-#include <munge.h>
 #include "crypto.h"
 #include "hkdf.h"
 #include "md.h"
 #include "tap.h"
+
+#include <munge.h>
+
+#include <stddef.h>                     /* size_t */
+#include <stdlib.h>                     /* exit, EXIT_SUCCESS */
+#include <string.h>                     /* memcmp */
 
 
 /*****************************************************************************

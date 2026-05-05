@@ -29,12 +29,14 @@
 #  include <config.h>
 #endif /* HAVE_CONFIG_H */
 
+#include "auth_recv.h"
+
+#include "log.h"
+#include "m_msg.h"
+
 #include <errno.h>
 #include <string.h>                     /* strerror, strlen */
 #include <sys/types.h>                  /* uid_t, gid_t */
-#include "auth_recv.h"
-#include "log.h"
-#include "m_msg.h"
 
 
 /*****************************************************************************
@@ -43,10 +45,12 @@
 
 #if AUTH_METHOD_RECVFD_MKFIFO || AUTH_METHOD_RECVFD_MKNOD
 
+#include "path.h"
+
+#include <munge.h>
+
 #include <sys/stat.h>                   /* (l)stat, S_* */
 #include <unistd.h>                     /* geteuid */
-#include <munge.h>
-#include "path.h"
 
 static void _check_auth_server_dir (const char *dir, int got_force);
 static void _check_auth_client_dir (const char *dir, int got_force);
@@ -671,13 +675,15 @@ _s_pipe (int fd[2])
 
 #if AUTH_METHOD_RECVFD_MKFIFO || AUTH_METHOD_RECVFD_MKNOD
 
-#include <assert.h>
-#include <stdio.h>                      /* snprintf */
-#include <stdlib.h>                     /* malloc, free */
-#include <munge.h>
 #include "conf.h"
 #include "random.h"                     /* random_pseudo_bytes */
 #include "str.h"                        /* strbin2hex */
+
+#include <munge.h>
+
+#include <assert.h>
+#include <stdio.h>                      /* snprintf */
+#include <stdlib.h>                     /* malloc, free */
 
 static int
 _name_auth_pipe (char **pipe_name_p)

@@ -29,10 +29,11 @@
 #define MUNGE_CTX_H
 
 
+#include <munge.h>
+
 #include <netinet/in.h>                 /* in_addr */
 #include <sys/types.h>                  /* uid_t, gid_t */
 #include <time.h>                       /* time_t */
-#include <munge.h>
 
 
 /*****************************************************************************

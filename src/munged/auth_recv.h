@@ -29,8 +29,9 @@
 #define MUNGE_AUTH_RECV_H
 
 
-#include <sys/types.h>                  /* uid_t, gid_t */
 #include "m_msg.h"
+
+#include <sys/types.h>                  /* uid_t, gid_t */
 
 
 void auth_recv_init (const char *srvrdir, const char *clntdir, int got_force);

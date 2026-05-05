@@ -29,8 +29,9 @@
 #  include <config.h>
 #endif /* HAVE_CONFIG_H */
 
-#include <stddef.h>                     /* size_t */
 #include "crypto.h"
+
+#include <stddef.h>                     /* size_t */
 
 
 /*****************************************************************************
@@ -39,9 +40,11 @@
 
 #if HAVE_LIBGCRYPT
 
-#include <gcrypt.h>
-#include <munge.h>
 #include "log.h"
+
+#include <munge.h>
+
+#include <gcrypt.h>
 
 /*  GCRY_THREAD_OPTION_PTHREAD_IMPL is obsolete since Libgcrypt 1.6.
  *  Its expansion defines mutex callback functions that call
@@ -120,6 +123,10 @@ crypto_fini (void)
 
 #if HAVE_OPENSSL
 
+#include "log.h"
+
+#include <munge.h>
+
 #include <errno.h>
 #include <openssl/crypto.h>
 #include <openssl/err.h>
@@ -127,8 +134,6 @@ crypto_fini (void)
 #include <pthread.h>
 #include <stdlib.h>                     /* calloc, malloc, free */
 #include <string.h>                     /* strerror */
-#include <munge.h>
-#include "log.h"
 
 #if HAVE_OPENSSL_PROVIDER_H
 #include <openssl/provider.h>

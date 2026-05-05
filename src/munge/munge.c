@@ -29,6 +29,17 @@
 #  include "config.h"
 #endif /* HAVE_CONFIG_H */
 
+#include "license.h"
+#include "log.h"
+#include "memwipe.h"
+#include "munge_defs.h"
+#include "query.h"
+#include "read.h"
+#include "version.h"
+#include "xsignal.h"
+
+#include <munge.h>
+
 #include <assert.h>
 #include <errno.h>
 #include <getopt.h>                     /* getopt_long */
@@ -39,15 +50,6 @@
 #include <string.h>                     /* strcmp, strlen, strncmp, strrchr */
 #include <sys/types.h>                  /* uid_t, gid_t */
 #include <unistd.h>                     /* geteuid, getegid, seteuid, setegid */
-#include <munge.h>
-#include "license.h"
-#include "log.h"
-#include "memwipe.h"
-#include "munge_defs.h"
-#include "query.h"
-#include "read.h"
-#include "version.h"
-#include "xsignal.h"
 
 
 /*****************************************************************************

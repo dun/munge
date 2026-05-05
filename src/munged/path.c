@@ -29,6 +29,11 @@
 #  include "config.h"
 #endif /* HAVE_CONFIG_H */
 
+#include "path.h"
+
+#include "common.h"                     /* GID_SENTINEL */
+#include "query.h"
+
 #include <errno.h>
 #include <stdarg.h>                     /* va_start, va_end, va_list */
 #include <stdio.h>                      /* vsnprintf */
@@ -37,9 +42,6 @@
 #include <sys/stat.h>                   /* stat, lstat, S_* */
 #include <sys/types.h>                  /* size_t, uid_t, gid_t */
 #include <unistd.h>                     /* geteuid */
-#include "common.h"                     /* GID_SENTINEL */
-#include "path.h"
-#include "query.h"
 
 
 /*****************************************************************************

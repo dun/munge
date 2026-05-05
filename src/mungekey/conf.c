@@ -29,6 +29,15 @@
 #  include <config.h>
 #endif /* HAVE_CONFIG_H */
 
+#include "conf.h"
+
+#include "license.h"
+#include "log.h"
+#include "munge_defs.h"
+#include "version.h"
+
+#include <munge.h>
+
 #include <assert.h>
 #include <ctype.h>                      /* isprint */
 #include <errno.h>
@@ -37,12 +46,6 @@
 #include <stdio.h>                      /* (sn)printf */
 #include <stdlib.h>                     /* calloc, free, exit, strtol */
 #include <string.h>                     /* strdup, strncmp, strrchr */
-#include <munge.h>
-#include "conf.h"
-#include "license.h"
-#include "log.h"
-#include "munge_defs.h"
-#include "version.h"
 
 
 /*****************************************************************************

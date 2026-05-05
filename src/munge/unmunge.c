@@ -29,6 +29,18 @@
 #  include "config.h"
 #endif /* HAVE_CONFIG_H */
 
+#include "common.h"                     /* MAX, UID_SENTINEL, GID_SENTINEL */
+#include "license.h"
+#include "log.h"
+#include "memwipe.h"
+#include "munge_defs.h"
+#include "read.h"
+#include "str.h"                        /* strcatf */
+#include "version.h"
+#include "xsignal.h"
+
+#include <munge.h>
+
 #include <arpa/inet.h>                  /* inet_ntop */
 #include <assert.h>
 #include <errno.h>
@@ -46,16 +58,6 @@
 #include <sys/types.h>                  /* uid_t, gid_t */
 #include <time.h>                       /* localtime, strftime, time_t, tm */
 #include <unistd.h>                     /* isatty */
-#include <munge.h>
-#include "common.h"                     /* MAX, UID_SENTINEL, GID_SENTINEL */
-#include "license.h"
-#include "log.h"
-#include "memwipe.h"
-#include "munge_defs.h"
-#include "read.h"
-#include "str.h"                        /* strcatf */
-#include "version.h"
-#include "xsignal.h"
 
 
 /*****************************************************************************

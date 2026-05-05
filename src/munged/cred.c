@@ -29,13 +29,16 @@
 #  include <config.h>
 #endif /* HAVE_CONFIG_H */
 
+#include "cred.h"
+
+#include "m_msg.h"
+#include "memwipe.h"
+
+#include <munge.h>
+
 #include <assert.h>
 #include <stdlib.h>                     /* calloc, free */
 #include <string.h>                     /* memset */
-#include <munge.h>
-#include "cred.h"
-#include "m_msg.h"
-#include "memwipe.h"
 
 
 munge_cred_t

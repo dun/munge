@@ -29,8 +29,9 @@
 #  include "config.h"
 #endif /* HAVE_CONFIG_H */
 
-#include <stdio.h>                      /* printf */
 #include "version.h"
+
+#include <stdio.h>                      /* printf */
 
 
 void

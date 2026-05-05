@@ -29,17 +29,19 @@
 #  include <config.h>
 #endif /* HAVE_CONFIG_H */
 
-#include <assert.h>
-#include <stdlib.h>                     /* free */
-#include <string.h>                     /* strdup, strlen */
-#include <sys/types.h>                  /* uid_t, gid_t */
-#include <munge.h>
 #include "common.h"                     /* UID_SENTINEL, GID_SENTINEL */
 #include "ctx.h"
 #include "m_msg.h"
 #include "m_msg_client.h"
 #include "munge_defs.h"
 #include "str.h"
+
+#include <munge.h>
+
+#include <assert.h>
+#include <stdlib.h>                     /* free */
+#include <string.h>                     /* strdup, strlen */
+#include <sys/types.h>                  /* uid_t, gid_t */
 
 
 /*****************************************************************************

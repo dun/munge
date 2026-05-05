@@ -29,6 +29,14 @@
 #  include "config.h"
 #endif /* HAVE_CONFIG_H */
 
+#include "license.h"
+#include "log.h"
+#include "query.h"
+#include "version.h"
+#include "xsignal.h"
+
+#include <munge.h>
+
 #include <assert.h>
 #include <errno.h>
 #include <getopt.h>                     /* getopt_long */
@@ -43,12 +51,6 @@
 #include <sys/types.h>                  /* uid_t, gid_t */
 #include <time.h>                       /* localtime(_r), strftime, time, time_t, tm */
 #include <unistd.h>                     /* close, sysconf, _POSIX_THREAD_ATTR_STACKSIZE */
-#include <munge.h>
-#include "license.h"
-#include "log.h"
-#include "query.h"
-#include "version.h"
-#include "xsignal.h"
 
 
 /*****************************************************************************

@@ -29,9 +29,11 @@
 #  include <config.h>
 #endif /* HAVE_CONFIG_H */
 
-#include <munge.h>
 #include "auth_send.h"
+
 #include "m_msg.h"
+
+#include <munge.h>
 
 
 /*****************************************************************************
@@ -55,6 +57,8 @@ auth_send (m_msg_t m)
 
 #if AUTH_METHOD_RECVFD_MKFIFO || AUTH_METHOD_RECVFD_MKNOD
 
+#include "str.h"
+
 #include <assert.h>
 #include <errno.h>
 #include <fcntl.h>                      /* open, O_* */
@@ -65,7 +69,6 @@ auth_send (m_msg_t m)
 #include <sys/ioctl.h>                  /* ioctl */
 #include <sys/stat.h>                   /* S_IRUSR */
 #include <unistd.h>                     /* close, unlink */
-#include "str.h"
 
 static int _recv_auth_req (int sd, char **pipe_name_p, char **file_dir_p);
 static int _name_auth_file (const char *pipe_name, const char *file_dir,

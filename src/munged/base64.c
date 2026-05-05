@@ -28,11 +28,12 @@
 #  include <config.h>
 #endif /* HAVE_CONFIG_H */
 
+#include "base64.h"
+
 #include <assert.h>
 #include <errno.h>
 #include <limits.h>                     /* INT_MAX */
 #include <string.h>                     /* memcpy, memset, strlen */
-#include "base64.h"
 
 /**
  *  Notes

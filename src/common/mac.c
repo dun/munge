@@ -29,9 +29,11 @@
 #  include <config.h>
 #endif /* HAVE_CONFIG_H */
 
-#include <string.h>                     /* memcpy, memset */
 #include "mac.h"
+
 #include "md.h"
+
+#include <string.h>                     /* memcpy, memset */
 
 
 /*****************************************************************************
@@ -176,8 +178,9 @@ mac_map_enum (munge_mac_t md, void *dst)
 
 #if HAVE_LIBGCRYPT
 
-#include <gcrypt.h>
 #include "log.h"
+
+#include <gcrypt.h>
 
 static int
 _mac_init (mac_ctx *x, munge_mac_t md, const void *key, int keylen)

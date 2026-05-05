@@ -29,6 +29,19 @@
 #  include <config.h>
 #endif /* HAVE_CONFIG_H */
 
+#include "replay.h"
+
+#include "conf.h"
+#include "cred.h"
+#include "hash.h"
+#include "log.h"
+#include "m_msg.h"
+#include "munge_defs.h"
+#include "thread.h"
+#include "timer.h"
+
+#include <munge.h>
+
 #include <assert.h>
 #include <errno.h>
 #include <pthread.h>
@@ -36,16 +49,6 @@
 #include <stdlib.h>                     /* malloc, free */
 #include <string.h>                     /* memcmp, memcpy, memset */
 #include <time.h>                       /* time, time_t */
-#include <munge.h>
-#include "conf.h"
-#include "cred.h"
-#include "hash.h"
-#include "log.h"
-#include "m_msg.h"
-#include "munge_defs.h"
-#include "replay.h"
-#include "thread.h"
-#include "timer.h"
 
 
 /*****************************************************************************

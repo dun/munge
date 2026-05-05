@@ -29,16 +29,19 @@
 #  include "config.h"
 #endif /* HAVE_CONFIG_H */
 
+#include "read.h"
+
+#include "log.h"
+#include "test.h"
+
+#include <munge.h>
+
 #include <assert.h>
 #include <limits.h>                     /* INT_MAX */
 #include <stddef.h>                     /* size_t */
 #include <stdio.h>                      /* ferror, fread, FILE */
 #include <stdlib.h>                     /* realloc, free */
 #include <string.h>                     /* memcpy */
-#include <munge.h>
-#include "log.h"
-#include "read.h"
-#include "test.h"
 
 
 /*****************************************************************************

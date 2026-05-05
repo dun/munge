@@ -33,8 +33,9 @@
 #  include <config.h>
 #endif /* HAVE_CONFIG_H */
 
-#include <munge.h>
 #include "munge_defs.h"
+
+#include <munge.h>
 
 
 /*****************************************************************************

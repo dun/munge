@@ -29,10 +29,11 @@
 #  include "config.h"
 #endif /* HAVE_CONFIG_H */
 
+#include "test.h"
+
 #include <errno.h>
 #include <limits.h>                     /* INT_MIN, INT_MAX */
 #include <stdlib.h>                     /* getenv, strtol */
-#include "test.h"
 
 
 /*****************************************************************************

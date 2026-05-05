@@ -29,6 +29,12 @@
 #  include <config.h>
 #endif /* HAVE_CONFIG_H */
 
+#include "ctx.h"
+
+#include "munge_defs.h"
+
+#include <munge.h>
+
 #include <assert.h>
 #include <netinet/in.h>                 /* in_addr */
 #include <stdarg.h>                     /* va_start, va_arg, va_end, va_list */
@@ -36,9 +42,6 @@
 #include <string.h>                     /* strdup, strlen */
 #include <sys/types.h>                  /* uid_t, gid_t */
 #include <time.h>                       /* time_t */
-#include <munge.h>
-#include "ctx.h"
-#include "munge_defs.h"
 
 
 /*****************************************************************************

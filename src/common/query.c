@@ -29,16 +29,18 @@
 #  include "config.h"
 #endif /* HAVE_CONFIG_H */
 
+#include "query.h"
+
+#include "common.h"                     /* UID_MAXIMUM, GID_MAXIMUM */
+#include "xgetgr.h"
+#include "xgetpw.h"
+
 #include <errno.h>
 #include <grp.h>                        /* group */
 #include <limits.h>                     /* LONG_MIN, LONG_MAX */
 #include <pwd.h>                        /* passwd */
 #include <stdlib.h>                     /* strtol */
 #include <sys/types.h>                  /* uid_t, gid_t */
-#include "common.h"                     /* UID_MAXIMUM, GID_MAXIMUM */
-#include "query.h"
-#include "xgetgr.h"
-#include "xgetpw.h"
 
 
 /*  Queries for the User ID using the [user] string which can specify the

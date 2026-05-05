@@ -29,6 +29,12 @@
 #  include "config.h"
 #endif /* HAVE_CONFIG_H */
 
+#include "xgetgr.h"
+
+#include "log.h"
+
+#include <munge.h>
+
 #if HAVE_GETGRENT_R_GNU
 #define _GNU_SOURCE 1
 #elif HAVE_GETGRENT_R_AIX
@@ -65,9 +71,6 @@
 #include <string.h>                     /* memcpy, memset, strlen */
 #include <sys/types.h>                  /* per getgrent(3) & getgrnam(3) */
 #include <unistd.h>                     /* sysconf */
-#include <munge.h>
-#include "log.h"
-#include "xgetgr.h"
 
 
 /*****************************************************************************

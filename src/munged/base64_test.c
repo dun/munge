@@ -28,10 +28,11 @@
 #  include <config.h>
 #endif /* HAVE_CONFIG_H */
 
-#include <stdlib.h>                     /* exit, EXIT_SUCCESS */
-#include <string.h>                     /* strlen, strncmp */
 #include "base64.h"
 #include "tap.h"
+
+#include <stdlib.h>                     /* exit, EXIT_SUCCESS */
+#include <string.h>                     /* strlen, strncmp */
 
 /**
  *  Test cases from RFC 2440 (OpenPGP Message Format)

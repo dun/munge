@@ -29,11 +29,13 @@
 #  include "config.h"
 #endif /* HAVE_CONFIG_H */
 
+#include "tap.h"
+
+#include <munge.h>
+
 #include <errno.h>
 #include <limits.h>                     /* INT_MAX */
 #include <stdlib.h>                     /* exit, EXIT_SUCCESS */
-#include <munge.h>
-#include "tap.h"
 
 
 void test_opt (int opt, const char *name);

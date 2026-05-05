@@ -29,16 +29,18 @@
 #  include "config.h"
 #endif /* HAVE_CONFIG_H */
 
-#include <assert.h>
-#include <signal.h>                     /* SIG* */
-#include <stdlib.h>                     /* exit, EXIT_SUCCESS */
-#include <munge.h>
 #include "conf.h"
 #include "crypto.h"
 #include "key.h"
 #include "log.h"
 #include "md.h"
 #include "xsignal.h"
+
+#include <munge.h>
+
+#include <assert.h>
+#include <signal.h>                     /* SIG* */
+#include <stdlib.h>                     /* exit, EXIT_SUCCESS */
 
 
 /*****************************************************************************

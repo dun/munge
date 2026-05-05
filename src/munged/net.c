@@ -29,6 +29,8 @@
 #  include <config.h>
 #endif /* HAVE_CONFIG_H */
 
+#include "net.h"
+
 #include <assert.h>
 #include <errno.h>
 #if HAVE_IFADDRS_H
@@ -38,7 +40,6 @@
 #include <netinet/in.h>                 /* in_addr, sockaddr_in */
 #include <string.h>                     /* memset, strcmp, strdup */
 #include <sys/socket.h>                 /* sockaddr, AF_INET, SOCK_STREAM */
-#include "net.h"
 
 
 /*****************************************************************************

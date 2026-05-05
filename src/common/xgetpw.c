@@ -29,6 +29,12 @@
 #  include "config.h"
 #endif /* HAVE_CONFIG_H */
 
+#include "xgetpw.h"
+
+#include "log.h"
+
+#include <munge.h>
+
 #if HAVE_GETPWNAM_R_POSIX
 #define _POSIX_PTHREAD_SEMANTICS 1      /* for SunOS */
 #elif HAVE_GETPWNAM_R_AIX
@@ -53,9 +59,6 @@
 #include <string.h>                     /* memcpy, memset, strlen */
 #include <sys/types.h>                  /* per getpwnam(3) */
 #include <unistd.h>                     /* sysconf */
-#include <munge.h>
-#include "log.h"
-#include "xgetpw.h"
 
 
 /*****************************************************************************

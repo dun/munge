@@ -29,8 +29,9 @@
 #  include "config.h"
 #endif /* HAVE_CONFIG_H */
 
-#include <stdio.h>                      /* printf */
 #include "license.h"
+
+#include <stdio.h>                      /* printf */
 
 
 /*  The license string was broken into an array of strings in order to keep

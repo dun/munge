@@ -29,6 +29,8 @@
 #  include "config.h"
 #endif /* HAVE_CONFIG_H */
 
+#include "fd.h"
+
 #include <assert.h>
 #include <errno.h>
 #include <fcntl.h>                      /* fcntl, F_* */
@@ -39,7 +41,6 @@
 #include <sys/types.h>                  /* size_t, ssize_t */
 #include <sys/uio.h>                    /* writev, iovec */
 #include <unistd.h>                     /* read, write */
-#include "fd.h"
 
 
 /*****************************************************************************

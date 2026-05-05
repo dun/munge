@@ -28,6 +28,12 @@
 #  include <config.h>
 #endif /* HAVE_CONFIG_H */
 
+#include "zip.h"
+
+#include "diag.h"
+
+#include <munge.h>
+
 #if HAVE_BZLIB_H
 #  include <stdio.h>                    /* for Solaris */
 #  include <bzlib.h>
@@ -43,9 +49,6 @@
 #include <limits.h>                     /* INT_MAX */
 #include <stddef.h>                     /* size_t */
 #include <stdint.h>                     /* uint32_t */
-#include <munge.h>
-#include "diag.h"
-#include "zip.h"
 
 /**
  *  Notes

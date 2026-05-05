@@ -29,12 +29,14 @@
 #  include "config.h"
 #endif /* HAVE_CONFIG_H */
 
+#include "daemonpipe.h"
+
+#include "fd.h"
+
 #include <errno.h>
 #include <string.h>                     /* memccpy, strlen */
 #include <sys/types.h>                  /* size_t, ssize_t */
 #include <unistd.h>                     /* close, pipe */
-#include "daemonpipe.h"
-#include "fd.h"
 
 
 /*****************************************************************************

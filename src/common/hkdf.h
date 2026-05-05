@@ -28,8 +28,9 @@
 #ifndef MUNGE_HKDF_H
 #define MUNGE_HKDF_H
 
-#include <stddef.h>                     /* size_t */
 #include <munge.h>
+
+#include <stddef.h>                     /* size_t */
 
 
 /*****************************************************************************

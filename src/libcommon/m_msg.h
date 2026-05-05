@@ -29,10 +29,11 @@
 #define MUNGE_MSG_H
 
 
+#include <munge.h>
+
 #include <netinet/in.h>                 /* in_addr */
 #include <stddef.h>                     /* size_t */
 #include <stdint.h>                     /* uint8_t, uint32_t */
-#include <munge.h>
 
 
 /*****************************************************************************

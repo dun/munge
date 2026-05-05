@@ -29,18 +29,21 @@
 #  include "config.h"
 #endif /* HAVE_CONFIG_H */
 
+#include "hkdf.h"
+
+#include "common.h"                     /* MIN */
+#include "log.h"
+#include "mac.h"
+#include "memwipe.h"
+
+#include <munge.h>
+
 #include <assert.h>
 #include <errno.h>
 #include <limits.h>                     /* INT_MAX */
 #include <stddef.h>                     /* size_t */
 #include <stdlib.h>                     /* calloc, free */
 #include <string.h>                     /* memcpy */
-#include <munge.h>
-#include "common.h"                     /* MIN */
-#include "hkdf.h"
-#include "log.h"
-#include "mac.h"
-#include "memwipe.h"
 
 
 /*****************************************************************************

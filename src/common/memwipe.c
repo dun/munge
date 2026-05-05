@@ -35,6 +35,8 @@
 #  define __STDC_WANT_LIB_EXT1__ 1
 #endif /* NEED_STDC_WANT_LIB_EXT1 */
 
+#include "memwipe.h"
+
 #include <assert.h>
 #include <stddef.h>                     /* size_t */
 
@@ -49,8 +51,6 @@
 #  include <string.h>
 #  include <strings.h>
 #endif
-
-#include "memwipe.h"
 
 /**
  *  Overwrite the first [n] bytes of [v] with the null byte in a manner that

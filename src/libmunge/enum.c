@@ -29,10 +29,11 @@
 #  include <config.h>
 #endif /* HAVE_CONFIG_H */
 
+#include <munge.h>
+
 #include <errno.h>
 #include <stdlib.h>                     /* strtol */
 #include <strings.h>                    /* strcasecmp */
-#include <munge.h>
 
 
 /*****************************************************************************

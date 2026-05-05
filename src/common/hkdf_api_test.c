@@ -29,15 +29,17 @@
 #  include "config.h"
 #endif /* HAVE_CONFIG_H */
 
-#include <errno.h>
-#include <stddef.h>                     /* size_t */
-#include <stdlib.h>                     /* exit, EXIT_SUCCESS */
-#include <string.h>                     /* memcmp, memset */
-#include <munge.h>
 #include "crypto.h"
 #include "hkdf.h"
 #include "md.h"
 #include "tap.h"
+
+#include <munge.h>
+
+#include <errno.h>
+#include <stddef.h>                     /* size_t */
+#include <stdlib.h>                     /* exit, EXIT_SUCCESS */
+#include <string.h>                     /* memcmp, memset */
 
 
 int

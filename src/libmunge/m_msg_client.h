@@ -29,8 +29,9 @@
 #define MUNGE_MSG_CLIENT_H
 
 
-#include <munge.h>
 #include "m_msg.h"
+
+#include <munge.h>
 
 
 munge_err_t m_msg_client_xfer (

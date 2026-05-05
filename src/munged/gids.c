@@ -29,6 +29,18 @@
 #  include "config.h"
 #endif /* HAVE_CONFIG_H */
 
+#include "gids.h"
+
+#include "common.h"                     /* UID_SENTINEL */
+#include "conf.h"
+#include "hash.h"
+#include "log.h"
+#include "timer.h"
+#include "xgetgr.h"
+#include "xgetpw.h"
+
+#include <munge.h>
+
 #include <assert.h>
 #include <errno.h>
 #include <grp.h>                        /* group */
@@ -40,15 +52,6 @@
 #include <sys/time.h>                   /* gettimeofday, timeval */
 #include <sys/types.h>                  /* size_t, uid_t, gid_t */
 #include <time.h>                       /* time, time_t */
-#include <munge.h>
-#include "common.h"                     /* UID_SENTINEL */
-#include "conf.h"
-#include "gids.h"
-#include "hash.h"
-#include "log.h"
-#include "timer.h"
-#include "xgetgr.h"
-#include "xgetpw.h"
 
 
 /*****************************************************************************

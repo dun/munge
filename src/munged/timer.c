@@ -33,6 +33,14 @@
 #  include <config.h>
 #endif /* HAVE_CONFIG_H */
 
+#include "timer.h"
+
+#include "clock.h"
+#include "log.h"
+#include "thread.h"
+
+#include <munge.h>
+
 #include <assert.h>
 #include <errno.h>
 #include <pthread.h>
@@ -40,11 +48,6 @@
 #include <stdlib.h>                     /* malloc, free */
 #include <time.h>                       /* timespec */
 #include <unistd.h>                     /* _POSIX_THREAD_ATTR_STACKSIZE */
-#include <munge.h>
-#include "clock.h"
-#include "log.h"
-#include "thread.h"
-#include "timer.h"
 
 
 /*****************************************************************************

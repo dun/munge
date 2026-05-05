@@ -29,6 +29,18 @@
 #  include <config.h>
 #endif /* HAVE_CONFIG_H */
 
+#include "key.h"
+
+#include "conf.h"
+#include "entropy.h"
+#include "fd.h"
+#include "hkdf.h"
+#include "log.h"
+#include "memwipe.h"
+#include "munge_defs.h"
+
+#include <munge.h>
+
 #include <assert.h>
 #include <errno.h>
 #include <fcntl.h>                      /* open, O_* */
@@ -36,15 +48,6 @@
 #include <stdio.h>                      /* snprintf */
 #include <string.h>                     /* strlen */
 #include <unistd.h>                     /* close, unlink */
-#include <munge.h>
-#include "conf.h"
-#include "entropy.h"
-#include "fd.h"
-#include "hkdf.h"
-#include "key.h"
-#include "log.h"
-#include "memwipe.h"
-#include "munge_defs.h"
 
 
 /*****************************************************************************

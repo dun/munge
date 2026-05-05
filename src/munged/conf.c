@@ -29,6 +29,23 @@
 #  include <config.h>
 #endif /* HAVE_CONFIG_H */
 
+#include "conf.h"
+
+#include "clock.h"
+#include "gids.h"                       /* GIDS_GROUP_FILE */
+#include "license.h"
+#include "lock.h"
+#include "log.h"
+#include "md.h"
+#include "memwipe.h"
+#include "munge_defs.h"
+#include "net.h"
+#include "path.h"
+#include "str.h"
+#include "version.h"
+
+#include <munge.h>
+
 #include <arpa/inet.h>                  /* inet_ntop, ntohl */
 #include <assert.h>
 #include <errno.h>
@@ -46,20 +63,6 @@
 #include <sys/types.h>                  /* pid_t */
 #include <time.h>                       /* clock_nanosleep, nanosleep, timespec */
 #include <unistd.h>                     /* close, getcwd, geteuid, gethostname, read, unlink */
-#include <munge.h>
-#include "clock.h"
-#include "conf.h"
-#include "gids.h"                       /* GIDS_GROUP_FILE */
-#include "license.h"
-#include "lock.h"
-#include "log.h"
-#include "md.h"
-#include "memwipe.h"
-#include "munge_defs.h"
-#include "net.h"
-#include "path.h"
-#include "str.h"
-#include "version.h"
 
 
 /*****************************************************************************

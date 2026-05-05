@@ -29,6 +29,21 @@
 #  include "config.h"
 #endif /* HAVE_CONFIG_H */
 
+#include "job.h"
+
+#include "conf.h"
+#include "dec.h"
+#include "enc.h"
+#include "fd.h"
+#include "gids.h"
+#include "log.h"
+#include "m_msg.h"
+#include "munge_defs.h"
+#include "str.h"
+#include "work.h"
+
+#include <munge.h>
+
 #include <arpa/inet.h>                  /* inet_ntop */
 #include <assert.h>
 #include <errno.h>
@@ -38,18 +53,6 @@
 #include <sys/socket.h>                 /* accept */
 #include <time.h>                       /* time, time_t */
 #include <unistd.h>                     /* close */
-#include <munge.h>
-#include "conf.h"
-#include "dec.h"
-#include "enc.h"
-#include "fd.h"
-#include "gids.h"
-#include "job.h"
-#include "log.h"
-#include "m_msg.h"
-#include "munge_defs.h"
-#include "str.h"
-#include "work.h"
 
 
 /*****************************************************************************

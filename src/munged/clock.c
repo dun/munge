@@ -29,10 +29,11 @@
 #  include <config.h>
 #endif /* HAVE_CONFIG_H */
 
+#include "clock.h"
+
 #include <errno.h>
 #include <sys/time.h>                   /* gettimeofday, timeval */
 #include <time.h>                       /* clock_gettime, timespec, CLOCK_* */
-#include "clock.h"
 
 
 /*  Set timespec [tsp] to the current time adjusted forward by

@@ -29,13 +29,15 @@
 #  include "config.h"
 #endif /* HAVE_CONFIG_H */
 
-#include <stdlib.h>                     /* exit, EXIT_SUCCESS */
-#include <string.h>                     /* memset, strlen */
-#include <munge.h>
 #include "crypto.h"
 #include "mac.h"
 #include "md.h"
 #include "tap.h"
+
+#include <munge.h>
+
+#include <stdlib.h>                     /* exit, EXIT_SUCCESS */
+#include <string.h>                     /* memset, strlen */
 
 
 int check_mac (munge_mac_t m, const char *str, const char *key, int keylen,

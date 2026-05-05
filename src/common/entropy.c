@@ -28,6 +28,11 @@
 #  include "config.h"
 #endif /* HAVE_CONFIG_H */
 
+#include "entropy.h"
+
+#include "fd.h"
+#include "log.h"
+
 #include <errno.h>
 #include <fcntl.h>                      /* open, O_* */
 #include <stddef.h>                     /* size_t */
@@ -51,9 +56,6 @@
 #endif /* HAVE_GETTIMEOFDAY */
 #include <time.h>                       /* clock, clock_gettime, timespec */
 #include <unistd.h>                     /* close, getentropy, getpid, getppid */
-#include "entropy.h"
-#include "fd.h"
-#include "log.h"
 
 /*  Maximum request size for entropy_read_csprng() syscall paths.
  *  For getrandom(2), reads up to this size return the full byte count and are

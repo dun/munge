@@ -29,6 +29,10 @@
 #  include "config.h"
 #endif /* HAVE_CONFIG_H */
 
+#include "hash.h"
+
+#include "thread.h"
+
 #include <assert.h>
 #include <errno.h>
 #if WITH_PTHREADS
@@ -37,8 +41,6 @@
 #include <stddef.h>                     /* size_t */
 #include <stdlib.h>                     /* calloc, malloc, free */
 #include <string.h>                     /* memset */
-#include "hash.h"
-#include "thread.h"
 
 
 /*****************************************************************************

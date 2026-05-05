@@ -29,23 +29,14 @@
 #  include "config.h"
 #endif /* HAVE_CONFIG_H */
 
-#include <arpa/inet.h>                  /* ntohl */
-#include <assert.h>
-#include <ctype.h>                      /* isspace */
-#include <errno.h>
-#include <stdint.h>                     /* uint32_t */
-#include <stdlib.h>                     /* malloc, free */
-#include <string.h>                     /* memcpy, memset, strdup, strncmp */
-#include <sys/types.h>                  /* uid_t, gid_t */
-#include <time.h>                       /* time, time_t */
-#include <munge.h>
+#include "dec.h"
+
 #include "auth_recv.h"
 #include "base64.h"
 #include "cipher.h"
 #include "conf.h"
 #include "cred.h"
 #include "crypto.h"
-#include "dec.h"
 #include "gids.h"
 #include "log.h"
 #include "m_msg.h"
@@ -55,6 +46,18 @@
 #include "replay.h"
 #include "str.h"
 #include "zip.h"
+
+#include <munge.h>
+
+#include <arpa/inet.h>                  /* ntohl */
+#include <assert.h>
+#include <ctype.h>                      /* isspace */
+#include <errno.h>
+#include <stdint.h>                     /* uint32_t */
+#include <stdlib.h>                     /* malloc, free */
+#include <string.h>                     /* memcpy, memset, strdup, strncmp */
+#include <sys/types.h>                  /* uid_t, gid_t */
+#include <time.h>                       /* time, time_t */
 
 
 /*****************************************************************************

@@ -29,6 +29,11 @@
 #  include "config.h"
 #endif /* HAVE_CONFIG_H */
 
+#include "log.h"
+
+#include "daemonpipe.h"
+#include "str.h"                        /* strftimet */
+
 #include <assert.h>
 #include <errno.h>
 #include <stdarg.h>                     /* va_start, va_end, va_list */
@@ -36,9 +41,6 @@
 #include <stdlib.h>                     /* abort, exit, getenv */
 #include <string.h>                     /* memccpy, memcpy, strerror, strrchr */
 #include <syslog.h>                     /* openlog, syslog, closelog */
-#include "daemonpipe.h"
-#include "log.h"
-#include "str.h"                        /* strftimet */
 
 
 /*****************************************************************************

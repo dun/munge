@@ -29,6 +29,14 @@
 #  include "config.h"
 #endif /* HAVE_CONFIG_H */
 
+#include "m_msg.h"
+
+#include "fd.h"
+#include "munge_defs.h"
+#include "str.h"
+
+#include <munge.h>
+
 #include <arpa/inet.h>                  /* htonl, htons, ntohl, ntohs */
 #include <assert.h>
 #include <errno.h>
@@ -39,11 +47,6 @@
 #include <sys/time.h>                   /* gettimeofday, timeval */
 #include <sys/uio.h>                    /* iovec */
 #include <unistd.h>                     /* close */
-#include <munge.h>
-#include "fd.h"
-#include "m_msg.h"
-#include "munge_defs.h"
-#include "str.h"
 
 
 /*****************************************************************************

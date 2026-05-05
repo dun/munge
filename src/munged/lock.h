@@ -29,8 +29,9 @@
 #define MUNGE_LOCK_H
 
 
-#include <sys/types.h>                  /* pid_t */
 #include "conf.h"
+
+#include <sys/types.h>                  /* pid_t */
 
 
 void lock_create (conf_t conf);

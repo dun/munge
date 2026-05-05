@@ -29,10 +29,12 @@
 #  include <config.h>
 #endif /* HAVE_CONFIG_H */
 
+#include "cipher.h"
+
+#include <munge.h>
+
 #include <assert.h>
 #include <string.h>                     /* memset */
-#include <munge.h>
-#include "cipher.h"
 
 
 /*****************************************************************************
@@ -220,11 +222,12 @@ cipher_map_enum (munge_cipher_t cipher, void *dst)
 
 #if HAVE_LIBGCRYPT
 
+#include "common.h"                     /* MIN */
+#include "log.h"
+
 #include <gcrypt.h>
 #include <stddef.h>                     /* size_t */
 #include <string.h>                     /* memcpy */
-#include "common.h"                     /* MIN */
-#include "log.h"
 
 static int _cipher_map [MUNGE_CIPHER_LAST_ITEM];
 

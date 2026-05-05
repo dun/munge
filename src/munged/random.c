@@ -29,21 +29,24 @@
 #  include <config.h>
 #endif /* HAVE_CONFIG_H */
 
-#include <assert.h>
-#include <errno.h>
-#include <fcntl.h>                      /* open, O_* */
-#include <string.h>                     /* strerror */
-#include <sys/stat.h>                   /* stat, fstat, lstat, S_* */
-#include <unistd.h>                     /* close, geteuid, unlink */
-#include <munge.h>
+#include "random.h"
+
 #include "common.h"                     /* MIN */
 #include "conf.h"
 #include "entropy.h"
 #include "fd.h"
 #include "log.h"
 #include "path.h"
-#include "random.h"
 #include "timer.h"
+
+#include <munge.h>
+
+#include <assert.h>
+#include <errno.h>
+#include <fcntl.h>                      /* open, O_* */
+#include <string.h>                     /* strerror */
+#include <sys/stat.h>                   /* stat, fstat, lstat, S_* */
+#include <unistd.h>                     /* close, geteuid, unlink */
 
 
 /*****************************************************************************

@@ -29,11 +29,14 @@
 #  include "config.h"
 #endif /* HAVE_CONFIG_H */
 
+#include "xsignal.h"
+
+#include "log.h"
+
+#include <munge.h>
+
 #include <signal.h>                     /* sigaction, sigfillset, SIG_IGN */
 #include <string.h>                     /* strsignal */
-#include <munge.h>
-#include "log.h"
-#include "xsignal.h"
 
 
 /*  Ignore the signal specified by [sig].

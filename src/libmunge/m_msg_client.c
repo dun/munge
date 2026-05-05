@@ -29,6 +29,17 @@
 #  include "config.h"
 #endif /* HAVE_CONFIG_H */
 
+#include "m_msg_client.h"
+
+#include "auth_send.h"
+#include "ctx.h"
+#include "fd.h"
+#include "m_msg.h"
+#include "munge_defs.h"
+#include "str.h"
+
+#include <munge.h>
+
 #include <assert.h>
 #include <errno.h>
 #include <stddef.h>                     /* size_t */
@@ -38,14 +49,6 @@
 #include <sys/un.h>                     /* sockaddr_un */
 #include <time.h>                       /* nanosleep, timespec */
 #include <unistd.h>                     /* close */
-#include <munge.h>
-#include "auth_send.h"
-#include "ctx.h"
-#include "fd.h"
-#include "m_msg.h"
-#include "m_msg_client.h"
-#include "munge_defs.h"
-#include "str.h"
 
 
 /*****************************************************************************

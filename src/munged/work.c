@@ -29,6 +29,12 @@
 #  include "config.h"
 #endif /* HAVE_CONFIG_H */
 
+#include "work.h"
+
+#include "log.h"
+
+#include <munge.h>
+
 #include <assert.h>
 #include <errno.h>
 #include <pthread.h>
@@ -37,9 +43,6 @@
 #include <stdlib.h>                     /* malloc, free */
 #include <string.h>                     /* strerror */
 #include <unistd.h>                     /* _POSIX_THREAD_ATTR_STACKSIZE */
-#include <munge.h>
-#include "log.h"
-#include "work.h"
 
 
 /*****************************************************************************

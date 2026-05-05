@@ -29,15 +29,17 @@
 #  include <config.h>
 #endif /* HAVE_CONFIG_H */
 
-#include <assert.h>
-#include <stdlib.h>                     /* free */
-#include <string.h>                     /* strdup, strlen */
-#include <munge.h>
 #include "ctx.h"
 #include "m_msg.h"
 #include "m_msg_client.h"
 #include "munge_defs.h"
 #include "str.h"
+
+#include <munge.h>
+
+#include <assert.h>
+#include <stdlib.h>                     /* free */
+#include <string.h>                     /* strdup, strlen */
 
 
 /*****************************************************************************
