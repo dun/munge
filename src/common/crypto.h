@@ -30,11 +30,11 @@
 
 
 #if HAVE_CONFIG_H
-#  include <config.h>
+#include <config.h>
 #endif /* HAVE_CONFIG_H */
 
 #if HAVE_LIBGCRYPT && HAVE_OPENSSL
-#  error "Libgcrypt and OpenSSL are mutually-exclusive"
+#error "Libgcrypt and OpenSSL are mutually-exclusive"
 #endif /* HAVE_LIBGCRYPT && HAVE_OPENSSL */
 
 #include <stddef.h>                     /* size_t */

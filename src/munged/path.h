@@ -33,7 +33,7 @@
 #include <sys/types.h>                  /* gid_t, size_t */
 
 #ifndef PATH_MAX
-#  define PATH_MAX 4096
+#define PATH_MAX 4096
 #endif /* PATH_MAX */
 
 

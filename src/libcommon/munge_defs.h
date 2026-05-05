@@ -29,7 +29,7 @@
 #define MUNGE_DEFS_H
 
 #if HAVE_CONFIG_H
-#  include "config.h"
+#include "config.h"
 #endif /* HAVE_CONFIG_H */
 
 #include <munge.h>
@@ -56,18 +56,18 @@
  *    <http://www.schneier.com/blog/archives/2009/07/another_new_aes.html>
  */
 #if HAVE_OPENSSL && !HAVE_EVP_AES_128_CBC
-#  define MUNGE_DEFAULT_CIPHER          MUNGE_CIPHER_CAST5
+#define MUNGE_DEFAULT_CIPHER            MUNGE_CIPHER_CAST5
 #else
-#  define MUNGE_DEFAULT_CIPHER          MUNGE_CIPHER_AES128
+#define MUNGE_DEFAULT_CIPHER            MUNGE_CIPHER_AES128
 #endif /* HAVE_OPENSSL && !HAVE_EVP_AES_128_CBC */
 
 /*  Default munge_mac_t for validating credentials.
  *    This should NEVER be set to MUNGE_MAC_NONE.
  */
 #if HAVE_OPENSSL && !HAVE_EVP_SHA256
-#  define MUNGE_DEFAULT_MAC             MUNGE_MAC_SHA1
+#define MUNGE_DEFAULT_MAC               MUNGE_MAC_SHA1
 #else
-#  define MUNGE_DEFAULT_MAC             MUNGE_MAC_SHA256
+#define MUNGE_DEFAULT_MAC               MUNGE_MAC_SHA256
 #endif /* HAVE_OPENSSL && !HAVE_EVP_SHA256 */
 
 /*  Integer for the default number of seconds before a credential expires.

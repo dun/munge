@@ -52,14 +52,14 @@
             && ((__GNUC__ > 4) \
                 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 6))) \
         || (defined (__clang__) && (__clang_major__ >= 3))
-#  define DIAG_PRAGMA(x)        _Pragma (#x)
-#  define DIAG_PUSH             DIAG_PRAGMA (GCC diagnostic push)
-#  define DIAG_POP              DIAG_PRAGMA (GCC diagnostic pop)
-#  define DIAG_OFF(w)           DIAG_PRAGMA (GCC diagnostic ignored w)
+#define DIAG_PRAGMA(x)          _Pragma (#x)
+#define DIAG_PUSH               DIAG_PRAGMA (GCC diagnostic push)
+#define DIAG_POP                DIAG_PRAGMA (GCC diagnostic pop)
+#define DIAG_OFF(w)             DIAG_PRAGMA (GCC diagnostic ignored w)
 #else
-#  define DIAG_PUSH             /* empty */
-#  define DIAG_POP              /* empty */
-#  define DIAG_OFF(w)           /* empty */
+#define DIAG_PUSH               /* empty */
+#define DIAG_POP                /* empty */
+#define DIAG_OFF(w)             /* empty */
 #endif /* (__GNUC__ >= 4.6) || (__clang__ >= 3.0) */
 
 #endif /* MUNGE_DIAG_H */

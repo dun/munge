@@ -25,7 +25,7 @@
  *****************************************************************************/
 
 #if HAVE_CONFIG_H
-#  include <config.h>
+#include <config.h>
 #endif /* HAVE_CONFIG_H */
 
 #include "zip.h"
@@ -35,12 +35,12 @@
 #include <munge.h>
 
 #if HAVE_BZLIB_H
-#  include <stdio.h>                    /* for Solaris */
-#  include <bzlib.h>
+#include <stdio.h>                      /* for Solaris */
+#include <bzlib.h>
 #endif /* HAVE_BZLIB_H */
 
 #if HAVE_ZLIB_H
-#  include <zlib.h>
+#include <zlib.h>
 #endif /* HAVE_ZLIB_H */
 
 #include <arpa/inet.h>                  /* htonl, ntohl */

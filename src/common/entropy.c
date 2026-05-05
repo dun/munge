@@ -25,7 +25,7 @@
  *****************************************************************************/
 
 #if HAVE_CONFIG_H
-#  include "config.h"
+#include "config.h"
 #endif /* HAVE_CONFIG_H */
 
 #include "entropy.h"
@@ -37,7 +37,7 @@
 #include <fcntl.h>                      /* open, O_* */
 #include <stddef.h>                     /* size_t */
 #if HAVE_GETLOADAVG
-#  include <stdlib.h>                   /* getloadavg */
+#include <stdlib.h>                     /* getloadavg */
 #endif /* HAVE_GETLOADAVG */
 #include <string.h>                     /* memcpy, strerror */
 /*
@@ -45,14 +45,14 @@
  *  causing compilation errors.  Only include it when needed.
  */
 #if HAVE_SYS_RANDOM_H && (HAVE_GETRANDOM || HAVE_GETENTROPY)
-#  include <sys/random.h>               /* getrandom, getentropy (macOS) */
+#include <sys/random.h>                 /* getrandom, getentropy (macOS) */
 #endif /* HAVE_SYS_RANDOM_H && (HAVE_GETRANDOM || HAVE_GETENTROPY) */
 #if HAVE_GETRUSAGE
-#  include <sys/resource.h>             /* getrusage, rusage */
+#include <sys/resource.h>               /* getrusage, rusage */
 #endif /* HAVE_GETRUSAGE */
 #include <sys/stat.h>                   /* stat, fstat */
 #if HAVE_GETTIMEOFDAY
-#  include <sys/time.h>                 /* gettimeofday, timeval */
+#include <sys/time.h>                   /* gettimeofday, timeval */
 #endif /* HAVE_GETTIMEOFDAY */
 #include <time.h>                       /* clock, clock_gettime, timespec */
 #include <unistd.h>                     /* close, getentropy, getpid, getppid */

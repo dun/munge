@@ -32,23 +32,23 @@
 #if WITH_PTHREADS
 
 #if HAVE_CONFIG_H
-#  include <config.h>
+#include <config.h>
 #endif /* HAVE_CONFIG_H */
 
-#  include <errno.h>
-#  include <pthread.h>
-#  include <stdlib.h>                   /* abort */
+#include <errno.h>
+#include <pthread.h>
+#include <stdlib.h>                     /* abort */
 
-#  ifdef WITH_LSD_FATAL_ERROR_FUNC
-#    undef lsd_fatal_error
+#ifdef WITH_LSD_FATAL_ERROR_FUNC
+#undef lsd_fatal_error
      extern void lsd_fatal_error (char *file, int line, char *mesg);
-#  else
-#    ifndef lsd_fatal_error
-#      define lsd_fatal_error(file, line, mesg) (abort ())
-#    endif /* lsd_fatal_error */
-#  endif /* WITH_LSD_FATAL_ERROR_FUNC */
+#else
+#ifndef lsd_fatal_error
+#define lsd_fatal_error(file, line, mesg) (abort ())
+#endif /* lsd_fatal_error */
+#endif /* WITH_LSD_FATAL_ERROR_FUNC */
 
-#  define lsd_mutex_init(pmutex)                                              \
+#define lsd_mutex_init(pmutex)                                                \
      do {                                                                     \
          int e = pthread_mutex_init (pmutex, NULL);                           \
          if (e != 0) {                                                        \
@@ -58,7 +58,7 @@
          }                                                                    \
      } while (0)
 
-#  define lsd_mutex_lock(pmutex)                                              \
+#define lsd_mutex_lock(pmutex)                                                \
      do {                                                                     \
          int e = pthread_mutex_lock (pmutex);                                 \
          if (e != 0) {                                                        \
@@ -68,7 +68,7 @@
          }                                                                    \
      } while (0)
 
-#  define lsd_mutex_unlock(pmutex)                                            \
+#define lsd_mutex_unlock(pmutex)                                              \
      do {                                                                     \
          int e = pthread_mutex_unlock (pmutex);                               \
          if (e != 0) {                                                        \
@@ -78,7 +78,7 @@
          }                                                                    \
      } while (0)
 
-#  define lsd_mutex_destroy(pmutex)                                           \
+#define lsd_mutex_destroy(pmutex)                                             \
      do {                                                                     \
          int e = pthread_mutex_destroy (pmutex);                              \
          if (e != 0) {                                                        \
@@ -88,17 +88,17 @@
          }                                                                    \
      } while (0)
 
-#  ifndef NDEBUG
+#ifndef NDEBUG
      int lsd_mutex_is_locked (pthread_mutex_t *pmutex);
-#  endif /* NDEBUG */
+#endif /* NDEBUG */
 
 #else
 
-#  define lsd_mutex_init(mutex)
-#  define lsd_mutex_lock(mutex)
-#  define lsd_mutex_unlock(mutex)
-#  define lsd_mutex_destroy(mutex)
-#  define lsd_mutex_is_locked(mutex) (1)
+#define lsd_mutex_init(mutex)
+#define lsd_mutex_lock(mutex)
+#define lsd_mutex_unlock(mutex)
+#define lsd_mutex_destroy(mutex)
+#define lsd_mutex_is_locked(mutex) (1)
 
 #endif /* WITH_PTHREADS */
 

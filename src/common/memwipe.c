@@ -25,14 +25,14 @@
  *****************************************************************************/
 
 #if HAVE_CONFIG_H
-#  include <config.h>
+#include <config.h>
 #endif /* HAVE_CONFIG_H */
 
 /*  Request C11 Annex K declarations (memset_s) from <string.h> when supported.
  *  This macro must be defined before the first inclusion of <string.h>.
  */
 #ifdef NEED_STDC_WANT_LIB_EXT1
-#  define __STDC_WANT_LIB_EXT1__ 1
+#define __STDC_WANT_LIB_EXT1__ 1
 #endif /* NEED_STDC_WANT_LIB_EXT1 */
 
 #include "memwipe.h"
@@ -48,8 +48,8 @@
     || HAVE_EXPLICIT_BZERO \
     || HAVE_EXPLICIT_MEMSET \
     || HAVE_MEMSET_S
-#  include <string.h>
-#  include <strings.h>
+#include <string.h>
+#include <strings.h>
 #endif
 
 /**
