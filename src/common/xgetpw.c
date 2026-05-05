@@ -47,12 +47,12 @@
 
 #include <assert.h>
 #include <errno.h>
-#include <pwd.h>
-#include <stddef.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/types.h>
-#include <unistd.h>
+#include <pwd.h>                        /* getpwnam*, passwd */
+#include <stddef.h>                     /* size_t */
+#include <stdlib.h>                     /* malloc, realloc, free */
+#include <string.h>                     /* memcpy, memset, strlen */
+#include <sys/types.h>                  /* per getpwnam(3) */
+#include <unistd.h>                     /* sysconf */
 #include <munge.h>
 #include "log.h"
 #include "xgetpw.h"

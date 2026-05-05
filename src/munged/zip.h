@@ -27,10 +27,6 @@
 #ifndef MUNGE_ZIP_H
 #define MUNGE_ZIP_H
 
-#if HAVE_CONFIG_H
-#  include <config.h>
-#endif /* HAVE_CONFIG_H */
-
 #include <munge.h>
 
 int zip_validate_type (munge_zip_t type);

@@ -28,13 +28,14 @@
 #ifndef MUNGE_XGETGR_H
 #define MUNGE_XGETGR_H
 
-#include <grp.h>
-#include <stddef.h>
+#include <stddef.h>                     /* size_t */
 
 
 /*****************************************************************************
  *  Data Types
  *****************************************************************************/
+
+struct group;
 
 typedef struct xgrbuf_t * xgrbuf_p;
 

@@ -29,11 +29,7 @@
 #define MUNGE_DAEMONPIPE_H
 
 
-#if HAVE_CONFIG_H
-#  include "config.h"
-#endif /* HAVE_CONFIG_H */
-
-#include <sys/types.h>
+#include <stddef.h>                     /* size_t */
 
 
 int daemonpipe_create (void);

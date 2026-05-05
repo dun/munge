@@ -36,10 +36,10 @@
 #include <assert.h>
 #include <errno.h>
 #include <pthread.h>
-#include <signal.h>
-#include <stdlib.h>
-#include <time.h>
-#include <unistd.h>
+#include <signal.h>                     /* sigfillset, sigset_t */
+#include <stdlib.h>                     /* malloc, free */
+#include <time.h>                       /* timespec */
+#include <unistd.h>                     /* _POSIX_THREAD_ATTR_STACKSIZE */
 #include <munge.h>
 #include "clock.h"
 #include "log.h"

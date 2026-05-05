@@ -30,8 +30,8 @@
 
 #include <assert.h>
 #include <errno.h>
-#include <limits.h>
-#include <string.h>
+#include <limits.h>                     /* INT_MAX */
+#include <string.h>                     /* memcpy, memset, strlen */
 #include "base64.h"
 
 /**
@@ -446,9 +446,9 @@ base64_decode_length (int srclen)
 
 #ifdef MUNGE_BASE64_INIT
 
-#include <ctype.h>
-#include <stdio.h>
-#include <stdlib.h>
+#include <ctype.h>                      /* isspace */
+#include <stdio.h>                      /* printf */
+#include <stdlib.h>                     /* atoi, exit, EXIT_SUCCESS */
 
 #define BASE64_DEF_COLS 12
 

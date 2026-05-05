@@ -31,24 +31,23 @@
 
 #include <assert.h>
 #include <errno.h>
-#include <fcntl.h>
-#include <munge.h>
-#include <signal.h>
-#include <stdlib.h>
-#include <string.h>
+#include <fcntl.h>                      /* open, O_RDWR */
+#include <signal.h>                     /* sigaction, sig_atomic_t, SIG* */
+#include <stdlib.h>                     /* exit, free, EXIT_* */
+#include <stdio.h>                      /* fopen, fprintf, snprintf, fclose, FILE, EOF, stderr */
+#include <string.h>                     /* memset, strerror, strnlen, strsignal */
 #if HAVE_MLOCKALL
-#include <sys/mman.h>
+#include <sys/mman.h>                   /* mlockall, MCL_* */
 #endif /* HAVE_MLOCKALL */
-#include <sys/resource.h>
-#include <sys/socket.h>
-#include <sys/stat.h>
-#include <sys/time.h>
-#include <sys/types.h>
-#include <sys/un.h>
-#include <unistd.h>
+#include <sys/resource.h>               /* getrlimit, setrlimit, rlimit, RLIMIT_* */
+#include <sys/socket.h>                 /* socket, bind, listen */
+#include <sys/stat.h>                   /* (l)stat, umask, S_* */
+#include <sys/types.h>                  /* mode_t, pid_t, size_t */
+#include <sys/un.h>                     /* sockaddr_un */
+#include <unistd.h>                     /* chdir, close, dup2, fork, geteuid, getpid, setsid, unlink, STD*_FILENO */
+#include <munge.h>
 #include "auth_recv.h"
 #include "cipher.h"
-#include "common.h"
 #include "conf.h"
 #include "crypto.h"
 #include "daemonpipe.h"
@@ -58,11 +57,9 @@
 #include "lock.h"
 #include "log.h"
 #include "md.h"
-#include "munge_defs.h"
 #include "path.h"
 #include "random.h"
 #include "replay.h"
-#include "str.h"
 #include "timer.h"
 #include "work.h"
 #include "xsignal.h"

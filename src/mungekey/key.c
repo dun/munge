@@ -31,11 +31,12 @@
 
 #include <assert.h>
 #include <errno.h>
-#include <fcntl.h>
-#include <string.h>
-#include <sys/types.h>
-#include <unistd.h>
-#include "common.h"
+#include <fcntl.h>                      /* open, O_* */
+#include <stddef.h>                     /* size_t */
+#include <stdio.h>                      /* snprintf */
+#include <string.h>                     /* strlen */
+#include <unistd.h>                     /* close, unlink */
+#include <munge.h>
 #include "conf.h"
 #include "entropy.h"
 #include "fd.h"
@@ -44,7 +45,6 @@
 #include "log.h"
 #include "memwipe.h"
 #include "munge_defs.h"
-#include "str.h"
 
 
 /*****************************************************************************

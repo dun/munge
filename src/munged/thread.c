@@ -29,14 +29,14 @@
 #  include "config.h"
 #endif /* HAVE_CONFIG_H */
 
-#include <assert.h>
-#include <errno.h>
-#include <pthread.h>
 #include "thread.h"
 
 
 #if WITH_PTHREADS
 #ifndef NDEBUG
+#include <assert.h>
+#include <errno.h>
+#include <pthread.h>
 int
 lsd_mutex_is_locked (pthread_mutex_t *mutex)
 {

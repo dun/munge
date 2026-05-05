@@ -29,12 +29,8 @@
 #define MUNGE_LOG_H
 
 
-#if HAVE_CONFIG_H
-#  include "config.h"
-#endif /* HAVE_CONFIG_H */
-
-#include <stdio.h>
-#include <syslog.h>
+#include <stdio.h>                      /* FILE */
+#include <syslog.h>                     /* syslog(3) LOG_* levels */
 
 
 #define LOG_OPT_NONE            0x00

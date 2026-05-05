@@ -29,8 +29,7 @@
 #  include <config.h>
 #endif /* HAVE_CONFIG_H */
 
-#include <assert.h>
-#include <string.h>
+#include <string.h>                     /* memcpy, memset */
 #include "mac.h"
 #include "md.h"
 
@@ -298,7 +297,8 @@ _mac_map_enum (munge_mac_t md, void *dst)
 
 #if HAVE_OPENSSL
 
-#include <limits.h>
+#include <limits.h>                     /* INT_MAX */
+#include <stddef.h>                     /* size_t */
 #include <openssl/evp.h>
 
 #if HAVE_OPENSSL_CORE_H

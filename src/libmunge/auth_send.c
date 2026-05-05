@@ -57,15 +57,14 @@ auth_send (m_msg_t m)
 
 #include <assert.h>
 #include <errno.h>
-#include <fcntl.h>                      /* open, O_RDONLY, etc. */
+#include <fcntl.h>                      /* open, O_* */
 #include <stdio.h>                      /* snprintf */
-#include <stdlib.h>
-#include <string.h>                     /* strdup, strerror, strrchr */
+#include <stdlib.h>                     /* malloc, free */
+#include <string.h>                     /* strdup, strerror, strlen, strrchr */
 #include <stropts.h>                    /* I_SENDFD */
 #include <sys/ioctl.h>                  /* ioctl */
-#include <sys/stat.h>                   /* I_IRUSR */
-#include <unistd.h>                     /* unlink, close */
-#include "munge_defs.h"
+#include <sys/stat.h>                   /* S_IRUSR */
+#include <unistd.h>                     /* close, unlink */
 #include "str.h"
 
 static int _recv_auth_req (int sd, char **pipe_name_p, char **file_dir_p);

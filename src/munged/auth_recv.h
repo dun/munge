@@ -29,7 +29,7 @@
 #define MUNGE_AUTH_RECV_H
 
 
-#include <sys/types.h>
+#include <sys/types.h>                  /* uid_t, gid_t */
 #include "m_msg.h"
 
 

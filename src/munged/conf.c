@@ -29,23 +29,27 @@
 #  include <config.h>
 #endif /* HAVE_CONFIG_H */
 
-#include <arpa/inet.h>                  /* for inet_ntop() */
+#include <arpa/inet.h>                  /* inet_ntop, ntohl */
 #include <assert.h>
 #include <errno.h>
-#include <fcntl.h>
-#include <limits.h>                     /* for _POSIX_HOST_NAME_MAX */
-#include <netinet/in.h>                 /* for INET_ADDRSTRLEN */
-#include <signal.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/socket.h>                 /* for AF_INET */
-#include <sys/stat.h>
-#include <sys/types.h>
-#include <time.h>
-#include <unistd.h>
+#include <fcntl.h>                      /* open, O_RDONLY */
+#include <getopt.h>                     /* getopt_long */
+#include <limits.h>                     /* INT*, LONG*, _POSIX_HOST_NAME_MAX */
+#include <netinet/in.h>                 /* INET_ADDRSTRLEN */
+#include <signal.h>                     /* kill */
+#include <stdint.h>                     /* uint32_t */
+#include <stdio.h>                      /* printf */
+#include <stdlib.h>                     /* exit, malloc, free, strtol, EXIT_* */
+#include <string.h>                     /* memset, str* */
+#include <sys/socket.h>                 /* AF_INET, SOMAXCONN */
+#include <sys/stat.h>                   /* (l)stat, S_* */
+#include <sys/types.h>                  /* pid_t */
+#include <time.h>                       /* clock_nanosleep, nanosleep, timespec */
+#include <unistd.h>                     /* close, getcwd, geteuid, gethostname, read, unlink */
 #include <munge.h>
 #include "clock.h"
 #include "conf.h"
+#include "gids.h"                       /* GIDS_GROUP_FILE */
 #include "license.h"
 #include "lock.h"
 #include "log.h"
@@ -56,7 +60,6 @@
 #include "path.h"
 #include "str.h"
 #include "version.h"
-#include "zip.h"
 
 
 /*****************************************************************************
@@ -83,7 +86,6 @@
 
 const char * const short_opts = ":hLVfFMsS:v";
 
-#include <getopt.h>
 struct option long_opts[] = {
     { "help",              no_argument,       NULL, 'h'               },
     { "license",           no_argument,       NULL, 'L'               },

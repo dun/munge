@@ -29,9 +29,8 @@
 #  include "config.h"
 #endif /* HAVE_CONFIG_H */
 
-#include <errno.h>
-#include <stdlib.h>
-#include <string.h>
+#include <stdlib.h>                     /* exit, EXIT_SUCCESS */
+#include <string.h>                     /* memset, strlen */
 #include <munge.h>
 #include "crypto.h"
 #include "mac.h"

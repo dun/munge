@@ -30,8 +30,8 @@
 #endif /* HAVE_CONFIG_H */
 
 #include <errno.h>
-#include <limits.h>
-#include <stdlib.h>
+#include <limits.h>                     /* INT_MAX */
+#include <stdlib.h>                     /* exit, EXIT_SUCCESS */
 #include <munge.h>
 #include "tap.h"
 

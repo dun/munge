@@ -29,31 +29,31 @@
 #  include "config.h"
 #endif /* HAVE_CONFIG_H */
 
-#include <arpa/inet.h>                  /* for inet_ntop() */
+#include <arpa/inet.h>                  /* inet_ntop */
 #include <assert.h>
 #include <errno.h>
-#include <fcntl.h>
-#include <grp.h>
-#include <limits.h>
-#include <netdb.h>                      /* for getnameinfo */
-#include <netinet/in.h>                 /* for INET_ADDRSTRLEN */
-#include <pwd.h>
+#include <getopt.h>                     /* getopt_long */
+#include <grp.h>                        /* getgrgid, group */
+#include <netdb.h>                      /* getnameinfo, NI_* */
+#include <netinet/in.h>                 /* in_addr, sockaddr_in, INET_ADDRSTRLEN */
+#include <pwd.h>                        /* getpwuid, passwd */
 #include <signal.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/socket.h>                 /* for AF_INET, getnameinfo */
-#include <sys/stat.h>
-#include <sys/types.h>
-#include <time.h>
-#include <unistd.h>
+#include <stdio.h>                      /* printf, f*, FILE, stdout, stderr */
+#include <stdlib.h>                     /* exit, malloc, free */
+#include <string.h>                     /* memset, str* */
+#include <strings.h>                    /* strcasecmp */
+#include <sys/socket.h>                 /* AF_INET, per getnameinfo(3) */
+#include <sys/types.h>                  /* uid_t, gid_t */
+#include <time.h>                       /* localtime, strftime, time_t, tm */
+#include <unistd.h>                     /* isatty */
 #include <munge.h>
-#include "common.h"
+#include "common.h"                     /* MAX, UID_SENTINEL, GID_SENTINEL */
 #include "license.h"
 #include "log.h"
 #include "memwipe.h"
 #include "munge_defs.h"
 #include "read.h"
+#include "str.h"                        /* strcatf */
 #include "version.h"
 #include "xsignal.h"
 
@@ -161,7 +161,6 @@ display_key_t munge_keys[] = {
 
 const char * const short_opts = ":hLVi:nm:o:k:KNS:";
 
-#include <getopt.h>
 struct option long_opts[] = {
     { "help", no_argument, NULL, 'h' },
     { "license", no_argument, NULL, 'L' },

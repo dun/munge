@@ -30,9 +30,8 @@
 #endif /* HAVE_CONFIG_H */
 
 #include <errno.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <strings.h>
+#include <stdlib.h>                     /* strtol */
+#include <strings.h>                    /* strcasecmp */
 #include <munge.h>
 
 

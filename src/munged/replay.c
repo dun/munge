@@ -32,8 +32,11 @@
 #include <assert.h>
 #include <errno.h>
 #include <pthread.h>
-#include <string.h>
-#include <time.h>
+#include <stddef.h>                     /* size_t */
+#include <stdlib.h>                     /* malloc, free */
+#include <string.h>                     /* memcmp, memcpy, memset */
+#include <time.h>                       /* time, time_t */
+#include <munge.h>
 #include "conf.h"
 #include "cred.h"
 #include "hash.h"

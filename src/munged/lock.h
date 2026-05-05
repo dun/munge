@@ -29,7 +29,7 @@
 #define MUNGE_LOCK_H
 
 
-#include <unistd.h>
+#include <sys/types.h>                  /* pid_t */
 #include "conf.h"
 
 

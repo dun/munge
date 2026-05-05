@@ -29,8 +29,9 @@
 #  include "config.h"
 #endif /* HAVE_CONFIG_H */
 
-#include <string.h>
-#include <unistd.h>
+#include <stddef.h>                     /* size_t */
+#include <stdlib.h>                     /* exit, EXIT_SUCCESS */
+#include <string.h>                     /* memcmp */
 #include <munge.h>
 #include "crypto.h"
 #include "hkdf.h"

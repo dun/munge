@@ -30,10 +30,8 @@
 #endif /* HAVE_CONFIG_H */
 
 #include <assert.h>
-#include <stdarg.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/types.h>
+#include <stdlib.h>                     /* free */
+#include <string.h>                     /* strdup, strlen */
 #include <munge.h>
 #include "ctx.h"
 #include "m_msg.h"

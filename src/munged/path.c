@@ -30,13 +30,14 @@
 #endif /* HAVE_CONFIG_H */
 
 #include <errno.h>
-#include <stdarg.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/stat.h>
-#include <unistd.h>
-#include "common.h"
+#include <stdarg.h>                     /* va_start, va_end, va_list */
+#include <stdio.h>                      /* vsnprintf */
+#include <stdlib.h>                     /* realpath */
+#include <string.h>                     /* memcpy, strerror, strnlen, strrchr */
+#include <sys/stat.h>                   /* stat, lstat, S_* */
+#include <sys/types.h>                  /* size_t, uid_t, gid_t */
+#include <unistd.h>                     /* geteuid */
+#include "common.h"                     /* GID_SENTINEL */
 #include "path.h"
 #include "query.h"
 

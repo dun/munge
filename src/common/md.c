@@ -30,8 +30,8 @@
 #endif /* HAVE_CONFIG_H */
 
 #include <assert.h>
+#include <string.h>                     /* memcpy, memset */
 #include <munge.h>
-#include <string.h>
 #include "md.h"
 
 
@@ -210,7 +210,6 @@ md_map_enum (munge_mac_t md, void *dst)
 #if HAVE_LIBGCRYPT
 
 #include <gcrypt.h>
-#include <string.h>
 #include "log.h"
 
 static int _md_map [MUNGE_MAC_LAST_ITEM];

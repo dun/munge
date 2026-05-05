@@ -24,9 +24,12 @@
  *  <https://www.gnu.org/licenses/>.
  *****************************************************************************/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#if HAVE_CONFIG_H
+#  include <config.h>
+#endif /* HAVE_CONFIG_H */
+
+#include <stdlib.h>                     /* exit, EXIT_SUCCESS */
+#include <string.h>                     /* strlen, strncmp */
 #include "base64.h"
 #include "tap.h"
 

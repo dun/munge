@@ -30,8 +30,9 @@
 #endif /* HAVE_CONFIG_H */
 
 #include <errno.h>
-#include <stdlib.h>
-#include <string.h>
+#include <stddef.h>                     /* size_t */
+#include <stdlib.h>                     /* exit, EXIT_SUCCESS */
+#include <string.h>                     /* memcmp, memset */
 #include <munge.h>
 #include "crypto.h"
 #include "hkdf.h"

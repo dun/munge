@@ -29,13 +29,9 @@
 #define MUNGE_MSG_H
 
 
-#if HAVE_CONFIG_H
-#  include "config.h"
-#endif /* HAVE_CONFIG_H */
-
-#include <inttypes.h>
-#include <netinet/in.h>                 /* for struct in_addr                */
-#include <stddef.h>
+#include <netinet/in.h>                 /* in_addr */
+#include <stddef.h>                     /* size_t */
+#include <stdint.h>                     /* uint8_t, uint32_t */
 #include <munge.h>
 
 

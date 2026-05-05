@@ -36,7 +36,7 @@
 #endif /* NEED_STDC_WANT_LIB_EXT1 */
 
 #include <assert.h>
-#include <stddef.h>
+#include <stddef.h>                     /* size_t */
 
 /*  explicit_bzero() may be declared by either <strings.h> (FreeBSD) or
  *  <string.h> (all other tested systems).  The other functions are

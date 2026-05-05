@@ -28,13 +28,14 @@
 #ifndef MUNGE_XGETPW_H
 #define MUNGE_XGETPW_H
 
-#include <pwd.h>
-#include <stddef.h>
+#include <stddef.h>                     /* size_t */
 
 
 /*****************************************************************************
  *  Data Types
  *****************************************************************************/
+
+struct passwd;
 
 typedef struct xpwbuf_t * xpwbuf_p;
 

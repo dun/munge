@@ -29,6 +29,7 @@
 #define MUNGE_JOB_H
 
 
+#include "conf.h"
 #include "m_msg.h"
 #include "work.h"
 

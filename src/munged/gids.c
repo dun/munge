@@ -31,20 +31,21 @@
 
 #include <assert.h>
 #include <errno.h>
+#include <grp.h>                        /* group */
 #include <pthread.h>
-#include <stddef.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/stat.h>
-#include <sys/time.h>
-#include <sys/types.h>
+#include <pwd.h>                        /* passwd */
+#include <stdlib.h>                     /* malloc, free */
+#include <string.h>                     /* strcmp, strdup, strerror */
+#include <sys/stat.h>                   /* stat */
+#include <sys/time.h>                   /* gettimeofday, timeval */
+#include <sys/types.h>                  /* size_t, uid_t, gid_t */
+#include <time.h>                       /* time, time_t */
 #include <munge.h>
-#include "common.h"
+#include "common.h"                     /* UID_SENTINEL */
 #include "conf.h"
 #include "gids.h"
 #include "hash.h"
 #include "log.h"
-#include "munge_defs.h"
 #include "timer.h"
 #include "xgetgr.h"
 #include "xgetpw.h"
@@ -848,6 +849,8 @@ _gids_uid_node_destroy (uid_node_p u)
  *****************************************************************************/
 
 #if _GIDS_DEBUG
+
+#include <stdio.h>                      /* printf */
 
 static void
 _gids_gid_hash_dump (hash_t gid_hash)

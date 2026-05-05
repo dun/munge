@@ -28,7 +28,7 @@
 #ifndef MUNGE_QUERY_H
 #define MUNGE_QUERY_H
 
-#include <unistd.h>
+#include <sys/types.h>                  /* uid_t, gid_t */
 
 
 int query_uid (const char *user, uid_t *uid_ptr);

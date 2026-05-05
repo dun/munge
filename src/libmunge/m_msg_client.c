@@ -31,13 +31,13 @@
 
 #include <assert.h>
 #include <errno.h>
-#include <string.h>
-#include <sys/socket.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-#include <sys/un.h>
-#include <time.h>
-#include <unistd.h>
+#include <stddef.h>                     /* size_t */
+#include <string.h>                     /* memcpy, memset, str* */
+#include <sys/socket.h>                 /* socket, connect, sockaddr_un */
+#include <sys/stat.h>                   /* stat */
+#include <sys/un.h>                     /* sockaddr_un */
+#include <time.h>                       /* nanosleep, timespec */
+#include <unistd.h>                     /* close */
 #include <munge.h>
 #include "auth_send.h"
 #include "ctx.h"

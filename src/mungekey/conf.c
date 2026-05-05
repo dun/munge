@@ -30,12 +30,13 @@
 #endif /* HAVE_CONFIG_H */
 
 #include <assert.h>
-#include <ctype.h>
+#include <ctype.h>                      /* isprint */
 #include <errno.h>
-#include <limits.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <getopt.h>                     /* getopt_long */
+#include <limits.h>                     /* INT_*, LONG_* */
+#include <stdio.h>                      /* (sn)printf */
+#include <stdlib.h>                     /* calloc, free, exit, strtol */
+#include <string.h>                     /* strdup, strncmp, strrchr */
 #include <munge.h>
 #include "conf.h"
 #include "license.h"
@@ -59,7 +60,6 @@
 
 const char * const short_opts = ":b:cfhk:LvV" GETOPT_DEBUG_SHORT_OPTS ;
 
-#include <getopt.h>
 struct option long_opts[] = {
     { "bits",     required_argument, NULL, 'b' },
     { "create",   no_argument,       NULL, 'c' },

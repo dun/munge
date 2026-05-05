@@ -34,7 +34,7 @@
 #elif HAVE_GETGRENT_R_AIX
 #define HAVE_GETGRENT_R_ERANGE_BROKEN 1
 #define _THREAD_SAFE 1
-#include <stdio.h>
+#include <stdio.h>                      /* FILE */
 #elif HAVE_GETGRENT_R_SUN
 #define HAVE_GETGRENT_R_ERANGE_BROKEN 1
 #elif HAVE_GETGRENT
@@ -59,12 +59,12 @@
 
 #include <assert.h>
 #include <errno.h>
-#include <grp.h>
-#include <stddef.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/types.h>
-#include <unistd.h>
+#include <grp.h>                        /* getgrent*, getgrnam*, group */
+#include <stddef.h>                     /* size_t */
+#include <stdlib.h>                     /* malloc, realloc, free */
+#include <string.h>                     /* memcpy, memset, strlen */
+#include <sys/types.h>                  /* per getgrent(3) & getgrnam(3) */
+#include <unistd.h>                     /* sysconf */
 #include <munge.h>
 #include "log.h"
 #include "xgetgr.h"

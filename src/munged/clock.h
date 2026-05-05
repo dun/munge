@@ -29,11 +29,7 @@
 #define MUNGE_CLOCK_H
 
 
-#if HAVE_CONFIG_H
-#  include <config.h>
-#endif /* HAVE_CONFIG_H */
-
-#include <time.h>
+struct timespec;
 
 
 int clock_get_timespec (struct timespec *tsp, long msecs);

@@ -29,8 +29,8 @@
 #  include "config.h"
 #endif /* HAVE_CONFIG_H */
 
-#include <signal.h>
-#include <string.h>
+#include <signal.h>                     /* sigaction, sigfillset, SIG_IGN */
+#include <string.h>                     /* strsignal */
 #include <munge.h>
 #include "log.h"
 #include "xsignal.h"

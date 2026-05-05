@@ -29,8 +29,7 @@
 #define MUNGE_CRED_H
 
 
-#include <inttypes.h>
-#include <munge.h>
+#include <stdint.h>                     /* uint8_t */
 #include "munge_defs.h"
 #include "m_msg.h"
 

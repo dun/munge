@@ -29,14 +29,16 @@
 #  include "config.h"
 #endif /* HAVE_CONFIG_H */
 
+#include <arpa/inet.h>                  /* ntohl */
 #include <assert.h>
-#include <ctype.h>
+#include <ctype.h>                      /* isspace */
 #include <errno.h>
-#include <netinet/in.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/types.h>
-#include <time.h>
+#include <stdint.h>                     /* uint32_t */
+#include <stdlib.h>                     /* malloc, free */
+#include <string.h>                     /* memcpy, memset, strdup, strncmp */
+#include <sys/types.h>                  /* uid_t, gid_t */
+#include <time.h>                       /* time, time_t */
+#include <munge.h>
 #include "auth_recv.h"
 #include "base64.h"
 #include "cipher.h"

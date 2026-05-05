@@ -31,18 +31,16 @@
 
 #include <assert.h>
 #include <errno.h>
-#include <limits.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/types.h>
+#include <limits.h>                     /* INT_MAX */
+#include <stddef.h>                     /* size_t */
+#include <stdlib.h>                     /* calloc, free */
+#include <string.h>                     /* memcpy */
 #include <munge.h>
-#include "common.h"
+#include "common.h"                     /* MIN */
 #include "hkdf.h"
 #include "log.h"
 #include "mac.h"
 #include "memwipe.h"
-#include "str.h"
 
 
 /*****************************************************************************

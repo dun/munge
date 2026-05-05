@@ -30,19 +30,23 @@
 #endif /* HAVE_CONFIG_H */
 
 #include <errno.h>
-#include <string.h>
-#include <sys/stat.h>
-#include <unistd.h>
-#include <munge.h>
+#include <string.h>                     /* strerror, strlen */
+#include <sys/types.h>                  /* uid_t, gid_t */
 #include "auth_recv.h"
 #include "log.h"
 #include "m_msg.h"
-#include "path.h"
 
 
 /*****************************************************************************
  *  initialization
  *****************************************************************************/
+
+#if AUTH_METHOD_RECVFD_MKFIFO || AUTH_METHOD_RECVFD_MKNOD
+
+#include <sys/stat.h>                   /* (l)stat, S_* */
+#include <unistd.h>                     /* geteuid */
+#include <munge.h>
+#include "path.h"
 
 static void _check_auth_server_dir (const char *dir, int got_force);
 static void _check_auth_client_dir (const char *dir, int got_force);
@@ -61,14 +65,11 @@ auth_recv_init (const char *srvrdir, const char *clntdir, int got_force)
 
     _check_auth_server_dir (srvrdir, got_force);
     _check_auth_client_dir (clntdir, got_force);
-
-    return;
 }
 
 static void
 _check_auth_server_dir (const char *dir, int got_force)
 {
-#if AUTH_METHOD_RECVFD_MKFIFO || AUTH_METHOD_RECVFD_MKNOD
     int          is_symlink;
     struct stat  st;
     int          n;
@@ -140,14 +141,11 @@ _check_auth_server_dir (const char *dir, int got_force)
         log_err_or_warn (got_force,
             "The auth server dir is inaccessible: %s", ebuf);
     }
-#endif /* AUTH_METHOD_RECVFD_MKFIFO || AUTH_METHOD_RECVFD_MKNOD */
-    return;
 }
 
 static void
 _check_auth_client_dir (const char *dir, int got_force)
 {
-#if AUTH_METHOD_RECVFD_MKFIFO || AUTH_METHOD_RECVFD_MKNOD
     int          is_symlink;
     struct stat  st;
     int          n;
@@ -218,9 +216,19 @@ _check_auth_client_dir (const char *dir, int got_force)
         log_err_or_warn (got_force,
             "The auth client dir is inaccessible: %s", ebuf);
     }
-#endif /* AUTH_METHOD_RECVFD_MKFIFO || AUTH_METHOD_RECVFD_MKNOD */
-    return;
 }
+
+#else
+
+/*  Checks for required privileges needed to perform client authentication.
+ */
+void
+auth_recv_init (const char *srvrdir, const char *clntdir, int got_force)
+{
+    /* no-op */
+}
+
+#endif /* AUTH_METHOD_RECVFD_MKFIFO || AUTH_METHOD_RECVFD_MKNOD */
 
 
 /*****************************************************************************
@@ -229,8 +237,8 @@ _check_auth_client_dir (const char *dir, int got_force)
 
 #if AUTH_METHOD_GETPEEREID
 
-#include <sys/socket.h>
-#include <sys/types.h>
+#include <sys/socket.h>                 /* getpeereid (OpenBSD) */
+#include <unistd.h>                     /* getpeereid (FreeBSD, macOS, NetBSD) */
 
 /*  Receives the identity of the client that sent msg [m],
  *    storing the result in the output parms [uid] and [gid].
@@ -256,7 +264,7 @@ auth_recv (m_msg_t m, uid_t *uid, gid_t *gid)
 
 #if AUTH_METHOD_GETPEERUCRED
 
-#include <ucred.h>
+#include <ucred.h>                      /* getpeerucred, ucred_* */
 
 /*  Receives the identity of the client that sent msg [m],
  *    storing the result in the output parms [uid] and [gid].
@@ -301,7 +309,7 @@ auth_recv (m_msg_t m, uid_t *uid, gid_t *gid)
 
 #if AUTH_METHOD_SO_PEERCRED
 
-#include <sys/socket.h>
+#include <sys/socket.h>                 /* getsockopt, socklen_t, ucred, SOL_SOCKET, SO_PEERCRED */
 
 #if !HAVE_SOCKLEN_T
 typedef int socklen_t;                  /* socklen_t is uint32_t in Posix.1g */
@@ -336,10 +344,10 @@ auth_recv (m_msg_t m, uid_t *uid, gid_t *gid)
 
 #if AUTH_METHOD_LOCAL_PEERCRED
 
-#include <sys/param.h>                  /* for FreeBSD */
-#include <sys/socket.h>
-#include <sys/ucred.h>
-#include <sys/un.h>                     /* for FreeBSD */
+#include <sys/param.h>
+#include <sys/socket.h>                 /* getsockopt, socklen_t */
+#include <sys/ucred.h>                  /* xucred */
+#include <sys/un.h>                     /* LOCAL_PEERCRED */
 
 #if !HAVE_SOCKLEN_T
 typedef int socklen_t;                  /* socklen_t is uint32_t in Posix.1g */
@@ -382,9 +390,10 @@ auth_recv (m_msg_t m, uid_t *uid, gid_t *gid)
 #include <assert.h>
 #include <fcntl.h>                      /* open, O_RDONLY */
 #include <stdlib.h>                     /* free */
-#include <stropts.h>                    /* I_RECVFD, struct strrecvfd */
+#include <stropts.h>                    /* strrecvfd, I_RECVFD */
 #include <sys/ioctl.h>                  /* ioctl */
-#include <sys/stat.h>                   /* mkfifo, S_IWUSR, etc. */
+#include <sys/stat.h>                   /* mkfifo, S_* */
+#include <unistd.h>                     /* close, unlink */
 
 static int _name_auth_pipe (char **pipe_name_p);
 static int _send_auth_req (int sd, const char *pipe_name);
@@ -477,11 +486,12 @@ err:
 #include <assert.h>
 #include <fcntl.h>                      /* open, O_RDWR */
 #include <stdlib.h>                     /* free */
-#include <stropts.h>                    /* struct strrecvfd, I_RECVFD */
+#include <stropts.h>                    /* strfdinsert, strrecvfd, I_FDINSERT, I_RECVFD */
 #include <sys/ioctl.h>                  /* ioctl */
-#include <sys/stat.h>                   /* struct stat, mknod, S_IFCHR */
+#include <sys/stat.h>                   /* stat, fstat, mknod, umask, S_* */
 #include <sys/stream.h>                 /* queue_t */
-#include <sys/uio.h>                    /* include before stream.h for aix */
+#include <sys/uio.h>
+#include <unistd.h>                     /* close, unlink */
 
 static int _ns_pipe (const char *name, int fds[2]);
 static int _s_pipe (int fd[2]);
@@ -664,7 +674,7 @@ _s_pipe (int fd[2])
 #include <assert.h>
 #include <stdio.h>                      /* snprintf */
 #include <stdlib.h>                     /* malloc, free */
-#include <string.h>                     /* memset, strlen, strdup */
+#include <munge.h>
 #include "conf.h"
 #include "random.h"                     /* random_pseudo_bytes */
 #include "str.h"                        /* strbin2hex */

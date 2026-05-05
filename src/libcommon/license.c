@@ -29,7 +29,7 @@
 #  include "config.h"
 #endif /* HAVE_CONFIG_H */
 
-#include <stdio.h>
+#include <stdio.h>                      /* printf */
 #include "license.h"
 
 

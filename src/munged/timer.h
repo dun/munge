@@ -29,11 +29,7 @@
 #define MUNGE_TIMER_H
 
 
-#if HAVE_CONFIG_H
-#  include <config.h>
-#endif /* HAVE_CONFIG_H */
-
-#include <time.h>
+struct timespec;
 
 
 /*****************************************************************************

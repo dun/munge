@@ -31,16 +31,14 @@
 
 #include <assert.h>
 #include <errno.h>
-#include <stdarg.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <syslog.h>
-#include <time.h>
-#include <unistd.h>
+#include <stdarg.h>                     /* va_start, va_end, va_list */
+#include <stdio.h>                      /* (v)snprintf, f*, FILE, EOF, stderr */
+#include <stdlib.h>                     /* abort, exit, getenv */
+#include <string.h>                     /* memccpy, memcpy, strerror, strrchr */
+#include <syslog.h>                     /* openlog, syslog, closelog */
 #include "daemonpipe.h"
 #include "log.h"
-#include "str.h"
+#include "str.h"                        /* strftimet */
 
 
 /*****************************************************************************

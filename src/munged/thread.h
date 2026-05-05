@@ -30,17 +30,14 @@
 
 
 #if WITH_PTHREADS
+
+#if HAVE_CONFIG_H
+#  include <config.h>
+#endif /* HAVE_CONFIG_H */
+
 #  include <errno.h>
 #  include <pthread.h>
-#  include <stdlib.h>
-#endif /* WITH_PTHREADS */
-
-
-/*****************************************************************************
- *  Macros
- *****************************************************************************/
-
-#if WITH_PTHREADS
+#  include <stdlib.h>                   /* abort */
 
 #  ifdef WITH_LSD_FATAL_ERROR_FUNC
 #    undef lsd_fatal_error

@@ -29,9 +29,8 @@
 #define MUNGE_CONF_H
 
 
-#include <inttypes.h>
+#include <netinet/in.h>                 /* in_addr */
 #include <munge.h>
-#include <netinet/in.h>
 #include "gids.h"
 
 

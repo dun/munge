@@ -30,8 +30,8 @@
 #endif /* HAVE_CONFIG_H */
 
 #include <errno.h>
-#include <limits.h>
-#include <stdlib.h>
+#include <limits.h>                     /* INT_MIN, INT_MAX */
+#include <stdlib.h>                     /* getenv, strtol */
 #include "test.h"
 
 

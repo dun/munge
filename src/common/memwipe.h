@@ -27,11 +27,7 @@
 #ifndef MUNGE_MEMWIPE_H
 #define MUNGE_MEMWIPE_H
 
-#if HAVE_CONFIG_H
-#  include <config.h>
-#endif /* HAVE_CONFIG_H */
-
-#include <stddef.h>
+#include <stddef.h>                     /* size_t */
 
 void memwipe (void *v, size_t n);
 

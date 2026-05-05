@@ -31,11 +31,13 @@
 
 #include <assert.h>
 #include <errno.h>
-#include <fcntl.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/stat.h>
-#include <unistd.h>
+#include <fcntl.h>                      /* fcntl, open, flock, SEEK_SET, F_*, O_* */
+#include <stdlib.h>                     /* free */
+#include <string.h>                     /* strerror */
+#include <sys/stat.h>                   /* fstat, umask, S_* */
+#include <sys/types.h>                  /* mode_t, pid_t */
+#include <unistd.h>                     /* close, geteuid, unlink */
+#include <munge.h>
 #include "conf.h"
 #include "lock.h"
 #include "log.h"

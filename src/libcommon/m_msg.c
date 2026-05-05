@@ -29,17 +29,17 @@
 #  include "config.h"
 #endif /* HAVE_CONFIG_H */
 
-#include <arpa/inet.h>
+#include <arpa/inet.h>                  /* htonl, htons, ntohl, ntohs */
 #include <assert.h>
 #include <errno.h>
-#include <inttypes.h>
+#include <stddef.h>                     /* size_t */
+#include <stdint.h>                     /* uint8_t, uint16_t, uint32_t */
+#include <stdlib.h>                     /* calloc, malloc, free */
+#include <string.h>                     /* memcpy, strdup, strlen */
+#include <sys/time.h>                   /* gettimeofday, timeval */
+#include <sys/uio.h>                    /* iovec */
+#include <unistd.h>                     /* close */
 #include <munge.h>
-#include <stddef.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/time.h>                   /* gettimeofday */
-#include <sys/uio.h>
-#include <unistd.h>
 #include "fd.h"
 #include "m_msg.h"
 #include "munge_defs.h"

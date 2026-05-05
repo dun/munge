@@ -30,8 +30,8 @@
 #endif /* HAVE_CONFIG_H */
 
 #include <assert.h>
-#include <signal.h>
-#include <stdlib.h>
+#include <signal.h>                     /* SIG* */
+#include <stdlib.h>                     /* exit, EXIT_SUCCESS */
 #include <munge.h>
 #include "conf.h"
 #include "crypto.h"

@@ -29,12 +29,8 @@
 #  include <config.h>
 #endif /* HAVE_CONFIG_H */
 
-#include <errno.h>
-#include <munge.h>
-#include <pthread.h>
-#include <stdlib.h>
+#include <stddef.h>                     /* size_t */
 #include "crypto.h"
-#include "log.h"
 
 
 /*****************************************************************************
@@ -44,9 +40,17 @@
 #if HAVE_LIBGCRYPT
 
 #include <gcrypt.h>
+#include <munge.h>
+#include "log.h"
 
-
+/*  GCRY_THREAD_OPTION_PTHREAD_IMPL is obsolete since Libgcrypt 1.6.
+ *  Its expansion defines mutex callback functions that call
+ *  pthread_mutex_*, malloc()/free(), and reference ENOMEM.
+ */
 #if GCRYPT_VERSION_NUMBER < 0x010600
+#include <errno.h>                      /* ENOMEM */
+#include <pthread.h>                    /* pthread_mutex_* */
+#include <stdlib.h>                     /* malloc, free */
 GCRY_THREAD_OPTION_PTHREAD_IMPL;
 #endif /* GCRYPT_VERSION_NUMBER < 0x010600 */
 
@@ -116,11 +120,15 @@ crypto_fini (void)
 
 #if HAVE_OPENSSL
 
-#include <assert.h>
+#include <errno.h>
 #include <openssl/crypto.h>
 #include <openssl/err.h>
 #include <openssl/opensslv.h>
-#include <string.h>
+#include <pthread.h>
+#include <stdlib.h>                     /* calloc, malloc, free */
+#include <string.h>                     /* strerror */
+#include <munge.h>
+#include "log.h"
 
 #if HAVE_OPENSSL_PROVIDER_H
 #include <openssl/provider.h>

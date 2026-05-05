@@ -30,13 +30,12 @@
 #endif /* HAVE_CONFIG_H */
 
 #include <assert.h>
-#include <stdlib.h>
-#include <string.h>
+#include <stdlib.h>                     /* calloc, free */
+#include <string.h>                     /* memset */
+#include <munge.h>
 #include "cred.h"
 #include "m_msg.h"
 #include "memwipe.h"
-#include "munge_defs.h"
-#include "str.h"
 
 
 munge_cred_t

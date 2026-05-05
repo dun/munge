@@ -31,18 +31,19 @@
 
 #include <assert.h>
 #include <errno.h>
-#include <limits.h>
+#include <getopt.h>                     /* getopt_long */
+#include <limits.h>                     /* INT_MAX, LONG_MAX, ULONG_MAX */
 #include <pthread.h>
 #include <signal.h>
-#include <stdarg.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/time.h>
-#include <sys/types.h>
-#include <unistd.h>
+#include <stdarg.h>                     /* va_start, va_end, va_list */
+#include <stdio.h>                      /* printf, setvbuf, vsnprintf */
+#include <stdlib.h>                     /* exit, malloc, free, strtol, strtoul */
+#include <string.h>                     /* strncmp, strrchr */
+#include <sys/time.h>                   /* gettimeofday, timeval */
+#include <sys/types.h>                  /* uid_t, gid_t */
+#include <time.h>                       /* localtime(_r), strftime, time, time_t, tm */
+#include <unistd.h>                     /* close, sysconf, _POSIX_THREAD_ATTR_STACKSIZE */
 #include <munge.h>
-#include "common.h"
 #include "license.h"
 #include "log.h"
 #include "query.h"
@@ -67,7 +68,6 @@
 
 const char * const short_opts = ":hLVqc:Cm:Mz:Zedl:u:g:t:S:D:N:T:W:";
 
-#include <getopt.h>
 struct option long_opts[] = {
     { "help",         no_argument,       NULL, 'h' },
     { "license",      no_argument,       NULL, 'L' },

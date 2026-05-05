@@ -31,18 +31,16 @@
 
 #include <assert.h>
 #include <errno.h>
-#include <fcntl.h>
+#include <fcntl.h>                      /* open, O_* */
+#include <string.h>                     /* strerror */
+#include <sys/stat.h>                   /* stat, fstat, lstat, S_* */
+#include <unistd.h>                     /* close, geteuid, unlink */
 #include <munge.h>
-#include <stdint.h>
-#include <string.h>
-#include <sys/stat.h>
-#include <unistd.h>
-#include "common.h"
+#include "common.h"                     /* MIN */
 #include "conf.h"
-#include "crypto.h"
 #include "entropy.h"
+#include "fd.h"
 #include "log.h"
-#include "munge_defs.h"
 #include "path.h"
 #include "random.h"
 #include "timer.h"
@@ -574,7 +572,6 @@ _random_stir_entropy (void *_arg_not_used_)
 #if HAVE_LIBGCRYPT
 
 #include <gcrypt.h>
-#include "fd.h"
 
 static void
 _random_cleanup (void)

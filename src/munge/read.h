@@ -28,8 +28,8 @@
 #ifndef MUNGE_READ_H
 #define MUNGE_READ_H
 
-#include <stdio.h>
-#include <stddef.h>
+#include <stddef.h>                     /* size_t */
+#include <stdio.h>                      /* FILE */
 
 
 void read_data_from_file (FILE *fp, void **dst, int *dst_len, size_t max_size);

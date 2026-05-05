@@ -29,12 +29,8 @@
 #define MUNGE_PATH_H
 
 
-#if HAVE_CONFIG_H
-#  include "config.h"
-#endif /* HAVE_CONFIG_H */
-
-#include <limits.h>
-#include <unistd.h>
+#include <limits.h>                     /* PATH_MAX */
+#include <sys/types.h>                  /* gid_t, size_t */
 
 #ifndef PATH_MAX
 #  define PATH_MAX 4096

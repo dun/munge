@@ -37,12 +37,12 @@
 #  include <zlib.h>
 #endif /* HAVE_ZLIB_H */
 
+#include <arpa/inet.h>                  /* htonl, ntohl */
 #include <assert.h>
 #include <errno.h>
-#include <inttypes.h>
-#include <limits.h>
-#include <netinet/in.h>
-#include <string.h>
+#include <limits.h>                     /* INT_MAX */
+#include <stddef.h>                     /* size_t */
+#include <stdint.h>                     /* uint32_t */
 #include <munge.h>
 #include "diag.h"
 #include "zip.h"

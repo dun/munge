@@ -30,17 +30,16 @@
 #endif /* HAVE_CONFIG_H */
 
 #include <assert.h>
-#include <ctype.h>
 #include <errno.h>
-#include <limits.h>
+#include <getopt.h>                     /* getopt_long */
+#include <limits.h>                     /* LONG_MAX, UINT_MAX */
 #include <signal.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/types.h>
-#include <unistd.h>
+#include <stdio.h>                      /* fopen, (f)printf, fclose, FILE */
+#include <stdlib.h>                     /* exit, malloc, free, strtol */
+#include <string.h>                     /* strcmp, strlen, strncmp, strrchr */
+#include <sys/types.h>                  /* uid_t, gid_t */
+#include <unistd.h>                     /* geteuid, getegid, seteuid, setegid */
 #include <munge.h>
-#include "common.h"
 #include "license.h"
 #include "log.h"
 #include "memwipe.h"
@@ -57,7 +56,6 @@
 
 const char * const short_opts = ":hLVns:i:o:c:Cm:Mz:Zu:U:g:G:t:S:";
 
-#include <getopt.h>
 struct option long_opts[] = {
     { "help",         no_argument,       NULL, 'h' },
     { "license",      no_argument,       NULL, 'L' },

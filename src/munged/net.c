@@ -32,15 +32,12 @@
 #include <assert.h>
 #include <errno.h>
 #if HAVE_IFADDRS_H
-#include <ifaddrs.h>
+#include <ifaddrs.h>                    /* getifaddrs, freeifaddrs, ifaddrs */
 #endif /* HAVE_IFADDRS_H */
-#include <netdb.h>                      /* getaddrinfo */
+#include <netdb.h>                      /* getaddrinfo, freeaddrinfo, addrinfo, AI_*, EAI_* */
 #include <netinet/in.h>                 /* in_addr, sockaddr_in */
-#include <stdlib.h>
-#include <string.h>
-#include <sys/socket.h>                 /* AF_INET, sockaddr */
-#include <sys/types.h>
-#include <munge.h>
+#include <string.h>                     /* memset, strcmp, strdup */
+#include <sys/socket.h>                 /* sockaddr, AF_INET, SOCK_STREAM */
 #include "net.h"
 
 

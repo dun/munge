@@ -32,10 +32,11 @@
 #include <assert.h>
 #include <errno.h>
 #include <pthread.h>
-#include <signal.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
+#include <signal.h>                     /* sigfillset, sigset_t */
+#include <stddef.h>                     /* size_t */
+#include <stdlib.h>                     /* malloc, free */
+#include <string.h>                     /* strerror */
+#include <unistd.h>                     /* _POSIX_THREAD_ATTR_STACKSIZE */
 #include <munge.h>
 #include "log.h"
 #include "work.h"

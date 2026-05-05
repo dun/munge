@@ -30,8 +30,8 @@
 #endif /* HAVE_CONFIG_H */
 
 #include <errno.h>
-#include <sys/time.h>                   /* gettimeofday */
-#include <time.h>                       /* clock_gettime */
+#include <sys/time.h>                   /* gettimeofday, timeval */
+#include <time.h>                       /* clock_gettime, timespec, CLOCK_* */
 #include "clock.h"
 
 

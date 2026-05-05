@@ -29,7 +29,7 @@
 #define MUNGE_NET_H
 
 
-#include <netinet/in.h>
+struct in_addr;
 
 
 int net_resolve_address (const char *name, struct in_addr *inaddrp,

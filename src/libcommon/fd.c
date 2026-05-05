@@ -31,13 +31,14 @@
 
 #include <assert.h>
 #include <errno.h>
-#include <fcntl.h>
-#include <poll.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/time.h>
-#include <sys/uio.h>
-#include <unistd.h>
+#include <fcntl.h>                      /* fcntl, F_* */
+#include <poll.h>                       /* poll, pollfd, POLL* */
+#include <stdlib.h>                     /* malloc, free */
+#include <string.h>                     /* memcpy */
+#include <sys/time.h>                   /* gettimeofday, timeval */
+#include <sys/types.h>                  /* size_t, ssize_t */
+#include <sys/uio.h>                    /* writev, iovec */
+#include <unistd.h>                     /* read, write */
 #include "fd.h"
 
 

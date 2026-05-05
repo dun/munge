@@ -31,8 +31,12 @@
 
 #include <assert.h>
 #include <errno.h>
-#include <stdlib.h>
-#include <string.h>
+#if WITH_PTHREADS
+#include <pthread.h>
+#endif /* WITH_PTHREADS */
+#include <stddef.h>                     /* size_t */
+#include <stdlib.h>                     /* calloc, malloc, free */
+#include <string.h>                     /* memset */
 #include "hash.h"
 #include "thread.h"
 

@@ -27,7 +27,7 @@
 #ifndef MUNGE_ENTROPY_H
 #define MUNGE_ENTROPY_H
 
-#include <sys/types.h>
+#include <stddef.h>                     /* size_t */
 
 /*  Maximum number of bytes guaranteed to be read in full by
  *  entropy_read_csprng() in a single call.

@@ -30,9 +30,9 @@
 #endif /* HAVE_CONFIG_H */
 
 #include <errno.h>
-#include <string.h>
-#include <sys/types.h>
-#include <unistd.h>
+#include <string.h>                     /* memccpy, strlen */
+#include <sys/types.h>                  /* size_t, ssize_t */
+#include <unistd.h>                     /* close, pipe */
 #include "daemonpipe.h"
 #include "fd.h"
 

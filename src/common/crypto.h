@@ -37,7 +37,7 @@
 #  error "Libgcrypt and OpenSSL are mutually-exclusive"
 #endif /* HAVE_LIBGCRYPT && HAVE_OPENSSL */
 
-#include <sys/types.h>
+#include <stddef.h>                     /* size_t */
 
 
 void crypto_init (void);

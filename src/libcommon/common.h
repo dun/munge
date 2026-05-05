@@ -29,18 +29,6 @@
 #define MUNGE_COMMON_H
 
 
-#if HAVE_CONFIG_H
-#  include <config.h>
-#endif /* HAVE_CONFIG_H */
-
-#include "fd.h"
-#include "license.h"
-#include "log.h"
-#include "m_msg.h"
-#include "munge_defs.h"
-#include "str.h"
-
-
 #ifndef MAX
 #  define MAX(a,b) ((a >= b) ? (a) : (b))
 #endif /* MAX */
@@ -49,8 +37,9 @@
 #  define MIN(a,b) ((a <= b) ? (a) : (b))
 #endif /* MIN */
 
-#include <stdint.h>
-#include <unistd.h>
+#include <stdint.h>                     /* UINT32_MAX */
+#include <sys/types.h>                  /* uid_t, gid_t */
+
 #define UID_MAXIMUM     (UINT32_MAX - 1)
 #define UID_SENTINEL    ((uid_t) -1)
 #define GID_MAXIMUM     (UINT32_MAX - 1)

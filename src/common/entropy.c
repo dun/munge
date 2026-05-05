@@ -29,7 +29,8 @@
 #endif /* HAVE_CONFIG_H */
 
 #include <errno.h>
-#include <fcntl.h>                      /* open */
+#include <fcntl.h>                      /* open, O_* */
+#include <stddef.h>                     /* size_t */
 #if HAVE_GETLOADAVG
 #  include <stdlib.h>                   /* getloadavg */
 #endif /* HAVE_GETLOADAVG */
@@ -42,15 +43,14 @@
 #  include <sys/random.h>               /* getrandom, getentropy (macOS) */
 #endif /* HAVE_SYS_RANDOM_H && (HAVE_GETRANDOM || HAVE_GETENTROPY) */
 #if HAVE_GETRUSAGE
-#  include <sys/resource.h>             /* getrusage */
+#  include <sys/resource.h>             /* getrusage, rusage */
 #endif /* HAVE_GETRUSAGE */
-#include <sys/stat.h>                   /* fstat */
+#include <sys/stat.h>                   /* stat, fstat */
 #if HAVE_GETTIMEOFDAY
-#  include <sys/time.h>                 /* gettimeofday */
+#  include <sys/time.h>                 /* gettimeofday, timeval */
 #endif /* HAVE_GETTIMEOFDAY */
-#include <sys/types.h>
-#include <time.h>                       /* clock, clock_gettime */
-#include <unistd.h>                     /* getentropy, getpid, getppid */
+#include <time.h>                       /* clock, clock_gettime, timespec */
+#include <unistd.h>                     /* close, getentropy, getpid, getppid */
 #include "entropy.h"
 #include "fd.h"
 #include "log.h"

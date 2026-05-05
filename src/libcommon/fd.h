@@ -29,14 +29,10 @@
 #define MUNGE_FD_H
 
 
-#if HAVE_CONFIG_H
-#  include "config.h"
-#endif /* HAVE_CONFIG_H */
+#include <sys/types.h>                  /* size_t, ssize_t */
 
-#include <sys/time.h>
-#include <sys/types.h>
-#include <sys/uio.h>
-#include <unistd.h>
+struct iovec;
+struct timeval;
 
 
 ssize_t fd_read_n (int fd, void *buf, size_t n);

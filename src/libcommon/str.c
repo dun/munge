@@ -30,11 +30,11 @@
 #endif /* HAVE_CONFIG_H */
 
 #include <errno.h>
-#include <stdarg.h>
-#include <stdio.h>
-#include <string.h>
-#include <sys/types.h>
-#include <time.h>
+#include <stdarg.h>                     /* va_start, va_end, va_list */
+#include <stddef.h>                     /* size_t */
+#include <stdio.h>                      /* vsnprintf */
+#include <string.h>                     /* strdup */
+#include <time.h>                       /* localtime(_r), strftime, time, time_t, tm */
 #include "str.h"
 
 
