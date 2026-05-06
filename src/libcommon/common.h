@@ -24,18 +24,8 @@
  *  <https://www.gnu.org/licenses/>.
  *****************************************************************************/
 
-
 #ifndef MUNGE_COMMON_H
 #define MUNGE_COMMON_H
-
-
-#ifndef MAX
-#define MAX(a,b) ((a >= b) ? (a) : (b))
-#endif /* MAX */
-
-#ifndef MIN
-#define MIN(a,b) ((a <= b) ? (a) : (b))
-#endif /* MIN */
 
 #include <stdint.h>                     /* UINT32_MAX */
 #include <sys/types.h>                  /* uid_t, gid_t */
@@ -44,6 +34,5 @@
 #define UID_SENTINEL    ((uid_t) -1)
 #define GID_MAXIMUM     (UINT32_MAX - 1)
 #define GID_SENTINEL    ((gid_t) -1)
-
 
 #endif /* MUNGE_COMMON_H */

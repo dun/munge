@@ -29,7 +29,7 @@
 #include <config.h>
 #endif /* HAVE_CONFIG_H */
 
-#include "common.h"                     /* MAX, UID_SENTINEL, GID_SENTINEL */
+#include "common.h"                     /* UID_SENTINEL, GID_SENTINEL */
 #include "license.h"
 #include "log.h"
 #include "memwipe.h"
@@ -291,7 +291,7 @@ create_conf (void)
     for (i = 0, maxlen = 0; i < MUNGE_KEY_LAST; i++) {
         conf->key[i] = 0;
         len = strlen (key_val_to_str (i));
-        maxlen = MAX (maxlen, len);
+        maxlen = (maxlen > len) ? maxlen : len;
     }
     conf->key_width = maxlen + 1;       /* separate longest key by one space */
     conf->got_numeric = 0;

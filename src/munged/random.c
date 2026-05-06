@@ -31,7 +31,6 @@
 
 #include "random.h"
 
-#include "common.h"                     /* MIN */
 #include "conf.h"
 #include "entropy.h"
 #include "fd.h"
@@ -551,7 +550,10 @@ _random_stir_entropy (void *_arg_not_used_)
      *    for vigorous stirring of the entropy pool when the daemon is started.
      */
     if (_random_stir_secs < RANDOM_STIR_MAX_SECS) {
-        _random_stir_secs = MIN(_random_stir_secs * 2, RANDOM_STIR_MAX_SECS);
+        int backoff_secs = _random_stir_secs * 2;
+        _random_stir_secs = (backoff_secs < RANDOM_STIR_MAX_SECS)
+            ? backoff_secs
+            : RANDOM_STIR_MAX_SECS;
     }
     /*  The 10 low-order bits are used to stagger subsequent timer callbacks
      *    by up to 1023ms.

@@ -31,7 +31,6 @@
 
 #include "hkdf.h"
 
-#include "common.h"                     /* MIN */
 #include "log.h"
 #include "mac.h"
 #include "memwipe.h"
@@ -492,7 +491,7 @@ _hkdf_expand (hkdf_ctx_t *ctxp, const void *prk, size_t prklen,
             goto err;
         }
         assert (okmlen == ctxp->mdlen);
-        n = MIN(okmlen, dstlen_left);
+        n = (okmlen < dstlen_left) ? okmlen : dstlen_left;
         memcpy (dstp, okm, n);
         dstp += n;
         dstlen_left -= n;

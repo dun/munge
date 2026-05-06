@@ -222,7 +222,6 @@ cipher_map_enum (munge_cipher_t cipher, void *dst)
 
 #if HAVE_LIBGCRYPT
 
-#include "common.h"                     /* MIN */
 #include "log.h"
 
 #include <gcrypt.h>
@@ -315,6 +314,7 @@ _cipher_update (cipher_ctx *x, void *vdst, int *dstlenp,
  */
     int            n;
     int            n_written;
+    int            n_avail;
     int            n_partial;
     int            n_complete;
     unsigned char *dst = vdst;
@@ -326,7 +326,8 @@ _cipher_update (cipher_ctx *x, void *vdst, int *dstlenp,
      */
     if (x->len > 0) {
         assert (x->len < x->blklen);
-        n_partial = MIN (srclen, x->blklen - x->len);
+        n_avail = x->blklen - x->len;
+        n_partial = (srclen < n_avail) ? srclen : n_avail;
         memcpy (&(x->buf[x->len]), src, n_partial);
         x->len += n_partial;
         src += n_partial;
