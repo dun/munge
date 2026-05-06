@@ -1,4 +1,4 @@
-/*****************************************************************************
+/******************************************************************************
  *  Copyright (C) 2007-2026 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2002-2007 The Regents of the University of California.
  *  UCRL-CODE-155910.
@@ -44,7 +44,7 @@
 #include <string.h>                     /* memcpy */
 
 
-/*****************************************************************************
+/******************************************************************************
  *  Read data from file pointer into a dynamically allocated buffer.
  *
  *  Reads all data from [fp] into a malloc'd buffer, ensuring the buffer

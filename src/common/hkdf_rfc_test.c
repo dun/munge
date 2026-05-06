@@ -1,4 +1,4 @@
-/*****************************************************************************
+/******************************************************************************
  *  Copyright (C) 2007-2026 Lawrence Livermore National Security, LLC.
  *  Copyright (C) 2002-2007 The Regents of the University of California.
  *  UCRL-CODE-155910.
@@ -41,7 +41,7 @@
 #include <string.h>                     /* memcmp */
 
 
-/*****************************************************************************
+/******************************************************************************
  *  Test cases from RFC 5869: HMAC-based Extract-and-Expand Key Derivation
  *    Function (HKDF), Appendix A.
  *
