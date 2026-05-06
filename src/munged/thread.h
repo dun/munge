@@ -41,7 +41,7 @@
 
 #ifdef WITH_LSD_FATAL_ERROR_FUNC
 #undef lsd_fatal_error
-     extern void lsd_fatal_error (char *file, int line, char *mesg);
+extern void lsd_fatal_error (char *file, int line, char *mesg);
 #else
 #ifndef lsd_fatal_error
 #define lsd_fatal_error(file, line, mesg) (abort ())
@@ -49,47 +49,47 @@
 #endif /* WITH_LSD_FATAL_ERROR_FUNC */
 
 #define lsd_mutex_init(pmutex)                                                \
-     do {                                                                     \
-         int e = pthread_mutex_init (pmutex, NULL);                           \
-         if (e != 0) {                                                        \
-             errno = e;                                                       \
-             lsd_fatal_error (__FILE__, __LINE__, "mutex_init");              \
-             abort ();                                                        \
-         }                                                                    \
-     } while (0)
+ do {                                                                         \
+     int e = pthread_mutex_init (pmutex, NULL);                               \
+     if (e != 0) {                                                            \
+         errno = e;                                                           \
+         lsd_fatal_error (__FILE__, __LINE__, "mutex_init");                  \
+         abort ();                                                            \
+     }                                                                        \
+ } while (0)
 
 #define lsd_mutex_lock(pmutex)                                                \
-     do {                                                                     \
-         int e = pthread_mutex_lock (pmutex);                                 \
-         if (e != 0) {                                                        \
-             errno = e;                                                       \
-             lsd_fatal_error (__FILE__, __LINE__, "mutex_lock");              \
-             abort ();                                                        \
-         }                                                                    \
-     } while (0)
+ do {                                                                         \
+     int e = pthread_mutex_lock (pmutex);                                     \
+     if (e != 0) {                                                            \
+         errno = e;                                                           \
+         lsd_fatal_error (__FILE__, __LINE__, "mutex_lock");                  \
+         abort ();                                                            \
+     }                                                                        \
+ } while (0)
 
 #define lsd_mutex_unlock(pmutex)                                              \
-     do {                                                                     \
-         int e = pthread_mutex_unlock (pmutex);                               \
-         if (e != 0) {                                                        \
-             errno = e;                                                       \
-             lsd_fatal_error (__FILE__, __LINE__, "mutex_unlock");            \
-             abort ();                                                        \
-         }                                                                    \
-     } while (0)
+ do {                                                                         \
+     int e = pthread_mutex_unlock (pmutex);                                   \
+     if (e != 0) {                                                            \
+         errno = e;                                                           \
+         lsd_fatal_error (__FILE__, __LINE__, "mutex_unlock");                \
+         abort ();                                                            \
+     }                                                                        \
+ } while (0)
 
 #define lsd_mutex_destroy(pmutex)                                             \
-     do {                                                                     \
-         int e = pthread_mutex_destroy (pmutex);                              \
-         if (e != 0) {                                                        \
-             errno = e;                                                       \
-             lsd_fatal_error (__FILE__, __LINE__, "mutex_destroy");           \
-             abort ();                                                        \
-         }                                                                    \
-     } while (0)
+ do {                                                                         \
+     int e = pthread_mutex_destroy (pmutex);                                  \
+     if (e != 0) {                                                            \
+         errno = e;                                                           \
+         lsd_fatal_error (__FILE__, __LINE__, "mutex_destroy");               \
+         abort ();                                                            \
+     }                                                                        \
+ } while (0)
 
 #ifndef NDEBUG
-     int lsd_mutex_is_locked (pthread_mutex_t *pmutex);
+int lsd_mutex_is_locked (pthread_mutex_t *pmutex);
 #endif /* NDEBUG */
 
 #else
