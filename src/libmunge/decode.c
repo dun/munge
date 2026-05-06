@@ -29,7 +29,6 @@
 #include <config.h>
 #endif /* HAVE_CONFIG_H */
 
-#include "common.h"                     /* UID_SENTINEL, GID_SENTINEL */
 #include "ctx.h"
 #include "m_msg.h"
 #include "m_msg_client.h"
@@ -132,8 +131,8 @@ _decode_init (munge_ctx_t ctx, void **buf, int *len, uid_t *uid, gid_t *gid)
         ctx->addr.s_addr = 0;
         ctx->time0 = -1;
         ctx->time1 = -1;
-        ctx->auth_uid = UID_SENTINEL;
-        ctx->auth_gid = GID_SENTINEL;
+        ctx->auth_uid = MUNGE_UID_SENTINEL;
+        ctx->auth_gid = MUNGE_GID_SENTINEL;
         ctx->error_num = EMUNGE_SUCCESS;
         if (ctx->error_str) {
             free (ctx->error_str);
@@ -147,10 +146,10 @@ _decode_init (munge_ctx_t ctx, void **buf, int *len, uid_t *uid, gid_t *gid)
         *len = 0;
     }
     if (uid) {
-        *uid = UID_SENTINEL;
+        *uid = MUNGE_UID_SENTINEL;
     }
     if (gid) {
-        *gid = GID_SENTINEL;
+        *gid = MUNGE_GID_SENTINEL;
     }
     return;
 }

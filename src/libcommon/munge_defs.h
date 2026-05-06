@@ -34,6 +34,9 @@
 
 #include <munge.h>
 
+#include <stdint.h>                     /* UINT32_MAX */
+#include <sys/types.h>                  /* uid_t, gid_t */
+
 
 /*  MUNGE credential prefix string.
  */
@@ -237,6 +240,26 @@
 /*  String specifying the pathname of the daemon's PRNG seedfile.
  */
 #define MUNGE_SEEDFILE_PATH             LOCALSTATEDIR "/lib/munge/munged.seed"
+
+/*  Maximum value for a uid_t.  POSIX leaves uid_t signedness unspecified,
+ *  but MUNGE assumes 32-bit unsigned for all supported platforms; subtract
+ *  one to leave UINT32_MAX reserved as the sentinel.
+ */
+#define MUNGE_UID_MAXIMUM               (UINT32_MAX - 1)
+
+/*  Sentinel uid_t value indicating "no UID set" or "invalid".
+ *  Per POSIX convention, (uid_t) -1 is reserved and never a valid uid.
+ */
+#define MUNGE_UID_SENTINEL              ((uid_t) -1)
+
+/*  Maximum value for a gid_t.  Symmetric with MUNGE_UID_MAXIMUM.
+ */
+#define MUNGE_GID_MAXIMUM               (UINT32_MAX - 1)
+
+/*  Sentinel gid_t value indicating "no GID set" or "invalid".
+ *  Symmetric with MUNGE_UID_SENTINEL.
+ */
+#define MUNGE_GID_SENTINEL              ((gid_t) -1)
 
 
 #endif /* MUNGE_DEFS_H */

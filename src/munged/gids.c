@@ -31,10 +31,10 @@
 
 #include "gids.h"
 
-#include "common.h"                     /* UID_SENTINEL */
 #include "conf.h"
 #include "hash.h"
 #include "log.h"
+#include "munge_defs.h"
 #include "timer.h"
 #include "xgetgr.h"
 #include "xgetpw.h"
@@ -577,7 +577,7 @@ _gids_user_to_uid (hash_t uid_hash, hash_t ghost_hash,
  *  Set [*uid_resultp] (if non-NULL), and return 0 on success or -1 on error.
  */
     uid_node_p    u;
-    uid_t         uid = UID_SENTINEL;
+    uid_t         uid = MUNGE_UID_SENTINEL;
     struct passwd pw;
 
     if ((u = hash_find (uid_hash, user))) {
@@ -601,7 +601,7 @@ _gids_user_to_uid (hash_t uid_hash, hash_t ghost_hash,
         log_msg (LOG_INFO, "Failed to query passwd file for \"%s\": %s",
                 user, strerror (errno));
     }
-    if (uid == UID_SENTINEL) {
+    if (uid == MUNGE_UID_SENTINEL) {
         return (-1);
     }
     if (uid_resultp != NULL) {

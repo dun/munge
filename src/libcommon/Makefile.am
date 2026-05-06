@@ -39,7 +39,6 @@ libcommon_la_CPPFLAGS = \
 	# End of libcommon_la_CPPFLAGS
 
 libcommon_la_SOURCES = \
-	common.h \
 	daemonpipe.c \
 	daemonpipe.h \
 	fd.c \

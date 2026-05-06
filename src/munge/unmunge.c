@@ -29,7 +29,6 @@
 #include <config.h>
 #endif /* HAVE_CONFIG_H */
 
-#include "common.h"                     /* UID_SENTINEL, GID_SENTINEL */
 #include "license.h"
 #include "log.h"
 #include "memwipe.h"
@@ -286,8 +285,8 @@ create_conf (void)
     conf->cred = NULL;
     conf->dlen = 0;
     conf->data = NULL;
-    conf->uid = UID_SENTINEL;
-    conf->gid = GID_SENTINEL;
+    conf->uid = MUNGE_UID_SENTINEL;
+    conf->gid = MUNGE_GID_SENTINEL;
     for (i = 0, maxlen = 0; i < MUNGE_KEY_LAST; i++) {
         conf->key[i] = 0;
         len = strlen (key_val_to_str (i));

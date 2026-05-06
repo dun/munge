@@ -31,7 +31,7 @@
 
 #include "path.h"
 
-#include "common.h"                     /* GID_SENTINEL */
+#include "munge_defs.h"
 #include "query.h"
 
 #include <errno.h>
@@ -48,7 +48,7 @@
  *  Internal Variables
  *****************************************************************************/
 
-static gid_t _path_trusted_gid = GID_SENTINEL;
+static gid_t _path_trusted_gid = MUNGE_GID_SENTINEL;
 
 
 /*****************************************************************************
@@ -256,7 +256,7 @@ path_is_secure (const char *path, char *errbuf, size_t errbuflen,
              (st.st_mode & S_IWGRP)                     &&
             !(st.st_mode & S_ISVTX)                     &&
              ((st.st_gid != _path_trusted_gid) ||
-              (_path_trusted_gid == GID_SENTINEL))) {
+              (_path_trusted_gid == MUNGE_GID_SENTINEL))) {
             return (_path_set_err (0, errbuf, errbuflen,
                 "group-writable permissions without sticky bit set on \"%s\"",
                 buf));
@@ -289,7 +289,7 @@ path_is_secure (const char *path, char *errbuf, size_t errbuflen,
 int
 path_get_trusted_group (gid_t *gid_ptr)
 {
-    if (_path_trusted_gid == GID_SENTINEL) {
+    if (_path_trusted_gid == MUNGE_GID_SENTINEL) {
         errno = ERANGE;
         return (-1);
     }
@@ -312,7 +312,7 @@ int
 path_set_trusted_group (const char *group)
 {
     if (group == NULL) {
-        _path_trusted_gid = GID_SENTINEL;
+        _path_trusted_gid = MUNGE_GID_SENTINEL;
         return (0);
     }
     return (query_gid (group, &_path_trusted_gid));

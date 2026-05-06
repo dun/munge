@@ -31,7 +31,7 @@
 
 #include "query.h"
 
-#include "common.h"                     /* UID_MAXIMUM, GID_MAXIMUM */
+#include "munge_defs.h"
 #include "xgetgr.h"
 #include "xgetpw.h"
 
@@ -79,7 +79,7 @@ query_uid (const char *user, uid_t *uid_ptr)
         else if ((user == end_ptr) || (*end_ptr != '\0')) {
             rv = -1;
         }
-        else if ((l < 0) || ((unsigned int) l > UID_MAXIMUM)) {
+        else if ((l < 0) || ((unsigned int) l > MUNGE_UID_MAXIMUM)) {
             rv = -1;
         }
         else {
@@ -131,7 +131,7 @@ query_gid (const char *group, gid_t *gid_ptr)
         else if ((group == end_ptr) || (*end_ptr != '\0')) {
             rv = -1;
         }
-        else if ((l < 0) || ((unsigned int) l > GID_MAXIMUM)) {
+        else if ((l < 0) || ((unsigned int) l > MUNGE_GID_MAXIMUM)) {
             rv = -1;
         }
         else {
