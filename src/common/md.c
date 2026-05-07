@@ -239,7 +239,7 @@ static int
 _md_init (md_ctx *x, munge_mac_t md)
 {
     gcry_error_t e;
-    int          algo;
+    int algo;
 
     if (_md_map_enum (md, &algo) < 0) {
         return (-1);

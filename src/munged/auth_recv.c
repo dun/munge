@@ -74,10 +74,10 @@ auth_recv_init (const char *srvrdir, const char *clntdir, int got_force)
 static void
 _check_auth_server_dir (const char *dir, int got_force)
 {
-    int          is_symlink;
-    struct stat  st;
-    int          n;
-    char         ebuf [1024];
+    int is_symlink;
+    struct stat st;
+    int n;
+    char ebuf [1024];
 
     if ((dir == NULL) || (*dir == '\0')) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
@@ -150,11 +150,11 @@ _check_auth_server_dir (const char *dir, int got_force)
 static void
 _check_auth_client_dir (const char *dir, int got_force)
 {
-    int          is_symlink;
-    struct stat  st;
-    int          n;
-    char         parent_dir [PATH_MAX];
-    char         ebuf [1024];
+    int is_symlink;
+    struct stat st;
+    int n;
+    char parent_dir [PATH_MAX];
+    char ebuf [1024];
 
     if ((dir == NULL) || (*dir == '\0')) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
@@ -279,9 +279,9 @@ int
 auth_recv (m_msg_t m, uid_t *uid, gid_t *gid)
 {
     ucred_t *ucred = NULL;
-    uid_t    uid_tmp;
-    gid_t    gid_tmp;
-    int      rc = -1;
+    uid_t uid_tmp;
+    gid_t gid_tmp;
+    int rc = -1;
 
     if (getpeerucred (m->sd, &ucred) < 0) {
         log_msg (LOG_ERR, "Failed to get peer ucred: %s", strerror (errno));
@@ -410,9 +410,9 @@ static int _send_auth_req (int sd, const char *pipe_name);
 int
 auth_recv (m_msg_t m, uid_t *uid, gid_t *gid)
 {
-    char             *pipe_name = NULL;
-    int               pipe_fd = -1;
-    struct strrecvfd  recvfd;
+    char *pipe_name = NULL;
+    int pipe_fd = -1;
+    struct strrecvfd recvfd;
 
     if (_name_auth_pipe (&pipe_name) < 0) {
         log_msg (LOG_ERR, "Failed to name auth pipe");
@@ -510,9 +510,9 @@ static int _send_auth_req (int sd, const char *pipe_name);
 int
 auth_recv (m_msg_t m, uid_t *uid, gid_t *gid)
 {
-    char             *pipe_name = NULL;
-    int               pipe_fds[2] = {-1, -1};
-    struct strrecvfd  recvfd;
+    char *pipe_name = NULL;
+    int pipe_fds[2] = {-1, -1};
+    struct strrecvfd recvfd;
 
     if (_name_auth_pipe (&pipe_name) < 0) {
         log_msg (LOG_ERR, "Failed to name auth pipe");
@@ -695,12 +695,12 @@ _name_auth_pipe (char **pipe_name_p)
  *  Returns 0 on success, -1 on error.
  */
     unsigned char *nonce_bin = NULL;
-    int            nonce_bin_len;
-    char          *nonce_asc = NULL;
-    int            nonce_asc_len;
-    char          *dst = NULL;
-    int            dst_len;
-    int            n;
+    int nonce_bin_len;
+    char *nonce_asc = NULL;
+    int nonce_asc_len;
+    char *dst = NULL;
+    int dst_len;
+    int n;
 
     *pipe_name_p = NULL;
     assert (conf->auth_rnd_bytes > 0);
@@ -761,8 +761,8 @@ _send_auth_req (int sd, const char *pipe_name)
  *    name in which to create the authentication file corresponding to the file
  *    descriptor being sent.
  */
-    m_msg_t      m;
-    munge_err_t  e;
+    m_msg_t m;
+    munge_err_t e;
 
     if ((e = m_msg_create (&m)) != EMUNGE_SUCCESS) {
         goto end;

@@ -51,12 +51,12 @@
 int
 query_uid (const char *user, uid_t *uid_ptr)
 {
-    xpwbuf_p       pwbufp;
-    struct passwd  pw;
-    uid_t          uid;
-    long int       l;
-    char          *end_ptr;
-    int            rv;
+    xpwbuf_p pwbufp;
+    struct passwd pw;
+    uid_t uid;
+    long int l;
+    char *end_ptr;
+    int rv;
 
     if (user == NULL) {
         errno = EINVAL;
@@ -103,12 +103,12 @@ query_uid (const char *user, uid_t *uid_ptr)
 int
 query_gid (const char *group, gid_t *gid_ptr)
 {
-    xgrbuf_p       grbufp;
-    struct group   gr;
-    gid_t          gid;
-    long int       l;
-    char          *end_ptr;
-    int            rv;
+    xgrbuf_p grbufp;
+    struct group gr;
+    gid_t gid;
+    long int l;
+    char *end_ptr;
+    int rv;
 
     if (group == NULL) {
         errno = EINVAL;

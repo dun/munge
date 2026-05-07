@@ -325,8 +325,8 @@ void
 parse_cmdline (conf_t conf, int argc, char **argv)
 {
     char *prog;
-    int   c;
-    long  l;
+    int c;
+    long l;
     char *p;
 
     assert (conf != NULL);
@@ -709,7 +709,7 @@ _conf_set_cwd (conf_t conf)
 /*  Set the current working directory in order to fix relative paths so these
  *    locations can still be accessed after chdir() is called.
  */
-    char  buf [PATH_MAX];
+    char buf [PATH_MAX];
     char *rv;
 
     rv = getcwd (buf, sizeof (buf));
@@ -882,7 +882,7 @@ _conf_process_stop (conf_t conf)
  *    A SIGKILL is sent afterwards if the process fails to terminate.
  */
     pid_t pid;
-    int   rv;
+    int rv;
 
     assert (conf != NULL);
     assert (MUNGE_SIGNAL_WAIT_MSECS > 0);
@@ -939,8 +939,8 @@ _conf_send_signal (pid_t pid, int signum, int msecs)
  *    or 0 if the process has terminated.
  */
     struct timespec wait_abstime;
-    int             rv;
-    int             sig;
+    int rv;
+    int sig;
 
     assert (pid > 0);
     assert (signum > 0);
@@ -990,7 +990,7 @@ _conf_sleep (int msecs)
  */
 #if HAVE_CLOCK_NANOSLEEP
     struct timespec check_abstime;
-    int             rv;
+    int rv;
 
     rv = clock_get_timespec (&check_abstime, msecs);
     if (rv < 0) {
@@ -1007,7 +1007,7 @@ _conf_sleep (int msecs)
     }
 #else
     struct timespec check_reltime;
-    int             rv;
+    int rv;
 
     check_reltime.tv_sec = msecs / 1000;
     check_reltime.tv_nsec = (msecs % 1000) * 1000 * 1000;
@@ -1095,12 +1095,12 @@ _conf_open_keyfile (const char *keyfile, int got_force)
 {
 /*  Returns a valid file-descriptor to the opened [keyfile], or dies trying.
  */
-    int          is_symlink;
-    struct stat  st;
-    int          n;
-    char         keydir [PATH_MAX];
-    char         ebuf [1024];
-    int          fd;
+    int is_symlink;
+    struct stat st;
+    int n;
+    char keydir [PATH_MAX];
+    char ebuf [1024];
+    int fd;
 
     if ((keyfile == NULL) || (*keyfile == '\0')) {
         log_err (EMUNGE_SNAFU, LOG_ERR, "Keyfile name is undefined");

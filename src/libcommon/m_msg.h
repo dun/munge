@@ -72,48 +72,48 @@ enum m_msg_type {                       /* message type                      */
 };
 
 struct m_msg {
-    int                sd;              /* munge socket descriptor           */
-    uint8_t            type;            /* enum m_msg_type                   */
-    uint8_t            retry;           /* retry count for this transaction  */
-    uint32_t           pkt_len;         /* length of msg pkt mem allocation  */
-    void              *pkt;             /* ptr to msg for xfer over socket   */
-    uint8_t            cipher;          /* munge_cipher_t enum               */
-    uint8_t            mac;             /* munge_mac_t enum                  */
-    uint8_t            zip;             /* munge_zip_t enum                  */
-    uint8_t            realm_len;       /* length of realm string with NUL   */
-    char              *realm_str;       /* security realm string with NUL    */
-    uint32_t           ttl;             /* time-to-live                      */
-    uint8_t            addr_len;        /* length of IP address              */
-    struct in_addr     addr;            /* IP addr where cred was encoded    */
-    uint32_t           time0;           /* time at which cred was encoded    */
-    uint32_t           time1;           /* time at which cred was decoded    */
-    uint32_t           client_uid;      /* UID of connecting client process  */
-    uint32_t           client_gid;      /* GID of connecting client process  */
-    uint32_t           cred_uid;        /* UID of client that requested cred */
-    uint32_t           cred_gid;        /* GID of client that requested cred */
-    uint32_t           auth_uid;        /* UID of client allowed to decode   */
-    uint32_t           auth_gid;        /* GID of client allowed to decode   */
-    uint32_t           data_len;        /* length of data                    */
-    void              *data;            /* ptr to data munged into cred      */
-    uint32_t           auth_s_len;      /* length of auth srvr string w/ NUL */
-    char              *auth_s_str;      /* auth srvr path name string w/ NUL */
-    uint32_t           auth_c_len;      /* length of auth clnt string w/ NUL */
-    char              *auth_c_str;      /* auth clnt dir name string w/ NUL  */
-    uint8_t            error_num;       /* munge_err_t for encode/decode op  */
-    uint8_t            error_len;       /* length of err msg str with NUL    */
-    char              *error_str;       /* descriptive err msg str with NUL  */
-    unsigned           pkt_is_copy:1;   /* true if mem for pkt is a copy     */
-    unsigned           realm_is_copy:1; /* true if mem for realm is a copy   */
-    unsigned           data_is_copy:1;  /* true if mem for data is a copy    */
-    unsigned           error_is_copy:1; /* true if mem for err str is a copy */
-    unsigned           auth_s_is_copy:1;/* true if mem for auth srvr is copy */
-    unsigned           auth_c_is_copy:1;/* true if mem for auth clnt is copy */
+    int sd;                             /* munge socket descriptor           */
+    uint8_t type;                       /* enum m_msg_type                   */
+    uint8_t retry;                      /* retry count for this transaction  */
+    uint32_t pkt_len;                   /* length of msg pkt mem allocation  */
+    void *pkt;                          /* ptr to msg for xfer over socket   */
+    uint8_t cipher;                     /* munge_cipher_t enum               */
+    uint8_t mac;                        /* munge_mac_t enum                  */
+    uint8_t zip;                        /* munge_zip_t enum                  */
+    uint8_t realm_len;                  /* length of realm string with NUL   */
+    char *realm_str;                    /* security realm string with NUL    */
+    uint32_t ttl;                       /* time-to-live                      */
+    uint8_t addr_len;                   /* length of IP address              */
+    struct in_addr addr;                /* IP addr where cred was encoded    */
+    uint32_t time0;                     /* time at which cred was encoded    */
+    uint32_t time1;                     /* time at which cred was decoded    */
+    uint32_t client_uid;                /* UID of connecting client process  */
+    uint32_t client_gid;                /* GID of connecting client process  */
+    uint32_t cred_uid;                  /* UID of client that requested cred */
+    uint32_t cred_gid;                  /* GID of client that requested cred */
+    uint32_t auth_uid;                  /* UID of client allowed to decode   */
+    uint32_t auth_gid;                  /* GID of client allowed to decode   */
+    uint32_t data_len;                  /* length of data                    */
+    void *data;                         /* ptr to data munged into cred      */
+    uint32_t auth_s_len;                /* length of auth srvr string w/ NUL */
+    char *auth_s_str;                   /* auth srvr path name string w/ NUL */
+    uint32_t auth_c_len;                /* length of auth clnt string w/ NUL */
+    char *auth_c_str;                   /* auth clnt dir name string w/ NUL  */
+    uint8_t error_num;                  /* munge_err_t for encode/decode op  */
+    uint8_t error_len;                  /* length of err msg str with NUL    */
+    char *error_str;                    /* descriptive err msg str with NUL  */
+    unsigned pkt_is_copy:1;             /* true if mem for pkt is a copy     */
+    unsigned realm_is_copy:1;           /* true if mem for realm is a copy   */
+    unsigned data_is_copy:1;            /* true if mem for data is a copy    */
+    unsigned error_is_copy:1;           /* true if mem for err str is a copy */
+    unsigned auth_s_is_copy:1;          /* true if mem for auth srvr is copy */
+    unsigned auth_c_is_copy:1;          /* true if mem for auth clnt is copy */
 };
 
-typedef struct m_msg *  m_msg_t;
+typedef struct m_msg * m_msg_t;
 typedef enum m_msg_type m_msg_type_t;
-typedef uint32_t        m_msg_magic_t;
-typedef uint8_t         m_msg_version_t;
+typedef uint32_t m_msg_magic_t;
+typedef uint8_t m_msg_version_t;
 
 
 /******************************************************************************

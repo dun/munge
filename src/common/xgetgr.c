@@ -96,8 +96,8 @@
  *****************************************************************************/
 
 struct xgrbuf_t {
-    char   *buf;
-    size_t  len;
+    char *buf;
+    size_t len;
 };
 
 
@@ -210,22 +210,22 @@ xgetgrent (struct group *grp, xgrbuf_p grbufp)
  *  Returns -1 with ERANGE when the underlying getgrent_r() call cannot be
  *    automatically restarted after resizing the buffer [grbufp].
  */
-    int                     rv;
+    int rv;
 #if HAVE_GETGRENT_R_GNU
-    struct group           *rv_grp;
+    struct group *rv_grp;
 #elif HAVE_GETGRENT_R_AIX
 #elif HAVE_GETGRENT_R_SUN
-    struct group           *rv_grp;
+    struct group *rv_grp;
 #elif HAVE_GETGRENT
 #if WITH_PTHREADS
-    static pthread_mutex_t  mutex = PTHREAD_MUTEX_INITIALIZER;
-    int                     rv_mutex;
+    static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+    int rv_mutex;
 #endif /* WITH_PTHREADS */
-    int                     rv_copy;
-    struct group           *rv_grp;
+    int rv_copy;
+    struct group *rv_grp;
 #endif /* HAVE_GETGRENT_R_GNU */
-    int                     got_eof;
-    int                     got_err;
+    int got_eof;
+    int got_err;
 
     if ((grp == NULL) || (grbufp == NULL)) {
         errno = EINVAL;
@@ -335,20 +335,20 @@ xgetgrnam (const char *name, struct group *grp, xgrbuf_p grbufp)
 /*  Portable encapsulation of getgrnam_r().
  */
 #if HAVE_GETGRNAM_R_POSIX
-    struct group           *rv_grp;
+    struct group *rv_grp;
 #elif HAVE_GETGRNAM_R_SUN
-    struct group           *rv_grp;
+    struct group *rv_grp;
 #elif HAVE_GETGRNAM
 #if WITH_PTHREADS
-    static pthread_mutex_t  mutex = PTHREAD_MUTEX_INITIALIZER;
-    int                     rv_mutex;
+    static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+    int rv_mutex;
 #endif /* WITH_PTHREADS */
-    int                     rv_copy;
-    struct group           *rv_grp;
+    int rv_copy;
+    struct group *rv_grp;
 #endif /* HAVE_GETGRNAM_R_POSIX */
-    int                     rv;
-    int                     got_err;
-    int                     got_none;
+    int rv;
+    int got_err;
+    int got_none;
 
     if ((name == NULL)    ||
         (name[0] == '\0') ||
@@ -492,7 +492,7 @@ _xgetgrbuf_get_sys_size (void)
 {
 /*  Returns the system recommended size for the xgetgr buffer.
  */
-    long   n = -1;
+    long n = -1;
     size_t len;
 
 #if HAVE_SYSCONF
@@ -512,8 +512,8 @@ _xgetgrbuf_grow (xgrbuf_p grbufp, size_t minlen)
 /*  Grows the buffer [grbufp] to be at least as large as the length [minlen].
  *  Returns 0 on success, or -1 on error (with errno).
  */
-    size_t  newlen;
-    char   *newbuf;
+    size_t newlen;
+    char *newbuf;
 
     assert (grbufp != NULL);
     assert (grbufp->buf != NULL);
@@ -549,12 +549,12 @@ _xgetgrbuf_copy_struct (const struct group *src, struct group *dst,
  *    whatnot into the buffer [grbufp].
  *  Returns 0 on success, or -1 on error (with errno).
  */
-    int      num_ptrs;
-    size_t   num_bytes;
-    char   **userp;
-    char    *p;
-    size_t   n;
-    int      i;
+    int num_ptrs;
+    size_t num_bytes;
+    char **userp;
+    char *p;
+    size_t n;
+    int i;
 
     assert (src != NULL);
     assert (dst != NULL);

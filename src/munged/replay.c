@@ -68,8 +68,8 @@ union replay_node {
         union replay_node *next;        /* ptr for chaining by allocator     */
     } alloc;
     struct {
-        time_t             t_expired;   /* time after which cred expires     */
-        unsigned char      mac [MUNGE_MINIMUM_MD_LEN];  /* msg auth code     */
+        time_t t_expired;               /* time after which cred expires     */
+        unsigned char mac [MUNGE_MINIMUM_MD_LEN];       /* msg auth code     */
     } data;
 };
 
@@ -188,9 +188,9 @@ replay_insert (munge_cred_t c)
  *    Returns 1 if the credential is already present (ie, replay).
  *    Returns -1 on error with errno set.
  */
-    m_msg_t   m;
-    int       e;
-    replay_t  r;
+    m_msg_t m;
+    int e;
+    replay_t r;
 
     if (!replay_hash) {
         if (conf->got_benchmark)
@@ -235,9 +235,9 @@ replay_remove (munge_cred_t c)
 {
 /*  Removes the credential [c] from the replay hash.
  */
-    m_msg_t            m;
-    union replay_node  rnode;
-    replay_t           r;
+    m_msg_t m;
+    union replay_node rnode;
+    replay_t r;
 
     if (!replay_hash) {
         if (conf->got_benchmark)
@@ -270,8 +270,8 @@ replay_purge (void)
 {
 /*  Purges the replay hash of any expired credentials.
  */
-    time_t  now;
-    int     n;
+    time_t now;
+    int n;
 
     if (!replay_hash) {
         return;
@@ -351,9 +351,9 @@ replay_alloc (void)
 /*  Allocates a replay_t object.
  *  Returns a ptr to the object, or NULL if memory allocation fails.
  */
-    size_t    size;
-    replay_t  r;
-    int       i;
+    size_t size;
+    replay_t r;
+    int i;
 
     assert (REPLAY_NODE_ALLOC_NUM > 0);
     lsd_mutex_lock (&replay_free_list_lock);

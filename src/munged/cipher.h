@@ -47,11 +47,11 @@
 #include <gcrypt.h>
 
 typedef struct {
-    gcry_cipher_hd_t    ctx;
-    int                 do_encrypt;
-    int                 len;
-    int                 blklen;
-    unsigned char       buf [MUNGE_MAXIMUM_BLK_LEN];
+    gcry_cipher_hd_t ctx;
+    int do_encrypt;
+    int len;
+    int blklen;
+    unsigned char buf[MUNGE_MAXIMUM_BLK_LEN];
 } cipher_ctx;
 
 #endif /* HAVE_LIBGCRYPT */
@@ -62,7 +62,7 @@ typedef struct {
 #include <openssl/evp.h>
 
 typedef struct {
-    EVP_CIPHER_CTX     *ctx;
+    EVP_CIPHER_CTX *ctx;
 } cipher_ctx;
 
 #endif /* HAVE_OPENSSL */

@@ -254,9 +254,9 @@ static int
 _cipher_init (cipher_ctx *x, munge_cipher_t cipher,
               unsigned char *key, unsigned char *iv, int enc)
 {
-    gcry_error_t  e;
-    int           algo;
-    size_t        nbytes;
+    gcry_error_t e;
+    int algo;
+    size_t nbytes;
 
     if (_cipher_map_enum (cipher, &algo) < 0) {
         return (-1);
@@ -312,11 +312,11 @@ _cipher_update (cipher_ctx *x, void *vdst, int *dstlenp,
  *    the end of each update to ensure the padding is properly removed when
  *    the decryption is finalized.
  */
-    int            n;
-    int            n_written;
-    int            n_avail;
-    int            n_partial;
-    int            n_complete;
+    int n;
+    int n_written;
+    int n_avail;
+    int n_partial;
+    int n_complete;
     unsigned char *dst = vdst;
     unsigned char *src = (void *) vsrc;
 
@@ -404,7 +404,7 @@ _cipher_update_aux (cipher_ctx *x, void *dst, int *dstlenp,
                     const void *src, int srclen)
 {
     gcry_error_t e;
-    int          dstlen = *dstlenp;
+    int dstlen = *dstlenp;
 
     if (x->do_encrypt) {
         e = gcry_cipher_encrypt (x->ctx, dst, dstlen, src, srclen);
@@ -502,8 +502,8 @@ static int
 _cipher_block_size (munge_cipher_t cipher)
 {
     gcry_error_t e;
-    int          algo;
-    size_t       nbytes;
+    int algo;
+    size_t nbytes;
 
     if (_cipher_map_enum (cipher, &algo) < 0) {
         return (-1);
@@ -530,8 +530,8 @@ static int
 _cipher_key_size (munge_cipher_t cipher)
 {
     gcry_error_t e;
-    int          algo;
-    size_t       nbytes;
+    int algo;
+    size_t nbytes;
 
     if (_cipher_map_enum (cipher, &algo) < 0) {
         return (-1);

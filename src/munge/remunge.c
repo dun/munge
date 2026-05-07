@@ -107,39 +107,39 @@ struct option long_opts[] = {
  *      are constant while processing credentials.
  */
 struct conf {
-    munge_ctx_t     ctx;                /* munge context                     */
-    int             do_decode;          /* true to decode/validate all creds */
-    char           *payload;            /* payload to be encoded into cred   */
-    int             num_payload;        /* number of bytes for cred payload  */
-    int             max_threads;        /* max number of threads available   */
-    int             num_threads;        /* number of threads to spawn        */
-    int             num_running;        /* number of threads now running     */
-    int             num_seconds;        /* number of seconds to run          */
-    unsigned long   num_creds;          /* number of credentials to process  */
-    int             warn_time;          /* number of seconds to allow for op */
-    struct timeval  t_main_start;       /* time when cred processing started */
-    struct timeval  t_main_stop;        /* time when cred processing stopped */
-    pthread_t      *tids;               /* ptr to array of thread IDs        */
+    munge_ctx_t ctx;                    /* munge context                     */
+    int do_decode;                      /* true to decode/validate all creds */
+    char *payload;                      /* payload to be encoded into cred   */
+    int num_payload;                    /* number of bytes for cred payload  */
+    int max_threads;                    /* max number of threads available   */
+    int num_threads;                    /* number of threads to spawn        */
+    int num_running;                    /* number of threads now running     */
+    int num_seconds;                    /* number of seconds to run          */
+    unsigned long num_creds;            /* number of credentials to process  */
+    int warn_time;                      /* number of seconds to allow for op */
+    struct timeval t_main_start;        /* time when cred processing started */
+    struct timeval t_main_stop;         /* time when cred processing stopped */
+    pthread_t *tids;                    /* ptr to array of thread IDs        */
     pthread_mutex_t mutex;              /* mutex for accessing shared data   */
-    pthread_cond_t  cond_done;          /* cond for when last thread is done */
+    pthread_cond_t cond_done;           /* cond for when last thread is done */
 
     struct {                            /* thread-modified data; mutex req'd */
       unsigned long num_creds_done;     /*   number of credentials processed */
       unsigned long num_encode_errs;    /*   number of errors encoding creds */
       unsigned long num_decode_errs;    /*   number of errors decoding creds */
-    }               shared;
+    } shared;
 };
 typedef struct conf * conf_t;
 
 struct thread_data {
-    conf_t          conf;               /* reference to global configuration */
-    munge_ctx_t     ectx;               /* local munge context for encodes   */
-    munge_ctx_t     dctx;               /* local munge context for decodes   */
+    conf_t conf;                        /* reference to global configuration */
+    munge_ctx_t ectx;                   /* local munge context for encodes   */
+    munge_ctx_t dctx;                   /* local munge context for decodes   */
 };
 typedef struct thread_data * tdata_t;
 
 typedef void * (*thread_f) (void *);
-typedef void   (*thread_cleanup_f) (void *);
+typedef void (*thread_cleanup_f) (void *);
 
 
 /******************************************************************************
@@ -153,21 +153,21 @@ int g_got_quiet = 0;
  *  Prototypes
  *****************************************************************************/
 
-conf_t  create_conf (void);
-void    destroy_conf (conf_t conf);
+conf_t create_conf (void);
+void destroy_conf (conf_t conf);
 tdata_t create_tdata (conf_t conf);
-void    destroy_tdata (tdata_t tdata);
-void    parse_cmdline (conf_t conf, int argc, char **argv);
-void    display_help (char *prog);
-void    display_strings (const char *header, munge_enum_t type);
-int     get_si_multiple (char c);
-int     get_time_multiple (char c);
-void    start_threads (conf_t conf);
-void    process_creds (conf_t conf);
-void    stop_threads (conf_t conf);
-void *  remunge (conf_t conf);
-void    remunge_cleanup (tdata_t tdata);
-void    output_msg (const char *format, ...);
+void destroy_tdata (tdata_t tdata);
+void parse_cmdline (conf_t conf, int argc, char **argv);
+void display_help (char *prog);
+void display_strings (const char *header, munge_enum_t type);
+int get_si_multiple (char c);
+int get_time_multiple (char c);
+void start_threads (conf_t conf);
+void process_creds (conf_t conf);
+void stop_threads (conf_t conf);
+void * remunge (conf_t conf);
+void remunge_cleanup (tdata_t tdata);
+void output_msg (const char *format, ...);
 
 
 /******************************************************************************
@@ -231,7 +231,7 @@ create_conf (void)
  *  Returns a valid ptr or dies trying.
  */
     conf_t conf;
-    int    n;
+    int n;
 
     if (!(conf = malloc (sizeof (*conf)))) {
         log_errno (EMUNGE_NO_MEMORY, LOG_ERR, "Failed to allocate conf");
@@ -357,14 +357,14 @@ parse_cmdline (conf_t conf, int argc, char **argv)
 {
 /*  Parses the command-line, altering the configuration [conf] as specified.
  */
-    char          *prog;
-    int            c;
-    char          *p;
-    int            i;
-    long int       l;
-    unsigned long  u;
-    int            multiplier;
-    munge_err_t    e;
+    char *prog;
+    int c;
+    char *p;
+    int i;
+    long int l;
+    unsigned long u;
+    int multiplier;
+    munge_err_t e;
 
     opterr = 0;                         /* suppress default getopt err msgs */
 
@@ -761,7 +761,7 @@ display_help (char *prog)
 void
 display_strings (const char *header, munge_enum_t type)
 {
-    int         i;
+    int i;
     const char *p;
 
     if (header) {
@@ -856,8 +856,8 @@ start_threads (conf_t conf)
 /*  Start the number of threads specified by [conf] for processing credentials.
  */
     pthread_attr_t tattr;
-    size_t         stacksize = 256 * 1024;
-    int            i;
+    size_t stacksize = 256 * 1024;
+    int i;
 
     if (!(conf->tids = malloc (sizeof (*conf->tids) * conf->num_threads))) {
         log_err (EMUNGE_NO_MEMORY, LOG_ERR, "Failed to allocate tid array");
@@ -917,8 +917,8 @@ process_creds (conf_t conf)
  *  Processing continues for the specified duration or until the
  *    credential count is reached, whichever comes first.
  */
-    int             n_secs;
-    unsigned long   n_creds;
+    int n_secs;
+    unsigned long n_creds;
     struct timespec to;
 
     /*  Start the main timer before the timeout is computed below.
@@ -1000,10 +1000,10 @@ stop_threads (conf_t conf)
 {
 /*  Stop the threads from processing further credentials.  Output the results.
  */
-    int           i;
+    int i;
     unsigned long n;
-    double        delta;
-    double        rate;
+    double delta;
+    double rate;
 
     /*  The mutex must be unlocked here in order to let the threads clean up
      *    (via remunge_cleanup()) once they are canceled/finished.
@@ -1075,20 +1075,20 @@ remunge (conf_t conf)
 {
 /*  Worker thread responsible for encoding/decoding/validating credentials.
  */
-    tdata_t         tdata;
-    int             cancel_state;
-    unsigned long   n;
-    unsigned long   got_encode_err;
-    unsigned long   got_decode_err;
-    struct timeval  t_start;
-    struct timeval  t_stop;
-    double          delta;
-    munge_err_t     e;
-    char           *cred;
-    void           *data;
-    int             dlen;
-    uid_t           uid;
-    gid_t           gid;
+    tdata_t tdata;
+    int cancel_state;
+    unsigned long n;
+    unsigned long got_encode_err;
+    unsigned long got_decode_err;
+    struct timeval t_start;
+    struct timeval t_stop;
+    double delta;
+    munge_err_t e;
+    char *cred;
+    void *data;
+    int dlen;
+    uid_t uid;
+    gid_t gid;
 
     tdata = create_tdata (conf);
 
@@ -1230,14 +1230,14 @@ output_msg (const char *format, ...)
 /*  Outputs the current time followed by the [format] string
  *    to stdout in a thread-safe manner.
  */
-    time_t     t;
-    struct tm  tm;
+    time_t t;
+    struct tm tm;
     struct tm *tm_ptr;
-    char       buf[256];
-    char      *p = buf;
-    int        len = sizeof (buf);
-    int        n;
-    va_list    vargs;
+    char buf[256];
+    char *p = buf;
+    int len = sizeof (buf);
+    int n;
+    va_list vargs;
 
     if (g_got_quiet) {
         return;

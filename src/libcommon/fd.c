@@ -61,8 +61,8 @@ ssize_t
 fd_read_n (int fd, void *buf, size_t n)
 {
     unsigned char *p;
-    size_t         nleft;
-    ssize_t        nread;
+    size_t nleft;
+    ssize_t nread;
 
     p = buf;
     nleft = n;
@@ -90,8 +90,8 @@ ssize_t
 fd_write_n (int fd, const void *buf, size_t n)
 {
     const unsigned char *p;
-    size_t               nleft;
-    ssize_t              nwritten;
+    size_t nleft;
+    ssize_t nwritten;
 
     p = buf;
     nleft = n;
@@ -126,11 +126,11 @@ fd_timed_read_n (int fd, void *buf, size_t n,
                  const struct timeval *when, int do_skip_first_poll)
 {
     unsigned char *p;
-    int            msecs;
-    struct pollfd  pfd;
-    int            nfd;
-    size_t         nleft;
-    ssize_t        nread;
+    int msecs;
+    struct pollfd pfd;
+    int nfd;
+    size_t nleft;
+    ssize_t nread;
 
     if ((fd < 0) || (buf == NULL)) {
         errno = EINVAL;
@@ -209,11 +209,11 @@ fd_timed_write_n (int fd, const void *buf, size_t n,
                   const struct timeval *when, int do_skip_first_poll)
 {
     const unsigned char *p;
-    int                  msecs;
-    struct pollfd        pfd;
-    int                  nfd;
-    size_t               nleft;
-    ssize_t              nwritten;
+    int msecs;
+    struct pollfd pfd;
+    int nfd;
+    size_t nleft;
+    ssize_t nwritten;
 
     if ((fd < 0) || (buf == NULL)) {
         errno = EINVAL;
@@ -291,14 +291,14 @@ ssize_t
 fd_timed_write_iov (int fd, const struct iovec *iov_orig, int iov_cnt,
                     const struct timeval *when, int do_skip_first_poll)
 {
-    int            iov_mem_len;
-    struct iovec  *iov;
-    int            i;
-    size_t         n, nleft, iov_len;
-    struct pollfd  pfd;
-    int            nfd;
-    int            msecs;
-    ssize_t        nwritten;
+    int iov_mem_len;
+    struct iovec *iov;
+    int i;
+    size_t n, nleft, iov_len;
+    struct pollfd pfd;
+    int nfd;
+    int msecs;
+    ssize_t nwritten;
 
     if ((fd < 0) || (iov_orig == NULL) || (iov_cnt <= 0)) {
         errno = EINVAL;
@@ -498,7 +498,7 @@ _fd_get_poll_timeout (const struct timeval *when)
  *    (indicating poll() should wait indefinitely).
  */
     struct timeval now;
-    int            msecs;
+    int msecs;
 
     if (when == NULL) {
         return (-1);

@@ -198,11 +198,11 @@ m_msg_send (m_msg_t m, m_msg_type_t type, size_t maxlen)
  *    and an error returned.
  *  Returns a standard munge error code.
  */
-    munge_err_t     e;
-    int             n, nsend;
-    uint8_t         hdr [MUNGE_MSG_HDR_SIZE];
-    struct iovec    iov [2];
-    struct timeval  tv;
+    munge_err_t e;
+    int n, nsend;
+    uint8_t hdr [MUNGE_MSG_HDR_SIZE];
+    struct iovec iov [2];
+    struct timeval tv;
 
     assert (m != NULL);
     assert (m->sd >= 0);
@@ -312,9 +312,9 @@ m_msg_recv (m_msg_t m, m_msg_type_t type, size_t maxlen)
  *    and an error returned.
  *  Returns a standard munge error code.
  */
-    int             n, nrecv;
-    uint8_t         hdr [MUNGE_MSG_HDR_SIZE];
-    struct timeval  tv;
+    int n, nrecv;
+    uint8_t hdr [MUNGE_MSG_HDR_SIZE];
+    struct timeval tv;
 
     assert (m != NULL);
     assert (m->sd >= 0);
@@ -540,10 +540,10 @@ _msg_pack (m_msg_t m, m_msg_type_t type, void *dst, int dstlen)
 /*  Packs the message [m] of type [type] into the buffer [dst]
  *    of length [dstlen] for transport across the munge socket.
  */
-    m_msg_magic_t    magic = MUNGE_MSG_MAGIC;
-    m_msg_version_t  version = MUNGE_MSG_VERSION;
-    void            *p = dst;
-    void            *q = (unsigned char *) dst + dstlen;
+    m_msg_magic_t magic = MUNGE_MSG_MAGIC;
+    m_msg_version_t version = MUNGE_MSG_VERSION;
+    void *p = dst;
+    void *q = (unsigned char *) dst + dstlen;
 
     assert (m != NULL);
 
@@ -629,10 +629,10 @@ _msg_unpack (m_msg_t m, m_msg_type_t type, const void *src, int srclen)
 /*  Unpacks the message [m] from transport across the munge socket.
  *  Checks to ensure the message is of the expected type [type].
  */
-    m_msg_magic_t    magic;
-    m_msg_version_t  version;
-    void            *p = (void *) src;
-    void            *q = (unsigned char *) src + srclen;
+    m_msg_magic_t magic;
+    m_msg_version_t version;
+    void *p = (void *) src;
+    void *q = (unsigned char *) src + srclen;
 
     assert (m != NULL);
 
@@ -809,9 +809,9 @@ _pack (void **pdst, void *src, int len, const void *last)
  *  Returns the number of bytes copied into [dst].
  *    On success (ie, > 0), the [dst] ptr is advanced by [len].
  */
-    void     *dst;
-    uint16_t  u16;
-    uint32_t  u32;
+    void *dst;
+    uint16_t u16;
+    uint32_t u32;
 
     assert (pdst != NULL);
     assert (src != NULL);
@@ -849,9 +849,9 @@ _unpack (void *dst, void **psrc, int len, const void *last)
  *  Returns the number of bytes copied into [dst].
  *    On success (ie, > 0), the [src] ptr is advanced by [len].
  */
-    void     *src;
-    uint16_t  u16;
-    uint32_t  u32;
+    void *src;
+    uint16_t u16;
+    uint32_t u32;
 
     assert (dst != NULL);
     assert (psrc != NULL);

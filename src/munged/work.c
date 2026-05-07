@@ -50,21 +50,21 @@
  *****************************************************************************/
 
 typedef struct work_arg {
-    struct work_arg    *next;           /* next work element in queue        */
-    void               *arg;            /* arg describing work to be done    */
+    struct work_arg *next;              /* next work element in queue        */
+    void *arg;                          /* arg describing work to be done    */
 } work_arg_t, *work_arg_p;
 
 typedef struct work {
-    pthread_mutex_t     lock;           /* mutex for accessing struct        */
-    pthread_cond_t      received_work;  /* cond for when new work is recv'd  */
-    pthread_cond_t      finished_work;  /* cond for when all work is done    */
-    pthread_t          *workers;        /* ptr to array of worker thread IDs */
-    work_func_t         work_func;      /* function to perform work in queue */
-    work_arg_p          work_head;      /* head of the work queue            */
-    work_arg_p          work_tail;      /* tail of the work queue            */
-    int                 n_workers;      /* number of worker threads (total)  */
-    int                 n_working;      /* number of worker threads working  */
-    int                 got_fini;       /* true prevents new work after fini */
+    pthread_mutex_t lock;               /* mutex for accessing struct        */
+    pthread_cond_t received_work;       /* cond for when new work is recv'd  */
+    pthread_cond_t finished_work;       /* cond for when all work is done    */
+    pthread_t *workers;                 /* ptr to array of worker thread IDs */
+    work_func_t work_func;              /* function to perform work in queue */
+    work_arg_p work_head;               /* head of the work queue            */
+    work_arg_p work_tail;               /* tail of the work queue            */
+    int n_workers;                      /* number of worker threads (total)  */
+    int n_working;                      /* number of worker threads working  */
+    int got_fini;                       /* true prevents new work after fini */
 } work_t;
 
 
@@ -73,7 +73,7 @@ typedef struct work {
  *****************************************************************************/
 
 static void * _work_exec (void *arg);
-static void   _work_exec_cleanup (void *arg);
+static void _work_exec_cleanup (void *arg);
 static void * _work_enqueue (work_p wp, void *work);
 static void * _work_dequeue (work_p wp);
 
@@ -338,10 +338,10 @@ _work_exec (void *arg)
 /*  The worker thread.  It continually removes the next element
  *    from the work queue and processes it -- until it's canceled.
  */
-    work_p    wp;
-    sigset_t  sigset;
-    int       cancel_state;
-    void     *work;
+    work_p wp;
+    sigset_t sigset;
+    int cancel_state;
+    void *work;
 
     assert (arg != NULL);
     wp = arg;
@@ -481,8 +481,8 @@ _work_dequeue (work_p wp)
  *  LOCKING PROTOCOL:
  *    This routine requires the caller to have locked the [wp]'s mutex.
  */
-    work_arg_p  wap;
-    void       *work;
+    work_arg_p wap;
+    void *work;
 
     assert (wp != NULL);
 

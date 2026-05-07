@@ -106,28 +106,28 @@
  *****************************************************************************/
 
 struct gids {
-    pthread_mutex_t     mutex;          /* mutex for accessing struct        */
-    hash_t              gid_hash;       /* hash of GIDs mappings             */
-    hash_t              ghost_hash;     /* hash of missing users (ghosts!)   */
-    long                timer;          /* timer ID for next GIDs map update */
-    int                 interval_secs;  /* seconds between GIDs map updates  */
-    int                 do_group_stat;  /* true if updates stat group file   */
-    time_t              t_last_update;  /* time of last good GIDs map update */
+    pthread_mutex_t mutex;              /* mutex for accessing struct        */
+    hash_t gid_hash;                    /* hash of GIDs mappings             */
+    hash_t ghost_hash;                  /* hash of missing users (ghosts!)   */
+    long timer;                         /* timer ID for next GIDs map update */
+    int interval_secs;                  /* seconds between GIDs map updates  */
+    int do_group_stat;                  /* true if updates stat group file   */
+    time_t t_last_update;               /* time of last good GIDs map update */
 };
 
 struct gid_head {
-    struct gid_node    *next;
-    uid_t               uid;            /* gid_hash key                      */
+    struct gid_node *next;
+    uid_t uid;                          /* gid_hash key                      */
 };
 
 struct gid_node {
-    struct gid_node    *next;
-    gid_t               gid;
+    struct gid_node *next;
+    gid_t gid;
 };
 
 struct uid_node {
-    char               *user;           /* uid_hash key                      */
-    uid_t               uid;
+    char *user;                         /* uid_hash key                      */
+    uid_t uid;
 };
 
 typedef struct uid_node * uid_node_p;
@@ -139,33 +139,33 @@ typedef struct gid_head * gid_head_p;
  *  Prototypes
  *****************************************************************************/
 
-static void         _gids_map_update (gids_t gids);
-static hash_t       _gids_map_create (hash_t ghost_hash);
-static int          _gids_user_to_uid (hash_t uid_hash, hash_t ghost_hash,
+static void _gids_map_update (gids_t gids);
+static hash_t _gids_map_create (hash_t ghost_hash);
+static int _gids_user_to_uid (hash_t uid_hash, hash_t ghost_hash,
                         const char *user, uid_t *uid_resultp, xpwbuf_p pwbufp);
-static int          _gids_gid_add (hash_t gid_hash, uid_t uid, gid_t gid);
-static int          _gids_uid_add (hash_t uid_hash,
+static int _gids_gid_add (hash_t gid_hash, uid_t uid, gid_t gid);
+static int _gids_uid_add (hash_t uid_hash,
                         const char *user, uid_t uid);
-static int          _gids_ghost_add (hash_t ghost_hash, const char *user);
-static int          _gids_ghost_del (hash_t ghost_hash, const char *user);
-static gid_head_p   _gids_gid_head_create (uid_t uid);
-static void         _gids_gid_head_destroy (gid_head_p g);
-static int          _gids_gid_head_cmp (
+static int _gids_ghost_add (hash_t ghost_hash, const char *user);
+static int _gids_ghost_del (hash_t ghost_hash, const char *user);
+static gid_head_p _gids_gid_head_create (uid_t uid);
+static void _gids_gid_head_destroy (gid_head_p g);
+static int _gids_gid_head_cmp (
                         const uid_t *uid1p, const uid_t *uid2p);
 static unsigned int _gids_gid_head_key (uid_t *uidp);
-static gid_node_p   _gids_gid_node_create (gid_t gid);
-static uid_node_p   _gids_uid_node_create (const char *user, uid_t uid);
-static void         _gids_uid_node_destroy (uid_node_p u);
+static gid_node_p _gids_gid_node_create (gid_t gid);
+static uid_node_p _gids_uid_node_create (const char *user, uid_t uid);
+static void _gids_uid_node_destroy (uid_node_p u);
 
 #if _GIDS_DEBUG
-static void         _gids_gid_hash_dump (hash_t gid_hash);
-static void         _gids_gid_node_dump (gid_head_p g, const uid_t *uidp,
+static void _gids_gid_hash_dump (hash_t gid_hash);
+static void _gids_gid_node_dump (gid_head_p g, const uid_t *uidp,
                         const void *null);
-static void         _gids_uid_hash_dump (hash_t uid_hash);
-static void         _gids_uid_node_dump (uid_node_p u, const char *user,
+static void _gids_uid_hash_dump (hash_t uid_hash);
+static void _gids_uid_node_dump (uid_node_p u, const char *user,
                         const void *null);
-static void         _gids_ghost_hash_dump (hash_t ghost_hash);
-static void         _gids_ghost_node_dump (const char *data, const char *user,
+static void _gids_ghost_hash_dump (hash_t ghost_hash);
+static void _gids_ghost_node_dump (const char *data, const char *user,
                         const void *null);
 #endif /* _GIDS_DEBUG */
 
@@ -298,7 +298,7 @@ gids_update (gids_t gids)
 int
 gids_is_member (gids_t gids, uid_t uid, gid_t gid)
 {
-    int        is_member = 0;
+    int is_member = 0;
     gid_head_p g;
     gid_node_p node;
 
@@ -333,10 +333,10 @@ _gids_map_update (gids_t gids)
 {
 /*  Update the GIDs mapping [gids] and schedule the next update.
  */
-    int    do_group_stat;
+    int do_group_stat;
     time_t t_last_update;
     time_t t_now;
-    int    do_update = 1;
+    int do_update = 1;
     hash_t gid_hash = NULL;
 
     assert (gids != NULL);
@@ -424,22 +424,22 @@ _gids_map_create (hash_t ghost_hash)
 /*  Create a new gid_hash to map UIDs to their supplementary groups.
  *  Return a pointer to the new hash on success, or NULL on error.
  */
-    static size_t   grbuflen = 0;
-    static size_t   pwbuflen = 0;
-    hash_t          gid_hash = NULL;
-    hash_t          uid_hash = NULL;
-    struct timeval  t_start;
-    struct timeval  t_stop;
-    int             do_group_db_close = 0;
-    int             num_inits = 0;
-    const int       max_inits = 16;
-    struct group    gr;
-    xgrbuf_p        grbufp = NULL;
-    xpwbuf_p        pwbufp = NULL;
-    char          **userp;
-    uid_t           uid;
-    int             n_users;
-    double          n_seconds;
+    static size_t grbuflen = 0;
+    static size_t pwbuflen = 0;
+    hash_t gid_hash = NULL;
+    hash_t uid_hash = NULL;
+    struct timeval t_start;
+    struct timeval t_stop;
+    int do_group_db_close = 0;
+    int num_inits = 0;
+    const int max_inits = 16;
+    struct group gr;
+    xgrbuf_p grbufp = NULL;
+    xpwbuf_p pwbufp = NULL;
+    char **userp;
+    uid_t uid;
+    int n_users;
+    double n_seconds;
 
     gid_hash = hash_create (GID_HASH_SIZE,
             (hash_key_f) _gids_gid_head_key,
@@ -576,8 +576,8 @@ _gids_user_to_uid (hash_t uid_hash, hash_t ghost_hash,
  *    [pwbufp] is a pre-allocated buffer for xgetpwnam() (see above comments).
  *  Set [*uid_resultp] (if non-NULL), and return 0 on success or -1 on error.
  */
-    uid_node_p    u;
-    uid_t         uid = MUNGE_UID_SENTINEL;
+    uid_node_p u;
+    uid_t uid = MUNGE_UID_SENTINEL;
     struct passwd pw;
 
     if ((u = hash_find (uid_hash, user))) {
@@ -618,8 +618,8 @@ _gids_gid_add (hash_t gid_hash, uid_t uid, gid_t gid)
  *  Return 1 if the entry was added, 0 if the entry already exists,
  *    or -1 on error.
  */
-    gid_head_p  g;
-    gid_node_p  node;
+    gid_head_p g;
+    gid_node_p node;
     gid_node_p *nodep;
 
     if (!(g = hash_find (gid_hash, &uid))) {

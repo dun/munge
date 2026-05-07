@@ -56,20 +56,20 @@
  *****************************************************************************/
 
 struct hash_node {
-    struct hash_node   *next;           /* next node in list                 */
-    void               *data;           /* ptr to hashed item                */
-    const void         *hkey;           /* ptr to hashed item's key          */
+    struct hash_node *next;             /* next node in list                 */
+    void *data;                         /* ptr to hashed item                */
+    const void *hkey;                   /* ptr to hashed item's key          */
 };
 
 struct hash {
-    int                 count;          /* number of items in hash table     */
-    int                 size;           /* num slots allocated in hash table */
-    struct hash_node  **table;          /* hash table array of node ptrs     */
-    hash_cmp_f          cmp_f;          /* key comparison function           */
-    hash_del_f          del_f;          /* item deletion function            */
-    hash_key_f          key_f;          /* key hash function                 */
+    int count;                          /* number of items in hash table     */
+    int size;                           /* num slots allocated in hash table */
+    struct hash_node **table;           /* hash table array of node ptrs     */
+    hash_cmp_f cmp_f;                   /* key comparison function           */
+    hash_del_f del_f;                   /* item deletion function            */
+    hash_key_f key_f;                   /* key hash function                 */
 #if WITH_PTHREADS
-    pthread_mutex_t     mutex;          /* mutex to protect access to hash   */
+    pthread_mutex_t mutex;              /* mutex to protect access to hash   */
 #endif /* WITH_PTHREADS */
 };
 

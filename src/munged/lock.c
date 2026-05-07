@@ -69,7 +69,7 @@ lock_create (conf_t conf)
 {
 /*  Creates a lockfile to ensure exclusive access to the Unix domain socket.
  */
-    int    rv;
+    int rv;
     mode_t mask;
 
     if (conf == NULL) {
@@ -154,7 +154,7 @@ lock_query (conf_t conf)
  *  Returns the pid of a running process (>0) if the lock is held,
  *    0 if the lock is not held, or -1 on error.
  */
-    int   rv;
+    int rv;
     pid_t pid;
 
     if (conf == NULL) {
@@ -211,7 +211,7 @@ _lock_stat (int fd, const char *name)
 /*  Stats the lockfile [name] via the file-descriptor [fd] to prevent TOCTOU
  *    and checks for peculiarities.
  */
-    int         rv;
+    int rv;
     struct stat st;
 
     assert (fd >= 0);
@@ -249,7 +249,7 @@ _lock_set (int fd)
  *    or -1 on error (with errno set).
  */
     struct flock fl;
-    int          rv;
+    int rv;
 
     if (fd < 0) {
         errno = EBADF;
@@ -280,7 +280,7 @@ _lock_is_set (int fd)
  *    holding a conflicting lock, or -1 on error (with errno set).
  */
     struct flock fl;
-    int          rv;
+    int rv;
 
     if (fd < 0) {
         errno = EBADF;

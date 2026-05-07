@@ -55,11 +55,11 @@
  *****************************************************************************/
 
 struct timer {
-    long               id;              /* timer ID                          */
-    struct timespec    ts;              /* expiration time                   */
-    callback_f         f;               /* callback function                 */
-    void              *arg;             /* callback function arg             */
-    struct timer      *next;            /* next timer in list                */
+    long id;                            /* timer ID                          */
+    struct timespec ts;                 /* expiration time                   */
+    callback_f f;                       /* callback function                 */
+    void *arg;                          /* callback function arg             */
+    struct timer *next;                 /* next timer in list                */
 };
 
 typedef struct timer * timer_p;
@@ -80,23 +80,23 @@ static timer_p _timer_alloc (void);
  *  Private Variables
  *****************************************************************************/
 
-static pthread_t       _timer_tid = 0;
-static pthread_cond_t  _timer_cond = PTHREAD_COND_INITIALIZER;
+static pthread_t _timer_tid = 0;
+static pthread_cond_t _timer_cond = PTHREAD_COND_INITIALIZER;
 static pthread_mutex_t _timer_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 /*  The _timer_id is the ID of the last timer that was set.
  */
-static long            _timer_id = 0;
+static long _timer_id = 0;
 
 /*  The _timer_active list contains timers waiting to be dispatched, sorted in
  *    order of increasing timespecs; the list head is the next timer to expire.
  */
-static timer_p         _timer_active = NULL;
+static timer_p _timer_active = NULL;
 
 /*  The _timer_inactive list contains timers that have been dispatched and can
  *    be reused without allocating more memory.
  */
-static timer_p         _timer_inactive = NULL;
+static timer_p _timer_inactive = NULL;
 
 
 /******************************************************************************
@@ -110,7 +110,7 @@ void
 timer_init (void)
 {
     pthread_attr_t tattr;
-    size_t         stacksize = 256 * 1024;
+    size_t stacksize = 256 * 1024;
 
     if (_timer_tid != 0) {
         return;
@@ -149,9 +149,9 @@ timer_init (void)
 void
 timer_fini (void)
 {
-    void    *result;
+    void *result;
     timer_p *t_prev_ptr;
-    timer_p  t;
+    timer_p t;
 
     if (_timer_tid == 0) {
         return;
@@ -202,9 +202,9 @@ timer_fini (void)
 long
 timer_set_absolute (callback_f cb, void *arg, const struct timespec *tsp)
 {
-    timer_p  t;
+    timer_p t;
     timer_p *t_prev_ptr;
-    int      do_signal = 0;
+    int do_signal = 0;
 
     if (!cb || !tsp) {
         errno = EINVAL;
@@ -284,8 +284,8 @@ int
 timer_cancel (long id)
 {
     timer_p *t_prev_ptr;
-    timer_p  t = NULL;
-    int      do_signal = 0;
+    timer_p t = NULL;
+    int do_signal = 0;
 
     if (id <= 0) {
         errno = EINVAL;
@@ -338,12 +338,12 @@ _timer_thread (void *arg)
 /*  The timer thread.  It waits until the next active timer expires,
  *    at which point it invokes the timer's callback function.
  */
-    sigset_t         sigset;
-    int              cancel_state;
-    struct timespec  ts_now;
-    timer_p         *t_prev_ptr;
-    timer_p          timer_expired;
-    int              rv;
+    sigset_t sigset;
+    int cancel_state;
+    struct timespec ts_now;
+    timer_p *t_prev_ptr;
+    timer_p timer_expired;
+    int rv;
 
     if (sigfillset (&sigset)) {
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to init timer sigset");

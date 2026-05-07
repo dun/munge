@@ -41,46 +41,46 @@
  *****************************************************************************/
 
 struct conf {
-    int             ld;                 /* listening socket descriptor       */
-    unsigned        got_benchmark:1;    /* flag for BENCHMARK option         */
-    unsigned        got_clock_skew:1;   /* flag for allowing clock skew      */
-    unsigned        got_force:1;        /* flag for FORCE option             */
-    unsigned        got_foreground:1;   /* flag for FOREGROUND option        */
-    unsigned        got_group_stat:1;   /* flag for gids stat'ing /etc/group */
-    unsigned        got_stop:1;         /* flag for stopping daemon          */
-    unsigned        got_mlockall:1;     /* flag for locking all memory pages */
-    unsigned        got_root_auth:1;    /* flag if root can decode any cred  */
-    unsigned        got_socket_retry:1; /* flag for allowing decode retries  */
-    unsigned        got_syslog:1;       /* flag if logging to syslog instead */
-    unsigned        got_verbose:1;      /* flag for being verbose            */
-    munge_cipher_t  def_cipher;         /* default cipher type               */
-    munge_zip_t     def_zip;            /* default compression type          */
-    munge_mac_t     def_mac;            /* default message auth code type    */
-    munge_ttl_t     def_ttl;            /* default time-to-live in seconds   */
-    munge_ttl_t     max_ttl;            /* maximum time-to-live in seconds   */
-    char           *cwd;                /* current working dir at startup    */
-    char           *config_name;        /* configuration filename            */
-    int             lockfile_fd;        /* daemon lockfile fd                */
-    char           *lockfile_name;      /* daemon lockfile name              */
-    char           *logfile_name;       /* daemon logfile name               */
-    char           *pidfile_name;       /* daemon pidfile name               */
-    char           *socket_name;        /* unix domain socket filename       */
-    int             listen_backlog;     /* unix domain socket listen backlog */
-    char           *seed_name;          /* random seed filename              */
-    char           *key_name;           /* symmetric key filename            */
-    unsigned char  *dek_key;            /* subkey for cipher ops             */
-    int             dek_key_len;        /* length of cipher subkey           */
-    unsigned char  *mac_key;            /* subkey for mac ops                */
-    int             mac_key_len;        /* length of mac subkey              */
-    char           *origin_name;        /* origin addr hostname/IP string    */
-    char           *origin_ifname;      /* origin addr n/w interface name    */
-    struct in_addr  addr;               /* origin addr in n/w byte order     */
-    gids_t          gids;               /* supplementary group information   */
-    int             gids_update_secs;   /* gids update interval in seconds   */
-    int             nthreads;           /* num threads for processing creds  */
-    char           *auth_server_dir;    /* dir in which to create auth pipe  */
-    char           *auth_client_dir;    /* dir in which to create auth file  */
-    int             auth_rnd_bytes;     /* num rnd bytes in auth pipe name   */
+    int ld;                             /* listening socket descriptor       */
+    unsigned got_benchmark:1;           /* flag for BENCHMARK option         */
+    unsigned got_clock_skew:1;          /* flag for allowing clock skew      */
+    unsigned got_force:1;               /* flag for FORCE option             */
+    unsigned got_foreground:1;          /* flag for FOREGROUND option        */
+    unsigned got_group_stat:1;          /* flag for gids stat'ing /etc/group */
+    unsigned got_stop:1;                /* flag for stopping daemon          */
+    unsigned got_mlockall:1;            /* flag for locking all memory pages */
+    unsigned got_root_auth:1;           /* flag if root can decode any cred  */
+    unsigned got_socket_retry:1;        /* flag for allowing decode retries  */
+    unsigned got_syslog:1;              /* flag if logging to syslog instead */
+    unsigned got_verbose:1;             /* flag for being verbose            */
+    munge_cipher_t def_cipher;          /* default cipher type               */
+    munge_zip_t def_zip;                /* default compression type          */
+    munge_mac_t def_mac;                /* default message auth code type    */
+    munge_ttl_t def_ttl;                /* default time-to-live in seconds   */
+    munge_ttl_t max_ttl;                /* maximum time-to-live in seconds   */
+    char *cwd;                          /* current working dir at startup    */
+    char *config_name;                  /* configuration filename            */
+    int lockfile_fd;                    /* daemon lockfile fd                */
+    char *lockfile_name;                /* daemon lockfile name              */
+    char *logfile_name;                 /* daemon logfile name               */
+    char *pidfile_name;                 /* daemon pidfile name               */
+    char *socket_name;                  /* unix domain socket filename       */
+    int listen_backlog;                 /* unix domain socket listen backlog */
+    char *seed_name;                    /* random seed filename              */
+    char *key_name;                     /* symmetric key filename            */
+    unsigned char *dek_key;             /* subkey for cipher ops             */
+    int dek_key_len;                    /* length of cipher subkey           */
+    unsigned char *mac_key;             /* subkey for mac ops                */
+    int mac_key_len;                    /* length of mac subkey              */
+    char *origin_name;                  /* origin addr hostname/IP string    */
+    char *origin_ifname;                /* origin addr n/w interface name    */
+    struct in_addr addr;                /* origin addr in n/w byte order     */
+    gids_t gids;                        /* supplementary group information   */
+    int gids_update_secs;               /* gids update interval in seconds   */
+    int nthreads;                       /* num threads for processing creds  */
+    char *auth_server_dir;              /* dir in which to create auth pipe  */
+    char *auth_client_dir;              /* dir in which to create auth file  */
+    int auth_rnd_bytes;                 /* num rnd bytes in auth pipe name   */
 };
 
 typedef struct conf * conf_t;

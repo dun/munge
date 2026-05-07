@@ -84,8 +84,8 @@
  *****************************************************************************/
 
 struct xpwbuf_t {
-    char   *buf;
-    size_t  len;
+    char *buf;
+    size_t len;
 };
 
 
@@ -174,21 +174,21 @@ xgetpwnam (const char *name, struct passwd *pwp, xpwbuf_p pwbufp)
  *    Returns -1 with ENOENT when [name] is not found.
  */
 #if HAVE_GETPWNAM_R_POSIX
-    struct passwd          *rv_pwp;
+    struct passwd *rv_pwp;
 #elif HAVE_GETPWNAM_R_AIX
 #elif HAVE_GETPWNAM_R_SUN
-    struct passwd          *rv_pwp;
+    struct passwd *rv_pwp;
 #elif HAVE_GETPWNAM
 #if WITH_PTHREADS
-    static pthread_mutex_t  mutex = PTHREAD_MUTEX_INITIALIZER;
-    int                     rv_mutex;
+    static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+    int rv_mutex;
 #endif /* WITH_PTHREADS */
-    int                     rv_copy;
-    struct passwd          *rv_pwp;
+    int rv_copy;
+    struct passwd *rv_pwp;
 #endif /* HAVE_GETPWNAM_R_POSIX */
-    int                     rv;
-    int                     got_err;
-    int                     got_none;
+    int rv;
+    int got_err;
+    int got_none;
 
     if ((name == NULL)    ||
         (name[0] == '\0') ||
@@ -343,7 +343,7 @@ _xgetpwbuf_get_sys_size (void)
 {
 /*  Returns the system recommended size for the xgetpw buffer.
  */
-    long   n = -1;
+    long n = -1;
     size_t len;
 
 #if HAVE_SYSCONF
@@ -363,8 +363,8 @@ _xgetpwbuf_grow (xpwbuf_p pwbufp, size_t minlen)
 /*  Grows the buffer [pwbufp] to be at least as large as the length [minlen].
  *  Returns 0 on success, or -1 on error (with errno).
  */
-    size_t  newlen;
-    char   *newbuf;
+    size_t newlen;
+    char *newbuf;
 
     assert (pwbufp != NULL);
     assert (pwbufp->buf != NULL);
@@ -400,8 +400,8 @@ _xgetpwbuf_copy_struct (const struct passwd *src, struct passwd *dst,
  *    and whatnot into buffer [pwbuf].
  *  Returns 0 on success, or -1 on error (with errno).
  */
-    size_t  num_bytes;
-    char   *p;
+    size_t num_bytes;
+    char *p;
 
     assert (src != NULL);
     assert (dst != NULL);

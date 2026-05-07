@@ -54,27 +54,27 @@
  *****************************************************************************/
 
 struct munge_cred {
-    uint8_t             version;        /* version of the munge cred format  */
-    m_msg_t             msg;            /* ptr to corresponding munge msg    */
-    int                 outer_mem_len;  /* length of outer credential memory */
-    unsigned char      *outer_mem;      /* outer cred memory allocation      */
-    int                 outer_len;      /* length of outer credential data   */
-    unsigned char      *outer;          /* ptr to outer credential data      */
-    int                 inner_mem_len;  /* length of inner credential memory */
-    unsigned char      *inner_mem;      /* inner cred memory allocation      */
-    int                 inner_len;      /* length of inner credential data   */
-    unsigned char      *inner;          /* ptr to inner credential data      */
-    int                 realm_mem_len;  /* length of realm string memory     */
-    unsigned char      *realm_mem;      /* realm string memory allocation    */
-    int                 salt_len;       /* length of salt data               */
-    unsigned char       salt[MAX_SALT]; /* cryptographic seasoning salt      */
-    int                 mac_len;        /* length of mac data                */
-    unsigned char       mac[MAX_MAC];   /* message authentication code       */
-    int                 dek_len;        /* length of dek data                */
-    unsigned char       dek[MAX_DEK];   /* symmetric data encryption key     */
-    int                 iv_len;         /* length of iv data                 */
-    unsigned char       iv[MAX_IV];     /* initialization vector             */
-    unsigned char      *outer_zip_ref;  /* ref to zip_t in outer cred memory */
+    uint8_t version;                    /* version of the munge cred format  */
+    m_msg_t msg;                        /* ptr to corresponding munge msg    */
+    int outer_mem_len;                  /* length of outer credential memory */
+    unsigned char *outer_mem;           /* outer cred memory allocation      */
+    int outer_len;                      /* length of outer credential data   */
+    unsigned char *outer;               /* ptr to outer credential data      */
+    int inner_mem_len;                  /* length of inner credential memory */
+    unsigned char *inner_mem;           /* inner cred memory allocation      */
+    int inner_len;                      /* length of inner credential data   */
+    unsigned char *inner;               /* ptr to inner credential data      */
+    int realm_mem_len;                  /* length of realm string memory     */
+    unsigned char *realm_mem;           /* realm string memory allocation    */
+    int salt_len;                       /* length of salt data               */
+    unsigned char salt[MAX_SALT];       /* cryptographic seasoning salt      */
+    int mac_len;                        /* length of mac data                */
+    unsigned char mac[MAX_MAC];         /* message authentication code       */
+    int dek_len;                        /* length of dek data                */
+    unsigned char dek[MAX_DEK];         /* symmetric data encryption key     */
+    int iv_len;                         /* length of iv data                 */
+    unsigned char iv[MAX_IV];           /* initialization vector             */
+    unsigned char *outer_zip_ref;       /* ref to zip_t in outer cred memory */
 };
 
 typedef struct munge_cred * munge_cred_t;

@@ -186,7 +186,7 @@ static int
 _mac_init (mac_ctx *x, munge_mac_t md, const void *key, int keylen)
 {
     gcry_error_t e;
-    int          algo;
+    int algo;
 
     if (_mac_map_enum (md, &algo) < 0) {
         return (-1);
@@ -245,10 +245,10 @@ static int
 _mac_block (munge_mac_t md, const void *key, int keylen,
             void *dst, int *dstlenp, const void *src, int srclen)
 {
-    gcry_error_t   e;
-    int            algo;
-    int            len;
-    gcry_md_hd_t   ctx;
+    gcry_error_t e;
+    int algo;
+    int len;
+    gcry_md_hd_t ctx;
     unsigned char *digest;
 
     if (_mac_map_enum (md, &algo) < 0) {

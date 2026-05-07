@@ -55,9 +55,9 @@
 char *
 strdupf (const char *fmt, ...)
 {
-    va_list  vargs;
-    char     buf[MAX_STR_SIZE];
-    char    *p;
+    va_list vargs;
+    char buf[MAX_STR_SIZE];
+    char *p;
 
     if (!fmt) {
         return (NULL);
@@ -85,12 +85,12 @@ strdupf (const char *fmt, ...)
 int
 strcatf (char *dst, size_t size, const char *fmt, ...)
 {
-    va_list  vargs;
-    char    *p;
-    char    *q;
-    int      n;
-    int      len;
-    int      nleft;
+    va_list vargs;
+    char *p;
+    char *q;
+    int n;
+    int len;
+    int nleft;
 
     if (!dst || !size) {
         return (0);
@@ -133,10 +133,10 @@ strcatf (char *dst, size_t size, const char *fmt, ...)
 int
 strbin2hex (char *dst, size_t dstlen, const void *src, size_t srclen)
 {
-    const char  bin2hex[] = "0123456789ABCDEF";
-    char       *pdst = dst;
+    const char bin2hex[] = "0123456789ABCDEF";
+    char *pdst = dst;
     const char *psrc = src;
-    int         i;
+    int i;
 
     if (dstlen < ((srclen * 2) + 1)) {
         errno = EINVAL;
@@ -161,11 +161,11 @@ strbin2hex (char *dst, size_t dstlen, const void *src, size_t srclen)
 int
 strhex2bin (void *dst, size_t dstlen, const char *src, size_t srclen)
 {
-    char       *pdst = dst;
+    char *pdst = dst;
     const char *psrc = src;
-    int         i;
-    int         c;
-    int         n;
+    int i;
+    int c;
+    int n;
 
     if (dstlen < (srclen + 1) / 2) {
         errno = EINVAL;
@@ -209,10 +209,10 @@ int
 strftimet (char *dst, size_t dstlen, const char *tfmt, time_t t)
 {
 #if HAVE_LOCALTIME_R
-    struct tm  tm;
+    struct tm tm;
 #endif /* HAVE_LOCALTIME_R */
     struct tm *tm_ptr;
-    int        n;
+    int n;
 
     if ((dst == NULL) || (dstlen == 0) || (tfmt == NULL)) {
         errno = EINVAL;

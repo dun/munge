@@ -81,7 +81,7 @@ int
 enc_process_msg (m_msg_t m)
 {
     munge_cred_t c = NULL;              /* aux data for processing this cred */
-    int          rc = -1;               /* return code                       */
+    int rc = -1;                        /* return code                       */
 
     if (enc_validate_msg (m) < 0)
         ;
@@ -217,7 +217,7 @@ enc_init (munge_cred_t c)
 {
 /*  Initializes state necessary for encoding a credential.
  */
-    m_msg_t  m = c->msg;
+    m_msg_t m = c->msg;
 
     /*  Generate salt.
      */
@@ -250,9 +250,9 @@ enc_authenticate (munge_cred_t c)
 {
 /*  Ascertains the UID/GID of the client process.
  */
-    m_msg_t  m = c->msg;
-    uid_t   *p_uid;
-    gid_t   *p_gid;
+    m_msg_t m = c->msg;
+    uid_t *p_uid;
+    gid_t *p_gid;
 
     p_uid = (uid_t *) &(m->client_uid);
     p_gid = (gid_t *) &(m->client_gid);
@@ -272,7 +272,7 @@ enc_check_retry (munge_cred_t c)
 {
 /*  Checks whether the transaction is being retried.
  */
-    m_msg_t  m = c->msg;
+    m_msg_t m = c->msg;
 
     if (m->retry > 0) {
         log_msg (LOG_INFO,
@@ -292,8 +292,8 @@ enc_timestamp (munge_cred_t c)
 {
 /*  Queries the current time.
  */
-    m_msg_t  m = c->msg;
-    time_t   now;
+    m_msg_t m = c->msg;
+    time_t now;
 
     /*  Set the "encode" time.
      */
@@ -317,7 +317,7 @@ enc_pack_outer (munge_cred_t c)
  *    unterminated realm string (if realm_len > 0), and the cipher's
  *    initialization vector (if encrypted).
  */
-    m_msg_t        m = c->msg;
+    m_msg_t m = c->msg;
     unsigned char *p;                   /* ptr into packed data              */
 
     assert (c->outer_mem == NULL);
@@ -378,9 +378,9 @@ enc_pack_inner (munge_cred_t c)
  *    salt, ip addr len, origin ip addr, encode time, ttl, uid, gid,
  *    data length, and data (if present).
  */
-    m_msg_t        m = c->msg;
+    m_msg_t m = c->msg;
     unsigned char *p;                   /* ptr into packed data              */
-    uint32_t       u32;                 /* tmp for packing into MSBF         */
+    uint32_t u32;                       /* tmp for packing into MSBF         */
 
     assert (c->inner_mem == NULL);
 
@@ -467,10 +467,10 @@ enc_compress (munge_cred_t c)
  *    "outer" data header.  And since that field is included in the MAC,
  *    compression must be attempted before the MAC is computed.
  */
-    m_msg_t        m = c->msg;
+    m_msg_t m = c->msg;
     unsigned char *buf;                 /* compression buffer                */
-    int            buf_len;             /* length of compression buffer      */
-    int            n;                   /* length of compressed data         */
+    int buf_len;                        /* length of compression buffer      */
+    int n;                              /* length of compressed data         */
 
     /*  Is compression disabled?
      */
@@ -531,9 +531,9 @@ enc_mac (munge_cred_t c)
 /*  Computes the Message Authentication Code (MAC) over the entire message
  *    (ie, both "outer" and "inner" data).
  */
-    m_msg_t       m = c->msg;
-    mac_ctx       x;                    /* message auth code context         */
-    int           n;                    /* all-purpose int                   */
+    m_msg_t m = c->msg;
+    mac_ctx x;                          /* message auth code context         */
+    int n;                              /* all-purpose int                   */
 
     /*  Init MAC.
      */
@@ -580,13 +580,13 @@ enc_encrypt (munge_cred_t c)
 {
 /*  Encrypts the "inner" credential data.
  */
-    m_msg_t           m = c->msg;
-    int               buf_len;          /* length of ciphertext buffer       */
-    unsigned char    *buf;              /* ciphertext buffer                 */
-    unsigned char    *buf_ptr;          /* ptr into ciphertext buffer        */
-    cipher_ctx        x;                /* cipher context                    */
-    int               n_written;        /* number of bytes written to buf    */
-    int               n;                /* all-purpose int                   */
+    m_msg_t m = c->msg;
+    int buf_len;                        /* length of ciphertext buffer       */
+    unsigned char *buf;                 /* ciphertext buffer                 */
+    unsigned char *buf_ptr;             /* ptr into ciphertext buffer        */
+    cipher_ctx x;                       /* cipher context                    */
+    int n_written;                      /* number of bytes written to buf    */
+    int n;                              /* all-purpose int                   */
 
     /*  Is encryption disabled?
      */
@@ -678,14 +678,14 @@ enc_armor (munge_cred_t c)
 /*  Armors the credential allowing it to be sent over virtually any transport.
  *  The armor consists of PREFIX + BASE64 [ OUTER + MAC + INNER ] + SUFFIX.
  */
-    m_msg_t        m = c->msg;
-    int            prefix_len;          /* prefix string length              */
-    int            suffix_len;          /* prefix string length              */
-    int            buf_len;             /* length of armor'd data buffer     */
+    m_msg_t m = c->msg;
+    int prefix_len;                     /* prefix string length              */
+    int suffix_len;                     /* prefix string length              */
+    int buf_len;                        /* length of armor'd data buffer     */
     unsigned char *buf;                 /* armor'd data buffer               */
     unsigned char *buf_ptr;             /* ptr into armor'd data buffer      */
-    base64_ctx     x;                   /* base64 context                    */
-    int            n;                   /* temporary int                     */
+    base64_ctx x;                       /* base64 context                    */
+    int n;                              /* temporary int                     */
 
     prefix_len = sizeof MUNGE_CRED_PREFIX - 1;
     assert (prefix_len > 0);
@@ -777,7 +777,7 @@ enc_fini (munge_cred_t c)
 {
 /*  Finalizes encoding a credential, ensuring it is ready for transit.
  */
-    m_msg_t  m = c->msg;
+    m_msg_t m = c->msg;
 
     /*  Free any "request data".
      */

@@ -143,8 +143,8 @@ daemonpipe_read (int *statusptr, int *priorityptr,
         char *dstbufptr, size_t dstbuflen)
 {
     signed char c;
-    char        buf [1024];
-    ssize_t     n, m;
+    char buf [1024];
+    ssize_t n, m;
 
     if ((statusptr == NULL) || (priorityptr == NULL) || (dstbufptr == NULL)) {
         errno = EINVAL;
@@ -225,8 +225,8 @@ int
 daemonpipe_write (int status, int priority, const char *msg)
 {
     signed char c;
-    ssize_t     len;
-    ssize_t     n;
+    ssize_t len;
+    ssize_t n;
 
     if (_daemonpipe_fd_write < 0) {
         errno = EBADF;

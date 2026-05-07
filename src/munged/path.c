@@ -152,10 +152,10 @@ path_dirname (const char *src, char *dst, size_t dstlen)
 int
 path_is_accessible (const char *path, char *errbuf, size_t errbuflen)
 {
-    int          n;
-    char         buf [PATH_MAX];
-    struct stat  st;
-    char        *p;
+    int n;
+    char buf [PATH_MAX];
+    struct stat st;
+    char *p;
 
     n = path_canonicalize (path, buf, sizeof (buf));
     if (n < 0) {
@@ -214,11 +214,11 @@ int
 path_is_secure (const char *path, char *errbuf, size_t errbuflen,
                 path_security_flag_t flags)
 {
-    int          n;
-    char         buf [PATH_MAX];
-    struct stat  st;
-    char        *p;
-    uid_t        euid;
+    int n;
+    char buf [PATH_MAX];
+    struct stat st;
+    char *p;
+    uid_t euid;
 
     n = path_canonicalize (path, buf, sizeof (buf));
     if (n < 0) {

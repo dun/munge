@@ -59,12 +59,12 @@
 
 struct log_ctx {
     FILE *fp;
-    int   got_init;
-    int   got_syslog;
-    int   got_fprintf_error;
-    int   priority;
-    int   options;
-    char  id [LOG_IDENTITY_MAXLEN];
+    int got_init;
+    int got_syslog;
+    int got_fprintf_error;
+    int priority;
+    int options;
+    char id [LOG_IDENTITY_MAXLEN];
 };
 
 
@@ -201,7 +201,7 @@ void
 log_err (int status, int priority, const char *format, ...)
 {
     va_list vargs;
-    char    msg [LOG_BUFFER_MAXLEN];
+    char msg [LOG_BUFFER_MAXLEN];
 
     va_start (vargs, format);
     _log_aux (0, priority, msg, sizeof (msg), format, vargs);
@@ -222,7 +222,7 @@ void
 log_errno (int status, int priority, const char *format, ...)
 {
     va_list vargs;
-    char    msg [LOG_BUFFER_MAXLEN];
+    char msg [LOG_BUFFER_MAXLEN];
 
     va_start (vargs, format);
     _log_aux (errno, priority, msg, sizeof (msg), format, vargs);
@@ -258,8 +258,8 @@ void
 log_err_or_warn (int got_force, const char *format, ...)
 {
     va_list vargs;
-    char    msg [LOG_BUFFER_MAXLEN];
-    int     priority;
+    char msg [LOG_BUFFER_MAXLEN];
+    int priority;
 
     priority = (got_force) ? LOG_WARNING : LOG_ERR;
 
@@ -282,13 +282,13 @@ static void
 _log_aux (int errnum, int priority, char *msgbuf, int msgbuflen,
         const char *format, va_list vargs)
 {
-    char  buf [LOG_BUFFER_MAXLEN];      /* message buffer                    */
+    char buf [LOG_BUFFER_MAXLEN];       /* message buffer                    */
     char *p;                            /* current position in msg buf       */
     char *sbuf;                         /* syslog portion of message buffer  */
     char *prefix;                       /* priority prefix message           */
-    int   n;                            /* return value of num chars written */
-    int   len;                          /* remaining len in buf includes nul */
-    int   append_nl = 0;                /* set to 1 if trailing nl is needed */
+    int n;                              /* return value of num chars written */
+    int len;                            /* remaining len in buf includes nul */
+    int append_nl = 0;                  /* set to 1 if trailing nl is needed */
 
     /*  If no log has been specified, output log msgs to stderr.
      */

@@ -64,7 +64,7 @@ void
 crypto_init (void)
 {
     gcry_error_t e;
-    const char  *v;
+    const char *v;
 
 #if GCRYPT_VERSION_NUMBER < 0x010600
     /*  GCRYCTL_SET_THREAD_CBS must be set before any other Libcrypt function.

@@ -45,11 +45,11 @@
 int
 main (int argc, char *argv[])
 {
-    hkdf_ctx_t    *hkdfp;
-    size_t         buflen;
-    unsigned char  buf[8200];
-    unsigned char  vanillabuf[8200];
-    unsigned char  partialbuf[13];
+    hkdf_ctx_t *hkdfp;
+    size_t buflen;
+    unsigned char buf[8200];
+    unsigned char vanillabuf[8200];
+    unsigned char partialbuf[13];
 
     crypto_init ();
     md_init_subsystem ();

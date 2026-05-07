@@ -87,7 +87,7 @@ int
 dec_process_msg (m_msg_t m)
 {
     munge_cred_t c = NULL;              /* aux data for processing this cred */
-    int          rc = -1;               /* return code                       */
+    int rc = -1;                        /* return code                       */
 
     if (dec_validate_msg (m) < 0)
         ;
@@ -180,8 +180,8 @@ dec_timestamp (munge_cred_t c)
 {
 /*  Queries the current time.
  */
-    m_msg_t  m = c->msg;
-    time_t   now;
+    m_msg_t m = c->msg;
+    time_t now;
 
     /*  Set the "decode" time.
      */
@@ -200,9 +200,9 @@ dec_authenticate (munge_cred_t c)
 {
 /*  Ascertains the UID/GID of the client process.
  */
-    m_msg_t  m = c->msg;
-    uid_t   *p_uid;
-    gid_t   *p_gid;
+    m_msg_t m = c->msg;
+    uid_t *p_uid;
+    gid_t *p_gid;
 
     p_uid = (uid_t *) &(m->client_uid);
     p_gid = (gid_t *) &(m->client_gid);
@@ -222,7 +222,7 @@ dec_check_retry (munge_cred_t c)
 {
 /*  Checks whether the transaction is being retried.
  */
-    m_msg_t  m = c->msg;
+    m_msg_t m = c->msg;
 
     if (m->retry > 0) {
         log_msg (LOG_INFO,
@@ -243,13 +243,13 @@ dec_unarmor (munge_cred_t c)
 /*  Removes the credential's armor, converting it into a packed byte array.
  *  The armor consists of PREFIX + BASE64 [ OUTER + MAC + INNER ] + SUFFIX.
  */
-    m_msg_t        m = c->msg;
-    int            prefix_len;          /* prefix string length              */
-    int            suffix_len;          /* prefix string length              */
-    int            base64_len;          /* length of base64 data             */
+    m_msg_t m = c->msg;
+    int prefix_len;                     /* prefix string length              */
+    int suffix_len;                     /* prefix string length              */
+    int base64_len;                     /* length of base64 data             */
     unsigned char *base64_ptr;          /* base64 data (ptr into msg data)   */
     unsigned char *base64_tmp;          /* base64 data tmp ptr               */
-    int            n;                   /* all-purpose int                   */
+    int n;                              /* all-purpose int                   */
 
     prefix_len = sizeof MUNGE_CRED_PREFIX - 1;
     assert (prefix_len > 0);
@@ -354,10 +354,10 @@ dec_unpack_outer (munge_cred_t c)
  *    (along with the location of the "inner" data) is determined as a
  *    result of unpacking the "outer" data.
  */
-    m_msg_t           m = c->msg;
-    unsigned char    *p;                /* ptr into packed data              */
-    int               len;              /* length of packed data remaining   */
-    int               n;                /* all-purpose int                   */
+    m_msg_t m = c->msg;
+    unsigned char *p;                   /* ptr into packed data              */
+    int len;                            /* length of packed data remaining   */
+    int n;                              /* all-purpose int                   */
 
     assert (c->outer != NULL);
 
@@ -560,13 +560,13 @@ dec_decrypt (munge_cred_t c)
  *    set here and the MAC computation in dec_validate_mac() is performed
  *    regardless in order to minimize information leaked via timing.
  */
-    m_msg_t           m = c->msg;
-    int               buf_len;          /* length of plaintext buffer        */
-    unsigned char    *buf;              /* plaintext buffer                  */
-    unsigned char    *buf_ptr;          /* ptr into plaintext buffer         */
-    cipher_ctx        x;                /* cipher context                    */
-    int               n_written;        /* number of bytes written to buf    */
-    int               n;                /* all-purpose int                   */
+    m_msg_t m = c->msg;
+    int buf_len;                        /* length of plaintext buffer        */
+    unsigned char *buf;                 /* plaintext buffer                  */
+    unsigned char *buf_ptr;             /* ptr into plaintext buffer         */
+    cipher_ctx x;                       /* cipher context                    */
+    int n_written;                      /* number of bytes written to buf    */
+    int n;                              /* all-purpose int                   */
 
     /*  Is this credential encrypted?
      */
@@ -657,10 +657,10 @@ dec_validate_mac (munge_cred_t c)
 /*  Validates the Message Authentication Code (MAC) over the entire message
  *    (ie, both "outer" and "inner" data).
  */
-    m_msg_t        m = c->msg;
-    mac_ctx        x;                   /* message auth code context         */
-    unsigned char  mac[MAX_MAC];        /* message authentication code       */
-    int            n;                   /* all-purpose int                   */
+    m_msg_t m = c->msg;
+    mac_ctx x;                          /* message auth code context         */
+    unsigned char mac[MAX_MAC];         /* message authentication code       */
+    int n;                              /* all-purpose int                   */
 
     /*  Compute MAC.
      */
@@ -708,10 +708,10 @@ dec_decompress (munge_cred_t c)
 {
 /*  Decompresses the "inner" credential data.
  */
-    m_msg_t        m = c->msg;
+    m_msg_t m = c->msg;
     unsigned char *buf;                 /* decompression buffer              */
-    int            buf_len;             /* length of decompression buffer    */
-    int            n;                   /* length of decompressed data       */
+    int buf_len;                        /* length of decompression buffer    */
+    int n;                              /* length of decompressed data       */
 
     /*  Is this credential compressed?
      */
@@ -776,11 +776,11 @@ dec_unpack_inner (munge_cred_t c)
  *    not leaked that could help further an attack.  But the MAC has already
  *    been validated as this point, so it should be safe to be specific.
  */
-    m_msg_t        m = c->msg;
+    m_msg_t m = c->msg;
     unsigned char *p;                   /* ptr into packed data              */
-    int            len;                 /* length of packed data remaining   */
-    int            n;                   /* all-purpose int                   */
-    uint32_t       u;                   /* all-purpose uint32                */
+    int len;                            /* length of packed data remaining   */
+    int n;                              /* all-purpose int                   */
+    uint32_t u;                         /* all-purpose uint32                */
 
     assert (c->inner != NULL);
 
@@ -961,7 +961,7 @@ dec_validate_auth (munge_cred_t c)
 /*  Validates whether the client is authorized to view this credential.
  *  But allow root to decode any credential if so configured.
  */
-    m_msg_t  m = c->msg;
+    m_msg_t m = c->msg;
 
     if ( (m->auth_uid != MUNGE_UID_ANY)
       && (m->auth_uid != m->client_uid)
@@ -991,10 +991,10 @@ dec_validate_time (munge_cred_t c)
 /*  Validates whether this credential has been generated within an
  *    acceptable time interval.
  */
-    m_msg_t  m = c->msg;
-    int      skew;                      /* negative clock skew for rewind    */
-    time_t   tmin;                      /* min decode time_t, else rewound   */
-    time_t   tmax;                      /* max decode time_t, else expired   */
+    m_msg_t m = c->msg;
+    int skew;                           /* negative clock skew for rewind    */
+    time_t tmin;                        /* min decode time_t, else rewound   */
+    time_t tmax;                        /* max decode time_t, else expired   */
 
     /*  Bound the cred's ttl by the configuration's max ttl.
      */
@@ -1026,8 +1026,8 @@ dec_validate_replay (munge_cred_t c)
 {
 /*  Validates whether this credential has been replayed.
  */
-    m_msg_t  m = c->msg;
-    int      rc;
+    m_msg_t m = c->msg;
+    int rc;
 
     rc = replay_insert (c);
 

@@ -77,15 +77,15 @@
  *****************************************************************************/
 
 struct hkdf_ctx {
-    unsigned     salt_is_allocated:1;
-    munge_mac_t  md;                    /* message digest / hash function    */
-    size_t       mdlen;                 /* length of MD output (in bytes)    */
-    const void  *key;                   /* input keying material             */
-    size_t       keylen;                /* length of key (in bytes)          */
-    const void  *salt;                  /* optional: non-secret random value */
-    size_t       saltlen;               /* length of salt (in bytes)         */
-    const void  *info;                  /* optional: context specific info   */
-    size_t       infolen;               /* length of info (in bytes)         */
+    unsigned salt_is_allocated:1;
+    munge_mac_t md;                     /* message digest / hash function    */
+    size_t mdlen;                       /* length of MD output (in bytes)    */
+    const void *key;                    /* input keying material             */
+    size_t keylen;                      /* length of key (in bytes)          */
+    const void *salt;                   /* optional: non-secret random value */
+    size_t saltlen;                     /* length of salt (in bytes)         */
+    const void *info;                   /* optional: context specific info   */
+    size_t infolen;                     /* length of info (in bytes)         */
 };
 
 
@@ -246,9 +246,9 @@ int
 hkdf (hkdf_ctx_t *ctxp, void *dst, size_t *dstlenp)
 {
     unsigned char *prk = NULL;          /* pseudorandom key                  */
-    size_t         prklen;              /* length of PRK (in bytes)          */
-    size_t         prklen_used;         /* length of PRK used (in bytes)     */
-    int            rv;
+    size_t prklen;                      /* length of PRK (in bytes)          */
+    size_t prklen_used;                 /* length of PRK used (in bytes)     */
+    int rv;
 
     if ((ctxp == NULL) || (dst == NULL) || (dstlenp == NULL)) {
         errno = EINVAL;
@@ -333,9 +333,9 @@ static int
 _hkdf_extract (hkdf_ctx_t *ctxp, void *prk, size_t *prklenp)
 {
     mac_ctx mac_ctx;
-    int     mac_ctx_is_initialized = 0;
-    int     prklen;
-    int     rv = 0;
+    int mac_ctx_is_initialized = 0;
+    int prklen;
+    int rv = 0;
 
     assert (ctxp != NULL);
     assert (ctxp->salt != NULL);
@@ -402,14 +402,14 @@ _hkdf_expand (hkdf_ctx_t *ctxp, const void *prk, size_t prklen,
               void *dst, size_t *dstlenp)
 {
     unsigned char *dstp;
-    size_t         dstlen_left;
+    size_t dstlen_left;
     unsigned char *okm = NULL;
-    int            okmlen;
-    unsigned char  round;
-    mac_ctx        mac_ctx;
-    int            mac_ctx_is_initialized = 0;
-    int            n;
-    int            rv = 0, rv2;
+    int okmlen;
+    unsigned char round;
+    mac_ctx mac_ctx;
+    int mac_ctx_is_initialized = 0;
+    int n;
+    int rv = 0, rv2;
 
     assert (ctxp != NULL);
     assert (prk != NULL);

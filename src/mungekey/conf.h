@@ -34,11 +34,11 @@
  *****************************************************************************/
 
 typedef struct conf {
-    unsigned    do_create:1;            /* flag to create new key            */
-    unsigned    do_force:1;             /* flag to force overwriting key     */
-    unsigned    do_verbose:1;           /* flag to be verbose                */
-    char       *key_path;               /* pathname of keyfile               */
-    int         key_num_bytes;          /* number of bytes for key creation  */
+    unsigned do_create:1;               /* flag to create new key            */
+    unsigned do_force:1;                /* flag to force overwriting key     */
+    unsigned do_verbose:1;              /* flag to be verbose                */
+    char *key_path;                     /* pathname of keyfile               */
+    int key_num_bytes;                  /* number of bytes for key creation  */
 } conf_t;
 
 

@@ -87,19 +87,19 @@
 
 static long _random_timer_id = 0;       /* timer ID for entropy pool stir    */
 
-static int  _random_stir_secs;          /* secs between entropy pool stirs   */
+static int _random_stir_secs;           /* secs between entropy pool stirs   */
 
 
 /******************************************************************************
  *  Private Prototypes
  *****************************************************************************/
 
-static int  _random_read_entropy_from_kernel (void);
-static int  _random_read_entropy_from_file (const char *path);
-static int  _random_read_entropy_from_process (void);
-static int  _random_read_seed (const char *path, int num_bytes);
-static int  _random_write_seed (const char *path, int num_bytes);
-static int  _random_check_entropy (unsigned char *buf, int n);
+static int _random_read_entropy_from_kernel (void);
+static int _random_read_entropy_from_file (const char *path);
+static int _random_read_entropy_from_process (void);
+static int _random_read_seed (const char *path, int num_bytes);
+static int _random_write_seed (const char *path, int num_bytes);
+static int _random_check_entropy (unsigned char *buf, int n);
 static void _random_stir_entropy (void *_arg_not_used_);
 
 static void _random_cleanup (void);
@@ -245,8 +245,8 @@ _random_read_entropy_from_kernel (void)
 /*  Reads entropy from the kernel's CSPRNG.
  *  Returns the number of bytes of entropy added, or -1 on error.
  */
-    int            n;
-    unsigned char  buf [RANDOM_SOURCE_BYTES];
+    int n;
+    unsigned char buf [RANDOM_SOURCE_BYTES];
 
     n = entropy_read_csprng (buf, sizeof (buf));
     if (n > 0) {
@@ -271,11 +271,11 @@ _random_read_entropy_from_file (const char *path)
 /*  Reads entropy from the seed file specified by 'path'.
  *  Returns the number of bytes of entropy added, or -1 on error.
  */
-    int  is_path_secure = 0;
-    int  n;
+    int is_path_secure = 0;
+    int n;
     char dir [PATH_MAX];
     char ebuf [1024];
-    int  rv;
+    int rv;
 
     if ((path == NULL) || (path[0] == '\0')) {
         errno = EINVAL;
@@ -344,13 +344,13 @@ _random_read_seed (const char *path, int num_bytes)
  *    and adds them to the PRNG entropy pool.
  *  Returns the number of bytes read, or -1 on error.
  */
-    int           fd;
-    int           is_symlink;
-    int           is_valid = 0;
-    int           num_left = num_bytes;
-    int           num_want;
-    int           n;
-    struct stat   st;
+    int fd;
+    int is_symlink;
+    int is_valid = 0;
+    int num_left = num_bytes;
+    int num_want;
+    int n;
+    struct stat st;
     unsigned char buf [RANDOM_SEED_BYTES];
 
     assert (path != NULL);
@@ -442,12 +442,12 @@ _random_write_seed (const char *path, int num_bytes)
 /*  Writes 'num_bytes' of random bytes to the seed file specified by 'path'.
  *  Returns the number of bytes written, or -1 on error.
  */
-    int            rv;
-    int            fd;
-    int            num_left;
-    int            num_want;
-    int            n;
-    unsigned char  buf [RANDOM_SEED_BYTES];
+    int rv;
+    int fd;
+    int num_left;
+    int num_want;
+    int n;
+    unsigned char buf [RANDOM_SEED_BYTES];
 
     assert (path != NULL);
     assert (num_bytes > 0);
@@ -503,9 +503,9 @@ _random_check_entropy (unsigned char *buf, int n)
  *  Returns 0 if entropy appears sufficient; o/w returns -1.
  */
     unsigned char c;
-    int           i;
-    int           cnt;
-    int           lim;
+    int i;
+    int cnt;
+    int lim;
 
     assert (buf != NULL);
     assert (n > 0);

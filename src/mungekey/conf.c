@@ -149,11 +149,11 @@ destroy_conf (conf_t *confp)
 void
 parse_cmdline (conf_t *confp, int argc, char **argv)
 {
-    char       *p;
-    char       *prog;
-    int         long_ind;
+    char *p;
+    char *prog;
+    int long_ind;
     const char *long_opt;
-    int         c;
+    int c;
 
     assert (confp != NULL);
     assert (argv != NULL);
@@ -381,7 +381,7 @@ _conf_get_opt_string (int short_opt, const char *long_opt,
 static int
 _conf_set_int (int *dstp, const char *src, long min, long max)
 {
-    long  l;
+    long l;
     char *endp;
 
     if ((dstp == NULL) || (src == NULL)) {

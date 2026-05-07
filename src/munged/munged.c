@@ -99,8 +99,8 @@ int
 main (int argc, char *argv[])
 {
     char *log_identity = argv[0];
-    int   log_priority = LOG_INFO;
-    int   log_options = LOG_OPT_PRIORITY;
+    int log_priority = LOG_INFO;
+    int log_options = LOG_OPT_PRIORITY;
     work_p workers;
 
 #ifndef NDEBUG
@@ -199,9 +199,9 @@ daemonize_init (char *progname, conf_t conf)
  *    will not be returned to the shell until daemonize_fini() is called.
  */
     pid_t pid;
-    int   status;
-    int   priority;
-    char  buf [1024];
+    int status;
+    int priority;
+    char buf [1024];
 
     /*  Clear file mode creation mask.
      */
@@ -331,14 +331,14 @@ daemonize_fini (void)
 static void
 open_logfile (const char *logfile, int priority, int got_force)
 {
-    int          is_symlink;
-    int          is_missing;
-    struct stat  st;
-    int          rv;
-    char         logdir [PATH_MAX];
-    char         ebuf [1024];
-    mode_t       mask;
-    FILE        *fp;
+    int is_symlink;
+    int is_missing;
+    struct stat st;
+    int rv;
+    char logdir [PATH_MAX];
+    char ebuf [1024];
+    mode_t mask;
+    FILE *fp;
 
     if ((logfile == NULL) || (*logfile == '\0')) {
         log_err (EMUNGE_SNAFU, LOG_ERR, "Logfile name is undefined");
@@ -417,8 +417,8 @@ static void
 handle_signals (void)
 {
     struct sigaction sa;
-    int              sig;
-    int              rv;
+    int sig;
+    int rv;
 
     sa.sa_handler = sig_handler;
     sa.sa_flags = 0;
@@ -476,11 +476,11 @@ write_pidfile (const char *pidfile, int got_force)
  *    the lock), but before the original parent process terminates (i.e.,
  *    before daemonize_fini()).
  */
-    char    piddir [PATH_MAX];
-    char    ebuf [1024];
-    int     rv;
-    mode_t  mask;
-    FILE   *fp;
+    char piddir [PATH_MAX];
+    char ebuf [1024];
+    int rv;
+    mode_t mask;
+    FILE *fp;
 
     if ((pidfile == NULL) || (*pidfile == '\0')) {
         log_err (EMUNGE_SNAFU, LOG_ERR, "PIDfile name is undefined");
@@ -595,13 +595,13 @@ lock_memory (void)
 static void
 sock_create (conf_t conf)
 {
-    size_t              path_len;
-    char                sockdir [PATH_MAX];
-    char                ebuf [1024];
-    int                 sd;
-    struct sockaddr_un  addr;
-    mode_t              mask;
-    int                 rv;
+    size_t path_len;
+    char sockdir [PATH_MAX];
+    char ebuf [1024];
+    int sd;
+    struct sockaddr_un addr;
+    mode_t mask;
+    int rv;
 
     assert (conf != NULL);
 

@@ -45,8 +45,8 @@
 #include <gcrypt.h>
 
 typedef struct {
-    gcry_md_hd_t        ctx;
-    int                 diglen;
+    gcry_md_hd_t ctx;
+    int diglen;
 } md_ctx;
 
 #endif /* HAVE_LIBGCRYPT */
@@ -57,8 +57,8 @@ typedef struct {
 #include <openssl/evp.h>
 
 typedef struct {
-    EVP_MD_CTX         *ctx;
-    int                 diglen;
+    EVP_MD_CTX *ctx;
+    int diglen;
 } md_ctx;
 
 #endif /* HAVE_OPENSSL */

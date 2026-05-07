@@ -67,9 +67,9 @@ void
 create_key (conf_t *confp)
 {
     unsigned char buf[MUNGE_KEY_LEN_MAX_BYTES];
-    int           fd;
-    int           n;
-    int           rv;
+    int fd;
+    int n;
+    int rv;
 
     assert (confp != NULL);
     assert (confp->key_num_bytes <= MUNGE_KEY_LEN_MAX_BYTES);
@@ -129,15 +129,15 @@ create_key (conf_t *confp)
 static int
 _create_key_secret (unsigned char *buf, size_t buflen)
 {
-    unsigned char      key[ENTROPY_CSPRNG_GUARANTEED_SIZE];
-    unsigned long      salt;
-    const munge_mac_t  md = MUNGE_DEFAULT_MAC;
-    const char        *md_str;
-    const char        *info_prefix = "MUNGEKEY";
-    int                num_bits;
-    char               info[1024];
-    hkdf_ctx_t        *hkdfp = NULL;
-    int                rv;
+    unsigned char key[ENTROPY_CSPRNG_GUARANTEED_SIZE];
+    unsigned long salt;
+    const munge_mac_t md = MUNGE_DEFAULT_MAC;
+    const char *md_str;
+    const char *info_prefix = "MUNGEKEY";
+    int num_bits;
+    char info[1024];
+    hkdf_ctx_t *hkdfp = NULL;
+    int rv;
 
     assert (buf != NULL);
     assert (buflen > 0);

@@ -45,7 +45,7 @@ void
 xsignal_ignore (int sig)
 {
     struct sigaction sa;
-    int              rv;
+    int rv;
 
     sa.sa_handler = SIG_IGN;
     sa.sa_flags = 0;

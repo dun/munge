@@ -45,8 +45,8 @@
 #include <gcrypt.h>
 
 typedef struct {
-    gcry_md_hd_t        ctx;
-    int                 diglen;
+    gcry_md_hd_t ctx;
+    int diglen;
 } mac_ctx;
 
 #endif /* HAVE_LIBGCRYPT */
@@ -65,8 +65,8 @@ typedef struct {
 
 /*  OpenSSL >= 3.0  */
 typedef struct {
-    EVP_MAC_CTX        *ctx;
-    int                 diglen;
+    EVP_MAC_CTX *ctx;
+    int diglen;
 } mac_ctx;
 
 #else
@@ -77,8 +77,8 @@ typedef struct {
 
 /*  OpenSSL < 3.0  */
 typedef struct {
-    HMAC_CTX           *ctx;
-    int                 diglen;
+    HMAC_CTX *ctx;
+    int diglen;
 } mac_ctx;
 
 #endif /* HAVE_EVP_MAC_CTX_P && HAVE_EVP_MAC_CTX_NEW */

@@ -75,8 +75,8 @@ typedef struct conf * conf_t;
 typedef void display_func_t (conf_t);
 
 typedef struct {
-    int             val;
-    char           *str;
+    int val;
+    char *str;
     display_func_t *fp;
 } display_key_t;
 
@@ -185,25 +185,25 @@ struct option long_opts[] = {
  *****************************************************************************/
 
 struct conf {
-    munge_ctx_t  ctx;                   /* munge context                     */
-    munge_err_t  status;                /* error status unmunging the cred   */
-    char        *fn_in;                 /* input filename, '-' for stdin     */
-    char        *fn_meta;               /* metadata filename, '-' for stdout */
-    char        *fn_out;                /* output filename, '-' for stdout   */
-    FILE        *fp_in;                 /* input file pointer                */
-    FILE        *fp_meta;               /* metadata file pointer             */
-    FILE        *fp_out;                /* output file pointer               */
-    int          clen;                  /* munged credential length          */
-    char        *cred;                  /* munged credential                 */
-    int          dlen;                  /* unmunged payload data length      */
-    void        *data;                  /* unmunged payload data             */
-    uid_t        uid;                   /* process uid according to cred     */
-    gid_t        gid;                   /* process gid according to cred     */
-    char         key[ MUNGE_KEY_LAST ]; /* key flag array (true if enabled)  */
-    int          key_width;             /* num chars reserved for key field  */
-    unsigned     got_numeric:1;         /* flag for NUMERIC option           */
-    unsigned     is_ttl_ignored:1;
-    unsigned     is_replay_ignored:1;
+    munge_ctx_t ctx;                    /* munge context                     */
+    munge_err_t status;                 /* error status unmunging the cred   */
+    char *fn_in;                        /* input filename, '-' for stdin     */
+    char *fn_meta;                      /* metadata filename, '-' for stdout */
+    char *fn_out;                       /* output filename, '-' for stdout   */
+    FILE *fp_in;                        /* input file pointer                */
+    FILE *fp_meta;                      /* metadata file pointer             */
+    FILE *fp_out;                       /* output file pointer               */
+    int clen;                           /* munged credential length          */
+    char *cred;                         /* munged credential                 */
+    int dlen;                           /* unmunged payload data length      */
+    void *data;                         /* unmunged payload data             */
+    uid_t uid;                          /* process uid according to cred     */
+    gid_t gid;                          /* process gid according to cred     */
+    char key[ MUNGE_KEY_LAST ];         /* key flag array (true if enabled)  */
+    int key_width;                      /* num chars reserved for key field  */
+    unsigned got_numeric:1;             /* flag for NUMERIC option           */
+    unsigned is_ttl_ignored:1;
+    unsigned is_replay_ignored:1;
 };
 
 
@@ -214,9 +214,9 @@ struct conf {
 int
 main (int argc, char *argv[])
 {
-    conf_t       conf;
-    int          rc;
-    const char  *p;
+    conf_t conf;
+    int rc;
+    const char *p;
 
     xsignal_ignore (SIGHUP);
     xsignal_ignore (SIGPIPE);
@@ -264,9 +264,9 @@ conf_t
 create_conf (void)
 {
     conf_t conf;
-    int    i;
-    int    len;
-    int    maxlen;
+    int i;
+    int len;
+    int maxlen;
 
     if (!(conf = malloc (sizeof (struct conf)))) {
         log_errno (EMUNGE_NO_MEMORY, LOG_ERR, "Failed to allocate conf");
@@ -353,12 +353,12 @@ destroy_conf (conf_t conf)
 void
 parse_cmdline (conf_t conf, int argc, char **argv)
 {
-    int          got_keys = 0;
-    char        *prog;
-    int          c;
-    munge_err_t  e;
-    const char  *p;
-    int          i;
+    int got_keys = 0;
+    char *prog;
+    int c;
+    munge_err_t e;
+    const char *p;
+    int i;
 
     opterr = 0;                         /* suppress default getopt err msgs */
 
@@ -559,8 +559,8 @@ void
 parse_keys (conf_t conf, char *keys)
 {
     const char *separators = " \t\n.,;";
-    char       *key;
-    int         val;
+    char *key;
+    int val;
 
     if (!keys || !*keys) {
         return;
@@ -673,7 +673,7 @@ void
 display_status (conf_t conf)
 {
     const char *key;
-    int         num_spaces;
+    int num_spaces;
 
     assert (conf != NULL);
 
@@ -694,12 +694,12 @@ display_status (conf_t conf)
 void
 display_encode_host (conf_t conf)
 {
-    const char           *key;
-    int                   num_spaces;
-    munge_err_t           err;
-    const char           *p;
-    struct in_addr        addr;
-    char                  addr_str[ INET_ADDRSTRLEN ];
+    const char *key;
+    int num_spaces;
+    munge_err_t err;
+    const char *p;
+    struct in_addr addr;
+    char addr_str[ INET_ADDRSTRLEN ];
 
     assert (conf != NULL);
 
@@ -738,14 +738,14 @@ display_encode_host (conf_t conf)
 void
 display_encode_time (conf_t conf)
 {
-    const char  *key;
-    int          num_spaces;
-    munge_err_t  err;
-    const char  *p;
-    time_t       t;
-    struct tm   *tm_ptr;
-    int          t_len;
-    char         t_buf[ MAX_TIME_STR ];
+    const char *key;
+    int num_spaces;
+    munge_err_t err;
+    const char *p;
+    time_t t;
+    struct tm *tm_ptr;
+    int t_len;
+    char t_buf[ MAX_TIME_STR ];
 
     assert (conf != NULL);
 
@@ -788,14 +788,14 @@ display_encode_time (conf_t conf)
 void
 display_decode_time (conf_t conf)
 {
-    const char  *key;
-    int          num_spaces;
-    munge_err_t  err;
-    const char  *p;
-    time_t       t;
-    struct tm   *tm_ptr;
-    int          t_len;
-    char         t_buf[ MAX_TIME_STR ];
+    const char *key;
+    int num_spaces;
+    munge_err_t err;
+    const char *p;
+    time_t t;
+    struct tm *tm_ptr;
+    int t_len;
+    char t_buf[ MAX_TIME_STR ];
 
     assert (conf != NULL);
 
@@ -838,11 +838,11 @@ display_decode_time (conf_t conf)
 void
 display_ttl (conf_t conf)
 {
-    const char  *key;
-    int          num_spaces;
-    munge_err_t  err;
-    const char  *p;
-    int          i;
+    const char *key;
+    int num_spaces;
+    munge_err_t err;
+    const char *p;
+    int i;
 
     assert (conf != NULL);
 
@@ -862,11 +862,11 @@ display_ttl (conf_t conf)
 void
 display_cipher_type (conf_t conf)
 {
-    const char  *key;
-    int          num_spaces;
-    munge_err_t  err;
-    const char  *p;
-    int          i;
+    const char *key;
+    int num_spaces;
+    munge_err_t err;
+    const char *p;
+    int i;
 
     assert (conf != NULL);
 
@@ -893,11 +893,11 @@ display_cipher_type (conf_t conf)
 void
 display_mac_type (conf_t conf)
 {
-    const char  *key;
-    int          num_spaces;
-    munge_err_t  err;
-    const char  *p;
-    int          i;
+    const char *key;
+    int num_spaces;
+    munge_err_t err;
+    const char *p;
+    int i;
 
     assert (conf != NULL);
 
@@ -924,11 +924,11 @@ display_mac_type (conf_t conf)
 void
 display_zip_type (conf_t conf)
 {
-    const char  *key;
-    int          num_spaces;
-    munge_err_t  err;
-    const char  *p;
-    int          i;
+    const char *key;
+    int num_spaces;
+    munge_err_t err;
+    const char *p;
+    int i;
 
     assert (conf != NULL);
 
@@ -955,8 +955,8 @@ display_zip_type (conf_t conf)
 void
 display_uid (conf_t conf)
 {
-    const char    *key;
-    int            num_spaces;
+    const char *key;
+    int num_spaces;
     struct passwd *pw_ptr;
 
     assert (conf != NULL);
@@ -979,9 +979,9 @@ display_uid (conf_t conf)
 void
 display_gid (conf_t conf)
 {
-    const char    *key;
-    int            num_spaces;
-    struct group  *gr_ptr;
+    const char *key;
+    int num_spaces;
+    struct group *gr_ptr;
 
     assert (conf != NULL);
 
@@ -1003,11 +1003,11 @@ display_gid (conf_t conf)
 void
 display_uid_restriction (conf_t conf)
 {
-    const char    *key;
-    int            num_spaces;
-    munge_err_t    err;
-    const char    *p;
-    int            i;
+    const char *key;
+    int num_spaces;
+    munge_err_t err;
+    const char *p;
+    int i;
     struct passwd *pw_ptr;
 
     assert (conf != NULL);
@@ -1039,12 +1039,12 @@ display_uid_restriction (conf_t conf)
 void
 display_gid_restriction (conf_t conf)
 {
-    const char    *key;
-    int            num_spaces;
-    munge_err_t    err;
-    const char    *p;
-    int            i;
-    struct group  *gr_ptr;
+    const char *key;
+    int num_spaces;
+    munge_err_t err;
+    const char *p;
+    int i;
+    struct group *gr_ptr;
 
     assert (conf != NULL);
 
@@ -1076,7 +1076,7 @@ void
 display_length (conf_t conf)
 {
     const char *key;
-    int         num_spaces;
+    int num_spaces;
 
     assert (conf != NULL);
 

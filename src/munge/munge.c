@@ -87,19 +87,19 @@ struct option long_opts[] = {
  *****************************************************************************/
 
 struct conf {
-    munge_ctx_t  ctx;                   /* munge context                     */
-    munge_err_t  status;                /* error status munging the cred     */
-    uid_t        cuid;                  /* credential UID                    */
-    gid_t        cgid;                  /* credential GID                    */
-    char        *string;                /* input from string instead of file */
-    char        *fn_in;                 /* input filename, '-' for stdin     */
-    char        *fn_out;                /* output filename, '-' for stdout   */
-    FILE        *fp_in;                 /* input file pointer                */
-    FILE        *fp_out;                /* output file pointer               */
-    int          dlen;                  /* payload data length               */
-    void        *data;                  /* payload data                      */
-    int          clen;                  /* munged credential length          */
-    char        *cred;                  /* munged credential null-terminated */
+    munge_ctx_t ctx;                    /* munge context                     */
+    munge_err_t status;                 /* error status munging the cred     */
+    uid_t cuid;                         /* credential UID                    */
+    gid_t cgid;                         /* credential GID                    */
+    char *string;                       /* input from string instead of file */
+    char *fn_in;                        /* input filename, '-' for stdin     */
+    char *fn_out;                       /* output filename, '-' for stdout   */
+    FILE *fp_in;                        /* input file pointer                */
+    FILE *fp_out;                       /* output file pointer               */
+    int dlen;                           /* payload data length               */
+    void *data;                         /* payload data                      */
+    int clen;                           /* munged credential length          */
+    char *cred;                         /* munged credential null-terminated */
 };
 
 typedef struct conf * conf_t;
@@ -110,13 +110,13 @@ typedef struct conf * conf_t;
  *****************************************************************************/
 
 conf_t create_conf (void);
-void   destroy_conf (conf_t conf);
-void   parse_cmdline (conf_t conf, int argc, char **argv);
-void   display_help (char *prog);
-void   display_strings (const char *header, munge_enum_t type);
-void   open_files (conf_t conf);
-int    encode_cred (conf_t conf);
-void   display_cred (conf_t conf);
+void destroy_conf (conf_t conf);
+void parse_cmdline (conf_t conf, int argc, char **argv);
+void display_help (char *prog);
+void display_strings (const char *header, munge_enum_t type);
+void open_files (conf_t conf);
+int encode_cred (conf_t conf);
+void display_cred (conf_t conf);
 
 
 /******************************************************************************
@@ -126,7 +126,7 @@ void   display_cred (conf_t conf);
 int
 main (int argc, char *argv[])
 {
-    conf_t      conf;
+    conf_t conf;
     const char *p;
 
     xsignal_ignore (SIGHUP);
@@ -226,12 +226,12 @@ destroy_conf (conf_t conf)
 void
 parse_cmdline (conf_t conf, int argc, char **argv)
 {
-    char        *prog;
-    int          c;
-    char        *p;
-    munge_err_t  e;
-    int          i;
-    long int     l;
+    char *prog;
+    int c;
+    char *p;
+    munge_err_t e;
+    int i;
+    long int l;
 
     opterr = 0;                         /* suppress default getopt err msgs */
 
@@ -532,7 +532,7 @@ display_help (char *prog)
 void
 display_strings (const char *header, munge_enum_t type)
 {
-    int         i;
+    int i;
     const char *p;
 
     if (header) {
