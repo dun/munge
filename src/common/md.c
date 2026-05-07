@@ -74,7 +74,6 @@ md_init_subsystem (void)
         _md_init_subsystem ();
         _md_is_initialized++;
     }
-    return;
 }
 
 
@@ -231,7 +230,6 @@ _md_init_subsystem (void)
     _md_map[MUNGE_MAC_RIPEMD160] = GCRY_MD_RMD160;
     _md_map[MUNGE_MAC_SHA256] = GCRY_MD_SHA256;
     _md_map[MUNGE_MAC_SHA512] = GCRY_MD_SHA512;
-    return;
 }
 
 
@@ -364,8 +362,6 @@ _md_init_subsystem (void)
 #if HAVE_EVP_SHA512
     _md_map[MUNGE_MAC_SHA512] = EVP_sha512 ();
 #endif /* HAVE_EVP_SHA512 */
-
-    return;
 }
 
 

@@ -77,7 +77,6 @@ cipher_init_subsystem (void)
         _cipher_init_subsystem ();
         _cipher_is_initialized++;
     }
-    return;
 }
 
 
@@ -246,7 +245,6 @@ _cipher_init_subsystem (void)
     _cipher_map[MUNGE_CIPHER_CAST5] = GCRY_CIPHER_CAST5;
     _cipher_map[MUNGE_CIPHER_AES128] = GCRY_CIPHER_AES128;
     _cipher_map[MUNGE_CIPHER_AES256] = GCRY_CIPHER_AES256;
-    return;
 }
 
 
@@ -597,8 +595,6 @@ _cipher_init_subsystem (void)
 #if HAVE_EVP_AES_256_CBC && HAVE_EVP_SHA256
     _cipher_map[MUNGE_CIPHER_AES256] = EVP_aes_256_cbc ();
 #endif /* HAVE_EVP_AES_256_CBC && HAVE_EVP_SHA256 */
-
-    return;
 }
 
 

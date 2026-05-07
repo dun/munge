@@ -191,7 +191,6 @@ random_fini (const char *seed_path)
         (void) _random_write_seed (seed_path, RANDOM_SEED_BYTES);
     }
     _random_cleanup ();
-    return;
 }
 
 
@@ -204,7 +203,6 @@ random_add (const void *buf, int n)
         return;
     }
     _random_add (buf, n);
-    return;
 }
 
 
@@ -217,7 +215,6 @@ random_bytes (void *buf, int n)
         return;
     }
     _random_bytes (buf, n);
-    return;
 }
 
 
@@ -231,7 +228,6 @@ random_pseudo_bytes (void *buf, int n)
         return;
     }
     _random_pseudo_bytes (buf, n);
-    return;
 }
 
 
@@ -566,7 +562,6 @@ _random_stir_entropy (void *_arg_not_used_)
     if (_random_timer_id < 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to set PRNG stir timer");
     }
-    return;
 }
 
 
@@ -581,7 +576,7 @@ _random_stir_entropy (void *_arg_not_used_)
 static void
 _random_cleanup (void)
 {
-    return;
+    /* no-op */
 }
 
 
@@ -599,7 +594,6 @@ _random_add (const void *buf, int n)
                 n, (n == 1 ? "" : "s"), gcry_strerror (e));
     }
     gcry_fast_random_poll ();
-    return;
 }
 
 
@@ -610,7 +604,6 @@ _random_bytes (void *buf, int n)
     assert (n > 0);
 
     gcry_randomize (buf, n, GCRY_STRONG_RANDOM);
-    return;
 }
 
 
@@ -621,7 +614,6 @@ _random_pseudo_bytes (void *buf, int n)
     assert (n > 0);
 
     gcry_create_nonce (buf, n);
-    return;
 }
 
 #endif /* HAVE_LIBGCRYPT */
@@ -644,7 +636,6 @@ _random_cleanup (void)
     /*  OpenSSL < 1.1.0  */
     RAND_cleanup ();
 #endif /* HAVE_RAND_CLEANUP */
-    return;
 }
 
 
@@ -655,7 +646,6 @@ _random_add (const void *buf, int n)
     assert (n > 0);
 
     RAND_seed (buf, n);
-    return;
 }
 
 
@@ -677,7 +667,6 @@ _random_bytes (void *buf, int n)
         log_msg (LOG_WARNING,
                 "RAND_bytes failed: %s", ERR_reason_error_string (e));
     }
-    return;
 }
 
 
@@ -714,7 +703,6 @@ _random_pseudo_bytes (void *buf, int n)
     _random_bytes (buf, n);
     (void) rc;                          /* suppress unused-variable warning */
 #endif /* HAVE_RAND_PSEUDO_BYTES && (OPENSSL_VERSION_NUMBER < 0x10100000L) */
-    return;
 }
 
 #endif /* HAVE_OPENSSL */

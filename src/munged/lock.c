@@ -142,7 +142,6 @@ lock_create (conf_t conf)
                     conf->lockfile_name);
         }
     }
-    return;
 }
 
 
@@ -201,7 +200,6 @@ _lock_create_name (conf_t conf)
     if (conf->lockfile_name == NULL) {
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to create lockfile_name");
     }
-    return;
 }
 
 
@@ -237,7 +235,6 @@ _lock_stat (int fd, const char *name)
                 "Failed to validate lockfile: \"%s\" should be owned by "
                 "UID %u", name, (unsigned) geteuid());
     }
-    return;
 }
 
 

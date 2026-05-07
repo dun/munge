@@ -102,7 +102,6 @@ crypto_init (void)
         log_err (EMUNGE_SNAFU, LOG_ERR,
             "Failed to initialize Libgcrypt: %s", gcry_strerror (e));
     }
-    return;
 }
 
 
@@ -111,7 +110,7 @@ crypto_init (void)
 void
 crypto_fini (void)
 {
-    return;
+    /* no-op */
 }
 
 #endif /* HAVE_LIBGCRYPT */
@@ -189,7 +188,6 @@ _openssl_thread_lock_cb (int mode, int n, const char *file, int line)
                 "Failed to unlock OpenSSL mutex #%d", n);
         }
     }
-    return;
 }
 
 #if HAVE_CRYPTO_DYNLOCK
@@ -240,7 +238,6 @@ _openssl_thread_dynlock_lock_cb (
                 "Failed to unlock OpenSSL dynamic mutex");
         }
     }
-    return;
 }
 
 static void
@@ -256,7 +253,6 @@ _openssl_thread_dynlock_destroy_cb (
             "Failed to destroy OpenSSL dynamic mutex: %s", strerror (rv));
     }
     free (lock);
-    return;
 }
 
 #endif /* HAVE_CRYPTO_DYNLOCK */
@@ -289,8 +285,6 @@ crypto_init (void)
                 "See OSSL_PROVIDER-legacy(7ssl) manpage for more info");
     }
 #endif /* HAVE_OPENSSL_PROVIDER_H */
-
-    return;
 }
 
 
@@ -316,8 +310,6 @@ crypto_fini (void)
     /*  OpenSSL < 1.1.0  */
     ERR_free_strings ();
 #endif /* HAVE_ERR_FREE_STRINGS */
-
-    return;
 }
 
 
@@ -377,7 +369,6 @@ _openssl_thread_setup (void)
 #endif /* HAVE_CRYPTO_DYNLOCK */
 
 #endif /* OPENSSL_VERSION_NUMBER < 0x10100000L */
-    return;
 }
 
 
@@ -425,7 +416,6 @@ _openssl_thread_cleanup (void)
     openssl_mutex_array_num_locks = 0;
 
 #endif /* OPENSSL_VERSION_NUMBER < 0x10100000L */
-    return;
 }
 
 

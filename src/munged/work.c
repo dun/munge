@@ -248,7 +248,6 @@ work_fini (work_p wp, int do_wait)
     }
     free (wp->workers);
     free (wp);
-    return;
 }
 
 
@@ -324,7 +323,6 @@ work_wait (work_p wp)
         log_errno (EMUNGE_SNAFU, LOG_ERR,
             "Failed to unlock work thread mutex");
     }
-    return;
 }
 
 
@@ -438,7 +436,6 @@ _work_exec_cleanup (void *arg)
         log_errno (EMUNGE_SNAFU, LOG_ERR,
             "Failed to unlock work thread mutex");
     }
-    return;
 }
 
 

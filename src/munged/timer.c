@@ -140,7 +140,6 @@ timer_init (void)
         log_errno (EMUNGE_SNAFU, LOG_ERR,
                 "Failed to destroy timer thread attribute");
     }
-    return;
 }
 
 
@@ -191,7 +190,6 @@ timer_fini (void)
     if ((errno = pthread_mutex_unlock (&_timer_mutex)) != 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to unlock timer mutex");
     }
-    return;
 }
 
 
@@ -475,7 +473,6 @@ _timer_thread_cleanup (void *arg)
     if ((errno = pthread_mutex_unlock (&_timer_mutex)) != 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to unlock timer mutex");
     }
-    return;
 }
 
 

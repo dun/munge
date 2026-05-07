@@ -187,7 +187,6 @@ disable_core_dumps (void)
             "Failed to disable core dumps");
     }
 #endif /* NDEBUG */
-    return;
 }
 
 
@@ -273,7 +272,6 @@ daemonize_init (char *progname, conf_t conf)
     }
     /*  Grandchild process continues.
      */
-    return;
 }
 
 
@@ -324,7 +322,6 @@ daemonize_fini (void)
         log_errno (EMUNGE_SNAFU, LOG_ERR,
             "Failed to close write-end of daemonpipe");
     }
-    return;
 }
 
 
@@ -409,7 +406,6 @@ open_logfile (const char *logfile, int priority, int got_force)
     }
     log_open_file (fp, NULL, priority,
         LOG_OPT_JUSTIFY | LOG_OPT_PRIORITY | LOG_OPT_TIMESTAMP);
-    return;
 }
 
 
@@ -449,7 +445,6 @@ handle_signals (void)
                 strsignal (sig));
     }
     xsignal_ignore (SIGPIPE);
-    return;
 }
 
 
@@ -462,7 +457,6 @@ sig_handler (int sig)
     else if ((sig == SIGINT) || (sig == SIGTERM)) {
         got_terminate = sig;
     }
-    return;
 }
 
 
@@ -550,7 +544,6 @@ write_pidfile (const char *pidfile, int got_force)
         log_msg (LOG_WARNING, "Failed to remove PIDfile \"%s\": %s",
                 pidfile, strerror (errno));
     }
-    return;                             /* failure */
 }
 
 
@@ -685,7 +678,6 @@ sock_create (conf_t conf)
     log_msg (LOG_INFO, "Created socket \"%s\"", conf->socket_name);
     log_msg (LOG_INFO, "Set socket listen backlog to %d",
             conf->listen_backlog);
-    return;
 }
 
 
@@ -734,5 +726,4 @@ sock_destroy (conf_t conf)
         }
         conf->lockfile_fd = -1;
     }
-    return;
 }

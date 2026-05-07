@@ -219,7 +219,6 @@ destroy_conf (conf_t conf)
     }
     munge_ctx_destroy (conf->ctx);
     free (conf);
-    return;
 }
 
 
@@ -443,7 +442,6 @@ parse_cmdline (conf_t conf, int argc, char **argv)
         log_err (EMUNGE_SNAFU, LOG_ERR,
             "Unrecognized parameter \"%s\"", argv[optind]);
     }
-    return;
 }
 
 
@@ -525,7 +523,6 @@ display_help (char *prog)
     printf ("\n");
     printf ("By default, payload read from stdin, "
             "credential written to stdout.\n\n");
-    return;
 }
 
 
@@ -544,7 +541,6 @@ display_strings (const char *header, munge_enum_t type)
         }
     }
     printf ("\n");
-    return;
 }
 
 
@@ -569,7 +565,6 @@ open_files (conf_t conf)
                 "Failed to write to \"%s\"", conf->fn_out);
         }
     }
-    return;
 }
 
 
@@ -625,5 +620,4 @@ display_cred (conf_t conf)
     if (fprintf (conf->fp_out, "%s\n", conf->cred) < 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Write error");
     }
-    return;
 }

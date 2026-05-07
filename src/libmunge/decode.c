@@ -151,7 +151,6 @@ _decode_init (munge_ctx_t ctx, void **buf, int *len, uid_t *uid, gid_t *gid)
     if (gid) {
         *gid = MUNGE_GID_SENTINEL;
     }
-    return;
 }
 
 

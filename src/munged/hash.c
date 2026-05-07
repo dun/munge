@@ -184,7 +184,6 @@ hash_destroy (hash_t h)
     lsd_mutex_destroy (&h->mutex);
     free (h->table);
     free (h);
-    return;
 }
 
 
@@ -213,7 +212,6 @@ void hash_reset (hash_t h)
     }
     h->count = 0;
     lsd_mutex_unlock (&h->mutex);
-    return;
 }
 
 
@@ -467,7 +465,6 @@ hash_drop_memory (void)
     }
     hash_free_list = NULL;
     lsd_mutex_unlock (&hash_free_list_lock);
-    return;
 }
 
 
@@ -547,5 +544,4 @@ hash_node_free (struct hash_node *node)
     node->next = hash_free_list;
     hash_free_list = node;
     lsd_mutex_unlock (&hash_free_list_lock);
-    return;
 }

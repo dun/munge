@@ -316,8 +316,6 @@ destroy_conf (conf_t conf, int do_unlink)
         conf->auth_client_dir = NULL;
     }
     free (conf);
-
-    return;
 }
 
 
@@ -540,7 +538,6 @@ process_conf (conf_t conf)
         _conf_process_stop (conf);
     }
     _conf_set_origin_addr (conf);
-    return;
 }
 
 
@@ -694,8 +691,6 @@ create_subkeys (conf_t conf)
         log_err (EMUNGE_SNAFU, LOG_ERR, "Failed to compute MAC subkey");
     }
     assert (n <= conf->mac_key_len);
-
-    return;
 }
 
 
@@ -843,7 +838,6 @@ _conf_display_help (char *prog)
             "Specify trusted group/GID for directory checks");
 
     printf ("\n");
-    return;
 }
 
 

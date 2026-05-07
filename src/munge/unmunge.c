@@ -346,7 +346,6 @@ destroy_conf (conf_t conf)
     }
     munge_ctx_destroy (conf->ctx);
     free (conf);
-    return;
 }
 
 
@@ -490,7 +489,6 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                     "Failed to ignore replay errors");
         }
     }
-    return;
 }
 
 
@@ -551,7 +549,6 @@ display_help (char *prog)
     printf ("\n");
     printf ("By default, credential read from stdin, "
             "metadata & payload written to stdout.\n\n");
-    return;
 }
 
 
@@ -573,7 +570,6 @@ parse_keys (conf_t conf, char *keys)
         }
         key = strtok (NULL, separators);
     }
-    return;
 }
 
 
@@ -587,7 +583,6 @@ display_keys (void)
         printf ("  %s\n", munge_keys[i].str);
     }
     printf ("\n");
-    return;
 }
 
 
@@ -634,7 +629,6 @@ open_files (conf_t conf)
                     "Failed to write to \"%s\"", conf->fn_out);
         }
     }
-    return;
 }
 
 
@@ -665,7 +659,6 @@ display_meta (conf_t conf)
     if (conf->fp_meta == conf->fp_out) {
         fprintf (conf->fp_meta, "\n");
     }
-    return;
 }
 
 
@@ -687,7 +680,6 @@ display_status (conf_t conf)
         fprintf (conf->fp_meta, "%s:%*c%s (%d)\n", key, num_spaces, 0x20,
                 munge_strerror (conf->status), conf->status);
     }
-    return;
 }
 
 
@@ -731,7 +723,6 @@ display_encode_host (conf_t conf)
         fprintf (conf->fp_meta, "%s:%*c%s (%s)\n", key, num_spaces, 0x20,
                 (rv == 0 ? hostname : "???"), addr_str);
     }
-    return;
 }
 
 
@@ -781,7 +772,6 @@ display_encode_time (conf_t conf)
         }
         fprintf (conf->fp_meta, "%s:%*c%s\n", key, num_spaces, 0x20, t_buf);
     }
-    return;
 }
 
 
@@ -831,7 +821,6 @@ display_decode_time (conf_t conf)
         }
         fprintf (conf->fp_meta, "%s:%*c%s\n", key, num_spaces, 0x20, t_buf);
     }
-    return;
 }
 
 
@@ -855,7 +844,6 @@ display_ttl (conf_t conf)
                 (p ? p : "Unspecified error"));
     }
     fprintf (conf->fp_meta, "%s:%*c%d\n", key, num_spaces, 0x20, i);
-    return;
 }
 
 
@@ -886,7 +874,6 @@ display_cipher_type (conf_t conf)
         fprintf (conf->fp_meta, "%s:%*c%s (%d)\n", key, num_spaces, 0x20,
                 (p ? p : "???"), i);
     }
-    return;
 }
 
 
@@ -917,7 +904,6 @@ display_mac_type (conf_t conf)
         fprintf (conf->fp_meta, "%s:%*c%s (%d)\n", key, num_spaces, 0x20,
                 (p ? p : "???"), i);
     }
-    return;
 }
 
 
@@ -948,7 +934,6 @@ display_zip_type (conf_t conf)
         fprintf (conf->fp_meta, "%s:%*c%s (%d)\n", key, num_spaces, 0x20,
                 (p ? p : "???"), i);
     }
-    return;
 }
 
 
@@ -972,7 +957,6 @@ display_uid (conf_t conf)
         fprintf (conf->fp_meta, "%s:%*c%s (%u)\n", key, num_spaces, 0x20,
                 (pw_ptr ? pw_ptr->pw_name : "???"), (unsigned) conf->uid);
     }
-    return;
 }
 
 
@@ -996,7 +980,6 @@ display_gid (conf_t conf)
         fprintf (conf->fp_meta, "%s:%*c%s (%u)\n", key, num_spaces, 0x20,
                 (gr_ptr ? gr_ptr->gr_name : "???"), (unsigned) conf->gid);
     }
-    return;
 }
 
 
@@ -1032,7 +1015,6 @@ display_uid_restriction (conf_t conf)
         fprintf (conf->fp_meta, "%s:%*c%s (%u)\n", key, num_spaces, 0x20,
                 (pw_ptr ? pw_ptr->pw_name : "???"), (unsigned) i);
     }
-    return;
 }
 
 
@@ -1068,7 +1050,6 @@ display_gid_restriction (conf_t conf)
         fprintf (conf->fp_meta, "%s:%*c%s (%u)\n", key, num_spaces, 0x20,
                 (gr_ptr ? gr_ptr->gr_name : "???"), (unsigned) i);
     }
-    return;
 }
 
 
@@ -1083,7 +1064,6 @@ display_length (conf_t conf)
     key = key_val_to_str (MUNGE_KEY_LENGTH);
     num_spaces = conf->key_width - strlen (key);
     fprintf (conf->fp_meta, "%s:%*c%d\n", key, num_spaces, 0x20, conf->dlen);
-    return;
 }
 
 
@@ -1105,7 +1085,6 @@ display_data (conf_t conf)
             ((char *) conf->data) [conf->dlen - 1] != '\n') {
         fprintf (conf->fp_out, "\n");
     }
-    return;
 }
 
 

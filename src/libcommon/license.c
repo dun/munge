@@ -74,5 +74,4 @@ display_license (void)
     for (pp = license_text; *pp != NULL; pp++) {
         printf ("%s\n", *pp);
     }
-    return;
 }

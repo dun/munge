@@ -59,5 +59,4 @@ xsignal_ignore (int sig)
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to ignore signal %d (%s)",
                 sig, strsignal (sig));
     }
-    return;
 }

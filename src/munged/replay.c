@@ -153,7 +153,6 @@ replay_init (void)
       (callback_f) replay_purge, NULL, MUNGE_REPLAY_PURGE_SECS * 1000) < 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to set replay purge timer");
     }
-    return;
 }
 
 
@@ -173,7 +172,6 @@ replay_fini (void)
     hash_destroy (replay_hash);
     replay_hash = NULL;
     replay_drop_memory ();
-    return;
 }
 
 
@@ -289,7 +287,6 @@ replay_purge (void)
       (callback_f) replay_purge, NULL, MUNGE_REPLAY_PURGE_SECS * 1000) < 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to set replay purge timer");
     }
-    return;
 }
 
 
@@ -396,7 +393,6 @@ replay_free (replay_t r)
     r->alloc.next = replay_free_list;
     replay_free_list = r;
     lsd_mutex_unlock (&replay_free_list_lock);
-    return;
 }
 
 
@@ -417,5 +413,4 @@ replay_drop_memory (void)
     }
     replay_free_list = NULL;
     lsd_mutex_unlock (&replay_free_list_lock);
-    return;
 }

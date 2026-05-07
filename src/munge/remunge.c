@@ -296,7 +296,6 @@ destroy_conf (conf_t conf)
     munge_ctx_destroy (conf->ctx);
     free (conf->tids);
     free (conf);
-    return;
 }
 
 
@@ -348,7 +347,6 @@ destroy_tdata (tdata_t tdata)
     }
     munge_ctx_destroy (tdata->ectx);
     free (tdata);
-    return;
 }
 
 
@@ -668,7 +666,6 @@ parse_cmdline (conf_t conf, int argc, char **argv)
         }
         conf->payload[conf->num_payload] = '\0';
     }
-    return;
 }
 
 
@@ -754,7 +751,6 @@ display_help (char *prog)
             "Specify max seconds for munge op before warning");
 
     printf ("\n");
-    return;
 }
 
 
@@ -773,7 +769,6 @@ display_strings (const char *header, munge_enum_t type)
         }
     }
     printf ("\n");
-    return;
 }
 
 
@@ -906,7 +901,6 @@ start_threads (conf_t conf)
         log_errno (EMUNGE_SNAFU, LOG_ERR,
             "Failed to destroy thread attribute");
     }
-    return;
 }
 
 
@@ -991,7 +985,6 @@ process_creds (conf_t conf)
             log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to wait on condition");
         }
     }
-    return;
 }
 
 
@@ -1066,7 +1059,6 @@ stop_threads (conf_t conf)
         printf ("\nWARNING: Results based on such a short time interval "
                 "are of low accuracy\n\n");
     }
-    return;
 }
 
 
@@ -1220,7 +1212,6 @@ remunge_cleanup (tdata_t tdata)
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to unlock mutex");
     }
     destroy_tdata (tdata);
-    return;
 }
 
 
@@ -1272,5 +1263,4 @@ output_msg (const char *format, ...)
         buf[sizeof (buf) - 1] = '\0';   /* technically redundant */
     }
     printf ("%s\n", buf);
-    return;
 }

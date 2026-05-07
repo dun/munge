@@ -119,7 +119,6 @@ _encode_init (char **cred, munge_ctx_t ctx)
             ctx->error_str = NULL;
         }
     }
-    return;
 }
 
 

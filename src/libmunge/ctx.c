@@ -138,7 +138,6 @@ munge_ctx_destroy (munge_ctx_t ctx)
         free (ctx->error_str);
     }
     free (ctx);
-    return;
 }
 
 

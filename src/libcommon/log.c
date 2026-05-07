@@ -140,7 +140,6 @@ log_close_file (void)
         (void) fclose (log_ctx.fp);
         log_ctx.fp = NULL;
     }
-    return;
 }
 
 
@@ -178,7 +177,6 @@ log_close_syslog (void)
         closelog ();
         log_ctx.got_syslog = 0;
     }
-    return;
 }
 
 
@@ -189,7 +187,6 @@ log_close_all (void)
 {
     log_close_file ();
     log_close_syslog ();
-    return;
 }
 
 
@@ -244,8 +241,6 @@ log_msg (int priority, const char *format, ...)
     va_start (vargs, format);
     _log_aux (0, priority, NULL, 0, format, vargs);
     va_end (vargs);
-
-    return;
 }
 
 
@@ -270,7 +265,6 @@ log_err_or_warn (int got_force, const char *format, ...)
     if (!got_force) {
         _log_die (1, priority, msg);
     }
-    return;
 }
 
 
@@ -431,7 +425,6 @@ _log_aux (int errnum, int priority, char *msgbuf, int msgbuflen,
         }
         errno = errno_save;
     }
-    return;
 }
 
 

@@ -81,5 +81,4 @@ cred_destroy (munge_cred_t c)
     }
     memwipe (c, sizeof *c);
     free (c);
-    return;
 }

@@ -167,7 +167,6 @@ xgetgrbuf_destroy (xgrbuf_p grbufp)
         }
         free (grbufp);
     }
-    return;
 }
 
 
@@ -194,7 +193,6 @@ xgetgrent_init (void)
     _gr_fp = NULL;
 #endif /* HAVE_GETGRENT_R_AIX */
     setgrent ();
-    return;
 }
 
 
@@ -325,7 +323,6 @@ xgetgrent_fini (void)
 /*  Portable encapsulation of endgrent().
  */
     endgrent ();
-    return;
 }
 
 

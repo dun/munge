@@ -134,7 +134,6 @@ m_msg_destroy (m_msg_t m)
         free (m->auth_c_str);
     }
     free (m);
-    return;
 }
 
 
@@ -170,7 +169,6 @@ m_msg_reset (m_msg_t m)
         }
         m->data = NULL;
     }
-    return;
 }
 
 
@@ -455,7 +453,6 @@ _get_timeval (struct timeval *tv, int msecs)
             tv->tv_usec %= 1000000;
         }
     }
-    return;
 }
 
 

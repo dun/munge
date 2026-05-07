@@ -146,7 +146,6 @@ xgetpwbuf_destroy (xpwbuf_p pwbufp)
         }
         free (pwbufp);
     }
-    return;
 }
 
 

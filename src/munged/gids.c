@@ -254,7 +254,6 @@ gids_destroy (gids_t gids)
                 strerror (errno));
     }
     free (gids);
-    return;
 }
 
 
@@ -288,7 +287,6 @@ gids_update (gids_t gids)
     if ((errno = pthread_mutex_unlock (&gids->mutex)) != 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to unlock gids mutex");
     }
-    return;
 }
 
 
@@ -414,7 +412,6 @@ _gids_map_update (gids_t gids)
     if (gid_hash != NULL) {
         hash_destroy (gid_hash);
     }
-    return;
 }
 
 
@@ -764,7 +761,6 @@ _gids_gid_head_destroy (gid_head_p g)
         node = node->next;
         free (node_tmp);
     }
-    return;
 }
 
 
@@ -843,7 +839,6 @@ _gids_uid_node_destroy (uid_node_p u)
         free (u->user);
     }
     free (u);
-    return;
 }
 
 
@@ -867,7 +862,6 @@ _gids_gid_hash_dump (hash_t gid_hash)
     }
     printf ("* GIDs Dump (%d UID%s):\n", n, ((n == 1) ? "" : "s"));
     hash_for_each (gid_hash, (hash_arg_f) _gids_gid_node_dump, NULL);
-    return;
 }
 
 
@@ -883,7 +877,6 @@ _gids_gid_node_dump (gid_head_p g, const uid_t *uidp, const void *null)
         printf (" %u", (unsigned) node->gid);
     }
     printf ("\n");
-    return;
 }
 
 
@@ -899,7 +892,6 @@ _gids_uid_hash_dump (hash_t uid_hash)
     }
     printf ("* UID Dump (%d user%s):\n", n, ((n == 1) ? "" : "s"));
     hash_for_each (uid_hash, (hash_arg_f) _gids_uid_node_dump, NULL);
-    return;
 }
 
 
@@ -909,7 +901,6 @@ _gids_uid_node_dump (uid_node_p u, const char *user, const void *null)
     assert (u->user == user);
 
     printf ("  %-10u: %s\n", (unsigned) u->uid, u->user);
-    return;
 }
 
 
@@ -925,7 +916,6 @@ _gids_ghost_hash_dump (hash_t ghost_hash)
     }
     printf ("* Ghost Dump (%d user%s):\n", n, ((n == 1) ? "" : "s"));
     hash_for_each (ghost_hash, (hash_arg_f) _gids_ghost_node_dump, NULL);
-    return;
 }
 
 
@@ -935,7 +925,6 @@ _gids_ghost_node_dump (const char *data, const char *user, const void *null)
     assert (data == user);
 
     printf ("  %s\n", user);
-    return;
 }
 
 #endif /* _GIDS_DEBUG */

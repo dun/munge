@@ -38,5 +38,4 @@ void
 display_version (void)
 {
     printf ("%s-%s (%s)\n", PACKAGE, VERSION, DATE);
-    return;
 }
