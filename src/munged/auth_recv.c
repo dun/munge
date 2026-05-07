@@ -316,7 +316,7 @@ auth_recv (m_msg_t m, uid_t *uid, gid_t *gid)
 #include <sys/socket.h>                 /* getsockopt, socklen_t, ucred, SOL_SOCKET, SO_PEERCRED */
 
 #if !HAVE_SOCKLEN_T
-typedef int socklen_t;                  /* socklen_t is uint32_t in Posix.1g */
+typedef int socklen_t;                  /* socklen_t is uint32_t in POSIX.1g */
 #endif /* !HAVE_SOCKLEN_T */
 
 /*  Receives the identity of the client that sent msg [m],
@@ -354,7 +354,7 @@ auth_recv (m_msg_t m, uid_t *uid, gid_t *gid)
 #include <sys/un.h>                     /* LOCAL_PEERCRED */
 
 #if !HAVE_SOCKLEN_T
-typedef int socklen_t;                  /* socklen_t is uint32_t in Posix.1g */
+typedef int socklen_t;                  /* socklen_t is uint32_t in POSIX.1g */
 #endif /* !HAVE_SOCKLEN_T */
 
 /*  Receives the identity of the client that sent msg [m],
