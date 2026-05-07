@@ -77,7 +77,7 @@ _check_auth_server_dir (const char *dir, int got_force)
     int is_symlink;
     struct stat st;
     int n;
-    char ebuf [1024];
+    char ebuf[1024];
 
     if ((dir == NULL) || (*dir == '\0')) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
@@ -153,8 +153,8 @@ _check_auth_client_dir (const char *dir, int got_force)
     int is_symlink;
     struct stat st;
     int n;
-    char parent_dir [PATH_MAX];
-    char ebuf [1024];
+    char parent_dir[PATH_MAX];
+    char ebuf[1024];
 
     if ((dir == NULL) || (*dir == '\0')) {
         log_err (EMUNGE_SNAFU, LOG_ERR,

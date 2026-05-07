@@ -228,7 +228,7 @@ cipher_map_enum (munge_cipher_t cipher, void *dst)
 #include <stddef.h>                     /* size_t */
 #include <string.h>                     /* memcpy */
 
-static int _cipher_map [MUNGE_CIPHER_LAST_ITEM];
+static int _cipher_map[MUNGE_CIPHER_LAST_ITEM];
 
 static int _cipher_update_aux (cipher_ctx *x, void *dst, int *dstlenp,
     const void *src, int srclen);
@@ -240,12 +240,12 @@ _cipher_init_subsystem (void)
     int i;
 
     for (i = 0; i < MUNGE_CIPHER_LAST_ITEM; i++) {
-        _cipher_map [i] = -1;
+        _cipher_map[i] = -1;
     }
-    _cipher_map [MUNGE_CIPHER_BLOWFISH] = GCRY_CIPHER_BLOWFISH;
-    _cipher_map [MUNGE_CIPHER_CAST5] = GCRY_CIPHER_CAST5;
-    _cipher_map [MUNGE_CIPHER_AES128] = GCRY_CIPHER_AES128;
-    _cipher_map [MUNGE_CIPHER_AES256] = GCRY_CIPHER_AES256;
+    _cipher_map[MUNGE_CIPHER_BLOWFISH] = GCRY_CIPHER_BLOWFISH;
+    _cipher_map[MUNGE_CIPHER_CAST5] = GCRY_CIPHER_CAST5;
+    _cipher_map[MUNGE_CIPHER_AES128] = GCRY_CIPHER_AES128;
+    _cipher_map[MUNGE_CIPHER_AES256] = GCRY_CIPHER_AES256;
     return;
 }
 
@@ -553,7 +553,7 @@ _cipher_map_enum (munge_cipher_t cipher, void *dst)
     int algo = -1;
 
     if ((cipher > MUNGE_CIPHER_DEFAULT) && (cipher < MUNGE_CIPHER_LAST_ITEM)) {
-        algo = _cipher_map [cipher];
+        algo = _cipher_map[cipher];
     }
     if (algo < 0) {
         return (-1);
@@ -576,7 +576,7 @@ _cipher_map_enum (munge_cipher_t cipher, void *dst)
 #include <openssl/crypto.h>
 #include <openssl/evp.h>
 
-static const EVP_CIPHER *_cipher_map [MUNGE_CIPHER_LAST_ITEM];
+static const EVP_CIPHER *_cipher_map[MUNGE_CIPHER_LAST_ITEM];
 
 
 void
@@ -585,17 +585,17 @@ _cipher_init_subsystem (void)
     int i;
 
     for (i = 0; i < MUNGE_CIPHER_LAST_ITEM; i++) {
-        _cipher_map [i] = NULL;
+        _cipher_map[i] = NULL;
     }
-    _cipher_map [MUNGE_CIPHER_BLOWFISH] = EVP_bf_cbc ();
-    _cipher_map [MUNGE_CIPHER_CAST5] = EVP_cast5_cbc ();
+    _cipher_map[MUNGE_CIPHER_BLOWFISH] = EVP_bf_cbc ();
+    _cipher_map[MUNGE_CIPHER_CAST5] = EVP_cast5_cbc ();
 
 #if HAVE_EVP_AES_128_CBC
-    _cipher_map [MUNGE_CIPHER_AES128] = EVP_aes_128_cbc ();
+    _cipher_map[MUNGE_CIPHER_AES128] = EVP_aes_128_cbc ();
 #endif /* HAVE_EVP_AES_128_CBC */
 
 #if HAVE_EVP_AES_256_CBC && HAVE_EVP_SHA256
-    _cipher_map [MUNGE_CIPHER_AES256] = EVP_aes_256_cbc ();
+    _cipher_map[MUNGE_CIPHER_AES256] = EVP_aes_256_cbc ();
 #endif /* HAVE_EVP_AES_256_CBC && HAVE_EVP_SHA256 */
 
     return;
@@ -756,7 +756,7 @@ _cipher_map_enum (munge_cipher_t cipher, void *dst)
     const EVP_CIPHER *algo = NULL;
 
     if ((cipher > MUNGE_CIPHER_DEFAULT) && (cipher < MUNGE_CIPHER_LAST_ITEM)) {
-        algo = _cipher_map [cipher];
+        algo = _cipher_map[cipher];
     }
     if (algo == NULL) {
         return (-1);

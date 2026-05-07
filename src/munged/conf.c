@@ -709,7 +709,7 @@ _conf_set_cwd (conf_t conf)
 /*  Set the current working directory in order to fix relative paths so these
  *    locations can still be accessed after chdir() is called.
  */
-    char buf [PATH_MAX];
+    char buf[PATH_MAX];
     char *rv;
 
     rv = getcwd (buf, sizeof (buf));
@@ -1098,8 +1098,8 @@ _conf_open_keyfile (const char *keyfile, int got_force)
     int is_symlink;
     struct stat st;
     int n;
-    char keydir [PATH_MAX];
-    char ebuf [1024];
+    char keydir[PATH_MAX];
+    char ebuf[1024];
     int fd;
 
     if ((keyfile == NULL) || (*keyfile == '\0')) {

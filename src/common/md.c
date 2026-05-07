@@ -215,7 +215,7 @@ md_map_enum (munge_mac_t md, void *dst)
 
 #include <gcrypt.h>
 
-static int _md_map [MUNGE_MAC_LAST_ITEM];
+static int _md_map[MUNGE_MAC_LAST_ITEM];
 
 
 static void
@@ -224,13 +224,13 @@ _md_init_subsystem (void)
     int i;
 
     for (i = 0; i < MUNGE_MAC_LAST_ITEM; i++) {
-        _md_map [i] = -1;
+        _md_map[i] = -1;
     }
-    _md_map [MUNGE_MAC_MD5] = GCRY_MD_MD5;
-    _md_map [MUNGE_MAC_SHA1] = GCRY_MD_SHA1;
-    _md_map [MUNGE_MAC_RIPEMD160] = GCRY_MD_RMD160;
-    _md_map [MUNGE_MAC_SHA256] = GCRY_MD_SHA256;
-    _md_map [MUNGE_MAC_SHA512] = GCRY_MD_SHA512;
+    _md_map[MUNGE_MAC_MD5] = GCRY_MD_MD5;
+    _md_map[MUNGE_MAC_SHA1] = GCRY_MD_SHA1;
+    _md_map[MUNGE_MAC_RIPEMD160] = GCRY_MD_RMD160;
+    _md_map[MUNGE_MAC_SHA256] = GCRY_MD_SHA256;
+    _md_map[MUNGE_MAC_SHA512] = GCRY_MD_SHA512;
     return;
 }
 
@@ -318,7 +318,7 @@ _md_map_enum (munge_mac_t md, void *dst)
     int algo = -1;
 
     if ((md > MUNGE_MAC_DEFAULT) && (md < MUNGE_MAC_LAST_ITEM)) {
-        algo = _md_map [md];
+        algo = _md_map[md];
     }
     if (algo < 0) {
         return (-1);
@@ -340,7 +340,7 @@ _md_map_enum (munge_mac_t md, void *dst)
 
 #include <openssl/evp.h>
 
-static const EVP_MD * _md_map [MUNGE_MAC_LAST_ITEM];
+static const EVP_MD * _md_map[MUNGE_MAC_LAST_ITEM];
 
 static int _md_ctx_create (md_ctx *x);
 
@@ -351,18 +351,18 @@ _md_init_subsystem (void)
     int i;
 
     for (i = 0; i < MUNGE_MAC_LAST_ITEM; i++) {
-        _md_map [i] = NULL;
+        _md_map[i] = NULL;
     }
-    _md_map [MUNGE_MAC_MD5] = EVP_md5 ();
-    _md_map [MUNGE_MAC_SHA1] = EVP_sha1 ();
-    _md_map [MUNGE_MAC_RIPEMD160] = EVP_ripemd160 ();
+    _md_map[MUNGE_MAC_MD5] = EVP_md5 ();
+    _md_map[MUNGE_MAC_SHA1] = EVP_sha1 ();
+    _md_map[MUNGE_MAC_RIPEMD160] = EVP_ripemd160 ();
 
 #if HAVE_EVP_SHA256
-    _md_map [MUNGE_MAC_SHA256] = EVP_sha256 ();
+    _md_map[MUNGE_MAC_SHA256] = EVP_sha256 ();
 #endif /* HAVE_EVP_SHA256 */
 
 #if HAVE_EVP_SHA512
-    _md_map [MUNGE_MAC_SHA512] = EVP_sha512 ();
+    _md_map[MUNGE_MAC_SHA512] = EVP_sha512 ();
 #endif /* HAVE_EVP_SHA512 */
 
     return;
@@ -532,7 +532,7 @@ _md_map_enum (munge_mac_t md, void *dst)
     const EVP_MD *algo = NULL;
 
     if ((md > MUNGE_MAC_DEFAULT) && (md < MUNGE_MAC_LAST_ITEM)) {
-        algo = _md_map [md];
+        algo = _md_map[md];
     }
     if (algo == NULL) {
         return (-1);

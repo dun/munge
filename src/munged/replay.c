@@ -69,7 +69,7 @@ union replay_node {
     } alloc;
     struct {
         time_t t_expired;               /* time after which cred expires     */
-        unsigned char mac [MUNGE_MINIMUM_MD_LEN];       /* msg auth code     */
+        unsigned char mac[MUNGE_MINIMUM_MD_LEN];        /* msg auth code     */
     } data;
 };
 

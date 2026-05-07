@@ -65,7 +65,7 @@ static int _daemonpipe_fd_write = -1;
 int
 daemonpipe_create (void)
 {
-    int fd_pipe [2];
+    int fd_pipe[2];
     int errno_bak;
 
     if (pipe (fd_pipe) < 0) {
@@ -143,7 +143,7 @@ daemonpipe_read (int *statusptr, int *priorityptr,
         char *dstbufptr, size_t dstbuflen)
 {
     signed char c;
-    char buf [1024];
+    char buf[1024];
     ssize_t n, m;
 
     if ((statusptr == NULL) || (priorityptr == NULL) || (dstbufptr == NULL)) {

@@ -609,7 +609,7 @@ _xgetgrbuf_copy_struct (const struct group *src, struct group *dst,
     }
     for (i = 0; i < num_ptrs; i++) {
         if (_xgetgrbuf_copy_string
-                (src->gr_mem [i], &(dst->gr_mem [i]), &p, &num_bytes) < 0) {
+                (src->gr_mem[i], &(dst->gr_mem[i]), &p, &num_bytes) < 0) {
             goto err;
         }
     }

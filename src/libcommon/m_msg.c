@@ -200,8 +200,8 @@ m_msg_send (m_msg_t m, m_msg_type_t type, size_t maxlen)
  */
     munge_err_t e;
     int n, nsend;
-    uint8_t hdr [MUNGE_MSG_HDR_SIZE];
-    struct iovec iov [2];
+    uint8_t hdr[MUNGE_MSG_HDR_SIZE];
+    struct iovec iov[2];
     struct timeval tv;
 
     assert (m != NULL);
@@ -313,7 +313,7 @@ m_msg_recv (m_msg_t m, m_msg_type_t type, size_t maxlen)
  *  Returns a standard munge error code.
  */
     int n, nrecv;
-    uint8_t hdr [MUNGE_MSG_HDR_SIZE];
+    uint8_t hdr[MUNGE_MSG_HDR_SIZE];
     struct timeval tv;
 
     assert (m != NULL);

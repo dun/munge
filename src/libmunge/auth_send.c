@@ -257,7 +257,7 @@ _name_auth_file (const char *pipe_name, const char *file_dir,
     }
     m = rnd_bin_len / 2;
     for (i = 0; i < m; i++) {
-        rnd_bin [i] ^= rnd_bin [i + m];
+        rnd_bin[i] ^= rnd_bin[i + m];
     }
     if (!(strbin2hex (rnd_asc, rnd_asc_len, rnd_bin, m))) {
         goto err;

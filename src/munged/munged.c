@@ -201,7 +201,7 @@ daemonize_init (char *progname, conf_t conf)
     pid_t pid;
     int status;
     int priority;
-    char buf [1024];
+    char buf[1024];
 
     /*  Clear file mode creation mask.
      */
@@ -335,8 +335,8 @@ open_logfile (const char *logfile, int priority, int got_force)
     int is_missing;
     struct stat st;
     int rv;
-    char logdir [PATH_MAX];
-    char ebuf [1024];
+    char logdir[PATH_MAX];
+    char ebuf[1024];
     mode_t mask;
     FILE *fp;
 
@@ -476,8 +476,8 @@ write_pidfile (const char *pidfile, int got_force)
  *    the lock), but before the original parent process terminates (i.e.,
  *    before daemonize_fini()).
  */
-    char piddir [PATH_MAX];
-    char ebuf [1024];
+    char piddir[PATH_MAX];
+    char ebuf[1024];
     int rv;
     mode_t mask;
     FILE *fp;
@@ -596,8 +596,8 @@ static void
 sock_create (conf_t conf)
 {
     size_t path_len;
-    char sockdir [PATH_MAX];
-    char ebuf [1024];
+    char sockdir[PATH_MAX];
+    char ebuf[1024];
     int sd;
     struct sockaddr_un addr;
     mode_t mask;

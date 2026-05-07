@@ -246,7 +246,7 @@ _random_read_entropy_from_kernel (void)
  *  Returns the number of bytes of entropy added, or -1 on error.
  */
     int n;
-    unsigned char buf [RANDOM_SOURCE_BYTES];
+    unsigned char buf[RANDOM_SOURCE_BYTES];
 
     n = entropy_read_csprng (buf, sizeof (buf));
     if (n > 0) {
@@ -273,8 +273,8 @@ _random_read_entropy_from_file (const char *path)
  */
     int is_path_secure = 0;
     int n;
-    char dir [PATH_MAX];
-    char ebuf [1024];
+    char dir[PATH_MAX];
+    char ebuf[1024];
     int rv;
 
     if ((path == NULL) || (path[0] == '\0')) {
@@ -351,7 +351,7 @@ _random_read_seed (const char *path, int num_bytes)
     int num_want;
     int n;
     struct stat st;
-    unsigned char buf [RANDOM_SEED_BYTES];
+    unsigned char buf[RANDOM_SEED_BYTES];
 
     assert (path != NULL);
     assert (num_bytes > 0);
@@ -447,7 +447,7 @@ _random_write_seed (const char *path, int num_bytes)
     int num_left;
     int num_want;
     int n;
-    unsigned char buf [RANDOM_SEED_BYTES];
+    unsigned char buf[RANDOM_SEED_BYTES];
 
     assert (path != NULL);
     assert (num_bytes > 0);

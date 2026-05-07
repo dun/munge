@@ -73,7 +73,7 @@ static int _path_set_err (int rc, char *buf, size_t buflen,
 int
 path_canonicalize (const char *src, char *dst, size_t dstlen)
 {
-    char buf [PATH_MAX];                /* realpath() requires PATH_MAX bytes */
+    char buf[PATH_MAX];                /* realpath() requires PATH_MAX bytes */
     size_t buflen;
 
     if (!src || !*src || !dst) {
@@ -153,7 +153,7 @@ int
 path_is_accessible (const char *path, char *errbuf, size_t errbuflen)
 {
     int n;
-    char buf [PATH_MAX];
+    char buf[PATH_MAX];
     struct stat st;
     char *p;
 
@@ -215,7 +215,7 @@ path_is_secure (const char *path, char *errbuf, size_t errbuflen,
                 path_security_flag_t flags)
 {
     int n;
-    char buf [PATH_MAX];
+    char buf[PATH_MAX];
     struct stat st;
     char *p;
     uid_t euid;
@@ -336,7 +336,7 @@ _path_set_err (int rc, char *buf, size_t buflen, const char *format, ...)
     if ((buf != NULL) && (buflen > 0)) {
         va_start (vargs, format);
         (void) vsnprintf (buf, buflen, format, vargs);
-        buf [buflen - 1] = '\0';
+        buf[buflen - 1] = '\0';
         va_end (vargs);
     }
     return (rc);

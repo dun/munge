@@ -199,7 +199,7 @@ struct conf {
     void *data;                         /* unmunged payload data             */
     uid_t uid;                          /* process uid according to cred     */
     gid_t gid;                          /* process gid according to cred     */
-    char key[ MUNGE_KEY_LAST ];         /* key flag array (true if enabled)  */
+    char key[MUNGE_KEY_LAST];           /* key flag array (true if enabled)  */
     int key_width;                      /* num chars reserved for key field  */
     unsigned got_numeric:1;             /* flag for NUMERIC option           */
     unsigned is_ttl_ignored:1;
@@ -699,7 +699,7 @@ display_encode_host (conf_t conf)
     munge_err_t err;
     const char *p;
     struct in_addr addr;
-    char addr_str[ INET_ADDRSTRLEN ];
+    char addr_str[INET_ADDRSTRLEN];
 
     assert (conf != NULL);
 
@@ -745,7 +745,7 @@ display_encode_time (conf_t conf)
     time_t t;
     struct tm *tm_ptr;
     int t_len;
-    char t_buf[ MAX_TIME_STR ];
+    char t_buf[MAX_TIME_STR];
 
     assert (conf != NULL);
 
@@ -795,7 +795,7 @@ display_decode_time (conf_t conf)
     time_t t;
     struct tm *tm_ptr;
     int t_len;
-    char t_buf[ MAX_TIME_STR ];
+    char t_buf[MAX_TIME_STR];
 
     assert (conf != NULL);
 

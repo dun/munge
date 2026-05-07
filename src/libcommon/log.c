@@ -64,7 +64,7 @@ struct log_ctx {
     int got_fprintf_error;
     int priority;
     int options;
-    char id [LOG_IDENTITY_MAXLEN];
+    char id[LOG_IDENTITY_MAXLEN];
 };
 
 
@@ -201,7 +201,7 @@ void
 log_err (int status, int priority, const char *format, ...)
 {
     va_list vargs;
-    char msg [LOG_BUFFER_MAXLEN];
+    char msg[LOG_BUFFER_MAXLEN];
 
     va_start (vargs, format);
     _log_aux (0, priority, msg, sizeof (msg), format, vargs);
@@ -222,7 +222,7 @@ void
 log_errno (int status, int priority, const char *format, ...)
 {
     va_list vargs;
-    char msg [LOG_BUFFER_MAXLEN];
+    char msg[LOG_BUFFER_MAXLEN];
 
     va_start (vargs, format);
     _log_aux (errno, priority, msg, sizeof (msg), format, vargs);
@@ -258,7 +258,7 @@ void
 log_err_or_warn (int got_force, const char *format, ...)
 {
     va_list vargs;
-    char msg [LOG_BUFFER_MAXLEN];
+    char msg[LOG_BUFFER_MAXLEN];
     int priority;
 
     priority = (got_force) ? LOG_WARNING : LOG_ERR;
@@ -282,7 +282,7 @@ static void
 _log_aux (int errnum, int priority, char *msgbuf, int msgbuflen,
         const char *format, va_list vargs)
 {
-    char buf [LOG_BUFFER_MAXLEN];       /* message buffer                    */
+    char buf[LOG_BUFFER_MAXLEN];       /* message buffer                    */
     char *p;                            /* current position in msg buf       */
     char *sbuf;                         /* syslog portion of message buffer  */
     char *prefix;                       /* priority prefix message           */
@@ -302,13 +302,13 @@ _log_aux (int errnum, int priority, char *msgbuf, int msgbuflen,
     sbuf = NULL;
     len = sizeof (buf);
 
-    if ((!format) || (format [strlen (format) - 1] != '\n')) {
+    if ((!format) || (format[strlen (format) - 1] != '\n')) {
         append_nl = 1;
         --len;                          /* reserve space for trailing LF */
     }
     /*  Add identity string.
      */
-    if (log_ctx.id [0] != '\0') {
+    if (log_ctx.id[0] != '\0') {
         n = snprintf (p, len, "%s: ", log_ctx.id);
         if ((n < 0) || (n >= len)) {
             p += len - 1;
