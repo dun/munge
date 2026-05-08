@@ -63,10 +63,10 @@ strdupf (const char *fmt, ...)
         return NULL;
     }
     va_start (vargs, fmt);
-    vsnprintf (buf, sizeof (buf), fmt, vargs);
+    vsnprintf (buf, sizeof buf, fmt, vargs);
     va_end (vargs);
 
-    buf[sizeof (buf) - 1] = '\0';        /* ensure buf is null-terminated */
+    buf[sizeof buf - 1] = '\0';         /* ensure buf is null-terminated */
 
     if (!(p = strdup (buf))) {
         return NULL;

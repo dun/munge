@@ -227,7 +227,7 @@ daemonize_init (char *progname, conf_t conf)
             log_errno (EMUNGE_SNAFU, LOG_ERR,
                 "Failed to close write-end of daemonpipe");
         }
-        if (daemonpipe_read (&status, &priority, buf, sizeof (buf)) < 0) {
+        if (daemonpipe_read (&status, &priority, buf, sizeof buf) < 0) {
             log_errno (EMUNGE_SNAFU, LOG_ERR,
                 "Failed to read from daemonpipe");
         }
@@ -378,12 +378,12 @@ open_logfile (const char *logfile, int priority, int got_force)
     }
     /*  Ensure logfile dir is secure against modification by others.
      */
-    rv = path_dirname (logfile, logdir, sizeof (logdir));
+    rv = path_dirname (logfile, logdir, sizeof logdir);
     if (rv < 0) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
             "Failed to determine dirname of logfile \"%s\"", logfile);
     }
-    rv = path_is_secure (logdir, ebuf, sizeof (ebuf),
+    rv = path_is_secure (logdir, ebuf, sizeof ebuf,
         PATH_SECURITY_IGNORE_GROUP_WRITE);
     if (rv < 0) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
@@ -489,11 +489,11 @@ write_pidfile (const char *pidfile, int got_force)
     }
     /*  Ensure pidfile dir is secure against modification by others.
      */
-    if (path_dirname (pidfile, piddir, sizeof (piddir)) < 0) {
+    if (path_dirname (pidfile, piddir, sizeof piddir) < 0) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
             "Failed to determine dirname of PIDfile \"%s\"", pidfile);
     }
-    rv = path_is_secure (piddir, ebuf, sizeof (ebuf), PATH_SECURITY_NO_FLAGS);
+    rv = path_is_secure (piddir, ebuf, sizeof ebuf, PATH_SECURITY_NO_FLAGS);
     if (rv < 0) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
             "Failed to check PIDfile dir \"%s\": %s", piddir, ebuf);
@@ -609,12 +609,12 @@ sock_create (conf_t conf)
     }
     /*  Ensure socket dir is secure against modification by others.
      */
-    rv = path_dirname (conf->socket_name, sockdir, sizeof (sockdir));
+    rv = path_dirname (conf->socket_name, sockdir, sizeof sockdir);
     if (rv < 0) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
             "Failed to determine dirname of socket \"%s\"", conf->socket_name);
     }
-    rv = path_is_secure (sockdir, ebuf, sizeof (ebuf), PATH_SECURITY_NO_FLAGS);
+    rv = path_is_secure (sockdir, ebuf, sizeof ebuf, PATH_SECURITY_NO_FLAGS);
     if (rv < 0) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
             "Failed to check socket dir \"%s\": %s", sockdir, ebuf);
@@ -624,7 +624,7 @@ sock_create (conf_t conf)
     }
     /*  Ensure socket dir is accessible by all.
      */
-    rv = path_is_accessible (sockdir, ebuf, sizeof (ebuf));
+    rv = path_is_accessible (sockdir, ebuf, sizeof ebuf);
     if (rv < 0) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
             "Failed to check socket dir \"%s\": %s", sockdir, ebuf);
@@ -656,14 +656,14 @@ sock_create (conf_t conf)
     if (sd < 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to create socket");
     }
-    memset (&addr, 0, sizeof (addr));
+    memset (&addr, 0, sizeof addr);
     addr.sun_family = AF_UNIX;
     memcpy (addr.sun_path, conf->socket_name, path_len + 1);
     /*
      *  Ensure socket is accessible by all.
      */
     mask = umask (0);
-    rv = bind (sd, (struct sockaddr *) &addr, sizeof (addr));
+    rv = bind (sd, (struct sockaddr *) &addr, sizeof addr);
     umask (mask);
 
     if (rv < 0) {

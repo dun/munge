@@ -163,7 +163,7 @@ daemonpipe_read (int *statusptr, int *priorityptr,
     }
     /*  Read status.
      */
-    n = fd_read_n (_daemonpipe_fd_read, &c, sizeof (c));
+    n = fd_read_n (_daemonpipe_fd_read, &c, sizeof c);
     if (n < 0) {
         return -1;
     }
@@ -176,7 +176,7 @@ daemonpipe_read (int *statusptr, int *priorityptr,
     }
     /*  Read priority.
      */
-    n = fd_read_n (_daemonpipe_fd_read, &c, sizeof (c));
+    n = fd_read_n (_daemonpipe_fd_read, &c, sizeof c);
     if (n < 0) {
         return -1;
     }
@@ -188,7 +188,7 @@ daemonpipe_read (int *statusptr, int *priorityptr,
     }
     /*  Read error message.
      */
-    n = fd_read_n (_daemonpipe_fd_read, buf, sizeof (buf));
+    n = fd_read_n (_daemonpipe_fd_read, buf, sizeof buf);
     if (n < 0) {
         return -1;
     }
@@ -196,7 +196,7 @@ daemonpipe_read (int *statusptr, int *priorityptr,
         /*
          *  Ensure buf[] is null-terminated.
          */
-        m = (n < sizeof (buf)) ? n : sizeof (buf) - 1;
+        m = (n < sizeof buf) ? n : sizeof buf - 1;
         buf[m] = '\0';
         /*
          *  Remove trailing LF if present.
@@ -235,7 +235,7 @@ daemonpipe_write (int status, int priority, const char *msg)
     /*  Write status.
      */
     c = (signed char) status;
-    len = sizeof (c);
+    len = sizeof c;
     n = fd_write_n (_daemonpipe_fd_write, &c, len);
     if (n != len) {
         return -1;
@@ -243,7 +243,7 @@ daemonpipe_write (int status, int priority, const char *msg)
     /*  Write priority.
      */
     c = (signed char) priority;
-    len = sizeof (c);
+    len = sizeof c;
     n = fd_write_n (_daemonpipe_fd_write, &c, len);
     if (n != len) {
         return -1;

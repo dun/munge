@@ -150,7 +150,7 @@ md_cleanup (md_ctx *x)
         return -1;
     }
     rc = _md_cleanup (x);
-    memset (x, 0, sizeof (*x));
+    memset (x, 0, sizeof *x);
     return rc;
 }
 

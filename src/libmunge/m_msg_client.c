@@ -210,7 +210,7 @@ _m_msg_client_connect (m_msg_t m, char *path)
             strerror (errno)));
         return EMUNGE_SOCKET;
     }
-    memset (&addr, 0, sizeof (addr));
+    memset (&addr, 0, sizeof addr);
     addr.sun_family = AF_UNIX;
     memcpy (addr.sun_path, path, path_len + 1);
     i = 1;
@@ -224,7 +224,7 @@ _m_msg_client_connect (m_msg_t m, char *path)
          * BSD: connect() returns ECONNREFUSED for UNIX domain stream sockets
          *   when the listening socket's queue is full. [Stevens UNPv1]
          */
-        n = connect (sd, (struct sockaddr *) &addr, sizeof (addr));
+        n = connect (sd, (struct sockaddr *) &addr, sizeof addr);
 
         if (n == 0) {
             break;

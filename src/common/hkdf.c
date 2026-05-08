@@ -111,7 +111,7 @@ hkdf_ctx_create (void)
 {
     hkdf_ctx_t *ctxp;
 
-    ctxp = calloc (1, sizeof (*ctxp));
+    ctxp = calloc (1, sizeof *ctxp);
     return ctxp;
 }
 
@@ -469,8 +469,8 @@ _hkdf_expand (hkdf_ctx_t *ctxp, const void *prk, size_t prklen,
                 goto err;
             }
         }
-        assert (sizeof (round) == 1);
-        rv = mac_update (&mac_ctx, &round, sizeof (round));
+        assert (sizeof round == 1);
+        rv = mac_update (&mac_ctx, &round, sizeof round);
         if (rv == -1) {
             log_msg (LOG_ERR,
                     "Failed to update HKDF MAC ctx with count "

@@ -201,7 +201,7 @@ log_err (int status, int priority, const char *format, ...)
     char msg[LOG_BUFFER_MAXLEN];
 
     va_start (vargs, format);
-    _log_aux (0, priority, msg, sizeof (msg), format, vargs);
+    _log_aux (0, priority, msg, sizeof msg, format, vargs);
     va_end (vargs);
 
     _log_die (status, priority, msg);
@@ -222,7 +222,7 @@ log_errno (int status, int priority, const char *format, ...)
     char msg[LOG_BUFFER_MAXLEN];
 
     va_start (vargs, format);
-    _log_aux (errno, priority, msg, sizeof (msg), format, vargs);
+    _log_aux (errno, priority, msg, sizeof msg, format, vargs);
     va_end (vargs);
 
     _log_die (status, priority, msg);
@@ -259,7 +259,7 @@ log_err_or_warn (int got_force, const char *format, ...)
     priority = (got_force) ? LOG_WARNING : LOG_ERR;
 
     va_start (vargs, format);
-    _log_aux (0, priority, msg, sizeof (msg), format, vargs);
+    _log_aux (0, priority, msg, sizeof msg, format, vargs);
     va_end (vargs);
 
     if (!got_force) {
@@ -294,7 +294,7 @@ _log_aux (int errnum, int priority, char *msgbuf, int msgbuflen,
     }
     p = buf;
     sbuf = NULL;
-    len = sizeof (buf);
+    len = sizeof buf;
 
     if ((!format) || (format[strlen (format) - 1] != '\n')) {
         append_nl = 1;

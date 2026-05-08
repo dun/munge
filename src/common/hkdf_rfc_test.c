@@ -107,9 +107,9 @@ hkdf_test (munge_mac_t md,
             return -1;
         }
     }
-    if (okmlen > sizeof (buf)) {
+    if (okmlen > sizeof buf) {
         diag ("Exceeded %zu-byte buffer with %zu bytes of "
-                "HKDF output keying material", sizeof (buf), okmlen);
+                "HKDF output keying material", sizeof buf, okmlen);
         return -1;
     }
     buflen = okmlen;
@@ -156,8 +156,8 @@ hkdf_test_1 (void)
     };
     const munge_mac_t md = MUNGE_MAC_SHA256;
 
-    return hkdf_test (md, ikm, sizeof (ikm), salt, sizeof (salt),
-            info, sizeof (info), okm, sizeof (okm));
+    return hkdf_test (md, ikm, sizeof ikm, salt, sizeof salt,
+            info, sizeof info, okm, sizeof okm);
 }
 
 
@@ -204,8 +204,8 @@ hkdf_test_2 (void)
     };
     const munge_mac_t md = MUNGE_MAC_SHA256;
 
-    return hkdf_test (md, ikm, sizeof (ikm), salt, sizeof (salt),
-            info, sizeof (info), okm, sizeof (okm));
+    return hkdf_test (md, ikm, sizeof ikm, salt, sizeof salt,
+            info, sizeof info, okm, sizeof okm);
 }
 
 
@@ -232,8 +232,7 @@ hkdf_test_3 (void)
     };
     const munge_mac_t md = MUNGE_MAC_SHA256;
 
-    return hkdf_test (md, ikm, sizeof (ikm), salt, 0, info, 0,
-            okm, sizeof (okm));
+    return hkdf_test (md, ikm, sizeof ikm, salt, 0, info, 0, okm, sizeof okm);
 }
 
 
@@ -260,8 +259,8 @@ hkdf_test_4 (void)
     };
     const munge_mac_t md = MUNGE_MAC_SHA1;
 
-    return hkdf_test (md, ikm, sizeof (ikm), salt, sizeof (salt),
-            info, sizeof (info), okm, sizeof (okm));
+    return hkdf_test (md, ikm, sizeof ikm, salt, sizeof salt,
+            info, sizeof info, okm, sizeof okm);
 }
 
 
@@ -308,8 +307,8 @@ hkdf_test_5 (void)
     };
     const munge_mac_t md = MUNGE_MAC_SHA1;
 
-    return hkdf_test (md, ikm, sizeof (ikm), salt, sizeof (salt),
-            info, sizeof (info), okm, sizeof (okm));
+    return hkdf_test (md, ikm, sizeof ikm, salt, sizeof salt,
+            info, sizeof info, okm, sizeof okm);
 }
 
 
@@ -336,8 +335,7 @@ hkdf_test_6 (void)
     };
     const munge_mac_t md = MUNGE_MAC_SHA1;
 
-    return hkdf_test (md, ikm, sizeof (ikm), salt, 0, info, 0,
-            okm, sizeof (okm));
+    return hkdf_test (md, ikm, sizeof ikm, salt, 0, info, 0, okm, sizeof okm);
 }
 
 
@@ -361,8 +359,7 @@ hkdf_test_7 (void)
     };
     const munge_mac_t md = MUNGE_MAC_SHA1;
 
-    return hkdf_test (md, ikm, sizeof (ikm), NULL, 0, info, 0,
-            okm, sizeof (okm));
+    return hkdf_test (md, ikm, sizeof ikm, NULL, 0, info, 0, okm, sizeof okm);
 }
 
 

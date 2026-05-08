@@ -237,7 +237,7 @@ enc_init (munge_cred_t c)
                 m->cipher));
         }
         if (c->iv_len > 0) {
-            assert (c->iv_len <= sizeof (c->iv));
+            assert (c->iv_len <= sizeof c->iv);
             random_pseudo_bytes (c->iv, c->iv_len);
         }
     }
@@ -322,11 +322,11 @@ enc_pack_outer (munge_cred_t c)
 
     assert (c->outer_mem == NULL);
 
-    c->outer_mem_len += sizeof (c->version);
-    c->outer_mem_len += sizeof (m->cipher);
-    c->outer_mem_len += sizeof (m->mac);
-    c->outer_mem_len += sizeof (m->zip);
-    c->outer_mem_len += sizeof (m->realm_len);
+    c->outer_mem_len += sizeof c->version;
+    c->outer_mem_len += sizeof m->cipher;
+    c->outer_mem_len += sizeof m->mac;
+    c->outer_mem_len += sizeof m->zip;
+    c->outer_mem_len += sizeof m->realm_len;
     c->outer_mem_len += m->realm_len;
     c->outer_mem_len += c->iv_len;
     if (!(c->outer_mem = malloc (c->outer_mem_len))) {
@@ -335,26 +335,26 @@ enc_pack_outer (munge_cred_t c)
     p = c->outer = c->outer_mem;
     c->outer_len = c->outer_mem_len;
 
-    assert (sizeof (c->version) == 1);
+    assert (sizeof c->version == 1);
     *p = c->version;
-    p += sizeof (c->version);
+    p += sizeof c->version;
 
-    assert (sizeof (m->cipher) == 1);
+    assert (sizeof m->cipher == 1);
     *p = m->cipher;
-    p += sizeof (m->cipher);
+    p += sizeof m->cipher;
 
-    assert (sizeof (m->mac) == 1);
+    assert (sizeof m->mac == 1);
     *p = m->mac;
-    p += sizeof (m->mac);
+    p += sizeof m->mac;
 
-    assert (sizeof (m->zip) == 1);
+    assert (sizeof m->zip == 1);
     c->outer_zip_ref = p;
     *p = m->zip;
-    p += sizeof (m->zip);
+    p += sizeof m->zip;
 
-    assert (sizeof (m->realm_len) == 1);
+    assert (sizeof m->realm_len == 1);
     *p = m->realm_len;
-    p += sizeof (m->realm_len);
+    p += sizeof m->realm_len;
 
     if (m->realm_len > 0) {
         memcpy (p, m->realm_str, m->realm_len);
@@ -385,15 +385,15 @@ enc_pack_inner (munge_cred_t c)
     assert (c->inner_mem == NULL);
 
     c->inner_mem_len += c->salt_len;
-    c->inner_mem_len += sizeof (m->addr_len);
-    c->inner_mem_len += sizeof (m->addr);
-    c->inner_mem_len += sizeof (m->time0);
-    c->inner_mem_len += sizeof (m->ttl);
-    c->inner_mem_len += sizeof (m->client_uid);
-    c->inner_mem_len += sizeof (m->client_gid);
-    c->inner_mem_len += sizeof (m->auth_uid);
-    c->inner_mem_len += sizeof (m->auth_gid);
-    c->inner_mem_len += sizeof (m->data_len);
+    c->inner_mem_len += sizeof m->addr_len;
+    c->inner_mem_len += sizeof m->addr;
+    c->inner_mem_len += sizeof m->time0;
+    c->inner_mem_len += sizeof m->ttl;
+    c->inner_mem_len += sizeof m->client_uid;
+    c->inner_mem_len += sizeof m->client_gid;
+    c->inner_mem_len += sizeof m->auth_uid;
+    c->inner_mem_len += sizeof m->auth_gid;
+    c->inner_mem_len += sizeof m->data_len;
     c->inner_mem_len += m->data_len;
     if (!(c->inner_mem = malloc (c->inner_mem_len))) {
         return m_msg_set_err (m, EMUNGE_NO_MEMORY, NULL);
@@ -405,48 +405,48 @@ enc_pack_inner (munge_cred_t c)
     memcpy (p, c->salt, c->salt_len);
     p += c->salt_len;
 
-    assert (sizeof (m->addr_len) == 1);
-    assert (sizeof (conf->addr) == sizeof (m->addr));
-    assert (sizeof (conf->addr) < 256);
-    *p = m->addr_len = sizeof (m->addr);
-    p += sizeof (m->addr_len);
-    memcpy (p, &conf->addr, sizeof (m->addr));
-    p += sizeof (m->addr);
+    assert (sizeof m->addr_len == 1);
+    assert (sizeof conf->addr == sizeof m->addr);
+    assert (sizeof conf->addr < 256);
+    *p = m->addr_len = sizeof m->addr;
+    p += sizeof m->addr_len;
+    memcpy (p, &conf->addr, sizeof m->addr);
+    p += sizeof m->addr;
 
-    assert (sizeof (m->time0) == 4);
+    assert (sizeof m->time0 == 4);
     u32 = htonl (m->time0);
-    memcpy (p, &u32, sizeof (m->time0));
-    p += sizeof (m->time0);
+    memcpy (p, &u32, sizeof m->time0);
+    p += sizeof m->time0;
 
-    assert (sizeof (m->ttl) == 4);
+    assert (sizeof m->ttl == 4);
     u32 = htonl (m->ttl);
-    memcpy (p, &u32, sizeof (m->ttl));
-    p += sizeof (m->ttl);
+    memcpy (p, &u32, sizeof m->ttl);
+    p += sizeof m->ttl;
 
-    assert (sizeof (m->client_uid) == 4);
+    assert (sizeof m->client_uid == 4);
     u32 = htonl (m->client_uid);
-    memcpy (p, &u32, sizeof (m->client_uid));
-    p += sizeof (m->client_uid);
+    memcpy (p, &u32, sizeof m->client_uid);
+    p += sizeof m->client_uid;
 
-    assert (sizeof (m->client_gid) == 4);
+    assert (sizeof m->client_gid == 4);
     u32 = htonl (m->client_gid);
-    memcpy (p, &u32, sizeof (m->client_gid));
-    p += sizeof (m->client_gid);
+    memcpy (p, &u32, sizeof m->client_gid);
+    p += sizeof m->client_gid;
 
-    assert (sizeof (m->auth_uid) == 4);
+    assert (sizeof m->auth_uid == 4);
     u32 = htonl (m->auth_uid);
-    memcpy (p, &u32, sizeof (m->auth_uid));
-    p += sizeof (m->auth_uid);
+    memcpy (p, &u32, sizeof m->auth_uid);
+    p += sizeof m->auth_uid;
 
-    assert (sizeof (m->auth_gid) == 4);
+    assert (sizeof m->auth_gid == 4);
     u32 = htonl (m->auth_gid);
-    memcpy (p, &u32, sizeof (m->auth_gid));
-    p += sizeof (m->auth_gid);
+    memcpy (p, &u32, sizeof m->auth_gid);
+    p += sizeof m->auth_gid;
 
-    assert (sizeof (m->data_len) == 4);
+    assert (sizeof m->data_len == 4);
     u32 = htonl (m->data_len);
-    memcpy (p, &u32, sizeof (m->data_len));
-    p += sizeof (m->data_len);
+    memcpy (p, &u32, sizeof m->data_len);
+    p += sizeof m->data_len;
 
     if (m->data_len > 0) {
         memcpy (p, m->data, m->data_len);
@@ -543,7 +543,7 @@ enc_mac (munge_cred_t c)
             strdupf ("Failed to determine digest length for MAC type %d",
                 m->mac));
     }
-    assert (c->mac_len <= sizeof (c->mac));
+    assert (c->mac_len <= sizeof c->mac);
     memset (c->mac, 0, c->mac_len);
 
     /*  Compute MAC.
@@ -602,7 +602,7 @@ enc_encrypt (munge_cred_t c)
             strdupf ("Failed to determine DEK key length for MAC type %d",
                 m->mac));
     }
-    assert (c->dek_len <= sizeof (c->dek));
+    assert (c->dek_len <= sizeof c->dek);
 
     n = c->dek_len;
     if (mac_block (m->mac, conf->dek_key, conf->dek_key_len,

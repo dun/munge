@@ -157,7 +157,7 @@ path_is_accessible (const char *path, char *errbuf, size_t errbuflen)
     struct stat st;
     char *p;
 
-    n = path_canonicalize (path, buf, sizeof (buf));
+    n = path_canonicalize (path, buf, sizeof buf);
     if (n < 0) {
         return _path_set_err (-1, errbuf, errbuflen,
             "cannot canonicalize \"%s\": %s", path, strerror (errno));
@@ -220,7 +220,7 @@ path_is_secure (const char *path, char *errbuf, size_t errbuflen,
     char *p;
     uid_t euid;
 
-    n = path_canonicalize (path, buf, sizeof (buf));
+    n = path_canonicalize (path, buf, sizeof buf);
     if (n < 0) {
         return _path_set_err (-1, errbuf, errbuflen,
             "cannot canonicalize \"%s\": %s", path, strerror (errno));

@@ -358,14 +358,14 @@ _conf_get_opt_string (int short_opt, const char *long_opt,
     static char buf[1024];
 
     if (long_opt != NULL) {
-        (void) snprintf (buf, sizeof (buf), "--%s", long_opt);
+        (void) snprintf (buf, sizeof buf, "--%s", long_opt);
         return buf;
     }
     else if ((argv_str != NULL) && (strncmp (argv_str, "--", 2) == 0)) {
         return argv_str;
     }
     else if (isprint (short_opt)) {
-        (void) snprintf (buf, sizeof (buf), "-%c", short_opt);
+        (void) snprintf (buf, sizeof buf, "-%c", short_opt);
         return buf;
     }
     log_err (EMUNGE_SNAFU, LOG_ERR, "Failed to process command-line");

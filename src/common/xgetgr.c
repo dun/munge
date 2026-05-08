@@ -573,7 +573,7 @@ _xgetgrbuf_copy_struct (const struct group *src, struct group *dst,
     if (src->gr_passwd) {
         num_bytes += strlen (src->gr_passwd) + 1;
     }
-    num_bytes += num_ptrs * (sizeof (char *));
+    num_bytes += num_ptrs * sizeof (char *);
 
     /*  Ensure requisite buffer space.
      */
@@ -585,10 +585,10 @@ _xgetgrbuf_copy_struct (const struct group *src, struct group *dst,
     /*  Copy group entry.
      */
     assert (grbufp->len >= num_bytes);
-    memset (dst, 0, sizeof (*dst));
+    memset (dst, 0, sizeof *dst);
     p = grbufp->buf;
 
-    n = num_ptrs * (sizeof (char *));
+    n = num_ptrs * sizeof (char *);
     if (num_bytes < n) {
         goto err;
     }

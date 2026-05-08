@@ -56,9 +56,9 @@ main (int argc, char *argv[])
 
     /*  initialize bufs with different data in preparation for memcmp tests
      */
-    memset (buf, 1, sizeof (buf));
-    memset (vanillabuf, 2, sizeof (vanillabuf));
-    memset (partialbuf, 3, sizeof (partialbuf));
+    memset (buf, 1, sizeof buf);
+    memset (vanillabuf, 2, sizeof vanillabuf);
+    memset (partialbuf, 3, sizeof partialbuf);
 
     plan (NO_PLAN);
 
@@ -70,21 +70,21 @@ main (int argc, char *argv[])
     }
     /*  validate hkdf() with null parms and unset md
      */
-    buflen = sizeof (buf);
+    buflen = sizeof buf;
     ok (hkdf (NULL, buf, &buflen) < 0 && (errno == EINVAL),
             "hkdf failure for null ctx ptr");
 
-    buflen = sizeof (buf);
+    buflen = sizeof buf;
     ok (hkdf (hkdfp, NULL, &buflen) < 0 && (errno == EINVAL),
             "hkdf failure for null dst ptr");
 
-    buflen = sizeof (buf);
+    buflen = sizeof buf;
     ok (hkdf (hkdfp, buf, NULL) < 0 && (errno == EINVAL),
             "hkdf failure for null dstlenp value-result");
 
     /*  validate hkdf_ctx_set_md()
      */
-    buflen = sizeof (buf);
+    buflen = sizeof buf;
     ok (hkdf (hkdfp, buf, &buflen) < 0,
             "hkdf failure for unset md");
 
@@ -99,7 +99,7 @@ main (int argc, char *argv[])
 
     /*  validate hkdf_ctx_set_key()
      */
-    buflen = sizeof (buf);
+    buflen = sizeof buf;
     ok (hkdf (hkdfp, buf, &buflen) < 0,
             "hkdf failure for unset key");
 
@@ -112,7 +112,7 @@ main (int argc, char *argv[])
     ok (hkdf_ctx_set_key (hkdfp, "xyzzy", 5) == 0,
             "hkdf_ctx_set_key success for nonzero-length key");
 
-    buflen = sizeof (buf);
+    buflen = sizeof buf;
     ok (hkdf (hkdfp, buf, &buflen) == 0,
             "hkdf success for nonzero-length key");
 
@@ -121,10 +121,10 @@ main (int argc, char *argv[])
     ok (hkdf_ctx_set_key (hkdfp, "", 0) == 0,
             "hkdf_ctx_set_key success for zero-length key");
 
-    ok (sizeof (vanillabuf) == sizeof (buf),
+    ok (sizeof vanillabuf == sizeof buf,
             "hkdf vanillabuf size matches buf size");
 
-    buflen = sizeof (vanillabuf);
+    buflen = sizeof vanillabuf;
     ok (hkdf (hkdfp, vanillabuf, &buflen) == 0,
             "hkdf success for zero-length key");
 
@@ -133,10 +133,10 @@ main (int argc, char *argv[])
 
     /*  max dstlen = mdlen * HKDF_MAX_ROUNDS = 32 * 255 = 8160 bytes
      */
-    ok (sizeof (buf) > 32 * 255,
+    ok (sizeof buf > 32 * 255,
             "hkdf buf size suitable for max dst check");
 
-    buflen = sizeof (buf);
+    buflen = sizeof buf;
     ok (hkdf (hkdfp, buf, &buflen) == 0,
             "hkdf success for max dst");
 
@@ -148,14 +148,14 @@ main (int argc, char *argv[])
 
     /*  partialbuf must be smaller than the SHA256 block size of 32 bytes
      */
-    ok (sizeof (partialbuf) < 32,
+    ok (sizeof partialbuf < 32,
             "hkdf buf size suitable for partial md block check");
 
-    buflen = sizeof (partialbuf);
+    buflen = sizeof partialbuf;
     ok (hkdf (hkdfp, partialbuf, &buflen) == 0,
             "hkdf success for partial md block");
 
-    ok (buflen == sizeof (partialbuf),
+    ok (buflen == sizeof partialbuf,
             "hkdf buflen correct for partial md block");
 
     ok (memcmp (vanillabuf, partialbuf, buflen) == 0,
@@ -172,7 +172,7 @@ main (int argc, char *argv[])
     ok (hkdf_ctx_set_salt (hkdfp, "salt", 4) == 0,
             "hkdf_ctx_set_salt success for nonzero-length salt");
 
-    buflen = sizeof (buf);
+    buflen = sizeof buf;
     ok (hkdf (hkdfp, buf, &buflen) == 0,
             "hkdf success for nonzero-length salt");
 
@@ -182,7 +182,7 @@ main (int argc, char *argv[])
     ok (hkdf_ctx_set_salt (hkdfp, "", 0) == 0,
             "hkdf_ctx_set_salt success for zero-length salt");
 
-    buflen = sizeof (buf);
+    buflen = sizeof buf;
     ok (hkdf (hkdfp, buf, &buflen) == 0,
             "hkdf success for zero-length salt");
 
@@ -200,7 +200,7 @@ main (int argc, char *argv[])
     ok (hkdf_ctx_set_info (hkdfp, "info", 4) == 0,
             "hkdf_ctx_set_info success for nonzero-length info");
 
-    buflen = sizeof (buf);
+    buflen = sizeof buf;
     ok (hkdf (hkdfp, buf, &buflen) == 0,
             "hkdf success for nonzero-length info");
 
@@ -210,7 +210,7 @@ main (int argc, char *argv[])
     ok (hkdf_ctx_set_info (hkdfp, "", 0) == 0,
             "hkdf_ctx_set_info success for zero-length info");
 
-    buflen = sizeof (buf);
+    buflen = sizeof buf;
     ok (hkdf (hkdfp, buf, &buflen) == 0,
             "hkdf success for zero-length info");
 

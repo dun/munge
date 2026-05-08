@@ -190,7 +190,7 @@ gids_create (int interval_secs, int do_group_stat)
         log_msg (LOG_INFO, "Disabled supplementary group mapping");
         return NULL;
     }
-    if (!(gids = malloc (sizeof (*gids)))) {
+    if (!(gids = malloc (sizeof *gids))) {
         log_errno (EMUNGE_NO_MEMORY, LOG_ERR,
                 "Failed to allocate gids struct");
     }
@@ -735,7 +735,7 @@ _gids_gid_head_create (uid_t uid)
  */
     gid_head_p g;
 
-    if (!(g = malloc (sizeof (*g)))) {
+    if (!(g = malloc (sizeof *g))) {
         return NULL;
     }
     g->next = NULL;
@@ -796,7 +796,7 @@ _gids_gid_node_create (gid_t gid)
  */
     gid_node_p node;
 
-    if (!(node = malloc (sizeof (*node)))) {
+    if (!(node = malloc (sizeof *node))) {
         return NULL;
     }
     node->next = NULL;
@@ -815,7 +815,7 @@ _gids_uid_node_create (const char *user, uid_t uid)
     if ((user == NULL) || (*user == '\0')) {
         return NULL;
     }
-    if (!(u = malloc (sizeof (*u)))) {
+    if (!(u = malloc (sizeof *u))) {
         return NULL;
     }
     if (!(u->user = strdup (user))) {

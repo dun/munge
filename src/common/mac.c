@@ -119,7 +119,7 @@ mac_cleanup (mac_ctx *x)
         return -1;
     }
     rc = _mac_cleanup (x);
-    memset (x, 0, sizeof (*x));
+    memset (x, 0, sizeof *x);
     return rc;
 }
 
@@ -280,7 +280,7 @@ _mac_block (munge_mac_t md, const void *key, int keylen,
     memcpy (dst, digest, len);
     *dstlenp = len;
     gcry_md_close (ctx);
-    memset (&ctx, 0, sizeof (ctx));
+    memset (&ctx, 0, sizeof ctx);
     return 0;
 }
 

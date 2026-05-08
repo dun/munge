@@ -75,10 +75,10 @@ create_key (conf_t *confp)
     assert (confp->key_num_bytes <= MUNGE_KEY_LEN_MAX_BYTES);
     assert (confp->key_num_bytes >= MUNGE_KEY_LEN_MIN_BYTES);
 
-    if (confp->key_num_bytes > sizeof (buf)) {
+    if (confp->key_num_bytes > sizeof buf) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
                 "Failed to create \"%s\": %d-byte key exceeds %zu-byte buffer",
-                confp->key_path, confp->key_num_bytes, sizeof (buf));
+                confp->key_path, confp->key_num_bytes, sizeof buf);
     }
     if (confp->do_force) {
         do {
@@ -144,7 +144,7 @@ _create_key_secret (unsigned char *buf, size_t buflen)
 
     /*  Read entropy from the kernel's CSPRNG for the input keying material.
      */
-    rv = entropy_read_csprng (key, sizeof (key));
+    rv = entropy_read_csprng (key, sizeof key);
     if (rv == -1) {
         goto err;
     }
@@ -164,11 +164,11 @@ _create_key_secret (unsigned char *buf, size_t buflen)
         goto err;
     }
     num_bits = buflen * 8;
-    rv = snprintf (info, sizeof (info), "%s:%s:%d:",
+    rv = snprintf (info, sizeof info, "%s:%s:%d:",
             info_prefix, md_str, num_bits);
-    if ((rv < 0) || (rv >= sizeof (info))) {
+    if ((rv < 0) || (rv >= sizeof info)) {
         log_msg (LOG_ERR, "Failed to create key distinguisher info: "
-                "exceeded %zu-byte buffer", sizeof (info));
+                "exceeded %zu-byte buffer", sizeof info);
         rv = -1;
         goto err;
     }
@@ -185,12 +185,12 @@ _create_key_secret (unsigned char *buf, size_t buflen)
         log_msg (LOG_ERR, "Failed to set HKDF message digest to md=%d", md);
         goto err;
     }
-    rv = hkdf_ctx_set_key (hkdfp, key, sizeof (key));
+    rv = hkdf_ctx_set_key (hkdfp, key, sizeof key);
     if (rv == -1) {
         log_msg (LOG_ERR, "Failed to set HKDF input keying material");
         goto err;
     }
-    rv = hkdf_ctx_set_salt (hkdfp, &salt, sizeof (salt));
+    rv = hkdf_ctx_set_salt (hkdfp, &salt, sizeof salt);
     if (rv == -1) {
         log_msg (LOG_ERR, "Failed to set HKDF salt");
         goto err;

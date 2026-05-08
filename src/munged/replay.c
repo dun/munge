@@ -206,8 +206,8 @@ replay_insert (munge_cred_t c)
         return -1;
     }
     r->data.t_expired = (time_t) (m->time0 + m->ttl);
-    assert (c->mac_len >= sizeof (r->data.mac));
-    memcpy (r->data.mac, c->mac, sizeof (r->data.mac));
+    assert (c->mac_len >= sizeof r->data.mac);
+    memcpy (r->data.mac, c->mac, sizeof r->data.mac);
     /*
      *  The replay hash key is just the replay_t object itself.
      */
@@ -252,8 +252,8 @@ replay_remove (munge_cred_t c)
     /*  Compute the cred's "hash key".
      */
     rnode.data.t_expired = (time_t) (m->time0 + m->ttl);
-    assert (c->mac_len >= sizeof (rnode.data.mac));
-    memcpy (rnode.data.mac, c->mac, sizeof (rnode.data.mac));
+    assert (c->mac_len >= sizeof rnode.data.mac);
+    memcpy (rnode.data.mac, c->mac, sizeof rnode.data.mac);
 
     r = hash_remove (replay_hash, &rnode);
     if (r != NULL) {
@@ -302,7 +302,7 @@ replay_key_f (const replay_t r)
  *    we can ignore it since this data is local to the node.
  */
     unsigned int key;
-    memcpy (&key, r->data.mac, sizeof (key));
+    memcpy (&key, r->data.mac, sizeof key);
     return key;
 }
 
@@ -316,7 +316,7 @@ replay_cmp_f (const replay_t r1, const replay_t r2)
  */
     int cmpval;
 
-    cmpval = memcmp (r1->data.mac, r2->data.mac, sizeof (r1->data.mac));
+    cmpval = memcmp (r1->data.mac, r2->data.mac, sizeof r1->data.mac);
     if (cmpval != 0) {
         return cmpval;
     }
@@ -356,13 +356,13 @@ replay_alloc (void)
     lsd_mutex_lock (&replay_free_list_lock);
 
     if (!replay_free_list) {
-        size = sizeof (r) + (REPLAY_NODE_ALLOC_NUM * sizeof (*r));
+        size = sizeof r + (REPLAY_NODE_ALLOC_NUM * sizeof *r);
         r = malloc (size);
 
         if (r != NULL) {
             r->alloc.next = replay_mem_list;
             replay_mem_list = r;
-            replay_free_list = (replay_t) ((unsigned char *) r + sizeof (r));
+            replay_free_list = (replay_t) ((unsigned char *) r + sizeof r);
 
             for (i = 0; i < REPLAY_NODE_ALLOC_NUM - 1; i++) {
                 replay_free_list[i].alloc.next = &replay_free_list[i+1];
@@ -373,7 +373,7 @@ replay_alloc (void)
     if (replay_free_list) {
         r = replay_free_list;
         replay_free_list = r->alloc.next;
-        memset (r, 0, sizeof (*r));
+        memset (r, 0, sizeof *r);
     }
     else {
         errno = ENOMEM;

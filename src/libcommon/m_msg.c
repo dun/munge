@@ -87,7 +87,7 @@ m_msg_create (m_msg_t *pm)
 
     assert (pm != NULL);
 
-    if (!(m = calloc (1, sizeof (*m)))) {
+    if (!(m = calloc (1, sizeof *m))) {
         *pm = NULL;
         return EMUNGE_NO_MEMORY;
     }
@@ -258,7 +258,7 @@ m_msg_send (m_msg_t m, m_msg_type_t type, size_t maxlen)
     }
     /*  Always repack the message header.
      */
-    e = _msg_pack (m, MUNGE_MSG_HDR, hdr, sizeof (hdr));
+    e = _msg_pack (m, MUNGE_MSG_HDR, hdr, sizeof hdr);
     if (e != EMUNGE_SUCCESS) {
         m_msg_set_err (m, e,
             strdup ("Failed to pack message header"));
@@ -268,7 +268,7 @@ m_msg_send (m_msg_t m, m_msg_type_t type, size_t maxlen)
      */
     nsend = 0;
     iov[0].iov_base = (void *) hdr;
-    nsend += iov[0].iov_len = sizeof (hdr);
+    nsend += iov[0].iov_len = sizeof hdr;
     iov[1].iov_base = m->pkt;
     nsend += iov[1].iov_len = m->pkt_len;
 
@@ -328,7 +328,7 @@ m_msg_recv (m_msg_t m, m_msg_type_t type, size_t maxlen)
 
     /*  Read and validate the message header.
      */
-    nrecv = sizeof (hdr);
+    nrecv = sizeof hdr;
     if ((errno = 0, n = fd_timed_read_n (m->sd, &hdr, nrecv, &tv, 1)) < 0) {
         m_msg_set_err (m, EMUNGE_SOCKET,
             strdupf ("Failed to receive message header: %s",
@@ -346,7 +346,7 @@ m_msg_recv (m_msg_t m, m_msg_type_t type, size_t maxlen)
             n, nrecv));
         return EMUNGE_SOCKET;
     }
-    else if (_msg_unpack (m, MUNGE_MSG_HDR, hdr, sizeof (hdr))
+    else if (_msg_unpack (m, MUNGE_MSG_HDR, hdr, sizeof hdr)
             != EMUNGE_SUCCESS) {
         m_msg_set_err (m, EMUNGE_SOCKET,
             strdup ("Failed to unpack message header"));
@@ -469,58 +469,58 @@ _msg_length (m_msg_t m, m_msg_type_t type)
         case MUNGE_MSG_HDR:
             n += sizeof (m_msg_magic_t);
             n += sizeof (m_msg_version_t);
-            n += sizeof (m->type);
-            n += sizeof (m->retry);
-            n += sizeof (m->pkt_len);
+            n += sizeof m->type;
+            n += sizeof m->retry;
+            n += sizeof m->pkt_len;
             break;
         case MUNGE_MSG_ENC_REQ:
-            n += sizeof (m->cipher);
-            n += sizeof (m->mac);
-            n += sizeof (m->zip);
-            n += sizeof (m->realm_len);
+            n += sizeof m->cipher;
+            n += sizeof m->mac;
+            n += sizeof m->zip;
+            n += sizeof m->realm_len;
             n += m->realm_len;
-            n += sizeof (m->ttl);
-            n += sizeof (m->auth_uid);
-            n += sizeof (m->auth_gid);
-            n += sizeof (m->data_len);
+            n += sizeof m->ttl;
+            n += sizeof m->auth_uid;
+            n += sizeof m->auth_gid;
+            n += sizeof m->data_len;
             n += m->data_len;
             break;
         case MUNGE_MSG_ENC_RSP:
-            n += sizeof (m->error_num);
-            n += sizeof (m->error_len);
+            n += sizeof m->error_num;
+            n += sizeof m->error_len;
             n += m->error_len;
-            n += sizeof (m->data_len);
+            n += sizeof m->data_len;
             n += m->data_len;
             break;
         case MUNGE_MSG_DEC_REQ:
-            n += sizeof (m->data_len);
+            n += sizeof m->data_len;
             n += m->data_len;
             break;
         case MUNGE_MSG_DEC_RSP:
-            n += sizeof (m->error_num);
-            n += sizeof (m->error_len);
+            n += sizeof m->error_num;
+            n += sizeof m->error_len;
             n += m->error_len;
-            n += sizeof (m->cipher);
-            n += sizeof (m->mac);
-            n += sizeof (m->zip);
-            n += sizeof (m->realm_len);
+            n += sizeof m->cipher;
+            n += sizeof m->mac;
+            n += sizeof m->zip;
+            n += sizeof m->realm_len;
             n += m->realm_len;
-            n += sizeof (m->ttl);
-            n += sizeof (m->addr_len);
+            n += sizeof m->ttl;
+            n += sizeof m->addr_len;
             n += m->addr_len;
-            n += sizeof (m->time0);
-            n += sizeof (m->time1);
-            n += sizeof (m->cred_uid);
-            n += sizeof (m->cred_gid);
-            n += sizeof (m->auth_uid);
-            n += sizeof (m->auth_gid);
-            n += sizeof (m->data_len);
+            n += sizeof m->time0;
+            n += sizeof m->time1;
+            n += sizeof m->cred_uid;
+            n += sizeof m->cred_gid;
+            n += sizeof m->auth_uid;
+            n += sizeof m->auth_gid;
+            n += sizeof m->data_len;
             n += m->data_len;
             break;
         case MUNGE_MSG_AUTH_FD_REQ:
-            n += sizeof (m->auth_s_len);
+            n += sizeof m->auth_s_len;
             n += m->auth_s_len;
-            n += sizeof (m->auth_c_len);
+            n += sizeof m->auth_c_len;
             n += m->auth_c_len;
             break;
         default:
@@ -546,65 +546,65 @@ _msg_pack (m_msg_t m, m_msg_type_t type, void *dst, int dstlen)
 
     switch (type) {
         case MUNGE_MSG_HDR:
-            if      (!_pack (&p, &magic, sizeof (magic), q)) ;
-            else if (!_pack (&p, &version, sizeof (version), q)) ;
-            else if (!_pack (&p, &(m->type), sizeof (m->type), q)) ;
-            else if (!_pack (&p, &(m->retry), sizeof (m->retry), q)) ;
-            else if (!_pack (&p, &(m->pkt_len), sizeof (m->pkt_len), q)) ;
+            if      (!_pack (&p, &magic, sizeof magic, q)) ;
+            else if (!_pack (&p, &version, sizeof version, q)) ;
+            else if (!_pack (&p, &(m->type), sizeof m->type, q)) ;
+            else if (!_pack (&p, &(m->retry), sizeof m->retry, q)) ;
+            else if (!_pack (&p, &(m->pkt_len), sizeof m->pkt_len, q)) ;
             else break;
             goto err;
         case MUNGE_MSG_ENC_REQ:
-            if      (!_pack (&p, &(m->cipher), sizeof (m->cipher), q)) ;
-            else if (!_pack (&p, &(m->mac), sizeof (m->mac), q)) ;
-            else if (!_pack (&p, &(m->zip), sizeof (m->zip), q)) ;
-            else if (!_pack (&p, &(m->realm_len), sizeof (m->realm_len), q)) ;
+            if      (!_pack (&p, &(m->cipher), sizeof m->cipher, q)) ;
+            else if (!_pack (&p, &(m->mac), sizeof m->mac, q)) ;
+            else if (!_pack (&p, &(m->zip), sizeof m->zip, q)) ;
+            else if (!_pack (&p, &(m->realm_len), sizeof m->realm_len, q)) ;
             else if ( _copy (p, m->realm_str, m->realm_len, p, q, &p) < 0) ;
-            else if (!_pack (&p, &(m->ttl), sizeof (m->ttl), q)) ;
-            else if (!_pack (&p, &(m->auth_uid), sizeof (m->auth_uid), q)) ;
-            else if (!_pack (&p, &(m->auth_gid), sizeof (m->auth_gid), q)) ;
-            else if (!_pack (&p, &(m->data_len), sizeof (m->data_len), q)) ;
+            else if (!_pack (&p, &(m->ttl), sizeof m->ttl, q)) ;
+            else if (!_pack (&p, &(m->auth_uid), sizeof m->auth_uid, q)) ;
+            else if (!_pack (&p, &(m->auth_gid), sizeof m->auth_gid, q)) ;
+            else if (!_pack (&p, &(m->data_len), sizeof m->data_len, q)) ;
             else if ( _copy (p, m->data, m->data_len, p, q, &p) < 0) ;
             else break;
             goto err;
         case MUNGE_MSG_ENC_RSP:
-            if      (!_pack (&p, &(m->error_num), sizeof (m->error_num), q)) ;
-            else if (!_pack (&p, &(m->error_len), sizeof (m->error_len), q)) ;
+            if      (!_pack (&p, &(m->error_num), sizeof m->error_num, q)) ;
+            else if (!_pack (&p, &(m->error_len), sizeof m->error_len, q)) ;
             else if ( _copy (p, m->error_str, m->error_len, p, q, &p) < 0) ;
-            else if (!_pack (&p, &(m->data_len), sizeof (m->data_len), q)) ;
+            else if (!_pack (&p, &(m->data_len), sizeof m->data_len, q)) ;
             else if ( _copy (p, m->data, m->data_len, p, q, &p) < 0) ;
             else break;
             goto err;
         case MUNGE_MSG_DEC_REQ:
-            if      (!_pack (&p, &(m->data_len), sizeof (m->data_len), q)) ;
+            if      (!_pack (&p, &(m->data_len), sizeof m->data_len, q)) ;
             else if ( _copy (p, m->data, m->data_len, p, q, &p) < 0) ;
             else break;
             goto err;
         case MUNGE_MSG_DEC_RSP:
-            if      (!_pack (&p, &(m->error_num), sizeof (m->error_num), q)) ;
-            else if (!_pack (&p, &(m->error_len), sizeof (m->error_len), q)) ;
+            if      (!_pack (&p, &(m->error_num), sizeof m->error_num, q)) ;
+            else if (!_pack (&p, &(m->error_len), sizeof m->error_len, q)) ;
             else if ( _copy (p, m->error_str, m->error_len, p, q, &p) < 0) ;
-            else if (!_pack (&p, &(m->cipher), sizeof (m->cipher), q)) ;
-            else if (!_pack (&p, &(m->mac), sizeof (m->mac), q)) ;
-            else if (!_pack (&p, &(m->zip), sizeof (m->zip), q)) ;
-            else if (!_pack (&p, &(m->realm_len), sizeof (m->realm_len), q)) ;
+            else if (!_pack (&p, &(m->cipher), sizeof m->cipher, q)) ;
+            else if (!_pack (&p, &(m->mac), sizeof m->mac, q)) ;
+            else if (!_pack (&p, &(m->zip), sizeof m->zip, q)) ;
+            else if (!_pack (&p, &(m->realm_len), sizeof m->realm_len, q)) ;
             else if ( _copy (p, m->realm_str, m->realm_len, p, q, &p) < 0) ;
-            else if (!_pack (&p, &(m->ttl), sizeof (m->ttl), q)) ;
-            else if (!_pack (&p, &(m->addr_len), sizeof (m->addr_len), q)) ;
+            else if (!_pack (&p, &(m->ttl), sizeof m->ttl, q)) ;
+            else if (!_pack (&p, &(m->addr_len), sizeof m->addr_len, q)) ;
             else if ( _copy (p, &(m->addr), m->addr_len, p, q, &p) < 0) ;
-            else if (!_pack (&p, &(m->time0), sizeof (m->time0), q)) ;
-            else if (!_pack (&p, &(m->time1), sizeof (m->time1), q)) ;
-            else if (!_pack (&p, &(m->cred_uid), sizeof (m->cred_uid), q)) ;
-            else if (!_pack (&p, &(m->cred_gid), sizeof (m->cred_gid), q)) ;
-            else if (!_pack (&p, &(m->auth_uid), sizeof (m->auth_uid), q)) ;
-            else if (!_pack (&p, &(m->auth_gid), sizeof (m->auth_gid), q)) ;
-            else if (!_pack (&p, &(m->data_len), sizeof (m->data_len), q)) ;
+            else if (!_pack (&p, &(m->time0), sizeof m->time0, q)) ;
+            else if (!_pack (&p, &(m->time1), sizeof m->time1, q)) ;
+            else if (!_pack (&p, &(m->cred_uid), sizeof m->cred_uid, q)) ;
+            else if (!_pack (&p, &(m->cred_gid), sizeof m->cred_gid, q)) ;
+            else if (!_pack (&p, &(m->auth_uid), sizeof m->auth_uid, q)) ;
+            else if (!_pack (&p, &(m->auth_gid), sizeof m->auth_gid, q)) ;
+            else if (!_pack (&p, &(m->data_len), sizeof m->data_len, q)) ;
             else if ( _copy (p, m->data, m->data_len, p, q, &p) < 0) ;
             else break;
             goto err;
         case MUNGE_MSG_AUTH_FD_REQ:
-            if      (!_pack (&p, &(m->auth_s_len), sizeof (m->auth_s_len), q));
+            if      (!_pack (&p, &(m->auth_s_len), sizeof m->auth_s_len, q));
             else if ( _copy (p, m->auth_s_str, m->auth_s_len, p, q, &p) < 0) ;
-            else if (!_pack (&p, &(m->auth_c_len), sizeof (m->auth_c_len), q));
+            else if (!_pack (&p, &(m->auth_c_len), sizeof m->auth_c_len, q));
             else if ( _copy (p, m->auth_c_str, m->auth_c_len, p, q, &p) < 0) ;
             else break;
             goto err;
@@ -635,66 +635,66 @@ _msg_unpack (m_msg_t m, m_msg_type_t type, const void *src, int srclen)
 
     switch (type) {
         case MUNGE_MSG_HDR:
-            if      (!_unpack (&magic, &p, sizeof (magic), q)) ;
-            else if (!_unpack (&version, &p, sizeof (version), q)) ;
-            else if (!_unpack (&(m->type), &p, sizeof (m->type), q)) ;
-            else if (!_unpack (&(m->retry), &p, sizeof (m->retry), q)) ;
-            else if (!_unpack (&(m->pkt_len), &p, sizeof (m->pkt_len), q)) ;
+            if      (!_unpack (&magic, &p, sizeof magic, q)) ;
+            else if (!_unpack (&version, &p, sizeof version, q)) ;
+            else if (!_unpack (&(m->type), &p, sizeof m->type, q)) ;
+            else if (!_unpack (&(m->retry), &p, sizeof m->retry, q)) ;
+            else if (!_unpack (&(m->pkt_len), &p, sizeof m->pkt_len, q)) ;
             else break;
             goto err;
         case MUNGE_MSG_ENC_REQ:
-            if      (!_unpack (&(m->cipher), &p, sizeof (m->cipher), q)) ;
-            else if (!_unpack (&(m->mac), &p, sizeof (m->mac), q)) ;
-            else if (!_unpack (&(m->zip), &p, sizeof (m->zip), q)) ;
-            else if (!_unpack (&(m->realm_len), &p, sizeof (m->realm_len), q));
+            if      (!_unpack (&(m->cipher), &p, sizeof m->cipher, q)) ;
+            else if (!_unpack (&(m->mac), &p, sizeof m->mac, q)) ;
+            else if (!_unpack (&(m->zip), &p, sizeof m->zip, q)) ;
+            else if (!_unpack (&(m->realm_len), &p, sizeof m->realm_len, q));
             else if (!_alloc ((vpp) &(m->realm_str), m->realm_len)) goto nomem;
             else if ( _copy (m->realm_str, p, m->realm_len, p, q, &p) < 0) ;
-            else if (!_unpack (&(m->ttl), &p, sizeof (m->ttl), q)) ;
-            else if (!_unpack (&(m->auth_uid), &p, sizeof (m->auth_uid), q)) ;
-            else if (!_unpack (&(m->auth_gid), &p, sizeof (m->auth_gid), q)) ;
-            else if (!_unpack (&(m->data_len), &p, sizeof (m->data_len), q)) ;
+            else if (!_unpack (&(m->ttl), &p, sizeof m->ttl, q)) ;
+            else if (!_unpack (&(m->auth_uid), &p, sizeof m->auth_uid, q)) ;
+            else if (!_unpack (&(m->auth_gid), &p, sizeof m->auth_gid, q)) ;
+            else if (!_unpack (&(m->data_len), &p, sizeof m->data_len, q)) ;
             else if (!_alloc (&(m->data), m->data_len)) goto nomem;
             else if ( _copy (m->data, p, m->data_len, p, q, &p) < 0) ;
             else break;
             goto err;
         case MUNGE_MSG_ENC_RSP:
-            if      (!_unpack (&(m->error_num), &p, sizeof (m->error_num), q));
-            else if (!_unpack (&(m->error_len), &p, sizeof (m->error_len), q));
+            if      (!_unpack (&(m->error_num), &p, sizeof m->error_num, q));
+            else if (!_unpack (&(m->error_len), &p, sizeof m->error_len, q));
             else if (!_alloc ((vpp) &(m->error_str), m->error_len)) goto nomem;
             else if ( _copy (m->error_str, p, m->error_len, p, q, &p) < 0) ;
-            else if (!_unpack (&(m->data_len), &p, sizeof (m->data_len), q)) ;
+            else if (!_unpack (&(m->data_len), &p, sizeof m->data_len, q)) ;
             else if (!_alloc (&(m->data), m->data_len)) goto nomem;
             else if ( _copy (m->data, p, m->data_len, p, q, &p) < 0) ;
             else break;
             goto err;
         case MUNGE_MSG_DEC_REQ:
-            if      (!_unpack (&(m->data_len), &p, sizeof (m->data_len), q)) ;
+            if      (!_unpack (&(m->data_len), &p, sizeof m->data_len, q)) ;
             else if (!_alloc (&(m->data), m->data_len)) goto nomem;
             else if ( _copy (m->data, p, m->data_len, p, q, &p) < 0) ;
             else break;
             goto err;
         case MUNGE_MSG_DEC_RSP:
-            if      (!_unpack (&(m->error_num), &p, sizeof (m->error_num), q));
-            else if (!_unpack (&(m->error_len), &p, sizeof (m->error_len), q));
+            if      (!_unpack (&(m->error_num), &p, sizeof m->error_num, q));
+            else if (!_unpack (&(m->error_len), &p, sizeof m->error_len, q));
             else if (!_alloc ((vpp) &(m->error_str), m->error_len)) goto nomem;
             else if ( _copy (m->error_str, p, m->error_len, p, q, &p) < 0) ;
-            else if (!_unpack (&(m->cipher), &p, sizeof (m->cipher), q)) ;
-            else if (!_unpack (&(m->mac), &p, sizeof (m->mac), q)) ;
-            else if (!_unpack (&(m->zip), &p, sizeof (m->zip), q)) ;
-            else if (!_unpack (&(m->realm_len), &p, sizeof (m->realm_len), q));
+            else if (!_unpack (&(m->cipher), &p, sizeof m->cipher, q)) ;
+            else if (!_unpack (&(m->mac), &p, sizeof m->mac, q)) ;
+            else if (!_unpack (&(m->zip), &p, sizeof m->zip, q)) ;
+            else if (!_unpack (&(m->realm_len), &p, sizeof m->realm_len, q));
             else if (!_alloc ((vpp) &(m->realm_str), m->realm_len)) goto nomem;
             else if ( _copy (m->realm_str, p, m->realm_len, p, q, &p) < 0) ;
-            else if (!_unpack (&(m->ttl), &p, sizeof (m->ttl), q)) ;
-            else if (!_unpack (&(m->addr_len), &p, sizeof (m->addr_len), q)) ;
-            else if (m->addr_len > sizeof (m->addr)) goto err;
+            else if (!_unpack (&(m->ttl), &p, sizeof m->ttl, q)) ;
+            else if (!_unpack (&(m->addr_len), &p, sizeof m->addr_len, q)) ;
+            else if (m->addr_len > sizeof m->addr) goto err;
             else if ( _copy (&(m->addr), p, m->addr_len, p, q, &p) < 0) ;
-            else if (!_unpack (&(m->time0), &p, sizeof (m->time0), q)) ;
-            else if (!_unpack (&(m->time1), &p, sizeof (m->time1), q)) ;
-            else if (!_unpack (&(m->cred_uid), &p, sizeof (m->cred_uid), q)) ;
-            else if (!_unpack (&(m->cred_gid), &p, sizeof (m->cred_gid), q)) ;
-            else if (!_unpack (&(m->auth_uid), &p, sizeof (m->auth_uid), q)) ;
-            else if (!_unpack (&(m->auth_gid), &p, sizeof (m->auth_gid), q)) ;
-            else if (!_unpack (&(m->data_len), &p, sizeof (m->data_len), q)) ;
+            else if (!_unpack (&(m->time0), &p, sizeof m->time0, q)) ;
+            else if (!_unpack (&(m->time1), &p, sizeof m->time1, q)) ;
+            else if (!_unpack (&(m->cred_uid), &p, sizeof m->cred_uid, q)) ;
+            else if (!_unpack (&(m->cred_gid), &p, sizeof m->cred_gid, q)) ;
+            else if (!_unpack (&(m->auth_uid), &p, sizeof m->auth_uid, q)) ;
+            else if (!_unpack (&(m->auth_gid), &p, sizeof m->auth_gid, q)) ;
+            else if (!_unpack (&(m->data_len), &p, sizeof m->data_len, q)) ;
             else if (!_alloc (&(m->data), m->data_len)) goto nomem;
             else if ( _copy (m->data, p, m->data_len, p, q, &p) < 0) ;
             else break;
@@ -818,14 +818,14 @@ _pack (void **pdst, void *src, int len, const void *last)
         return 0;
     }
     switch (len) {
-        case (sizeof (uint8_t)):
+        case sizeof (uint8_t):
             * (uint8_t *) dst = * (uint8_t *) src;
             break;
-        case (sizeof (uint16_t)):
+        case sizeof (uint16_t):
             u16 = htons (* (uint16_t *) src);
             memcpy (dst, &u16, len);
             break;
-        case (sizeof (uint32_t)):
+        case sizeof (uint32_t):
             u32 = htonl (* (uint32_t *) src);
             memcpy (dst, &u32, len);
             break;
@@ -858,14 +858,14 @@ _unpack (void *dst, void **psrc, int len, const void *last)
         return 0;
     }
     switch (len) {
-        case (sizeof (uint8_t)):
+        case sizeof (uint8_t):
             * (uint8_t *) dst = * (uint8_t *) src;
             break;
-        case (sizeof (uint16_t)):
+        case sizeof (uint16_t):
             memcpy (&u16, src, len);
             * (uint16_t *) dst = ntohs (u16);
             break;
-        case (sizeof (uint32_t)):
+        case sizeof (uint32_t):
             memcpy (&u32, src, len);
             * (uint32_t *) dst = ntohl (u32);
             break;

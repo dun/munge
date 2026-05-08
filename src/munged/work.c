@@ -104,7 +104,7 @@ work_init (work_func_t f, int n_threads)
         log_errno (EMUNGE_NO_MEMORY, LOG_ERR,
             "Failed to allocate work thread struct");
     }
-    if (!(wp->workers = malloc (sizeof (*wp->workers) * n_threads))) {
+    if (!(wp->workers = malloc (sizeof *wp->workers * n_threads))) {
         log_errno (EMUNGE_NO_MEMORY, LOG_ERR,
             "Failed to allocate tid array for work thread struct");
     }
@@ -454,7 +454,7 @@ _work_enqueue (work_p wp, void *work)
     if (!work) {
         return NULL;
     }
-    if (!(wap = malloc (sizeof (*wap)))) {
+    if (!(wap = malloc (sizeof *wap))) {
         log_errno (EMUNGE_NO_MEMORY, LOG_ERR, "Failed to enqueue work");
     }
     wap->next = NULL;

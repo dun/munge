@@ -703,7 +703,7 @@ display_encode_host (conf_t conf)
         log_err (EMUNGE_SNAFU, LOG_ERR, "Failed to retrieve %s: %s", key,
                 (p ? p : "Unspecified error"));
     }
-    if (!inet_ntop (AF_INET, &addr, addr_str, sizeof (addr_str))) {
+    if (!inet_ntop (AF_INET, &addr, addr_str, sizeof addr_str)) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
                 "Failed to convert %s to string: %s", key, strerror (errno));
     }
@@ -758,15 +758,15 @@ display_encode_time (conf_t conf)
             log_err (EMUNGE_SNAFU, LOG_ERR,
                     "Failed to convert %s to local time", key);
         }
-        t_len = strftime (t_buf, sizeof (t_buf),
+        t_len = strftime (t_buf, sizeof t_buf,
                 "%Y-%m-%d %H:%M:%S %z", tm_ptr);
-        if ((t_len == 0) || (t_len >= sizeof (t_buf))) {
+        if ((t_len == 0) || (t_len >= sizeof t_buf)) {
             log_err (EMUNGE_OVERFLOW, LOG_ERR,
                     "Failed to format %s: exceeded buffer", key);
         }
         /*  Since ISO C does not support the '%s' strftime() format option...
          */
-        if (strcatf (t_buf, sizeof (t_buf), " (%ld)", (long) t) < 0) {
+        if (strcatf (t_buf, sizeof t_buf, " (%ld)", (long) t) < 0) {
             log_err (EMUNGE_OVERFLOW, LOG_ERR,
                     "Failed to format %s: exceeded buffer", key);
         }
@@ -807,15 +807,14 @@ display_decode_time (conf_t conf)
             log_err (EMUNGE_SNAFU, LOG_ERR,
                     "Failed to convert %s to local time", key);
         }
-        t_len = strftime (t_buf, sizeof (t_buf),
-                "%Y-%m-%d %H:%M:%S %z", tm_ptr);
-        if ((t_len == 0) || (t_len >= sizeof (t_buf))) {
+        t_len = strftime (t_buf, sizeof t_buf, "%Y-%m-%d %H:%M:%S %z", tm_ptr);
+        if ((t_len == 0) || (t_len >= sizeof t_buf)) {
             log_err (EMUNGE_OVERFLOW, LOG_ERR,
                     "Failed to format %s: exceeded buffer", key);
         }
         /*  Since ISO C does not support the '%s' strftime() format option...
          */
-        if (strcatf (t_buf, sizeof (t_buf), " (%ld)", (long) t) < 0) {
+        if (strcatf (t_buf, sizeof t_buf, " (%ld)", (long) t) < 0) {
             log_err (EMUNGE_OVERFLOW, LOG_ERR,
                     "Failed to format %s: exceeded buffer", key);
         }

@@ -164,7 +164,7 @@ cipher_cleanup (cipher_ctx *x)
         return -1;
     }
     rc = _cipher_cleanup (x);
-    memset (x, 0, sizeof (*x));
+    memset (x, 0, sizeof *x);
     return rc;
 }
 

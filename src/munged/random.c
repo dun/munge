@@ -244,7 +244,7 @@ _random_read_entropy_from_kernel (void)
     int n;
     unsigned char buf[RANDOM_SOURCE_BYTES];
 
-    n = entropy_read_csprng (buf, sizeof (buf));
+    n = entropy_read_csprng (buf, sizeof buf);
     if (n > 0) {
         if (_random_check_entropy (buf, n) < 0) {
             n = 0;
@@ -278,12 +278,12 @@ _random_read_entropy_from_file (const char *path)
         return -1;
     }
 
-    if (path_dirname (path, dir, sizeof (dir)) < 0) {
+    if (path_dirname (path, dir, sizeof dir) < 0) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
                 "Failed to determine dirname of PRNG seed \"%s\"", path);
     }
 
-    n = path_is_secure (dir, ebuf, sizeof (ebuf), PATH_SECURITY_NO_FLAGS);
+    n = path_is_secure (dir, ebuf, sizeof ebuf, PATH_SECURITY_NO_FLAGS);
     if (n < 0) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
                 "Failed to check PRNG seed dir \"%s\": %s", dir, ebuf);
@@ -326,8 +326,8 @@ _random_read_entropy_from_process (void)
     int n = 0;
 
     if (entropy_read_weak (&buf) != -1) {
-        _random_add (&buf, sizeof (buf));
-        n += sizeof (buf);
+        _random_add (&buf, sizeof buf);
+        n += sizeof buf;
     }
     return n;
 }
@@ -404,7 +404,7 @@ _random_read_seed (const char *path, int num_bytes)
     else {
         is_valid = 1;
         while (num_left > 0) {
-            num_want = (num_left < sizeof (buf)) ? num_left : sizeof (buf);
+            num_want = (num_left < sizeof buf) ? num_left : sizeof buf;
             n = fd_read_n (fd, buf, num_want);
             if (n < 0) {
                 log_msg (LOG_WARNING,
@@ -467,7 +467,7 @@ _random_write_seed (const char *path, int num_bytes)
     }
     num_left = num_bytes;
     while (num_left > 0) {
-        num_want = (num_left < sizeof (buf)) ? num_left : sizeof (buf);
+        num_want = (num_left < sizeof buf) ? num_left : sizeof buf;
         _random_bytes (buf, num_want);
         n = fd_write_n (fd, buf, num_want);
         if (n < 0) {
@@ -540,7 +540,7 @@ _random_stir_entropy (void *_arg_not_used_)
     log_msg (LOG_DEBUG, "Stirring PRNG entropy pool");
 
     if (entropy_read_weak (&buf) != -1) {
-        _random_add (&buf, sizeof (buf));
+        _random_add (&buf, sizeof buf);
     }
     /*  Perform an exponential backoff up to the maximum timeout.  This allows
      *    for vigorous stirring of the entropy pool when the daemon is started.

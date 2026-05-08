@@ -436,7 +436,7 @@ _xgetpwbuf_copy_struct (const struct passwd *src, struct passwd *dst,
     /*  Copy password entry.
      */
     assert (pwbufp->len >= num_bytes);
-    memset (dst, 0, sizeof (*dst));
+    memset (dst, 0, sizeof *dst);
     p = pwbufp->buf;
 
     if (_xgetpwbuf_copy_string

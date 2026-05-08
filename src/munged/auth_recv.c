@@ -125,7 +125,7 @@ _check_auth_server_dir (const char *dir, int got_force)
     }
     /*  Check if [dir] is secure against modification by others.
      */
-    n = path_is_secure (dir, ebuf, sizeof (ebuf), PATH_SECURITY_NO_FLAGS);
+    n = path_is_secure (dir, ebuf, sizeof ebuf, PATH_SECURITY_NO_FLAGS);
     if (n < 0) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
             "Failed to check auth server dir \"%s\": %s", dir, ebuf);
@@ -136,7 +136,7 @@ _check_auth_server_dir (const char *dir, int got_force)
     }
     /*  Check if [dir] path is accessible by all.
      */
-    n = path_is_accessible (dir, ebuf, sizeof (ebuf));
+    n = path_is_accessible (dir, ebuf, sizeof ebuf);
     if (n < 0) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
             "Failed to check auth server dir \"%s\": %s", dir, ebuf);
@@ -194,11 +194,11 @@ _check_auth_client_dir (const char *dir, int got_force)
     }
     /*  Check if parent dir is secure against modification by others.
      */
-    if (path_dirname (dir, parent_dir, sizeof (parent_dir)) < 0) {
+    if (path_dirname (dir, parent_dir, sizeof parent_dir) < 0) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
             "Failed to determine dirname of auth client dir \"%s\"", dir);
     }
-    n = path_is_secure (parent_dir, ebuf, sizeof (ebuf),
+    n = path_is_secure (parent_dir, ebuf, sizeof ebuf,
             PATH_SECURITY_NO_FLAGS);
     if (n < 0) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
@@ -211,7 +211,7 @@ _check_auth_client_dir (const char *dir, int got_force)
     }
     /*  Check if [dir] path is accessible by all.
      */
-    n = path_is_accessible (dir, ebuf, sizeof (ebuf));
+    n = path_is_accessible (dir, ebuf, sizeof ebuf);
     if (n < 0) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
             "Failed to check auth client dir \"%s\": %s", dir, ebuf);
@@ -328,7 +328,7 @@ int
 auth_recv (m_msg_t m, uid_t *uid, gid_t *gid)
 {
     struct ucred cred;
-    socklen_t len = sizeof (cred);
+    socklen_t len = sizeof cred;
 
     if (getsockopt (m->sd, SOL_SOCKET, SO_PEERCRED, &cred, &len) < 0) {
         log_msg (LOG_ERR, "Failed to get peer identity: %s", strerror (errno));
@@ -366,7 +366,7 @@ int
 auth_recv (m_msg_t m, uid_t *uid, gid_t *gid)
 {
     struct xucred cred;
-    socklen_t len = sizeof (cred);
+    socklen_t len = sizeof cred;
 
     if (getsockopt (m->sd, 0, LOCAL_PEERCRED, &cred, &len) < 0) {
         log_msg (LOG_ERR, "Failed to get peer identity: %s", strerror (errno));

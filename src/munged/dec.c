@@ -372,7 +372,7 @@ dec_unpack_outer (munge_cred_t c)
      *    require a switch on the version number to invoke the appropriate
      *    unpack routine, but it doesn't really seem worth the effort.
      */
-    n = sizeof (c->version);
+    n = sizeof c->version;
     assert (n == 1);
     if (n > len) {
         return m_msg_set_err (m, EMUNGE_BAD_CRED,
@@ -388,7 +388,7 @@ dec_unpack_outer (munge_cred_t c)
     /*
      *  Unpack the cipher type.
      */
-    n = sizeof (m->cipher);
+    n = sizeof m->cipher;
     assert (n == 1);
     if (n > len) {
         return m_msg_set_err (m, EMUNGE_BAD_CRED,
@@ -409,14 +409,14 @@ dec_unpack_outer (munge_cred_t c)
                 strdupf ("Failed to determine IV length for cipher type %d",
                 m->cipher));
         }
-        assert (c->iv_len <= sizeof (c->iv));
+        assert (c->iv_len <= sizeof c->iv);
     }
     p += n;
     len -= n;
     /*
      *  Unpack the message authentication code type.
      */
-    n = sizeof (m->mac);
+    n = sizeof m->mac;
     assert (n == 1);
     if (n > len) {
         return m_msg_set_err (m, EMUNGE_BAD_CRED,
@@ -433,7 +433,7 @@ dec_unpack_outer (munge_cred_t c)
             strdupf ("Failed to determine digest length for MAC type %d",
             m->mac));
     }
-    assert (c->mac_len <= sizeof (c->mac));
+    assert (c->mac_len <= sizeof c->mac);
     p += n;
     len -= n;
     /*
@@ -449,7 +449,7 @@ dec_unpack_outer (munge_cred_t c)
     /*
      *  Unpack the compression type.
      */
-    n = sizeof (m->zip);
+    n = sizeof m->zip;
     assert (n == 1);
     if (n > len) {
         return m_msg_set_err (m, EMUNGE_BAD_CRED,
@@ -470,7 +470,7 @@ dec_unpack_outer (munge_cred_t c)
     /*
      *  Unpack the length of realm string.
      */
-    n = sizeof (m->realm_len);
+    n = sizeof m->realm_len;
     assert (n == 1);
     if (n > len) {
         return m_msg_set_err (m, EMUNGE_BAD_CRED,
@@ -515,7 +515,7 @@ dec_unpack_outer (munge_cred_t c)
             return m_msg_set_err (m, EMUNGE_BAD_CRED,
                 strdup ("Truncated cipher IV"));
         }
-        assert (c->iv_len <= sizeof (c->iv));
+        assert (c->iv_len <= sizeof c->iv);
         memcpy (c->iv, p, c->iv_len);
         p += c->iv_len;
         len -= c->iv_len;
@@ -582,7 +582,7 @@ dec_decrypt (munge_cred_t c)
             strdupf ("Failed to determine DEK key length for MAC type %d",
                 m->mac));
     }
-    assert (c->dek_len <= sizeof (c->dek));
+    assert (c->dek_len <= sizeof c->dek);
 
     n = c->dek_len;
     if (mac_block (m->mac, conf->dek_key, conf->dek_key_len,
@@ -673,14 +673,14 @@ dec_validate_mac (munge_cred_t c)
     if (mac_update (&x, c->inner, c->inner_len) < 0) {
         goto err_cleanup;
     }
-    n = sizeof (mac);
+    n = sizeof mac;
     if (mac_final (&x, mac, &n) < 0) {
         goto err_cleanup;
     }
     if (mac_cleanup (&x) < 0) {
         goto err;
     }
-    assert (n <= sizeof (mac));
+    assert (n <= sizeof mac);
 
     /*  Validate new computed MAC against old received MAC.
      */
@@ -793,7 +793,7 @@ dec_unpack_inner (munge_cred_t c)
      *  Add it to the PRNG entropy pool if it's encrypted.
      */
     c->salt_len = MUNGE_CRED_SALT_LEN;
-    assert (c->salt_len <= sizeof (c->salt));
+    assert (c->salt_len <= sizeof c->salt);
     if (c->salt_len > len) {
         return m_msg_set_err (m, EMUNGE_BAD_CRED, strdup ("Truncated salt"));
     }
@@ -806,7 +806,7 @@ dec_unpack_inner (munge_cred_t c)
     /*
      *  Unpack the length of the origin IP address.
      */
-    n = sizeof (m->addr_len);
+    n = sizeof m->addr_len;
     assert (n == 1);
     if (n > len) {
         return m_msg_set_err (m, EMUNGE_BAD_CRED,
@@ -823,11 +823,11 @@ dec_unpack_inner (munge_cred_t c)
             strdup ("Truncated origin IP addr"));
     }
     else if (m->addr_len == 4) {
-        assert (sizeof (m->addr) == 4);
+        assert (sizeof m->addr == 4);
         memcpy (&m->addr, p, m->addr_len);
     }
     else if (m->addr_len == 0) {
-        memset (&m->addr, 0, sizeof (m->addr));
+        memset (&m->addr, 0, sizeof m->addr);
     }
     else {
         return m_msg_set_err (m, EMUNGE_BAD_CRED,
@@ -838,7 +838,7 @@ dec_unpack_inner (munge_cred_t c)
     /*
      *  Unpack the encode time.
      */
-    n = sizeof (m->time0);
+    n = sizeof m->time0;
     assert (n == 4);
     if (n > len) {
         return m_msg_set_err (m, EMUNGE_BAD_CRED,
@@ -851,7 +851,7 @@ dec_unpack_inner (munge_cred_t c)
     /*
      *  Unpack the time-to-live.
      */
-    n = sizeof (m->ttl);
+    n = sizeof m->ttl;
     assert (n == 4);
     if (n > len) {
         return m_msg_set_err (m, EMUNGE_BAD_CRED,
@@ -864,7 +864,7 @@ dec_unpack_inner (munge_cred_t c)
     /*
      *  Unpack the UID.
      */
-    n = sizeof (m->cred_uid);
+    n = sizeof m->cred_uid;
     assert (n == 4);
     if (n > len) {
         return m_msg_set_err (m, EMUNGE_BAD_CRED, strdup ("Truncated UID"));
@@ -876,7 +876,7 @@ dec_unpack_inner (munge_cred_t c)
     /*
      *  Unpack the GID.
      */
-    n = sizeof (m->cred_gid);
+    n = sizeof m->cred_gid;
     assert (n == 4);
     if (n > len) {
         return m_msg_set_err (m, EMUNGE_BAD_CRED, strdup ("Truncated GID"));
@@ -888,7 +888,7 @@ dec_unpack_inner (munge_cred_t c)
     /*
      *  Unpack the UID restriction for authorization.
      */
-    n = sizeof (m->auth_uid);
+    n = sizeof m->auth_uid;
     assert (n == 4);
     if (n > len) {
         return m_msg_set_err (m, EMUNGE_BAD_CRED,
@@ -901,7 +901,7 @@ dec_unpack_inner (munge_cred_t c)
     /*
      *  Unpack the GID restriction for authorization.
      */
-    n = sizeof (m->auth_gid);
+    n = sizeof m->auth_gid;
     assert (n == 4);
     if (n > len) {
         return m_msg_set_err (m, EMUNGE_BAD_CRED,
@@ -914,7 +914,7 @@ dec_unpack_inner (munge_cred_t c)
     /*
      *  Unpack the length of auxiliary data.
      */
-    n = sizeof (m->data_len);
+    n = sizeof m->data_len;
     assert (n == 4);
     if (n > len) {
         return m_msg_set_err (m, EMUNGE_BAD_CRED,

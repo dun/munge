@@ -53,7 +53,7 @@ munge_ctx_create (void)
 {
     munge_ctx_t ctx;
 
-    if (!(ctx = malloc (sizeof (*ctx)))) {
+    if (!(ctx = malloc (sizeof *ctx))) {
         return NULL;
     }
     ctx->cipher = MUNGE_CIPHER_DEFAULT;
@@ -87,7 +87,7 @@ munge_ctx_copy (munge_ctx_t src)
     if (!src) {
         return NULL;
     }
-    if (!(dst = malloc (sizeof (*dst)))) {
+    if (!(dst = malloc (sizeof *dst))) {
         return NULL;
     }
     *dst = *src;

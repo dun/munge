@@ -140,7 +140,7 @@ hash_create (int size, hash_key_f key_f, hash_cmp_f cmp_f, hash_del_f del_f)
     if (size <= 0) {
         size = HASH_DEF_SIZE;
     }
-    if (!(h = malloc (sizeof (*h)))) {
+    if (!(h = malloc (sizeof *h))) {
         return NULL;
     }
     if (!(h->table = calloc (size, sizeof (struct hash_node *)))) {
@@ -506,14 +506,14 @@ hash_node_alloc (void)
     lsd_mutex_lock (&hash_free_list_lock);
 
     if (!hash_free_list) {
-        size = sizeof (p) + (HASH_NODE_ALLOC_NUM * sizeof (*p));
+        size = sizeof p + (HASH_NODE_ALLOC_NUM * sizeof *p);
         p = malloc (size);
 
         if (p != NULL) {
             p->next = hash_mem_list;
             hash_mem_list = p;
             hash_free_list = (struct hash_node *)
-                    ((unsigned char *) p + sizeof (p));
+                    ((unsigned char *) p + sizeof p);
 
             for (i = 0; i < HASH_NODE_ALLOC_NUM - 1; i++) {
                 hash_free_list[i].next = &hash_free_list[i+1];
@@ -524,7 +524,7 @@ hash_node_alloc (void)
     if (hash_free_list) {
         p = hash_free_list;
         hash_free_list = p->next;
-        memset (p, 0, sizeof (*p));
+        memset (p, 0, sizeof *p);
     }
     else {
         errno = ENOMEM;

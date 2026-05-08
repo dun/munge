@@ -233,7 +233,7 @@ create_conf (void)
     conf_t conf;
     int n;
 
-    if (!(conf = malloc (sizeof (*conf)))) {
+    if (!(conf = malloc (sizeof *conf))) {
         log_errno (EMUNGE_NO_MEMORY, LOG_ERR, "Failed to allocate conf");
     }
     if (!(conf->ctx = munge_ctx_create ())) {
@@ -311,7 +311,7 @@ create_tdata (conf_t conf)
 
     assert (conf != NULL);
 
-    if (!(tdata = malloc (sizeof (*tdata)))) {
+    if (!(tdata = malloc (sizeof *tdata))) {
         log_errno (EMUNGE_NO_MEMORY, LOG_ERR,
             "Failed to allocate thread data");
     }
@@ -854,7 +854,7 @@ start_threads (conf_t conf)
     size_t stacksize = 256 * 1024;
     int i;
 
-    if (!(conf->tids = malloc (sizeof (*conf->tids) * conf->num_threads))) {
+    if (!(conf->tids = malloc (sizeof *conf->tids * conf->num_threads))) {
         log_err (EMUNGE_NO_MEMORY, LOG_ERR, "Failed to allocate tid array");
     }
     if ((errno = pthread_attr_init (&tattr)) != 0) {
@@ -936,12 +936,12 @@ process_creds (conf_t conf)
     if (conf->num_seconds) {
         to.tv_sec = conf->t_main_start.tv_sec + conf->num_seconds;
         if (to.tv_sec < conf->t_main_start.tv_sec) {
-            to.tv_sec = (sizeof (to.tv_sec) == 4) ? INT_MAX : LONG_MAX;
+            to.tv_sec = (sizeof to.tv_sec == 4) ? INT_MAX : LONG_MAX;
         }
         to.tv_nsec = conf->t_main_start.tv_usec * 1e3;
     }
     else {
-        to.tv_sec = (sizeof (to.tv_sec) == 4) ? INT_MAX : LONG_MAX;
+        to.tv_sec = (sizeof to.tv_sec == 4) ? INT_MAX : LONG_MAX;
         to.tv_nsec = 0;
     }
     /*  Recompute the number of seconds in case the specified duration
@@ -1226,7 +1226,7 @@ output_msg (const char *format, ...)
     struct tm *tm_ptr;
     char buf[256];
     char *p = buf;
-    int len = sizeof (buf);
+    int len = sizeof buf;
     int n;
     va_list vargs;
 
@@ -1259,8 +1259,8 @@ output_msg (const char *format, ...)
     va_end (vargs);
 
     if ((n < 0) || (n >= len)) {
-        buf[sizeof (buf) - 2] = '+';
-        buf[sizeof (buf) - 1] = '\0';   /* technically redundant */
+        buf[sizeof buf - 2] = '+';
+        buf[sizeof buf - 1] = '\0';     /* technically redundant */
     }
     printf ("%s\n", buf);
 }

@@ -215,7 +215,7 @@ create_conf (void)
     conf->mac_key_len = 0;
     conf->origin_name = NULL;
     conf->origin_ifname = NULL;
-    memset (&conf->addr, 0, sizeof (conf->addr));
+    memset (&conf->addr, 0, sizeof conf->addr);
     conf->gids = NULL;
     conf->gids_update_secs = MUNGE_GROUP_UPDATE_SECS;
     conf->nthreads = MUNGE_THREADS;
@@ -647,7 +647,7 @@ create_subkeys (conf_t conf)
 
     n_total = 0;
     for (;;) {
-        n = read (fd, buf, sizeof (buf));
+        n = read (fd, buf, sizeof buf);
         if (n == 0)
             break;
         if ((n < 0) && (errno == EINTR))
@@ -707,7 +707,7 @@ _conf_set_cwd (conf_t conf)
     char buf[PATH_MAX];
     char *rv;
 
-    rv = getcwd (buf, sizeof (buf));
+    rv = getcwd (buf, sizeof buf);
 
     /*  Starting in Linux 2.6.36, the path returned by getcwd() will be
      *    prefixed with "(unreachable)" if the current directory is not below
@@ -727,7 +727,7 @@ _conf_set_cwd (conf_t conf)
         if (errno == ERANGE) {
             log_msg (LOG_WARNING,
                     "Failed to set current working directory: "
-                    "Exceeded %lu-byte buffer", sizeof (buf));
+                    "Exceeded %lu-byte buffer", sizeof buf);
         }
         else {
             log_msg (LOG_WARNING,
@@ -1133,11 +1133,11 @@ _conf_open_keyfile (const char *keyfile, int got_force)
     }
     /*  Ensure keyfile dir is secure against modification by others.
      */
-    if (path_dirname (keyfile, keydir, sizeof (keydir)) < 0) {
+    if (path_dirname (keyfile, keydir, sizeof keydir) < 0) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
             "Failed to determine dirname of keyfile \"%s\"", keyfile);
     }
-    n = path_is_secure (keydir, ebuf, sizeof (ebuf), PATH_SECURITY_NO_FLAGS);
+    n = path_is_secure (keydir, ebuf, sizeof ebuf, PATH_SECURITY_NO_FLAGS);
     if (n < 0) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
             "Failed to check keyfile dir \"%s\": %s", keydir, ebuf);

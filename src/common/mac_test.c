@@ -69,24 +69,24 @@ check_mac (munge_mac_t m, const char *str, const char *key, int keylen,
         fail ("check_mac invalid dst or dstlen for %s", str);
         return -1;
     }
-    if (dstlen > sizeof (buf)) {
+    if (dstlen > sizeof buf) {
         fail ("check_mac %ld-byte buf too small for %s %d-byte result",
-                sizeof (buf), str, dstlen);
+                sizeof buf, str, dstlen);
         return -1;
     }
     ok (mac_size (m) == dstlen, "mac_size %s is %d", str, dstlen);
 
     ok (!mac_map_enum (m, NULL), "mac_map_enum %s", str);
 
-    buflen = sizeof (buf);
-    memset (buf, 0, sizeof (buf));
+    buflen = sizeof buf;
+    memset (buf, 0, sizeof buf);
     ok (!mac_block (m, key, keylen, buf, &buflen, src, srclen),
             "mac_block %s", str);
     ok (buflen == dstlen, "mac_block %s outlen", str);
     cmp_mem (buf, dst, dstlen, "mac_block %s output", str);
 
-    buflen = sizeof (buf);
-    memset (buf, 0, sizeof (buf));
+    buflen = sizeof buf;
+    memset (buf, 0, sizeof buf);
     ok (!(rv = mac_init (&ctx, m, key, keylen)), "mac_init %s", str);
     ok (!rv && !(rv = mac_update (&ctx, src, srclen)), "mac_update %s", str);
     ok (!rv && !(rv = mac_final (&ctx, buf, &buflen)), "mac_final %s", str);
@@ -135,19 +135,19 @@ main (int argc, char *argv[])
     plan (NO_PLAN);
 
     check_mac (MUNGE_MAC_MD5, "MUNGE_MAC_MD5", key, strlen (key),
-            in, strlen (in), out_md5, sizeof (out_md5));
+            in, strlen (in), out_md5, sizeof out_md5);
 
     check_mac (MUNGE_MAC_SHA1, "MUNGE_MAC_SHA1", key, strlen (key),
-            in, strlen (in), out_sha1, sizeof (out_sha1));
+            in, strlen (in), out_sha1, sizeof out_sha1);
 
     check_mac (MUNGE_MAC_RIPEMD160, "MUNGE_MAC_RIPEMD160", key, strlen (key),
-            in, strlen (in), out_ripemd160, sizeof (out_ripemd160));
+            in, strlen (in), out_ripemd160, sizeof out_ripemd160);
 
     check_mac (MUNGE_MAC_SHA256, "MUNGE_MAC_SHA256", key, strlen (key),
-            in, strlen (in), out_sha256, sizeof (out_sha256));
+            in, strlen (in), out_sha256, sizeof out_sha256);
 
     check_mac (MUNGE_MAC_SHA512, "MUNGE_MAC_SHA512", key, strlen (key),
-            in, strlen (in), out_sha512, sizeof (out_sha512));
+            in, strlen (in), out_sha512, sizeof out_sha512);
 
     done_testing ();
 
