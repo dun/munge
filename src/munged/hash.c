@@ -135,17 +135,17 @@ hash_create (int size, hash_key_f key_f, hash_cmp_f cmp_f, hash_del_f del_f)
 
     if (!cmp_f || !key_f) {
         errno = EINVAL;
-        return (NULL);
+        return NULL;
     }
     if (size <= 0) {
         size = HASH_DEF_SIZE;
     }
     if (!(h = malloc (sizeof (*h)))) {
-        return (NULL);
+        return NULL;
     }
     if (!(h->table = calloc (size, sizeof (struct hash_node *)))) {
         free (h);
-        return (NULL);
+        return NULL;
     }
     h->count = 0;
     h->size = size;
@@ -153,7 +153,7 @@ hash_create (int size, hash_key_f key_f, hash_cmp_f cmp_f, hash_del_f del_f)
     h->del_f = del_f;
     h->key_f = key_f;
     lsd_mutex_init (&h->mutex);
-    return (h);
+    return h;
 }
 
 
@@ -225,7 +225,7 @@ hash_is_empty (hash_t h)
 
     if (!h) {
         errno = EINVAL;
-        return (-1);
+        return -1;
     }
     lsd_mutex_lock (&h->mutex);
     n = h->count;
@@ -244,12 +244,12 @@ hash_count (hash_t h)
 
     if (!h) {
         errno = EINVAL;
-        return (-1);
+        return -1;
     }
     lsd_mutex_lock (&h->mutex);
     n = h->count;
     lsd_mutex_unlock (&h->mutex);
-    return (n);
+    return n;
 }
 
 
@@ -268,7 +268,7 @@ hash_find (hash_t h, const void *key)
 
     if (!h || !key) {
         errno = EINVAL;
-        return (NULL);
+        return NULL;
     }
     errno = 0;
     lsd_mutex_lock (&h->mutex);
@@ -284,7 +284,7 @@ hash_find (hash_t h, const void *key)
         break;
     }
     lsd_mutex_unlock (&h->mutex);
-    return (data);
+    return data;
 }
 
 
@@ -305,7 +305,7 @@ hash_insert (hash_t h, const void *key, void *data)
 
     if (!h || !key || !data) {
         errno = EINVAL;
-        return (NULL);
+        return NULL;
     }
     lsd_mutex_lock (&h->mutex);
     slot = h->key_f (key) % h->size;
@@ -333,7 +333,7 @@ hash_insert (hash_t h, const void *key, void *data)
 
 end:
     lsd_mutex_unlock (&h->mutex);
-    return (data);
+    return data;
 }
 
 
@@ -353,7 +353,7 @@ hash_remove (hash_t h, const void *key)
 
     if (!h || !key) {
         errno = EINVAL;
-        return (NULL);
+        return NULL;
     }
     errno = 0;
     lsd_mutex_lock (&h->mutex);
@@ -372,7 +372,7 @@ hash_remove (hash_t h, const void *key)
         break;
     }
     lsd_mutex_unlock (&h->mutex);
-    return (data);
+    return data;
 }
 
 
@@ -393,7 +393,7 @@ hash_delete_if (hash_t h, hash_arg_f arg_f, void *arg)
 
     if (!h || !arg_f) {
         errno = EINVAL;
-        return (-1);
+        return -1;
     }
     lsd_mutex_lock (&h->mutex);
     for (i = 0; i < h->size; i++) {
@@ -413,7 +413,7 @@ hash_delete_if (hash_t h, hash_arg_f arg_f, void *arg)
         }
     }
     lsd_mutex_unlock (&h->mutex);
-    return (n);
+    return n;
 }
 
 
@@ -431,7 +431,7 @@ hash_for_each (hash_t h, hash_arg_f arg_f, void *arg)
 
     if (!h || !arg_f) {
         errno = EINVAL;
-        return (-1);
+        return -1;
     }
     lsd_mutex_lock (&h->mutex);
     for (i = 0; i < h->size; i++) {
@@ -442,7 +442,7 @@ hash_for_each (hash_t h, hash_arg_f arg_f, void *arg)
         }
     }
     lsd_mutex_unlock (&h->mutex);
-    return (n);
+    return n;
 }
 
 
@@ -484,7 +484,7 @@ hash_key_string (const char *str)
     for (p = (unsigned char *) str; *p != '\0'; p++) {
         hval += (multiplier * hval) + *p;
     }
-    return (hval);
+    return hval;
 }
 
 
@@ -530,7 +530,7 @@ hash_node_alloc (void)
         errno = ENOMEM;
     }
     lsd_mutex_unlock (&hash_free_list_lock);
-    return (p);
+    return p;
 }
 
 

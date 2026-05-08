@@ -170,12 +170,12 @@ random_init (const char *seed_path)
     }
 
     if (got_bad_seed) {
-        return (-1);
+        return -1;
     }
     if (num_bytes_entropy < RANDOM_BYTES_WANTED) {
-        return (0);
+        return 0;
     }
-    return (1);
+    return 1;
 }
 
 
@@ -257,7 +257,7 @@ _random_read_entropy_from_kernel (void)
                     n, (n == 1 ? "" : "s"));
         }
     }
-    return (n);
+    return n;
 }
 
 
@@ -275,7 +275,7 @@ _random_read_entropy_from_file (const char *path)
 
     if ((path == NULL) || (path[0] == '\0')) {
         errno = EINVAL;
-        return (-1);
+        return -1;
     }
 
     if (path_dirname (path, dir, sizeof (dir)) < 0) {
@@ -312,7 +312,7 @@ _random_read_entropy_from_file (const char *path)
         }
         n = 0;
     }
-    return (!is_path_secure ? -1 : n);
+    return !is_path_secure ? -1 : n;
 }
 
 
@@ -329,7 +329,7 @@ _random_read_entropy_from_process (void)
         _random_add (&buf, sizeof (buf));
         n += sizeof (buf);
     }
-    return (n);
+    return n;
 }
 
 
@@ -361,7 +361,7 @@ _random_read_seed (const char *path, int num_bytes)
         log_msg (LOG_WARNING,
                 "Ignoring PRNG seed \"%s\": must not be a symbolic link",
                 path);
-        return (-1);
+        return -1;
     }
     do {
         fd = open (path, O_RDONLY);
@@ -369,11 +369,11 @@ _random_read_seed (const char *path, int num_bytes)
 
     if (fd < 0) {
         if (errno == ENOENT) {
-            return (0);
+            return 0;
         }
         log_msg (LOG_WARNING, "Failed to open PRNG seed \"%s\": %s",
                 path, strerror (errno));
-        return (-1);
+        return -1;
     }
     /*  File is now open.  Do not prematurely return until it has been closed.
      */
@@ -428,7 +428,7 @@ _random_read_seed (const char *path, int num_bytes)
         log_msg (LOG_INFO, "Seeded PRNG with %d byte%s from \"%s\"",
                 n, (n == 1 ? "" : "s"), path);
     }
-    return (!is_valid ? -1 : n);
+    return !is_valid ? -1 : n;
 }
 
 
@@ -463,7 +463,7 @@ _random_write_seed (const char *path, int num_bytes)
     if (fd < 0) {
         log_msg (LOG_WARNING, "Failed to create PRNG seed \"%s\": %s",
                 path, strerror (errno));
-        return (-1);
+        return -1;
     }
     num_left = num_bytes;
     while (num_left > 0) {
@@ -486,7 +486,7 @@ _random_write_seed (const char *path, int num_bytes)
         log_msg (LOG_INFO, "Wrote %d byte%s to PRNG seed \"%s\"",
                 n, (n == 1 ? "" : "s"), path);
     }
-    return (n);
+    return n;
 }
 
 
@@ -516,9 +516,9 @@ _random_check_entropy (unsigned char *buf, int n)
      */
     lim = n;
     if (cnt >= lim) {
-        return (-1);
+        return -1;
     }
-    return (0);
+    return 0;
 }
 
 

@@ -37,45 +37,45 @@ munge_strerror (munge_err_t errnum)
 {
     switch (errnum) {
         case EMUNGE_SUCCESS:
-            return ("Success");
+            return "Success";
         case EMUNGE_SNAFU:
-            return ("Internal error");
+            return "Internal error";
         case EMUNGE_BAD_ARG:
-            return ("Invalid argument");
+            return "Invalid argument";
         case EMUNGE_BAD_LENGTH:
-            return ("Exceeded maximum message length");
+            return "Exceeded maximum message length";
         case EMUNGE_OVERFLOW:
-            return ("Buffer overflow");
+            return "Buffer overflow";
         case EMUNGE_NO_MEMORY:
-            return ("Out of memory");
+            return "Out of memory";
         case EMUNGE_SOCKET:
-            return ("Socket communication error");
+            return "Socket communication error";
         case EMUNGE_TIMEOUT:
-            return ("Socket timeout");
+            return "Socket timeout";
         case EMUNGE_BAD_CRED:
-            return ("Invalid credential format");
+            return "Invalid credential format";
         case EMUNGE_BAD_VERSION:
-            return ("Invalid credential version");
+            return "Invalid credential version";
         case EMUNGE_BAD_CIPHER:
-            return ("Invalid cipher type");
+            return "Invalid cipher type";
         case EMUNGE_BAD_MAC:
-            return ("Invalid MAC type");
+            return "Invalid MAC type";
         case EMUNGE_BAD_ZIP:
-            return ("Invalid compression type");
+            return "Invalid compression type";
         case EMUNGE_BAD_REALM:
-            return ("Unrecognized security realm");
+            return "Unrecognized security realm";
         case EMUNGE_CRED_INVALID:
-            return ("Invalid credential");
+            return "Invalid credential";
         case EMUNGE_CRED_EXPIRED:
-            return ("Expired credential");
+            return "Expired credential";
         case EMUNGE_CRED_REWOUND:
-            return ("Rewound credential");
+            return "Rewound credential";
         case EMUNGE_CRED_REPLAYED:
-            return ("Replayed credential");
+            return "Replayed credential";
         case EMUNGE_CRED_UNAUTHORIZED:
-            return ("Unauthorized credential");
+            return "Unauthorized credential";
         default:
             break;
     }
-    return ("Unknown error");
+    return "Unknown error";
 }

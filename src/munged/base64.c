@@ -279,7 +279,7 @@ base64_decode_update (base64_ctx *x, void *dst, int *dstlen,
     }
     *pdst = '\0';
     *dstlen = pdst - (unsigned char *) dst;
-    return (err ? -1 : 0);
+    return err ? -1 : 0;
 }
 
 /**

@@ -71,8 +71,8 @@ munge_encode (char **cred, munge_ctx_t ctx, const void *buf, int len)
      *  Ensure a ptr exists for returning the credential to the caller.
      */
     if (!cred) {
-        return (_munge_ctx_set_err (ctx, EMUNGE_BAD_ARG,
-            strdup ("No address specified for returning the credential")));
+        return _munge_ctx_set_err (ctx, EMUNGE_BAD_ARG,
+            strdup ("No address specified for returning the credential"));
     }
     /*  Ask the daemon to encode a credential.
      */
@@ -96,7 +96,7 @@ munge_encode (char **cred, munge_ctx_t ctx, const void *buf, int len)
         m->error_is_copy = 1;
     }
     m_msg_destroy (m);
-    return (e);
+    return e;
 }
 
 
@@ -173,9 +173,9 @@ _encode_req (m_msg_t m, munge_ctx_t ctx, const void *buf, int len)
         m_msg_set_err (m, EMUNGE_BAD_LENGTH,
             strdupf ("Payload size %lu exceeded maximum of %lu",
                 m->data_len, MUNGE_MAXIMUM_PAYLOAD_LEN));
-        return (EMUNGE_BAD_LENGTH);
+        return EMUNGE_BAD_LENGTH;
     }
-    return (EMUNGE_SUCCESS);
+    return EMUNGE_SUCCESS;
 }
 
 
@@ -197,17 +197,17 @@ _encode_rsp (m_msg_t m, char **cred)
     if (m->type != MUNGE_MSG_ENC_RSP) {
         m_msg_set_err (m, EMUNGE_SNAFU,
             strdupf ("Client received invalid message type %d", m->type));
-        return (EMUNGE_SNAFU);
+        return EMUNGE_SNAFU;
     }
     if (m->data_len <= 0) {
         m_msg_set_err (m, EMUNGE_SNAFU,
             strdupf ("Client received invalid data length %d", m->data_len));
-        return (EMUNGE_SNAFU);
+        return EMUNGE_SNAFU;
     }
     /*  Return the credential to the caller.
      */
     assert (* ((unsigned char *) m->data + m->data_len) == '\0');
     *cred = m->data;
     m->data_is_copy = 1;
-    return (m->error_num);
+    return m->error_num;
 }

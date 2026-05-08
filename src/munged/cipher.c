@@ -95,10 +95,10 @@ cipher_init (cipher_ctx *x, munge_cipher_t cipher,
 
     if (!x || !key || !iv
             || !((enc == CIPHER_DECRYPT) || (enc == CIPHER_ENCRYPT))) {
-        return (-1);
+        return -1;
     }
     rc = _cipher_init (x, cipher, key, iv, enc);
-    return (rc);
+    return rc;
 }
 
 
@@ -119,10 +119,10 @@ cipher_update (cipher_ctx *x, void *dst, int *dstlenp,
     assert (_cipher_is_initialized);
 
     if (!x || !dst || !dstlenp || (*dstlenp < 0) || !src || (srclen < 0)) {
-        return (-1);
+        return -1;
     }
     rc = _cipher_update (x, dst, dstlenp, src, srclen);
-    return (rc);
+    return rc;
 }
 
 
@@ -143,10 +143,10 @@ cipher_final (cipher_ctx *x, void *dst, int *dstlenp)
     assert (_cipher_is_initialized);
 
     if (!x || !dst || !dstlenp || (*dstlenp < 0)) {
-        return (-1);
+        return -1;
     }
     rc = _cipher_final (x, dst, dstlenp);
-    return (rc);
+    return rc;
 }
 
 
@@ -161,11 +161,11 @@ cipher_cleanup (cipher_ctx *x)
     assert (_cipher_is_initialized);
 
     if (!x) {
-        return (-1);
+        return -1;
     }
     rc = _cipher_cleanup (x);
     memset (x, 0, sizeof (*x));
-    return (rc);
+    return rc;
 }
 
 
@@ -175,7 +175,7 @@ int
 cipher_block_size (munge_cipher_t cipher)
 {
     assert (_cipher_is_initialized);
-    return (_cipher_block_size (cipher));
+    return _cipher_block_size (cipher);
 }
 
 
@@ -186,7 +186,7 @@ int
 cipher_iv_size (munge_cipher_t cipher)
 {
     assert (_cipher_is_initialized);
-    return (_cipher_iv_size (cipher));
+    return _cipher_iv_size (cipher);
 }
 
 
@@ -196,7 +196,7 @@ int
 cipher_key_size (munge_cipher_t cipher)
 {
     assert (_cipher_is_initialized);
-    return (_cipher_key_size (cipher));
+    return _cipher_key_size (cipher);
 }
 
 
@@ -211,7 +211,7 @@ int
 cipher_map_enum (munge_cipher_t cipher, void *dst)
 {
     assert (_cipher_is_initialized);
-    return (_cipher_map_enum (cipher, dst));
+    return _cipher_map_enum (cipher, dst);
 }
 
 
@@ -257,44 +257,44 @@ _cipher_init (cipher_ctx *x, munge_cipher_t cipher,
     size_t nbytes;
 
     if (_cipher_map_enum (cipher, &algo) < 0) {
-        return (-1);
+        return -1;
     }
     e = gcry_cipher_open (&(x->ctx), algo, GCRY_CIPHER_MODE_CBC, 0);
     if (e != 0) {
         log_msg (LOG_DEBUG, "gcry_cipher_open failed for cipher=%d: %s",
             cipher, gcry_strerror (e));
-        return (-1);
+        return -1;
     }
     e = gcry_cipher_algo_info (algo, GCRYCTL_GET_KEYLEN, NULL, &nbytes);
     if (e != 0) {
         log_msg (LOG_DEBUG,
             "gcry_cipher_algo_info failed for cipher=%d key length: %s",
             cipher, gcry_strerror (e));
-        return (-1);
+        return -1;
     }
     e = gcry_cipher_setkey (x->ctx, key, nbytes);
     if (e != 0) {
         log_msg (LOG_DEBUG, "gcry_cipher_setkey failed for cipher=%d: %s",
             cipher, gcry_strerror (e));
-        return (-1);
+        return -1;
     }
     e = gcry_cipher_algo_info (algo, GCRYCTL_GET_BLKLEN, NULL, &nbytes);
     if (e != 0) {
         log_msg (LOG_DEBUG,
             "gcry_cipher_algo_info failed for cipher=%d block length: %s",
             cipher, gcry_strerror (e));
-        return (-1);
+        return -1;
     }
     e = gcry_cipher_setiv (x->ctx, iv, nbytes);
     if (e != 0) {
         log_msg (LOG_DEBUG, "gcry_cipher_setiv failed for cipher=%d: %s",
             cipher, gcry_strerror (e));
-        return (-1);
+        return -1;
     }
     x->do_encrypt = enc;
     x->len = 0;
     x->blklen = (int) nbytes;
-    return (0);
+    return 0;
 }
 
 
@@ -389,11 +389,11 @@ _cipher_update (cipher_ctx *x, void *vdst, int *dstlenp,
     /*  Set the number of bytes written.
      */
     *dstlenp = n_written;
-    return (0);
+    return 0;
 
 err:
     *dstlenp = 0;
-    return (-1);
+    return -1;
 }
 
 
@@ -415,12 +415,12 @@ _cipher_update_aux (cipher_ctx *x, void *dst, int *dstlenp,
             (x->do_encrypt ? "gcry_cipher_encrypt" : "gcry_cipher_decrypt"),
             gcry_strerror (e));
         *dstlenp = 0;
-        return (-1);
+        return -1;
     }
     if ((src != NULL) || (srclen != 0)) {
         *dstlenp = srclen;
     }
-    return (0);
+    return 0;
 }
 
 
@@ -438,7 +438,7 @@ _cipher_final (cipher_ctx *x, void *dst, int *dstlenp)
             x->buf[i] = pad;
         }
         if (_cipher_update_aux (x, dst, dstlenp, x->buf, x->blklen) < 0) {
-            return (-1);
+            return -1;
         }
     }
     else {
@@ -448,13 +448,13 @@ _cipher_final (cipher_ctx *x, void *dst, int *dstlenp)
             log_msg (LOG_DEBUG,
                 "Final decryption block has only %d of %d bytes",
                 x->len, x->blklen);
-            return (-1);
+            return -1;
         }
         /*  Perform in-place decryption of final cipher block.
          */
         n = x->blklen;
         if (_cipher_update_aux (x, x->buf, &n, NULL, 0) < 0) {
-            return (-1);
+            return -1;
         }
         assert (n == x->blklen);
         /*
@@ -464,13 +464,13 @@ _cipher_final (cipher_ctx *x, void *dst, int *dstlenp)
         if ((pad <= 0) || (pad > x->blklen)) {
             log_msg (LOG_DEBUG,
                 "Final decryption block has invalid pad of %d", pad);
-            return (-1);
+            return -1;
         }
         for (i = x->blklen - pad; i < x->blklen; i++) {
             if (x->buf[i] != pad) {
                 log_msg (LOG_DEBUG,
                     "Final decryption block has padding error at byte %d", i);
-                return (-1);
+                return -1;
             }
         }
         /*  Copy decrypted plaintext to dst.
@@ -478,13 +478,13 @@ _cipher_final (cipher_ctx *x, void *dst, int *dstlenp)
         n = x->blklen - pad;
         if (n > 0) {
             if (*dstlenp < n) {
-                return (-1);
+                return -1;
             }
             memcpy (dst, x->buf, n);
         }
         *dstlenp = n;
     }
-    return (0);
+    return 0;
 }
 
 
@@ -492,7 +492,7 @@ static int
 _cipher_cleanup (cipher_ctx *x)
 {
     gcry_cipher_close (x->ctx);
-    return (0);
+    return 0;
 }
 
 
@@ -504,23 +504,23 @@ _cipher_block_size (munge_cipher_t cipher)
     size_t nbytes;
 
     if (_cipher_map_enum (cipher, &algo) < 0) {
-        return (-1);
+        return -1;
     }
     e = gcry_cipher_algo_info (algo, GCRYCTL_GET_BLKLEN, NULL, &nbytes);
     if (e != 0) {
         log_msg (LOG_DEBUG,
             "gcry_cipher_algo_info failed for cipher=%d block length: %s",
             cipher, gcry_strerror (e));
-        return (-1);
+        return -1;
     }
-    return (nbytes);
+    return nbytes;
 }
 
 
 static int
 _cipher_iv_size (munge_cipher_t cipher)
 {
-    return (_cipher_block_size (cipher));
+    return _cipher_block_size (cipher);
 }
 
 
@@ -532,16 +532,16 @@ _cipher_key_size (munge_cipher_t cipher)
     size_t nbytes;
 
     if (_cipher_map_enum (cipher, &algo) < 0) {
-        return (-1);
+        return -1;
     }
     e = gcry_cipher_algo_info (algo, GCRYCTL_GET_KEYLEN, NULL, &nbytes);
     if (e != 0) {
         log_msg (LOG_DEBUG,
             "gcry_cipher_algo_info failed for cipher=%d key length: %s",
             cipher, gcry_strerror (e));
-        return (-1);
+        return -1;
     }
-    return (nbytes);
+    return nbytes;
 }
 
 
@@ -554,12 +554,12 @@ _cipher_map_enum (munge_cipher_t cipher, void *dst)
         algo = _cipher_map[cipher];
     }
     if (algo < 0) {
-        return (-1);
+        return -1;
     }
     if (dst != NULL) {
         * (int *) dst = algo;
     }
-    return (0);
+    return 0;
 }
 
 #endif /* HAVE_LIBGCRYPT */
@@ -605,7 +605,7 @@ _cipher_init (cipher_ctx *x, munge_cipher_t cipher,
     EVP_CIPHER *algo;
 
     if (_cipher_map_enum (cipher, &algo) < 0) {
-        return (-1);
+        return -1;
     }
 #if HAVE_EVP_CIPHER_CTX_NEW
     /*  OpenSSL >= 0.9.8b  */
@@ -614,7 +614,7 @@ _cipher_init (cipher_ctx *x, munge_cipher_t cipher,
     x->ctx = OPENSSL_malloc (sizeof (EVP_CIPHER_CTX));
 #endif /* HAVE_EVP_CIPHER_CTX_NEW */
     if (x->ctx == NULL) {
-        return (-1);
+        return -1;
     }
 
 #if HAVE_EVP_CIPHERINIT_EX
@@ -624,13 +624,13 @@ _cipher_init (cipher_ctx *x, munge_cipher_t cipher,
 #endif /* HAVE_EVP_CIPHER_CTX_INIT */
     /*  OpenSSL >= 0.9.7  */
     if (EVP_CipherInit_ex (x->ctx, algo, NULL, key, iv, enc) != 1) {
-        return (-1);
+        return -1;
     }
 #elif HAVE_EVP_CIPHERINIT_RETURN_INT
     /*  EVP_CipherInit() implicitly initializes the EVP_CIPHER_CTX.  */
     /*  OpenSSL > 0.9.5a  */
     if (EVP_CipherInit (x->ctx, algo, key, iv, enc) != 1) {
-        return (-1);
+        return -1;
     }
 #elif HAVE_EVP_CIPHERINIT
     /*  EVP_CipherInit() implicitly initializes the EVP_CIPHER_CTX.  */
@@ -640,7 +640,7 @@ _cipher_init (cipher_ctx *x, munge_cipher_t cipher,
 #error "No OpenSSL EVP_CipherInit"
 #endif /* HAVE_EVP_CIPHERINIT_EX */
 
-    return (0);
+    return 0;
 }
 
 
@@ -651,7 +651,7 @@ _cipher_update (cipher_ctx *x, void *dst, int *dstlenp,
 #if HAVE_EVP_CIPHERUPDATE_RETURN_INT
     /*  OpenSSL > 0.9.5a  */
     if (EVP_CipherUpdate (x->ctx, dst, dstlenp, (void *) src, srclen) != 1) {
-        return (-1);
+        return -1;
     }
 #elif HAVE_EVP_CIPHERUPDATE
     /*  OpenSSL <= 0.9.5a  */
@@ -660,7 +660,7 @@ _cipher_update (cipher_ctx *x, void *dst, int *dstlenp,
 #error "No OpenSSL EVP_CipherUpdate"
 #endif /* HAVE_EVP_CIPHERUPDATE_RETURN_INT */
 
-    return (0);
+    return 0;
 }
 
 
@@ -670,17 +670,17 @@ _cipher_final (cipher_ctx *x, void *dst, int *dstlenp)
 #if HAVE_EVP_CIPHERFINAL_EX
     /*  OpenSSL >= 0.9.7  */
     if (EVP_CipherFinal_ex (x->ctx, dst, dstlenp) != 1) {
-        return (-1);
+        return -1;
     }
 #elif HAVE_EVP_CIPHERFINAL
     if (EVP_CipherFinal (x->ctx, dst, dstlenp) != 1) {
-        return (-1);
+        return -1;
     }
 #else
 #error "No OpenSSL EVP_CipherFinal"
 #endif /* HAVE_EVP_CIPHERFINAL_EX */
 
-    return (0);
+    return 0;
 }
 
 
@@ -706,7 +706,7 @@ _cipher_cleanup (cipher_ctx *x)
 #endif /* HAVE_EVP_CIPHER_CTX_FREE */
 
     x->ctx = NULL;
-    return (rv);
+    return rv;
 }
 
 
@@ -716,9 +716,9 @@ _cipher_block_size (munge_cipher_t cipher)
     EVP_CIPHER *algo;
 
     if (_cipher_map_enum (cipher, &algo) < 0) {
-        return (-1);
+        return -1;
     }
-    return (EVP_CIPHER_block_size (algo));
+    return EVP_CIPHER_block_size (algo);
 }
 
 
@@ -728,9 +728,9 @@ _cipher_iv_size (munge_cipher_t cipher)
     EVP_CIPHER *algo;
 
     if (_cipher_map_enum (cipher, &algo) < 0) {
-        return (-1);
+        return -1;
     }
-    return (EVP_CIPHER_iv_length (algo));
+    return EVP_CIPHER_iv_length (algo);
 }
 
 
@@ -740,9 +740,9 @@ _cipher_key_size (munge_cipher_t cipher)
     EVP_CIPHER *algo;
 
     if (_cipher_map_enum (cipher, &algo) < 0) {
-        return (-1);
+        return -1;
     }
-    return (EVP_CIPHER_key_length (algo));
+    return EVP_CIPHER_key_length (algo);
 }
 
 
@@ -755,12 +755,12 @@ _cipher_map_enum (munge_cipher_t cipher, void *dst)
         algo = _cipher_map[cipher];
     }
     if (algo == NULL) {
-        return (-1);
+        return -1;
     }
     if (dst != NULL) {
         * (const EVP_CIPHER **) dst = algo;
     }
-    return (0);
+    return 0;
 }
 
 #endif /* HAVE_OPENSSL */

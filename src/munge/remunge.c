@@ -272,7 +272,7 @@ create_conf (void)
         log_err (EMUNGE_SNAFU, LOG_ERR,
             "Failed to compute maximum number of threads");
     }
-    return (conf);
+    return conf;
 }
 
 
@@ -331,7 +331,7 @@ create_tdata (conf_t conf)
     if ((conf->do_decode) && !(tdata->dctx = munge_ctx_copy (conf->ctx))) {
         log_err (EMUNGE_SNAFU, LOG_ERR, "Failed to copy munge decode context");
     }
-    return (tdata);
+    return tdata;
 }
 
 
@@ -806,7 +806,7 @@ get_si_multiple (char c)
             multiple = 0;
             break;
     }
-    return (multiple);
+    return multiple;
 }
 
 
@@ -841,7 +841,7 @@ get_time_multiple (char c)
             multiple = 0;
             break;
     }
-    return (multiple);
+    return multiple;
 }
 
 
@@ -1193,7 +1193,7 @@ remunge (conf_t conf)
         conf->shared.num_decode_errs += got_decode_err;
     }
     pthread_cleanup_pop (1);
-    return (NULL);
+    return NULL;
 }
 
 

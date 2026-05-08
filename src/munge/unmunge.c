@@ -297,7 +297,7 @@ create_conf (void)
     conf->is_ttl_ignored = 0;
     conf->is_replay_ignored = 0;
 
-    return (conf);
+    return conf;
 }
 
 
@@ -1094,14 +1094,14 @@ key_str_to_val (const char *str)
     int i;
 
     if ((str == NULL) || (str[0] == '\0')) {
-        return (-1);
+        return -1;
     }
     for (i = 0; i < MUNGE_KEY_LAST; i++) {
         if (!strcasecmp (str, munge_keys[i].str)) {
-            return (i);
+            return i;
         }
     }
-    return (-1);
+    return -1;
 }
 
 
@@ -1112,5 +1112,5 @@ key_val_to_str (int val)
     assert (val < MUNGE_KEY_LAST);
     assert (munge_keys[val].str != NULL);
 
-    return (munge_keys[val].str);
+    return munge_keys[val].str;
 }

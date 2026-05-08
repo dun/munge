@@ -206,7 +206,7 @@ timer_set_absolute (callback_f cb, void *arg, const struct timespec *tsp)
 
     if (!cb || !tsp) {
         errno = EINVAL;
-        return (-1);
+        return -1;
     }
     if ((errno = pthread_mutex_lock (&_timer_mutex)) != 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to lock timer mutex");
@@ -250,7 +250,7 @@ timer_set_absolute (callback_f cb, void *arg, const struct timespec *tsp)
         }
     }
     assert (t->id > 0);
-    return (t->id);
+    return t->id;
 }
 
 
@@ -270,7 +270,7 @@ timer_set_relative (callback_f cb, void *arg, long msec)
     if (rv < 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to query current time");
     }
-    return (timer_set_absolute (cb, arg, &ts));
+    return timer_set_absolute (cb, arg, &ts);
 }
 
 
@@ -287,7 +287,7 @@ timer_cancel (long id)
 
     if (id <= 0) {
         errno = EINVAL;
-        return (-1);
+        return -1;
     }
     if ((errno = pthread_mutex_lock (&_timer_mutex)) != 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to lock timer mutex");
@@ -322,7 +322,7 @@ timer_cancel (long id)
                 "Failed to signal timer condition");
         }
     }
-    return (t ? 1 : 0);
+    return t ? 1 : 0;
 }
 
 
@@ -460,7 +460,7 @@ _timer_thread (void *arg)
     }
     assert (1);                         /* not reached */
     pthread_cleanup_pop (1);
-    return (NULL);
+    return NULL;
 }
 
 
@@ -494,5 +494,5 @@ _timer_alloc (void)
     else {
         t = malloc (sizeof (struct timer));
     }
-    return (t);
+    return t;
 }

@@ -106,13 +106,13 @@ log_open_file (FILE *fp, const char *identity, int priority, int options)
 
     if (!fp) {
         errno = EINVAL;
-        return (-1);
+        return -1;
     }
     if (ferror (fp)) {
-        return (-1);
+        return -1;
     }
     if (setvbuf (fp, NULL, _IONBF, 0) != 0) {   /* set stream unbuffered */
-        return (-1);
+        return -1;
     }
     log_ctx.fp = fp;
     if (identity) {
@@ -127,7 +127,7 @@ log_open_file (FILE *fp, const char *identity, int priority, int options)
     log_ctx.priority = (priority > 0) ? priority : 0;
     log_ctx.options = options;
     log_ctx.got_init = 1;
-    return (0);
+    return 0;
 }
 
 
@@ -156,7 +156,7 @@ log_open_syslog (const char *identity, int facility)
 
     if (!identity) {
         errno = EINVAL;
-        return (-1);
+        return -1;
     }
     if ((p = strrchr (identity, '/'))) {
         identity = p + 1;
@@ -164,7 +164,7 @@ log_open_syslog (const char *identity, int facility)
     openlog (identity, LOG_NDELAY | LOG_PID, facility);
     log_ctx.got_syslog = 1;
     log_ctx.got_init = 1;
-    return (0);
+    return 0;
 }
 
 
@@ -456,23 +456,23 @@ _log_prefix (int priority)
 {
     switch (priority) {
         case LOG_EMERG:
-            return ("Emergency");
+            return "Emergency";
         case LOG_ALERT:
-            return ("Alert");
+            return "Alert";
         case LOG_CRIT:
-            return ("Critical");
+            return "Critical";
         case LOG_ERR:
-            return ("Error");
+            return "Error";
         case LOG_WARNING:
-            return ("Warning");
+            return "Warning";
         case LOG_NOTICE:
-            return ("Notice");
+            return "Notice";
         case LOG_INFO:
-            return ("Info");
+            return "Info";
         case LOG_DEBUG:
-            return ("Debug");
+            return "Debug";
         default:
-            return ("Unknown");
+            return "Unknown";
     }
     assert (1);                         /* not reached */
 }

@@ -143,16 +143,16 @@ xgetgrbuf_create (size_t len)
     }
     grbufp = malloc (sizeof (struct xgrbuf_t));
     if (grbufp == NULL) {
-        return (NULL);
+        return NULL;
     }
     grbufp->buf = malloc (len);
     if (grbufp->buf == NULL) {
         free (grbufp);
-        return (NULL);
+        return NULL;
     }
     grbufp->len = len;
     log_msg (LOG_DEBUG, "Created group entry buffer of size %u", len);
-    return (grbufp);
+    return grbufp;
 }
 
 
@@ -178,9 +178,9 @@ xgetgrbuf_get_len (xgrbuf_p grbufp)
  */
     if (grbufp == NULL) {
         errno = EINVAL;
-        return (0);
+        return 0;
     }
-    return (grbufp->len);
+    return grbufp->len;
 }
 
 
@@ -227,7 +227,7 @@ xgetgrent (struct group *grp, xgrbuf_p grbufp)
 
     if ((grp == NULL) || (grbufp == NULL)) {
         errno = EINVAL;
-        return (-1);
+        return -1;
     }
     assert (grbufp->buf != NULL);
     assert (grbufp->len > 0);
@@ -294,13 +294,13 @@ restart:
     }
 #endif /* WITH_PTHREADS */
     if (rv_copy < 0) {
-        return (-1);
+        return -1;
     }
 #endif /* HAVE_GETGRENT_R_GNU */
 
     if (got_eof) {
         errno = ENOENT;
-        return (-1);
+        return -1;
     }
     if (got_err) {
         if (errno == ERANGE) {
@@ -311,9 +311,9 @@ restart:
             }
 #endif /* !HAVE_GETGRENT_R_ERANGE_BROKEN */
         }
-        return (-1);
+        return -1;
     }
-    return (0);
+    return 0;
 }
 
 
@@ -353,7 +353,7 @@ xgetgrnam (const char *name, struct group *grp, xgrbuf_p grbufp)
         (grbufp == NULL))
     {
         errno = EINVAL;
-        return (-1);
+        return -1;
     }
     assert (grbufp->buf != NULL);
     assert (grbufp->len > 0);
@@ -453,13 +453,13 @@ restart:
     }
 #endif /* WITH_PTHREADS */
     if (rv_copy < 0) {
-        return (-1);
+        return -1;
     }
 #endif /* HAVE_GETGRNAM_R_POSIX */
 
     if (got_none) {
         errno = ENOENT;
-        return (-1);
+        return -1;
     }
     if (got_err) {
         if (errno == EINTR) {
@@ -471,12 +471,12 @@ restart:
                 goto restart;
             }
         }
-        return (-1);
+        return -1;
     }
     /*  Some systems set errno even on success.  Go figure.
      */
     errno = 0;
-    return (0);
+    return 0;
 }
 
 
@@ -499,7 +499,7 @@ _xgetgrbuf_get_sys_size (void)
 #endif /* HAVE_SYSCONF */
 
     len = (n <= MINIMUM_GR_BUF_SIZE) ? MINIMUM_GR_BUF_SIZE : (size_t) n;
-    return (len);
+    return len;
 }
 
 
@@ -521,20 +521,20 @@ _xgetgrbuf_grow (xgrbuf_p grbufp, size_t minlen)
         newlen *= 2;
         if (newlen < grbufp->len) {     /* newlen overflowed */
             errno = ENOMEM;
-            return (-1);
+            return -1;
         }
     } while (newlen < minlen);
 
     newbuf = realloc (grbufp->buf, newlen);
     if (newbuf == NULL) {
         errno = ENOMEM;
-        return (-1);
+        return -1;
     }
     grbufp->buf = newbuf;
     grbufp->len = newlen;
 
     log_msg (LOG_INFO, "Increased group entry buffer size to %u", newlen);
-    return (0);
+    return 0;
 }
 
 
@@ -579,7 +579,7 @@ _xgetgrbuf_copy_struct (const struct group *src, struct group *dst,
      */
     if (grbufp->len < num_bytes) {
         if (_xgetgrbuf_grow (grbufp, num_bytes) < 0) {
-            return (-1);
+            return -1;
         }
     }
     /*  Copy group entry.
@@ -613,11 +613,11 @@ _xgetgrbuf_copy_struct (const struct group *src, struct group *dst,
     dst->gr_gid = src->gr_gid;
 
     assert (p <= grbufp->buf + grbufp->len);
-    return (0);
+    return 0;
 
 err:
     errno = ERANGE;
-    return (-1);
+    return -1;
 }
 
 
@@ -640,14 +640,14 @@ _xgetgrbuf_copy_string (const char *src, char **dstp,
 
     if (src == NULL) {
         *dstp = NULL;
-        return (0);
+        return 0;
     }
     n = strlen (src) + 1;
     if (*buflenp < n) {
-        return (-1);
+        return -1;
     }
     *dstp = memcpy (*bufp, src, n);
     *bufp += n;
     *buflenp -= n;
-    return (n);
+    return n;
 }

@@ -234,7 +234,7 @@ create_conf (void)
     }
 #endif /* AUTH_METHOD_RECVFD_MKFIFO || AUTH_METHOD_RECVFD_MKNOD */
 
-    return (conf);
+    return conf;
 }
 
 
@@ -951,7 +951,7 @@ _conf_send_signal (pid_t pid, int signum, int msecs)
         rv = kill (pid, sig);
         if (rv < 0) {
             if (errno == ESRCH) {
-                return (0);
+                return 0;
             }
             log_errno (EMUNGE_SNAFU, LOG_ERR,
                     "Failed to signal daemon (pid %d, sig %d)",
@@ -973,7 +973,7 @@ _conf_send_signal (pid_t pid, int signum, int msecs)
         }
         _conf_sleep (MUNGE_SIGNAL_CHECK_MSECS);
     }
-    return (1);
+    return 1;
 }
 
 
@@ -1151,5 +1151,5 @@ _conf_open_keyfile (const char *keyfile, int got_force)
         log_errno (EMUNGE_SNAFU, LOG_ERR,
             "Failed to open keyfile \"%s\"", keyfile);
     }
-    return (fd);
+    return fd;
 }

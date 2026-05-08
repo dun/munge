@@ -54,7 +54,7 @@ munge_ctx_create (void)
     munge_ctx_t ctx;
 
     if (!(ctx = malloc (sizeof (*ctx)))) {
-        return (NULL);
+        return NULL;
     }
     ctx->cipher = MUNGE_CIPHER_DEFAULT;
     ctx->mac = MUNGE_MAC_DEFAULT;
@@ -73,9 +73,9 @@ munge_ctx_create (void)
 
     if (!ctx->socket_str) {
         munge_ctx_destroy (ctx);
-        return (NULL);
+        return NULL;
     }
-    return (ctx);
+    return ctx;
 }
 
 
@@ -85,10 +85,10 @@ munge_ctx_copy (munge_ctx_t src)
     munge_ctx_t dst;
 
     if (!src) {
-        return (NULL);
+        return NULL;
     }
     if (!(dst = malloc (sizeof (*dst)))) {
-        return (NULL);
+        return NULL;
     }
     *dst = *src;
     /*
@@ -114,11 +114,11 @@ munge_ctx_copy (munge_ctx_t src)
     if (!(dst->socket_str = strdup (src->socket_str))) {
         goto err;
     }
-    return (dst);
+    return dst;
 
 err:
     munge_ctx_destroy (dst);
-    return (NULL);
+    return NULL;
 }
 
 
@@ -145,15 +145,15 @@ const char *
 munge_ctx_strerror (munge_ctx_t ctx)
 {
     if (!ctx) {
-        return (NULL);
+        return NULL;
     }
     if (ctx->error_num == EMUNGE_SUCCESS) {
-        return (NULL);
+        return NULL;
     }
     if (ctx->error_str != NULL) {
-        return (ctx->error_str);
+        return ctx->error_str;
     }
-    return (munge_strerror (ctx->error_num));
+    return munge_strerror (ctx->error_num);
 }
 
 
@@ -169,7 +169,7 @@ munge_ctx_get (munge_ctx_t ctx, int opt, ...)
     va_list          vargs;
 
     if (!ctx) {
-        return (EMUNGE_BAD_ARG);
+        return EMUNGE_BAD_ARG;
     }
     ctx->error_num = EMUNGE_SUCCESS;
     if (ctx->error_str) {
@@ -235,7 +235,7 @@ munge_ctx_get (munge_ctx_t ctx, int opt, ...)
             break;
     }
     va_end (vargs);
-    return (ctx->error_num);
+    return ctx->error_num;
 }
 
 
@@ -248,7 +248,7 @@ munge_ctx_set (munge_ctx_t ctx, int opt, ...)
     va_list      vargs;
 
     if (!ctx) {
-        return (EMUNGE_BAD_ARG);
+        return EMUNGE_BAD_ARG;
     }
     ctx->error_num = EMUNGE_SUCCESS;
     if (ctx->error_str) {
@@ -331,7 +331,7 @@ munge_ctx_set (munge_ctx_t ctx, int opt, ...)
             break;
     }
     va_end (vargs);
-    return (ctx->error_num);
+    return ctx->error_num;
 }
 
 
@@ -362,5 +362,5 @@ _munge_ctx_set_err (munge_ctx_t ctx, munge_err_t e, char *s)
     if (s) {
         free (s);
     }
-    return (e);
+    return e;
 }

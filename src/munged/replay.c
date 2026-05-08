@@ -192,18 +192,18 @@ replay_insert (munge_cred_t c)
 
     if (!replay_hash) {
         if (conf->got_benchmark)
-            return (0);
+            return 0;
         errno = EPERM;
-        return (-1);
+        return -1;
     }
     if (c == NULL) {
         errno = EINVAL;
-        return (-1);
+        return -1;
     }
     m = c->msg;
 
     if (!(r = replay_alloc ())) {
-        return (-1);
+        return -1;
     }
     r->data.t_expired = (time_t) (m->time0 + m->ttl);
     assert (c->mac_len >= sizeof (r->data.mac));
@@ -212,19 +212,19 @@ replay_insert (munge_cred_t c)
      *  The replay hash key is just the replay_t object itself.
      */
     if (hash_insert (replay_hash, r, r) != NULL) {
-        return (0);
+        return 0;
     }
     e = errno;
     replay_free (r);
 
     if (e == EEXIST) {
-        return (1);
+        return 1;
     }
     if (e == EINVAL) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
             "Attempted to insert cred into hash using invalid args");
     }
-    return (-1);
+    return -1;
 }
 
 
@@ -239,13 +239,13 @@ replay_remove (munge_cred_t c)
 
     if (!replay_hash) {
         if (conf->got_benchmark)
-            return (0);
+            return 0;
         errno = EPERM;
-        return (-1);
+        return -1;
     }
     if (c == NULL) {
         errno = EINVAL;
-        return (-1);
+        return -1;
     }
     m = c->msg;
 
@@ -259,7 +259,7 @@ replay_remove (munge_cred_t c)
     if (r != NULL) {
         replay_free (r);
     }
-    return (r ? 0 : -1);
+    return r ? 0 : -1;
 }
 
 
@@ -303,7 +303,7 @@ replay_key_f (const replay_t r)
  */
     unsigned int key;
     memcpy (&key, r->data.mac, sizeof (key));
-    return (key);
+    return key;
 }
 
 
@@ -318,15 +318,15 @@ replay_cmp_f (const replay_t r1, const replay_t r2)
 
     cmpval = memcmp (r1->data.mac, r2->data.mac, sizeof (r1->data.mac));
     if (cmpval != 0) {
-        return (cmpval);
+        return cmpval;
     }
     if (r1->data.t_expired < r2->data.t_expired) {
-        return (-1);
+        return -1;
     }
     if (r1->data.t_expired > r2->data.t_expired) {
-        return (1);
+        return 1;
     }
-    return (0);
+    return 0;
 }
 
 
@@ -336,9 +336,9 @@ replay_is_expired (replay_t r, void *key, time_t *pnow)
 /*  Returns true if replay_t object [r] has expired based on the time [pnow].
  */
     if (r->data.t_expired < *pnow) {
-        return (1);
+        return 1;
     }
-    return (0);
+    return 0;
 }
 
 
@@ -379,7 +379,7 @@ replay_alloc (void)
         errno = ENOMEM;
     }
     lsd_mutex_unlock (&replay_free_list_lock);
-    return (r);
+    return r;
 }
 
 

@@ -60,11 +60,11 @@ query_uid (const char *user, uid_t *uid_ptr)
 
     if (user == NULL) {
         errno = EINVAL;
-        return (-1);
+        return -1;
     }
     pwbufp = xgetpwbuf_create (0);
     if (pwbufp == NULL) {
-        return (-1);
+        return -1;
     }
     if (xgetpwnam (user, &pw, pwbufp) == 0) {
         uid = pw.pw_uid;
@@ -91,7 +91,7 @@ query_uid (const char *user, uid_t *uid_ptr)
         *uid_ptr = uid;
     }
     xgetpwbuf_destroy (pwbufp);
-    return (rv);
+    return rv;
 }
 
 
@@ -112,11 +112,11 @@ query_gid (const char *group, gid_t *gid_ptr)
 
     if (group == NULL) {
         errno = EINVAL;
-        return (-1);
+        return -1;
     }
     grbufp = xgetgrbuf_create (0);
     if (grbufp == NULL) {
-        return (-1);
+        return -1;
     }
     if (xgetgrnam (group, &gr, grbufp) == 0) {
         gid = gr.gr_gid;
@@ -143,5 +143,5 @@ query_gid (const char *group, gid_t *gid_ptr)
         *gid_ptr = gid;
     }
     xgetgrbuf_destroy (grbufp);
-    return (rv);
+    return rv;
 }

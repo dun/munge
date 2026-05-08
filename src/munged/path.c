@@ -78,22 +78,22 @@ path_canonicalize (const char *src, char *dst, size_t dstlen)
 
     if (!src || !*src || !dst) {
         errno = EINVAL;
-        return (-1);
+        return -1;
     }
     if (!realpath (src, buf)) {
-        return (-1);
+        return -1;
     }
     if (buf[0] != '/') {
         errno = EINVAL;
-        return (-1);
+        return -1;
     }
     buflen = strnlen (buf, dstlen);
     if (buflen >= dstlen) {
         errno = ENAMETOOLONG;
-        return (-1);
+        return -1;
     }
     memcpy (dst, buf, buflen + 1);
-    return (buflen);
+    return buflen;
 }
 
 
@@ -111,12 +111,12 @@ path_dirname (const char *src, char *dst, size_t dstlen)
 
     if (!src || !*src || !dst) {
         errno = EINVAL;
-        return (-1);
+        return -1;
     }
     srclen = strnlen (src, dstlen);
     if (srclen >= dstlen) {
         errno = ENAMETOOLONG;
-        return (-1);
+        return -1;
     }
     memcpy (dst, src, srclen + 1);
 
@@ -139,7 +139,7 @@ path_dirname (const char *src, char *dst, size_t dstlen)
         dst[0] = (state == prev_slash || state == last_slash) ? '/' : '.';
         dst[1] = '\0';
     }
-    return (0);
+    return 0;
 }
 
 
@@ -159,12 +159,12 @@ path_is_accessible (const char *path, char *errbuf, size_t errbuflen)
 
     n = path_canonicalize (path, buf, sizeof (buf));
     if (n < 0) {
-        return (_path_set_err (-1, errbuf, errbuflen,
-            "cannot canonicalize \"%s\": %s", path, strerror (errno)));
+        return _path_set_err (-1, errbuf, errbuflen,
+            "cannot canonicalize \"%s\": %s", path, strerror (errno));
     }
     if (lstat (buf, &st) < 0) {
-        return (_path_set_err (-1, errbuf, errbuflen,
-            "cannot stat \"%s\": %s", buf, strerror (errno)));
+        return _path_set_err (-1, errbuf, errbuflen,
+            "cannot stat \"%s\": %s", buf, strerror (errno));
     }
     if (!S_ISDIR (st.st_mode)) {
         if ((p = strrchr (buf, '/'))) {
@@ -173,32 +173,32 @@ path_is_accessible (const char *path, char *errbuf, size_t errbuflen)
     }
     while (buf[0] != '\0') {
         if (lstat (buf, &st) < 0) {
-            return (_path_set_err (-1, errbuf, errbuflen,
-                "cannot stat \"%s\": %s", buf, strerror (errno)));
+            return _path_set_err (-1, errbuf, errbuflen,
+                "cannot stat \"%s\": %s", buf, strerror (errno));
         }
         if (!S_ISDIR (st.st_mode)) {
             errno = EINVAL;
-            return (_path_set_err (-1, errbuf, errbuflen,
+            return _path_set_err (-1, errbuf, errbuflen,
                 "cannot check \"%s\": unexpected file type (st_mode=0%o)",
-                buf, st.st_mode));
+                buf, st.st_mode);
         }
         if ((st.st_mode & (S_IXUSR | S_IXGRP | S_IXOTH))
                 != (S_IXUSR | S_IXGRP | S_IXOTH)) {
-            return (_path_set_err (0, errbuf, errbuflen,
+            return _path_set_err (0, errbuf, errbuflen,
                 "execute permissions for all required on \"%s\" (st_mode=0%o)",
-                buf, st.st_mode));
+                buf, st.st_mode);
         }
         if (!(p = strrchr (buf, '/'))) {
             errno = EINVAL;
-            return (_path_set_err (-1, errbuf, errbuflen,
-                "cannot check \"%s\": internal error", buf));
+            return _path_set_err (-1, errbuf, errbuflen,
+                "cannot check \"%s\": internal error", buf);
         }
         if ((p == buf) && (buf[1] != '\0')) {
             p++;
         }
         *p = '\0';
     }
-    return (1);
+    return 1;
 }
 
 
@@ -222,12 +222,12 @@ path_is_secure (const char *path, char *errbuf, size_t errbuflen,
 
     n = path_canonicalize (path, buf, sizeof (buf));
     if (n < 0) {
-        return (_path_set_err (-1, errbuf, errbuflen,
-            "cannot canonicalize \"%s\": %s", path, strerror (errno)));
+        return _path_set_err (-1, errbuf, errbuflen,
+            "cannot canonicalize \"%s\": %s", path, strerror (errno));
     }
     if (lstat (buf, &st) < 0) {
-        return (_path_set_err (-1, errbuf, errbuflen,
-            "cannot stat \"%s\": %s", buf, strerror (errno)));
+        return _path_set_err (-1, errbuf, errbuflen,
+            "cannot stat \"%s\": %s", buf, strerror (errno));
     }
     if (!S_ISDIR (st.st_mode)) {
         if ((p = strrchr (buf, '/'))) {
@@ -238,45 +238,45 @@ path_is_secure (const char *path, char *errbuf, size_t errbuflen,
 
     while (buf[0] != '\0') {
         if (lstat (buf, &st) < 0) {
-            return (_path_set_err (-1, errbuf, errbuflen,
-                "cannot stat \"%s\": %s", buf, strerror (errno)));
+            return _path_set_err (-1, errbuf, errbuflen,
+                "cannot stat \"%s\": %s", buf, strerror (errno));
         }
         if (!S_ISDIR (st.st_mode)) {
             errno = EINVAL;
-            return (_path_set_err (-1, errbuf, errbuflen,
+            return _path_set_err (-1, errbuf, errbuflen,
                 "cannot check \"%s\": unexpected file type (st_mode=0%o)",
-                buf, st.st_mode));
+                buf, st.st_mode);
         }
         if ((st.st_uid != 0) && (st.st_uid != euid)) {
-            return (_path_set_err (0, errbuf, errbuflen,
+            return _path_set_err (0, errbuf, errbuflen,
                 "invalid ownership of \"%s\" (UID=%u)",
-                buf, (unsigned) st.st_uid));
+                buf, (unsigned) st.st_uid);
         }
         if (!(flags & PATH_SECURITY_IGNORE_GROUP_WRITE) &&
              (st.st_mode & S_IWGRP)                     &&
             !(st.st_mode & S_ISVTX)                     &&
              ((st.st_gid != _path_trusted_gid) ||
               (_path_trusted_gid == MUNGE_GID_SENTINEL))) {
-            return (_path_set_err (0, errbuf, errbuflen,
+            return _path_set_err (0, errbuf, errbuflen,
                 "group-writable permissions without sticky bit set on \"%s\"",
-                buf));
+                buf);
         }
         if ((st.st_mode & S_IWOTH) && !(st.st_mode & S_ISVTX)) {
-            return (_path_set_err (0, errbuf, errbuflen,
+            return _path_set_err (0, errbuf, errbuflen,
                 "world-writable permissions without sticky bit set on \"%s\"",
-                buf));
+                buf);
         }
         if (!(p = strrchr (buf, '/'))) {
             errno = EINVAL;
-            return (_path_set_err (-1, errbuf, errbuflen,
-                "cannot check \"%s\": internal error", buf));
+            return _path_set_err (-1, errbuf, errbuflen,
+                "cannot check \"%s\": internal error", buf);
         }
         if ((p == buf) && (buf[1] != '\0')) {
             p++;
         }
         *p = '\0';
     }
-    return (1);
+    return 1;
 }
 
 
@@ -291,12 +291,12 @@ path_get_trusted_group (gid_t *gid_ptr)
 {
     if (_path_trusted_gid == MUNGE_GID_SENTINEL) {
         errno = ERANGE;
-        return (-1);
+        return -1;
     }
     if (gid_ptr != NULL) {
         *gid_ptr = _path_trusted_gid;
     }
-    return (0);
+    return 0;
 }
 
 
@@ -313,9 +313,9 @@ path_set_trusted_group (const char *group)
 {
     if (group == NULL) {
         _path_trusted_gid = MUNGE_GID_SENTINEL;
-        return (0);
+        return 0;
     }
-    return (query_gid (group, &_path_trusted_gid));
+    return query_gid (group, &_path_trusted_gid);
 }
 
 
@@ -339,5 +339,5 @@ _path_set_err (int rc, char *buf, size_t buflen, const char *format, ...)
         buf[buflen - 1] = '\0';
         va_end (vargs);
     }
-    return (rc);
+    return rc;
 }

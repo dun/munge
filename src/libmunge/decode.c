@@ -77,8 +77,8 @@ munge_decode (const char *cred, munge_ctx_t ctx,
      *  Ensure a credential exists for decoding.
      */
     if ((cred == NULL) || (*cred == '\0')) {
-        return (_munge_ctx_set_err (ctx, EMUNGE_BAD_ARG,
-            strdup ("No credential specified")));
+        return _munge_ctx_set_err (ctx, EMUNGE_BAD_ARG,
+            strdup ("No credential specified"));
     }
     /*  Ask the daemon to decode a credential.
      */
@@ -106,7 +106,7 @@ munge_decode (const char *cred, munge_ctx_t ctx,
         m->error_is_copy = 1;
     }
     m_msg_destroy (m);
-    return (e);
+    return e;
 }
 
 
@@ -177,9 +177,9 @@ _decode_req (m_msg_t m, munge_ctx_t ctx, const char *cred)
         m_msg_set_err (m, EMUNGE_BAD_LENGTH,
             strdupf ("Credential size %lu exceeded maximum of %lu",
                 m->data_len, MUNGE_MAXIMUM_REQ_LEN));
-        return (EMUNGE_BAD_LENGTH);
+        return EMUNGE_BAD_LENGTH;
     }
-    return (EMUNGE_SUCCESS);
+    return EMUNGE_SUCCESS;
 }
 
 
@@ -201,7 +201,7 @@ _decode_rsp (m_msg_t m, munge_ctx_t ctx,
     if (m->type != MUNGE_MSG_DEC_RSP) {
         m_msg_set_err (m, EMUNGE_SNAFU,
             strdupf ("Client received invalid message type %d", m->type));
-        return (EMUNGE_SNAFU);
+        return EMUNGE_SNAFU;
     }
     /*  Return the result.
      */
@@ -233,7 +233,7 @@ _decode_rsp (m_msg_t m, munge_ctx_t ctx,
     if (gid) {
         *gid = m->cred_gid;
     }
-    return (m->error_num);
+    return m->error_num;
 }
 
 
@@ -271,5 +271,5 @@ _decode_ignore (m_msg_t m, munge_ctx_t ctx)
             }
             break;
     }
-    return (m->error_num);
+    return m->error_num;
 }

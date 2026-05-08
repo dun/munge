@@ -71,7 +71,7 @@ fd_read_n (int fd, void *buf, size_t n)
             if (errno == EINTR)
                 continue;
             else
-                return (-1);
+                return -1;
         }
         else if (nread == 0) {          /* EOF */
             break;
@@ -79,7 +79,7 @@ fd_read_n (int fd, void *buf, size_t n)
         nleft -= nread;
         p += nread;
     }
-    return (n - nleft);
+    return n - nleft;
 }
 
 
@@ -100,12 +100,12 @@ fd_write_n (int fd, const void *buf, size_t n)
             if (errno == EINTR)
                 continue;
             else
-                return (-1);
+                return -1;
         }
         nleft -= nwritten;
         p += nwritten;
     }
-    return (n);
+    return n;
 }
 
 
@@ -134,7 +134,7 @@ fd_timed_read_n (int fd, void *buf, size_t n,
 
     if ((fd < 0) || (buf == NULL)) {
         errno = EINVAL;
-        return (-1);
+        return -1;
     }
     p = buf;
     nleft = n;
@@ -154,7 +154,7 @@ fd_timed_read_n (int fd, void *buf, size_t n,
             if ((errno == EINTR) || (errno == EAGAIN))
                 continue;
             else
-                return (-1);
+                return -1;
         }
         else if (nfd == 0) {            /* timeout */
             errno = ETIMEDOUT;
@@ -162,11 +162,11 @@ fd_timed_read_n (int fd, void *buf, size_t n,
         }
         else if (pfd.revents & POLLNVAL) {
             errno = EBADF;
-            return (-1);
+            return -1;
         }
         else if (pfd.revents & POLLERR) {
             errno = EIO;
-            return (-1);
+            return -1;
         }
         assert (pfd.revents & POLLIN);
 
@@ -176,7 +176,7 @@ read_me:
             if ((errno == EINTR) || (errno == EAGAIN))
                 continue;
             else
-                return (-1);
+                return -1;
         }
         else if (nread == 0) {          /* EOF */
             break;
@@ -188,7 +188,7 @@ read_me:
             break;
         }
     }
-    return (n - nleft);
+    return n - nleft;
 }
 
 
@@ -217,7 +217,7 @@ fd_timed_write_n (int fd, const void *buf, size_t n,
 
     if ((fd < 0) || (buf == NULL)) {
         errno = EINVAL;
-        return (-1);
+        return -1;
     }
     p = buf;
     nleft = n;
@@ -237,7 +237,7 @@ fd_timed_write_n (int fd, const void *buf, size_t n,
             if ((errno == EINTR) || (errno == EAGAIN))
                 continue;
             else
-                return (-1);
+                return -1;
         }
         else if (nfd == 0) {            /* timeout */
             errno = ETIMEDOUT;
@@ -248,11 +248,11 @@ fd_timed_write_n (int fd, const void *buf, size_t n,
         }
         else if (pfd.revents & POLLNVAL) {
             errno = EBADF;
-            return (-1);
+            return -1;
         }
         else if (pfd.revents & POLLERR) {
             errno = EIO;
-            return (-1);
+            return -1;
         }
         assert (pfd.revents & POLLOUT);
 
@@ -262,7 +262,7 @@ write_me:
             if ((errno == EINTR) || (errno == EAGAIN))
                 continue;
             else
-                return (-1);
+                return -1;
         }
         nleft -= nwritten;
         p += nwritten;
@@ -271,7 +271,7 @@ write_me:
             break;
         }
     }
-    return (n - nleft);
+    return n - nleft;
 }
 
 
@@ -302,7 +302,7 @@ fd_timed_write_iov (int fd, const struct iovec *iov_orig, int iov_cnt,
 
     if ((fd < 0) || (iov_orig == NULL) || (iov_cnt <= 0)) {
         errno = EINVAL;
-        return (-1);
+        return -1;
     }
     /*  Create copy of iovec for modification to handle retrying short writes.
      */
@@ -310,7 +310,7 @@ fd_timed_write_iov (int fd, const struct iovec *iov_orig, int iov_cnt,
     iov = malloc (iov_mem_len);
     if (iov == NULL) {
         errno = ENOMEM;
-        return (-1);
+        return -1;
     }
     memcpy (iov, iov_orig, iov_mem_len);
 
@@ -376,11 +376,11 @@ writev_me:
         }
     }
     free (iov);
-    return (iov_len - nleft);
+    return iov_len - nleft;
 
 err:
     free (iov);
-    return (-1);
+    return -1;
 }
 
 
@@ -407,19 +407,19 @@ fd_read_line (int fd, void *buf, size_t maxlen)
         }
         else if (rc == 0) {
             if (n == 0)                 /* EOF, no data read */
-                return (0);
+                return 0;
             else                        /* EOF, some data read */
                 break;
         }
         else {
             if (errno == EINTR)
                 continue;
-            return (-1);
+            return -1;
         }
     }
 
     *p = '\0';                          /* null-terminate */
-    return (n);
+    return n;
 }
 
 
@@ -435,12 +435,12 @@ fd_set_close_on_exec (int fd)
 {
     if (fd < 0) {
         errno = EINVAL;
-        return (-1);
+        return -1;
     }
     if (fcntl (fd, F_SETFD, FD_CLOEXEC) < 0) {
-        return (-1);
+        return -1;
     }
-    return (0);
+    return 0;
 }
 
 
@@ -454,15 +454,15 @@ fd_set_nonblocking (int fd)
 
     if (fd < 0) {
         errno = EINVAL;
-        return (-1);
+        return -1;
     }
     if ((fval = fcntl (fd, F_GETFL, 0)) < 0) {
-        return (-1);
+        return -1;
     }
     if (fcntl (fd, F_SETFL, fval | O_NONBLOCK) < 0) {
-        return (-1);
+        return -1;
     }
-    return (0);
+    return 0;
 }
 
 
@@ -476,12 +476,12 @@ fd_is_nonblocking (int fd)
 
     if (fd < 0) {
         errno = EINVAL;
-        return (-1);
+        return -1;
     }
     if ((fval = fcntl (fd, F_GETFL, 0)) < 0) {
-        return (-1);
+        return -1;
     }
-    return ((fval & O_NONBLOCK) ? 1 : 0);
+    return (fval & O_NONBLOCK) ? 1 : 0;
 }
 
 
@@ -501,15 +501,15 @@ _fd_get_poll_timeout (const struct timeval *when)
     int msecs;
 
     if (when == NULL) {
-        return (-1);
+        return -1;
     }
     if ((when->tv_sec == 0) && (when->tv_usec == 0)) {
-        return (0);
+        return 0;
     }
     /*  POSIX says gettimeofday() can't fail, but just in case ...
      */
     if (gettimeofday (&now, NULL) < 0) {
-        return (0);
+        return 0;
     }
     /*  Round up to the next millisecond.
      *  XXX: msecs can overflow/underflow if [when] is too far from now.
@@ -519,5 +519,5 @@ _fd_get_poll_timeout (const struct timeval *when)
     /*
      *  Return 0 if [when] is in the past to indicate poll() should not block.
      */
-    return ((msecs < 0) ? 0 : msecs);
+    return (msecs < 0) ? 0 : msecs;
 }

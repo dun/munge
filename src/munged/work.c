@@ -161,7 +161,7 @@ work_init (work_func_t f, int n_threads)
     }
     log_msg (LOG_INFO, "Created %d work thread%s", n_threads,
             ((n_threads > 1) ? "s" : ""));
-    return (wp);
+    return wp;
 }
 
 
@@ -263,7 +263,7 @@ work_queue (work_p wp, void *work)
 
     if (!wp || !work) {
         errno = EINVAL;
-        return (-1);
+        return -1;
     }
     if ((errno = pthread_mutex_lock (&wp->lock)) != 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR,
@@ -294,7 +294,7 @@ work_queue (work_p wp, void *work)
                 "Failed to signal work thread for received work");
         }
     }
-    return (rc);
+    return rc;
 }
 
 
@@ -417,7 +417,7 @@ _work_exec (void *arg)
     }
     assert (1);                         /* not reached */
     pthread_cleanup_pop (1);
-    return (NULL);
+    return NULL;
 }
 
 
@@ -452,7 +452,7 @@ _work_enqueue (work_p wp, void *work)
     assert (wp != NULL);
 
     if (!work) {
-        return (NULL);
+        return NULL;
     }
     if (!(wap = malloc (sizeof (*wap)))) {
         log_errno (EMUNGE_NO_MEMORY, LOG_ERR, "Failed to enqueue work");
@@ -466,7 +466,7 @@ _work_enqueue (work_p wp, void *work)
         wp->work_tail->next = wap;
         wp->work_tail = wap;
     }
-    return (work);
+    return work;
 }
 
 
@@ -485,7 +485,7 @@ _work_dequeue (work_p wp)
 
     wap = wp->work_head;
     if (!wap) {
-        return (NULL);
+        return NULL;
     }
     wp->work_head = wap->next;
     work = wap->arg;
@@ -493,5 +493,5 @@ _work_dequeue (work_p wp)
     if (!wp->work_head) {
         wp->work_tail = NULL;
     }
-    return (work);
+    return work;
 }

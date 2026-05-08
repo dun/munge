@@ -142,14 +142,14 @@ munge_enum_is_valid (munge_enum_t type, int val)
     int                 i;
 
     if (!(tp = _munge_enum_lookup (type))) {
-        return (0);
+        return 0;
     }
     for (i = 0; tp[i].string != NULL; i++) {
         if (val == tp[i].value) {
-            return (tp[i].is_valid);
+            return tp[i].is_valid;
         }
     }
-    return (0);
+    return 0;
 }
 
 
@@ -160,14 +160,14 @@ munge_enum_int_to_str (munge_enum_t type, int val)
     int                 i;
 
     if (!(tp = _munge_enum_lookup (type))) {
-        return (NULL);
+        return NULL;
     }
     for (i = 0; tp[i].string != NULL; i++) {
         if (val == tp[i].value) {
-            return (tp[i].string);
+            return tp[i].string;
         }
     }
-    return (NULL);
+    return NULL;
 }
 
 
@@ -181,17 +181,17 @@ munge_enum_str_to_int (munge_enum_t type, const char *str)
     int                 errno_bak, errno_sav;
 
     if (!str || !*str) {
-        return (-1);
+        return -1;
     }
     if (!(tp = _munge_enum_lookup (type))) {
-        return (-1);
+        return -1;
     }
     /*  Check if the given string matches a valid string.
      *  Also determine the number of strings in the array.
      */
     for (i = 0; tp[i].string != NULL; i++) {
         if (!strcasecmp (str, tp[i].string)) {
-            return (tp[i].value);
+            return tp[i].value;
         }
     }
     /*  Check if the given string matches a valid enum.
@@ -208,12 +208,12 @@ munge_enum_str_to_int (munge_enum_t type, const char *str)
     errno = errno_bak;
 
     if ((errno_sav != 0) || (str == p) || (*p != '\0')) {
-        return (-1);
+        return -1;
     }
     if ((n < 0) || (n >= i)) {
-        return (-1);
+        return -1;
     }
-    return (n);
+    return n;
 }
 
 
@@ -226,13 +226,13 @@ _munge_enum_lookup (munge_enum_t type)
 {
     switch (type) {
         case MUNGE_ENUM_CIPHER:
-            return (_munge_cipher_table);
+            return _munge_cipher_table;
         case MUNGE_ENUM_MAC:
-            return (_munge_mac_table);
+            return _munge_mac_table;
         case MUNGE_ENUM_ZIP:
-            return (_munge_zip_table);
+            return _munge_zip_table;
         default:
-            return (NULL);
+            return NULL;
     }
-    return (NULL);
+    return NULL;
 }

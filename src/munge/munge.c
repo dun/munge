@@ -183,7 +183,7 @@ create_conf (void)
     conf->data = NULL;
     conf->clen = 0;
     conf->cred = NULL;
-    return (conf);
+    return conf;
 }
 
 
@@ -607,7 +607,7 @@ encode_cred (conf_t conf)
                     "Failed to restore privileges for GID %u", egid);
         }
     }
-    return ((conf->status == EMUNGE_SUCCESS) ? 0 : -1);
+    return (conf->status == EMUNGE_SUCCESS) ? 0 : -1;
 }
 
 

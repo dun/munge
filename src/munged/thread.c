@@ -46,7 +46,7 @@ lsd_mutex_is_locked (pthread_mutex_t *mutex)
 
     assert (mutex != NULL);
     rc = pthread_mutex_trylock (mutex);
-    return (rc == EBUSY ? 1 : 0);
+    return (rc == EBUSY) ? 1 : 0;
 }
 #endif /* NDEBUG */
 #endif /* WITH_PTHREADS */

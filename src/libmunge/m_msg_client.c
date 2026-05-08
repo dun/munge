@@ -74,7 +74,7 @@ m_msg_client_xfer (m_msg_t *pm, m_msg_type_t mreq_type, munge_ctx_t ctx)
     m_msg_type_t  mrsp_type;
 
     if (!pm || !*pm) {
-        return (EMUNGE_SNAFU);
+        return EMUNGE_SNAFU;
     }
     if (!ctx || !(socket = ctx->socket_str)) {
         socket = MUNGE_SOCKET_NAME;
@@ -88,7 +88,7 @@ m_msg_client_xfer (m_msg_t *pm, m_msg_type_t mreq_type, munge_ctx_t ctx)
         mrsp_type = MUNGE_MSG_DEC_RSP;
     }
     else {
-        return (EMUNGE_SNAFU);
+        return EMUNGE_SNAFU;
     }
 
     i = 1;
@@ -146,7 +146,7 @@ m_msg_client_xfer (m_msg_t *pm, m_msg_type_t mreq_type, munge_ctx_t ctx)
         mreq->sd = -1;                  /* prevent socket close by destroy() */
         m_msg_destroy (mreq);
     }
-    return (e);
+    return e;
 }
 
 
@@ -171,14 +171,14 @@ _m_msg_client_connect (m_msg_t m, char *path)
     if ((path == NULL) || (*path == '\0')) {
         m_msg_set_err (m, EMUNGE_SOCKET,
             strdup ("MUNGE socket name is undefined"));
-        return (EMUNGE_SOCKET);
+        return EMUNGE_SOCKET;
     }
     path_len = strnlen (path, sizeof addr.sun_path);
     if (path_len >= sizeof addr.sun_path) {
         m_msg_set_err (m, EMUNGE_OVERFLOW,
             strdupf ("Exceeded maximum length of %lu bytes for socket pathname",
                 sizeof addr.sun_path));
-        return (EMUNGE_OVERFLOW);
+        return EMUNGE_OVERFLOW;
     }
     if (stat (path, &st) < 0) {
         if (errno == ENOENT) {
@@ -191,24 +191,24 @@ _m_msg_client_connect (m_msg_t m, char *path)
                 strdupf ("Failed to access \"%s\": %s",
                 path, strerror (errno)));
         }
-        return (EMUNGE_SOCKET);
+        return EMUNGE_SOCKET;
     }
     if (!S_ISSOCK (st.st_mode)) {
         m_msg_set_err (m, EMUNGE_SOCKET,
             strdupf ("Invalid file type for socket \"%s\"", path));
-        return (EMUNGE_SOCKET);
+        return EMUNGE_SOCKET;
     }
     if ((sd = socket (PF_UNIX, SOCK_STREAM, 0)) < 0) {
         m_msg_set_err (m, EMUNGE_SOCKET,
             strdupf ("Failed to create socket: %s", strerror (errno)));
-        return (EMUNGE_SOCKET);
+        return EMUNGE_SOCKET;
     }
     if (fd_set_nonblocking (sd) < 0) {
         close (sd);
         m_msg_set_err (m, EMUNGE_SOCKET,
             strdupf ("Failed to set nonblocking socket: %s",
             strerror (errno)));
-        return (EMUNGE_SOCKET);
+        return EMUNGE_SOCKET;
     }
     memset (&addr, 0, sizeof (addr));
     addr.sun_family = AF_UNIX;
@@ -249,10 +249,10 @@ _m_msg_client_connect (m_msg_t m, char *path)
         m_msg_set_err (m, EMUNGE_SOCKET,
             strdupf ("Failed to connect to \"%s\": %s", path,
             strerror (errno)));
-        return (EMUNGE_SOCKET);
+        return EMUNGE_SOCKET;
     }
     m->sd = sd;
-    return (EMUNGE_SUCCESS);
+    return EMUNGE_SUCCESS;
 }
 
 
@@ -272,7 +272,7 @@ _m_msg_client_disconnect (m_msg_t m) {
         e = EMUNGE_SUCCESS;
     }
     m->sd = -1;
-    return (e);
+    return e;
 }
 
 
@@ -301,7 +301,7 @@ _m_msg_client_millisleep (m_msg_t m, unsigned long msecs)
             m_msg_set_err (m, EMUNGE_SNAFU,
                 strdupf ("Failed nanosleep: %s", strerror (errno)));
         }
-        return (EMUNGE_SNAFU);
+        return EMUNGE_SNAFU;
     }
-    return (EMUNGE_SUCCESS);
+    return EMUNGE_SUCCESS;
 }

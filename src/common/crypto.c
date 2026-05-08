@@ -162,7 +162,7 @@ _openssl_thread_threadid_cb (CRYPTO_THREADID *id)
 static unsigned long
 _openssl_thread_id_cb (void)
 {
-    return ((unsigned long) pthread_self ());
+    return (unsigned long) pthread_self ();
 }
 
 #endif /* HAVE_CRYPTO_THREADID_SET_CALLBACK */
@@ -213,7 +213,7 @@ _openssl_thread_dynlock_create_cb (const char *file, int line)
         log_errno (EMUNGE_SNAFU, LOG_ERR,
             "Failed to initialize OpenSSL dynamic mutex");
     }
-    return (lock);
+    return lock;
 }
 
 static void

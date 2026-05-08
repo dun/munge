@@ -171,10 +171,10 @@ lock_query (conf_t conf)
     }
     conf->lockfile_fd = open (conf->lockfile_name, O_WRONLY, S_IWUSR);
     if (conf->lockfile_fd < 0) {
-        return (-1);
+        return -1;
     }
     pid = _lock_is_set (conf->lockfile_fd);
-    return (pid);
+    return pid;
 }
 
 
@@ -250,7 +250,7 @@ _lock_set (int fd)
 
     if (fd < 0) {
         errno = EBADF;
-        return (-1);
+        return -1;
     }
     fl.l_type = F_WRLCK;
     fl.l_whence = SEEK_SET;
@@ -260,11 +260,11 @@ _lock_set (int fd)
     rv = fcntl (fd, F_SETLK, &fl);
     if (rv < 0) {
         if ((errno == EACCES) || (errno == EAGAIN)) {
-            return (1);
+            return 1;
         }
-        return (-1);
+        return -1;
     }
-    return (0);
+    return 0;
 }
 
 
@@ -281,7 +281,7 @@ _lock_is_set (int fd)
 
     if (fd < 0) {
         errno = EBADF;
-        return (-1);
+        return -1;
     }
     fl.l_type = F_WRLCK;
     fl.l_whence = SEEK_SET;
@@ -290,10 +290,10 @@ _lock_is_set (int fd)
 
     rv = fcntl (fd, F_GETLK, &fl);
     if (rv < 0) {
-        return (-1);
+        return -1;
     }
     if (fl.l_type == F_UNLCK) {
-        return (0);
+        return 0;
     }
-    return (fl.l_pid);
+    return fl.l_pid;
 }

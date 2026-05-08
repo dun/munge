@@ -60,7 +60,7 @@ strdupf (const char *fmt, ...)
     char *p;
 
     if (!fmt) {
-        return (NULL);
+        return NULL;
     }
     va_start (vargs, fmt);
     vsnprintf (buf, sizeof (buf), fmt, vargs);
@@ -69,9 +69,9 @@ strdupf (const char *fmt, ...)
     buf[sizeof (buf) - 1] = '\0';        /* ensure buf is null-terminated */
 
     if (!(p = strdup (buf))) {
-        return (NULL);
+        return NULL;
     }
-    return (p);
+    return p;
 }
 
 
@@ -93,7 +93,7 @@ strcatf (char *dst, size_t size, const char *fmt, ...)
     int nleft;
 
     if (!dst || !size) {
-        return (0);
+        return 0;
     }
     p = dst;
     q = dst + size;
@@ -103,14 +103,14 @@ strcatf (char *dst, size_t size, const char *fmt, ...)
     len = p - dst;
     if (len >= size) {                  /* dst not null-terminated */
         dst[size - 1] = '\0';
-        return (-1);
+        return -1;
     }
     if (!fmt || !*fmt) {                /* nothing to concatenate */
-        return (len);
+        return len;
     }
     nleft = size - len;
     if (nleft <= 1) {                   /* dst already full */
-        return (-1);
+        return -1;
     }
     va_start (vargs, fmt);
     n = vsnprintf (p, nleft, fmt, vargs);
@@ -118,9 +118,9 @@ strcatf (char *dst, size_t size, const char *fmt, ...)
 
     if ((n < 0) || (n >= nleft)) {
         dst[size - 1] = '\0';           /* ensure dst is null-terminated */
-        return (-1);
+        return -1;
     }
-    return (len + n);
+    return len + n;
 }
 
 
@@ -140,14 +140,14 @@ strbin2hex (char *dst, size_t dstlen, const void *src, size_t srclen)
 
     if (dstlen < ((srclen * 2) + 1)) {
         errno = EINVAL;
-        return (0);
+        return 0;
     }
     for (i = 0; i < srclen; i++) {
         *pdst++ = bin2hex[(psrc[i] >> 4) & 0x0f];
         *pdst++ = bin2hex[(psrc[i]     ) & 0x0f];
     }
     *pdst = '\0';
-    return (pdst - (char *) dst);
+    return pdst - (char *) dst;
 }
 
 
@@ -169,7 +169,7 @@ strhex2bin (void *dst, size_t dstlen, const char *src, size_t srclen)
 
     if (dstlen < (srclen + 1) / 2) {
         errno = EINVAL;
-        return (0);
+        return 0;
     }
     for (i = 0; i < srclen; i++) {
         c = psrc[i];
@@ -184,7 +184,7 @@ strhex2bin (void *dst, size_t dstlen, const char *src, size_t srclen)
         }
         else {
             errno = EINVAL;
-            return (0);
+            return 0;
         }
         if (i % 2) {
             *pdst++ |= n & 0x0f;
@@ -193,7 +193,7 @@ strhex2bin (void *dst, size_t dstlen, const char *src, size_t srclen)
             *pdst = (n & 0x0f) << 4;
         }
     }
-    return ((srclen + 1) / 2);
+    return (srclen + 1) / 2;
 }
 
 
@@ -216,11 +216,11 @@ strftimet (char *dst, size_t dstlen, const char *tfmt, time_t t)
 
     if ((dst == NULL) || (dstlen == 0) || (tfmt == NULL)) {
         errno = EINVAL;
-        return (-1);
+        return -1;
     }
     if (t == 0) {
         if (time (&t) == ((time_t) -1)) {
-            return (-1);
+            return -1;
         }
     }
 #if HAVE_LOCALTIME_R
@@ -229,12 +229,12 @@ strftimet (char *dst, size_t dstlen, const char *tfmt, time_t t)
     tm_ptr = localtime (&t);            /* FIXME: protect with mutex? */
 #endif /* HAVE_LOCALTIME_R */
     if (tm_ptr == NULL) {
-        return (-1);
+        return -1;
     }
     n = strftime (dst, dstlen, tfmt, tm_ptr);
     if ((n <= 0) || (n >= dstlen)) {
         /*  On strftime() error, contents of 'dst' are undefined.  */
-        return (0);
+        return 0;
     }
-    return (n);
+    return n;
 }

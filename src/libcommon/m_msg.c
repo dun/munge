@@ -89,13 +89,13 @@ m_msg_create (m_msg_t *pm)
 
     if (!(m = calloc (1, sizeof (*m)))) {
         *pm = NULL;
-        return (EMUNGE_NO_MEMORY);
+        return EMUNGE_NO_MEMORY;
     }
     m->sd = -1;
     m->type = MUNGE_MSG_UNDEF;
 
     *pm = m;
-    return (EMUNGE_SUCCESS);
+    return EMUNGE_SUCCESS;
 }
 
 
@@ -183,7 +183,7 @@ m_msg_bind (m_msg_t m, int sd)
         (void) close (m->sd);
     }
     m->sd = sd;
-    return (EMUNGE_SUCCESS);
+    return EMUNGE_SUCCESS;
 }
 
 
@@ -231,13 +231,13 @@ m_msg_send (m_msg_t m, m_msg_type_t type, size_t maxlen)
             m_msg_set_err (m, EMUNGE_NO_MEMORY,
                 strdupf ("Failed to compute length for message type %d n=%d",
                     type, n));
-            return (EMUNGE_SNAFU);
+            return EMUNGE_SNAFU;
         }
         if (!(m->pkt = malloc (n))) {
             m_msg_set_err (m, EMUNGE_NO_MEMORY,
                 strdupf ("Failed to allocate %d bytes for sending message",
                     n));
-            return (EMUNGE_NO_MEMORY);
+            return EMUNGE_NO_MEMORY;
         }
         m->pkt_len = n;
         m->type = type;
@@ -245,7 +245,7 @@ m_msg_send (m_msg_t m, m_msg_type_t type, size_t maxlen)
         if (e != EMUNGE_SUCCESS) {
             m_msg_set_err (m, e,
                 strdup ("Failed to pack message body"));
-            return (e);
+            return e;
         }
     }
     /*  Check if the message exceeds the maximum allowed length.
@@ -254,7 +254,7 @@ m_msg_send (m_msg_t m, m_msg_type_t type, size_t maxlen)
         m_msg_set_err (m, EMUNGE_BAD_LENGTH,
             strdupf ("Failed to send message: "
                 "Size %lu exceeded maximum of %lu", m->pkt_len, maxlen));
-        return (EMUNGE_BAD_LENGTH);
+        return EMUNGE_BAD_LENGTH;
     }
     /*  Always repack the message header.
      */
@@ -262,7 +262,7 @@ m_msg_send (m_msg_t m, m_msg_type_t type, size_t maxlen)
     if (e != EMUNGE_SUCCESS) {
         m_msg_set_err (m, e,
             strdup ("Failed to pack message header"));
-        return (e);
+        return e;
     }
     /*  Compute iovec for response header + body.
      */
@@ -281,19 +281,19 @@ m_msg_send (m_msg_t m, m_msg_type_t type, size_t maxlen)
     if ((errno = 0, n = fd_timed_write_iov (m->sd, iov, 2, &tv, 1)) < 0) {
         m_msg_set_err (m, EMUNGE_SOCKET,
             strdupf ("Failed to send message: %s", strerror (errno)));
-        return (EMUNGE_SOCKET);
+        return EMUNGE_SOCKET;
     }
     else if (errno == ETIMEDOUT) {
         m_msg_set_err (m, EMUNGE_SOCKET,
             strdup ("Failed to send message: Timed-out"));
-        return (EMUNGE_SOCKET);
+        return EMUNGE_SOCKET;
     }
     else if (n != nsend) {
         m_msg_set_err (m, EMUNGE_SOCKET,
             strdupf ("Sent incomplete message: %d of %d bytes", n, nsend));
-        return (EMUNGE_SOCKET);
+        return EMUNGE_SOCKET;
     }
-    return (EMUNGE_SUCCESS);
+    return EMUNGE_SUCCESS;
 
 }
 
@@ -333,63 +333,63 @@ m_msg_recv (m_msg_t m, m_msg_type_t type, size_t maxlen)
         m_msg_set_err (m, EMUNGE_SOCKET,
             strdupf ("Failed to receive message header: %s",
                 strerror (errno)));
-        return (EMUNGE_SOCKET);
+        return EMUNGE_SOCKET;
     }
     else if (errno == ETIMEDOUT) {
         m_msg_set_err (m, EMUNGE_SOCKET,
             strdup ("Failed to receive message header: Timed-out"));
-        return (EMUNGE_SOCKET);
+        return EMUNGE_SOCKET;
     }
     else if (n != nrecv) {
         m_msg_set_err (m, EMUNGE_SOCKET,
             strdupf ("Received incomplete message header: %d of %d bytes",
             n, nrecv));
-        return (EMUNGE_SOCKET);
+        return EMUNGE_SOCKET;
     }
     else if (_msg_unpack (m, MUNGE_MSG_HDR, hdr, sizeof (hdr))
             != EMUNGE_SUCCESS) {
         m_msg_set_err (m, EMUNGE_SOCKET,
             strdup ("Failed to unpack message header"));
-        return (EMUNGE_SOCKET);
+        return EMUNGE_SOCKET;
     }
     else if ((type != MUNGE_MSG_UNDEF) && (m->type != type)) {
         m_msg_set_err (m, EMUNGE_SOCKET,
             strdupf ("Received unexpected message type: wanted %d, got %d",
                 type, m->type));
-        return (EMUNGE_SOCKET);
+        return EMUNGE_SOCKET;
     }
     else if ((maxlen > 0) && (m->pkt_len > maxlen)) {
         m_msg_set_err (m, EMUNGE_BAD_LENGTH,
             strdupf ("Failed to receive message: "
                 "Size %lu exceeded maximum of %lu", m->pkt_len, maxlen));
-        return (EMUNGE_BAD_LENGTH);
+        return EMUNGE_BAD_LENGTH;
     }
     else if (!(m->pkt = malloc (m->pkt_len))) {
         m_msg_set_err (m, EMUNGE_NO_MEMORY,
             strdupf ("Failed to allocate %d bytes for receiving message", n));
-        return (EMUNGE_NO_MEMORY);
+        return EMUNGE_NO_MEMORY;
     }
     else if ((errno = 0,
               n = fd_timed_read_n (m->sd, m->pkt, m->pkt_len, &tv, 1)) < 0) {
         m_msg_set_err (m, EMUNGE_SOCKET,
             strdupf ("Failed to receive message body: %s", strerror (errno)));
-        return (EMUNGE_SOCKET);
+        return EMUNGE_SOCKET;
     }
     else if (errno == ETIMEDOUT) {
         m_msg_set_err (m, EMUNGE_SOCKET,
             strdup ("Failed to receive message body: Timed-out"));
-        return (EMUNGE_SOCKET);
+        return EMUNGE_SOCKET;
     }
     else if (n != m->pkt_len) {
         m_msg_set_err (m, EMUNGE_SOCKET,
             strdupf ("Received incomplete message body: %d of %d bytes",
             n, nrecv));
-        return (EMUNGE_SOCKET);
+        return EMUNGE_SOCKET;
     }
     else if (_msg_unpack (m, m->type, m->pkt, m->pkt_len) != EMUNGE_SUCCESS) {
         m_msg_set_err (m, EMUNGE_SOCKET,
             strdup ("Failed to unpack message body"));
-        return (EMUNGE_SOCKET);
+        return EMUNGE_SOCKET;
     }
     /*  The packed message can be discarded now that it's been unpacked.
      */
@@ -397,7 +397,7 @@ m_msg_recv (m_msg_t m, m_msg_type_t type, size_t maxlen)
     m->pkt = NULL;
     m->pkt_len = 0;
     assert (m->pkt_is_copy == 0);
-    return (EMUNGE_SUCCESS);
+    return EMUNGE_SUCCESS;
 }
 
 
@@ -427,7 +427,7 @@ m_msg_set_err (m_msg_t m, munge_err_t e, char *s)
     }
     /*  "Screw you guys, I'm goin' home." -ecartman
      */
-    return (-1);
+    return -1;
 }
 
 
@@ -524,10 +524,10 @@ _msg_length (m_msg_t m, m_msg_type_t type)
             n += m->auth_c_len;
             break;
         default:
-            return (-1);
+            return -1;
             break;
     }
-    return (n);
+    return n;
 }
 
 
@@ -611,12 +611,12 @@ _msg_pack (m_msg_t m, m_msg_type_t type, void *dst, int dstlen)
         default:
             goto err;
     }
-    return (EMUNGE_SUCCESS);
+    return EMUNGE_SUCCESS;
 
 err:
     m_msg_set_err (m, EMUNGE_SNAFU,
         strdupf ("Failed to pack message type %d", type));
-    return (EMUNGE_SNAFU);
+    return EMUNGE_SNAFU;
 }
 
 
@@ -717,24 +717,24 @@ _msg_unpack (m_msg_t m, m_msg_type_t type, const void *src, int srclen)
         if (magic != MUNGE_MSG_MAGIC) {
             m_msg_set_err (m, EMUNGE_SOCKET,
                 strdupf ("Received invalid message magic %d", magic));
-            return (EMUNGE_SOCKET);
+            return EMUNGE_SOCKET;
         }
         else if (version != MUNGE_MSG_VERSION) {
             m_msg_set_err (m, EMUNGE_SOCKET,
                 strdupf ("Received invalid message version %d", version));
-            return (EMUNGE_SOCKET);
+            return EMUNGE_SOCKET;
         }
     }
-    return (EMUNGE_SUCCESS);
+    return EMUNGE_SUCCESS;
 
 err:
     m_msg_set_err (m, EMUNGE_SNAFU,
         strdupf ("Failed to unpack message type %d", type));
-    return (EMUNGE_SNAFU);
+    return EMUNGE_SNAFU;
 
 nomem:
     m_msg_set_err (m, EMUNGE_NO_MEMORY, NULL);
-    return (EMUNGE_NO_MEMORY);
+    return EMUNGE_NO_MEMORY;
 }
 
 
@@ -751,19 +751,19 @@ _alloc (void **pdst, int len)
     assert (*pdst == NULL);
 
     if (len == 0) {                     /* valid no-op */
-        return (1);
+        return 1;
     }
     if (len < 0) {                      /* invalid length */
-        return (0);
+        return 0;
     }
     /*  Allocate an extra byte to null-terminate the memory allocation.
      */
     if (!(p = malloc (len + 1))) {
-        return (0);
+        return 0;
     }
     p[len] = '\0';
     *pdst = p;
-    return (1);
+    return 1;
 }
 
 
@@ -778,14 +778,14 @@ _copy (void *dst, void *src, int len,
  *    On success (ie, >= 0), an optional [inc] ptr is advanced by [len].
  */
     if (len < 0) {
-        return (-1);
+        return -1;
     }
     if (len == 0) {
-        return (0);
+        return 0;
     }
     if ((first != NULL) && (last != NULL)
             && ((unsigned char *) first + len > (unsigned char *) last)) {
-        return (-1);
+        return -1;
     }
     if (len > 0) {
         memcpy (dst, src, len);
@@ -793,7 +793,7 @@ _copy (void *dst, void *src, int len,
     if (pinc != NULL) {
         *pinc = (unsigned char *) *pinc + len;
     }
-    return (len);
+    return len;
 }
 
 
@@ -815,7 +815,7 @@ _pack (void **pdst, void *src, int len, const void *last)
 
     dst = *pdst;
     if (last && ((unsigned char *) dst + len > (unsigned char *) last)) {
-        return (0);
+        return 0;
     }
     switch (len) {
         case (sizeof (uint8_t)):
@@ -830,10 +830,10 @@ _pack (void **pdst, void *src, int len, const void *last)
             memcpy (dst, &u32, len);
             break;
         default:
-            return (0);
+            return 0;
     }
     *pdst = (unsigned char *) dst + len;
-    return (len);
+    return len;
 }
 
 
@@ -855,7 +855,7 @@ _unpack (void *dst, void **psrc, int len, const void *last)
 
     src = *psrc;
     if (last && ((unsigned char *) src + len > (unsigned char *) last)) {
-        return (0);
+        return 0;
     }
     switch (len) {
         case (sizeof (uint8_t)):
@@ -870,8 +870,8 @@ _unpack (void *dst, void **psrc, int len, const void *last)
             * (uint32_t *) dst = ntohl (u32);
             break;
         default:
-            return (0);
+            return 0;
     }
     *psrc = (unsigned char *) src + len;
-    return (len);
+    return len;
 }

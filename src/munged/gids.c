@@ -188,7 +188,7 @@ gids_create (int interval_secs, int do_group_stat)
 
     if ((interval_secs < 0) || (conf->got_benchmark)) {
         log_msg (LOG_INFO, "Disabled supplementary group mapping");
-        return (NULL);
+        return NULL;
     }
     if (!(gids = malloc (sizeof (*gids)))) {
         log_errno (EMUNGE_NO_MEMORY, LOG_ERR,
@@ -222,7 +222,7 @@ gids_create (int interval_secs, int do_group_stat)
     log_msg (LOG_INFO, "%s supplementary group mtime check of \"%s\"",
             (do_group_stat ? "Enabled" : "Disabled"), GIDS_GROUP_FILE);
 
-    return (gids);
+    return gids;
 }
 
 
@@ -301,7 +301,7 @@ gids_is_member (gids_t gids, uid_t uid, gid_t gid)
     gid_node_p node;
 
     if (!gids) {
-        return (0);
+        return 0;
     }
     if ((errno = pthread_mutex_lock (&gids->mutex)) != 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to lock gids mutex");
@@ -318,7 +318,7 @@ gids_is_member (gids_t gids, uid_t uid, gid_t gid)
     if ((errno = pthread_mutex_unlock (&gids->mutex)) != 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to unlock gids mutex");
     }
-    return (is_member);
+    return is_member;
 }
 
 
@@ -543,7 +543,7 @@ restart:
             n_users, ((n_users == 1) ? "" : "s"), n_seconds);
 
     hash_destroy (uid_hash);
-    return (gid_hash);
+    return gid_hash;
 
 err:
     if (do_group_db_close) {
@@ -561,7 +561,7 @@ err:
     if (gid_hash != NULL) {
         hash_destroy (gid_hash);
     }
-    return (NULL);
+    return NULL;
 }
 
 
@@ -599,12 +599,12 @@ _gids_user_to_uid (hash_t uid_hash, hash_t ghost_hash,
                 user, strerror (errno));
     }
     if (uid == MUNGE_UID_SENTINEL) {
-        return (-1);
+        return -1;
     }
     if (uid_resultp != NULL) {
         *uid_resultp = uid;
     }
-    return (0);
+    return 0;
 }
 
 
@@ -623,14 +623,14 @@ _gids_gid_add (hash_t gid_hash, uid_t uid, gid_t gid)
         if (!(g = _gids_gid_head_create (uid))) {
             log_msg (LOG_WARNING, "Failed to allocate gid head for UID=%u",
                     (unsigned) uid);
-            return (-1);
+            return -1;
         }
         if (!hash_insert (gid_hash, &g->uid, g)) {
             log_msg (LOG_WARNING,
                     "Failed to insert gid head for UID=%u into gid hash",
                     (unsigned) uid);
             _gids_gid_head_destroy (g);
-            return (-1);
+            return -1;
         }
     }
     assert (g->uid == uid);
@@ -640,17 +640,17 @@ _gids_gid_add (hash_t gid_hash, uid_t uid, gid_t gid)
         nodep = &(*nodep)->next;
     }
     if ((*nodep) && ((*nodep)->gid == gid)) {
-        return (0);
+        return 0;
     }
     if (!(node = _gids_gid_node_create (gid))) {
         log_msg (LOG_WARNING,
                 "Failed to allocate gid node for UID=%u GID=%u",
                 (unsigned) uid, (unsigned) gid);
-        return (-1);
+        return -1;
     }
     node->next = *nodep;
     *nodep = node;
-    return (1);
+    return 1;
 }
 
 
@@ -674,9 +674,9 @@ _gids_uid_add (hash_t uid_hash, const char *user, uid_t uid)
         _gids_uid_node_destroy (u);
     }
     else {
-        return (0);
+        return 0;
     }
-    return (-1);
+    return -1;
 }
 
 
@@ -700,9 +700,9 @@ _gids_ghost_add (hash_t ghost_hash, const char *user)
         free (p);
     }
     else {
-        return (0);
+        return 0;
     }
-    return (-1);
+    return -1;
 }
 
 
@@ -717,14 +717,14 @@ _gids_ghost_del (hash_t ghost_hash, const char *user)
 
     if (!user) {
         errno = EINVAL;
-        return (-1);
+        return -1;
     }
     p = hash_remove (ghost_hash, user);
     if (p == NULL) {
-        return (0);
+        return 0;
     }
     free (p);
-    return (1);
+    return 1;
 }
 
 
@@ -736,11 +736,11 @@ _gids_gid_head_create (uid_t uid)
     gid_head_p g;
 
     if (!(g = malloc (sizeof (*g)))) {
-        return (NULL);
+        return NULL;
     }
     g->next = NULL;
     g->uid = uid;
-    return (g);
+    return g;
 }
 
 
@@ -770,12 +770,12 @@ _gids_gid_head_cmp (const uid_t *uid1p, const uid_t *uid2p)
 /*  Hash comparison function for gid_hash keys [uid1p] and [uid2p].
  */
     if (*uid1p < *uid2p) {
-        return (-1);
+        return -1;
     }
     if (*uid1p > *uid2p) {
-        return (1);
+        return 1;
     }
-    return (0);
+    return 0;
 }
 
 
@@ -784,7 +784,7 @@ _gids_gid_head_key (uid_t *uidp)
 {
 /*  Hash key function for converting [uidp] into a gid_hash key.
  */
-    return (*uidp);
+    return *uidp;
 }
 
 
@@ -797,11 +797,11 @@ _gids_gid_node_create (gid_t gid)
     gid_node_p node;
 
     if (!(node = malloc (sizeof (*node)))) {
-        return (NULL);
+        return NULL;
     }
     node->next = NULL;
     node->gid = gid;
-    return (node);
+    return node;
 }
 
 
@@ -813,17 +813,17 @@ _gids_uid_node_create (const char *user, uid_t uid)
     uid_node_p u;
 
     if ((user == NULL) || (*user == '\0')) {
-        return (NULL);
+        return NULL;
     }
     if (!(u = malloc (sizeof (*u)))) {
-        return (NULL);
+        return NULL;
     }
     if (!(u->user = strdup (user))) {
         free (u);
-        return (NULL);
+        return NULL;
     }
     u->uid = uid;
-    return (u);
+    return u;
 }
 
 

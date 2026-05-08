@@ -122,16 +122,16 @@ xgetpwbuf_create (size_t len)
     }
     pwbufp = malloc (sizeof (struct xpwbuf_t));
     if (pwbufp == NULL) {
-        return (NULL);
+        return NULL;
     }
     pwbufp->buf = malloc (len);
     if (pwbufp->buf == NULL) {
         free (pwbufp);
-        return (NULL);
+        return NULL;
     }
     pwbufp->len = len;
     log_msg (LOG_DEBUG, "Created password entry buffer of size %u", len);
-    return (pwbufp);
+    return pwbufp;
 }
 
 
@@ -157,9 +157,9 @@ xgetpwbuf_get_len (xpwbuf_p pwbufp)
  */
     if (pwbufp == NULL) {
         errno = EINVAL;
-        return (0);
+        return 0;
     }
-    return (pwbufp->len);
+    return pwbufp->len;
 }
 
 
@@ -195,7 +195,7 @@ xgetpwnam (const char *name, struct passwd *pwp, xpwbuf_p pwbufp)
         (pwbufp == NULL))
     {
         errno = EINVAL;
-        return (-1);
+        return -1;
     }
     assert (pwbufp->buf != NULL);
     assert (pwbufp->len > 0);
@@ -306,13 +306,13 @@ restart:
     }
 #endif /* WITH_PTHREADS */
     if (rv_copy < 0) {
-        return (-1);
+        return -1;
     }
 #endif /* HAVE_GETPWNAM_R_POSIX */
 
     if (got_none) {
         errno = ENOENT;
-        return (-1);
+        return -1;
     }
     if (got_err) {
         if (errno == EINTR) {
@@ -324,12 +324,12 @@ restart:
                 goto restart;
             }
         }
-        return (-1);
+        return -1;
     }
     /*  Some systems set errno even on success.  Go figure.
      */
     errno = 0;
-    return (0);
+    return 0;
 }
 
 
@@ -352,7 +352,7 @@ _xgetpwbuf_get_sys_size (void)
 #endif /* HAVE_SYSCONF */
 
     len = (n <= MINIMUM_PW_BUF_SIZE) ? MINIMUM_PW_BUF_SIZE : (size_t) n;
-    return (len);
+    return len;
 }
 
 
@@ -374,20 +374,20 @@ _xgetpwbuf_grow (xpwbuf_p pwbufp, size_t minlen)
         newlen *= 2;
         if (newlen < pwbufp->len) {     /* newlen overflowed */
             errno = ENOMEM;
-            return (-1);
+            return -1;
         }
     } while (newlen < minlen);
 
     newbuf = realloc (pwbufp->buf, newlen);
     if (newbuf == NULL) {
         errno = ENOMEM;
-        return (-1);
+        return -1;
     }
     pwbufp->buf = newbuf;
     pwbufp->len = newlen;
 
     log_msg (LOG_INFO, "Increased password entry buffer size to %u", newlen);
-    return (0);
+    return 0;
 }
 
 
@@ -430,7 +430,7 @@ _xgetpwbuf_copy_struct (const struct passwd *src, struct passwd *dst,
      */
     if (pwbufp->len < num_bytes) {
         if (_xgetpwbuf_grow (pwbufp, num_bytes) < 0) {
-            return (-1);
+            return -1;
         }
     }
     /*  Copy password entry.
@@ -463,11 +463,11 @@ _xgetpwbuf_copy_struct (const struct passwd *src, struct passwd *dst,
     dst->pw_gid = src->pw_gid;
 
     assert (p <= pwbufp->buf + pwbufp->len);
-    return (0);
+    return 0;
 
 err:
     errno = ERANGE;
-    return (-1);
+    return -1;
 }
 
 
@@ -490,14 +490,14 @@ _xgetpwbuf_copy_string (const char *src, char **dstp,
 
     if (src == NULL) {
         *dstp = NULL;
-        return (0);
+        return 0;
     }
     n = strlen (src) + 1;
     if (*buflenp < n) {
-        return (-1);
+        return -1;
     }
     *dstp = memcpy (*bufp, src, n);
     *bufp += n;
     *buflenp -= n;
-    return (n);
+    return n;
 }

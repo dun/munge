@@ -254,9 +254,9 @@ auth_recv (m_msg_t m, uid_t *uid, gid_t *gid)
 {
     if (getpeereid (m->sd, uid, gid) < 0) {
         log_msg (LOG_ERR, "Failed to get peer identity: %s", strerror (errno));
-        return (-1);
+        return -1;
     }
-    return (0);
+    return 0;
 }
 
 #endif /* AUTH_METHOD_GETPEEREID */
@@ -301,7 +301,7 @@ auth_recv (m_msg_t m, uid_t *uid, gid_t *gid)
     if (ucred) {
         ucred_free (ucred);
     }
-    return (rc);
+    return rc;
 }
 
 #endif /* AUTH_METHOD_GETPEERUCRED */
@@ -332,11 +332,11 @@ auth_recv (m_msg_t m, uid_t *uid, gid_t *gid)
 
     if (getsockopt (m->sd, SOL_SOCKET, SO_PEERCRED, &cred, &len) < 0) {
         log_msg (LOG_ERR, "Failed to get peer identity: %s", strerror (errno));
-        return (-1);
+        return -1;
     }
     *uid = cred.uid;
     *gid = cred.gid;
-    return (0);
+    return 0;
 }
 
 #endif /* AUTH_METHOD_SO_PEERCRED */
@@ -370,16 +370,16 @@ auth_recv (m_msg_t m, uid_t *uid, gid_t *gid)
 
     if (getsockopt (m->sd, 0, LOCAL_PEERCRED, &cred, &len) < 0) {
         log_msg (LOG_ERR, "Failed to get peer identity: %s", strerror (errno));
-        return (-1);
+        return -1;
     }
     if (cred.cr_version != XUCRED_VERSION) {
         log_msg (LOG_ERR, "Failed to get peer identity: invalid xucred v%d",
             cred.cr_version);
-        return (-1);
+        return -1;
     }
     *uid = cred.cr_uid;
     *gid = cred.cr_gid;
-    return (0);
+    return 0;
 }
 
 #endif /* AUTH_METHOD_LOCAL_PEERCRED */
@@ -465,7 +465,7 @@ auth_recv (m_msg_t m, uid_t *uid, gid_t *gid)
     *uid = recvfd.uid;
     *gid = recvfd.gid;
     free (pipe_name);
-    return (0);
+    return 0;
 
 err:
     if (pipe_fd >= 0) {
@@ -475,7 +475,7 @@ err:
         (void) unlink (pipe_name);
         free (pipe_name);
     }
-    return (-1);
+    return -1;
 }
 
 #endif /* AUTH_METHOD_RECVFD_MKFIFO */
@@ -562,7 +562,7 @@ auth_recv (m_msg_t m, uid_t *uid, gid_t *gid)
     *uid = recvfd.uid;
     *gid = recvfd.gid;
     free (pipe_name);
-    return (0);
+    return 0;
 
 err:
     if (pipe_fds[0] >= 0) {
@@ -575,7 +575,7 @@ err:
         (void) unlink (pipe_name);
         free (pipe_name);
     }
-    return (-1);
+    return -1;
 }
 
 static int
@@ -596,7 +596,7 @@ _ns_pipe (const char *name, int fd[2])
     /*  Start with creating an unnamed stream pipe.
      */
     if (_s_pipe (fd) < 0) {
-        return (-1);
+        return -1;
     }
     /*  Ensure mode is 0666, notb.
      */
@@ -611,7 +611,7 @@ _ns_pipe (const char *name, int fd[2])
     if (fstat (fd[1], &stbuf) < 0) {
         (void) close (fd[0]);
         (void) close (fd[1]);
-        return (-1);
+        return -1;
     }
     /*  Create the filesystem entry by assigning the [name] to one end
      *    of the pipe.  This requires root privileges.
@@ -620,10 +620,10 @@ _ns_pipe (const char *name, int fd[2])
         (void) close (fd[0]);
         (void) close (fd[1]);
         umask (omask);
-        return (-1);
+        return -1;
     }
     umask (omask);
-    return (0);
+    return 0;
 }
 
 static int
@@ -638,11 +638,11 @@ _s_pipe (int fd[2])
     /*  Open the stream clone device "/dev/spx" twice.
      */
     if ((fd[0] = open ("/dev/spx", O_RDWR)) < 0) {
-        return (-1);
+        return -1;
     }
     if ((fd[1] = open ("/dev/spx", O_RDWR)) < 0) {
         (void) close (fd[0]);
-        return (-1);
+        return -1;
     }
     /*  Link these two streams together with an I_FDINSERT ioctl.
      */
@@ -661,9 +661,9 @@ _s_pipe (int fd[2])
     if (ioctl (fd[0], I_FDINSERT, (char *) &ins) < 0) {
         (void) close (fd[0]);
         (void) close (fd[1]);
-        return (-1);
+        return -1;
     }
-    return (0);
+    return 0;
 }
 
 #endif /* AUTH_METHOD_RECVFD_MKNOD */
@@ -733,7 +733,7 @@ _name_auth_pipe (char **pipe_name_p)
     free (nonce_bin);
     free (nonce_asc);
     *pipe_name_p = dst;
-    return (0);
+    return 0;
 
 err:
     if (nonce_bin) {
@@ -745,7 +745,7 @@ err:
     if (dst) {
         free (dst);
     }
-    return (-1);
+    return -1;
 }
 
 static int
@@ -784,7 +784,7 @@ end:
         m->sd = -1;                     /* prevent close by m_msg_destroy() */
         m_msg_destroy (m);
     }
-    return (e == EMUNGE_SUCCESS ? 0 : -1);
+    return (e == EMUNGE_SUCCESS) ? 0 : -1;
 }
 
 #endif /* AUTH_METHOD_RECVFD_MKFIFO || AUTH_METHOD_RECVFD_MKNOD */

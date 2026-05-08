@@ -45,7 +45,7 @@
 int
 auth_send (m_msg_t m)
 {
-    return (EMUNGE_SUCCESS);
+    return EMUNGE_SUCCESS;
 }
 
 #endif /* !(AUTH_METHOD_RECVFD_MKFIFO || AUTH_METHOD_RECVFD_MKNOD) */
@@ -132,7 +132,7 @@ auth_send (m_msg_t m)
     free (pipe_name);
     free (file_dir);
     free (file_name);
-    return (0);
+    return 0;
 
 err:
     if (pipe_fd >= 0) {
@@ -151,7 +151,7 @@ err:
     if (file_dir != NULL) {
         free (file_dir);
     }
-    return (m_msg_set_err (m, EMUNGE_SNAFU, estr));
+    return m_msg_set_err (m, EMUNGE_SNAFU, estr);
 }
 
 static int
@@ -198,7 +198,7 @@ end:
         m->sd = -1;                     /* prevent close by m_msg_destroy() */
         m_msg_destroy (m);
     }
-    return (e == EMUNGE_SUCCESS ? 0 : -1);
+    return (e == EMUNGE_SUCCESS) ? 0 : -1;
 }
 
 static int
@@ -276,7 +276,7 @@ _name_auth_file (const char *pipe_name, const char *file_dir,
     free (rnd_bin);
     free (rnd_asc);
     *file_name_p = dst;
-    return (0);
+    return 0;
 
 err:
     if (rnd_bin) {
@@ -288,7 +288,7 @@ err:
     if (dst) {
         free (dst);
     }
-    return (-1);
+    return -1;
 }
 
 #endif /* AUTH_METHOD_RECVFD_MKFIFO || AUTH_METHOD_RECVFD_MKNOD */

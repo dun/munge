@@ -69,7 +69,7 @@ daemonpipe_create (void)
     int errno_bak;
 
     if (pipe (fd_pipe) < 0) {
-        return (-1);
+        return -1;
     }
     if (daemonpipe_close_reads () < 0) {
         goto err;
@@ -79,14 +79,14 @@ daemonpipe_create (void)
     }
     _daemonpipe_fd_read = fd_pipe[0];
     _daemonpipe_fd_write = fd_pipe[1];
-    return (0);
+    return 0;
 
 err:
     errno_bak = errno;
     (void) close (fd_pipe[0]);
     (void) close (fd_pipe[1]);
     errno = errno_bak;
-    return (-1);
+    return -1;
 }
 
 
@@ -99,13 +99,13 @@ int
 daemonpipe_close_reads (void)
 {
     if (_daemonpipe_fd_read < 0) {
-        return (0);
+        return 0;
     }
     if (close (_daemonpipe_fd_read) < 0) {
-        return (-1);
+        return -1;
     }
     _daemonpipe_fd_read = -1;
-    return (0);
+    return 0;
 }
 
 
@@ -120,13 +120,13 @@ int
 daemonpipe_close_writes (void)
 {
     if (_daemonpipe_fd_write < 0) {
-        return (0);
+        return 0;
     }
     if (close (_daemonpipe_fd_write) < 0) {
-        return (-1);
+        return -1;
     }
     _daemonpipe_fd_write = -1;
-    return (0);
+    return 0;
 }
 
 
@@ -148,11 +148,11 @@ daemonpipe_read (int *statusptr, int *priorityptr,
 
     if ((statusptr == NULL) || (priorityptr == NULL) || (dstbufptr == NULL)) {
         errno = EINVAL;
-        return (-1);
+        return -1;
     }
     if (_daemonpipe_fd_read < 0) {
         errno = EBADF;
-        return (-1);
+        return -1;
     }
     /*  Initialize result parms in case of early return.
      */
@@ -165,11 +165,11 @@ daemonpipe_read (int *statusptr, int *priorityptr,
      */
     n = fd_read_n (_daemonpipe_fd_read, &c, sizeof (c));
     if (n < 0) {
-        return (-1);
+        return -1;
     }
     else if (n == 0) {                  /* if EOF, no err so return success */
         *statusptr = 0;
-        return (0);
+        return 0;
     }
     else if (n > 0) {
         *statusptr = (int) c;
@@ -178,10 +178,10 @@ daemonpipe_read (int *statusptr, int *priorityptr,
      */
     n = fd_read_n (_daemonpipe_fd_read, &c, sizeof (c));
     if (n < 0) {
-        return (-1);
+        return -1;
     }
     else if (n == 0) {
-        return (0);
+        return 0;
     }
     else if (n > 0) {
         *priorityptr = (int) c;
@@ -190,7 +190,7 @@ daemonpipe_read (int *statusptr, int *priorityptr,
      */
     n = fd_read_n (_daemonpipe_fd_read, buf, sizeof (buf));
     if (n < 0) {
-        return (-1);
+        return -1;
     }
     else if ((n > 0) && (dstbuflen > 0)) {
         /*
@@ -209,7 +209,7 @@ daemonpipe_read (int *statusptr, int *priorityptr,
             dstbufptr[dstbuflen - 1] = '\0';
         }
     }
-    return (0);
+    return 0;
 }
 
 
@@ -230,7 +230,7 @@ daemonpipe_write (int status, int priority, const char *msg)
 
     if (_daemonpipe_fd_write < 0) {
         errno = EBADF;
-        return (-1);
+        return -1;
     }
     /*  Write status.
      */
@@ -238,7 +238,7 @@ daemonpipe_write (int status, int priority, const char *msg)
     len = sizeof (c);
     n = fd_write_n (_daemonpipe_fd_write, &c, len);
     if (n != len) {
-        return (-1);
+        return -1;
     }
     /*  Write priority.
      */
@@ -246,7 +246,7 @@ daemonpipe_write (int status, int priority, const char *msg)
     len = sizeof (c);
     n = fd_write_n (_daemonpipe_fd_write, &c, len);
     if (n != len) {
-        return (-1);
+        return -1;
     }
     /*  Write error message.  If no message is specified, write a null string.
      */
@@ -256,7 +256,7 @@ daemonpipe_write (int status, int priority, const char *msg)
     len = strlen (msg) + 1;
     n = fd_write_n (_daemonpipe_fd_write, msg, len);
     if (n != len) {
-        return (-1);
+        return -1;
     }
-    return (0);
+    return 0;
 }

@@ -88,10 +88,10 @@ md_init (md_ctx *x, munge_mac_t md)
     assert (_md_is_initialized);
 
     if (!x) {
-        return (-1);
+        return -1;
     }
     rc = _md_init (x, md);
-    return (rc);
+    return rc;
 }
 
 
@@ -107,10 +107,10 @@ md_update (md_ctx *x, const void *src, int srclen)
     assert (_md_is_initialized);
 
     if (!x || !src || (srclen < 0)) {
-        return (-1);
+        return -1;
     }
     rc = _md_update (x, src, srclen);
-    return (rc);
+    return rc;
 }
 
 
@@ -129,10 +129,10 @@ md_final (md_ctx *x, void *dst, int *dstlenp)
     assert (_md_is_initialized);
 
     if (!x || !dst || !dstlenp) {
-        return (-1);
+        return -1;
     }
     rc = _md_final (x, dst, dstlenp);
-    return (rc);
+    return rc;
 }
 
 
@@ -147,11 +147,11 @@ md_cleanup (md_ctx *x)
     assert (_md_is_initialized);
 
     if (!x) {
-        return (-1);
+        return -1;
     }
     rc = _md_cleanup (x);
     memset (x, 0, sizeof (*x));
-    return (rc);
+    return rc;
 }
 
 
@@ -169,11 +169,11 @@ md_copy (md_ctx *xdst, md_ctx *xsrc)
     assert (_md_is_initialized);
 
     if (!xdst || !xsrc) {
-        return (-1);
+        return -1;
     }
     xdst->diglen = xsrc->diglen;
     rc = _md_copy (xdst, xsrc);
-    return (rc);
+    return rc;
 }
 
 
@@ -184,7 +184,7 @@ md_size (munge_mac_t md)
 {
     assert (_md_is_initialized);
 
-    return (_md_size (md));
+    return _md_size (md);
 }
 
 
@@ -200,7 +200,7 @@ md_map_enum (munge_mac_t md, void *dst)
 {
     assert (_md_is_initialized);
 
-    return (_md_map_enum (md, dst));
+    return _md_map_enum (md, dst);
 }
 
 
@@ -240,15 +240,15 @@ _md_init (md_ctx *x, munge_mac_t md)
     int algo;
 
     if (_md_map_enum (md, &algo) < 0) {
-        return (-1);
+        return -1;
     }
     if ((e = gcry_md_open (&(x->ctx), algo, 0)) != 0) {
         log_msg (LOG_DEBUG, "gcry_md_open failed for MAC=%d: %s",
             md, gcry_strerror (e));
-        return (-1);
+        return -1;
     }
     x->diglen = gcry_md_get_algo_dlen (algo);
-    return (0);
+    return 0;
 }
 
 
@@ -256,7 +256,7 @@ static int
 _md_update (md_ctx *x, const void *src, int srclen)
 {
     gcry_md_write (x->ctx, src, srclen);
-    return (0);
+    return 0;
 }
 
 
@@ -266,14 +266,14 @@ _md_final (md_ctx *x, void *dst, int *dstlenp)
     unsigned char *digest;
 
     if (*dstlenp < x->diglen) {
-        return (-1);
+        return -1;
     }
     if ((digest = gcry_md_read (x->ctx, 0)) == NULL) {
-        return (-1);
+        return -1;
     }
     memcpy (dst, digest, x->diglen);
     *dstlenp = x->diglen;
-    return (0);
+    return 0;
 }
 
 
@@ -281,7 +281,7 @@ static int
 _md_cleanup (md_ctx *x)
 {
     gcry_md_close (x->ctx);
-    return (0);
+    return 0;
 }
 
 
@@ -292,9 +292,9 @@ _md_copy (md_ctx *xdst, md_ctx *xsrc)
 
     if ((e = gcry_md_copy (&(xdst->ctx), xsrc->ctx)) != 0) {
         log_msg (LOG_DEBUG, "gcry_md_copy failed: %s", gcry_strerror (e));
-        return (-1);
+        return -1;
     }
-    return (0);
+    return 0;
 }
 
 
@@ -304,9 +304,9 @@ _md_size (munge_mac_t md)
     int algo;
 
     if (_md_map_enum (md, &algo) < 0) {
-        return (-1);
+        return -1;
     }
-    return (gcry_md_get_algo_dlen (algo));
+    return gcry_md_get_algo_dlen (algo);
 }
 
 
@@ -319,12 +319,12 @@ _md_map_enum (munge_mac_t md, void *dst)
         algo = _md_map[md];
     }
     if (algo < 0) {
-        return (-1);
+        return -1;
     }
     if (dst != NULL) {
         * (int *) dst = algo;
     }
-    return (0);
+    return 0;
 }
 
 #endif /* HAVE_LIBGCRYPT */
@@ -371,15 +371,15 @@ _md_init (md_ctx *x, munge_mac_t md)
     EVP_MD *algo;
 
     if (_md_map_enum (md, &algo) < 0) {
-        return (-1);
+        return -1;
     }
     if (_md_ctx_create (x) < 0) {
-        return (-1);
+        return -1;
     }
 #if HAVE_EVP_DIGESTINIT_EX
     /*  OpenSSL >= 0.9.7  */
     if (EVP_DigestInit_ex (x->ctx, algo, NULL) != 1) {
-        return (-1);
+        return -1;
     }
 #elif HAVE_EVP_DIGESTINIT
     /*  EVP_DigestInit() implicitly initializes the EVP_MD_CTX.  */
@@ -390,7 +390,7 @@ _md_init (md_ctx *x, munge_mac_t md)
 #endif /* HAVE_EVP_DIGESTINIT_EX */
 
     x->diglen = EVP_MD_size (algo);
-    return (0);
+    return 0;
 }
 
 
@@ -413,9 +413,9 @@ _md_ctx_create (md_ctx *x)
 #endif /* HAVE_EVP_MD_CTX_INIT */
 #endif /* HAVE_EVP_MD_CTX_NEW */
     if (x->ctx == NULL) {
-        return (-1);
+        return -1;
     }
-    return (0);
+    return 0;
 }
 
 
@@ -425,7 +425,7 @@ _md_update (md_ctx *x, const void *src, int srclen)
 #if HAVE_EVP_DIGESTUPDATE_RETURN_INT
     /*  OpenSSL >= 0.9.7  */
     if (EVP_DigestUpdate (x->ctx, src, (unsigned int) srclen) != 1) {
-        return (-1);
+        return -1;
     }
 #elif HAVE_EVP_DIGESTUPDATE
     /*  OpenSSL < 0.9.7  */
@@ -434,7 +434,7 @@ _md_update (md_ctx *x, const void *src, int srclen)
 #error "No OpenSSL EVP_DigestUpdate"
 #endif /* HAVE_EVP_DIGESTUPDATE_RETURN_INT */
 
-    return (0);
+    return 0;
 }
 
 
@@ -442,12 +442,12 @@ static int
 _md_final (md_ctx *x, void *dst, int *dstlenp)
 {
     if (*dstlenp < x->diglen) {
-        return (-1);
+        return -1;
     }
 #if HAVE_EVP_DIGESTFINAL_EX
     /*  OpenSSL >= 0.9.7  */
     if (!(EVP_DigestFinal_ex (x->ctx, dst, (unsigned int *) dstlenp))) {
-        return (-1);
+        return -1;
     }
 #elif HAVE_EVP_DIGESTFINAL
     /*  OpenSSL < 0.9.7  */
@@ -456,7 +456,7 @@ _md_final (md_ctx *x, void *dst, int *dstlenp)
 #error "No OpenSSL EVP_DigestFinal"
 #endif /* HAVE_EVP_DIGESTFINAL_EX */
 
-    return (0);
+    return 0;
 }
 
 
@@ -482,7 +482,7 @@ _md_cleanup (md_ctx *x)
 #endif /* HAVE_EVP_MD_CTX_FREE */
 
     x->ctx = NULL;
-    return (rc);
+    return rc;
 }
 
 
@@ -490,23 +490,23 @@ static int
 _md_copy (md_ctx *xdst, md_ctx *xsrc)
 {
     if (_md_ctx_create (xdst) < 0) {
-        return (-1);
+        return -1;
     }
 #if HAVE_EVP_MD_CTX_COPY_EX
     /*  OpenSSL >= 0.9.7  */
     if (!(EVP_MD_CTX_copy_ex (xdst->ctx, xsrc->ctx))) {
-        return (-1);
+        return -1;
     }
 #elif HAVE_EVP_MD_CTX_COPY
     /*  EVP_MD_CTX_copy() implicitly initializes the EVP_MD_CTX for xdst.  */
     if (!(EVP_MD_CTX_copy (xdst->ctx, xsrc->ctx))) {
-        return (-1);
+        return -1;
     }
 #else
 #error "No OpenSSL EVP_MD_CTX_copy"
 #endif /* HAVE_EVP_MD_CTX_COPY_EX */
 
-    return (0);
+    return 0;
 }
 
 
@@ -516,9 +516,9 @@ _md_size (munge_mac_t md)
     EVP_MD *algo;
 
     if (_md_map_enum (md, &algo) < 0) {
-        return (-1);
+        return -1;
     }
-    return (EVP_MD_size (algo));
+    return EVP_MD_size (algo);
 }
 
 
@@ -531,12 +531,12 @@ _md_map_enum (munge_mac_t md, void *dst)
         algo = _md_map[md];
     }
     if (algo == NULL) {
-        return (-1);
+        return -1;
     }
     if (dst != NULL) {
         * (const EVP_MD **) dst = algo;
     }
-    return (0);
+    return 0;
 }
 
 #endif /* HAVE_OPENSSL */

@@ -50,11 +50,11 @@ cred_create (m_msg_t m)
 
     if (!(c = calloc (1, sizeof (*c)))) {
         m_msg_set_err (m, EMUNGE_NO_MEMORY, NULL);
-        return (NULL);
+        return NULL;
     }
     c->version = MUNGE_CRED_VERSION;
     c->msg = m;
-    return (c);
+    return c;
 }
 
 
