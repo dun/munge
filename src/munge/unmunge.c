@@ -215,7 +215,7 @@ int
 main (int argc, char *argv[])
 {
     conf_t conf;
-    int rc;
+    int rv;
     const char *p;
 
     xsignal_ignore (SIGHUP);
@@ -253,10 +253,10 @@ main (int argc, char *argv[])
     display_meta (conf);
     display_data (conf);
 
-    rc = conf->status;
+    rv = conf->status;
     destroy_conf (conf);
     log_close_file ();
-    exit (rc);
+    exit (rv);
 }
 
 

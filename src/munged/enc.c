@@ -81,7 +81,7 @@ int
 enc_process_msg (m_msg_t m)
 {
     munge_cred_t c = NULL;              /* aux data for processing this cred */
-    int rc = -1;                        /* return code                       */
+    int rv = -1;
 
     if (enc_validate_msg (m) < 0)
         ;
@@ -110,19 +110,19 @@ enc_process_msg (m_msg_t m)
     else if (enc_fini (c) < 0)
         ;
     else /* success */
-        rc = 0;
+        rv = 0;
 
     /*  Since the same m_msg struct is used for both the request and response,
      *    the response message data must be sanitized for most errors.
      */
-    if (rc != 0) {
+    if (rv != 0) {
         m_msg_reset (m);
     }
     if (m_msg_send (m, MUNGE_MSG_ENC_RSP, 0) != EMUNGE_SUCCESS) {
-        rc = -1;
+        rv = -1;
     }
     cred_destroy (c);
-    return rc;
+    return rv;
 }
 
 

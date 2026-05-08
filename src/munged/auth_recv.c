@@ -281,7 +281,7 @@ auth_recv (m_msg_t m, uid_t *uid, gid_t *gid)
     ucred_t *ucred = NULL;
     uid_t uid_tmp;
     gid_t gid_tmp;
-    int rc = -1;
+    int rv = -1;
 
     if (getpeerucred (m->sd, &ucred) < 0) {
         log_msg (LOG_ERR, "Failed to get peer ucred: %s", strerror (errno));
@@ -295,13 +295,13 @@ auth_recv (m_msg_t m, uid_t *uid, gid_t *gid)
     else {
         *uid = uid_tmp;
         *gid = gid_tmp;
-        rc = 0;
+        rv = 0;
     }
 
     if (ucred) {
         ucred_free (ucred);
     }
-    return rc;
+    return rv;
 }
 
 #endif /* AUTH_METHOD_GETPEERUCRED */

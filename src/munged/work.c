@@ -258,7 +258,7 @@ work_fini (work_p wp, int do_wait)
 int
 work_queue (work_p wp, void *work)
 {
-    int rc = 0;
+    int rv = 0;
     int do_signal = 0;
 
     if (!wp || !work) {
@@ -271,11 +271,11 @@ work_queue (work_p wp, void *work)
     }
     if (wp->got_fini) {
         errno = EPERM;
-        rc = -1;
+        rv = -1;
     }
     else if (_work_enqueue (wp, work) == NULL) {
         errno = EINVAL;
-        rc = -1;
+        rv = -1;
     }
     else if ((wp->n_workers - wp->n_working) > 0) {
         /*
@@ -294,7 +294,7 @@ work_queue (work_p wp, void *work)
                 "Failed to signal work thread for received work");
         }
     }
-    return rc;
+    return rv;
 }
 
 

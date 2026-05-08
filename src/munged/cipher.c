@@ -89,7 +89,7 @@ int
 cipher_init (cipher_ctx *x, munge_cipher_t cipher,
              unsigned char *key, unsigned char *iv, int enc)
 {
-    int rc;
+    int rv;
 
     assert (_cipher_is_initialized);
 
@@ -97,8 +97,8 @@ cipher_init (cipher_ctx *x, munge_cipher_t cipher,
             || !((enc == CIPHER_DECRYPT) || (enc == CIPHER_ENCRYPT))) {
         return -1;
     }
-    rc = _cipher_init (x, cipher, key, iv, enc);
-    return rc;
+    rv = _cipher_init (x, cipher, key, iv, enc);
+    return rv;
 }
 
 
@@ -114,15 +114,15 @@ int
 cipher_update (cipher_ctx *x, void *dst, int *dstlenp,
                const void *src, int srclen)
 {
-    int rc;
+    int rv;
 
     assert (_cipher_is_initialized);
 
     if (!x || !dst || !dstlenp || (*dstlenp < 0) || !src || (srclen < 0)) {
         return -1;
     }
-    rc = _cipher_update (x, dst, dstlenp, src, srclen);
-    return rc;
+    rv = _cipher_update (x, dst, dstlenp, src, srclen);
+    return rv;
 }
 
 
@@ -138,15 +138,15 @@ cipher_update (cipher_ctx *x, void *dst, int *dstlenp,
 int
 cipher_final (cipher_ctx *x, void *dst, int *dstlenp)
 {
-    int rc;
+    int rv;
 
     assert (_cipher_is_initialized);
 
     if (!x || !dst || !dstlenp || (*dstlenp < 0)) {
         return -1;
     }
-    rc = _cipher_final (x, dst, dstlenp);
-    return rc;
+    rv = _cipher_final (x, dst, dstlenp);
+    return rv;
 }
 
 
@@ -156,16 +156,16 @@ cipher_final (cipher_ctx *x, void *dst, int *dstlenp)
 int
 cipher_cleanup (cipher_ctx *x)
 {
-    int rc;
+    int rv;
 
     assert (_cipher_is_initialized);
 
     if (!x) {
         return -1;
     }
-    rc = _cipher_cleanup (x);
+    rv = _cipher_cleanup (x);
     memset (x, 0, sizeof *x);
-    return rc;
+    return rv;
 }
 
 

@@ -42,11 +42,11 @@ lsd_mutex_is_locked (pthread_mutex_t *mutex)
 {
 /*  Returns true if the mutex is locked; o/w, returns false.
  */
-    int rc;
+    int rv;
 
     assert (mutex != NULL);
-    rc = pthread_mutex_trylock (mutex);
-    return (rc == EBUSY) ? 1 : 0;
+    rv = pthread_mutex_trylock (mutex);
+    return (rv == EBUSY) ? 1 : 0;
 }
 #endif /* NDEBUG */
 #endif /* WITH_PTHREADS */

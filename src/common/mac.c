@@ -60,13 +60,13 @@ static int _mac_map_enum (munge_mac_t md, void *dst);
 int
 mac_init (mac_ctx *x, munge_mac_t md, const void *key, int keylen)
 {
-    int rc;
+    int rv;
 
     if (!x || !key || (keylen < 0)) {
         return -1;
     }
-    rc = _mac_init (x, md, key, keylen);
-    return rc;
+    rv = _mac_init (x, md, key, keylen);
+    return rv;
 }
 
 
@@ -77,13 +77,13 @@ mac_init (mac_ctx *x, munge_mac_t md, const void *key, int keylen)
 int
 mac_update (mac_ctx *x, const void *src, int srclen)
 {
-    int rc;
+    int rv;
 
     if (!x || !src || (srclen < 0)) {
         return -1;
     }
-    rc = _mac_update (x, src, srclen);
-    return rc;
+    rv = _mac_update (x, src, srclen);
+    return rv;
 }
 
 
@@ -97,13 +97,13 @@ mac_update (mac_ctx *x, const void *src, int srclen)
 int
 mac_final (mac_ctx *x, void *dst, int *dstlenp)
 {
-    int rc;
+    int rv;
 
     if (!x || !dst || !dstlenp) {
         return -1;
     }
-    rc = _mac_final (x, dst, dstlenp);
-    return rc;
+    rv = _mac_final (x, dst, dstlenp);
+    return rv;
 }
 
 
@@ -113,14 +113,14 @@ mac_final (mac_ctx *x, void *dst, int *dstlenp)
 int
 mac_cleanup (mac_ctx *x)
 {
-    int rc;
+    int rv;
 
     if (!x) {
         return -1;
     }
-    rc = _mac_cleanup (x);
+    rv = _mac_cleanup (x);
     memset (x, 0, sizeof *x);
-    return rc;
+    return rv;
 }
 
 
@@ -145,13 +145,13 @@ int
 mac_block (munge_mac_t md, const void *key, int keylen,
            void *dst, int *dstlenp, const void *src, int srclen)
 {
-    int rc;
+    int rv;
 
     if (!key || (keylen < 0) || !dst || !dstlenp || !src || (srclen < 0)) {
         return -1;
     }
-    rc = _mac_block (md, key, keylen, dst, dstlenp, src, srclen);
-    return rc;
+    rv = _mac_block (md, key, keylen, dst, dstlenp, src, srclen);
+    return rv;
 }
 
 

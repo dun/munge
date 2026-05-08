@@ -83,15 +83,15 @@ md_init_subsystem (void)
 int
 md_init (md_ctx *x, munge_mac_t md)
 {
-    int rc;
+    int rv;
 
     assert (_md_is_initialized);
 
     if (!x) {
         return -1;
     }
-    rc = _md_init (x, md);
-    return rc;
+    rv = _md_init (x, md);
+    return rv;
 }
 
 
@@ -102,15 +102,15 @@ md_init (md_ctx *x, munge_mac_t md)
 int
 md_update (md_ctx *x, const void *src, int srclen)
 {
-    int rc;
+    int rv;
 
     assert (_md_is_initialized);
 
     if (!x || !src || (srclen < 0)) {
         return -1;
     }
-    rc = _md_update (x, src, srclen);
-    return rc;
+    rv = _md_update (x, src, srclen);
+    return rv;
 }
 
 
@@ -124,15 +124,15 @@ md_update (md_ctx *x, const void *src, int srclen)
 int
 md_final (md_ctx *x, void *dst, int *dstlenp)
 {
-    int rc;
+    int rv;
 
     assert (_md_is_initialized);
 
     if (!x || !dst || !dstlenp) {
         return -1;
     }
-    rc = _md_final (x, dst, dstlenp);
-    return rc;
+    rv = _md_final (x, dst, dstlenp);
+    return rv;
 }
 
 
@@ -142,16 +142,16 @@ md_final (md_ctx *x, void *dst, int *dstlenp)
 int
 md_cleanup (md_ctx *x)
 {
-    int rc;
+    int rv;
 
     assert (_md_is_initialized);
 
     if (!x) {
         return -1;
     }
-    rc = _md_cleanup (x);
+    rv = _md_cleanup (x);
     memset (x, 0, sizeof *x);
-    return rc;
+    return rv;
 }
 
 
@@ -164,7 +164,7 @@ md_cleanup (md_ctx *x)
 int
 md_copy (md_ctx *xdst, md_ctx *xsrc)
 {
-    int rc;
+    int rv;
 
     assert (_md_is_initialized);
 
@@ -172,8 +172,8 @@ md_copy (md_ctx *xdst, md_ctx *xsrc)
         return -1;
     }
     xdst->diglen = xsrc->diglen;
-    rc = _md_copy (xdst, xsrc);
-    return rc;
+    rv = _md_copy (xdst, xsrc);
+    return rv;
 }
 
 
@@ -463,7 +463,7 @@ _md_final (md_ctx *x, void *dst, int *dstlenp)
 static int
 _md_cleanup (md_ctx *x)
 {
-    int rc = 0;
+    int rv = 0;
 
 #if HAVE_EVP_MD_CTX_FREE
     /*  OpenSSL >= 1.1.0  */
@@ -475,14 +475,14 @@ _md_cleanup (md_ctx *x)
 #if HAVE_EVP_MD_CTX_CLEANUP
     /*  OpenSSL >= 0.9.7, < 1.1.0  */
     if (EVP_MD_CTX_cleanup (x->ctx) != 1) {
-        rc = -1;
+        rv = -1;
     }
 #endif /* HAVE_EVP_MD_CTX_CLEANUP */
     OPENSSL_free (x->ctx);
 #endif /* HAVE_EVP_MD_CTX_FREE */
 
     x->ctx = NULL;
-    return rc;
+    return rv;
 }
 
 

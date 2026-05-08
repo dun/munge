@@ -652,17 +652,17 @@ _random_add (const void *buf, int n)
 static void
 _random_bytes (void *buf, int n)
 {
-    int rc;
+    int rv;
 
     assert (buf != NULL);
     assert (n > 0);
 
-    rc = RAND_bytes (buf, n);
-    if (rc == -1) {
+    rv = RAND_bytes (buf, n);
+    if (rv == -1) {
         log_msg (LOG_ERR,
                 "RAND_bytes failed: not supported by OpenSSL RAND method");
     }
-    else if (rc == 0) {
+    else if (rv == 0) {
         unsigned long e = ERR_get_error ();
         log_msg (LOG_WARNING,
                 "RAND_bytes failed: %s", ERR_reason_error_string (e));
@@ -673,7 +673,7 @@ _random_bytes (void *buf, int n)
 static void
 _random_pseudo_bytes (void *buf, int n)
 {
-    int rc;
+    int rv;
 
     assert (buf != NULL);
     assert (n > 0);
@@ -689,19 +689,19 @@ _random_pseudo_bytes (void *buf, int n)
      */
 #if HAVE_RAND_PSEUDO_BYTES && (OPENSSL_VERSION_NUMBER < 0x10100000L)
     /*  OpenSSL >= 0.9.5, < 1.1.0  */
-    rc = RAND_pseudo_bytes (buf, n);
-    if (rc == -1) {
+    rv = RAND_pseudo_bytes (buf, n);
+    if (rv == -1) {
         log_msg (LOG_ERR, "RAND_pseudo_bytes failed: "
                 "not supported by OpenSSL RAND method");
     }
-    else if (rc == 0) {
+    else if (rv == 0) {
         unsigned long e = ERR_get_error ();
         log_msg (LOG_WARNING, "RAND_pseudo_bytes failed: %s",
                 ERR_reason_error_string (e));
     }
 #else
     _random_bytes (buf, n);
-    (void) rc;                          /* suppress unused-variable warning */
+    (void) rv;                          /* suppress unused-variable warning */
 #endif /* HAVE_RAND_PSEUDO_BYTES && (OPENSSL_VERSION_NUMBER < 0x10100000L) */
 }
 

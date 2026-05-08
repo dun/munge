@@ -293,7 +293,7 @@ base64_decode_update (base64_ctx *x, void *dst, int *dstlen,
 int
 base64_decode_final (base64_ctx *x, void *dst, int *dstlen)
 {
-    int rc = 0;
+    int rv = 0;
 
     if (!x || !dst || !dstlen) {
         errno = EINVAL;
@@ -303,11 +303,11 @@ base64_decode_final (base64_ctx *x, void *dst, int *dstlen)
 
     if (((x->num + x->pad) % 4) != 0) {
         errno = EBADMSG;
-        rc = -1;
+        rv = -1;
     }
     *dstlen = 0;
     assert ((x->finalized = 1));
-    return rc;
+    return rv;
 }
 
 /**

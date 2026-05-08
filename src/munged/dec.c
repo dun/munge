@@ -87,7 +87,7 @@ int
 dec_process_msg (m_msg_t m)
 {
     munge_cred_t c = NULL;              /* aux data for processing this cred */
-    int rc = -1;                        /* return code                       */
+    int rv = -1;
 
     if (dec_validate_msg (m) < 0)
         ;
@@ -118,14 +118,14 @@ dec_process_msg (m_msg_t m)
     else if (dec_validate_replay (c) < 0)
         ;
     else /* success */
-        rc = 0;
+        rv = 0;
 
     /*  Since the same m_msg struct is used for both the request and response,
      *    the response message data must be sanitized for most errors.
      *  The exception to this is for a credential that has been successfully
      *    decoded but is invalid due to being expired, rewound, or replayed.
      */
-    if ((rc != 0)
+    if ((rv != 0)
             && (m->error_num != EMUNGE_CRED_EXPIRED)
             && (m->error_num != EMUNGE_CRED_REWOUND)
             && (m->error_num != EMUNGE_CRED_REPLAYED) ) {
@@ -142,13 +142,13 @@ dec_process_msg (m_msg_t m)
      *    be in error.
      */
     if (m_msg_send (m, MUNGE_MSG_DEC_RSP, 0) != EMUNGE_SUCCESS) {
-        if (rc == 0) {
+        if (rv == 0) {
             replay_remove (c);
         }
-        rc = -1;
+        rv = -1;
     }
     cred_destroy (c);
-    return rc;
+    return rv;
 }
 
 
@@ -1024,14 +1024,14 @@ dec_validate_replay (munge_cred_t c)
 /*  Validates whether this credential has been replayed.
  */
     m_msg_t m = c->msg;
-    int rc;
+    int rv;
 
-    rc = replay_insert (c);
+    rv = replay_insert (c);
 
-    if (rc == 0) {
+    if (rv == 0) {
         return 0;
     }
-    if (rc > 0) {
+    if (rv > 0) {
         if ((conf->got_socket_retry)
                 && (m->retry > 0)
                 && (m->retry <= MUNGE_SOCKET_RETRY_ATTEMPTS)) {
