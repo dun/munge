@@ -67,7 +67,7 @@ static pid_t _lock_is_set (int fd);
 void
 lock_create (conf_t conf)
 {
-/*  Creates a lockfile to ensure exclusive access to the Unix domain socket.
+/*  Creates a lockfile to ensure exclusive access to the UNIX domain socket.
  */
     int rv;
     mode_t mask;

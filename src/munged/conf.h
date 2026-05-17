@@ -64,8 +64,8 @@ struct conf {
     char *lockfile_name;                /* daemon lockfile name              */
     char *logfile_name;                 /* daemon logfile name               */
     char *pidfile_name;                 /* daemon pidfile name               */
-    char *socket_name;                  /* unix domain socket filename       */
-    int listen_backlog;                 /* unix domain socket listen backlog */
+    char *socket_name;                  /* UNIX domain socket filename       */
+    int listen_backlog;                 /* UNIX domain socket listen backlog */
     char *seed_name;                    /* random seed filename              */
     char *key_name;                     /* symmetric key filename            */
     unsigned char *dek_key;             /* subkey for cipher ops             */

@@ -12,25 +12,25 @@
 #    AUTH_METHOD_GETPEEREID
 #     (AIX 5.2-ML4, Darwin, FreeBSD 4.6, NetBSD 5.0, OpenBSD 3.0)
 #      The server uses getpeereid() to determine the identity of the client
-#      connected across the Unix domain socket.
+#      connected across the UNIX domain socket.
 #
 #    AUTH_METHOD_GETPEERUCRED
 #     (SunOS 5.10)
 #      The server uses getpeerucred() to determine the identity of the client
-#      connected across the Unix domain socket.  The client's UID and GID are
+#      connected across the UNIX domain socket.  The client's UID and GID are
 #      then obtained via ucred_geteuid() and ucred_getegid().
 #
 #    AUTH_METHOD_SO_PEERCRED
 #     (Linux)
 #      The server uses the SO_PEERCRED socket option to determine the identity
-#      of the client connected across the Unix domain socket.  The client's UID
+#      of the client connected across the UNIX domain socket.  The client's UID
 #      and GID are then obtained from the ucred struct returned by
 #      getsockopt().
 #
 #    AUTH_METHOD_LOCAL_PEERCRED
 #     (Darwin, FreeBSD, GNU/kFreeBSD)
 #      The server uses the LOCAL_PEERCRED socket option to determine the
-#      identity of the client connected across the Unix domain socket.  The
+#      identity of the client connected across the UNIX domain socket.  The
 #      client's UID and GID are then obtained from the xucred struct returned
 #      by getsockopt().
 #

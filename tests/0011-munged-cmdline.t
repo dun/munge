@@ -87,7 +87,7 @@ test_expect_success 'munged seedfile creation with relative pathname' '
 #   failing to be removed at exit.
 # Set the CWD to the [MUNGE_SOCKETDIR] (which should be in [TMPDIR]) in order
 #   to prevent the socket pathname from exceeding the maximum length of
-#   108 bytes for a Unix domain socket.  Without this, "make distcheck" failed.
+#   108 bytes for a UNIX domain socket.  Without this, "make distcheck" failed.
 #
 test_expect_success 'munged socket cleanup with relative pathname' '
     local socket="socket.$$" &&

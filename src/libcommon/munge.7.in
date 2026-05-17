@@ -47,11 +47,11 @@ local daemon just needs a reliable means of ascertaining the UID and GID
 of the client process.  Furthermore, the remote daemons need a mechanism
 to ensure the forwarded authentication data has not been subsequently altered.
 .PP
-A common solution to this problem is to use Unix domain sockets to determine
+A common solution to this problem is to use UNIX domain sockets to determine
 the identity of the local client, and then forward this information on to
 remote hosts via trusted rsh connections.  But this presents several new
 problems.  First, there is no portable API for determining the identity of
-a client over a Unix domain socket.  Second, rsh connections must originate
+a client over a UNIX domain socket.  Second, rsh connections must originate
 from a reserved port; the limited number of reserved ports available on
 a given host directly limits scalability.  Third, root privileges are
 required in order to bind to a reserved port.  Finally, the remote daemons

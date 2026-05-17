@@ -139,11 +139,11 @@
  */
 #define MUNGE_SIGNAL_CHECK_MSECS        25
 
-/*  Socket backlog for the server listening on the unix domain socket.
+/*  Socket backlog for the server listening on the UNIX domain socket.
  */
 #define MUNGE_SOCKET_BACKLOG            256
 
-/*  String specifying the unix domain socket pathname for client-server comms.
+/*  String specifying the UNIX domain socket pathname for client-server comms.
  *  May be overridden in "config.h".
  */
 #ifndef MUNGE_SOCKET_NAME
@@ -155,7 +155,7 @@
 #define MUNGE_SOCKET_CONNECT_ATTEMPTS   10
 
 /*  Number of milliseconds for the start of the linear back-off where the
- *    client sleeps between attempts at retrying a connection to the unix
+ *    client sleeps between attempts at retrying a connection to the UNIX
  *    domain socket.
  */
 #define MUNGE_SOCKET_CONNECT_RETRY_MSECS        50

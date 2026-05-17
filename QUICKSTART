@@ -223,7 +223,7 @@ MUNGE Installation Guide
       should be set to 0700.
 
    D. ${runstatedir}/munge [/run/munge]
-      This directory will contain the Unix domain socket for clients to
+      This directory will contain the UNIX domain socket for clients to
       communicate with the local daemon.  It will also contain the daemon's
       pid file.  This directory must allow execute permissions for all.
       Its permissions should be set to 0755.
