@@ -457,7 +457,7 @@ _random_write_seed (const char *path, int num_bytes)
                 path, strerror (errno));
     }
     do {
-        fd = open (path, O_WRONLY | O_CREAT | O_TRUNC, 0600);
+        fd = open (path, O_WRONLY | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR);
     } while ((fd < 0) && (errno == EINTR));
 
     if (fd < 0) {

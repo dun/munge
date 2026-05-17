@@ -47,6 +47,7 @@
 #include <stddef.h>                     /* size_t */
 #include <stdio.h>                      /* snprintf */
 #include <string.h>                     /* strlen */
+#include <sys/stat.h>                   /* S_IRUSR, S_IWUSR */
 #include <unistd.h>                     /* close, unlink */
 
 
@@ -90,7 +91,7 @@ create_key (conf_t *confp)
                     confp->key_path);
         }
     }
-    fd = open (confp->key_path, O_WRONLY | O_CREAT | O_EXCL, 0600);
+    fd = open (confp->key_path, O_WRONLY | O_CREAT | O_EXCL, S_IRUSR | S_IWUSR);
     if (fd == -1) {
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to create \"%s\"",
                 confp->key_path);
