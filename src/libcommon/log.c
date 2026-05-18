@@ -34,7 +34,6 @@
 #include "daemonpipe.h"
 #include "str.h"                        /* strftimet */
 
-#include <assert.h>
 #include <errno.h>
 #include <stdarg.h>                     /* va_start, va_end, va_list */
 #include <stdio.h>                      /* (v)snprintf, f*, FILE, EOF, stderr */
@@ -205,7 +204,6 @@ log_err (int status, int priority, const char *format, ...)
     va_end (vargs);
 
     _log_die (status, priority, msg);
-    assert (1);                         /* not reached */
 }
 
 
@@ -226,7 +224,6 @@ log_errno (int status, int priority, const char *format, ...)
     va_end (vargs);
 
     _log_die (status, priority, msg);
-    assert (1);                         /* not reached */
 }
 
 
@@ -474,5 +471,4 @@ _log_prefix (int priority)
         default:
             return "Unknown";
     }
-    assert (1);                         /* not reached */
 }

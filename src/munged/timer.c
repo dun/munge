@@ -45,7 +45,7 @@
 #include <errno.h>
 #include <pthread.h>
 #include <signal.h>                     /* sigfillset, sigset_t */
-#include <stdlib.h>                     /* malloc, free */
+#include <stdlib.h>                     /* abort, malloc, free */
 #include <time.h>                       /* timespec */
 #include <unistd.h>                     /* _POSIX_THREAD_ATTR_STACKSIZE */
 
@@ -458,7 +458,7 @@ _timer_thread (void *arg)
                     "Failed to wait on timer condition");
         }
     }
-    assert (1);                         /* not reached */
+    abort ();                           /* not reached */
     pthread_cleanup_pop (1);
     return NULL;
 }

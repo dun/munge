@@ -40,7 +40,7 @@
 #include <pthread.h>
 #include <signal.h>                     /* sigfillset, sigset_t */
 #include <stddef.h>                     /* size_t */
-#include <stdlib.h>                     /* malloc, free */
+#include <stdlib.h>                     /* abort, malloc, free */
 #include <string.h>                     /* strerror */
 #include <unistd.h>                     /* _POSIX_THREAD_ATTR_STACKSIZE */
 
@@ -415,7 +415,7 @@ _work_exec (void *arg)
             }
         }
     }
-    assert (1);                         /* not reached */
+    abort ();                           /* not reached */
     pthread_cleanup_pop (1);
     return NULL;
 }
