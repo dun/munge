@@ -37,7 +37,7 @@
 #include <errno.h>
 #include <stdarg.h>                     /* va_start, va_end, va_list */
 #include <stdio.h>                      /* (v)snprintf, f*, FILE, EOF, stderr */
-#include <stdlib.h>                     /* abort, exit, getenv */
+#include <stdlib.h>                     /* abort, exit, getenv, EXIT_* */
 #include <string.h>                     /* memccpy, memcpy, strerror, strrchr */
 #include <syslog.h>                     /* openlog, syslog, closelog */
 
@@ -444,7 +444,7 @@ _log_die (int status, int priority, const char *msg)
     }
 #endif /* NDEBUG */
 
-    exit (status);
+    exit (EXIT_FAILURE);
 }
 
 

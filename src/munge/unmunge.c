@@ -238,6 +238,8 @@ main (int argc, char *argv[])
      *    of its contents is valid even though the credential itself is not.
      *  As such, display the metadata & payload with an appropriate status
      *    if the integrity checks succeed; o/w, exit out here with an error.
+     *  Per unmunge(1), the exit code corresponds to the munge_decode()
+     *    return code, so conf->status is propagated through exit().
      */
     if  ((conf->status != EMUNGE_SUCCESS)      &&
          (conf->status != EMUNGE_CRED_EXPIRED) &&
@@ -248,7 +250,8 @@ main (int argc, char *argv[])
         if (p == NULL) {
             p = munge_strerror (conf->status);
         }
-        log_err (conf->status, LOG_ERR, "%s", p);
+        log_msg (LOG_ERR, "%s", p);
+        exit (conf->status);
     }
     display_meta (conf);
     display_data (conf);
