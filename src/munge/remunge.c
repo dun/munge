@@ -45,7 +45,7 @@
 #include <signal.h>
 #include <stdarg.h>                     /* va_start, va_end, va_list */
 #include <stdio.h>                      /* printf, setvbuf, vsnprintf */
-#include <stdlib.h>                     /* exit, malloc, free, strtol, strtoul */
+#include <stdlib.h>                     /* exit, malloc, free, strtol, strtoul, EXIT_* */
 #include <string.h>                     /* strncmp, strrchr */
 #include <sys/time.h>                   /* gettimeofday, timeval */
 #include <sys/types.h>                  /* uid_t, gid_t */
@@ -220,7 +220,7 @@ main (int argc, char *argv[])
 
     destroy_conf (conf);
     log_close_file ();
-    exit (EMUNGE_SUCCESS);
+    exit (EXIT_SUCCESS);
 }
 
 
@@ -378,15 +378,15 @@ parse_cmdline (conf_t conf, int argc, char **argv)
         switch (c) {
             case 'h':
                 display_help (prog);
-                exit (EMUNGE_SUCCESS);
+                exit (EXIT_SUCCESS);
                 break;
             case 'L':
                 display_license ();
-                exit (EMUNGE_SUCCESS);
+                exit (EXIT_SUCCESS);
                 break;
             case 'V':
                 display_version ();
-                exit (EMUNGE_SUCCESS);
+                exit (EXIT_SUCCESS);
                 break;
             case 'q':
                 g_got_quiet = 1;
@@ -406,7 +406,7 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                 break;
             case 'C':
                 display_strings ("Cipher types", MUNGE_ENUM_CIPHER);
-                exit (EMUNGE_SUCCESS);
+                exit (EXIT_SUCCESS);
                 break;
             case 'm':
                 i = munge_enum_str_to_int (MUNGE_ENUM_MAC, optarg);
@@ -423,7 +423,7 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                 break;
             case 'M':
                 display_strings ("MAC types", MUNGE_ENUM_MAC);
-                exit (EMUNGE_SUCCESS);
+                exit (EXIT_SUCCESS);
                 break;
             case 'z':
                 i = munge_enum_str_to_int (MUNGE_ENUM_ZIP, optarg);
@@ -440,7 +440,7 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                 break;
             case 'Z':
                 display_strings ("Compression types", MUNGE_ENUM_ZIP);
-                exit (EMUNGE_SUCCESS);
+                exit (EXIT_SUCCESS);
                 break;
             case 'e':
                 conf->do_decode = 0;

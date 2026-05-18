@@ -50,7 +50,7 @@
 #include <pwd.h>                        /* getpwuid, passwd */
 #include <signal.h>
 #include <stdio.h>                      /* printf, f*, FILE, stdout, stderr */
-#include <stdlib.h>                     /* exit, malloc, free */
+#include <stdlib.h>                     /* exit, malloc, free, EXIT_* */
 #include <string.h>                     /* memset, str* */
 #include <strings.h>                    /* strcasecmp */
 #include <sys/socket.h>                 /* AF_INET, per getnameinfo(3) */
@@ -373,15 +373,15 @@ parse_cmdline (conf_t conf, int argc, char **argv)
         switch (c) {
             case 'h':
                 display_help (prog);
-                exit (EMUNGE_SUCCESS);
+                exit (EXIT_SUCCESS);
                 break;
             case 'L':
                 display_license ();
-                exit (EMUNGE_SUCCESS);
+                exit (EXIT_SUCCESS);
                 break;
             case 'V':
                 display_version ();
-                exit (EMUNGE_SUCCESS);
+                exit (EXIT_SUCCESS);
                 break;
             case 'i':
                 conf->fn_in = optarg;
@@ -402,7 +402,7 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                 break;
             case 'K':
                 display_keys ();
-                exit (EMUNGE_SUCCESS);
+                exit (EXIT_SUCCESS);
                 break;
             case 'N':
                 conf->got_numeric = 1;

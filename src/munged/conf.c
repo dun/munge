@@ -343,15 +343,15 @@ parse_cmdline (conf_t conf, int argc, char **argv)
         switch (c) {
             case 'h':
                 _conf_display_help (prog);
-                exit (EMUNGE_SUCCESS);
+                exit (EXIT_SUCCESS);
                 break;
             case 'L':
                 display_license ();
-                exit (EMUNGE_SUCCESS);
+                exit (EXIT_SUCCESS);
                 break;
             case 'V':
                 display_version ();
-                exit (EMUNGE_SUCCESS);
+                exit (EXIT_SUCCESS);
                 break;
             case 'f':
                 conf->got_force = 1;

@@ -168,7 +168,7 @@ main (int argc, char *argv[])
         PACKAGE, VERSION, (int) getpid ());
     log_close_all ();
 
-    exit (EMUNGE_SUCCESS);
+    exit (EXIT_SUCCESS);
 }
 
 
