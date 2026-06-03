@@ -30,6 +30,7 @@
 #endif /* HAVE_CONFIG_H */
 
 #include "cipher.h"
+#include "memwipe.h"
 
 #include <munge.h>
 
@@ -492,6 +493,7 @@ static int
 _cipher_cleanup (cipher_ctx *x)
 {
     gcry_cipher_close (x->ctx);
+    memwipe (x->buf, sizeof x->buf);
     return 0;
 }
 
