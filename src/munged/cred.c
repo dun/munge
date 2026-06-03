@@ -38,7 +38,6 @@
 
 #include <assert.h>
 #include <stdlib.h>                     /* calloc, free */
-#include <string.h>                     /* memset */
 
 
 munge_cred_t
@@ -58,6 +57,12 @@ cred_create (m_msg_t m)
 }
 
 
+/**
+ *  Destroy the credential [c], releasing all associated memory.
+ *
+ *  Securely erase [inner_mem] (may hold plaintext) and [dek].  All other
+ *  fields are either public wire-format data or public identifiers.
+ */
 void
 cred_destroy (munge_cred_t c)
 {
@@ -66,19 +71,18 @@ cred_destroy (munge_cred_t c)
     }
     if (c->outer_mem) {
         assert (c->outer_mem_len > 0);
-        memset (c->outer_mem, 0, c->outer_mem_len);
         free (c->outer_mem);
     }
     if (c->inner_mem) {
         assert (c->inner_mem_len > 0);
-        memset (c->inner_mem, 0, c->inner_mem_len);
-        free (c->inner_mem);
+        memwipe_and_free (c->inner_mem, (size_t) c->inner_mem_len);
     }
     if (c->realm_mem) {
         assert (c->realm_mem_len > 0);
-        memset (c->realm_mem, 0, c->realm_mem_len);
         free (c->realm_mem);
     }
-    memwipe (c, sizeof *c);
+    assert (c->dek_len >= 0);
+    assert (c->dek_len <= (int) sizeof c->dek);
+    memwipe (c->dek, (size_t) c->dek_len);
     free (c);
 }

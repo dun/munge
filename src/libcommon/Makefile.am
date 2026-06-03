@@ -35,6 +35,7 @@ libcommon_la_CPPFLAGS = \
 	-DLOCALSTATEDIR='"$(localstatedir)"' \
 	-DRUNSTATEDIR='"$(runstatedir)"' \
 	-DSYSCONFDIR='"$(sysconfdir)"' \
+	-I$(top_srcdir)/src/common \
 	-I$(top_srcdir)/src/libmunge \
 	# End of libcommon_la_CPPFLAGS
 
@@ -54,6 +55,8 @@ libcommon_la_SOURCES = \
 	str.h \
 	version.c \
 	version.h \
+	$(top_srcdir)/src/common/memwipe.c \
+	$(top_srcdir)/src/common/memwipe.h \
 	# End of libcommon_la_SOURCES
 
 # For dependencies on DATE.

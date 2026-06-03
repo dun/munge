@@ -41,6 +41,7 @@
 #include "log.h"
 #include "m_msg.h"
 #include "mac.h"
+#include "memwipe.h"
 #include "munge_defs.h"
 #include "random.h"
 #include "replay.h"
@@ -650,8 +651,8 @@ dec_decrypt (munge_cred_t c)
 err_cleanup:
     cipher_cleanup (&x);
 err:
-    memset (buf, 0, buf_len);
-    free (buf);
+    assert (buf_len > 0);
+    memwipe_and_free (buf, (size_t) buf_len);
     return m_msg_set_err (m, EMUNGE_SNAFU,
         strdup ("Failed to decrypt credential"));
 }
@@ -751,8 +752,7 @@ dec_decompress (munge_cred_t c)
      */
     if (c->inner_mem) {
         assert (c->inner_mem_len > 0);
-        memset (c->inner_mem, 0, c->inner_mem_len);
-        free (c->inner_mem);
+        memwipe_and_free (c->inner_mem, (size_t) c->inner_mem_len);
     }
     c->inner_mem = buf;
     c->inner_mem_len = buf_len;

@@ -108,8 +108,6 @@ munged_SOURCES = \
 	$(top_srcdir)/src/common/mac.h \
 	$(top_srcdir)/src/common/md.c \
 	$(top_srcdir)/src/common/md.h \
-	$(top_srcdir)/src/common/memwipe.c \
-	$(top_srcdir)/src/common/memwipe.h \
 	$(top_srcdir)/src/common/query.c \
 	$(top_srcdir)/src/common/query.h \
 	$(top_srcdir)/src/common/xgetgr.c \

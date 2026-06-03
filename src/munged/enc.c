@@ -39,6 +39,7 @@
 #include "log.h"
 #include "m_msg.h"
 #include "mac.h"
+#include "memwipe.h"
 #include "munge_defs.h"
 #include "random.h"
 #include "str.h"
@@ -506,13 +507,16 @@ enc_compress (munge_cred_t c)
     if (n >= c->inner_len) {
         m->zip = MUNGE_ZIP_NONE;
         *c->outer_zip_ref = m->zip;
-        memset (buf, 0, buf_len);
-        free (buf);
+        /*
+         *  buf_len is int because zip_compress_length() returns -1 on error,
+         *  but is verified > 0 above; the assert guards the cast to size_t.
+         */
+        assert (buf_len > 0);
+        memwipe_and_free (buf, (size_t) buf_len);
     }
     else {
         assert (c->inner_mem_len > 0);
-        memset (c->inner_mem, 0, c->inner_mem_len);
-        free (c->inner_mem);
+        memwipe_and_free (c->inner_mem, (size_t) c->inner_mem_len);
 
         c->inner_mem = buf;
         c->inner_mem_len = buf_len;
@@ -522,9 +526,8 @@ enc_compress (munge_cred_t c)
     return 0;
 
 err:
-    if ((buf_len > 0) && (buf != NULL)) {
-        memset (buf, 0, buf_len);
-        free (buf);
+    if ((buf_len > 0) && (buf != NULL)) {       /* buf_len may be -1 on err */
+        memwipe_and_free (buf, (size_t) buf_len);
     }
     return m_msg_set_err (m, EMUNGE_SNAFU,
         strdup ("Failed to compress credential"));
@@ -550,7 +553,7 @@ enc_mac (munge_cred_t c)
                 m->mac));
     }
     assert (c->mac_len <= sizeof c->mac);
-    memset (c->mac, 0, c->mac_len);
+    memset (c->mac, 0, c->mac_len);     /* initialization; cosmetic only */
 
     /*  Compute MAC.
      */
@@ -659,8 +662,7 @@ enc_encrypt (munge_cred_t c)
     /*  Replace "inner" plaintext with ciphertext.
      */
     assert (c->inner_mem_len > 0);
-    memset (c->inner_mem, 0, c->inner_mem_len);
-    free (c->inner_mem);
+    memwipe_and_free (c->inner_mem, (size_t) c->inner_mem_len);
 
     c->inner_mem = buf;
     c->inner_mem_len = buf_len;
@@ -671,7 +673,6 @@ enc_encrypt (munge_cred_t c)
 err_cleanup:
     cipher_cleanup (&x);
 err:
-    memset (buf, 0, buf_len);
     free (buf);
     return m_msg_set_err (m, EMUNGE_SNAFU,
         strdup ("Failed to encrypt credential"));
@@ -751,18 +752,14 @@ enc_armor (munge_cred_t c)
 
     /*  Replace "outer+inner" data with armor'd data.
      */
-    assert (c->outer_mem_len > 0);
-    memset (c->outer_mem, 0, c->outer_mem_len);
     free (c->outer_mem);
-
     c->outer_mem = buf;
     c->outer_mem_len = buf_len;
     c->outer = buf;
     c->outer_len = buf_ptr - buf + 1;
 
     assert (c->inner_mem_len > 0);
-    memset (c->inner_mem, 0, c->inner_mem_len);
-    free (c->inner_mem);
+    memwipe_and_free (c->inner_mem, (size_t) c->inner_mem_len);
 
     c->inner_mem = NULL;
     c->inner_mem_len = 0;
@@ -771,7 +768,6 @@ enc_armor (munge_cred_t c)
 err_cleanup:
     (void) base64_cleanup (&x);
 err:
-    memset (buf, 0, buf_len);
     free (buf);
     return m_msg_set_err (m, EMUNGE_SNAFU,
         strdup ("Failed to base64-encode credential"));
@@ -790,7 +786,7 @@ enc_fini (munge_cred_t c)
     if (m->data) {
         assert (m->data_len > 0);
         assert (m->data_is_copy == 0);
-        free (m->data);
+        memwipe_and_free (m->data, (size_t) m->data_len);
     }
     /*  Place credential in message "data" payload for transit.
      *  This memory is still owned by the cred struct, so it will be

@@ -32,6 +32,7 @@
 #include "m_msg.h"
 
 #include "fd.h"
+#include "memwipe.h"
 #include "munge_defs.h"
 #include "str.h"
 
@@ -111,7 +112,7 @@ m_msg_destroy (m_msg_t m)
     }
     if (m->pkt && !m->pkt_is_copy) {
         assert (m->pkt_len > 0);
-        free (m->pkt);
+        memwipe_and_free (m->pkt, (size_t) m->pkt_len);
     }
     if (m->realm_str && !m->realm_is_copy) {
         assert (m->realm_len > 0);
@@ -119,7 +120,7 @@ m_msg_destroy (m_msg_t m)
     }
     if (m->data && !m->data_is_copy) {
         assert (m->data_len > 0);
-        free (m->data);
+        memwipe_and_free (m->data, (size_t) m->data_len);
     }
     if (m->error_str && !m->error_is_copy) {
         assert (m->error_len > 0);
@@ -164,8 +165,9 @@ m_msg_reset (m_msg_t m)
     m->auth_uid = MUNGE_UID_ANY;
     m->auth_gid = MUNGE_GID_ANY;
     if (m->data) {
+        assert (m->data_len > 0);
         if (!m->data_is_copy) {
-            free (m->data);
+            memwipe_and_free (m->data, (size_t) m->data_len);
         }
         m->data = NULL;
         m->data_len = 0;
@@ -216,7 +218,7 @@ m_msg_send (m_msg_t m, m_msg_type_t type, size_t maxlen)
         if (m->pkt) {
             assert (m->pkt_len > 0);
             if (!m->pkt_is_copy) {
-                free (m->pkt);
+                memwipe_and_free (m->pkt, (size_t) m->pkt_len);
             }
             m->pkt = NULL;
             m->pkt_len = 0;
@@ -395,7 +397,8 @@ m_msg_recv (m_msg_t m, m_msg_type_t type, size_t maxlen)
     }
     /*  The packed message can be discarded now that it's been unpacked.
      */
-    free (m->pkt);
+    assert (m->pkt_len > 0);
+    memwipe_and_free (m->pkt, (size_t) m->pkt_len);
     m->pkt = NULL;
     m->pkt_len = 0;
     assert (m->pkt_is_copy == 0);
