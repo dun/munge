@@ -39,6 +39,7 @@
 
 #include <assert.h>
 #include <stddef.h>                     /* size_t */
+#include <stdlib.h>                     /* free */
 
 /*  explicit_bzero() may be declared by either <strings.h> (FreeBSD) or
  *  <string.h> (all other tested systems).  The other functions are
@@ -83,4 +84,18 @@ memwipe (void *v, size_t n)
         *p++ = 0;
     }
 #endif /* HAVE_MEMSET_EXPLICIT */
+}
+
+/**
+ *  Overwrite the first [n] bytes of [v] with the null byte (via memwipe),
+ *  then deallocate [v] via free().  If [v] is NULL, do nothing.
+ */
+void
+memwipe_and_free (void *v, size_t n)
+{
+    if (v == NULL) {
+        return;
+    }
+    memwipe (v, n);
+    free (v);
 }

@@ -31,4 +31,6 @@
 
 void memwipe (void *v, size_t n);
 
+void memwipe_and_free (void *v, size_t n);
+
 #endif /* MUNGE_MEMWIPE_H */
