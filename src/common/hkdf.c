@@ -308,10 +308,7 @@ hkdf (hkdf_ctx_t *ctxp, void *dst, size_t *dstlenp)
     rv = _hkdf_expand (ctxp, prk, prklen, dst, dstlenp);
 
 cleanup:
-    if (prk != NULL) {
-        memwipe (prk, prklen);
-        free (prk);
-    }
+    memwipe_and_free (prk, prklen);
     return rv;
 }
 
@@ -509,9 +506,6 @@ err:
             rv = -1;
         }
     }
-    if (okm != NULL) {
-        memwipe (okm, ctxp->mdlen);
-        free (okm);
-    }
+    memwipe_and_free (okm, ctxp->mdlen);
     return rv;
 }

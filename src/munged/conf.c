@@ -290,13 +290,11 @@ destroy_conf (conf_t conf, int do_unlink)
         conf->key_name = NULL;
     }
     if (conf->dek_key) {
-        memwipe (conf->dek_key, conf->dek_key_len);
-        free (conf->dek_key);
+        memwipe_and_free (conf->dek_key, conf->dek_key_len);
         conf->dek_key = NULL;
     }
     if (conf->mac_key) {
-        memwipe (conf->mac_key, conf->mac_key_len);
-        free (conf->mac_key);
+        memwipe_and_free (conf->mac_key, conf->mac_key_len);
         conf->mac_key = NULL;
     }
     if (conf->origin_name) {

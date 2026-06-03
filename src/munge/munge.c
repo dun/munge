@@ -207,14 +207,12 @@ destroy_conf (conf_t conf)
     }
     if (conf->data != NULL) {
         if (conf->data != conf->string) {
-            memwipe (conf->data, conf->dlen);
-            free (conf->data);
+            memwipe_and_free (conf->data, conf->dlen);
         }
         conf->data = NULL;
     }
     if (conf->cred != NULL) {
-        memwipe (conf->cred, conf->clen);
-        free (conf->cred);
+        memwipe_and_free (conf->cred, conf->clen);
         conf->cred = NULL;
     }
     munge_ctx_destroy (conf->ctx);

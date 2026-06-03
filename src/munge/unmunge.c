@@ -337,14 +337,12 @@ destroy_conf (conf_t conf)
     }
     if (conf->cred) {
         assert (conf->clen > 0);
-        memwipe (conf->cred, conf->clen);
-        free (conf->cred);
+        memwipe_and_free (conf->cred, conf->clen);
         conf->cred = NULL;
     }
     if (conf->data) {
         assert (conf->dlen > 0);
-        memwipe (conf->data, conf->dlen);
-        free (conf->data);
+        memwipe_and_free (conf->data, conf->dlen);
         conf->data = NULL;
     }
     munge_ctx_destroy (conf->ctx);
