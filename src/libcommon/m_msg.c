@@ -147,12 +147,13 @@ m_msg_reset (m_msg_t m)
     m->cipher = MUNGE_CIPHER_NONE;
     m->mac = MUNGE_MAC_NONE;
     m->zip = MUNGE_ZIP_NONE;
-    m->realm_len = 0;
     if (m->realm_str) {
         if (!m->realm_is_copy) {
             free (m->realm_str);
         }
         m->realm_str = NULL;
+        m->realm_len = 0;
+        m->realm_is_copy = 0;
     }
     m->ttl = MUNGE_TTL_DEFAULT;
     m->addr_len = 0;
@@ -162,12 +163,13 @@ m_msg_reset (m_msg_t m)
     m->cred_gid = MUNGE_GID_ANY;
     m->auth_uid = MUNGE_UID_ANY;
     m->auth_gid = MUNGE_GID_ANY;
-    m->data_len = 0;
     if (m->data) {
         if (!m->data_is_copy) {
             free (m->data);
         }
         m->data = NULL;
+        m->data_len = 0;
+        m->data_is_copy = 0;
     }
 }
 
