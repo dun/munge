@@ -200,6 +200,28 @@ test_expect_success MUNGE_INSTALL 'replay credential' '
     test_must_fail unmunge <cred.$$
 '
 
+# Verify libmunge.so is self-contained.  A third-party application should be
+#   able to link with "-lmunge" alone, with no need to provide additional
+#   objects to satisfy libmunge-internal symbols.  Unresolved references
+#   inside libmunge.so will cause the link or load to fail.
+#
+libmunge_verify_link()
+{
+    local cc src bin &&
+    cc=$(sed -n "s/^CC *= *//p" "${MUNGE_BUILD_DIR}/Makefile" | head -1) &&
+    src="libmunge_link_test.$$.c" &&
+    bin="libmunge_link_test.$$" &&
+    cat > "${src}" <<-EOF &&
+	#include <munge.h>
+	int main(void) { munge_encode(0,0,0,0); return 0; }
+	EOF
+    ${cc:-cc} -o "${bin}" "${src}" -lmunge &&
+    "./${bin}"
+}
+test_expect_success MUNGE_INSTALL 'verify libmunge.so is self-contained' '
+    libmunge_verify_link
+'
+
 # Stop the munge service.
 #
 test_expect_success MUNGE_INSTALL 'stop munge service' '
