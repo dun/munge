@@ -481,7 +481,6 @@ _md_cleanup (md_ctx *x)
     OPENSSL_free (x->ctx);
 #endif /* HAVE_EVP_MD_CTX_FREE */
 
-    x->ctx = NULL;
     return rv;
 }
 

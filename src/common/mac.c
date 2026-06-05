@@ -458,7 +458,6 @@ _mac_cleanup (mac_ctx *x)
     OPENSSL_free (x->ctx);
 #endif /* HAVE_EVP_MAC_CTX_FREE */
 
-    x->ctx = NULL;
     return 0;
 }
 

@@ -707,7 +707,6 @@ _cipher_cleanup (cipher_ctx *x)
     OPENSSL_free (x->ctx);
 #endif /* HAVE_EVP_CIPHER_CTX_FREE */
 
-    x->ctx = NULL;
     return rv;
 }
 
