@@ -280,7 +280,6 @@ _mac_block (munge_mac_t md, const void *key, int keylen,
     memcpy (dst, digest, len);
     *dstlenp = len;
     gcry_md_close (ctx);
-    memset (&ctx, 0, sizeof ctx);
     return 0;
 }
 
