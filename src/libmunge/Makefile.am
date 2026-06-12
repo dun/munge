@@ -52,6 +52,7 @@ libmunge_la_CPPFLAGS = \
 
 libmunge_la_LDFLAGS = \
 	-export-symbols-regex "^munge_.*" \
+	-no-undefined $(LD_NO_UNDEFINED) \
 	-version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE) \
 	# End of libmunge_la_LDFLAGS
 

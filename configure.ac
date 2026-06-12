@@ -68,10 +68,11 @@ AC_CHECK_HEADERS( \
 )
 
 ##
-# Checks for typedefs, structures, and compiler characteristics.
+# Checks for typedefs, structures, and compiler/linker characteristics.
 ##
 AC_C_CONST
 AC_TYPE_UID_T
+X_AC_CHECK_LD_NO_UNDEFINED
 AC_CHECK_DECLS([RLIMIT_MEMLOCK], [], [], [[#include <sys/resource.h>]])
 AC_CHECK_TYPES(socklen_t, [], [], [#include <sys/types.h>
 #include <sys/socket.h>])
