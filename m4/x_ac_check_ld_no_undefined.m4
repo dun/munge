@@ -13,9 +13,10 @@
 #   resolution requirement cannot be satisfied even when the linker itself
 #   accepts the flag.
 #
-#   The test compiles a small source file that references a libc
-#   symbol and attempts to link it as a shared object (with "-shared"
-#   and "-Wl,--no-undefined").  This mirrors the actual usage in
+#   The test compiles a small source file (with "-fPIC", which libtool
+#   adds automatically when building libmunge.la) that references
+#   a libc symbol and attempts to link it as a shared object (with
+#   "-shared" and "-Wl,--no-undefined").  This mirrors the actual usage in
 #   libmunge_la_LDFLAGS more closely than a plain link test.  The libc symbol
 #   must be called with a runtime-valued argument because the compiler can
 #   fold calls like strlen("") to a constant at compile time regardless
@@ -40,7 +41,9 @@ AC_DEFUN([X_AC_CHECK_LD_NO_UNDEFINED], [
   AC_CACHE_CHECK(
     [whether the linker supports --no-undefined for shared libraries],
     [x_ac_cv_check_ld_no_undefined],
-    [x_ac_save_LDFLAGS="${LDFLAGS}"
+    [x_ac_save_CFLAGS="${CFLAGS}"
+     x_ac_save_LDFLAGS="${LDFLAGS}"
+     CFLAGS="${CFLAGS} -fPIC"
      LDFLAGS="${LDFLAGS} -shared -Wl,--no-undefined"
      AC_LINK_IFELSE(
        [AC_LANG_SOURCE([[
@@ -51,6 +54,7 @@ AC_DEFUN([X_AC_CHECK_LD_NO_UNDEFINED], [
        [x_ac_cv_check_ld_no_undefined=yes],
        [x_ac_cv_check_ld_no_undefined=no]
      )
+     CFLAGS="${x_ac_save_CFLAGS}"
      LDFLAGS="${x_ac_save_LDFLAGS}"]
   )
   AS_IF(
