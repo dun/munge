@@ -343,6 +343,8 @@ _timer_thread (void *arg)
     timer_p timer_expired;
     int rv;
 
+    (void) arg;                 /* unused; required by pthread_create() */
+
     if (sigfillset (&sigset)) {
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to init timer sigset");
     }
@@ -470,6 +472,8 @@ _timer_thread_cleanup (void *arg)
 /*  The cleanup routine for the timer thread.
  *    It ensures the mutex is released when the thread is canceled.
  */
+    (void) arg;                 /* unused; required by pthread_cleanup_push() */
+
     if ((errno = pthread_mutex_unlock (&_timer_mutex)) != 0) {
         log_errno (EMUNGE_SNAFU, LOG_ERR, "Failed to unlock timer mutex");
     }

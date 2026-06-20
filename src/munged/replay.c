@@ -335,6 +335,8 @@ replay_is_expired (replay_t r, void *key, time_t *pnow)
 {
 /*  Returns true if replay_t object [r] has expired based on the time [pnow].
  */
+    (void) key;                         /* unused; required by hash_arg_f */
+
     if (r->data.t_expired < *pnow) {
         return 1;
     }

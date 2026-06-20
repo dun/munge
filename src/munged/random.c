@@ -100,7 +100,7 @@ static int _random_read_entropy_from_process (void);
 static int _random_read_seed (const char *path, int num_bytes);
 static int _random_write_seed (const char *path, int num_bytes);
 static int _random_check_entropy (unsigned char *buf, int n);
-static void _random_stir_entropy (void *_arg_not_used_);
+static void _random_stir_entropy (void *arg);
 
 static void _random_cleanup (void);
 static void _random_add (const void *buf, int n);
@@ -523,12 +523,14 @@ _random_check_entropy (unsigned char *buf, int n)
 
 
 static void
-_random_stir_entropy (void *_arg_not_used_)
+_random_stir_entropy (void *arg)
 {
 /*  Periodically stirs the entropy pool by mixing in new entropy.
  */
     unsigned long buf;
     int msecs;
+
+    (void) arg;                         /* unused; required by callback_f */
 
     assert (RANDOM_STIR_MAX_SECS > 0);
 

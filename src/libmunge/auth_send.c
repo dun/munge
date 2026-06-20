@@ -45,6 +45,8 @@
 int
 auth_send (m_msg_t m)
 {
+    (void) m;                           /* unused; required by prototype */
+
     return EMUNGE_SUCCESS;
 }
 

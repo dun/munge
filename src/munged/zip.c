@@ -256,7 +256,7 @@ zip_decompress_block (munge_zip_t type,
  *  The calculation includes space for 8 bytes of metadata (magic + length).
  *  Return the required size, or -1 on error (with errno set).
  *
- *  Note: The [src] parameter is currently unused.
+ *  Note: [src] is validated but not used; retained for interface symmetry.
  */
 int
 zip_compress_length (munge_zip_t type, const void *src, int len)
@@ -300,13 +300,15 @@ zip_compress_length (munge_zip_t type, const void *src, int len)
  *  Extract the decompressed (original) size from compressed data metadata.
  *  Return the decompressed size, or -1 on error (with errno set).
  *
- *  Note: The [type] parameter is currently unused.
+ *  Note: [type] is not used; retained for interface symmetry.
  */
 int
 zip_decompress_length (munge_zip_t type, const void *src, int len)
 {
     const zip_meta_t *meta;
     uint32_t orig_len;
+
+    (void) type;                        /* unused; for interface symmetry */
 
     if (!src) {
         errno = EINVAL;

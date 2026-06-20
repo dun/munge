@@ -229,7 +229,9 @@ _check_auth_client_dir (const char *dir, int got_force)
 void
 auth_recv_init (const char *srvrdir, const char *clntdir, int got_force)
 {
-    /* no-op */
+    (void) srvrdir;                     /* unused; required by prototype */
+    (void) clntdir;                     /* unused; required by prototype */
+    (void) got_force;                   /* unused; required by prototype */
 }
 
 #endif /* AUTH_METHOD_RECVFD_MKFIFO || AUTH_METHOD_RECVFD_MKNOD */

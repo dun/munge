@@ -51,8 +51,7 @@
 static void _decode_init (munge_ctx_t ctx, void **buf, int *len,
     uid_t *uid, gid_t *gid);
 
-static munge_err_t _decode_req (m_msg_t m, munge_ctx_t ctx,
-    const char *cred);
+static munge_err_t _decode_req (m_msg_t m, const char *cred);
 
 static munge_err_t _decode_rsp (m_msg_t m, munge_ctx_t ctx,
     void **buf, int *len, uid_t *uid, gid_t *gid);
@@ -86,7 +85,7 @@ munge_decode (const char *cred, munge_ctx_t ctx,
     if ((e = m_msg_create (&m)) != EMUNGE_SUCCESS) {
         ;
     }
-    else if ((e = _decode_req (m, ctx, cred)) != EMUNGE_SUCCESS) {
+    else if ((e = _decode_req (m, cred)) != EMUNGE_SUCCESS) {
         ;
     }
     else if ((e = m_msg_client_xfer (&m, MUNGE_MSG_DEC_REQ, ctx))
@@ -156,7 +155,7 @@ _decode_init (munge_ctx_t ctx, void **buf, int *len, uid_t *uid, gid_t *gid)
 
 
 static munge_err_t
-_decode_req (m_msg_t m, munge_ctx_t ctx, const char *cred)
+_decode_req (m_msg_t m, const char *cred)
 {
 /*  Creates a Decode Request message to be sent to the local munge daemon.
  *  The inputs to this message are as follows:

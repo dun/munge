@@ -172,6 +172,11 @@ _openssl_thread_lock_cb (int mode, int n, const char *file, int line)
 {
     int rv;
 
+    /*  unused; required by CRYPTO_set_locking_callback()
+     */
+    (void) file;
+    (void) line;
+
     if (mode & CRYPTO_LOCK) {
         rv = pthread_mutex_lock (&openssl_mutex_array[n]);
         if (rv != 0) {
@@ -202,6 +207,11 @@ _openssl_thread_dynlock_create_cb (const char *file, int line)
     struct CRYPTO_dynlock_value *lock;
     int rv;
 
+    /*  unused; required by CRYPTO_set_dynlock_create_callback()
+     */
+    (void) file;
+    (void) line;
+
     lock = malloc (sizeof (struct CRYPTO_dynlock_value));
     if (lock == NULL) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
@@ -221,6 +231,11 @@ _openssl_thread_dynlock_lock_cb (
     int mode, struct CRYPTO_dynlock_value *lock, const char *file, int line)
 {
     int rv;
+
+    /*  unused; required by CRYPTO_set_dynlock_lock_callback()
+     */
+    (void) file;
+    (void) line;
 
     if (mode & CRYPTO_LOCK) {
         rv = pthread_mutex_lock (&lock->mutex);
@@ -245,6 +260,11 @@ _openssl_thread_dynlock_destroy_cb (
     struct CRYPTO_dynlock_value *lock, const char *file, int line)
 {
     int rv;
+
+    /*  unused; required by CRYPTO_set_dynlock_destroy_callback()
+     */
+    (void) file;
+    (void) line;
 
     rv = pthread_mutex_destroy (&lock->mutex);
     if (rv != 0) {

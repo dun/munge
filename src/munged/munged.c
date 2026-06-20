@@ -72,7 +72,7 @@
  *****************************************************************************/
 
 static void disable_core_dumps (void);
-static void daemonize_init (char *progname, conf_t conf);
+static void daemonize_init (conf_t conf);
 static void daemonize_fini (void);
 static void open_logfile (const char *logfile, int priority, int got_force);
 static void handle_signals (void);
@@ -117,7 +117,7 @@ main (int argc, char *argv[])
         conf->got_force);
 
     if (!conf->got_foreground) {
-        daemonize_init (argv[0], conf);
+        daemonize_init (conf);
         if (conf->got_syslog) {
             log_close_file ();
             log_open_syslog (log_identity, LOG_DAEMON);
@@ -191,7 +191,7 @@ disable_core_dumps (void)
 
 
 static void
-daemonize_init (char *progname, conf_t conf)
+daemonize_init (conf_t conf)
 {
 /*  Begins the daemonization of the process.
  *  Despite the fact that this routine backgrounds the process, control

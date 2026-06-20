@@ -62,6 +62,9 @@ int
 test_get_env_int (const char *name, int *dst_val)
 {
 #ifdef NDEBUG
+    (void) name;                        /* used by the !NDEBUG build */
+    (void) dst_val;                     /* used by the !NDEBUG build */
+
     errno = ENOSYS;
     return -1;
 
