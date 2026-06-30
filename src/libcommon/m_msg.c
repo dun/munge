@@ -704,10 +704,10 @@ _msg_unpack (m_msg_t m, m_msg_type_t type, const void *src, int srclen)
             else break;
             goto err;
         case MUNGE_MSG_AUTH_FD_REQ:
-            if      (!_unpack(&(m->auth_s_len), &p, sizeof(m->auth_s_len), q));
+            if      (!_unpack(&(m->auth_s_len), &p, sizeof m->auth_s_len, q));
             else if (!_alloc((vpp)&(m->auth_s_str), m->auth_s_len)) goto nomem;
             else if ( _copy (m->auth_s_str, p, m->auth_s_len, p, q, &p) < 0) ;
-            else if (!_unpack(&(m->auth_c_len), &p, sizeof(m->auth_c_len), q));
+            else if (!_unpack(&(m->auth_c_len), &p, sizeof m->auth_c_len, q));
             else if (!_alloc((vpp)&(m->auth_c_str), m->auth_c_len)) goto nomem;
             else if ( _copy (m->auth_c_str, p, m->auth_c_len, p, q, &p) < 0) ;
             else break;
