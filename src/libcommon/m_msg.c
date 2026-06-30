@@ -606,9 +606,9 @@ _msg_pack (m_msg_t m, m_msg_type_t type, void *dst, int dstlen)
             else break;
             goto err;
         case MUNGE_MSG_AUTH_FD_REQ:
-            if      (!_pack (&p, &(m->auth_s_len), sizeof m->auth_s_len, q));
+            if      (!_pack (&p, &(m->auth_s_len), sizeof m->auth_s_len, q)) ;
             else if ( _copy (p, m->auth_s_str, m->auth_s_len, p, q, &p) < 0) ;
-            else if (!_pack (&p, &(m->auth_c_len), sizeof m->auth_c_len, q));
+            else if (!_pack (&p, &(m->auth_c_len), sizeof m->auth_c_len, q)) ;
             else if ( _copy (p, m->auth_c_str, m->auth_c_len, p, q, &p) < 0) ;
             else break;
             goto err;
@@ -650,7 +650,7 @@ _msg_unpack (m_msg_t m, m_msg_type_t type, const void *src, int srclen)
             if      (!_unpack (&(m->cipher), &p, sizeof m->cipher, q)) ;
             else if (!_unpack (&(m->mac), &p, sizeof m->mac, q)) ;
             else if (!_unpack (&(m->zip), &p, sizeof m->zip, q)) ;
-            else if (!_unpack (&(m->realm_len), &p, sizeof m->realm_len, q));
+            else if (!_unpack (&(m->realm_len), &p, sizeof m->realm_len, q)) ;
             else if (!_alloc ((vpp) &(m->realm_str), m->realm_len)) goto nomem;
             else if ( _copy (m->realm_str, p, m->realm_len, p, q, &p) < 0) ;
             else if (!_unpack (&(m->ttl), &p, sizeof m->ttl, q)) ;
@@ -662,8 +662,8 @@ _msg_unpack (m_msg_t m, m_msg_type_t type, const void *src, int srclen)
             else break;
             goto err;
         case MUNGE_MSG_ENC_RSP:
-            if      (!_unpack (&(m->error_num), &p, sizeof m->error_num, q));
-            else if (!_unpack (&(m->error_len), &p, sizeof m->error_len, q));
+            if      (!_unpack (&(m->error_num), &p, sizeof m->error_num, q)) ;
+            else if (!_unpack (&(m->error_len), &p, sizeof m->error_len, q)) ;
             else if (!_alloc ((vpp) &(m->error_str), m->error_len)) goto nomem;
             else if ( _copy (m->error_str, p, m->error_len, p, q, &p) < 0) ;
             else if (!_unpack (&(m->data_len), &p, sizeof m->data_len, q)) ;
@@ -678,14 +678,14 @@ _msg_unpack (m_msg_t m, m_msg_type_t type, const void *src, int srclen)
             else break;
             goto err;
         case MUNGE_MSG_DEC_RSP:
-            if      (!_unpack (&(m->error_num), &p, sizeof m->error_num, q));
-            else if (!_unpack (&(m->error_len), &p, sizeof m->error_len, q));
+            if      (!_unpack (&(m->error_num), &p, sizeof m->error_num, q)) ;
+            else if (!_unpack (&(m->error_len), &p, sizeof m->error_len, q)) ;
             else if (!_alloc ((vpp) &(m->error_str), m->error_len)) goto nomem;
             else if ( _copy (m->error_str, p, m->error_len, p, q, &p) < 0) ;
             else if (!_unpack (&(m->cipher), &p, sizeof m->cipher, q)) ;
             else if (!_unpack (&(m->mac), &p, sizeof m->mac, q)) ;
             else if (!_unpack (&(m->zip), &p, sizeof m->zip, q)) ;
-            else if (!_unpack (&(m->realm_len), &p, sizeof m->realm_len, q));
+            else if (!_unpack (&(m->realm_len), &p, sizeof m->realm_len, q)) ;
             else if (!_alloc ((vpp) &(m->realm_str), m->realm_len)) goto nomem;
             else if ( _copy (m->realm_str, p, m->realm_len, p, q, &p) < 0) ;
             else if (!_unpack (&(m->ttl), &p, sizeof m->ttl, q)) ;
@@ -704,10 +704,10 @@ _msg_unpack (m_msg_t m, m_msg_type_t type, const void *src, int srclen)
             else break;
             goto err;
         case MUNGE_MSG_AUTH_FD_REQ:
-            if      (!_unpack(&(m->auth_s_len), &p, sizeof m->auth_s_len, q));
+            if      (!_unpack(&(m->auth_s_len), &p, sizeof m->auth_s_len, q)) ;
             else if (!_alloc((vpp)&(m->auth_s_str), m->auth_s_len)) goto nomem;
             else if ( _copy (m->auth_s_str, p, m->auth_s_len, p, q, &p) < 0) ;
-            else if (!_unpack(&(m->auth_c_len), &p, sizeof m->auth_c_len, q));
+            else if (!_unpack(&(m->auth_c_len), &p, sizeof m->auth_c_len, q)) ;
             else if (!_alloc((vpp)&(m->auth_c_str), m->auth_c_len)) goto nomem;
             else if ( _copy (m->auth_c_str, p, m->auth_c_len, p, q, &p) < 0) ;
             else break;
