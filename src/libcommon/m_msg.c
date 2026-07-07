@@ -715,8 +715,12 @@ _msg_unpack (m_msg_t m, m_msg_type_t type, const void *src, int srclen)
         default:
             goto err;
     }
-    assert (p == (unsigned char *) src + srclen);
-
+    if (p != (unsigned char *) src + srclen) {
+        m_msg_set_err (m, EMUNGE_SNAFU,
+            strdupf ("Unpacked wrong number of bytes for message type %d",
+            type));
+        return EMUNGE_SNAFU;
+    }
     if (type == MUNGE_MSG_HDR) {
         if (magic != MUNGE_MSG_MAGIC) {
             m_msg_set_err (m, EMUNGE_SOCKET,
