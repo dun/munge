@@ -317,6 +317,7 @@ m_msg_recv (m_msg_t m, m_msg_type_t type, size_t maxlen)
     int n, nrecv;
     uint8_t hdr[MUNGE_MSG_HDR_SIZE];
     struct timeval tv;
+    munge_err_t e = EMUNGE_SUCCESS;
 
     assert (m != NULL);
     assert (m->sd >= 0);
@@ -382,32 +383,32 @@ m_msg_recv (m_msg_t m, m_msg_type_t type, size_t maxlen)
               n = fd_timed_read_n (m->sd, m->pkt, m->pkt_len, &tv, 1)) < 0) {
         m_msg_set_err (m, EMUNGE_SOCKET,
             strdupf ("Failed to receive message body: %s", strerror (errno)));
-        return EMUNGE_SOCKET;
+        e = EMUNGE_SOCKET;
     }
     else if (errno == ETIMEDOUT) {
         m_msg_set_err (m, EMUNGE_SOCKET,
             strdup ("Failed to receive message body: Timed-out"));
-        return EMUNGE_SOCKET;
+        e = EMUNGE_SOCKET;
     }
     else if (n != m->pkt_len) {
         m_msg_set_err (m, EMUNGE_SOCKET,
             strdupf ("Received incomplete message body: %d of %d bytes",
             n, nrecv));
-        return EMUNGE_SOCKET;
+        e = EMUNGE_SOCKET;
     }
     else if (_msg_unpack (m, m->type, m->pkt, m->pkt_len) != EMUNGE_SUCCESS) {
         m_msg_set_err (m, EMUNGE_SOCKET,
             strdup ("Failed to unpack message body"));
-        return EMUNGE_SOCKET;
+        e = EMUNGE_SOCKET;
     }
-    /*  The packed message can be discarded now that it's been unpacked.
+    /*  Discard the packed message.
      */
     assert (m->pkt_len > 0);
     memwipe_and_free (m->pkt, (size_t) m->pkt_len);
     m->pkt = NULL;
     m->pkt_len = 0;
     assert (m->pkt_is_copy == 0);
-    return EMUNGE_SUCCESS;
+    return e;
 }
 
 
