@@ -362,6 +362,11 @@ m_msg_recv (m_msg_t m, m_msg_type_t type, size_t maxlen)
                 type, m->type));
         return EMUNGE_SOCKET;
     }
+    else if (m->pkt_len == 0) {
+        m_msg_set_err (m, EMUNGE_BAD_LENGTH,
+            strdup ("Failed to receive message: Size 0 is invalid"));
+        return EMUNGE_BAD_LENGTH;
+    }
     else if ((maxlen > 0) && (m->pkt_len > maxlen)) {
         m_msg_set_err (m, EMUNGE_BAD_LENGTH,
             strdupf ("Failed to receive message: "
