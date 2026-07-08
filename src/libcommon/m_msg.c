@@ -376,7 +376,8 @@ m_msg_recv (m_msg_t m, m_msg_type_t type, size_t maxlen)
     }
     else if (!(m->pkt = malloc (m->pkt_len))) {
         m_msg_set_err (m, EMUNGE_NO_MEMORY,
-            strdupf ("Failed to allocate %d bytes for receiving message", n));
+            strdupf ("Failed to allocate %d bytes for receiving message",
+                m->pkt_len));
         return EMUNGE_NO_MEMORY;
     }
     else if ((errno = 0,
@@ -393,7 +394,7 @@ m_msg_recv (m_msg_t m, m_msg_type_t type, size_t maxlen)
     else if (n != m->pkt_len) {
         m_msg_set_err (m, EMUNGE_SOCKET,
             strdupf ("Received incomplete message body: %d of %d bytes",
-            n, nrecv));
+            n, m->pkt_len));
         e = EMUNGE_SOCKET;
     }
     else if (_msg_unpack (m, m->type, m->pkt, m->pkt_len) != EMUNGE_SUCCESS) {
