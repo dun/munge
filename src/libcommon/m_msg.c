@@ -41,6 +41,7 @@
 #include <arpa/inet.h>                  /* htonl, htons, ntohl, ntohs */
 #include <assert.h>
 #include <errno.h>
+#include <inttypes.h>                   /* PRIu32 */
 #include <stddef.h>                     /* size_t */
 #include <stdint.h>                     /* uint8_t, uint16_t, uint32_t, UINT8_MAX */
 #include <stdlib.h>                     /* calloc, malloc, free */
@@ -256,8 +257,8 @@ m_msg_send (m_msg_t m, m_msg_type_t type, size_t maxlen)
      */
     if ((maxlen > 0) && (m->pkt_len > maxlen)) {
         m_msg_set_err (m, EMUNGE_BAD_LENGTH,
-            strdupf ("Failed to send message: "
-                "Size %lu exceeded maximum of %lu", m->pkt_len, maxlen));
+            strdupf ("Failed to send message: Size %" PRIu32
+                " exceeded maximum of %zu", m->pkt_len, maxlen));
         return EMUNGE_BAD_LENGTH;
     }
     /*  Always repack the message header.
@@ -370,14 +371,14 @@ m_msg_recv (m_msg_t m, m_msg_type_t type, size_t maxlen)
     }
     else if ((maxlen > 0) && (m->pkt_len > maxlen)) {
         m_msg_set_err (m, EMUNGE_BAD_LENGTH,
-            strdupf ("Failed to receive message: "
-                "Size %lu exceeded maximum of %lu", m->pkt_len, maxlen));
+            strdupf ("Failed to receive message: Size %" PRIu32
+                " exceeded maximum of %zu", m->pkt_len, maxlen));
         return EMUNGE_BAD_LENGTH;
     }
     else if (!(m->pkt = malloc (m->pkt_len))) {
         m_msg_set_err (m, EMUNGE_NO_MEMORY,
-            strdupf ("Failed to allocate %d bytes for receiving message",
-                m->pkt_len));
+            strdupf ("Failed to allocate %" PRIu32
+                " bytes for receiving message", m->pkt_len));
         return EMUNGE_NO_MEMORY;
     }
     else if ((errno = 0,
@@ -393,8 +394,8 @@ m_msg_recv (m_msg_t m, m_msg_type_t type, size_t maxlen)
     }
     else if (n != m->pkt_len) {
         m_msg_set_err (m, EMUNGE_SOCKET,
-            strdupf ("Received incomplete message body: %d of %d bytes",
-            n, m->pkt_len));
+            strdupf ("Received incomplete message body: %d of %" PRIu32
+                " bytes", n, m->pkt_len));
         e = EMUNGE_SOCKET;
     }
     else if (_msg_unpack (m, m->type, m->pkt, m->pkt_len) != EMUNGE_SUCCESS) {
@@ -731,7 +732,7 @@ _msg_unpack (m_msg_t m, m_msg_type_t type, const void *src, int srclen)
     if (type == MUNGE_MSG_HDR) {
         if (magic != MUNGE_MSG_MAGIC) {
             m_msg_set_err (m, EMUNGE_SOCKET,
-                strdupf ("Received invalid message magic %d", magic));
+                strdupf ("Received invalid message magic %" PRIu32, magic));
             return EMUNGE_SOCKET;
         }
         else if (version != MUNGE_MSG_VERSION) {
