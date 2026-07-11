@@ -440,23 +440,23 @@ _xgetpwbuf_copy_struct (const struct passwd *src, struct passwd *dst,
     p = pwbufp->buf;
 
     if (_xgetpwbuf_copy_string
-            (src->pw_name, &(dst->pw_name), &p, &num_bytes) < 0) {
+            (src->pw_name, &dst->pw_name, &p, &num_bytes) < 0) {
         goto err;
     }
     if (_xgetpwbuf_copy_string
-            (src->pw_passwd, &(dst->pw_passwd), &p, &num_bytes) < 0) {
+            (src->pw_passwd, &dst->pw_passwd, &p, &num_bytes) < 0) {
         goto err;
     }
     if (_xgetpwbuf_copy_string
-            (src->pw_gecos, &(dst->pw_gecos), &p, &num_bytes) < 0) {
+            (src->pw_gecos, &dst->pw_gecos, &p, &num_bytes) < 0) {
         goto err;
     }
     if (_xgetpwbuf_copy_string
-            (src->pw_dir, &(dst->pw_dir), &p, &num_bytes) < 0) {
+            (src->pw_dir, &dst->pw_dir, &p, &num_bytes) < 0) {
         goto err;
     }
     if (_xgetpwbuf_copy_string
-            (src->pw_shell, &(dst->pw_shell), &p, &num_bytes) < 0) {
+            (src->pw_shell, &dst->pw_shell, &p, &num_bytes) < 0) {
         goto err;
     }
     dst->pw_uid = src->pw_uid;

@@ -446,7 +446,7 @@ _timer_thread (void *arg)
              *  Cancellation point.
              */
             errno = pthread_cond_timedwait (
-                    &_timer_cond, &_timer_mutex, &(_timer_active->ts));
+                    &_timer_cond, &_timer_mutex, &_timer_active->ts);
 
             if (errno == EINTR) {
                 continue;

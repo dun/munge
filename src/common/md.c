@@ -242,7 +242,7 @@ _md_init (md_ctx *x, munge_mac_t md)
     if (_md_map_enum (md, &algo) < 0) {
         return -1;
     }
-    if ((e = gcry_md_open (&(x->ctx), algo, 0)) != 0) {
+    if ((e = gcry_md_open (&x->ctx, algo, 0)) != 0) {
         log_msg (LOG_DEBUG, "gcry_md_open failed for MAC=%d: %s",
             md, gcry_strerror (e));
         return -1;
@@ -290,7 +290,7 @@ _md_copy (md_ctx *xdst, md_ctx *xsrc)
 {
     gcry_error_t e;
 
-    if ((e = gcry_md_copy (&(xdst->ctx), xsrc->ctx)) != 0) {
+    if ((e = gcry_md_copy (&xdst->ctx, xsrc->ctx)) != 0) {
         log_msg (LOG_DEBUG, "gcry_md_copy failed: %s", gcry_strerror (e));
         return -1;
     }

@@ -597,16 +597,16 @@ _xgetgrbuf_copy_struct (const struct group *src, struct group *dst,
     num_bytes -= n;
 
     if (_xgetgrbuf_copy_string
-            (src->gr_name, &(dst->gr_name), &p, &num_bytes) < 0) {
+            (src->gr_name, &dst->gr_name, &p, &num_bytes) < 0) {
         goto err;
     }
     if (_xgetgrbuf_copy_string
-            (src->gr_passwd, &(dst->gr_passwd), &p, &num_bytes) < 0) {
+            (src->gr_passwd, &dst->gr_passwd, &p, &num_bytes) < 0) {
         goto err;
     }
     for (i = 0; i < num_ptrs; i++) {
         if (_xgetgrbuf_copy_string
-                (src->gr_mem[i], &(dst->gr_mem[i]), &p, &num_bytes) < 0) {
+                (src->gr_mem[i], &dst->gr_mem[i], &p, &num_bytes) < 0) {
             goto err;
         }
     }

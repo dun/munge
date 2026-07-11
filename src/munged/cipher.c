@@ -260,7 +260,7 @@ _cipher_init (cipher_ctx *x, munge_cipher_t cipher,
     if (_cipher_map_enum (cipher, &algo) < 0) {
         return -1;
     }
-    e = gcry_cipher_open (&(x->ctx), algo, GCRY_CIPHER_MODE_CBC, 0);
+    e = gcry_cipher_open (&x->ctx, algo, GCRY_CIPHER_MODE_CBC, 0);
     if (e != 0) {
         log_msg (LOG_DEBUG, "gcry_cipher_open failed for cipher=%d: %s",
             cipher, gcry_strerror (e));
@@ -327,7 +327,7 @@ _cipher_update (cipher_ctx *x, void *vdst, int *dstlenp,
         assert (x->len < x->blklen);
         n_avail = x->blklen - x->len;
         n_partial = (srclen < n_avail) ? srclen : n_avail;
-        memcpy (&(x->buf[x->len]), src, n_partial);
+        memcpy (&x->buf[x->len], src, n_partial);
         x->len += n_partial;
         src += n_partial;
         srclen -= n_partial;

@@ -309,7 +309,7 @@ hash_insert (hash_t h, const void *key, void *data)
     }
     lsd_mutex_lock (&h->mutex);
     slot = h->key_f (key) % h->size;
-    for (pp = &(h->table[slot]); (p = *pp) != NULL; pp = &(p->next)) {
+    for (pp = &h->table[slot]; (p = *pp) != NULL; pp = &p->next) {
         cmpval = h->cmp_f (p->hkey, key);
         if (cmpval < 0) {
             continue;
@@ -358,7 +358,7 @@ hash_remove (hash_t h, const void *key)
     errno = 0;
     lsd_mutex_lock (&h->mutex);
     slot = h->key_f (key) % h->size;
-    for (pp = &(h->table[slot]); (p = *pp) != NULL; pp = &(p->next)) {
+    for (pp = &h->table[slot]; (p = *pp) != NULL; pp = &p->next) {
         cmpval = h->cmp_f (p->hkey, key);
         if (cmpval < 0) {
             continue;
@@ -397,7 +397,7 @@ hash_delete_if (hash_t h, hash_arg_f arg_f, void *arg)
     }
     lsd_mutex_lock (&h->mutex);
     for (i = 0; i < h->size; i++) {
-        pp = &(h->table[i]);
+        pp = &h->table[i];
         while ((p = *pp) != NULL) {
             if (arg_f (p->data, p->hkey, arg) > 0) {
                 if (h->del_f)
@@ -408,7 +408,7 @@ hash_delete_if (hash_t h, hash_arg_f arg_f, void *arg)
                 n++;
             }
             else {
-                pp = &(p->next);
+                pp = &p->next;
             }
         }
     }

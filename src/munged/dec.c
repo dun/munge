@@ -212,8 +212,8 @@ dec_authenticate (munge_cred_t c)
     assert (sizeof (uid_t) <= sizeof m->client_uid);
     assert (sizeof (gid_t) <= sizeof m->client_gid);
 
-    p_uid = (uid_t *) &(m->client_uid);
-    p_gid = (gid_t *) &(m->client_gid);
+    p_uid = (uid_t *) &m->client_uid;
+    p_gid = (gid_t *) &m->client_gid;
 
     /*  Determine identity of client process.
      */
