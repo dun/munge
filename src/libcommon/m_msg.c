@@ -71,7 +71,7 @@ static munge_err_t _msg_unpack (m_msg_t m, m_msg_type_t type,
 static int _alloc (void **pdst, int len);
 static int _copy (void *dst, const void *src, int len,
         void **pfirst, const void *last);
-static int _pack (void **pdst, void *src, int len, const void *last);
+static int _pack (void **pdst, const void *src, int len, const void *last);
 static int _unpack (void *dst, void **psrc, int len, const void *last);
 
 
@@ -825,7 +825,7 @@ _copy (void *dst, const void *src, int len, void **pfirst, const void *last)
 
 
 static int
-_pack (void **pdst, void *src, int len, const void *last)
+_pack (void **pdst, const void *src, int len, const void *last)
 {
 /*  Packs the [src] data of [len] bytes into [dst] using MSBF.
  *    If [last] is non-NULL, checks to ensure [len] bytes
