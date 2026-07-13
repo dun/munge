@@ -69,8 +69,8 @@ static munge_err_t _msg_pack (m_msg_t m, m_msg_type_t type,
 static munge_err_t _msg_unpack (m_msg_t m, m_msg_type_t type,
         const void *src, int srclen);
 static int _alloc (void **pdst, int len);
-static int _copy (void *dst, void *src, int len,
-        const void *first, const void *last, void **pinc);
+static int _copy (void *dst, const void *src, int len,
+        void **pfirst, const void *last);
 static int _pack (void **pdst, void *src, int len, const void *last);
 static int _unpack (void *dst, void **psrc, int len, const void *last);
 
@@ -570,39 +570,39 @@ _msg_pack (m_msg_t m, m_msg_type_t type, void *dst, int dstlen)
             else if (_pack (&p, &m->mac, sizeof m->mac, q) < 0) ;
             else if (_pack (&p, &m->zip, sizeof m->zip, q) < 0) ;
             else if (_pack (&p, &m->realm_len, sizeof m->realm_len, q) < 0) ;
-            else if (_copy (p, m->realm_str, m->realm_len, p, q, &p) < 0) ;
+            else if (_copy (p, m->realm_str, m->realm_len, &p, q) < 0) ;
             else if (_pack (&p, &m->ttl, sizeof m->ttl, q) < 0) ;
             else if (_pack (&p, &m->auth_uid, sizeof m->auth_uid, q) < 0) ;
             else if (_pack (&p, &m->auth_gid, sizeof m->auth_gid, q) < 0) ;
             else if (_pack (&p, &m->data_len, sizeof m->data_len, q) < 0) ;
-            else if (_copy (p, m->data, m->data_len, p, q, &p) < 0) ;
+            else if (_copy (p, m->data, m->data_len, &p, q) < 0) ;
             else break;
             goto err;
         case MUNGE_MSG_ENC_RSP:
             if      (_pack (&p, &m->error_num, sizeof m->error_num, q) < 0) ;
             else if (_pack (&p, &m->error_len, sizeof m->error_len, q) < 0) ;
-            else if (_copy (p, m->error_str, m->error_len, p, q, &p) < 0) ;
+            else if (_copy (p, m->error_str, m->error_len, &p, q) < 0) ;
             else if (_pack (&p, &m->data_len, sizeof m->data_len, q) < 0) ;
-            else if (_copy (p, m->data, m->data_len, p, q, &p) < 0) ;
+            else if (_copy (p, m->data, m->data_len, &p, q) < 0) ;
             else break;
             goto err;
         case MUNGE_MSG_DEC_REQ:
             if      (_pack (&p, &m->data_len, sizeof m->data_len, q) < 0) ;
-            else if (_copy (p, m->data, m->data_len, p, q, &p) < 0) ;
+            else if (_copy (p, m->data, m->data_len, &p, q) < 0) ;
             else break;
             goto err;
         case MUNGE_MSG_DEC_RSP:
             if      (_pack (&p, &m->error_num, sizeof m->error_num, q) < 0) ;
             else if (_pack (&p, &m->error_len, sizeof m->error_len, q) < 0) ;
-            else if (_copy (p, m->error_str, m->error_len, p, q, &p) < 0) ;
+            else if (_copy (p, m->error_str, m->error_len, &p, q) < 0) ;
             else if (_pack (&p, &m->cipher, sizeof m->cipher, q) < 0) ;
             else if (_pack (&p, &m->mac, sizeof m->mac, q) < 0) ;
             else if (_pack (&p, &m->zip, sizeof m->zip, q) < 0) ;
             else if (_pack (&p, &m->realm_len, sizeof m->realm_len, q) < 0) ;
-            else if (_copy (p, m->realm_str, m->realm_len, p, q, &p) < 0) ;
+            else if (_copy (p, m->realm_str, m->realm_len, &p, q) < 0) ;
             else if (_pack (&p, &m->ttl, sizeof m->ttl, q) < 0) ;
             else if (_pack (&p, &m->addr_len, sizeof m->addr_len, q) < 0) ;
-            else if (_copy (p, &m->addr, m->addr_len, p, q, &p) < 0) ;
+            else if (_copy (p, &m->addr, m->addr_len, &p, q) < 0) ;
             else if (_pack (&p, &m->time0, sizeof m->time0, q) < 0) ;
             else if (_pack (&p, &m->time1, sizeof m->time1, q) < 0) ;
             else if (_pack (&p, &m->cred_uid, sizeof m->cred_uid, q) < 0) ;
@@ -610,14 +610,14 @@ _msg_pack (m_msg_t m, m_msg_type_t type, void *dst, int dstlen)
             else if (_pack (&p, &m->auth_uid, sizeof m->auth_uid, q) < 0) ;
             else if (_pack (&p, &m->auth_gid, sizeof m->auth_gid, q) < 0) ;
             else if (_pack (&p, &m->data_len, sizeof m->data_len, q) < 0) ;
-            else if (_copy (p, m->data, m->data_len, p, q, &p) < 0) ;
+            else if (_copy (p, m->data, m->data_len, &p, q) < 0) ;
             else break;
             goto err;
         case MUNGE_MSG_AUTH_FD_REQ:
             if      (_pack (&p, &m->auth_s_len, sizeof m->auth_s_len, q) < 0) ;
-            else if (_copy (p, m->auth_s_str, m->auth_s_len, p, q, &p) < 0) ;
+            else if (_copy (p, m->auth_s_str, m->auth_s_len, &p, q) < 0) ;
             else if (_pack (&p, &m->auth_c_len, sizeof m->auth_c_len, q) < 0) ;
-            else if (_copy (p, m->auth_c_str, m->auth_c_len, p, q, &p) < 0) ;
+            else if (_copy (p, m->auth_c_str, m->auth_c_len, &p, q) < 0) ;
             else break;
             goto err;
         default:
@@ -660,46 +660,46 @@ _msg_unpack (m_msg_t m, m_msg_type_t type, const void *src, int srclen)
             else if (_unpack (&m->zip, &p, sizeof m->zip, q) < 0) ;
             else if (_unpack (&m->realm_len, &p, sizeof m->realm_len, q) < 0) ;
             else if (_alloc ((vpp) &m->realm_str, m->realm_len) < 0) goto nomem;
-            else if (_copy (m->realm_str, p, m->realm_len, p, q, &p) < 0) ;
+            else if (_copy (m->realm_str, p, m->realm_len, &p, q) < 0) ;
             else if (_unpack (&m->ttl, &p, sizeof m->ttl, q) < 0) ;
             else if (_unpack (&m->auth_uid, &p, sizeof m->auth_uid, q) < 0) ;
             else if (_unpack (&m->auth_gid, &p, sizeof m->auth_gid, q) < 0) ;
             else if (_unpack (&m->data_len, &p, sizeof m->data_len, q) < 0) ;
             else if (_alloc (&m->data, m->data_len) < 0) goto nomem;
-            else if (_copy (m->data, p, m->data_len, p, q, &p) < 0) ;
+            else if (_copy (m->data, p, m->data_len, &p, q) < 0) ;
             else break;
             goto err;
         case MUNGE_MSG_ENC_RSP:
             if      (_unpack (&m->error_num, &p, sizeof m->error_num, q) < 0) ;
             else if (_unpack (&m->error_len, &p, sizeof m->error_len, q) < 0) ;
             else if (_alloc ((vpp) &m->error_str, m->error_len) < 0) goto nomem;
-            else if (_copy (m->error_str, p, m->error_len, p, q, &p) < 0) ;
+            else if (_copy (m->error_str, p, m->error_len, &p, q) < 0) ;
             else if (_unpack (&m->data_len, &p, sizeof m->data_len, q) < 0) ;
             else if (_alloc (&m->data, m->data_len) < 0) goto nomem;
-            else if (_copy (m->data, p, m->data_len, p, q, &p) < 0) ;
+            else if (_copy (m->data, p, m->data_len, &p, q) < 0) ;
             else break;
             goto err;
         case MUNGE_MSG_DEC_REQ:
             if      (_unpack (&m->data_len, &p, sizeof m->data_len, q) < 0) ;
             else if (_alloc (&m->data, m->data_len) < 0) goto nomem;
-            else if (_copy (m->data, p, m->data_len, p, q, &p) < 0) ;
+            else if (_copy (m->data, p, m->data_len, &p, q) < 0) ;
             else break;
             goto err;
         case MUNGE_MSG_DEC_RSP:
             if      (_unpack (&m->error_num, &p, sizeof m->error_num, q) < 0) ;
             else if (_unpack (&m->error_len, &p, sizeof m->error_len, q) < 0) ;
             else if (_alloc ((vpp) &m->error_str, m->error_len) < 0) goto nomem;
-            else if (_copy (m->error_str, p, m->error_len, p, q, &p) < 0) ;
+            else if (_copy (m->error_str, p, m->error_len, &p, q) < 0) ;
             else if (_unpack (&m->cipher, &p, sizeof m->cipher, q) < 0) ;
             else if (_unpack (&m->mac, &p, sizeof m->mac, q) < 0) ;
             else if (_unpack (&m->zip, &p, sizeof m->zip, q) < 0) ;
             else if (_unpack (&m->realm_len, &p, sizeof m->realm_len, q) < 0) ;
             else if (_alloc ((vpp) &m->realm_str, m->realm_len) < 0) goto nomem;
-            else if (_copy (m->realm_str, p, m->realm_len, p, q, &p) < 0) ;
+            else if (_copy (m->realm_str, p, m->realm_len, &p, q) < 0) ;
             else if (_unpack (&m->ttl, &p, sizeof m->ttl, q) < 0) ;
             else if (_unpack (&m->addr_len, &p, sizeof m->addr_len, q) < 0) ;
             else if (m->addr_len > sizeof m->addr) goto err;
-            else if (_copy (&m->addr, p, m->addr_len, p, q, &p) < 0) ;
+            else if (_copy (&m->addr, p, m->addr_len, &p, q) < 0) ;
             else if (_unpack (&m->time0, &p, sizeof m->time0, q) < 0) ;
             else if (_unpack (&m->time1, &p, sizeof m->time1, q) < 0) ;
             else if (_unpack (&m->cred_uid, &p, sizeof m->cred_uid, q) < 0) ;
@@ -708,16 +708,16 @@ _msg_unpack (m_msg_t m, m_msg_type_t type, const void *src, int srclen)
             else if (_unpack (&m->auth_gid, &p, sizeof m->auth_gid, q) < 0) ;
             else if (_unpack (&m->data_len, &p, sizeof m->data_len, q) < 0) ;
             else if (_alloc (&m->data, m->data_len) < 0) goto nomem;
-            else if (_copy (m->data, p, m->data_len, p, q, &p) < 0) ;
+            else if (_copy (m->data, p, m->data_len, &p, q) < 0) ;
             else break;
             goto err;
         case MUNGE_MSG_AUTH_FD_REQ:
             if      (_unpack (&m->auth_s_len, &p, sizeof m->auth_s_len, q) < 0) ;
             else if (_alloc ((vpp) &m->auth_s_str, m->auth_s_len) < 0) goto nomem;
-            else if (_copy (m->auth_s_str, p, m->auth_s_len, p, q, &p) < 0) ;
+            else if (_copy (m->auth_s_str, p, m->auth_s_len, &p, q) < 0) ;
             else if (_unpack (&m->auth_c_len, &p, sizeof m->auth_c_len, q) < 0) ;
             else if (_alloc ((vpp) &m->auth_c_str, m->auth_c_len) < 0) goto nomem;
-            else if (_copy (m->auth_c_str, p, m->auth_c_len, p, q, &p) < 0) ;
+            else if (_copy (m->auth_c_str, p, m->auth_c_len, &p, q) < 0) ;
             else break;
             goto err;
         default:
@@ -792,31 +792,33 @@ _alloc (void **pdst, int len)
 }
 
 
-static int
-_copy (void *dst, void *src, int len,
-       const void *first, const void *last, void **pinc)
-{
-/*  Copies [len] bytes of data from [src] to [dst].
- *    If [first] and [last] are both non-NULL, checks to ensure
- *    [len] bytes of data resides between [first] and [last].
- *  Returns the number of bytes copied into [dst], or -1 on error.
- *    On success (ie, >= 0), an optional [inc] ptr is advanced by [len].
+/**
+ *  Copy [len] bytes from [src] to [dst], requiring [len] bytes to be available
+ *  in [*pfirst, last) and then advancing the cursor [*pfirst] by [len].
+ *
+ *  Return the number of bytes copied, or -1 on error.
+ *
+ *  Note: [len] is validated at runtime because it may derive from
+ *  peer-supplied message fields; the pointer arguments are caller-controlled
+ *  invariants and are checked with assert().
  */
+static int
+_copy (void *dst, const void *src, int len, void **pfirst, const void *last)
+{
     if (len < 0) {
         return -1;
     }
-    if (len == 0) {
-        return 0;
-    }
-    if ((first != NULL) && (last != NULL)
-            && ((unsigned char *) first + len > (unsigned char *) last)) {
+    assert (pfirst != NULL);
+    assert (*pfirst != NULL);
+    assert (last != NULL);
+    if ((unsigned char *) *pfirst + len > (unsigned char *) last) {
         return -1;
     }
     if (len > 0) {
+        assert (dst != NULL);
+        assert (src != NULL);
         memcpy (dst, src, len);
-    }
-    if (pinc != NULL) {
-        *pinc = (unsigned char *) *pinc + len;
+        *pfirst = (unsigned char *) *pfirst + len;
     }
     return len;
 }
