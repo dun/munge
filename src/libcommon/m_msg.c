@@ -824,24 +824,29 @@ _copy (void *dst, const void *src, int len, void **pfirst, const void *last)
 }
 
 
+/**
+ *  Pack the [src] scalar of [len] bytes into the buffer at [*pdst] in
+ *  MSB-first order, then advance [*pdst] by [len].
+ *
+ *  Require [len] bytes to fit in the buffer bounded by [last]; [last] must be
+ *  non-NULL.  [len] must be a supported scalar width.
+ *
+ *  Return the number of bytes packed, or -1 on error.
+ */
 static int
 _pack (void **pdst, const void *src, int len, const void *last)
 {
-/*  Packs the [src] data of [len] bytes into [dst] using MSBF.
- *    If [last] is non-NULL, checks to ensure [len] bytes
- *    of [dst] data resides prior to the [last] valid byte.
- *  Returns the number of bytes copied into [dst], or -1 on error.
- *    On success (ie, > 0), the [dst] ptr is advanced by [len].
- */
     void *dst;
     uint16_t u16;
     uint32_t u32;
 
     assert (pdst != NULL);
     assert (src != NULL);
+    assert (len >= 0);
+    assert (last != NULL);
 
     dst = *pdst;
-    if (last && ((unsigned char *) dst + len > (unsigned char *) last)) {
+    if ((unsigned char *) dst + len > (unsigned char *) last) {
         return -1;
     }
     switch (len) {
@@ -864,24 +869,29 @@ _pack (void **pdst, const void *src, int len, const void *last)
 }
 
 
+/**
+ *  Unpack [len] bytes in MSB-first order from the buffer at [*psrc] into the
+ *  [dst] scalar, then advance [*psrc] by [len].
+ *
+ *  Require [len] bytes to exist in the buffer bounded by [last]; [last] must
+ *  be non-NULL.  [len] must be a supported scalar width.
+ *
+ *  Return the number of bytes unpacked, or -1 on error.
+ */
 static int
 _unpack (void *dst, void **psrc, int len, const void *last)
 {
-/*  Unpacks the MSBF [src] data of [len] bytes into [dst].
- *    If [last] is non-NULL, checks to ensure [len] bytes
- *    of [src] data resides prior to the [last] valid byte.
- *  Returns the number of bytes copied into [dst], or -1 on error.
- *    On success (ie, > 0), the [src] ptr is advanced by [len].
- */
     void *src;
     uint16_t u16;
     uint32_t u32;
 
     assert (dst != NULL);
     assert (psrc != NULL);
+    assert (len >= 0);
+    assert (last != NULL);
 
     src = *psrc;
-    if (last && ((unsigned char *) src + len > (unsigned char *) last)) {
+    if ((unsigned char *) src + len > (unsigned char *) last) {
         return -1;
     }
     switch (len) {
