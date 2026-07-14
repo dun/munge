@@ -754,25 +754,34 @@ nomem:
 }
 
 
+/**
+ *  Allocate [len]+1 bytes and store the result at [*pdst].
+ *
+ *  The trailing byte at [len] is set to NUL so a string field remains
+ *  null-terminated even when the copied wire data is not.
+ *
+ *  Return the number of bytes requested ([len]), or -1 on error.
+ */
 static int
 _alloc (void **pdst, int len)
 {
-/*  Allocates memory for [pdst] of length [len + 1],
- *    null-terminating the last byte.
- *  Returns 0 on success, or -1 on error.
- */
     unsigned char *p;
 
     assert (pdst != NULL);
-    assert (*pdst == NULL);
+    assert (*pdst == NULL);             /* must not overwrite a live pointer */
 
-    if (len == 0) {                     /* valid no-op */
-        return 0;
-    }
-    if (len < 0) {                      /* invalid length */
+    if (len < 0) {
         return -1;
     }
-    /*  Allocate an extra byte to null-terminate the memory allocation.
+    if (len == 0) {                     /* valid empty field, no allocation */
+        return 0;
+    }
+    /*  Allocate one extra byte and set it to NUL so a string field stays
+     *  terminated even when the copied wire data is not.  The terminator is
+     *  set here in the allocator, rather than at the copy: _copy() runs
+     *  without a preceding _alloc() in some cases, so it has no terminator
+     *  slot to rely on.  Callers copy exactly [len] bytes into [0,len),
+     *  leaving this byte at [len] intact.
      */
     if (!(p = malloc (len + 1))) {
         return -1;
