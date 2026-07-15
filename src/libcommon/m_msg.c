@@ -233,7 +233,7 @@ m_msg_send (m_msg_t m, m_msg_type_t type, size_t maxlen)
         assert (m->pkt_len == 0);
         assert (m->pkt_is_copy == 0);
         if ((n = _msg_length (m, type)) <= 0) {
-            m_msg_set_err (m, EMUNGE_NO_MEMORY,
+            m_msg_set_err (m, EMUNGE_SNAFU,
                 strdupf ("Failed to compute length for message type %d n=%d",
                     type, n));
             return EMUNGE_SNAFU;
