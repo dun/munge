@@ -537,7 +537,6 @@ _msg_length (m_msg_t m, m_msg_type_t type)
             break;
         default:
             return -1;
-            break;
     }
     return n;
 }
