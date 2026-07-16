@@ -185,6 +185,9 @@ m_msg_bind (m_msg_t m, int sd)
  */
     assert (m != NULL);
 
+    if (sd < 0) {
+        return EMUNGE_BAD_ARG;
+    }
     if (m->sd >= 0) {
         (void) close (m->sd);
     }
