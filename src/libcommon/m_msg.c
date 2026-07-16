@@ -272,7 +272,7 @@ m_msg_send (m_msg_t m, m_msg_type_t type, size_t maxlen)
     /*  Compute iovec for response header + body.
      */
     nsend = 0;
-    iov[0].iov_base = (void *) hdr;
+    iov[0].iov_base = hdr;
     nsend += iov[0].iov_len = sizeof hdr;
     iov[1].iov_base = m->pkt;
     nsend += iov[1].iov_len = m->pkt_len;
