@@ -274,7 +274,7 @@ static void
 _log_aux (int errnum, int priority, char *msgbuf, int msgbuflen,
         const char *format, va_list vargs)
 {
-    char buf[LOG_BUFFER_MAXLEN];       /* message buffer                    */
+    char buf[LOG_BUFFER_MAXLEN];        /* message buffer                    */
     char *p;                            /* current position in msg buf       */
     char *sbuf;                         /* syslog portion of message buffer  */
     char *prefix;                       /* priority prefix message           */
