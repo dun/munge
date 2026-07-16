@@ -335,7 +335,7 @@ m_msg_recv (m_msg_t m, m_msg_type_t type, size_t maxlen)
     /*  Read and validate the message header.
      */
     nrecv = sizeof hdr;
-    if ((errno = 0, n = fd_timed_read_n (m->sd, &hdr, nrecv, &tv, 1)) < 0) {
+    if ((errno = 0, n = fd_timed_read_n (m->sd, hdr, nrecv, &tv, 1)) < 0) {
         m_msg_set_err (m, EMUNGE_SOCKET,
             strdupf ("Failed to receive message header: %s",
                 strerror (errno)));
