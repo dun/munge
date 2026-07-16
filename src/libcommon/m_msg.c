@@ -80,12 +80,15 @@ static int _unpack (void *dst, void **psrc, int len, const void *last);
  *  Public Functions
  *****************************************************************************/
 
+/**
+ *  Create a message and return it by reference via [pm] for transfer over the
+ *  munge socket.
+ *
+ *  Return a standard munge error code.
+ */
 munge_err_t
 m_msg_create (m_msg_t *pm)
 {
-/*  Creates a message (passed by reference) for sending over the munge socket.
- *  Returns a standard munge error code.
- */
     m_msg_t m;
 
     assert (pm != NULL);
@@ -102,11 +105,13 @@ m_msg_create (m_msg_t *pm)
 }
 
 
+/**
+ *  Destroy the message [m], closing its bound socket and freeing every buffer
+ *  it owns (those not marked as a copy).
+ */
 void
 m_msg_destroy (m_msg_t m)
 {
-/*  Destroys the message [m].
- */
     assert (m != NULL);
 
     if (m->sd >= 0) {
@@ -140,11 +145,22 @@ m_msg_destroy (m_msg_t m)
 }
 
 
+/**
+ *  Reset the request-derived fields of message [m] so it can be reused to
+ *  carry the response for the same transaction.
+ *
+ *  Clear the option and payload fields that a request populates, and wipe
+ *  [data] since it may hold a sensitive payload.  This keeps a request's
+ *  contents from leaking into an error response.
+ *
+ *  Deliberately preserve [error_num] and [error_str]: they are set while
+ *  processing the request and must survive into the response, which is how an
+ *  error is returned to the client (see m_msg_set_err()).  [type], [retry],
+ *  [pkt], and the client identity are likewise left untouched.
+ */
 void
 m_msg_reset (m_msg_t m)
 {
-/*  Reset sensitive fields in the message [m] that could leak information.
- */
     assert (m != NULL);
 
     m->cipher = MUNGE_CIPHER_NONE;
@@ -167,7 +183,7 @@ m_msg_reset (m_msg_t m)
     m->auth_uid = MUNGE_UID_ANY;
     m->auth_gid = MUNGE_GID_ANY;
     if (m->data) {
-        assert (m->data_len > 0);
+        assert (m->data_len > 0);       /* in sync; used as memwipe size */
         if (!m->data_is_copy) {
             memwipe_and_free (m->data, (size_t) m->data_len);
         }
@@ -178,33 +194,43 @@ m_msg_reset (m_msg_t m)
 }
 
 
+/**
+ *  Bind the message [m] to the socket [sd], closing any socket already bound
+ *  to [m] first.
+ *
+ *  Return a standard munge error code.
+ */
 munge_err_t
 m_msg_bind (m_msg_t m, int sd)
 {
-/*  Binds the message [m] to the socket [sd].
- */
     assert (m != NULL);
 
     if (sd < 0) {
         return EMUNGE_BAD_ARG;
     }
     if (m->sd >= 0) {
-        (void) close (m->sd);
+        (void) close (m->sd);           /* prevent leaking live sd */
     }
     m->sd = sd;
     return EMUNGE_SUCCESS;
 }
 
 
+/**
+ *  Send the message [m] of type [type] over its bound socket.
+ *
+ *  Pack and cache the message body on the first send of a given [type],
+ *  reusing the cached body on a subsequent send (retry); a change of [type]
+ *  discards the cached body and repacks.
+ *
+ *  If [maxlen] > 0, reject a message body larger than [maxlen] bytes with
+ *  EMUNGE_BAD_LENGTH.
+ *
+ *  Return a standard munge error code.
+ */
 munge_err_t
 m_msg_send (m_msg_t m, m_msg_type_t type, size_t maxlen)
 {
-/*  Sends the message [m] of type [type] to the recipient at the other end
- *    of the already-specified socket.
- *  If [maxlen] > 0, message bodies larger than this value will be discarded
- *    and an error returned.
- *  Returns a standard munge error code.
- */
     munge_err_t e;
     int n, nsend;
     uint8_t hdr[MUNGE_MSG_HDR_SIZE];
@@ -217,7 +243,7 @@ m_msg_send (m_msg_t m, m_msg_type_t type, size_t maxlen)
     assert (type != MUNGE_MSG_HDR);
 
     /*  If the stored message type [m->type] does not match the given
-     *    message type [type], clean up the old packed message body.
+     *  message type [type], clean up the old packed message body.
      */
     if (m->type != type) {
         if (m->pkt) {
@@ -231,7 +257,7 @@ m_msg_send (m_msg_t m, m_msg_type_t type, size_t maxlen)
         }
     }
     /*  If a previously packed message body does not already exist,
-     *    create & pack the message body.
+     *  create & pack the message body.
      */
     if (!m->pkt) {
         assert (m->pkt_len == 0);
@@ -307,18 +333,21 @@ m_msg_send (m_msg_t m, m_msg_type_t type, size_t maxlen)
 }
 
 
+/**
+ *  Receive a message over [m]'s bound socket, unpacking and storing it in the
+ *  previously-created [m].
+ *
+ *  If [type] is specified (not MUNGE_MSG_UNDEF) and does not match the
+ *  received header type, discard the message and return an error.
+ *
+ *  Reject a zero-length body, and (if [maxlen] > 0) a body larger than
+ *  [maxlen] bytes, with EMUNGE_BAD_LENGTH.
+ *
+ *  Return a standard munge error code.
+ */
 munge_err_t
 m_msg_recv (m_msg_t m, m_msg_type_t type, size_t maxlen)
 {
-/*  Receives a message from the sender at the other end of the
- *    already-specified socket.  This message is stored in the
- *    previously-created [m].
- *  If a [type] is specified (ie, not MUNGE_MSG_UNDEF) and does not match
- *    the header type, the message will be discarded and an error returned.
- *  If [maxlen] > 0, message bodies larger than this value will be discarded
- *    and an error returned.
- *  Returns a standard munge error code.
- */
     int n, nrecv;
     uint8_t hdr[MUNGE_MSG_HDR_SIZE];
     struct timeval tv;
@@ -420,6 +449,7 @@ m_msg_recv (m_msg_t m, m_msg_type_t type, size_t maxlen)
 
 /**
  *  Set an error code [e] and error string [s] if an error is not already set.
+ *
  *  Return -1 always and consume [s].
  */
 int
@@ -451,11 +481,15 @@ m_msg_set_err (m_msg_t m, munge_err_t e, char *s)
  *  Private Functions
  *****************************************************************************/
 
+/**
+ *  Set [tv] to the current time advanced by [msecs] milliseconds.
+ *
+ *  On erro, set [tv] to zero, a past absolute deadline that fd_timed_*()
+ *  callers treat as an immediate timeout.
+ */
 static void
 _get_timeval (struct timeval *tv, int msecs)
 {
-/*  Sets [tv] to the current time adjusted forward by [msecs] milliseconds.
- */
     assert (tv != NULL);
 
     if (gettimeofday (tv, NULL) < 0) {
@@ -472,11 +506,14 @@ _get_timeval (struct timeval *tv, int msecs)
 }
 
 
+/**
+ *  Compute the number of bytes needed to pack the message [m] of type [type].
+ *
+ *  Return the packed length (> 0), or -1 on error.
+ */
 static int
 _msg_length (m_msg_t m, m_msg_type_t type)
 {
-/*  Returns the length needed to pack the message [m] of type [type].
- */
     uint64_t n = 0;
 
     assert (m != NULL);
@@ -549,12 +586,15 @@ _msg_length (m_msg_t m, m_msg_type_t type)
 }
 
 
+/**
+ *  Pack the message [m] of type [type] into the buffer [dst] of length
+ *  [dstlen] for transport across the munge socket.
+ *
+ *  Return a standard munge error code.
+ */
 static munge_err_t
 _msg_pack (m_msg_t m, m_msg_type_t type, void *dst, int dstlen)
 {
-/*  Packs the message [m] of type [type] into the buffer [dst]
- *    of length [dstlen] for transport across the munge socket.
- */
     m_msg_magic_t magic = MUNGE_MSG_MAGIC;
     m_msg_version_t version = MUNGE_MSG_VERSION;
     void *p = dst;
@@ -638,12 +678,15 @@ err:
 }
 
 
+/**
+ *  Unpack the message [m] of type [type] from the buffer [src] of length
+ *  [srclen] received across the munge socket.
+ *
+ *  Return a standard munge error code.
+ */
 static munge_err_t
 _msg_unpack (m_msg_t m, m_msg_type_t type, const void *src, int srclen)
 {
-/*  Unpacks the message [m] from transport across the munge socket.
- *  Checks to ensure the message is of the expected type [type].
- */
     m_msg_magic_t magic;
     m_msg_version_t version;
     void *p = (void *) src;
