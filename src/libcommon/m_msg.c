@@ -392,7 +392,7 @@ m_msg_recv (m_msg_t m, m_msg_type_t type, size_t maxlen)
             strdup ("Failed to receive message body: Timed-out"));
         e = EMUNGE_SOCKET;
     }
-    else if (n != m->pkt_len) {
+    else if ((uint32_t) n != m->pkt_len) {
         m_msg_set_err (m, EMUNGE_SOCKET,
             strdupf ("Received incomplete message body: %d of %" PRIu32
                 " bytes", n, m->pkt_len));
