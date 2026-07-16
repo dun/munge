@@ -42,6 +42,7 @@
 #include <assert.h>
 #include <errno.h>
 #include <inttypes.h>                   /* PRIu32 */
+#include <limits.h>                     /* INT_MAX */
 #include <stddef.h>                     /* size_t */
 #include <stdint.h>                     /* uint8_t, uint16_t, uint32_t, UINT8_MAX */
 #include <stdlib.h>                     /* calloc, malloc, free */
@@ -473,7 +474,7 @@ _msg_length (m_msg_t m, m_msg_type_t type)
 {
 /*  Returns the length needed to pack the message [m] of type [type].
  */
-    int n = 0;
+    uint64_t n = 0;
 
     assert (m != NULL);
 
@@ -538,7 +539,10 @@ _msg_length (m_msg_t m, m_msg_type_t type)
         default:
             return -1;
     }
-    return n;
+    if (n > INT_MAX) {
+        return -1;
+    }
+    return (int) n;
 }
 
 
