@@ -24,7 +24,6 @@
  *  <https://www.gnu.org/licenses/>.
  *****************************************************************************/
 
-
 #if HAVE_CONFIG_H
 #include <config.h>
 #endif /* HAVE_CONFIG_H */
@@ -51,17 +50,7 @@
 #include <sys/uio.h>                    /* iovec */
 #include <unistd.h>                     /* close */
 
-
-/******************************************************************************
- *  Data Types
- *****************************************************************************/
-
 typedef void ** vpp;
-
-
-/******************************************************************************
- *  Prototypes
- *****************************************************************************/
 
 static void _get_timeval (struct timeval *tv, int msecs);
 static int _msg_length (m_msg_t m, m_msg_type_t type);
@@ -74,11 +63,6 @@ static int _copy (void *dst, const void *src, int len,
         void **pfirst, const void *last);
 static int _pack (void **pdst, const void *src, int len, const void *last);
 static int _unpack (void *dst, void **psrc, int len, const void *last);
-
-
-/******************************************************************************
- *  Public Functions
- *****************************************************************************/
 
 /**
  *  Create a message and return it by reference via [pm] for transfer over the
@@ -103,7 +87,6 @@ m_msg_create (m_msg_t *pm)
     *pm = m;
     return EMUNGE_SUCCESS;
 }
-
 
 /**
  *  Destroy the message [m], closing its bound socket and freeing every buffer
@@ -143,7 +126,6 @@ m_msg_destroy (m_msg_t m)
     }
     free (m);
 }
-
 
 /**
  *  Reset the request-derived fields of message [m] so it can be reused to
@@ -193,7 +175,6 @@ m_msg_reset (m_msg_t m)
     }
 }
 
-
 /**
  *  Bind the message [m] to the socket [sd], closing any socket already bound
  *  to [m] first.
@@ -214,7 +195,6 @@ m_msg_bind (m_msg_t m, int sd)
     m->sd = sd;
     return EMUNGE_SUCCESS;
 }
-
 
 /**
  *  Send the message [m] of type [type] over its bound socket.
@@ -332,7 +312,6 @@ m_msg_send (m_msg_t m, m_msg_type_t type, size_t maxlen)
 
 }
 
-
 /**
  *  Receive a message over [m]'s bound socket, unpacking and storing it in the
  *  previously-created [m].
@@ -446,7 +425,6 @@ m_msg_recv (m_msg_t m, m_msg_type_t type, size_t maxlen)
     return e;
 }
 
-
 /**
  *  Set an error code [e] and error string [s] if an error is not already set.
  *
@@ -476,11 +454,6 @@ m_msg_set_err (m_msg_t m, munge_err_t e, char *s)
     return -1;
 }
 
-
-/******************************************************************************
- *  Private Functions
- *****************************************************************************/
-
 /**
  *  Set [tv] to the current time advanced by [msecs] milliseconds.
  *
@@ -504,7 +477,6 @@ _get_timeval (struct timeval *tv, int msecs)
         }
     }
 }
-
 
 /**
  *  Compute the number of bytes needed to pack the message [m] of type [type].
@@ -584,7 +556,6 @@ _msg_length (m_msg_t m, m_msg_type_t type)
     }
     return (int) n;
 }
-
 
 /**
  *  Pack the message [m] of type [type] into the buffer [dst] of length
@@ -676,7 +647,6 @@ err:
         strdupf ("Failed to pack message type %d", type));
     return EMUNGE_SNAFU;
 }
-
 
 /**
  *  Unpack the message [m] of type [type] from the buffer [src] of length
@@ -802,7 +772,6 @@ nomem:
     return EMUNGE_NO_MEMORY;
 }
 
-
 /**
  *  Allocate [len]+1 bytes and store the result at [*pdst].
  *
@@ -840,7 +809,6 @@ _alloc (void **pdst, int len)
     return len;
 }
 
-
 /**
  *  Copy [len] bytes from [src] to [dst], requiring [len] bytes to be available
  *  in [*pfirst, last) and then advancing the cursor [*pfirst] by [len].
@@ -871,7 +839,6 @@ _copy (void *dst, const void *src, int len, void **pfirst, const void *last)
     }
     return len;
 }
-
 
 /**
  *  Pack the [src] scalar of [len] bytes into the buffer at [*pdst] in
@@ -916,7 +883,6 @@ _pack (void **pdst, const void *src, int len, const void *last)
     *pdst = (unsigned char *) dst + len;
     return len;
 }
-
 
 /**
  *  Unpack [len] bytes in MSB-first order from the buffer at [*psrc] into the
