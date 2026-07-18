@@ -29,19 +29,24 @@
 #define MUNGE_STR_H
 
 
+#include "attr.h"
+
 #include <stddef.h>                     /* size_t */
 #include <time.h>                       /* time_t */
 
 
-char * strdupf (const char *fmt, ...);
+char * strdupf (const char *fmt, ...)
+    ATTR_FORMAT (__printf__, 1, 2);
 
-int strcatf (char *dst, size_t size, const char *fmt, ...);
+int strcatf (char *dst, size_t size, const char *fmt, ...)
+    ATTR_FORMAT (__printf__, 3, 4);
 
 int strbin2hex (char *dst, size_t dstlen, const void *src, size_t srclen);
 
 int strhex2bin (void *dst, size_t dstlen, const char *src, size_t srclen);
 
-int strftimet (char *dst, size_t dstlen, const char *tfmt, time_t t);
+int strftimet (char *dst, size_t dstlen, const char *tfmt, time_t t)
+    ATTR_FORMAT (__strftime__, 3, 0);
 
 
 #endif /* MUNGE_STR_H */

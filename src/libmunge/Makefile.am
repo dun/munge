@@ -47,6 +47,7 @@ LT_AGE = 0
 libmunge_la_CPPFLAGS = \
 	-DRUNSTATEDIR='"$(runstatedir)"' \
 	-DSYSCONFDIR='"$(sysconfdir)"' \
+	-I$(top_srcdir)/src/common \
 	-I$(top_srcdir)/src/libcommon \
 	# End of libmunge_la_CPPFLAGS
 

@@ -38,6 +38,7 @@
 #include <munge.h>
 
 #include <assert.h>
+#include <inttypes.h>                   /* PRIu32 */
 #include <stdlib.h>                     /* free */
 #include <string.h>                     /* strdup, strlen */
 
@@ -171,7 +172,7 @@ _encode_req (m_msg_t m, munge_ctx_t ctx, const void *buf, int len)
      */
     if (m->data_len > MUNGE_MAXIMUM_PAYLOAD_LEN) {
         m_msg_set_err (m, EMUNGE_BAD_LENGTH,
-            strdupf ("Payload size %lu exceeded maximum of %lu",
+            strdupf ("Payload size %" PRIu32 " exceeded maximum of %d",
                 m->data_len, MUNGE_MAXIMUM_PAYLOAD_LEN));
         return EMUNGE_BAD_LENGTH;
     }

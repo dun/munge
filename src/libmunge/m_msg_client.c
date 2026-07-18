@@ -176,7 +176,7 @@ _m_msg_client_connect (m_msg_t m, char *path)
     path_len = strnlen (path, sizeof addr.sun_path);
     if (path_len >= sizeof addr.sun_path) {
         m_msg_set_err (m, EMUNGE_OVERFLOW,
-            strdupf ("Exceeded maximum length of %lu bytes for socket pathname",
+            strdupf ("Exceeded maximum length of %zu bytes for socket pathname",
                 sizeof addr.sun_path));
         return EMUNGE_OVERFLOW;
     }
