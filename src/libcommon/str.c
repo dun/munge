@@ -29,6 +29,7 @@
 #include <config.h>
 #endif /* HAVE_CONFIG_H */
 
+#include "diag.h"
 #include "str.h"
 
 #include <errno.h>
@@ -231,7 +232,10 @@ strftimet (char *dst, size_t dstlen, const char *tfmt, time_t t)
     if (tm_ptr == NULL) {
         return -1;
     }
+    DIAG_PUSH
+    DIAG_OFF ("-Wformat-nonliteral")
     n = strftime (dst, dstlen, tfmt, tm_ptr);
+    DIAG_POP
     if ((n <= 0) || (n >= dstlen)) {
         /*  On strftime() error, contents of 'dst' are undefined.  */
         return 0;
