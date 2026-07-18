@@ -55,6 +55,7 @@ libcommon_la_SOURCES = \
 	str.h \
 	version.c \
 	version.h \
+	$(top_srcdir)/src/common/attr.h \
 	$(top_srcdir)/src/common/memwipe.c \
 	$(top_srcdir)/src/common/memwipe.h \
 	# End of libcommon_la_SOURCES
