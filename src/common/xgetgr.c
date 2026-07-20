@@ -151,7 +151,7 @@ xgetgrbuf_create (size_t len)
         return NULL;
     }
     grbufp->len = len;
-    log_msg (LOG_DEBUG, "Created group entry buffer of size %u", len);
+    log_msg (LOG_DEBUG, "Created group entry buffer of size %zu", len);
     return grbufp;
 }
 
@@ -533,7 +533,7 @@ _xgetgrbuf_grow (xgrbuf_p grbufp, size_t minlen)
     grbufp->buf = newbuf;
     grbufp->len = newlen;
 
-    log_msg (LOG_INFO, "Increased group entry buffer size to %u", newlen);
+    log_msg (LOG_INFO, "Increased group entry buffer size to %zu", newlen);
     return 0;
 }
 

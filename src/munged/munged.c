@@ -604,7 +604,7 @@ sock_create (conf_t conf)
     path_len = strnlen (conf->socket_name, sizeof addr.sun_path);
     if (path_len >= sizeof addr.sun_path) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
-            "Exceeded maximum length of %lu bytes for socket pathname",
+            "Exceeded maximum length of %zu bytes for socket pathname",
             sizeof addr.sun_path);
     }
     /*  Ensure socket dir is secure against modification by others.

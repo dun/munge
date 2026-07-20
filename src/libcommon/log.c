@@ -31,6 +31,7 @@
 
 #include "log.h"
 
+#include "attr.h"
 #include "daemonpipe.h"
 #include "str.h"                        /* strftimet */
 
@@ -79,7 +80,7 @@ static struct log_ctx log_ctx = { NULL, 0, 0, 0, 0, 0, { '\0' } };
  *****************************************************************************/
 
 static void _log_aux (int errnum, int priority, char *msgbuf, int msgbuflen,
-        const char *format, va_list vargs);
+        const char *format, va_list vargs) ATTR_FORMAT (__printf__, 5, 0);
 static void _log_die (int status, int priority, const char *msg);
 static char * _log_prefix (int priority);
 

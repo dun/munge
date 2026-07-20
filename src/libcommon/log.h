@@ -29,6 +29,8 @@
 #define MUNGE_LOG_H
 
 
+#include "attr.h"
+
 #include <stdio.h>                      /* FILE */
 #include <syslog.h>                     /* syslog(3) LOG_* levels */
 
@@ -49,13 +51,17 @@ void log_close_syslog (void);
 
 void log_close_all (void);
 
-void log_err (int status, int priority, const char *format, ...);
+void log_err (int status, int priority, const char *format, ...)
+    ATTR_FORMAT (__printf__, 3, 4);
 
-void log_errno (int status, int priority, const char *format, ...);
+void log_errno (int status, int priority, const char *format, ...)
+    ATTR_FORMAT (__printf__, 3, 4);
 
-void log_msg (int priority, const char *format, ...);
+void log_msg (int priority, const char *format, ...)
+    ATTR_FORMAT (__printf__, 2, 3);
 
-void log_err_or_warn (int got_force, const char *format, ...);
+void log_err_or_warn (int got_force, const char *format, ...)
+    ATTR_FORMAT (__printf__, 2, 3);
 
 
 #endif /* MUNGE_LOG_H */
