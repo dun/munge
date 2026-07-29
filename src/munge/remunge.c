@@ -29,6 +29,7 @@
 #include <config.h>
 #endif /* HAVE_CONFIG_H */
 
+#include "attr.h"
 #include "license.h"
 #include "log.h"
 #include "query.h"
@@ -167,7 +168,7 @@ void process_creds (conf_t conf);
 void stop_threads (conf_t conf);
 void * remunge (conf_t conf);
 void remunge_cleanup (tdata_t tdata);
-void output_msg (const char *format, ...);
+void output_msg (const char *format, ...) ATTR_FORMAT (__printf__, 1, 2);
 
 
 /******************************************************************************
