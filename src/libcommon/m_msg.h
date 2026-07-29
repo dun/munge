@@ -24,21 +24,14 @@
  *  <https://www.gnu.org/licenses/>.
  *****************************************************************************/
 
-
 #ifndef MUNGE_MSG_H
 #define MUNGE_MSG_H
-
 
 #include <munge.h>
 
 #include <netinet/in.h>                 /* in_addr */
 #include <stddef.h>                     /* size_t */
 #include <stdint.h>                     /* uint8_t, uint32_t */
-
-
-/******************************************************************************
- *  Constants
- *****************************************************************************/
 
 /*  Length of the munge message header (in bytes):
  *    magic + version + type + retry + pkt_len.
@@ -55,11 +48,6 @@
  *    otherwise, the message may be parsed incorrectly when decoded.
  */
 #define MUNGE_MSG_VERSION               4
-
-
-/******************************************************************************
- *  Data Types
- *****************************************************************************/
 
 enum m_msg_type {                       /* message type                      */
     MUNGE_MSG_UNDEF,                    /*  undefined (new) message          */
@@ -115,11 +103,6 @@ typedef enum m_msg_type m_msg_type_t;
 typedef uint32_t m_msg_magic_t;
 typedef uint8_t m_msg_version_t;
 
-
-/******************************************************************************
- *  Prototypes
- *****************************************************************************/
-
 munge_err_t m_msg_create (m_msg_t *pm);
 
 void m_msg_destroy (m_msg_t m);
@@ -133,6 +116,5 @@ munge_err_t m_msg_send (m_msg_t m, m_msg_type_t type, size_t maxlen);
 munge_err_t m_msg_recv (m_msg_t m, m_msg_type_t type, size_t maxlen);
 
 int m_msg_set_err (m_msg_t m, munge_err_t e, char *s);
-
 
 #endif /* MUNGE_MSG_H */
