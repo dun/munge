@@ -49,6 +49,7 @@
 
 #include <arpa/inet.h>                  /* htonl */
 #include <assert.h>
+#include <inttypes.h>                   /* PRIu32 */
 #include <stdint.h>                     /* uint32_t */
 #include <stdlib.h>                     /* malloc, free */
 #include <string.h>                     /* memcpy, memset, strdup */
@@ -190,7 +191,7 @@ enc_validate_msg (m_msg_t m)
     }
     else if (m->data_len > MUNGE_MAXIMUM_PAYLOAD_LEN) {
         return m_msg_set_err (m, EMUNGE_BAD_LENGTH,
-            strdupf ("Payload size %lu exceeded maximum of %lu",
+            strdupf ("Payload size %" PRIu32 " exceeded maximum of %d",
                 m->data_len, MUNGE_MAXIMUM_PAYLOAD_LEN));
     }
     /*  Validate realm.

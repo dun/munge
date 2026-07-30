@@ -38,6 +38,7 @@
 #include <munge.h>
 
 #include <assert.h>
+#include <inttypes.h>                   /* PRIu32 */
 #include <stdlib.h>                     /* free */
 #include <string.h>                     /* strdup, strlen */
 #include <sys/types.h>                  /* uid_t, gid_t */
@@ -175,7 +176,7 @@ _decode_req (m_msg_t m, munge_ctx_t ctx, const char *cred)
      */
     if (m->data_len > MUNGE_MAXIMUM_REQ_LEN) {
         m_msg_set_err (m, EMUNGE_BAD_LENGTH,
-            strdupf ("Credential size %lu exceeded maximum of %lu",
+            strdupf ("Credential size %" PRIu32 " exceeded maximum of %d",
                 m->data_len, MUNGE_MAXIMUM_REQ_LEN));
         return EMUNGE_BAD_LENGTH;
     }

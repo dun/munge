@@ -87,8 +87,8 @@ job_accept (conf_t conf, work_p workers)
 
     while (!got_terminate) {
         if (got_reconfig) {
-            log_msg (LOG_NOTICE, "Processing signal %d (%s)",
-                    got_reconfig, strsignal (got_reconfig));
+            log_msg (LOG_NOTICE, "Processing signal %ld (%s)",
+                    (long) got_reconfig, strsignal (got_reconfig));
             got_reconfig = 0;
             gids_update (conf->gids);
         }
@@ -174,8 +174,8 @@ job_accept (conf_t conf, work_p workers)
             log_msg (LOG_WARNING, "Failed to queue client request");
         }
     }
-    log_msg (LOG_NOTICE, "Exiting on signal %d (%s)",
-            got_terminate, strsignal (got_terminate));
+    log_msg (LOG_NOTICE, "Exiting on signal %ld (%s)",
+            (long) got_terminate, strsignal (got_terminate));
 }
 
 

@@ -130,7 +130,7 @@ xgetpwbuf_create (size_t len)
         return NULL;
     }
     pwbufp->len = len;
-    log_msg (LOG_DEBUG, "Created password entry buffer of size %u", len);
+    log_msg (LOG_DEBUG, "Created password entry buffer of size %zu", len);
     return pwbufp;
 }
 
@@ -386,7 +386,7 @@ _xgetpwbuf_grow (xpwbuf_p pwbufp, size_t minlen)
     pwbufp->buf = newbuf;
     pwbufp->len = newlen;
 
-    log_msg (LOG_INFO, "Increased password entry buffer size to %u", newlen);
+    log_msg (LOG_INFO, "Increased password entry buffer size to %zu", newlen);
     return 0;
 }
 

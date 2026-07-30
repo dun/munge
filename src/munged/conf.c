@@ -725,7 +725,7 @@ _conf_set_cwd (conf_t conf)
         if (errno == ERANGE) {
             log_msg (LOG_WARNING,
                     "Failed to set current working directory: "
-                    "Exceeded %lu-byte buffer", sizeof buf);
+                    "Exceeded %zu-byte buffer", sizeof buf);
         }
         else {
             log_msg (LOG_WARNING,

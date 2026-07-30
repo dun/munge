@@ -98,7 +98,7 @@ read_data_from_file (FILE *fp, void **dst, int *dst_len, size_t max_size)
         if (dst_used > max_size - n) {
             free (dst_buf);
             log_err (EMUNGE_SNAFU, LOG_ERR,
-                    "Input size exceeded maximum of %lu", max_size);
+                    "Input size exceeded maximum of %zu", max_size);
         }
         /*  Grow buffer exponentially to minimize realloc() calls.
          */
@@ -113,7 +113,7 @@ read_data_from_file (FILE *fp, void **dst, int *dst_len, size_t max_size)
             if (!new_buf) {
                 free (dst_buf);
                 log_errno (EMUNGE_NO_MEMORY, LOG_ERR,
-                        "Failed to allocate %lu bytes", new_size + 1);
+                        "Failed to allocate %zu bytes", new_size + 1);
             }
             dst_buf = new_buf;
             dst_size = new_size;

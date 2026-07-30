@@ -300,7 +300,7 @@ hkdf (hkdf_ctx_t *ctxp, void *dst, size_t *dstlenp)
     }
     if (prklen != prklen_used) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
-                "Failed HKDF Extraction: expected %u bytes, received %u bytes",
+                "Failed HKDF Extraction: expected %zu bytes, received %zu bytes",
                 prklen, prklen_used);
     }
     /*  Expand pseudorandom key to desired length.

@@ -54,6 +54,7 @@
 #include <assert.h>
 #include <ctype.h>                      /* isspace */
 #include <errno.h>
+#include <inttypes.h>                   /* PRIu32 */
 #include <stdint.h>                     /* uint32_t */
 #include <stdlib.h>                     /* malloc, free */
 #include <string.h>                     /* memcpy, memset, strdup, strncmp */
@@ -941,7 +942,7 @@ dec_unpack_inner (munge_cred_t c)
     }
     else if (m->data_len > MUNGE_MAXIMUM_PAYLOAD_LEN) {
         return m_msg_set_err (m, EMUNGE_BAD_LENGTH,
-            strdupf ("Payload size %lu exceeded maximum of %lu",
+            strdupf ("Payload size %" PRIu32 " exceeded maximum of %d",
                 m->data_len, MUNGE_MAXIMUM_PAYLOAD_LEN));
     }
     else if (m->data_len > 0) {

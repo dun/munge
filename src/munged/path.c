@@ -29,6 +29,7 @@
 #include <config.h>
 #endif /* HAVE_CONFIG_H */
 
+#include "attr.h"
 #include "path.h"
 
 #include "munge_defs.h"
@@ -56,7 +57,7 @@ static gid_t _path_trusted_gid = MUNGE_GID_SENTINEL;
  *****************************************************************************/
 
 static int _path_set_err (int rc, char *buf, size_t buflen,
-    const char *format, ...);
+    const char *format, ...) ATTR_FORMAT (__printf__, 4, 5);
 
 
 /******************************************************************************
