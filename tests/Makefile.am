@@ -73,11 +73,10 @@ EXTRA_DIST = \
 	valgrind.supp \
 	# End of EXTRA_DIST
 
-EXTRA_PROGRAMS = \
+check_PROGRAMS = \
 	$(test_programs) \
-	# End of EXTRA_PROGRAMS
+	# End of check_PROGRAMS
 
 clean-local:
-	-rm -f $(test_programs)
 	-rm -rf test-results
 	-rm -rf trash*directory.*
