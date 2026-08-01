@@ -55,6 +55,7 @@
 #include <ctype.h>                      /* isspace */
 #include <errno.h>
 #include <inttypes.h>                   /* PRIu32 */
+#include <stddef.h>                     /* size_t */
 #include <stdint.h>                     /* uint32_t */
 #include <stdlib.h>                     /* malloc, free */
 #include <string.h>                     /* memcpy, memset, strdup, strncmp */
@@ -417,7 +418,7 @@ dec_unpack_outer (munge_cred_t c)
                 strdupf ("Failed to determine IV length for cipher type %d",
                 m->cipher));
         }
-        assert (c->iv_len <= sizeof c->iv);
+        assert ((size_t) c->iv_len <= sizeof c->iv);
     }
     p += n;
     len -= n;
@@ -441,7 +442,7 @@ dec_unpack_outer (munge_cred_t c)
             strdupf ("Failed to determine digest length for MAC type %d",
             m->mac));
     }
-    assert (c->mac_len <= sizeof c->mac);
+    assert ((size_t) c->mac_len <= sizeof c->mac);
     p += n;
     len -= n;
     /*
@@ -523,7 +524,7 @@ dec_unpack_outer (munge_cred_t c)
             return m_msg_set_err (m, EMUNGE_BAD_CRED,
                 strdup ("Truncated cipher IV"));
         }
-        assert (c->iv_len <= sizeof c->iv);
+        assert ((size_t) c->iv_len <= sizeof c->iv);
         memcpy (c->iv, p, c->iv_len);
         p += c->iv_len;
         len -= c->iv_len;
@@ -590,7 +591,7 @@ dec_decrypt (munge_cred_t c)
             strdupf ("Failed to determine DEK key length for MAC type %d",
                 m->mac));
     }
-    assert (c->dek_len <= sizeof c->dek);
+    assert ((size_t) c->dek_len <= sizeof c->dek);
 
     n = c->dek_len;
     if (mac_block (m->mac, conf->dek_key, conf->dek_key_len,
@@ -688,7 +689,8 @@ dec_validate_mac (munge_cred_t c)
     if (mac_cleanup (&x) < 0) {
         goto err;
     }
-    assert (n <= sizeof mac);
+    assert (n >= 0);                    /* mac_final() sets n to digest len */
+    assert ((size_t) n <= sizeof mac);
 
     /*  Validate new computed MAC against old received MAC.
      */
@@ -800,7 +802,7 @@ dec_unpack_inner (munge_cred_t c)
      *  Add it to the PRNG entropy pool if it's encrypted.
      */
     c->salt_len = MUNGE_CRED_SALT_LEN;
-    assert (c->salt_len <= sizeof c->salt);
+    assert ((size_t) c->salt_len <= sizeof c->salt);
     if (c->salt_len > len) {
         return m_msg_set_err (m, EMUNGE_BAD_CRED, strdup ("Truncated salt"));
     }
@@ -936,7 +938,11 @@ dec_unpack_inner (munge_cred_t c)
      *  The 'data' memory is owned by the cred struct, so it will be
      *    free()d by cred_destroy() called from dec_process_msg().
      */
-    if (m->data_len > len) {
+    /*  Each field above returns on truncation before decrementing len, so
+     *    len is a non-negative int and the cast to uint32_t is
+     *    value-preserving.
+     */
+    if (m->data_len > (uint32_t) len) {
         return m_msg_set_err (m, EMUNGE_BAD_CRED,
             strdup ("Truncated payload data"));
     }
@@ -972,12 +978,16 @@ dec_validate_auth (munge_cred_t c)
  */
     m_msg_t m = c->msg;
 
-    if ( (m->auth_uid != MUNGE_UID_ANY)
+    /*  The MUNGE_UID_ANY/MUNGE_GID_ANY sentinels are -1, which is stored in
+     *    the uint32_t auth_uid/auth_gid fields as (uint32_t) -1; cast the
+     *    sentinels to match.
+     */
+    if ( (m->auth_uid != (uint32_t) MUNGE_UID_ANY)
       && (m->auth_uid != m->client_uid)
       && (! (conf->got_root_auth && (m->client_uid == 0)))) {
         goto unauthorized;
     }
-    if (m->auth_gid == MUNGE_GID_ANY) {
+    if (m->auth_gid == (uint32_t) MUNGE_GID_ANY) {
         return 0;
     }
     else if (m->auth_gid == m->client_gid) {
@@ -1006,9 +1016,13 @@ dec_validate_time (munge_cred_t c)
     time_t tmax;                        /* max decode time_t, else expired   */
 
     /*  Bound the cred's ttl by the configuration's max ttl.
+     *
+     *  conf->max_ttl is a signed munge_ttl_t constrained at parse time to
+     *    [1, MUNGE_MAXIMUM_TTL], so the cast to uint32_t to match m->ttl is
+     *    value-preserving.
      */
-    if (m->ttl > conf->max_ttl) {
-        m->ttl = conf->max_ttl;
+    if (m->ttl > (uint32_t) conf->max_ttl) {
+        m->ttl = (uint32_t) conf->max_ttl;
     }
     /*  Even if no clock skew is allowed, allow the cred's timestamp to be
      *    "rewound" by up to 1 second.  Without this, we were seeing an

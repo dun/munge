@@ -487,8 +487,13 @@ _hkdf_expand (hkdf_ctx_t *ctxp, const void *prk, size_t prklen,
             log_msg (LOG_ERR, "Failed to cleanup HKDF MAC ctx for expansion");
             goto err;
         }
-        assert (okmlen == ctxp->mdlen);
-        n = (okmlen < dstlen_left) ? okmlen : dstlen_left;
+        assert ((size_t) okmlen == ctxp->mdlen);
+        assert (okmlen >= 0);           /* mac_final() sets okmlen to md len */
+        /*
+         *  In the else branch, dstlen_left <= okmlen, and okmlen is an int,
+         *    so the cast to int is value-preserving.
+         */
+        n = ((size_t) okmlen < dstlen_left) ? okmlen : (int) dstlen_left;
         memcpy (dstp, okm, n);
         dstp += n;
         dstlen_left -= n;

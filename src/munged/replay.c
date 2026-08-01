@@ -206,7 +206,7 @@ replay_insert (munge_cred_t c)
         return -1;
     }
     r->data.t_expired = (time_t) (m->time0 + m->ttl);
-    assert (c->mac_len >= sizeof r->data.mac);
+    assert (c->mac_len >= 0 && (size_t) c->mac_len >= sizeof r->data.mac);
     memcpy (r->data.mac, c->mac, sizeof r->data.mac);
     /*
      *  The replay hash key is just the replay_t object itself.
@@ -252,7 +252,7 @@ replay_remove (munge_cred_t c)
     /*  Compute the cred's "hash key".
      */
     rnode.data.t_expired = (time_t) (m->time0 + m->ttl);
-    assert (c->mac_len >= sizeof rnode.data.mac);
+    assert (c->mac_len >= 0 && (size_t) c->mac_len >= sizeof rnode.data.mac);
     memcpy (rnode.data.mac, c->mac, sizeof rnode.data.mac);
 
     r = hash_remove (replay_hash, &rnode);

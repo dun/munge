@@ -76,7 +76,7 @@ create_key (conf_t *confp)
     assert (confp->key_num_bytes <= MUNGE_KEY_LEN_MAX_BYTES);
     assert (confp->key_num_bytes >= MUNGE_KEY_LEN_MIN_BYTES);
 
-    if (confp->key_num_bytes > sizeof buf) {
+    if ((size_t) confp->key_num_bytes > sizeof buf) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
                 "Failed to create \"%s\": %d-byte key exceeds %zu-byte buffer",
                 confp->key_path, confp->key_num_bytes, sizeof buf);
@@ -167,7 +167,7 @@ _create_key_secret (unsigned char *buf, size_t buflen)
     num_bits = buflen * 8;
     rv = snprintf (info, sizeof info, "%s:%s:%d:",
             info_prefix, md_str, num_bits);
-    if ((rv < 0) || (rv >= sizeof info)) {
+    if ((rv < 0) || ((size_t) rv >= sizeof info)) {
         log_msg (LOG_ERR, "Failed to create key distinguisher info: "
                 "exceeded %zu-byte buffer", sizeof info);
         rv = -1;
