@@ -52,6 +52,7 @@
 /src/munged/munged
 /src/mungekey/mungekey
 /stamp-h1
+/tests/ctx_opt_ignore.t
 /tests/test-results/
 /tests/trash directory.*/
 Makefile
