@@ -102,7 +102,7 @@ strcatf (char *dst, size_t size, const char *fmt, ...)
         p++;
     }
     len = p - dst;
-    if (len >= size) {                  /* dst not null-terminated */
+    if ((size_t) len >= size) {         /* dst not null-terminated */
         dst[size - 1] = '\0';
         return -1;
     }
@@ -137,7 +137,7 @@ strbin2hex (char *dst, size_t dstlen, const void *src, size_t srclen)
     const char bin2hex[] = "0123456789ABCDEF";
     char *pdst = dst;
     const char *psrc = src;
-    int i;
+    size_t i;
 
     if (dstlen < ((srclen * 2) + 1)) {
         errno = EINVAL;
@@ -164,7 +164,7 @@ strhex2bin (void *dst, size_t dstlen, const char *src, size_t srclen)
 {
     char *pdst = dst;
     const char *psrc = src;
-    int i;
+    size_t i;
     int c;
     int n;
 
@@ -236,7 +236,7 @@ strftimet (char *dst, size_t dstlen, const char *tfmt, time_t t)
     DIAG_OFF ("-Wformat-nonliteral")
     n = strftime (dst, dstlen, tfmt, tm_ptr);
     DIAG_POP
-    if ((n <= 0) || (n >= dstlen)) {
+    if ((n <= 0) || ((size_t) n >= dstlen)) {
         /*  On strftime() error, contents of 'dst' are undefined.  */
         return 0;
     }

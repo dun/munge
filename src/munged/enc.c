@@ -50,6 +50,7 @@
 #include <arpa/inet.h>                  /* htonl */
 #include <assert.h>
 #include <inttypes.h>                   /* PRIu32 */
+#include <stddef.h>                     /* size_t */
 #include <stdint.h>                     /* uint32_t */
 #include <stdlib.h>                     /* malloc, free */
 #include <string.h>                     /* memcpy, memset, strdup */
@@ -207,8 +208,12 @@ enc_validate_msg (m_msg_t m)
     if (m->ttl == 0) {
         m->ttl = conf->def_ttl;
     }
-    else if (m->ttl > conf->max_ttl) {
-        m->ttl = conf->max_ttl;
+    /*  conf->max_ttl is a signed munge_ttl_t constrained at parse time to
+     *    [1, MUNGE_MAXIMUM_TTL], so the cast to uint32_t to match m->ttl is
+     *    value-preserving.
+     */
+    else if (m->ttl > (uint32_t) conf->max_ttl) {
+        m->ttl = (uint32_t) conf->max_ttl;
     }
     return 0;
 }
@@ -239,7 +244,7 @@ enc_init (munge_cred_t c)
                 m->cipher));
         }
         if (c->iv_len > 0) {
-            assert (c->iv_len <= sizeof c->iv);
+            assert ((size_t) c->iv_len <= sizeof c->iv);
             random_pseudo_bytes (c->iv, c->iv_len);
         }
     }
@@ -553,7 +558,7 @@ enc_mac (munge_cred_t c)
             strdupf ("Failed to determine digest length for MAC type %d",
                 m->mac));
     }
-    assert (c->mac_len <= sizeof c->mac);
+    assert ((size_t) c->mac_len <= sizeof c->mac);
     memset (c->mac, 0, c->mac_len);     /* initialization; cosmetic only */
 
     /*  Compute MAC.
@@ -612,7 +617,7 @@ enc_encrypt (munge_cred_t c)
             strdupf ("Failed to determine DEK key length for MAC type %d",
                 m->mac));
     }
-    assert (c->dek_len <= sizeof c->dek);
+    assert ((size_t) c->dek_len <= sizeof c->dek);
 
     n = c->dek_len;
     if (mac_block (m->mac, conf->dek_key, conf->dek_key_len,

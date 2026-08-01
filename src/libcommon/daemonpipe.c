@@ -196,7 +196,7 @@ daemonpipe_read (int *statusptr, int *priorityptr,
         /*
          *  Ensure buf[] is null-terminated.
          */
-        m = (n < sizeof buf) ? n : sizeof buf - 1;
+        m = ((size_t) n < sizeof buf) ? n : (ssize_t) (sizeof buf - 1);
         buf[m] = '\0';
         /*
          *  Remove trailing LF if present.

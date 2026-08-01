@@ -49,6 +49,7 @@
 #include <netinet/in.h>                 /* in_addr, sockaddr_in, INET_ADDRSTRLEN */
 #include <pwd.h>                        /* getpwuid, passwd */
 #include <signal.h>
+#include <stddef.h>                     /* size_t */
 #include <stdio.h>                      /* printf, f*, FILE, stdout, stderr */
 #include <stdlib.h>                     /* exit, malloc, free, EXIT_* */
 #include <string.h>                     /* memset, str* */
@@ -736,7 +737,7 @@ display_encode_time (conf_t conf)
     const char *p;
     time_t t;
     struct tm *tm_ptr;
-    int t_len;
+    size_t t_len;
     char t_buf[MAX_TIME_STR];
 
     assert (conf != NULL);
@@ -785,7 +786,7 @@ display_decode_time (conf_t conf)
     const char *p;
     time_t t;
     struct tm *tm_ptr;
-    int t_len;
+    size_t t_len;
     char t_buf[MAX_TIME_STR];
 
     assert (conf != NULL);
@@ -1076,7 +1077,8 @@ display_data (conf_t conf)
     if (!conf->fp_out) {
         return;
     }
-    if (fwrite (conf->data, 1, conf->dlen, conf->fp_out) != conf->dlen) {
+    if (fwrite (conf->data, 1, conf->dlen, conf->fp_out)
+            != (size_t) conf->dlen) {
         log_err (EMUNGE_SNAFU, LOG_ERR, "Write error");
     }
     /*  If outputting to a tty, append a final newline if one is missing.

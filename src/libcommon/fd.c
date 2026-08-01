@@ -375,7 +375,8 @@ writev_me:
             break;
         }
         for (i = 0; (i < iov_cnt) && (nwritten > 0); i++) {
-            n = (nwritten > iov[i].iov_len) ? iov[i].iov_len : nwritten;
+            n = ((size_t) nwritten > iov[i].iov_len)
+                    ? iov[i].iov_len : (size_t) nwritten;
             if (n == 0)
                 continue;
             nwritten -= n;
@@ -409,7 +410,7 @@ fd_read_line (int fd, void *buf, size_t maxlen)
     }
     n = 0;
     p = buf;
-    while (n < maxlen - 1) {            /* -1 for terminating null byte */
+    while ((size_t) n < maxlen - 1) {   /* -1 for terminating null byte */
 
         if ((rv = read (fd, &c, 1)) == 1) {
             n++;

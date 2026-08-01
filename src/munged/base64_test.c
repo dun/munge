@@ -74,7 +74,7 @@ validate (const char *dst, const void *src, int srclen)
     if (encode_block (buf, &n, src, srclen) < 0) {
         return -1;
     }
-    if (n != strlen (dst)) {
+    if ((size_t) n != strlen (dst)) {
         return -1;
     }
     if (strncmp (dst, buf, n)) {
@@ -94,7 +94,7 @@ validate (const char *dst, const void *src, int srclen)
     if (encode_context (buf, &n, src, srclen) < 0) {
         return -1;
     }
-    if (n != strlen (dst)) {
+    if ((size_t) n != strlen (dst)) {
         return -1;
     }
     if (strncmp (dst, buf, n)) {

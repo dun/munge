@@ -43,6 +43,7 @@
 #include <assert.h>
 #include <errno.h>
 #include <fcntl.h>                      /* open, O_* */
+#include <stddef.h>                     /* size_t */
 #include <string.h>                     /* strerror */
 #include <sys/stat.h>                   /* stat, fstat, lstat, S_* */
 #include <unistd.h>                     /* close, geteuid, unlink */
@@ -404,7 +405,8 @@ _random_read_seed (const char *path, int num_bytes)
     else {
         is_valid = 1;
         while (num_left > 0) {
-            num_want = (num_left < sizeof buf) ? num_left : sizeof buf;
+            num_want = ((size_t) num_left < sizeof buf)
+                    ? num_left : (int) sizeof buf;
             n = fd_read_n (fd, buf, num_want);
             if (n < 0) {
                 log_msg (LOG_WARNING,
@@ -467,7 +469,8 @@ _random_write_seed (const char *path, int num_bytes)
     }
     num_left = num_bytes;
     while (num_left > 0) {
-        num_want = (num_left < sizeof buf) ? num_left : sizeof buf;
+        num_want = ((size_t) num_left < sizeof buf)
+                ? num_left : (int) sizeof buf;
         _random_bytes (buf, num_want);
         n = fd_write_n (fd, buf, num_want);
         if (n < 0) {
