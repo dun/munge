@@ -395,6 +395,10 @@ fd_read_line (int fd, void *buf, size_t maxlen)
     ssize_t n, rc;
     unsigned char c, *p;
 
+    if (maxlen == 0) {
+        errno = EINVAL;
+        return -1;
+    }
     n = 0;
     p = buf;
     while (n < maxlen - 1) {            /* -1 for terminating null byte */
