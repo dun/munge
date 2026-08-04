@@ -56,7 +56,7 @@ static gid_t _path_trusted_gid = MUNGE_GID_SENTINEL;
  *  Internal Prototypes
  *****************************************************************************/
 
-static int _path_set_err (int rc, char *buf, size_t buflen,
+static int _path_set_err (int rv, char *buf, size_t buflen,
     const char *format, ...) ATTR_FORMAT (__printf__, 4, 5);
 
 
@@ -325,12 +325,12 @@ path_set_trusted_group (const char *group)
  *****************************************************************************/
 
 static int
-_path_set_err (int rc, char *buf, size_t buflen, const char *format, ...)
+_path_set_err (int rv, char *buf, size_t buflen, const char *format, ...)
 {
 /*  Sets an error condition to be returned to the caller.
  *  If [buf] is non-NULL, the [format] string will be expanded and written
  *    to the buffer [buf] of length [buflen].
- *  Returns [rc].
+ *  Returns [rv].
  */
     va_list vargs;
 
@@ -340,5 +340,5 @@ _path_set_err (int rc, char *buf, size_t buflen, const char *format, ...)
         buf[buflen - 1] = '\0';
         va_end (vargs);
     }
-    return rc;
+    return rv;
 }

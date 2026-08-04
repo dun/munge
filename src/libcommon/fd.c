@@ -400,7 +400,7 @@ err:
 ssize_t
 fd_read_line (int fd, void *buf, size_t maxlen)
 {
-    ssize_t n, rc;
+    ssize_t n, rv;
     unsigned char c, *p;
 
     if (fd < 0 || !buf || maxlen == 0) {
@@ -411,13 +411,13 @@ fd_read_line (int fd, void *buf, size_t maxlen)
     p = buf;
     while (n < maxlen - 1) {            /* -1 for terminating null byte */
 
-        if ((rc = read (fd, &c, 1)) == 1) {
+        if ((rv = read (fd, &c, 1)) == 1) {
             n++;
             *p++ = c;
             if (c == '\n')
                 break;                  /* store newline, like fgets() */
         }
-        else if (rc == 0) {
+        else if (rv == 0) {
             if (n == 0)                 /* EOF, no data read */
                 return 0;
             else                        /* EOF, some data read */
