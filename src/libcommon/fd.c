@@ -64,6 +64,10 @@ fd_read_n (int fd, void *buf, size_t n)
     size_t nleft;
     ssize_t nread;
 
+    if (fd < 0 || !buf) {
+        errno = EINVAL;
+        return -1;
+    }
     p = buf;
     nleft = n;
     while (nleft > 0) {
@@ -93,6 +97,10 @@ fd_write_n (int fd, const void *buf, size_t n)
     size_t nleft;
     ssize_t nwritten;
 
+    if (fd < 0 || !buf) {
+        errno = EINVAL;
+        return -1;
+    }
     p = buf;
     nleft = n;
     while (nleft > 0) {
@@ -132,7 +140,7 @@ fd_timed_read_n (int fd, void *buf, size_t n,
     size_t nleft;
     ssize_t nread;
 
-    if ((fd < 0) || (buf == NULL)) {
+    if (fd < 0 || !buf) {
         errno = EINVAL;
         return -1;
     }
@@ -215,7 +223,7 @@ fd_timed_write_n (int fd, const void *buf, size_t n,
     size_t nleft;
     ssize_t nwritten;
 
-    if ((fd < 0) || (buf == NULL)) {
+    if (fd < 0 || !buf) {
         errno = EINVAL;
         return -1;
     }
@@ -300,7 +308,7 @@ fd_timed_write_iov (int fd, const struct iovec *iov_orig, int iov_cnt,
     int msecs;
     ssize_t nwritten;
 
-    if ((fd < 0) || (iov_orig == NULL) || (iov_cnt <= 0)) {
+    if (fd < 0 || !iov_orig || iov_cnt <= 0) {
         errno = EINVAL;
         return -1;
     }
@@ -395,7 +403,7 @@ fd_read_line (int fd, void *buf, size_t maxlen)
     ssize_t n, rc;
     unsigned char c, *p;
 
-    if (maxlen == 0) {
+    if (fd < 0 || !buf || maxlen == 0) {
         errno = EINVAL;
         return -1;
     }
