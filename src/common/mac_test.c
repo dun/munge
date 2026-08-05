@@ -99,7 +99,7 @@ check_mac (munge_mac_t m, const char *str, const char *key, int keylen,
 
 
 int
-main (int argc, char *argv[])
+main (void)
 {
     const char *key = "magic words";
     const char *in = "squeamish ossifrage";

@@ -43,7 +43,7 @@
 
 
 int
-main (int argc, char *argv[])
+main (void)
 {
     hkdf_ctx_t *hkdfp;
     size_t buflen;
