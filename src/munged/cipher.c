@@ -263,33 +263,33 @@ _cipher_init (cipher_ctx *x, munge_cipher_t cipher,
     e = gcry_cipher_open (&x->ctx, algo, GCRY_CIPHER_MODE_CBC, 0);
     if (e != 0) {
         log_msg (LOG_DEBUG, "gcry_cipher_open failed for cipher=%d: %s",
-            cipher, gcry_strerror (e));
+            (int) cipher, gcry_strerror (e));
         return -1;
     }
     e = gcry_cipher_algo_info (algo, GCRYCTL_GET_KEYLEN, NULL, &nbytes);
     if (e != 0) {
         log_msg (LOG_DEBUG,
             "gcry_cipher_algo_info failed for cipher=%d key length: %s",
-            cipher, gcry_strerror (e));
+            (int) cipher, gcry_strerror (e));
         return -1;
     }
     e = gcry_cipher_setkey (x->ctx, key, nbytes);
     if (e != 0) {
         log_msg (LOG_DEBUG, "gcry_cipher_setkey failed for cipher=%d: %s",
-            cipher, gcry_strerror (e));
+            (int) cipher, gcry_strerror (e));
         return -1;
     }
     e = gcry_cipher_algo_info (algo, GCRYCTL_GET_BLKLEN, NULL, &nbytes);
     if (e != 0) {
         log_msg (LOG_DEBUG,
             "gcry_cipher_algo_info failed for cipher=%d block length: %s",
-            cipher, gcry_strerror (e));
+            (int) cipher, gcry_strerror (e));
         return -1;
     }
     e = gcry_cipher_setiv (x->ctx, iv, nbytes);
     if (e != 0) {
         log_msg (LOG_DEBUG, "gcry_cipher_setiv failed for cipher=%d: %s",
-            cipher, gcry_strerror (e));
+            (int) cipher, gcry_strerror (e));
         return -1;
     }
     x->do_encrypt = enc;
@@ -512,7 +512,7 @@ _cipher_block_size (munge_cipher_t cipher)
     if (e != 0) {
         log_msg (LOG_DEBUG,
             "gcry_cipher_algo_info failed for cipher=%d block length: %s",
-            cipher, gcry_strerror (e));
+            (int) cipher, gcry_strerror (e));
         return -1;
     }
     return nbytes;
@@ -540,7 +540,7 @@ _cipher_key_size (munge_cipher_t cipher)
     if (e != 0) {
         log_msg (LOG_DEBUG,
             "gcry_cipher_algo_info failed for cipher=%d key length: %s",
-            cipher, gcry_strerror (e));
+            (int) cipher, gcry_strerror (e));
         return -1;
     }
     return nbytes;

@@ -1114,7 +1114,7 @@ remunge (conf_t conf)
         }
         if (e != EMUNGE_SUCCESS) {
             output_msg ("Credential #%lu encoding failed: %s (err=%d)",
-                n, munge_ctx_strerror (tdata->ectx), e);
+                n, munge_ctx_strerror (tdata->ectx), (int) e);
             ++got_encode_err;
         }
         else if (conf->do_decode) {
@@ -1130,7 +1130,7 @@ remunge (conf_t conf)
             }
             if (e != EMUNGE_SUCCESS) {
                 output_msg ("Credential #%lu decoding failed: %s (err=%d)",
-                    n, munge_ctx_strerror (tdata->dctx), e);
+                    n, munge_ctx_strerror (tdata->dctx), (int) e);
                 ++got_decode_err;
             }
 

@@ -202,7 +202,8 @@ _encode_rsp (m_msg_t m, char **cred)
     }
     if (m->data_len <= 0) {
         m_msg_set_err (m, EMUNGE_SNAFU,
-            strdupf ("Client received invalid data length %d", m->data_len));
+            strdupf ("Client received invalid data length %" PRIu32,
+                m->data_len));
         return EMUNGE_SNAFU;
     }
     /*  Return the credential to the caller.

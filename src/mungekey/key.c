@@ -160,7 +160,7 @@ _create_key_secret (unsigned char *buf, size_t buflen)
      */
     md_str = munge_enum_int_to_str (MUNGE_ENUM_MAC, md);
     if (md_str == NULL) {
-        log_msg (LOG_ERR, "Failed to get text string for md=%d", md);
+        log_msg (LOG_ERR, "Failed to get text string for md=%d", (int) md);
         rv = -1;
         goto err;
     }
@@ -183,7 +183,8 @@ _create_key_secret (unsigned char *buf, size_t buflen)
     }
     rv = hkdf_ctx_set_md (hkdfp, md);
     if (rv == -1) {
-        log_msg (LOG_ERR, "Failed to set HKDF message digest to md=%d", md);
+        log_msg (LOG_ERR, "Failed to set HKDF message digest to md=%d",
+                (int) md);
         goto err;
     }
     rv = hkdf_ctx_set_key (hkdfp, key, sizeof key);
