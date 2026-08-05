@@ -46,7 +46,7 @@ int decode_block (char *dst, int *dstlen, const void *src, int srclen);
 int decode_context (char *dst, int *dstlen, const void *src, int srclen);
 
 int
-main (int argc, char *argv[])
+main (void)
 {
     const unsigned char src1[] = { 0x14, 0xfb, 0x9c, 0x03, 0xd9, 0x7e };
     const unsigned char src2[] = { 0x14, 0xfb, 0x9c, 0x03, 0xd9 };

@@ -364,7 +364,7 @@ hkdf_test_7 (void)
 
 
 int
-main (int argc, char *argv[])
+main (void)
 {
     crypto_init ();
     md_init_subsystem ();

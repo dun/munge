@@ -90,7 +90,7 @@ test_opt (int opt, const char *name)
 
 
 int
-main (int argc, char *argv[])
+main (void)
 {
     plan (NO_PLAN);
     test_opt (MUNGE_OPT_IGNORE_TTL, "ignore-ttl");
