@@ -245,7 +245,7 @@ m_msg_send (m_msg_t m, m_msg_type_t type, size_t maxlen)
         if ((n = _msg_length (m, type)) <= 0) {
             m_msg_set_err (m, EMUNGE_SNAFU,
                 strdupf ("Failed to compute length for message type %d n=%d",
-                    type, n));
+                    (int) type, n));
             return EMUNGE_SNAFU;
         }
         if (!(m->pkt = malloc (n))) {
@@ -373,7 +373,7 @@ m_msg_recv (m_msg_t m, m_msg_type_t type, size_t maxlen)
     else if ((type != MUNGE_MSG_UNDEF) && (m->type != type)) {
         m_msg_set_err (m, EMUNGE_SOCKET,
             strdupf ("Received unexpected message type: wanted %d, got %d",
-                type, m->type));
+                (int) type, m->type));
         return EMUNGE_SOCKET;
     }
     else if (m->pkt_len == 0) {
@@ -644,7 +644,7 @@ _msg_pack (m_msg_t m, m_msg_type_t type, void *dst, int dstlen)
 
 err:
     m_msg_set_err (m, EMUNGE_SNAFU,
-        strdupf ("Failed to pack message type %d", type));
+        strdupf ("Failed to pack message type %d", (int) type));
     return EMUNGE_SNAFU;
 }
 
@@ -745,7 +745,7 @@ _msg_unpack (m_msg_t m, m_msg_type_t type, const void *src, int srclen)
     if (p != (unsigned char *) src + srclen) {
         m_msg_set_err (m, EMUNGE_SNAFU,
             strdupf ("Unpacked wrong number of bytes for message type %d",
-            type));
+            (int) type));
         return EMUNGE_SNAFU;
     }
     if (type == MUNGE_MSG_HDR) {
@@ -764,7 +764,7 @@ _msg_unpack (m_msg_t m, m_msg_type_t type, const void *src, int srclen)
 
 err:
     m_msg_set_err (m, EMUNGE_SNAFU,
-        strdupf ("Failed to unpack message type %d", type));
+        strdupf ("Failed to unpack message type %d", (int) type));
     return EMUNGE_SNAFU;
 
 nomem:

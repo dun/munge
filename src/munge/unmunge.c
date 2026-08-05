@@ -676,11 +676,11 @@ display_status (conf_t conf)
     num_spaces = conf->key_width - strlen (key);
     if (conf->got_numeric) {
         fprintf (conf->fp_meta, "%s:%*c%d\n", key, num_spaces, 0x20,
-                conf->status);
+                (int) conf->status);
     }
     else {
         fprintf (conf->fp_meta, "%s:%*c%s (%d)\n", key, num_spaces, 0x20,
-                munge_strerror (conf->status), conf->status);
+                munge_strerror (conf->status), (int) conf->status);
     }
 }
 

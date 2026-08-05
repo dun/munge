@@ -244,7 +244,7 @@ _md_init (md_ctx *x, munge_mac_t md)
     }
     if ((e = gcry_md_open (&x->ctx, algo, 0)) != 0) {
         log_msg (LOG_DEBUG, "gcry_md_open failed for MAC=%d: %s",
-            md, gcry_strerror (e));
+            (int) md, gcry_strerror (e));
         return -1;
     }
     x->diglen = gcry_md_get_algo_dlen (algo);

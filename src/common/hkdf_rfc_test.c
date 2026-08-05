@@ -83,7 +83,7 @@ hkdf_test (munge_mac_t md,
     }
     rv = hkdf_ctx_set_md (hkdfp, md);
     if (rv == -1) {
-        diag ("Failed to set HKDF message digest to md=%d", md);
+        diag ("Failed to set HKDF message digest to md=%d", (int) md);
         return -1;
     }
     if (ikm != NULL) {
