@@ -70,7 +70,7 @@ check_mac (munge_mac_t m, const char *str, const char *key, int keylen,
         return -1;
     }
     if ((size_t) dstlen > sizeof buf) {
-        fail ("check_mac %ld-byte buf too small for %s %d-byte result",
+        fail ("check_mac %zu-byte buf too small for %s %d-byte result",
                 sizeof buf, str, dstlen);
         return -1;
     }
