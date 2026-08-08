@@ -53,7 +53,8 @@ AC_DEFUN([X_AC_DEBUG], [
           # Under "-std=c99 -pedantic", Clang flags each expansion as a
           # C11 extension.  Probe the positive "-Wc11-extensions" form.
           # GCC accepts an unknown "-Wno-" flag silently.
-          X_AC_CHECK_CFLAG([-Wno-c11-extensions], [-Wc11-extensions]) ]
+          X_AC_CHECK_CFLAG([-Wno-c11-extensions], [-Wc11-extensions])
+          _X_AC_DEBUG_FORMAT_NONLITERAL ]
       )
       AM_CFLAGS="${AM_CFLAGS} \$(DEBUGCFLAGS)"
       AC_SUBST([AM_CFLAGS])
@@ -63,5 +64,58 @@ AC_DEFUN([X_AC_DEBUG], [
         [NDEBUG], [1],
         [Define to 1 if you are building a production release.]
       ) ]
+  ) ]
+)
+
+###############################################################################
+# SYNOPSIS:
+#   _X_AC_DEBUG_FORMAT_NONLITERAL
+#
+# DESCRIPTION:
+#   Disable "-Wformat-nonliteral" when the compiler cannot suppress it at the
+#   call site.  "-Wformat=2" enables that warning.  The tree suppresses it
+#   with the DIAG_OFF() macro from "diag.h", which expands to an in-function
+#   diagnostic pragma.  GCC honors that pragma only in v4.6 or later.
+#
+#   Probe the pragma in the assembled DEBUGCFLAGS context with "-Werror" so
+#   the test matches the real build.  A compiler that ignores the pragma
+#   warns; one that rejects it errors.  Either way the probe fails, and
+#   "-Wno-format-nonliteral" then disables the warning for the whole build.
+#   This is a feature test rather than a version check.
+#
+#   The probe takes "struct tm" as a parameter rather than declaring an
+#   uninitialized local.  A local would trip "-Wuninitialized" under
+#   "-Wextra" and fail the test on a capable compiler.
+###############################################################################
+
+AC_DEFUN([_X_AC_DEBUG_FORMAT_NONLITERAL], [
+  AC_REQUIRE([AC_PROG_CC])[]dnl
+  AC_CACHE_CHECK(
+    [whether in-function pragmas suppress -Wformat-nonliteral],
+    [x_ac_cv_debug_format_nonliteral],
+    [ x_ac_save_CFLAGS="${CFLAGS}"
+      CFLAGS="${CFLAGS} ${DEBUGCFLAGS} -Wformat-nonliteral -Werror"
+      AC_COMPILE_IFELSE(
+        [ AC_LANG_SOURCE([[
+            #include <time.h>
+            size_t x_ac_probe (char *s, size_t n, const char *f, struct tm *t);
+            size_t x_ac_probe (char *s, size_t n, const char *f, struct tm *t)
+            {
+                size_t r;
+                _Pragma ("GCC diagnostic push")
+                _Pragma ("GCC diagnostic ignored \"-Wformat-nonliteral\"")
+                r = strftime (s, n, f, t);
+                _Pragma ("GCC diagnostic pop")
+                return r;
+            }
+          ]]) ],
+        [x_ac_cv_debug_format_nonliteral=yes],
+        [x_ac_cv_debug_format_nonliteral=no]
+      )
+      CFLAGS="${x_ac_save_CFLAGS}" ]
+  )
+  AS_IF(
+    [test "x${x_ac_cv_debug_format_nonliteral}" = xno],
+    [X_AC_CHECK_CFLAG([-Wno-format-nonliteral], [-Wformat-nonliteral])]
   ) ]
 )
