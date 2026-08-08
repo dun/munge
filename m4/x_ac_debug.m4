@@ -10,6 +10,9 @@
 #   Clear configure's default "-g -O2" unless the user set CFLAGS.
 #   The test reads "ac_env_CFLAGS_set", an autoconf internal with no
 #   documented replacement.
+#
+#   Probe the optional warning flags with X_AC_CHECK_CFLAG.  The set depends
+#   on what the compiler accepts.
 ###############################################################################
 
 AC_DEFUN_ONCE([X_AC_DEBUG], [
@@ -31,6 +34,7 @@ AC_DEFUN_ONCE([X_AC_DEBUG], [
       esac
     ]
   )
+  AC_MSG_RESULT([${x_ac_debug}])
   AS_IF(
     [test "x${x_ac_debug}" = xyes],
     [
@@ -42,7 +46,22 @@ AC_DEFUN_ONCE([X_AC_DEBUG], [
       )
       AS_IF(
         [test "x${GCC}" = xyes],
-        [DEBUGCFLAGS="${DEBUGCFLAGS} -std=c99 -pedantic -Wall"]
+        [
+          DEBUGCFLAGS="${DEBUGCFLAGS} -std=c99 -pedantic -Wall"
+          X_AC_CHECK_CFLAG([-Wextra])
+          X_AC_CHECK_CFLAG([-Wformat=2])
+          # "-Wformat=2" already implies "-Wformat-security".  Probe it
+          # explicitly so the check survives removal of "-Wformat=2".
+          # Clang enables it by default, so the probe is a no-op there.
+          X_AC_CHECK_CFLAG([-Wformat-security])
+          X_AC_CHECK_CFLAG([-Wformat-signedness])
+          # glibc 2.43 defines strchr(), strrchr(), and similar
+          # functions as C23 type-generic macros built with "_Generic".
+          # Under "-std=c99 -pedantic", Clang flags each expansion as a
+          # C11 extension.  Probe the positive "-Wc11-extensions" form.
+          # GCC accepts an unknown "-Wno-" flag silently.
+          X_AC_CHECK_CFLAG([-Wno-c11-extensions], [-Wc11-extensions])
+        ]
       )
       AM_CFLAGS="${AM_CFLAGS} \$(DEBUGCFLAGS)"
       AC_SUBST([AM_CFLAGS])
@@ -54,5 +73,4 @@ AC_DEFUN_ONCE([X_AC_DEBUG], [
       )
     ]
   )
-  AC_MSG_RESULT([${x_ac_debug}])
 ])
