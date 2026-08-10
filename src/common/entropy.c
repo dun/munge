@@ -142,7 +142,8 @@ entropy_read_csprng (void *dst, size_t dstlen)
                 errno = ENODEV;
                 log_msg (LOG_WARNING, "Failed to validate \"%s\": "
                         "not a character device (type=%07o)",
-                        ENTROPY_URANDOM_PATH, (st.st_mode & S_IFMT));
+                        ENTROPY_URANDOM_PATH,
+                        (unsigned) (st.st_mode & S_IFMT));
             }
             else {
                 len = dstlen;

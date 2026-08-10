@@ -357,7 +357,7 @@ open_logfile (const char *logfile, int priority, int got_force)
         if (!S_ISREG (st.st_mode)) {
             log_err (EMUNGE_SNAFU, LOG_ERR,
                 "Logfile is insecure: \"%s\" must be a regular file "
-                "(type=%07o)", logfile, (st.st_mode & S_IFMT));
+                "(type=%07o)", logfile, (unsigned) (st.st_mode & S_IFMT));
         }
         if (st.st_uid != geteuid ()) {
             log_err_or_warn (got_force,
@@ -368,12 +368,12 @@ open_logfile (const char *logfile, int priority, int got_force)
         if (st.st_mode & S_IWGRP) {
             log_err_or_warn (got_force,
                 "Logfile is insecure: \"%s\" should not be writable by group "
-                "(perms=%04o)", logfile, (st.st_mode & ~S_IFMT));
+                "(perms=%04o)", logfile, (unsigned) (st.st_mode & ~S_IFMT));
         }
         if (st.st_mode & S_IWOTH) {
             log_err_or_warn (got_force,
                 "Logfile is insecure: \"%s\" should not be writable by other "
-                "(perms=%04o)", logfile, (st.st_mode & ~S_IFMT));
+                "(perms=%04o)", logfile, (unsigned) (st.st_mode & ~S_IFMT));
         }
     }
     /*  Ensure logfile dir is secure against modification by others.

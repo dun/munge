@@ -1105,7 +1105,7 @@ _conf_open_keyfile (const char *keyfile, int got_force)
     if (!S_ISREG (st.st_mode)) {
         log_err (EMUNGE_SNAFU, LOG_ERR,
             "Keyfile is insecure: \"%s\" must be a regular file (type=%07o)",
-            keyfile, (st.st_mode & S_IFMT));
+            keyfile, (unsigned) (st.st_mode & S_IFMT));
     }
     if (is_symlink) {
         log_err_or_warn (got_force,
@@ -1120,12 +1120,14 @@ _conf_open_keyfile (const char *keyfile, int got_force)
     if (st.st_mode & (S_IRGRP | S_IWGRP)) {
         log_err_or_warn (got_force,
             "Keyfile is insecure: \"%s\" should not be readable or writable "
-            "by group (perms=%04o)", keyfile, (st.st_mode & ~S_IFMT));
+            "by group (perms=%04o)",
+            keyfile, (unsigned) (st.st_mode & ~S_IFMT));
     }
     if (st.st_mode & (S_IROTH | S_IWOTH)) {
         log_err_or_warn (got_force,
             "Keyfile is insecure: \"%s\" should not be readable or writable "
-            "by other (perms=%04o)", keyfile, (st.st_mode & ~S_IFMT));
+            "by other (perms=%04o)",
+            keyfile, (unsigned) (st.st_mode & ~S_IFMT));
     }
     /*  Ensure keyfile dir is secure against modification by others.
      */
