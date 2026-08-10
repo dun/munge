@@ -385,7 +385,7 @@ _random_read_seed (const char *path, int num_bytes)
     else if (!S_ISREG (st.st_mode)) {
         log_msg (LOG_WARNING,
                 "Ignoring PRNG seed \"%s\": must be a regular file "
-                "(type=%07o)", path, (st.st_mode & S_IFMT));
+                "(type=%07o)", path, (unsigned) (st.st_mode & S_IFMT));
     }
     else if (st.st_uid != geteuid ()) {
         log_msg (LOG_WARNING, "Ignoring PRNG seed \"%s\": must be owned by "
@@ -395,12 +395,14 @@ _random_read_seed (const char *path, int num_bytes)
     else if (st.st_mode & (S_IRGRP | S_IWGRP)) {
         log_msg (LOG_WARNING,
                 "Ignoring PRNG seed \"%s\": must not be readable or writable "
-                "by group (perms=%04o)", path, (st.st_mode & ~S_IFMT));
+                "by group (perms=%04o)",
+                path, (unsigned) (st.st_mode & ~S_IFMT));
     }
     else if (st.st_mode & (S_IROTH | S_IWOTH)) {
         log_msg (LOG_WARNING,
                 "Ignoring PRNG seed \"%s\": must not be readable or writable "
-                "by other (perms=%04o)", path, (st.st_mode & ~S_IFMT));
+                "by other (perms=%04o)",
+                path, (unsigned) (st.st_mode & ~S_IFMT));
     }
     else {
         is_valid = 1;
