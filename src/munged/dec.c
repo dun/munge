@@ -1033,11 +1033,15 @@ dec_validate_time (munge_cred_t c)
     tmax = m->time0 + m->ttl;
     /*
      *  Check the decode time against the allowable min & max.
+     *
+     *  tmin and tmax are computed from m->time0 (uint32_t) in 32-bit
+     *    unsigned arithmetic, so both fit a uint32_t and the casts are
+     *    value-preserving.
      */
-    if (m->time1 < tmin) {
+    if (m->time1 < (uint32_t) tmin) {
         return m_msg_set_err (m, EMUNGE_CRED_REWOUND, NULL);
     }
-    if (m->time1 > tmax) {
+    if (m->time1 > (uint32_t) tmax) {
         return m_msg_set_err (m, EMUNGE_CRED_EXPIRED, NULL);
     }
     return 0;
