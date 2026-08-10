@@ -502,10 +502,10 @@ parse_cmdline (conf_t conf, int argc, char **argv)
                         "Overflowed maximum time-to-live of %ld seconds",
                         LONG_MAX);
                 }
-                if (l > UINT_MAX) {
+                if (l > INT_MAX) {
                     log_err (EMUNGE_SNAFU, LOG_ERR,
-                        "Exceeded maximum time-to-live of %u seconds",
-                        UINT_MAX);
+                        "Exceeded maximum time-to-live of %d seconds",
+                        INT_MAX);
                 }
                 if (l == -1) {
                     l = MUNGE_TTL_MAXIMUM;
