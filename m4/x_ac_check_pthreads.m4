@@ -25,7 +25,7 @@ AC_DEFUN([X_AC_CHECK_PTHREADS], [
           [
             AC_LANG_PROGRAM(
               [[#include <pthread.h>]],
-              [[pthread_join (0, 0);]]
+              [[(void) pthread_join (pthread_self (), 0);]]
             )
           ],
           [x_ac_cv_check_pthreads_flag="${x_ac_flag}"; break],
@@ -37,7 +37,7 @@ AC_DEFUN([X_AC_CHECK_PTHREADS], [
   )
   AS_IF(
     [test "x${x_ac_cv_check_pthreads_flag}" = xno],
-    [AC_MSG_FAILURE([cannot link against pthreads])]
+    [AC_MSG_FAILURE([cannot determine how to link against pthreads])]
   )
   LIBPTHREAD="${x_ac_cv_check_pthreads_flag}"
   AC_SUBST([LIBPTHREAD])
