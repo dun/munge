@@ -6,24 +6,65 @@ on:
     branches:
       - build
 
+permissions:
+  contents: read
+
 jobs:
   build:
     strategy:
       fail-fast: false
       matrix:
-        os:
-          - ubuntu-latest
-          - ubuntu-26.04-arm
-          - macos-latest
-        lib:
-          - openssl
-          - libgcrypt
-        cc:
-          - gcc
-          - clang
-        exclude:
+        include:
+          - os: ubuntu-latest
+            crypto: openssl
+            opts: "--disable-debug"
+            cc: gcc
+            cflags: "-O2 -Wall"
+          - os: ubuntu-latest
+            crypto: openssl
+            opts: "--enable-debug"
+            cc: clang
+            cflags: "-O2"
+          - os: ubuntu-latest
+            crypto: libgcrypt
+            opts: "--enable-debug"
+            cc: gcc
+            cflags: "-O2"
+          - os: ubuntu-latest
+            crypto: libgcrypt
+            opts: "--disable-debug"
+            cc: clang
+            cflags: "-O2 -Wall"
+          - os: ubuntu-26.04-arm
+            crypto: openssl
+            opts: "--enable-debug"
+            cc: gcc
+            cflags: "-O2"
+          - os: ubuntu-26.04-arm
+            crypto: openssl
+            opts: "--disable-debug"
+            cc: clang
+            cflags: "-O2 -Wall"
+          - os: ubuntu-26.04-arm
+            crypto: libgcrypt
+            opts: "--disable-debug"
+            cc: gcc
+            cflags: "-O2 -Wall"
+          - os: ubuntu-26.04-arm
+            crypto: libgcrypt
+            opts: "--enable-debug"
+            cc: clang
+            cflags: "-O2"
           - os: macos-latest
-            lib: libgcrypt
+            crypto: openssl
+            opts: "--disable-debug"
+            cflags: "-O2 -Wall"
+            cc: clang
+          - os: macos-latest
+            crypto: openssl
+            opts: "--enable-debug"
+            cc: clang
+            cflags: "-O2"
     runs-on: ${{ matrix.os }}
     continue-on-error: false
     steps:
@@ -41,7 +82,8 @@ jobs:
       - name: Install deps
         run: |
           if expr "${{ matrix.os }}" : "ubuntu" >/dev/null; then
-            sudo apt install autoconf automake libtool \
+            sudo apt-get update
+            sudo apt-get install -y autoconf automake libtool \
               libgcrypt20-dev libssl-dev zlib1g-dev libbz2-dev faketime
           elif expr "${{ matrix.os }}" : "macos" >/dev/null; then
             brew install autoconf automake libtool
@@ -50,14 +92,15 @@ jobs:
         run: ./bootstrap
       - name: Configure
         run: |
-          ./configure --with-crypto-lib="${{ matrix.lib }}" \
-            CC="${{ matrix.cc }}" --enable-debug
+          ./configure \
+            --with-crypto-lib="${{ matrix.crypto }}" ${{ matrix.opts }} \
+            CC="${{ matrix.cc }}" CFLAGS="${{ matrix.cflags }}"
       - name: Get config.log
         run: cat config.log
       - name: Get config.h
         run: cat config.h
       - name: Build
-        run: make V=1
+        run: make V=1 CFLAGS="${{ matrix.cflags }} -Werror"
       - name: Test
         run: |
           expr "${{ matrix.os }}" : "macos" >/dev/null && tmp="/private/tmp"
