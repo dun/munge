@@ -14,19 +14,57 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os:
-          - ubuntu-latest
-          - ubuntu-24.04-arm
-          - macos-latest
-        lib:
-          - openssl
-          - libgcrypt
-        cc:
-          - gcc
-          - clang
-        exclude:
+        include:
+          - os: ubuntu-latest
+            crypto: openssl
+            opts: "--disable-debug"
+            cc: gcc
+            cflags: "-O2 -Wall -Wextra"
+          - os: ubuntu-latest
+            crypto: openssl
+            opts: "--enable-debug"
+            cc: clang
+            cflags: "-O2"
+          - os: ubuntu-latest
+            crypto: libgcrypt
+            opts: "--enable-debug"
+            cc: gcc
+            cflags: "-O2"
+          - os: ubuntu-latest
+            crypto: libgcrypt
+            opts: "--disable-debug"
+            cc: clang
+            cflags: "-O2 -Wall -Wextra"
+          - os: ubuntu-26.04-arm
+            crypto: openssl
+            opts: "--enable-debug"
+            cc: gcc
+            cflags: "-O2"
+          - os: ubuntu-26.04-arm
+            crypto: openssl
+            opts: "--disable-debug"
+            cc: clang
+            cflags: "-O2 -Wall -Wextra"
+          - os: ubuntu-26.04-arm
+            crypto: libgcrypt
+            opts: "--disable-debug"
+            cc: gcc
+            cflags: "-O2 -Wall -Wextra"
+          - os: ubuntu-26.04-arm
+            crypto: libgcrypt
+            opts: "--enable-debug"
+            cc: clang
+            cflags: "-O2"
           - os: macos-latest
-            lib: libgcrypt
+            crypto: openssl
+            opts: "--disable-debug"
+            cc: clang
+            cflags: "-O2 -Wall -Wextra"
+          - os: macos-latest
+            crypto: openssl
+            opts: "--enable-debug"
+            cc: clang
+            cflags: "-O2"
     runs-on: ${{ matrix.os }}
     continue-on-error: false
     steps:
@@ -54,8 +92,9 @@ jobs:
         run: ./bootstrap
       - name: Configure
         run: |
-          ./configure --with-crypto-lib="${{ matrix.lib }}" \
-            CC="${{ matrix.cc }}" CFLAGS="-Wall"
+          ./configure --with-crypto-lib="${{ matrix.crypto }}" \
+            ${{ matrix.opts }} CC="${{ matrix.cc }}" \
+            CFLAGS="${{ matrix.cflags }}"
       - name: Get config.log
         run: cat config.log
       - name: Get config.h
