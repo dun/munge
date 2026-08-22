@@ -93,19 +93,19 @@ jobs:
       - name: Configure
         run: |
           ./configure --with-crypto-lib="${{ matrix.crypto }}" \
-            ${{ matrix.opts }} CC="${{ matrix.cc }}" \
-            CFLAGS="${{ matrix.cflags }}"
+            ${{ matrix.opts }} CC="${{ matrix.cc }}"
       - name: Get config.log
         run: cat config.log
       - name: Get config.h
         run: cat config.h
       - name: Build
-        run: make V=1
+        run: make V=1 CFLAGS="${{ matrix.cflags }} -Werror"
       - name: Test
         run: |
           expr "${{ matrix.os }}" : "macos" >/dev/null && tmp="/private/tmp"
-          make check chain_lint=t verbose=t VERBOSE=t \
-            TMPDIR="${tmp:-/tmp}" root="${tmp:-/tmp}/munge-test-$$"
+          make check V=1 CFLAGS="${{ matrix.cflags }} -Werror" \
+            TMPDIR="${tmp:-/tmp}" root="${tmp:-/tmp}/munge-test-$$" \
+            chain_lint=t verbose=t VERBOSE=t
       - name: Get test-suite.log
         if: ${{ failure() }}
         run: find . -type f -name "test-suite.log" -execdir cat {} \;
