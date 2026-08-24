@@ -3,73 +3,116 @@
 #   X_AC_WITH_OPENSSL
 #
 # DESCRIPTION:
-#   Check for the OpenSSL libcrypto library.  Use pkgconf if available.
-#   Allow LIBCRYPTO_CFLAGS and LIBCRYPTO_LIBS to be manually specified.
-#   Define LIBCRYPTO_CFLAGS and LIBCRYPTO_LIBS accordingly.
+#   Check for the OpenSSL libcrypto library and set LIBCRYPTO_CFLAGS and
+#   LIBCRYPTO_LIBS.  Query pkg-config when it is available.  If pkg-config
+#   is unavailable or does not find libcrypto, link a test program against
+#   libcrypto.
+#
+#   For an explicit prefix, skip pkg-config and use only the link test,
+#   since the caller has named the installation to use.
+#
+#   The link test is not cached.  Its result depends on
+#   "--with-openssl-prefix", which "config.cache" does not record,
+#   so a cached result could outlive a change to the prefix.
 #
 # USAGE:
-#   --with-openssl-prefix (or option not specified)
-#     check with pkgconf; if not found, check in the standard path
-#   --with-openssl-prefix=/path
-#     ignore pkgconf and check in the specified absolute path
+#   unspecified (default)
+#     check with pkg-config, then in the standard path
+#   --with-openssl-prefix
+#     check with pkg-config, then in the standard path; fail if not found
+#   --with-openssl-prefix=PATH
+#     skip pkg-config and search PATH first; PATH must be absolute
 #   --without-openssl-prefix
 #     do not check
 ###############################################################################
 
-AC_DEFUN_ONCE([X_AC_WITH_OPENSSL],
-[
-  AC_REQUIRE([AC_PROG_CC])
-  AC_ARG_WITH([openssl-prefix],
-    [AS_HELP_STRING([--with-openssl-prefix=PATH],
-      [prefix where OpenSSL is installed])])
+AC_DEFUN_ONCE([X_AC_WITH_OPENSSL], [
+  AC_REQUIRE([AC_PROG_CC])[]dnl
+  AC_ARG_WITH(
+    [openssl-prefix],
+    [AS_HELP_STRING(
+      [--with-openssl-prefix=PATH],
+      [prefix where OpenSSL is installed]
+    )]dnl
+  )
+  x_ac_have_libcrypto=no
+  x_ac_prefix=
 
-  have_libcrypto=
-  openssl_prefix=
-
-  if test "x${withval}" != xno; then
-    if test "x${withval}" = xyes || test "x${withval}" = x; then
-      m4_ifdef([PKG_PROG_PKG_CONFIG],
-        [PKG_PROG_PKG_CONFIG([0.9.0], [PKG_CONFIG="false"])])
-      if test "x${PKG_CONFIG}" != "xfalse"; then
-        m4_ifdef([PKG_CHECK_MODULES],
-          [PKG_CHECK_MODULES(
-            [LIBCRYPTO], [libcrypto], [have_libcrypto=yes], [:])],
-          [:])
-      fi
-    elif expr match "${withval}" "[[^/]]" >/dev/null; then
-      AC_MSG_ERROR([invalid value "${withval}" for --with-openssl-prefix])
-    else
-      openssl_prefix="${withval}"
-    fi
-
-    if test "x${have_libcrypto}" != xyes; then
-      AC_MSG_CHECKING([for libcrypto])
-      openssl_cflags=
-      openssl_libs="-lcrypto"
-      if test "x${openssl_prefix}" != x; then
-        openssl_cflags="-I${openssl_prefix}/include ${openssl_cflags}"
-        openssl_libs="-L${openssl_prefix}/lib ${openssl_libs}"
-      fi
-      openssl_cflags_save="${CFLAGS}"
-      openssl_libs_save="${LIBS}"
-      CFLAGS="${openssl_cflags} ${CFLAGS}"
-      LIBS="${openssl_libs} ${LIBS}"
-      AC_LINK_IFELSE(
-        [AC_LANG_PROGRAM(
-          [[#include <openssl/rand.h>]],
-          [[(void) RAND_bytes (NULL, 0);]])],
-        [ LIBCRYPTO_CFLAGS="${openssl_cflags}"
-          LIBCRYPTO_LIBS="${openssl_libs}"
-          have_libcrypto=yes])
-      CFLAGS="${openssl_cflags_save}"
-      LIBS="${openssl_libs_save}"
-      AC_MSG_RESULT([${have_libcrypto:=no}])
-    fi
-  fi
-
+  AS_IF(
+    [test "x${withval}" != xno],
+    [
+      AS_IF(
+        [test "x${withval}" = xyes || test "x${withval}" = x],
+        [
+          m4_ifdef(
+            [PKG_PROG_PKG_CONFIG],
+            [PKG_PROG_PKG_CONFIG([0.9.0], [PKG_CONFIG="false"])]
+          )
+          AS_IF(
+            [test "x${PKG_CONFIG}" != xfalse],
+            [
+              m4_ifdef(
+                [PKG_CHECK_MODULES],
+                [
+                  PKG_CHECK_MODULES(
+                    [LIBCRYPTO], [libcrypto], [x_ac_have_libcrypto=yes], [:]
+                  )
+                ],
+                [:]
+              )
+            ]
+          )
+        ],
+        [expr match "${withval}" "[[^/]]" >/dev/null],
+        [
+          AC_MSG_ERROR(
+            [m4_normalize(
+              [expected an absolute directory name for
+                --with-openssl-prefix=${withval}]
+            )])
+        ],
+        [x_ac_prefix="${withval}"]
+      )
+      AS_IF(
+        [test "x${x_ac_have_libcrypto}" != xyes],
+        [
+          AC_MSG_CHECKING([for libcrypto])
+          x_ac_cflags=
+          x_ac_libs="-lcrypto"
+          AS_IF(
+            [test "x${x_ac_prefix}" != x],
+            [
+              x_ac_cflags="-I${x_ac_prefix}/include ${x_ac_cflags}"
+              x_ac_libs="-L${x_ac_prefix}/lib ${x_ac_libs}"
+            ]
+          )
+          x_ac_save_CFLAGS="${CFLAGS}"
+          x_ac_save_LIBS="${LIBS}"
+          CFLAGS="${x_ac_cflags} ${CFLAGS}"
+          LIBS="${x_ac_libs} ${LIBS}"
+          AC_LINK_IFELSE(
+            [
+              AC_LANG_PROGRAM(
+                [[#include <openssl/rand.h>]],
+                [[(void) RAND_bytes (NULL, 0);]]
+              )
+            ], [
+              LIBCRYPTO_CFLAGS="${x_ac_cflags}"
+              LIBCRYPTO_LIBS="${x_ac_libs}"
+              x_ac_have_libcrypto=yes
+            ]
+          )
+          CFLAGS="${x_ac_save_CFLAGS}"
+          LIBS="${x_ac_save_LIBS}"
+          AC_MSG_RESULT([${x_ac_have_libcrypto}])
+        ]
+      )
+    ]
+  )
   AC_SUBST([LIBCRYPTO_CFLAGS])
   AC_SUBST([LIBCRYPTO_LIBS])
-  if test "x${LIBCRYPTO_LIBS}" = x && test "x${withval}" = xyes; then
-    AC_MSG_FAILURE([failed to configure --with-openssl-prefix])
-  fi
+  AS_IF(
+    [test "x${LIBCRYPTO_LIBS}" = x && test "x${withval}" = xyes],
+    [AC_MSG_FAILURE([failed to configure --with-openssl-prefix])]
+  )
 ])
