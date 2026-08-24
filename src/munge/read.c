@@ -63,7 +63,7 @@
 void
 read_data_from_file (FILE *fp, void **dst, int *dst_len, size_t max_size)
 {
-    const size_t read_chunk = 8192;
+    enum { read_chunk = 8192 };
     unsigned char read_buf[read_chunk];
     unsigned char *dst_buf = NULL;
     size_t dst_used = 0;
@@ -103,7 +103,7 @@ read_data_from_file (FILE *fp, void **dst, int *dst_len, size_t max_size)
         /*  Grow buffer exponentially to minimize realloc() calls.
          */
         if (dst_used + n > dst_size) {
-            size_t new_size = (dst_size == 0 ? read_chunk : dst_size * 2);
+            size_t new_size = (dst_size == 0 ? sizeof read_buf : dst_size * 2);
             if (new_size > max_size) {
                 new_size = max_size;
             }
