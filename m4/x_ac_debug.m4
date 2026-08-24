@@ -49,6 +49,7 @@ AC_DEFUN_ONCE([X_AC_DEBUG], [
         [
           DEBUGCFLAGS="${DEBUGCFLAGS} -std=c99 -pedantic -Wall"
           X_AC_CHECK_CFLAG([-Wextra])
+          X_AC_CHECK_CFLAG([-Wvla])
           X_AC_CHECK_CFLAG([-Wformat=2])
           # "-Wformat=2" already implies "-Wformat-security".  Probe it
           # explicitly so the check survives removal of "-Wformat=2".
