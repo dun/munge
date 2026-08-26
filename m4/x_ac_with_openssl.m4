@@ -41,11 +41,10 @@ AC_DEFUN_ONCE([X_AC_WITH_OPENSSL], [
   AS_IF(
     [test "x${with_openssl_prefix}" != xno],
     [
-      AS_IF(
+      AS_CASE(
+        ["${with_openssl_prefix}"],
+        [yes|""],
         [
-          test "x${with_openssl_prefix}" = xyes \
-              || test "x${with_openssl_prefix}" = x \
-        ], [
           m4_ifdef(
             [PKG_PROG_PKG_CONFIG],
             [PKG_PROG_PKG_CONFIG([0.9.0], [PKG_CONFIG="false"])]
@@ -65,7 +64,7 @@ AC_DEFUN_ONCE([X_AC_WITH_OPENSSL], [
             ]
           )
         ],
-        [expr match "${with_openssl_prefix}" "[[^/]]" >/dev/null],
+        [[[!/]]*],
         [
           AC_MSG_ERROR(
             [m4_normalize(
