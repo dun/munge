@@ -39,11 +39,13 @@ AC_DEFUN_ONCE([X_AC_WITH_OPENSSL], [
   x_ac_prefix=
 
   AS_IF(
-    [test "x${withval}" != xno],
+    [test "x${with_openssl_prefix}" != xno],
     [
       AS_IF(
-        [test "x${withval}" = xyes || test "x${withval}" = x],
         [
+          test "x${with_openssl_prefix}" = xyes \
+              || test "x${with_openssl_prefix}" = x \
+        ], [
           m4_ifdef(
             [PKG_PROG_PKG_CONFIG],
             [PKG_PROG_PKG_CONFIG([0.9.0], [PKG_CONFIG="false"])]
@@ -63,15 +65,15 @@ AC_DEFUN_ONCE([X_AC_WITH_OPENSSL], [
             ]
           )
         ],
-        [expr match "${withval}" "[[^/]]" >/dev/null],
+        [expr match "${with_openssl_prefix}" "[[^/]]" >/dev/null],
         [
           AC_MSG_ERROR(
             [m4_normalize(
               [expected an absolute directory name for
-                --with-openssl-prefix=${withval}]
+                --with-openssl-prefix=${with_openssl_prefix}]
             )])
         ],
-        [x_ac_prefix="${withval}"]
+        [x_ac_prefix="${with_openssl_prefix}"]
       )
       AS_IF(
         [test "x${x_ac_have_libcrypto}" != xyes],
@@ -112,7 +114,7 @@ AC_DEFUN_ONCE([X_AC_WITH_OPENSSL], [
   AC_SUBST([LIBCRYPTO_CFLAGS])
   AC_SUBST([LIBCRYPTO_LIBS])
   AS_IF(
-    [test "x${LIBCRYPTO_LIBS}" = x && test "x${withval}" = xyes],
+    [test "x${LIBCRYPTO_LIBS}" = x && test "x${with_openssl_prefix}" = xyes],
     [AC_MSG_FAILURE([failed to configure --with-openssl-prefix])]
   )
 ])
