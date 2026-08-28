@@ -43,12 +43,17 @@ AC_DEFUN([X_AC_CHECK_FIFO_RECVFD], [
             int fd;
             struct strrecvfd recvfd;
             int rv = 1;
+            int n;
 
-            if (!(tmpdir = getenv ("TMPDIR"))) {
+            tmpdir = getenv ("TMPDIR");
+            if (tmpdir == NULL || tmpdir[0] == '\0') {
                 tmpdir = "/tmp";
             }
-            snprintf (name, sizeof name, "%s/.%s.%d",
-                    tmpdir, prefix, getpid ());
+            n = snprintf (name, sizeof name, "%s/.%s.%d",
+                    tmpdir, prefix, (int) getpid ());
+            if ((n < 0) || ((size_t) n >= sizeof name)) {
+                return 1;
+            }
             unlink (name);
             if (   (mkfifo (name, S_IWUSR | S_IRUSR) == 0)
                 && ((fd = open (name, O_RDONLY | O_NONBLOCK)) >= 0)
