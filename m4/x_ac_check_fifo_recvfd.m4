@@ -38,9 +38,9 @@ AC_DEFUN([X_AC_CHECK_FIFO_RECVFD], [
             #endif /* !PATH_MAX */
           ]], [[
             char name[PATH_MAX];
-            char *tmpdir;
-            char *prefix = "fifo";
-            int fd;
+            const char *tmpdir;
+            const char *prefix = "fifo";
+            int fd = -1;
             struct strrecvfd recvfd;
             int rv = 1;
             int n;
@@ -54,14 +54,17 @@ AC_DEFUN([X_AC_CHECK_FIFO_RECVFD], [
             if ((n < 0) || ((size_t) n >= sizeof name)) {
                 return 1;
             }
-            unlink (name);
+            (void) unlink (name);
             if (   (mkfifo (name, S_IWUSR | S_IRUSR) == 0)
                 && ((fd = open (name, O_RDONLY | O_NONBLOCK)) >= 0)
                 && ((ioctl (fd, I_RECVFD, &recvfd) == -1)
                     && (errno == EAGAIN))) {
                 rv = 0;
             }
-            unlink (name);
+            if (fd >= 0) {
+                (void) close (fd);
+            }
+            (void) unlink (name);
             return rv;
           ]])
         ],
