@@ -17,6 +17,7 @@
 ###############################################################################
 
 AC_DEFUN([X_AC_DARWIN], [
+  AC_REQUIRE([AC_CANONICAL_HOST])[]dnl
   case "${host}" in
     *-*-darwin*)
       AC_DEFINE(
