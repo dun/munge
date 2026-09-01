@@ -33,7 +33,7 @@ AC_DEFUN([_X_AC_GETGRNAM_R_POSIX], [
             #include <grp.h>
           ]], [[
             int rv;
-            char *name;
+            char *name = "";
             struct group gr, *pgr;
             char buf[1024];
             rv = getgrnam_r (name, &gr, buf, sizeof buf, &pgr); (void) rv;
@@ -76,7 +76,7 @@ AC_DEFUN([_X_AC_GETGRNAM_R_SUN], [
             #undef _POSIX_PTHREAD_SEMANTICS     /* override POSIX getgrnam_r */
             #include <grp.h>
           ]], [[
-            char *name;
+            char *name = "";
             struct group gr, *pgr;
             char buf[1024];
             pgr = getgrnam_r (name, &gr, buf, sizeof buf); (void) pgr;

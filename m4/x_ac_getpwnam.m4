@@ -37,7 +37,7 @@ AC_DEFUN([_X_AC_GETPWNAM_R_AIX], [
             #include <pwd.h>
           ]], [[
             int rv;
-            char *user;
+            char *user = "";
             struct passwd pw;
             char buf[1024];
             rv = getpwnam_r (user, &pw, buf, sizeof buf); (void) rv;
@@ -80,7 +80,7 @@ AC_DEFUN([_X_AC_GETPWNAM_R_POSIX], [
             #include <pwd.h>
           ]], [[
             int rv;
-            char *user;
+            char *user = "";
             struct passwd pw, *ppw;
             char buf[1024];
             rv = getpwnam_r (user, &pw, buf, sizeof buf, &ppw); (void) rv;
@@ -146,7 +146,7 @@ AC_DEFUN([_X_AC_GETPWNAM_R_SUN], [
             #undef _POSIX_PTHREAD_SEMANTICS     /* override POSIX getpwnam_r */
             #include <pwd.h>
           ]], [[
-            char *user;
+            char *user = "";
             struct passwd pw, *ppw;
             char buf[1024];
             ppw = getpwnam_r (user, &pw, buf, sizeof buf); (void) ppw;
