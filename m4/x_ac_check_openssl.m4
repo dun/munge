@@ -129,6 +129,9 @@ AC_DEFUN([X_AC_CHECK_OPENSSL], [
 #   HAVE_<name>_RETURN_INT in config.h.  <args> is the argument list for the
 #   test call, and <includes> is the required header prologue.
 #
+#   Define OPENSSL_SUPPRESS_DEPRECATED ahead of the includes.  Without it a
+#   deprecated function warns, and "-Werror" would make the check report no.
+#
 #   Insert an #undef of <name> after the includes, so a backward-compatibility
 #   macro cannot interfere with the return-type check.
 #
@@ -161,6 +164,7 @@ AC_DEFUN([_X_AC_CHECK_OPENSSL_FUNC_RETURNS_INT], [
           AC_LINK_IFELSE(
             [
               AC_LANG_PROGRAM([[
+                #define OPENSSL_SUPPRESS_DEPRECATED
                 $3
                 #undef $1
               ]], [[
