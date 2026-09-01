@@ -129,6 +129,12 @@ AC_DEFUN([X_AC_CHECK_OPENSSL], [
 #   HAVE_<name>_RETURN_INT in config.h.  <args> is the argument list for the
 #   test call, and <includes> is the required header prologue.
 #
+#   The test assigns the result to an int.  That assignment is the check:
+#   initializing an int from a void expression is an error.  Casting the call
+#   to void instead would compile for a void return too, so the check would
+#   report int for every function.  Casting "rv" only silences
+#   "-Wunused-variable".
+#
 #   Define OPENSSL_SUPPRESS_DEPRECATED ahead of the includes.  Without it a
 #   deprecated function warns, and "-Werror" would make the check report no.
 #
@@ -168,7 +174,7 @@ AC_DEFUN([_X_AC_CHECK_OPENSSL_FUNC_RETURNS_INT], [
                 $3
                 #undef $1
               ]], [[
-                int rv = $1 ($2);
+                int rv = $1 ($2); (void) rv;
               ]])
             ],
             [x_ac_cv_have_$1_return_int=yes],
