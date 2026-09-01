@@ -92,7 +92,7 @@ AC_DEFUN([_X_AC_GETGRENT_R_AIX], [
             struct group gr;
             char buf[1024];
             FILE *fp;
-            rv = getgrent_r (&gr, buf, sizeof buf, &fp);
+            rv = getgrent_r (&gr, buf, sizeof buf, &fp); (void) rv;
           ]])
         ],
         [x_ac_cv_have_getgrent_r_aix=yes],
@@ -135,7 +135,7 @@ AC_DEFUN([_X_AC_GETGRENT_R_GNU], [
             int rv;
             struct group gr, *pgr;
             char buf[1024];
-            rv = getgrent_r (&gr, buf, sizeof buf, &pgr);
+            rv = getgrent_r (&gr, buf, sizeof buf, &pgr); (void) rv;
           ]])
         ],
         [x_ac_cv_have_getgrent_r_gnu=yes],
@@ -176,7 +176,7 @@ AC_DEFUN([_X_AC_GETGRENT_R_SUN], [
           ]], [[
             struct group gr, *pgr;
             char buf[1024];
-            pgr = getgrent_r (&gr, buf, sizeof buf);
+            pgr = getgrent_r (&gr, buf, sizeof buf); (void) pgr;
           ]])
         ],
         [x_ac_cv_have_getgrent_r_sun=yes],

@@ -40,7 +40,7 @@ AC_DEFUN([_X_AC_GETPWNAM_R_AIX], [
             char *user;
             struct passwd pw;
             char buf[1024];
-            rv = getpwnam_r (user, &pw, buf, sizeof buf);
+            rv = getpwnam_r (user, &pw, buf, sizeof buf); (void) rv;
           ]])
         ],
         [x_ac_cv_have_getpwnam_r_aix=yes],
@@ -83,7 +83,7 @@ AC_DEFUN([_X_AC_GETPWNAM_R_POSIX], [
             char *user;
             struct passwd pw, *ppw;
             char buf[1024];
-            rv = getpwnam_r (user, &pw, buf, sizeof buf, &ppw);
+            rv = getpwnam_r (user, &pw, buf, sizeof buf, &ppw); (void) rv;
           ]])
         ],
         [
@@ -149,7 +149,7 @@ AC_DEFUN([_X_AC_GETPWNAM_R_SUN], [
             char *user;
             struct passwd pw, *ppw;
             char buf[1024];
-            ppw = getpwnam_r (user, &pw, buf, sizeof buf);
+            ppw = getpwnam_r (user, &pw, buf, sizeof buf); (void) ppw;
           ]])
         ],
         [x_ac_cv_have_getpwnam_r_sun=yes],

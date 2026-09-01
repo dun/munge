@@ -36,7 +36,7 @@ AC_DEFUN([_X_AC_GETGRNAM_R_POSIX], [
             char *name;
             struct group gr, *pgr;
             char buf[1024];
-            rv = getgrnam_r (name, &gr, buf, sizeof buf, &pgr);
+            rv = getgrnam_r (name, &gr, buf, sizeof buf, &pgr); (void) rv;
           ]])
         ],
         [x_ac_cv_have_getgrnam_r_posix=yes],
@@ -79,7 +79,7 @@ AC_DEFUN([_X_AC_GETGRNAM_R_SUN], [
             char *name;
             struct group gr, *pgr;
             char buf[1024];
-            pgr = getgrnam_r (name, &gr, buf, sizeof buf);
+            pgr = getgrnam_r (name, &gr, buf, sizeof buf); (void) pgr;
           ]])
         ],
         [x_ac_cv_have_getgrnam_r_sun=yes],
