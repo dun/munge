@@ -15,21 +15,23 @@ AC_DEFUN([X_AC_CHECK_MEMSET_S], [
   AC_LINK_IFELSE(
     [
       AC_LANG_PROGRAM([[
-#define __STDC_WANT_LIB_EXT1__ 1
-#include <string.h>
-]], [[
-char buf[8]; (void) memset_s (buf, sizeof buf, 0, sizeof buf);
-]]
-      )
+        #define __STDC_WANT_LIB_EXT1__ 1
+        #include <string.h>
+      ]], [[
+        char buf[8];
+        (void) memset_s (buf, sizeof buf, 0, sizeof buf);
+      ]])
     ], [
-      AC_DEFINE([HAVE_MEMSET_S], [1],
+      AC_DEFINE(
+        [HAVE_MEMSET_S], [1],
         [Define to 1 if you have the 'memset_s' function.]
       )
-      AC_DEFINE([NEED_STDC_WANT_LIB_EXT1], [1],
+      AC_DEFINE(
+        [NEED_STDC_WANT_LIB_EXT1], [1],
         [Define to 1 before including <string.h> to expose 'memset_s'.]
       )
       AC_MSG_RESULT([yes])
     ],
     [AC_MSG_RESULT([no])]
-  )]
-)
+  )
+])
