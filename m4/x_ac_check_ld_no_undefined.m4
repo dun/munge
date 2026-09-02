@@ -24,8 +24,9 @@
 #   test to incorrectly report support on platforms (e.g., OpenBSD) where
 #   the actual libmunge.la shared-library link fails.
 #
-#   Intended use: add $(LD_NO_UNDEFINED) to *_LDFLAGS for any libtool shared
-#   library that should be self-contained:
+# USAGE:
+#   Add $(LD_NO_UNDEFINED) to *_LDFLAGS for any libtool shared library that
+#   should be self-contained:
 #
 #     libmunge_la_LDFLAGS = \
 #         -no-undefined $(LD_NO_UNDEFINED) ...
@@ -41,26 +42,30 @@ AC_DEFUN([X_AC_CHECK_LD_NO_UNDEFINED], [
   AC_CACHE_CHECK(
     [whether the linker supports --no-undefined for shared libraries],
     [x_ac_cv_check_ld_no_undefined],
-    [x_ac_save_CFLAGS="${CFLAGS}"
-     x_ac_save_LDFLAGS="${LDFLAGS}"
-     CFLAGS="${CFLAGS} -fPIC"
-     LDFLAGS="${LDFLAGS} -shared -Wl,--no-undefined"
-     AC_LINK_IFELSE(
-       [AC_LANG_SOURCE([[
-         #include <stddef.h>
-         #include <string.h>
-         size_t f(const char *s) { return strlen(s); }
-       ]])],
-       [x_ac_cv_check_ld_no_undefined=yes],
-       [x_ac_cv_check_ld_no_undefined=no]
-     )
-     CFLAGS="${x_ac_save_CFLAGS}"
-     LDFLAGS="${x_ac_save_LDFLAGS}"]
+    [
+      x_ac_save_CFLAGS="${CFLAGS}"
+      x_ac_save_LDFLAGS="${LDFLAGS}"
+      CFLAGS="${CFLAGS} -fPIC"
+      LDFLAGS="${LDFLAGS} -shared -Wl,--no-undefined"
+      AC_LINK_IFELSE(
+        [
+          AC_LANG_SOURCE([[
+            #include <stddef.h>
+            #include <string.h>
+            size_t f (const char *s) { return strlen (s); }
+          ]])
+        ],
+        [x_ac_cv_check_ld_no_undefined=yes],
+        [x_ac_cv_check_ld_no_undefined=no]
+      )
+      CFLAGS="${x_ac_save_CFLAGS}"
+      LDFLAGS="${x_ac_save_LDFLAGS}"
+    ]
   )
   AS_IF(
     [test "x${x_ac_cv_check_ld_no_undefined}" = xyes],
     [LD_NO_UNDEFINED="-Wl,--no-undefined"],
     [LD_NO_UNDEFINED=""]
   )
-  AC_SUBST([LD_NO_UNDEFINED])]
-)
+  AC_SUBST([LD_NO_UNDEFINED])
+])
