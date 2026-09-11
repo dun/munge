@@ -6,6 +6,10 @@
 #   Add support for the "--enable-debug" configure option.  If enabled,
 #   collect debugging flags in DEBUGCFLAGS and append them to AM_CFLAGS.
 #   Otherwise define NDEBUG to disable assert() checks.
+#
+#   Clear configure's default "-g -O2" unless the user set CFLAGS.
+#   The test reads "ac_env_CFLAGS_set", an autoconf internal with no
+#   documented replacement.
 ###############################################################################
 
 AC_DEFUN_ONCE([X_AC_DEBUG], [
@@ -30,7 +34,6 @@ AC_DEFUN_ONCE([X_AC_DEBUG], [
   AS_IF(
     [test "x${x_ac_debug}" = xyes],
     [
-      # Clear configure's default CFLAGS when not explicitly set by user.
       AS_IF([test "x${ac_env_CFLAGS_set}" = x], [CFLAGS=])
       DEBUGCFLAGS="${DEBUGCFLAGS} -O0"
       AS_IF(
