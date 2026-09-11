@@ -23,47 +23,20 @@
 AC_DEFUN([X_AC_GETGRENT], [
   AC_REQUIRE([AC_PROG_CC])[]dnl
   AC_CHECK_FUNCS([getgrent])
-  _X_AC_GETGRENT_CHECK_WNO_IMPLICIT
+  X_AC_CHECK_CFLAG(
+    [-Wno-implicit-function-declaration],
+    [-Wimplicit-function-declaration],
+    [x_ac_getgrent_cflags]
+  )
   x_ac_save_CFLAGS="${CFLAGS}"
   x_ac_save_werror="${ac_c_werror_flag}"
-  CFLAGS="${CFLAGS} ${x_ac_getgrent_wno_implicit_flag}"
+  CFLAGS="${CFLAGS} ${x_ac_getgrent_cflags}"
   ac_c_werror_flag=yes
   _X_AC_GETGRENT_R_AIX
   _X_AC_GETGRENT_R_GNU
   _X_AC_GETGRENT_R_SUN
   CFLAGS="${x_ac_save_CFLAGS}"
   ac_c_werror_flag="${x_ac_save_werror}"
-])
-
-###############################################################################
-# SYNOPSIS:
-#   _X_AC_GETGRENT_CHECK_WNO_IMPLICIT
-#
-# DESCRIPTION:
-#   Check if the compiler supports the -Wno-implicit-function-declaration flag.
-###############################################################################
-
-AC_DEFUN([_X_AC_GETGRENT_CHECK_WNO_IMPLICIT], [
-  AC_REQUIRE([AC_PROG_CC])[]dnl
-  AC_MSG_CHECKING([if ${CC} supports -Wno-implicit-function-declaration])
-  x_ac_save_CFLAGS="${CFLAGS}"
-  CFLAGS="${CFLAGS} -Wno-implicit-function-declaration -Werror"
-  AC_COMPILE_IFELSE(
-    [AC_LANG_PROGRAM()],
-    [
-      x_ac_getgrent_have_wno_implicit=yes
-      x_ac_getgrent_wno_implicit_flag="-Wno-implicit-function-declaration"
-    ], [
-      x_ac_getgrent_have_wno_implicit=no
-      x_ac_getgrent_wno_implicit_flag=""
-    ]
-  )
-  CFLAGS="${x_ac_save_CFLAGS}"
-  AS_IF(
-    [test "x${x_ac_getgrent_have_wno_implicit}" = xyes],
-    [AC_MSG_RESULT([yes])],
-    [AC_MSG_RESULT([no])]
-  )
 ])
 
 ###############################################################################
