@@ -6,7 +6,7 @@
 ##
 # Prologue
 ##
-AC_PREREQ([2.61])
+AC_PREREQ([2.64])
 AC_INIT([MUNGE], m4_esyscmd([build-aux/gen-version]))
 AC_SUBST([DATE], m4_esyscmd([build-aux/gen-date]))
 
