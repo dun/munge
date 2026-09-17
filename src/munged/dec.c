@@ -43,7 +43,6 @@
 #include "mac.h"
 #include "memwipe.h"
 #include "munge_defs.h"
-#include "random.h"
 #include "replay.h"
 #include "str.h"
 #include "zip.h"
@@ -799,7 +798,6 @@ dec_unpack_inner (munge_cred_t c)
     len = c->inner_len;
     /*
      *  Unpack the salt.
-     *  Add it to the PRNG entropy pool if it's encrypted.
      */
     c->salt_len = MUNGE_CRED_SALT_LEN;
     assert ((size_t) c->salt_len <= sizeof c->salt);
@@ -807,9 +805,6 @@ dec_unpack_inner (munge_cred_t c)
         return m_msg_set_err (m, EMUNGE_BAD_CRED, strdup ("Truncated salt"));
     }
     memcpy (c->salt, p, c->salt_len);
-    if (m->cipher != MUNGE_CIPHER_NONE) {
-        random_add (c->salt, c->salt_len);
-    }
     p += c->salt_len;
     len -= c->salt_len;
     /*
