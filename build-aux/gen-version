@@ -89,6 +89,10 @@ if test "x${VERSION}" = x && test -f "${RELEASE_FILE}"; then
 fi
 
 # Omit the trailing newline so m4_esyscmd can use the result directly.
-test "x${VERSION}" != x && printf %s "${VERSION}" || printf %s "UNKNOWN"
+if test "x${VERSION}" != x; then
+    printf %s "${VERSION}"
+else
+    printf %s "UNKNOWN"
+fi
 
 exit 0

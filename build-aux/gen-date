@@ -53,6 +53,10 @@ if test "x${DATE}" = x; then
 fi
 
 # Omit the trailing newline so m4_esyscmd can use the result directly.
-test "x${DATE}" != x && printf %s "${DATE}" || printf %s "UNKNOWN"
+if test "x${DATE}" != x; then
+    printf %s "${DATE}"
+else
+    printf %s "UNKNOWN"
+fi
 
 exit 0
