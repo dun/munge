@@ -1,7 +1,13 @@
 #!/bin/sh
 set -e
-autoreconf --force --install --verbose ${AUTOCONF_FLAGS:-}
+
+# Remove the cache that a failed run left behind.
 rm -rf autom4te.cache
 
-# Print package version for verification after bootstrap
+autoreconf --force --install --verbose ${AUTOCONF_FLAGS:-}
+
+# Clean up after a successful reconf.
+rm -rf autom4te.cache
+
+# Print package version for verification after bootstrap.
 sed -ne "s/^PACKAGE_STRING='\([^']*\)'$/\1/p" configure
