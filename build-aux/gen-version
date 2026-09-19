@@ -9,7 +9,7 @@
 #
 # Snapshots (i.e., releases where the most recent git tag does not point to the
 # latest commit) will have the version string appended with the date and hash
-# of the latest commit in the form ".YYYYMMDD.H"; this format presumes there
+# of the latest commit in the form ".YYYYMMDD.HASH"; this format presumes there
 # will be at most one such release per day.
 ##
 
