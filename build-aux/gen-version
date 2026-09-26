@@ -91,9 +91,9 @@ fi
 
 # Omit the trailing newline so m4_esyscmd can use the result directly.
 if test "x${VERSION}" != x; then
-    printf %s "${VERSION}"
+    printf '%s' "${VERSION}"
 else
-    printf %s "UNKNOWN"
+    printf '%s' "UNKNOWN"
 fi
 
 exit 0
