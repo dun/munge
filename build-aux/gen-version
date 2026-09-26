@@ -44,14 +44,14 @@ fi
 if test "x${VERSION}" = x && test -e "${GIT_DIR:-.git}"; then
     DESC=$(git describe --match "${TAG_PREFIX}*" --tags 2>/dev/null)
     if test "x${DESC}" != x; then
-        VERSION=$(echo "${DESC}" \
+        VERSION=$(printf '%s\n' "${DESC}" \
                 | sed -ne "s/^${TAG_PREFIX}\([^-]*\).*/\1/p")
 
         # Check the git-describe string for a commit hash to determine whether
         #   this is a snapshot release.  By default, git-describe will show
         #   only the tag name if it points to the given commit.
         if test "x${VERSION}" != x; then
-            COMMIT_HASH=$(echo "${DESC}" \
+            COMMIT_HASH=$(printf '%s\n' "${DESC}" \
                     | sed -ne "s/^${TAG_PREFIX}.*-g\([0-9a-f]*\)$/\1/p")
             if test "x${COMMIT_HASH}" != x; then
                 COMMIT_DATE=$(git show -s --pretty=format:%ci \
@@ -68,8 +68,9 @@ fi
 # The most recent release should be listed in the first line of the file.
 if test "x${VERSION}" = x && test -f "${RELEASE_FILE}"; then
     LATEST=$(head -1 "${RELEASE_FILE}")
-    VERSION=$(echo "${LATEST}" | sed -ne 's/^[^0-9]*\([^ ]*\).*/\1/p')
-    RELEASE_DATE=$(echo "${LATEST}" | sed -ne 's/.*(\([^)]*\)).*/\1/p')
+    VERSION=$(printf '%s\n' "${LATEST}" | sed -ne 's/^[^0-9]*\([^ ]*\).*/\1/p')
+    RELEASE_DATE=$(printf '%s\n' "${LATEST}" \
+            | sed -ne 's/.*(\([^)]*\)).*/\1/p')
 
     # Check the git archive metadata for both the archive date and commit hash.
     # These should be present in git archives & GitHub source code assets.
@@ -83,7 +84,7 @@ if test "x${VERSION}" = x && test -f "${RELEASE_FILE}"; then
         test "x${RELEASE_DATE}" != "x${ARCHIVE_DATE}" \
                 && test "x${ARCHIVE_DATE}" != x \
                 && test "x${ARCHIVE_HASH}" != x \
-                && DATE=$(echo "${ARCHIVE_DATE}" | sed -e 's/-//g') \
+                && DATE=$(printf '%s\n' "${ARCHIVE_DATE}" | sed -e 's/-//g') \
                 && VERSION="${VERSION}.${DATE}.${ARCHIVE_HASH}"
     fi
 fi
