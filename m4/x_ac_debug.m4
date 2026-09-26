@@ -10,6 +10,7 @@
 
 AC_DEFUN_ONCE([X_AC_DEBUG], [
   AC_REQUIRE([AC_PROG_CC])[]dnl
+  x_ac_debug=no
   AC_MSG_CHECKING([whether debugging is enabled])
   AC_ARG_ENABLE(
     [debug],
@@ -50,5 +51,5 @@ AC_DEFUN_ONCE([X_AC_DEBUG], [
       )
     ]
   )
-  AC_MSG_RESULT([${x_ac_debug=no}])
+  AC_MSG_RESULT([${x_ac_debug}])
 ])
