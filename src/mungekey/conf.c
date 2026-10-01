@@ -447,7 +447,7 @@ _conf_set_str (char **dstp, const char *src)
 /*  Validate [confp] to check that everything is properly initialized
  *    and within the appropriate limits.
  */
-void
+static void
 _conf_validate (conf_t *confp)
 {
     if (confp == NULL) {

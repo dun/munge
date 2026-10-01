@@ -284,7 +284,7 @@ _mac_block (munge_mac_t md, const void *key, int keylen,
 }
 
 
-int
+static int
 _mac_map_enum (munge_mac_t md, void *dst)
 {
     return md_map_enum (md, dst);
@@ -514,7 +514,7 @@ _mac_block (munge_mac_t md, const void *key, int keylen,
 }
 
 
-int
+static int
 _mac_map_enum (munge_mac_t md, void *dst)
 {
 #if HAVE_EVP_MAC_INIT

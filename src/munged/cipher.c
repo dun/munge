@@ -234,7 +234,7 @@ static int _cipher_update_aux (cipher_ctx *x, void *dst, int *dstlenp,
     const void *src, int srclen);
 
 
-void
+static void
 _cipher_init_subsystem (void)
 {
     int i;
@@ -579,7 +579,7 @@ _cipher_map_enum (munge_cipher_t cipher, void *dst)
 static const EVP_CIPHER *_cipher_map[MUNGE_CIPHER_LAST_ITEM];
 
 
-void
+static void
 _cipher_init_subsystem (void)
 {
     int i;
