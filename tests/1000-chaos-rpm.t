@@ -25,7 +25,6 @@ fi
 # Ensure this is a RHEL-based system (AlmaLinux, CentOS, Fedora).
 #
 if ! grep -E -q '^ID.*=.*\b(rhel|fedora)\b' /etc/os-release 2>/dev/null; then
-    local id &&
     id=$(sed -ne '/^ID=/!d; s/.*=//; s/"//g; p; q' /etc/os-release 2>/dev/null)
     skip_all="skipping tests: ${id:+${id} }system type not supported"
     test_done
