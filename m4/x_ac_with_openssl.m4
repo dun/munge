@@ -50,7 +50,7 @@ AC_DEFUN_ONCE([X_AC_WITH_OPENSSL], [
             [PKG_PROG_PKG_CONFIG([0.9.0], [PKG_CONFIG="false"])]
           )
           AS_IF(
-            [test "x${PKG_CONFIG}" != xfalse],
+            [test "x${PKG_CONFIG}" != xfalse && test "x${PKG_CONFIG}" != x],
             [
               m4_ifdef(
                 [PKG_CHECK_MODULES],
