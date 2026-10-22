@@ -8,8 +8,12 @@
 #   is unavailable or does not find libcrypto, link a test program against
 #   libcrypto.
 #
-#   For an explicit prefix, skip pkg-config and use only the link test,
-#   since the caller has named the installation to use.
+#   For an explicit prefix, skip pkg-config, since the caller has named the
+#   installation to use.  Require the OpenSSL headers and libcrypto under
+#   the prefix before the link test.  The compiler and linker still search
+#   their own directories, so a link test alone would accept a different
+#   installation.  Look for libcrypto in "lib" and then "lib64".  OpenSSL's
+#   default libdir for its linux-x86_64 target is "lib64" as of OpenSSL 3.0.0.
 #
 #   The link test is not cached.  Its result depends on
 #   "--with-openssl-prefix", which "config.cache" does not record,
@@ -21,7 +25,7 @@
 #   --with-openssl-prefix
 #     check with pkg-config, then in the standard path; fail if not found
 #   --with-openssl-prefix=PATH
-#     skip pkg-config and search PATH first; PATH must be absolute
+#     check under PATH, which must be absolute; fail if not found
 #   --without-openssl-prefix
 #     do not check
 ###############################################################################
@@ -77,16 +81,38 @@ AC_DEFUN_ONCE([X_AC_WITH_OPENSSL], [
       AS_IF(
         [test "x${x_ac_have_libcrypto}" != xyes],
         [
-          AC_MSG_CHECKING([for libcrypto])
           x_ac_cflags=
-          x_ac_libs="-lcrypto"
+          x_ac_libs=
           AS_IF(
             [test "x${x_ac_prefix}" != x],
             [
-              x_ac_cflags="-I${x_ac_prefix}/include ${x_ac_cflags}"
-              x_ac_libs="-L${x_ac_prefix}/lib ${x_ac_libs}"
+              AS_IF(
+                [test ! -f "${x_ac_prefix}/include/openssl/rand.h"],
+                [AC_MSG_ERROR([no OpenSSL headers under "${x_ac_prefix}"])]
+              )
+              x_ac_cflags="-I${x_ac_prefix}/include"
+              for x_ac_dir in lib lib64; do
+                for x_ac_file in "${x_ac_prefix}/${x_ac_dir}"/libcrypto.*; do
+                  if test -f "${x_ac_file}"; then
+                    x_ac_libs="-L${x_ac_prefix}/${x_ac_dir} -lcrypto"
+                    break 2
+                  fi
+                done
+              done
+              AS_IF(
+                [test "x${x_ac_libs}" = x],
+                [
+                  AC_MSG_ERROR(
+                    [m4_normalize(
+                      [no libcrypto in "${x_ac_prefix}/lib" or
+                        "${x_ac_prefix}/lib64"]
+                    )])
+                ]
+              )
             ]
           )
+          AS_IF([test "x${x_ac_libs}" = x], [x_ac_libs="-lcrypto"])
+          AC_MSG_CHECKING([for libcrypto])
           x_ac_save_CFLAGS="${CFLAGS}"
           x_ac_save_LIBS="${LIBS}"
           CFLAGS="${x_ac_cflags} ${CFLAGS}"
@@ -113,7 +139,11 @@ AC_DEFUN_ONCE([X_AC_WITH_OPENSSL], [
   AC_SUBST([LIBCRYPTO_CFLAGS])
   AC_SUBST([LIBCRYPTO_LIBS])
   AS_IF(
-    [test "x${LIBCRYPTO_LIBS}" = x && test "x${with_openssl_prefix}" = xyes],
+    [
+      test "x${LIBCRYPTO_LIBS}" = x \
+          && test "x${with_openssl_prefix}" != x \
+          && test "x${with_openssl_prefix}" != xno \
+    ],
     [AC_MSG_FAILURE([failed to configure --with-openssl-prefix])]
   )
 ])
