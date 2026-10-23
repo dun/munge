@@ -11,6 +11,9 @@
 #   configure was generated, this macro skips the check and prints a
 #   "skipped" result.  LIBGCRYPT_CFLAGS and LIBGCRYPT_LIBS then keep the
 #   values configure inherited.
+#
+#   When the check runs, AM_PATH_LIBGCRYPT sets both variables from
+#   Libgcrypt's config script, overwriting a preset value.
 ###############################################################################
 
 AC_DEFUN_ONCE([X_AC_WITH_LIBGCRYPT], [
