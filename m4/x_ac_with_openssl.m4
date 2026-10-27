@@ -15,6 +15,12 @@
 #   installation.  Look for libcrypto in "lib" and then "lib64".  OpenSSL's
 #   default libdir for its linux-x86_64 target is "lib64" as of OpenSSL 3.0.0.
 #
+#   A preset LIBCRYPTO_CFLAGS or LIBCRYPTO_LIBS skips pkg-config and replaces
+#   the value this macro would compute for that variable.  The link test
+#   still runs, so a preset that does not link fails here rather than at
+#   build time.  OpenSSL ships no autoconf macro, so this macro is the only
+#   check on a preset.
+#
 #   The link test is not cached.  Its result depends on
 #   "--with-openssl-prefix", which "config.cache" does not record,
 #   so a cached result could outlive a change to the prefix.
@@ -28,6 +34,8 @@
 #     check under PATH, which must be absolute; fail if not found
 #   --without-openssl-prefix
 #     do not check
+#   LIBCRYPTO_CFLAGS, LIBCRYPTO_LIBS
+#     use in place of the computed value; fail if the result does not link
 ###############################################################################
 
 AC_DEFUN_ONCE([X_AC_WITH_OPENSSL], [
@@ -39,8 +47,22 @@ AC_DEFUN_ONCE([X_AC_WITH_OPENSSL], [
       [prefix where OpenSSL is installed]
     )]dnl
   )
+  AC_ARG_VAR([LIBCRYPTO_CFLAGS], [C compiler flags for libcrypto])
+  AC_ARG_VAR([LIBCRYPTO_LIBS], [linker flags for libcrypto])
   x_ac_have_libcrypto=no
   x_ac_prefix=
+  x_ac_required=no
+
+  # Fail instead of falling back when the caller named an installation or
+  # supplied flags.
+  AS_IF(
+    [
+      test "x${with_openssl_prefix}" != x \
+          || test "x${LIBCRYPTO_CFLAGS}" != x \
+          || test "x${LIBCRYPTO_LIBS}" != x \
+    ],
+    [x_ac_required=yes]
+  )
 
   AS_IF(
     [test "x${with_openssl_prefix}" != xno],
@@ -53,9 +75,14 @@ AC_DEFUN_ONCE([X_AC_WITH_OPENSSL], [
             [PKG_PROG_PKG_CONFIG],
             [PKG_PROG_PKG_CONFIG([0.9.0], [PKG_CONFIG="false"])]
           )
+          # A preset skips pkg-config so that the link test checks it.
           AS_IF(
-            [test "x${PKG_CONFIG}" != xfalse && test "x${PKG_CONFIG}" != x],
             [
+              test "x${PKG_CONFIG}" != xfalse \
+                  && test "x${PKG_CONFIG}" != x \
+                  && test "x${LIBCRYPTO_CFLAGS}" = x \
+                  && test "x${LIBCRYPTO_LIBS}" = x \
+            ], [
               m4_ifdef(
                 [PKG_CHECK_MODULES],
                 [
@@ -81,16 +108,22 @@ AC_DEFUN_ONCE([X_AC_WITH_OPENSSL], [
       AS_IF(
         [test "x${x_ac_have_libcrypto}" != xyes],
         [
-          x_ac_cflags=
-          x_ac_libs=
+          # Start from the presets.  The prefix fills in only an empty one.
+          x_ac_cflags="${LIBCRYPTO_CFLAGS}"
+          x_ac_libs="${LIBCRYPTO_LIBS}"
           AS_IF(
-            [test "x${x_ac_prefix}" != x],
+            [test "x${x_ac_prefix}" != x && test "x${x_ac_cflags}" = x],
             [
               AS_IF(
                 [test ! -f "${x_ac_prefix}/include/openssl/rand.h"],
                 [AC_MSG_ERROR([no OpenSSL headers under "${x_ac_prefix}"])]
               )
               x_ac_cflags="-I${x_ac_prefix}/include"
+            ]
+          )
+          AS_IF(
+            [test "x${x_ac_prefix}" != x && test "x${x_ac_libs}" = x],
+            [
               for x_ac_dir in lib lib64; do
                 for x_ac_file in "${x_ac_prefix}/${x_ac_dir}"/libcrypto.*; do
                   if test -f "${x_ac_file}"; then
@@ -105,7 +138,8 @@ AC_DEFUN_ONCE([X_AC_WITH_OPENSSL], [
                   AC_MSG_ERROR(
                     [m4_normalize(
                       [no libcrypto in "${x_ac_prefix}/lib" or
-                        "${x_ac_prefix}/lib64"]
+                        "${x_ac_prefix}/lib64"; set LIBCRYPTO_LIBS for
+                        another layout]
                     )])
                 ]
               )
@@ -140,10 +174,10 @@ AC_DEFUN_ONCE([X_AC_WITH_OPENSSL], [
   AC_SUBST([LIBCRYPTO_LIBS])
   AS_IF(
     [
-      test "x${LIBCRYPTO_LIBS}" = x \
-          && test "x${with_openssl_prefix}" != x \
+      test "x${x_ac_have_libcrypto}" != xyes \
           && test "x${with_openssl_prefix}" != xno \
+          && test "x${x_ac_required}" = xyes \
     ],
-    [AC_MSG_FAILURE([failed to configure --with-openssl-prefix])]
+    [AC_MSG_FAILURE([failed to configure libcrypto])]
   )
 ])
