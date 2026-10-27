@@ -8,8 +8,8 @@ test_description="Because nothing is so simple that it can't still go wrong"
 
 # When testing an expr string regex match for an absolute path, check if the
 #   "/" regex should be escaped (i.e., "\/").
-# FreeBSD requires the "/" regex in expr to be escaped.
-# See "m4/x_ac_with_munge_socket.m4".
+# FreeBSD's expr parses a bare "/" operand as its division operator, so a
+#   regex of just "/" is a syntax error.  The "\/" regex avoids that.
 #
 test_expect_success 'expr string match of absolute path with "/" regex' '
     test_might_fail test "$(expr "/path" : "/")" -eq 1
