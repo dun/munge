@@ -30,22 +30,26 @@ AC_DEFUN_ONCE([X_AC_WITH_SYSVINITDDIR], [
       [sysvinit script installation directory]
     )]dnl
   )
-  AS_IF(
+  AS_CASE(
+    ["${with_sysvinitddir}"],
+    [yes|""],
     [
-      test "x${with_sysvinitddir}" = xyes \
-          || (test "x${with_sysvinitddir}" = x \
-              && test "x${systemdunitdir}" = x) \
-    ], [
       AS_IF(
-        [test -d /etc/rc.d/init.d],
-        [sysvinitddir='${sysconfdir}/rc.d/init.d'],
-        [test -d /etc/init.d],
-        [sysvinitddir='${sysconfdir}/init.d']
+        [test "x${with_sysvinitddir}" = xyes || test "x${systemdunitdir}" = x],
+        [
+          AS_IF(
+            [test -d /etc/rc.d/init.d],
+            [sysvinitddir='${sysconfdir}/rc.d/init.d'],
+            [test -d /etc/init.d],
+            [sysvinitddir='${sysconfdir}/init.d']
+          )
+        ]
       )
     ],
-    [expr "x${with_sysvinitddir}" : "x\/" >/dev/null 2>&1],
+    [/*],
     [sysvinitddir="${with_sysvinitddir}"],
-    [test "x${with_sysvinitddir}" != xno && test "x${with_sysvinitddir}" != x],
+    [no],
+    [],
     [
       AC_MSG_RESULT([failed])
       AC_MSG_ERROR(
