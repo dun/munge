@@ -25,19 +25,19 @@ AC_DEFUN_ONCE([X_AC_WITH_PKGCONFIGDIR], [
       [pkg-config .pc file installation directory]
     )]dnl
   )
-  AS_IF(
+  AS_CASE(
+    ["${with_pkgconfigdir}"],
+    [yes|""],
     [
-      test "x${with_pkgconfigdir}" = xyes \
-          || test "x${with_pkgconfigdir}" = x \
-    ], [
       AS_IF(
         [find /usr/lib*/pkgconfig -type d >/dev/null 2>&1],
         [pkgconfigdir='${libdir}/pkgconfig']
       )
     ],
-    [expr "x${with_pkgconfigdir}" : "x\/" >/dev/null 2>&1],
+    [/*],
     [pkgconfigdir="${with_pkgconfigdir}"],
-    [test "x${with_pkgconfigdir}" != xno],
+    [no],
+    [],
     [
       AC_MSG_RESULT([failed])
       AC_MSG_ERROR(

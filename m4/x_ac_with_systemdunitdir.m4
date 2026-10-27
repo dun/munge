@@ -26,19 +26,19 @@ AC_DEFUN_ONCE([X_AC_WITH_SYSTEMDUNITDIR], [
       [systemd service file installation directory]
     )]dnl
   )
-  AS_IF(
+  AS_CASE(
+    ["${with_systemdunitdir}"],
+    [yes|""],
     [
-      test "x${with_systemdunitdir}" = xyes \
-          || test "x${with_systemdunitdir}" = x \
-    ], [
       AS_IF(
         [systemctl --version >/dev/null 2>&1],
         [systemdunitdir='${prefix}/lib/systemd/system']
       )
     ],
-    [expr "x${with_systemdunitdir}" : "x\/" >/dev/null 2>&1],
+    [/*],
     [systemdunitdir="${with_systemdunitdir}"],
-    [test "x${with_systemdunitdir}" != xno],
+    [no],
+    [],
     [
       AC_MSG_RESULT([failed])
       AC_MSG_ERROR(

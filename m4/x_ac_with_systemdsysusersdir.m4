@@ -25,19 +25,19 @@ AC_DEFUN_ONCE([X_AC_WITH_SYSTEMDSYSUSERSDIR], [
       [systemd-sysusers config file installation directory]
     )]dnl
   )
-  AS_IF(
+  AS_CASE(
+    ["${with_systemdsysusersdir}"],
+    [yes|""],
     [
-      test "x${with_systemdsysusersdir}" = xyes \
-          || test "x${with_systemdsysusersdir}" = x \
-    ], [
       AS_IF(
         [test -d /usr/lib/sysusers.d],
         [systemdsysusersdir='${prefix}/lib/sysusers.d']
       )
     ],
-    [expr "x${with_systemdsysusersdir}" : "x\/" >/dev/null 2>&1],
+    [/*],
     [systemdsysusersdir="${with_systemdsysusersdir}"],
-    [test "x${with_systemdsysusersdir}" != xno],
+    [no],
+    [],
     [
       AC_MSG_RESULT([failed])
       AC_MSG_ERROR(

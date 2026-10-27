@@ -26,11 +26,10 @@ AC_DEFUN_ONCE([X_AC_WITH_SYSCONFIGDIR], [
       [systemd/sysvinit config file installation directory]
     )]dnl
   )
-  AS_IF(
+  AS_CASE(
+    ["${with_sysconfigdir}"],
+    [yes|""],
     [
-      test "x${with_sysconfigdir}" = xyes \
-          || test "x${with_sysconfigdir}" = x \
-    ], [
       AS_IF(
         [test -d /etc/sysconfig],
         [sysconfigdir='${sysconfdir}/sysconfig'],
@@ -38,9 +37,10 @@ AC_DEFUN_ONCE([X_AC_WITH_SYSCONFIGDIR], [
         [sysconfigdir='${sysconfdir}/default']
       )
     ],
-    [expr "x${with_sysconfigdir}" : "x\/" >/dev/null 2>&1],
+    [/*],
     [sysconfigdir="${with_sysconfigdir}"],
-    [test "x${with_sysconfigdir}" != xno],
+    [no],
+    [],
     [
       AC_MSG_RESULT([failed])
       AC_MSG_ERROR(

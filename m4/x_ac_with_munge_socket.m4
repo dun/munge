@@ -19,20 +19,21 @@ AC_DEFUN_ONCE([X_AC_WITH_MUNGE_SOCKET], [
       [MUNGE socket pathname default]
     )]dnl
   )
-  AS_IF(
-    [test "x${with_munge_socket}" = xyes],
+  AS_CASE(
+    ["${with_munge_socket}"],
+    [yes],
     [
       AC_MSG_RESULT([failed])
       AC_MSG_ERROR([missing argument to --with-munge-socket])
     ],
-    [test "x${with_munge_socket}" = xno],
+    [no],
     [
       AC_MSG_RESULT([failed])
       AC_MSG_ERROR([invalid option --without-munge-socket])
     ],
-    [expr "x${with_munge_socket}" : "x\/" >/dev/null 2>&1],
+    [/*],
     [x_ac_socket="${with_munge_socket}"],
-    [test "x${with_munge_socket}" != x],
+    [?*],
     [
       AC_MSG_RESULT([failed])
       AC_MSG_ERROR(

@@ -24,20 +24,21 @@ AC_DEFUN_ONCE([X_AC_WITH_RUNSTATEDIR], [
         @<:@LOCALSTATEDIR/run@:>@]
     )]dnl
   )
-  AS_IF(
-    [test "x${with_runstatedir}" = xyes],
+  AS_CASE(
+    ["${with_runstatedir}"],
+    [yes],
     [
       AC_MSG_RESULT([failed])
       AC_MSG_ERROR([missing argument to --with-runstatedir])
     ],
-    [test "x${with_runstatedir}" = xno],
+    [no],
     [
       AC_MSG_RESULT([failed])
       AC_MSG_ERROR([invalid option --without-runstatedir])
     ],
-    [expr "x${with_runstatedir}" : "x\/" >/dev/null 2>&1],
+    [/*],
     [runstatedir="${with_runstatedir}"],
-    [test "x${with_runstatedir}" != x],
+    [?*],
     [
       AC_MSG_RESULT([failed])
       AC_MSG_ERROR(

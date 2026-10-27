@@ -25,19 +25,19 @@ AC_DEFUN_ONCE([X_AC_WITH_LOGROTATEDDIR], [
       [logrotate config file installation directory]
     )]dnl
   )
-  AS_IF(
+  AS_CASE(
+    ["${with_logrotateddir}"],
+    [yes|""],
     [
-      test "x${with_logrotateddir}" = xyes \
-          || test "x${with_logrotateddir}" = x \
-    ], [
       AS_IF(
         [test -d /etc/logrotate.d],
         [logrotateddir='${sysconfdir}/logrotate.d']
       )
     ],
-    [expr "x${with_logrotateddir}" : "x\/" >/dev/null 2>&1],
+    [/*],
     [logrotateddir="${with_logrotateddir}"],
-    [test "x${with_logrotateddir}" != xno],
+    [no],
+    [],
     [
       AC_MSG_RESULT([failed])
       AC_MSG_ERROR(
