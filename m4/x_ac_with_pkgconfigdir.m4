@@ -32,7 +32,7 @@ AC_DEFUN_ONCE([X_AC_WITH_PKGCONFIGDIR], [
     [=yes|""],
     [
       AS_IF(
-        [find /usr/lib*/pkgconfig -type d >/dev/null 2>&1],
+        [ls -d /usr/lib*/pkgconfig >/dev/null 2>&1],
         [pkgconfigdir='${libdir}/pkgconfig']
       )
     ],
