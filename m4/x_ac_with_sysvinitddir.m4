@@ -31,9 +31,10 @@ AC_DEFUN_ONCE([X_AC_WITH_SYSVINITDDIR], [
     )]dnl
   )
   sysvinitddir=
+  # Dispatch on "=VALUE" so that an empty argument differs from no option.
   AS_CASE(
-    ["${with_sysvinitddir}"],
-    [yes|""],
+    ["${with_sysvinitddir+=}${with_sysvinitddir}"],
+    [=yes|""],
     [
       AS_IF(
         [test "x${with_sysvinitddir}" = xyes || test "x${systemdunitdir}" = x],
@@ -47,9 +48,9 @@ AC_DEFUN_ONCE([X_AC_WITH_SYSVINITDDIR], [
         ]
       )
     ],
-    [/*],
+    [=/*],
     [sysvinitddir="${with_sysvinitddir}"],
-    [no],
+    [=no],
     [],
     [
       AC_MSG_RESULT([failed])

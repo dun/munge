@@ -26,18 +26,19 @@ AC_DEFUN_ONCE([X_AC_WITH_PKGCONFIGDIR], [
     )]dnl
   )
   pkgconfigdir=
+  # Dispatch on "=VALUE" so that an empty argument differs from no option.
   AS_CASE(
-    ["${with_pkgconfigdir}"],
-    [yes|""],
+    ["${with_pkgconfigdir+=}${with_pkgconfigdir}"],
+    [=yes|""],
     [
       AS_IF(
         [find /usr/lib*/pkgconfig -type d >/dev/null 2>&1],
         [pkgconfigdir='${libdir}/pkgconfig']
       )
     ],
-    [/*],
+    [=/*],
     [pkgconfigdir="${with_pkgconfigdir}"],
-    [no],
+    [=no],
     [],
     [
       AC_MSG_RESULT([failed])

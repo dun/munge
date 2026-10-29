@@ -27,9 +27,10 @@ AC_DEFUN_ONCE([X_AC_WITH_SYSCONFIGDIR], [
     )]dnl
   )
   sysconfigdir=
+  # Dispatch on "=VALUE" so that an empty argument differs from no option.
   AS_CASE(
-    ["${with_sysconfigdir}"],
-    [yes|""],
+    ["${with_sysconfigdir+=}${with_sysconfigdir}"],
+    [=yes|""],
     [
       AS_IF(
         [test -d /etc/sysconfig],
@@ -38,9 +39,9 @@ AC_DEFUN_ONCE([X_AC_WITH_SYSCONFIGDIR], [
         [sysconfigdir='${sysconfdir}/default']
       )
     ],
-    [/*],
+    [=/*],
     [sysconfigdir="${with_sysconfigdir}"],
-    [no],
+    [=no],
     [],
     [
       AC_MSG_RESULT([failed])

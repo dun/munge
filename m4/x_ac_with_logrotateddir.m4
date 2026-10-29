@@ -26,18 +26,19 @@ AC_DEFUN_ONCE([X_AC_WITH_LOGROTATEDDIR], [
     )]dnl
   )
   logrotateddir=
+  # Dispatch on "=VALUE" so that an empty argument differs from no option.
   AS_CASE(
-    ["${with_logrotateddir}"],
-    [yes|""],
+    ["${with_logrotateddir+=}${with_logrotateddir}"],
+    [=yes|""],
     [
       AS_IF(
         [test -d /etc/logrotate.d],
         [logrotateddir='${sysconfdir}/logrotate.d']
       )
     ],
-    [/*],
+    [=/*],
     [logrotateddir="${with_logrotateddir}"],
-    [no],
+    [=no],
     [],
     [
       AC_MSG_RESULT([failed])

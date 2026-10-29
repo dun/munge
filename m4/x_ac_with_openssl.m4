@@ -67,9 +67,10 @@ AC_DEFUN_ONCE([X_AC_WITH_OPENSSL], [
   AS_IF(
     [test "x${with_openssl_prefix}" != xno],
     [
+      # Dispatch on "=VALUE" so that an empty argument differs from no option.
       AS_CASE(
-        ["${with_openssl_prefix}"],
-        [yes|""],
+        ["${with_openssl_prefix+=}${with_openssl_prefix}"],
+        [=yes|""],
         [
           m4_ifdef(
             [PKG_PROG_PKG_CONFIG],
@@ -95,15 +96,15 @@ AC_DEFUN_ONCE([X_AC_WITH_OPENSSL], [
             ]
           )
         ],
-        [[[!/]]*],
+        [=/*],
+        [x_ac_prefix="${with_openssl_prefix}"],
         [
           AC_MSG_ERROR(
             [m4_normalize(
               [expected an absolute directory name for
                 --with-openssl-prefix=${with_openssl_prefix}]
             )])
-        ],
-        [x_ac_prefix="${with_openssl_prefix}"]
+        ]
       )
       AS_IF(
         [test "x${x_ac_have_libcrypto}" != xyes],

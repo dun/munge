@@ -20,21 +20,22 @@ AC_DEFUN_ONCE([X_AC_WITH_MUNGE_SOCKET], [
     )]dnl
   )
   x_ac_socket=
+  # Dispatch on "=VALUE" so that an empty argument differs from no option.
   AS_CASE(
-    ["${with_munge_socket}"],
-    [yes],
+    ["${with_munge_socket+=}${with_munge_socket}"],
+    [=yes],
     [
       AC_MSG_RESULT([failed])
       AC_MSG_ERROR([missing argument to --with-munge-socket])
     ],
-    [no],
+    [=no],
     [
       AC_MSG_RESULT([failed])
       AC_MSG_ERROR([invalid option --without-munge-socket])
     ],
-    [/*],
+    [=/*],
     [x_ac_socket="${with_munge_socket}"],
-    [?*],
+    [=*],
     [
       AC_MSG_RESULT([failed])
       AC_MSG_ERROR(

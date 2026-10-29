@@ -26,18 +26,19 @@ AC_DEFUN_ONCE([X_AC_WITH_SYSTEMDSYSUSERSDIR], [
     )]dnl
   )
   systemdsysusersdir=
+  # Dispatch on "=VALUE" so that an empty argument differs from no option.
   AS_CASE(
-    ["${with_systemdsysusersdir}"],
-    [yes|""],
+    ["${with_systemdsysusersdir+=}${with_systemdsysusersdir}"],
+    [=yes|""],
     [
       AS_IF(
         [test -d /usr/lib/sysusers.d],
         [systemdsysusersdir='${prefix}/lib/sysusers.d']
       )
     ],
-    [/*],
+    [=/*],
     [systemdsysusersdir="${with_systemdsysusersdir}"],
-    [no],
+    [=no],
     [],
     [
       AC_MSG_RESULT([failed])

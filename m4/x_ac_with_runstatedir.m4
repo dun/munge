@@ -24,21 +24,22 @@ AC_DEFUN_ONCE([X_AC_WITH_RUNSTATEDIR], [
         @<:@LOCALSTATEDIR/run@:>@]
     )]dnl
   )
+  # Dispatch on "=VALUE" so that an empty argument differs from no option.
   AS_CASE(
-    ["${with_runstatedir}"],
-    [yes],
+    ["${with_runstatedir+=}${with_runstatedir}"],
+    [=yes],
     [
       AC_MSG_RESULT([failed])
       AC_MSG_ERROR([missing argument to --with-runstatedir])
     ],
-    [no],
+    [=no],
     [
       AC_MSG_RESULT([failed])
       AC_MSG_ERROR([invalid option --without-runstatedir])
     ],
-    [/*],
+    [=/*],
     [runstatedir="${with_runstatedir}"],
-    [?*],
+    [=*],
     [
       AC_MSG_RESULT([failed])
       AC_MSG_ERROR(

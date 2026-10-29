@@ -27,18 +27,19 @@ AC_DEFUN_ONCE([X_AC_WITH_SYSTEMDUNITDIR], [
     )]dnl
   )
   systemdunitdir=
+  # Dispatch on "=VALUE" so that an empty argument differs from no option.
   AS_CASE(
-    ["${with_systemdunitdir}"],
-    [yes|""],
+    ["${with_systemdunitdir+=}${with_systemdunitdir}"],
+    [=yes|""],
     [
       AS_IF(
         [systemctl --version >/dev/null 2>&1],
         [systemdunitdir='${prefix}/lib/systemd/system']
       )
     ],
-    [/*],
+    [=/*],
     [systemdunitdir="${with_systemdunitdir}"],
-    [no],
+    [=no],
     [],
     [
       AC_MSG_RESULT([failed])
