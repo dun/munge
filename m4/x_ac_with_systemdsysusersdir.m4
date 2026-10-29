@@ -25,6 +25,7 @@ AC_DEFUN_ONCE([X_AC_WITH_SYSTEMDSYSUSERSDIR], [
       [systemd-sysusers config file installation directory]
     )]dnl
   )
+  systemdsysusersdir=
   AS_CASE(
     ["${with_systemdsysusersdir}"],
     [yes|""],

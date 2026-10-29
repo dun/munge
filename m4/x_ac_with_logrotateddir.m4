@@ -25,6 +25,7 @@ AC_DEFUN_ONCE([X_AC_WITH_LOGROTATEDDIR], [
       [logrotate config file installation directory]
     )]dnl
   )
+  logrotateddir=
   AS_CASE(
     ["${with_logrotateddir}"],
     [yes|""],

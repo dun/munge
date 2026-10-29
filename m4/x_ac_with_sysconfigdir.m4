@@ -26,6 +26,7 @@ AC_DEFUN_ONCE([X_AC_WITH_SYSCONFIGDIR], [
       [systemd/sysvinit config file installation directory]
     )]dnl
   )
+  sysconfigdir=
   AS_CASE(
     ["${with_sysconfigdir}"],
     [yes|""],

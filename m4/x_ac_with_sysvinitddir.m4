@@ -30,6 +30,7 @@ AC_DEFUN_ONCE([X_AC_WITH_SYSVINITDDIR], [
       [sysvinit script installation directory]
     )]dnl
   )
+  sysvinitddir=
   AS_CASE(
     ["${with_sysvinitddir}"],
     [yes|""],

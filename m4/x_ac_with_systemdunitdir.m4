@@ -26,6 +26,7 @@ AC_DEFUN_ONCE([X_AC_WITH_SYSTEMDUNITDIR], [
       [systemd service file installation directory]
     )]dnl
   )
+  systemdunitdir=
   AS_CASE(
     ["${with_systemdunitdir}"],
     [yes|""],

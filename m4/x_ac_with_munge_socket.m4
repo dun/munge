@@ -19,6 +19,7 @@ AC_DEFUN_ONCE([X_AC_WITH_MUNGE_SOCKET], [
       [MUNGE socket pathname default]
     )]dnl
   )
+  x_ac_socket=
   AS_CASE(
     ["${with_munge_socket}"],
     [yes],

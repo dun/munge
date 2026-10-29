@@ -25,6 +25,7 @@ AC_DEFUN_ONCE([X_AC_WITH_PKGCONFIGDIR], [
       [pkg-config .pc file installation directory]
     )]dnl
   )
+  pkgconfigdir=
   AS_CASE(
     ["${with_pkgconfigdir}"],
     [yes|""],
